@@ -1,0 +1,16 @@
+***************
+*** 1589,1594 ****
+      uint32 team = reference->GetTeam();
+  
+      uint32 count = 0;
+  
+      // check every member of the group to be able to join
+      for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
+--- 1590,1596 ----
+      uint32 team = reference->GetTeam();
+  
+      uint32 count = 0;
++     BattleGroundQueueTypeId bgQueueTypeIdRandom = BattleGroundMgr::BGQueueTypeId(BATTLEGROUND_RB, 0);
+  
+      // check every member of the group to be able to join
+      for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
