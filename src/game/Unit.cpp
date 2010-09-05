@@ -4526,7 +4526,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
 
                 // remove from target if target found
                 if (Unit* itr_target = GetMap()->GetUnit(itr_targetGuid))
-                    itr_target->RemoveAurasDueToSpell(itr_spellEntry->Id);
+                    itr_target->RemoveAurasByCasterSpell(itr_spellEntry->Id, GetGUID());
 
                 itr = scTargets.begin();                    // list can be changed at remove aura
                 continue;
@@ -4540,7 +4540,7 @@ void Unit::RemoveNotOwnSingleTargetAuras(uint32 newPhase)
 
                     // remove from target if target found
                     if (itr_target)
-                        itr_target->RemoveAurasDueToSpell(itr_spellEntry->Id);
+                        itr_target->RemoveAurasByCasterSpell(itr_spellEntry->Id, GetGUID());
 
                     itr = scTargets.begin();                // list can be changed at remove aura
                     continue;
