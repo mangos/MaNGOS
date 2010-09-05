@@ -159,7 +159,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     float orientation   = fields[5].GetFloat();
     uint32 mapid        = fields[6].GetUInt32();
 
-    Object::_Create(ObjectGuid(HIGHGUID_CORPSE, guid));
+    Object::_Create(ObjectGuid(HIGHGUID_CORPSE, lowguid));
 
     m_time = time_t(fields[7].GetUInt64());
     m_type = CorpseType(fields[8].GetUInt32());

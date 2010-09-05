@@ -15133,7 +15133,7 @@ bool Player::MinimalLoadFromDB(uint64 lowguid)
 
     Field *fields = result->Fetch();
 
-    Object::_Create( lowguid, 0, HIGHGUID_PLAYER );
+    Object::_Create(ObjectGuid(HIGHGUID_PLAYER, lowguid));
 
     sLog.outDebug("Player #%d minimal data loaded",lowguid);
 

@@ -354,7 +354,7 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
 {
     // create item before any checks for store correct guid
     // and allow use "FSetState(ITEM_REMOVED); SaveToDB();" for deleting item from DB
-    Object::_Create(ObjectGuid(HIGHGUID_ITEM, guidlow));
+    Object::_Create(ObjectGuid(HIGHGUID_ITEM, guidLow));
 
     bool delete_result = false;
     if(!result)
