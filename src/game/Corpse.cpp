@@ -67,7 +67,7 @@ void Corpse::RemoveFromWorld()
 
 bool Corpse::Create( uint32 guidlow )
 {
-    Object::_Create(guidlow, 0, HIGHGUID_CORPSE);
+    Object::_Create(ObjectGuid(HIGHGUID_CORPSE, guidlow));
     return true;
 }
 
@@ -75,7 +75,7 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
 {
     MANGOS_ASSERT(owner);
 
-    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
+    WorldObject::_Create(ObjectGuid(HIGHGUID_CORPSE, guidlow), owner->GetPhaseMask());
     Relocate(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), owner->GetOrientation());
 
     //we need to assign owner's map for corpse
@@ -159,7 +159,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     float orientation   = fields[5].GetFloat();
     uint32 mapid        = fields[6].GetUInt32();
 
-    Object::_Create(lowguid, 0, HIGHGUID_CORPSE);
+    Object::_Create(ObjectGuid(HIGHGUID_CORPSE, guid));
 
     m_time = time_t(fields[7].GetUInt64());
     m_type = CorpseType(fields[8].GetUInt32());

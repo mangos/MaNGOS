@@ -247,7 +247,7 @@ Item::Item( )
 
 bool Item::Create( uint32 guidlow, uint32 itemid, Player const* owner)
 {
-    Object::_Create( guidlow, 0, HIGHGUID_ITEM );
+    Object::_Create(ObjectGuid(HIGHGUID_ITEM, guidlow));
 
     SetEntry(itemid);
     SetObjectScale(DEFAULT_OBJECT_SCALE);
@@ -354,7 +354,7 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
 {
     // create item before any checks for store correct guid
     // and allow use "FSetState(ITEM_REMOVED); SaveToDB();" for deleting item from DB
-    Object::_Create(guidLow, 0, HIGHGUID_ITEM);
+    Object::_Create(ObjectGuid(HIGHGUID_ITEM, guidlow));
 
     bool delete_result = false;
     if(!result)

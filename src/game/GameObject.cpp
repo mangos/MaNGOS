@@ -115,7 +115,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMa
         return false;
     }
 
-    Object::_Create(guidlow, goinfo->id, HIGHGUID_GAMEOBJECT);
+    Object::_Create(ObjectGuid(HIGHGUID_GAMEOBJECT, goinfo->id, guidlow));
 
     m_goInfo = goinfo;
 
