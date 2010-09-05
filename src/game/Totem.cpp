@@ -53,9 +53,8 @@ void Totem::Update( uint32 time )
 
 void Totem::Summon(Unit* owner)
 {
-    owner->GetMap()->Add((Creature*)this);
-
     AIM_Initialize();
+    owner->GetMap()->Add((Creature*)this);
 
     if (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->AI())
         ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
