@@ -150,7 +150,6 @@ namespace MaNGOS
         Player &i_player;
         PlayerRelocationNotifier(Player &pl) : i_player(pl) {}
         template<class T> void Visit(GridRefManager<T> &) {}
-        void Visit(PlayerMapType &);
         void Visit(CreatureMapType &);
     };
 
