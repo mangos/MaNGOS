@@ -879,7 +879,7 @@ void Guild::LoadGuildEventLogFromDB()
         NewEvent.TimeStamp = fields[5].GetUInt64();
 
         // There can be a problem if more events have same TimeStamp the ORDER can be broken when fields[0].GetUInt32() == configCount, but
-        // events with same timestamp can appear when there is lag, and we naivly suppose that mangos isn't laggy
+        // events with same timestamp can appear when there is lag, and we naively suppose that mangos isn't laggy
         // but if problem appears, player will see set of guild events that have same timestamp in bad order
 
         // Add entry to list
