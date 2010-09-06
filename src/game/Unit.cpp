@@ -8689,6 +8689,10 @@ bool Unit::CanHaveThreatList() const
     if( ((Creature*)this)->isPet() && IS_PLAYER_GUID(((Pet*)this)->GetOwnerGUID()) )
         return false;
 
+    // Is it correct?
+    if (isCharmed())
+        return false;
+
     return true;
 }
 
@@ -9875,6 +9879,10 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
     switch(flag)
     {
         case ACT_COMMAND:                                   //0x07
+       // Maybe exists some flag that disable it at client side
+            if (GUID_HIPART(guid1) == HIGHGUID_VEHICLE)
+                return;
+
             switch(spellid)
             {
                 case COMMAND_STAY:                          //flat=1792  //STAY

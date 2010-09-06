@@ -1946,8 +1946,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void EnterVehicle(VehicleKit *vehicle, int8 seatId = -1);
         void ExitVehicle();
         void ChangeSeat(int8 seatId, bool next = true);
-        VehicleKit* GetVehicle() { return m_pVehicle; }
-        VehicleKit* GetVehicleKit() { return m_pVehicleKit; }
+        VehicleKit* GetVehicle() const { return m_pVehicle; }
+        VehicleKit* GetVehicleKit() const { return m_pVehicleKit; }
         bool CreateVehicleKit(uint32 vehicleId);
         void RemoveVehicleKit();
 

@@ -139,11 +139,27 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
         seatInfo->m_attachmentOffsetX, seatInfo->m_attachmentOffsetY, seatInfo->m_attachmentOffsetZ,
         seatInfo->m_passengerYaw, getMSTime(), seat->first, seatInfo);
 
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
+    {
+        ((Player*)passenger)->GetCamera().SetView(m_pBase);
+
+        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8+4);
+        data << passenger->GetPackGUID();
+        data << uint32((passenger->m_movementInfo.GetVehicleSeatFlags() & SEAT_FLAG_CAN_CAST) ? 2 : 0);
+        passenger->SendMessageToSet(&data, true);
+    }
+
     if (seatInfo->m_flags & SEAT_FLAG_MAIN_RIDER)
     {
-        passenger->SetCharm(m_pBase);
+        m_pBase->StopMoving();
+        m_pBase->GetMotionMaster()->Clear();
+        m_pBase->CombatStop(true);
+        m_pBase->DeleteThreatList();
+        m_pBase->getHostileRefManager().deleteReferences();
         m_pBase->SetCharmerGUID(passenger->GetGUID());
         m_pBase->addUnitState(UNIT_STAT_CONTROLLED);
+
+        passenger->SetCharm(m_pBase);
 
         if (passenger->GetTypeId() == TYPEID_PLAYER)
         {
@@ -160,16 +176,8 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
             player->SetClientControl(m_pBase, 1);
             player->VehicleSpellInitialize();
         }
-    }
 
-    if (passenger->GetTypeId() == TYPEID_PLAYER)
-    {
-        ((Player*)passenger)->GetCamera().SetView(m_pBase);
-
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, 8+4);
-        data << passenger->GetPackGUID();
-        data << uint32((passenger->m_movementInfo.GetVehicleSeatFlags() & SEAT_FLAG_CAN_CAST) ? 2 : 0);
-        passenger->SendMessageToSet(&data, true);
+        ((Creature*)m_pBase)->AIM_Initialize();
     }
 
     passenger->SendMonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
@@ -202,8 +210,9 @@ void VehicleKit::RemovePassenger(Unit *passenger)
     {
         passenger->SetCharm(NULL);
         passenger->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
+
+        m_pBase->SetCharmerGUID(0);
         m_pBase->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-        m_pBase->SetCharmerGUID(NULL);
         m_pBase->clearUnitState(UNIT_STAT_CONTROLLED);
 
         if (passenger->GetTypeId() == TYPEID_PLAYER)
@@ -213,6 +222,8 @@ void VehicleKit::RemovePassenger(Unit *passenger)
             player->SetClientControl(m_pBase, 0);
             player->RemovePetActionBar();
         }
+
+        ((Creature*)m_pBase)->AIM_Initialize();
     }
 
     if (passenger->GetTypeId() == TYPEID_PLAYER)

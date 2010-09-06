@@ -31,6 +31,9 @@
 
 void WorldSession::HandlePetAction( WorldPacket & recv_data )
 {
+    DEBUG_LOG("WORLD: Received CMSG_PET_ACTION");
+    recv_data.hexlike();
+
     uint64 guid1;
     uint32 data;
     uint64 guid2;
