@@ -327,6 +327,15 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage /= count;                    // divide to all targets
                         break;
                     }
+                    // AoE spells, which damage is reduced with distance from the initial hit point 
+                    case 62598: case 62937:     // Detonate 
+                    case 65279:                 // Lightning Nova 
+                    case 62311: case 64596:     // Cosmic Smash 
+                    { 
+                        float distance = unitTarget->GetDistance2d(m_targets.m_destX, m_targets.m_destY); 
+                        damage *= exp(-distance/15.0f); 
+                        break; 
+                    }
                     // percent from health with min
                     case 25599:                             // Thundercrash
                     {
@@ -3302,7 +3311,8 @@ void Spell::EffectSendEvent(SpellEffectIndex effectIndex)
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[effectIndex], m_spellInfo->Id);
 
     if (!Script->ProcessEventId(m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject, true))
-        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject);
+        if (m_caster->IsInWorld())
+            m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject);
 }
 
 void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
@@ -3881,7 +3891,7 @@ void Spell::EffectOpenLock(SpellEffectIndex eff_idx)
             if (BattleGround *bg = player->GetBattleGround())
             {
                 // check if it's correct bg
-                if (bg->GetTypeID() == BATTLEGROUND_AB || bg->GetTypeID() == BATTLEGROUND_AV)
+                if (bg->GetTypeID(true) == BATTLEGROUND_AB || bg->GetTypeID(true) == BATTLEGROUND_AV)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
@@ -3892,7 +3902,7 @@ void Spell::EffectOpenLock(SpellEffectIndex eff_idx)
             // in battleground check
             if (BattleGround *bg = player->GetBattleGround())
             {
-                if (bg->GetTypeID() == BATTLEGROUND_EY)
+                if (bg->GetTypeID(true) == BATTLEGROUND_EY)
                     bg->EventPlayerClickedOnFlag(player, gameObjTarget);
                 return;
             }
@@ -5817,7 +5827,7 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
         {
             case 489:                                       //WS
             {
-                if(bg && bg->GetTypeID()==BATTLEGROUND_WS && bg->GetStatus() == STATUS_IN_PROGRESS)
+                if(bg && bg->GetTypeID(true)==BATTLEGROUND_WS && bg->GetStatus() == STATUS_IN_PROGRESS)
                 {
                     uint32 team = ALLIANCE;
 
@@ -5830,7 +5840,7 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
             }
             case 566:                                       //EY
             {
-                if(bg && bg->GetTypeID()==BATTLEGROUND_EY && bg->GetStatus() == STATUS_IN_PROGRESS)
+                if(bg && bg->GetTypeID(true)==BATTLEGROUND_EY && bg->GetStatus() == STATUS_IN_PROGRESS)
                 {
                     ((BattleGroundEY*)bg)->SetDroppedFlagGUID(pGameObj->GetGUID());
                 }
@@ -7189,7 +7199,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         return;
 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart spellid %u in EffectScriptEffect ", m_spellInfo->Id);
-    m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster, unitTarget);
+    if (m_caster->IsInWorld())
+        m_caster->GetMap()->ScriptsStart(sSpellScripts, m_spellInfo->Id, m_caster, unitTarget);
 }
 
 void Spell::EffectSanctuary(SpellEffectIndex /*eff_idx*/)
@@ -7322,11 +7333,10 @@ void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
     DEBUG_LOG("Spell Effect: Stuck");
     DETAIL_LOG("Player %s (guid %u) used auto-unstuck future at map %u (%f, %f, %f)", pTarget->GetName(), pTarget->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
 
-    if(pTarget->IsTaxiFlying())
+    if(pTarget->IsTaxiFlying() || pTarget->InBattleGround())
         return;
 
-    // homebind location is loaded always
-    pTarget->TeleportToHomebind(unitTarget==m_caster ? TELE_TO_SPELL : 0);
+    pTarget->RepopAtGraveyard();
 
     // Stuck spell trigger Hearthstone cooldown
     SpellEntry const *spellInfo = sSpellStore.LookupEntry(8690);

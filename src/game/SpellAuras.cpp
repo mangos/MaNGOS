@@ -7899,6 +7899,25 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
     }
 }
 
+void Aura::HandleAuraLinked(bool apply, bool Real)
+{
+    if (!Real)
+        return;
+
+    uint32 linkedSpell = GetSpellProto()->EffectTriggerSpell[m_effIndex];
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(linkedSpell);
+    if (!spellInfo)
+    {
+        sLog.outError("HandleAuraLinked for spell %u effect %u: triggering unknown spell %u", GetSpellProto()->Id, m_effIndex, linkedSpell);
+        return;
+    }
+
+    if (apply)
+        GetTarget()->CastSpell(GetTarget(), linkedSpell, true, NULL, this);
+    else
+        GetTarget()->RemoveAurasByCasterSpell(linkedSpell, GetCasterGUID());
+}
+
 void Aura::HandleAuraOpenStable(bool apply, bool Real)
 {
     if(!Real || GetTarget()->GetTypeId() != TYPEID_PLAYER || !GetTarget()->IsInWorld())

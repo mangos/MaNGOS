@@ -146,6 +146,7 @@ struct SpellCooldown
 };
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
+typedef UNORDERED_MAP<uint32 /*category*/, uint32 /*MSTime*/> GlobalCooldowns;
 
 enum TrainerSpellState
 {
@@ -925,6 +926,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,
     PLAYER_LOGIN_QUERY_LOADTALENTS,
     PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS,
+    PLAYER_LOGIN_QUERY_LOADRANDOMBG,
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -1739,6 +1741,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
         void SendClearCooldown( uint32 spell_id, Unit* target );
 
+        GlobalCooldowns const& GetGlobalCooldownMap() const { return m_globalCooldowns; }
+        bool HasGlobalCooldown(SpellEntry const* spellInfo) const;
+        uint32 GetGlobalCooldownDelay(SpellEntry const* spellInfo) const;
+        void AddGlobalCooldown(SpellEntry const* spellInfo);
+
         void RemoveArenaSpellCooldowns();
         void RemoveAllSpellCooldown();
         void _LoadSpellCooldowns(QueryResult *result);
@@ -2212,6 +2219,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool isTotalImmune();
         bool CanCaptureTowerPoint();
 
+        bool GetRandomWinner() { return m_IsBGRandomWinner; }
+        void SetRandomWinner(bool isWinner);
+
         /*********************************************************/
         /***                    REST SYSTEM                    ***/
         /*********************************************************/
@@ -2433,6 +2443,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         BgBattleGroundQueueID_Rec m_bgBattleGroundQueueID[PLAYER_MAX_BATTLEGROUND_QUEUES];
         BGData                    m_bgData;
+        bool m_IsBGRandomWinner;
 
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
@@ -2459,6 +2470,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadQuestStatus(QueryResult *result);
         void _LoadDailyQuestStatus(QueryResult *result);
         void _LoadWeeklyQuestStatus(QueryResult *result);
+        void _LoadRandomBGStatus(QueryResult *result);
         void _LoadGroup(QueryResult *result);
         void _LoadSkills(QueryResult *result);
         void _LoadSpells(QueryResult *result);
@@ -2543,6 +2555,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         PlayerSpellMap m_spells;
         PlayerTalentMap m_talents[MAX_TALENT_SPEC_COUNT];
         SpellCooldowns m_spellCooldowns;
+        GlobalCooldowns m_globalCooldowns;
         uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
 
         uint8 m_activeSpec;

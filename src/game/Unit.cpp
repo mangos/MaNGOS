@@ -197,6 +197,11 @@ Unit::Unit()
 
     m_Visibility = VISIBILITY_ON;
 
+    m_notify_sheduled = false;
+    m_last_notified_position.x = 0;
+    m_last_notified_position.y = 0;
+    m_last_notified_position.z = 0;
+
     m_detectInvisibilityMask = 0;
     m_invisibilityMask = 0;
     m_transform = 0;
@@ -6437,7 +6442,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
             case 7293: // Rage of Rivendare
             {
                 if (pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, UI64LIT(0x0200000000000000)))
-                    DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+                    DoneTotalMod *= ((*i)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_1)*2+100.0f)/100.0f;
                 break;
             }
             // Twisted Faith
@@ -7441,7 +7446,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit *pVictim, uint32 pdamage,WeaponAttackType
                 case 7293: // Rage of Rivendare
                 {
                     if (pVictim->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, UI64LIT(0x0200000000000000)))
-                        DonePercent *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+                        DonePercent *= ((*i)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_1)*2+100.0f)/100.0f;
                     break;
                 }
                 // Marked for Death
@@ -8257,12 +8262,9 @@ void Unit::SetVisibility(UnitVisibility x)
             }
         }
 
-        Map *m = GetMap();
-
-        if(GetTypeId()==TYPEID_PLAYER)
-            m->PlayerRelocation((Player*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
-        else
-            m->CreatureRelocation((Creature*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
+        GetViewPoint().Call_UpdateVisibilityForOwner();
+        UpdateObjectVisibility();
+        SheduleAINotify(0);
 
         GetViewPoint().Event_ViewPointVisibilityChanged();
     }
@@ -11495,4 +11497,48 @@ void Unit::_AddAura(uint32 spellID, uint32 duration)
             AddSpellAuraHolder(holder);
         }
     }
+}
+
+class RelocationNotifyEvent : public BasicEvent
+{
+    public:
+        RelocationNotifyEvent(Unit& owner) : BasicEvent(), m_owner(owner)
+        {
+            m_owner.m_notify_sheduled = true;
+        }
+
+        bool Execute(uint64, uint32)
+        {
+            float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+
+            if (m_owner.GetTypeId() == TYPEID_PLAYER)
+            {
+                MaNGOS::PlayerRelocationNotifier notify((Player&)m_owner);
+                Cell::VisitAllObjects(&m_owner,notify,radius);
+            } 
+            else //if(m_owner.GetTypeId() == TYPEID_UNIT)
+            {
+                MaNGOS::CreatureRelocationNotifier notify((Creature&)m_owner);
+                Cell::VisitAllObjects(&m_owner,notify,radius);
+            }
+            m_owner.m_notify_sheduled = false;
+            return true;
+        }
+
+        void Abort(uint64)
+        {
+            m_owner.m_notify_sheduled = false;
+        }
+
+    private:
+        Unit& m_owner;
+};
+
+void Unit::SheduleAINotify(uint32 delay)
+{
+    if (m_notify_sheduled)
+        return;
+
+    RelocationNotifyEvent *notify = new RelocationNotifyEvent(*this);
+    m_Events.AddEvent(notify, m_Events.CalculateTime(delay));
 }

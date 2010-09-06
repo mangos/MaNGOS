@@ -362,9 +362,9 @@ class MANGOS_DLL_SPEC Aura
         void HandleModTargetArmorPct(bool Apply, bool Real);
         void HandleAuraModAllCritChance(bool Apply, bool Real);
         void HandleAuraMirrorImage(bool Apply, bool Real);
+        void HandleAuraLinked(bool Apply, bool Real);
         void HandleAllowOnlyAbility(bool Apply, bool Real);
         void HandleAuraOpenStable(bool apply, bool Real);
-        void HandleAuraLinked(bool Apply, bool Real);
 
         virtual ~Aura();
 
@@ -373,7 +373,7 @@ class MANGOS_DLL_SPEC Aura
         Modifier const* GetModifier() const { return &m_modifier; }
         int32 GetMiscValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValue[m_effIndex]; }
         int32 GetMiscBValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValueB[m_effIndex]; }
-        
+
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
         uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
         uint64 GetCastItemGUID() const { return GetHolder()->GetCastItemGUID(); }

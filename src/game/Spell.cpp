@@ -2146,8 +2146,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             FillAreaTargets(targetUnitMap, m_caster->GetPositionX(), m_caster->GetPositionY(), radius, PUSH_IN_FRONT_15, SPELL_TARGETS_AOE_DAMAGE);
             break;
         case TARGET_IN_FRONT_OF_CASTER_30:
-            FillAreaTargets(targetUnitMap, m_caster->GetPositionX(), m_caster->GetPositionY(), radius, PUSH_IN_FRONT_30, SPELL_TARGETS_AOE_DAMAGE);
+        {
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC)
+                FillAreaTargets(targetUnitMap, m_caster->GetPositionX(), m_caster->GetPositionY(), radius, PUSH_IN_FRONT_30, SPELL_TARGETS_AOE_DAMAGE);
+            else
+                FillAreaTargets(targetUnitMap, m_caster->GetPositionX(), m_caster->GetPositionY(), radius, PUSH_IN_FRONT_90, SPELL_TARGETS_AOE_DAMAGE);
             break;
+        }
         case TARGET_DUELVSPLAYER:
         {
             Unit *target = m_targets.getUnitTarget();
@@ -2782,6 +2787,10 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
 
         // will show cast bar
         SendSpellStart();
+
+        // trigger global cooldown
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            static_cast<Player*>(m_caster)->AddGlobalCooldown(m_spellInfo);
     }
     // execute triggered without cast time explicitly in call point
     else if(m_timer == 0)
@@ -4390,6 +4399,11 @@ SpellCastResult Spell::CheckCast(bool strict)
         else
             return SPELL_FAILED_NOT_READY;
     }
+
+    // check global cooldown
+    if (strict && !m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER &&
+        static_cast<Player*>(m_caster)->HasGlobalCooldown(m_spellInfo))
+        return SPELL_FAILED_NOT_READY;
 
     // only allow triggered spells if at an ended battleground
     if (!m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER)

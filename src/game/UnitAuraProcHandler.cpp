@@ -1777,8 +1777,33 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     break;
                 } 
             }
+            // King of the Jungle
+            if (dummySpell->SpellIconID == 2850)
+            {
+                if (!procSpell)
+                    return SPELL_AURA_PROC_FAILED;
+
+                // Enrage (bear) - single rank - the aura for the bear form from the 2 existing kotj auras has a miscValue == 126
+                if (procSpell->Id == 5229 && triggeredByAura->GetMiscValue() == 126)
+                {
+                    // note : the remove part is done in spellAuras/HandlePeriodicEnergize as RemoveAurasDueToSpell
+                    basepoints[0] = triggerAmount;
+                    triggered_spell_id = 51185;
+                    target = this;
+                    break;
+                }
+                // Tiger Fury (cat) - all ranks - the aura for the cat form from the 2 existing kotj auras has a miscValue != 126
+                if (procSpell->SpellFamilyFlags2 & UI64LIT(0x00000800)  && triggeredByAura->GetMiscValue() != 126)
+                {
+                    basepoints[0] = triggerAmount;
+                    triggered_spell_id = 51178;
+                    target = this;
+                    break;
+                }
+                return SPELL_AURA_PROC_FAILED;
+            }
             // Eclipse
-            if (dummySpell->SpellIconID == 2856)
+            else if (dummySpell->SpellIconID == 2856)
             {
                 if (!procSpell)
                     return SPELL_AURA_PROC_FAILED;
