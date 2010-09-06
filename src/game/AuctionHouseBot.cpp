@@ -319,7 +319,7 @@ void AuctionHouseBot::addNewAuctions(Player *AHBplayer, AHBConfig *config)
                 case BIND_WHEN_PICKED_UP:
                        buyBondingK = Bind_When_Picked_Up;
                        break;
-                case BIND_WHEN_EQUIPED:
+                case BIND_WHEN_EQUIPPED:
                        buyBondingK = Bind_When_Equipped;
                        break;
                 case BIND_WHEN_USE:
@@ -919,7 +919,7 @@ void AuctionHouseBot::Initialize()
                 if (Bind_When_Picked_Up == 0)
                     continue;
                 break;
-            case BIND_WHEN_EQUIPED:
+            case BIND_WHEN_EQUIPPED:
                 if (Bind_When_Equipped == 0)
                     continue;
                 break;
