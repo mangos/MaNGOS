@@ -62,7 +62,7 @@ enum AchievementCriteriaRequirementType
     ACHIEVEMENT_CRITERIA_REQUIRE_HOLIDAY             = 16,  // holiday_id     0             event in holiday time
     ACHIEVEMENT_CRITERIA_REQUIRE_BG_LOSS_TEAM_SCORE  = 17,  // min_score      max_score     player's team win bg and opposition team have team score in range
     ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT     = 18,  // 0              0             maker instance script call for check current criteria requirements fit
-    ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM_LVL  = 19,  // item_level     item_quality  fir equipped item in slot `misc1` to item level and quality
+    ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL = 19,  // item_level     item_quality  fir equipped item in slot `misc1` to item level and quality
 };
 
 #define MAX_ACHIEVEMENT_CRITERIA_REQUIREMENT_TYPE      20   // maximum value in AchievementCriteriaRequirementType enum
@@ -157,7 +157,7 @@ struct AchievementCriteriaRequirement
             uint32 max_score;
         } bg_loss_team_score;
         // ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT   = 18 (no data)
-        // ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM    = 19
+        // ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL=19
         struct
         {
             uint32 item_level;
