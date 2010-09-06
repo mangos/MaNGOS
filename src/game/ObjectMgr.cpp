@@ -2549,15 +2549,17 @@ void ObjectMgr::LoadPetLevelInfo()
         sLog.outString( ">> Loaded %u level pet stats definitions", count );
     }
 
+    PetLevelInfo* petBaseInfo = petInfo[1];
+
     // Fill gaps and check integrity
     for (PetLevelInfoMap::iterator itr = petInfo.begin(); itr != petInfo.end(); ++itr)
     {
         PetLevelInfo* pInfo = itr->second;
 
         // fatal error if no level 1 data
-        if(!pInfo || pInfo[0].health == 0 )
+        if(!pInfo || pInfo[0].health == 0 || pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health == 0 )
         {
-            sLog.outErrorDb("Creature %u does not have pet stats data for Level 1!",itr->first);
+            sLog.outErrorDb("Creature %u does not have pet stats data for Levels 1 and %u!",itr->first, CONFIG_UINT32_MAX_PLAYER_LEVEL);
             Log::WaitBeforeContinueIfNeed();
             exit(1);
         }

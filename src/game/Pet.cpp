@@ -810,54 +810,59 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     m_bonusdamage = 0;
 
-    float ArmorAdd              = 0.0f;
-    float BaseAttackTimeBonus   = 1.0f;
-    float OffAttackTimeBonus    = 1.0f;
-    float RangedAttackTimeBonus = 1.0f;
-    float SpellCastSpeedBonus   = 1.0f;
-    float RangedDamageMod       = 1.0f;
-
-    uint32 createStats[MAX_STATS+2] = {22,     // STAT_STRENGTH
+    int32 createStats[MAX_STATS+7] =  {22,     // STAT_STRENGTH
                                        22,     // STAT_AGILITY
                                        25,     // STAT_STAMINA
                                        28,     // STAT_INTELLECT
                                        27,     // STAT_SPIRIT
-                                       0,      // MAXHEALTH
-                                       0};     // MAXPOWER/MANA
+                                       42,     // Base HEALTH
+                                       20,     // Base POWER/MANA
+                                       10,     // Base AttackPower
+                                       5,      // Base MinDamage
+                                       10,     // Base MaxDamage
+                                       1,      // Base MinRangeDamage
+                                       3};     // Base MaxRangeDamage
 
-    uint32 ResistanceAdd[MAX_SPELL_SCHOOL] = {0,0,0,0,0,0,0};
+    uint32 createResistance[MAX_SPELL_SCHOOL] = {0,0,0,0,0,0,0};
 
-    if(cinfo)
+    if(cinfo) // Default create values (from creature_template)
     {
-        ResistanceAdd[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
-        ResistanceAdd[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;
-        ResistanceAdd[SPELL_SCHOOL_NATURE] = cinfo->resistance3;
-        ResistanceAdd[SPELL_SCHOOL_FROST]  = cinfo->resistance4;
-        ResistanceAdd[SPELL_SCHOOL_SHADOW] = cinfo->resistance5;
-        ResistanceAdd[SPELL_SCHOOL_ARCANE] = cinfo->resistance6;
+        createResistance[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
+        createResistance[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;
+        createResistance[SPELL_SCHOOL_NATURE] = cinfo->resistance3;
+        createResistance[SPELL_SCHOOL_FROST]  = cinfo->resistance4;
+        createResistance[SPELL_SCHOOL_SHADOW] = cinfo->resistance5;
+        createResistance[SPELL_SCHOOL_ARCANE] = cinfo->resistance6;
+        // Armor
+        createResistance[SPELL_SCHOOL_NORMAL] = int32(cinfo->armor  * petlevel / cinfo->maxlevel / (1 +  cinfo->rank));
 
-        createStats[MAX_STATS]    = (uint32)((float)cinfo->maxhealth / cinfo->maxlevel / (1 +  cinfo->rank) * petlevel);
-        createStats[MAX_STATS+1]  = (uint32)((float)cinfo->maxmana / cinfo->maxlevel / (1 +  cinfo->rank) * petlevel);
+        createStats[MAX_STATS]    = int32(cinfo->maxhealth * petlevel / cinfo->maxlevel / (1 +  cinfo->rank));
+        createStats[MAX_STATS+1]  = int32(cinfo->maxmana * petlevel / cinfo->maxlevel / (1 +  cinfo->rank));
+        createStats[MAX_STATS+2]  = int32(cinfo->attackpower * petlevel / cinfo->maxlevel / (1 +  cinfo->rank));
+        createStats[MAX_STATS+3]  = int32( cinfo->mindmg * petlevel / cinfo->maxlevel / (1 + cinfo->rank));
+        createStats[MAX_STATS+4]  = int32( cinfo->maxdmg * petlevel / cinfo->maxlevel / (1 + cinfo->rank));
+        createStats[MAX_STATS+5]  = int32(cinfo->minrangedmg * petlevel / cinfo->maxlevel/ (1 + cinfo->rank));
+        createStats[MAX_STATS+6]  = int32(cinfo->maxrangedmg * petlevel / cinfo->maxlevel/ (1 + cinfo->rank));
+        SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, float(cinfo->maxrangedmg * petlevel / cinfo->maxlevel));
         setPowerType(Powers(cinfo->powerType));
+        SetAttackTime(BASE_ATTACK, cinfo->baseattacktime);
+        SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime);
+    }
+    else
+    {
+        SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
+        SetAttackTime(RANGED_ATTACK, BASE_ATTACK_TIME);
 
+        for (int i = 0; i < MAX_STATS+7; ++i)
+            createStats[i] *= petlevel/10;
+        // Armor
+        createResistance[SPELL_SCHOOL_NORMAL] = petlevel*50;
     }
 
     switch(getPetType())
     {
         case SUMMON_PET:
         {
-            if(owner->GetTypeId() == TYPEID_PLAYER)
-            {
-                if(cinfo->Entry == 29264)     // Feral Spirit
-                {
-                    if (owner)
-                    {
-                        ArmorAdd = float(owner->GetArmor()) * 0.35f;                  //  Bonus Armor (35% of player armor)
-                        SetModifierValue(UNIT_MOD_STAT_STAMINA, TOTAL_VALUE, float(owner->GetStat(STAT_STAMINA)) * 0.3f);  //  Bonus Stamina (30% of player stamina)
-                    }
-                }
-            }
-
             if (cinfo->family == CREATURE_FAMILY_GHOUL)
                 setPowerType(POWER_ENERGY);
             break;
@@ -893,8 +898,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             // DK ghouls have energy
             if (cinfo->family == CREATURE_FAMILY_GHOUL)
                 setPowerType(POWER_ENERGY);
-            else
-                setPowerType(POWER_MANA);
             break;
         }
         default:
@@ -920,88 +923,66 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         if (pInfo->armor)
             SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
         else
-            SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE,  float(cinfo->armor  * petlevel / cinfo->maxlevel));
-
-        SetModifierValue(UNIT_MOD_ARMOR, TOTAL_VALUE, float(ArmorAdd));
+            SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE,  float(createResistance[SPELL_SCHOOL_NORMAL]));
 
         for( int i = STAT_STRENGTH; i < MAX_STATS; ++i)
-        {
             if (pInfo->stats[i])
                SetCreateStat(Stats(i), float(pInfo->stats[i]));
             else
                SetCreateStat(Stats(i), float(createStats[i]));
 
-            SetModifierValue(UnitMods(i), BASE_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), TOTAL_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
-            SetModifierValue(UnitMods(i), TOTAL_PCT, 1.0f);
-        }
-
-        SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(pInfo->attackpower));
-
         if (pInfo->attackpower)
             SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(pInfo->attackpower));
         else
-            SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower * petlevel / cinfo->maxlevel));
+            SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(createStats[MAX_STATS+2]));
 
         if (pInfo->mindmg)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->mindmg));
         else
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(cinfo->mindmg * petlevel / cinfo->maxlevel));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(createStats[MAX_STATS+3]));
 
         if (pInfo->maxdmg)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->maxdmg));
         else
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(cinfo->mindmg * petlevel / cinfo->maxlevel));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(createStats[MAX_STATS+4]));
 
-        SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,float(cinfo->minrangedmg * RangedDamageMod));
-        SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE,float(cinfo->maxrangedmg * RangedDamageMod));
+        SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,float(createStats[MAX_STATS+5]));
+        SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE,float(createStats[MAX_STATS+6]));
 
         DEBUG_LOG("Pet %u stats for level initialized (from pet_levelstat values)", cinfo->Entry);
-
     }
     else                                            // not exist in DB, use some default fake data
     {
         DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB. Use hardcoded values.",cinfo->Entry);
         for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
-        {
             SetCreateStat(Stats(i),float(createStats[i]));
 
-            SetModifierValue(UnitMods(i), BASE_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), TOTAL_VALUE, 0.0f);
-            SetModifierValue(UnitMods(i), BASE_PCT, 1.0f);
-            SetModifierValue(UnitMods(i), TOTAL_PCT, 1.0f);
-        }
         SetCreateHealth(createStats[MAX_STATS]);
         SetCreateMana(createStats[MAX_STATS+1]);
-        SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE,  float(cinfo->armor  * petlevel / cinfo->maxlevel)  + ArmorAdd);
+        SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE,  float(createResistance[SPELL_SCHOOL_NORMAL]));
 
-        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(cinfo->mindmg * petlevel / cinfo->maxlevel));
-        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(cinfo->maxdmg * petlevel / cinfo->maxlevel));
+        SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(createStats[MAX_STATS+2]));
 
-        SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, float(cinfo->minrangedmg * petlevel / cinfo->maxlevel));
-        SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, float(cinfo->maxrangedmg * petlevel / cinfo->maxlevel));
+        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(createStats[MAX_STATS+3]));
+        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(createStats[MAX_STATS+4]));
 
-        SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower * petlevel / cinfo->maxlevel));
+        SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, float(createStats[MAX_STATS+5]));
+        SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, float(createStats[MAX_STATS+6]));
 
         DEBUG_LOG("Pet %u stats for level initialized (from creature_template values)", cinfo->Entry);
     }
 
-    SetAttackTime(BASE_ATTACK, cinfo->baseattacktime);
-    SetAttackTime(OFF_ATTACK, cinfo->baseattacktime);
-    SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime);
-
-//    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0);
-
     for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-        if (ResistanceAdd[i] > 0)
-            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(ResistanceAdd[i]));
-        else SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, 0);
+            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(createResistance[i]));
+
+    SetAttackTime(OFF_ATTACK, BASE_ATTACK_TIME);
+    SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0);
+
+
+    UpdateAllStats();
 
     SetHealth(GetMaxHealth());
     SetPower(getPowerType(), GetMaxPower(getPowerType()));
-
-    UpdateAllStats();
 
     return true;
 }
@@ -1242,6 +1223,7 @@ void Pet::_LoadAuras(uint32 timediff)
 
         delete result;
     }
+    LoadCreaturesAddon(true);
 }
 
 void Pet::_SaveAuras()
@@ -1418,7 +1400,9 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     m_spells[spell_id] = newspell;
 
     if (IsPassiveSpell(spellInfo))
+    {
         CastSpell(this, spell_id, true);
+    }
     else
         m_charmInfo->AddSpellToActionBar(spell_id, ActiveStates(newspell.active));
 
@@ -1941,41 +1925,164 @@ void Pet::CastPetAuras(bool current)
 void Pet::CastPetAura(PetAura const* aura)
 {
     uint32 auraId = aura->GetAura(GetEntry());
+
     if(!auraId)
         return;
 
     Unit* owner = GetOwner();
 
+    if(!owner)
+        return;
+
+    DEBUG_LOG("Cast pet aura %u", auraId);
+
+    if(owner->GetTypeId() != TYPEID_PLAYER)
+    {
+        CastSpell(this, auraId, true);
+        return;
+    }
+
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(auraId);
+    if (!spellInfo)
+        return;
+
+    int32 basePoints[MAX_EFFECT_INDEX];
+
+    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        basePoints[i] = spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
+
     switch (auraId)
     {
+        case 54566: // DK pet scaling 01
+        {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA)*0.3f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetStat(STAT_STRENGTH)*0.7f);
+            break;
+        }
+        case 51996: // DK pet scaling 02
+        {
+//            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA)*(aura->GetDamage()+1)/10.0f
+//                                - GetCreateStat(STAT_STAMINA));
+//            basePoints[EFFECT_INDEX_2] = int32(owner->GetAttackTime(BASE_ATTACK))*k; //Mod attack speed
+            break;
+        }
+        case 61697: // DK pet scaling 03
+        {
+            break;
+        }
+        case 34902: // Hunter pet scaling 01
+        {
+            break;
+        }
+        case 34903: // Hunter pet scaling 02
+        {
+            break;
+        }
+        case 34904: // Hunter pet scaling 03
+        {
+            break;
+        }
+        case 61017: // Hunter pet scaling 04
+        {
+            break;
+        }
+        case 61783: // Feral spirit pet scaling 04
+        {
+            break;
+        }
+        case 34947: // Warlock pet scaling 01
+        {
+            int32 fire  = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
+            int32 shadow = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW);
+            int32 maxpower  = (fire > shadow) ? fire : shadow;
+            if(maxpower < 0)
+                 maxpower = 0;
+            DEBUG_LOG("Clculated damage %u", int32(maxpower));
+
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA) * 0.3f - GetCreateStat(STAT_STAMINA));
+            basePoints[EFFECT_INDEX_1] = int32(maxpower * 0.15f);
+            basePoints[EFFECT_INDEX_2] = int32(maxpower * 0.57f);
+            break;
+        }
+        case 34956: // Warlock pet scaling 02
+        {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_INTELLECT) * 0.3f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetArmor() * 0.35f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_FIRE)) * 0.4f);
+            break;
+        }
+        case 34957: // Warlock pet scaling 03
+        {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_FROST)) * 0.4f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_ARCANE)) * 0.4f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_NATURE)) * 0.4f);
+            break;
+        }
+        case 34958: // Warlock pet scaling 04
+        {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_SHADOW)) * 0.4f);
+//            basePoints[EFFECT_INDEX_1]
+            basePoints[EFFECT_INDEX_2] = 10;
+            break;
+        }
         case 35696: // Demonic Knowledge
         {
-            int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
-            CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);
+            basePoints[EFFECT_INDEX_0] = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
             break;
         }
-        case 54566: // Ravenous Dead
-        {
-            if (owner)
-            {
-                // We must give x% bonus to base bonus from owner's stamina to ghoul stamina
-                int32 basePoints0 =
-                    int32(owner->GetStat(STAT_STAMINA)*0.3f*(aura->GetDamage()+100.0f)/100.0f
-                    - (GetStat(STAT_STAMINA)-GetCreateStat(STAT_STAMINA)));
-                // We must give x% bonus to base bonus from owner's strength to ghoul strength
-                int32 basePoints1 =
-                    int32(owner->GetStat(STAT_STRENGTH)*0.3f*(aura->GetDamage()+100.0f)/100.0f
-                    - (GetStat(STAT_STRENGTH)-GetCreateStat(STAT_STRENGTH)));
-                CastCustomSpell(this, auraId, &basePoints0, &basePoints1, NULL, true);
-            }
-            break;
-        }
+        case 18739: // Tamed pet stats scaling
+        case 17206:
+        case 17208:
+        case 17216:
+        case 7000:
+        case 17209:
+        case 17210:
+        case 17211:
+        case 17212:
+        case 34887:
+        case 54642:
+        case 58598:
+        case 54676:
+        case 56634:
+        case 55192:
+        case 61199:
+        case 55729:
+        case 30147:
+        case 30148:
+        case 30149:
+        case 18730:
+        case 18738:
+        case 19007:
+        case 17214:
+        case 17215:
+        case 18728:
+        case 18737:
+        case 18740:
+        case 50297:
+        case 35253:
+        case 17217:
+        case 17218:
+        case 35257:
+        case 35386:
+        case 17219:
+        case 35258:
+        case 18729:
+        case 18741:
+        case 18736:
+        case 17220:
+        case 17221:
+        case 18735:
+        case 18742:
+        case 35254:
+        case 56635:
+        case 17222:
+        case 17223:
         default:
-        {
             CastSpell(this, auraId, true);
-            break;
-        }
+            return;
     }
+    CastCustomSpell(this, auraId, &basePoints[EFFECT_INDEX_0], &basePoints[EFFECT_INDEX_1], &basePoints[EFFECT_INDEX_2] , true);
+
 }
 
 struct DoPetLearnSpell
