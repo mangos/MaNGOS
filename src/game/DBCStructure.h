@@ -496,8 +496,10 @@ struct AchievementCriteriaEntry
     uint32  timedCriteriaMiscId;                            // 12 Alway appears with timed events, used internally to start the achievement, store 
     uint32  timeLimit;                                      // 13 time limit in seconds
     uint32  showOrder;                                      // 14 show order
-    //uint32 unk1;                                          // 15 all zeros
+    //uint32 unk1;                                          // 15 only one value, still unknown
     //uint32 unk2;                                          // 16 all zeros
+    //uint32 moreRequirement[3];                            // 17-19
+    //uint32 moreRequirementValue[3];                       // 20-22
 
     // helpers
     bool IsExplicitlyStartedTimedCriteria() const
