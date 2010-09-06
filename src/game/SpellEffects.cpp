@@ -3288,7 +3288,7 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
         else if ((m_spellInfo->Id == 67486 || m_spellInfo->Id == 67489) && unitTarget->GetTypeId() == TYPEID_PLAYER)
         {
             Player* player = (Player*)unitTarget;
-            if (player->HasSkill(SKILL_ENGINERING))
+            if (player->HasSkill(SKILL_ENGINEERING))
                 addhealth += int32(addhealth * 0.25);
         }
 
@@ -3594,7 +3594,7 @@ void Spell::EffectEnergize(SpellEffectIndex eff_idx)
             if (unitTarget->GetTypeId() == TYPEID_PLAYER)
             {
                 Player* player = (Player*)unitTarget;
-                if (player->HasSkill(SKILL_ENGINERING))
+                if (player->HasSkill(SKILL_ENGINEERING))
                     damage += int32(damage * 0.25);
             }
             break;
@@ -4392,9 +4392,9 @@ void Spell::DoSummonWild(SpellEffectIndex eff_idx, uint32 forceFaction)
     if (m_caster->GetTypeId()==TYPEID_PLAYER && m_CastItem)
     {
         ItemPrototype const *proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINERING)
+        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
         {
-            uint16 skill202 = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINERING);
+            uint16 skill202 = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
             if (skill202)
                 level = skill202/5;
         }
@@ -4456,9 +4456,9 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
     if (m_caster->GetTypeId() == TYPEID_PLAYER && m_CastItem)
     {
         ItemPrototype const *proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINERING)
+        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
         {
-            uint16 skill202 = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINERING);
+            uint16 skill202 = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
             if (skill202)
             {
                 level = skill202 / 5;
