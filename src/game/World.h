@@ -579,7 +579,7 @@ class World
 
         // for max speed access
         static float GetMaxVisibleDistanceOnContinents()    { return m_MaxVisibleDistanceOnContinents; }
-        static float GetMaxVisibleDistanceInInstances()     { return m_MaxVisibleDistanceInInctances;  }
+        static float GetMaxVisibleDistanceInInstances()     { return m_MaxVisibleDistanceInInstances;  }
         static float GetMaxVisibleDistanceInBGArenas()      { return m_MaxVisibleDistanceInBGArenas;   }
         static float GetMaxVisibleDistanceForObject()       { return m_MaxVisibleDistanceForObject;   }
 
@@ -694,7 +694,7 @@ class World
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;
-        static float m_MaxVisibleDistanceInInctances;
+        static float m_MaxVisibleDistanceInInstances;
         static float m_MaxVisibleDistanceInBGArenas;
         static float m_MaxVisibleDistanceForObject;
 
