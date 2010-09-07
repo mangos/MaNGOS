@@ -39,12 +39,19 @@ bool Player::UpdateStats(Stats stat)
 
     SetStat(stat, int32(value));
 
-    Pet *pet = GetPet();
-    if (pet)
+    if(Pet* pet = GetPet())
     {
-        pet->UpdateStats(stat);
-        pet->RemoveAllAuras();
-        pet->CastPetAuras(true);
+        GroupPetList m_groupPets = GetPets();
+        if (!m_groupPets.empty())
+        {
+            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                if (Pet* _pet = GetMap()->GetPet(*itr))
+                {
+                    _pet->CastPetPassiveSpells(false);
+                    _pet->CastPetPassiveSpells(true);
+                    _pet->UpdateStats(stat);
+                }
+        }
     }
 
     switch(stat)
@@ -151,10 +158,20 @@ void Player::UpdateResistances(uint32 school)
     {
         float value  = GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school));
         SetResistance(SpellSchools(school), int32(value));
-
-        Pet *pet = GetPet();
-        if(pet)
-            pet->UpdateResistances(school);
+        if(Pet* pet = GetPet())
+        {
+            GroupPetList m_groupPets = GetPets();
+            if  (!m_groupPets.empty())
+            {
+                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                    if (Pet* _pet = GetMap()->GetPet(*itr))
+                    {
+                        _pet->CastPetPassiveSpells(false);
+                        _pet->CastPetPassiveSpells(true);
+                        _pet->UpdateResistances(school);
+                    }
+            }
+        }
     }
     else
         UpdateArmor();
@@ -183,9 +200,20 @@ void Player::UpdateArmor()
 
     SetArmor(int32(value));
 
-    Pet *pet = GetPet();
-    if(pet)
-        pet->UpdateArmor();
+        if(Pet* pet = GetPet())
+        {
+            GroupPetList m_groupPets = GetPets();
+            if  (!m_groupPets.empty())
+            {
+                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                    if (Pet* _pet = GetMap()->GetPet(*itr))
+                    {
+                        _pet->CastPetPassiveSpells(false);
+                        _pet->CastPetPassiveSpells(true);
+                        _pet->UpdateArmor();
+                    }
+            }
+        }
 
     UpdateAttackPowerAndDamage();                           // armor dependent auras update for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
 }

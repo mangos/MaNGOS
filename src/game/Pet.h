@@ -202,6 +202,8 @@ class Pet : public Creature
         void LearnPetPassives();
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
+        void CastPetPassiveSpells(bool current = true);
+        void CastPetPassiveSpell(uint32 SpellID, int damage = 0);
 
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();

@@ -204,9 +204,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
             SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
-            // DK ghouls have energy
-            if (cinfo->family == CREATURE_FAMILY_GHOUL)
-                setPowerType(POWER_ENERGY);
             break;
         case HUNTER_PET:
             SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
@@ -1223,7 +1220,8 @@ void Pet::_LoadAuras(uint32 timediff)
 
         delete result;
     }
-    LoadCreaturesAddon(true);
+    else
+        LoadCreaturesAddon(true);
 }
 
 void Pet::_SaveAuras()
@@ -1401,7 +1399,8 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
 
     if (IsPassiveSpell(spellInfo))
     {
-        CastSpell(this, spell_id, true);
+        // CastPetPassiveSpell(spell_id);
+        // Cast over CastPetPassiveSpells(true)
     }
     else
         m_charmInfo->AddSpellToActionBar(spell_id, ActiveStates(newspell.active));
@@ -1901,10 +1900,56 @@ void Pet::LearnPetPassives()
         for(PetFamilySpellsSet::const_iterator petSet = petStore->second.begin(); petSet != petStore->second.end(); ++petSet)
             addSpell(*petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
     }
+
+    /// Override for not found way to learn pet scaling spells
+    Unit* owner = GetOwner();
+
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    switch(getPetType())
+    {
+        case SUMMON_PET:
+        {
+            switch(owner->getClass())
+            {
+                case CLASS_WARLOCK:
+                    addSpell(34947, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    addSpell(34956, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    addSpell(34957, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    addSpell(34958, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    addSpell(61013, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    break;
+                case CLASS_DEATH_KNIGHT:
+                    addSpell(51996, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    addSpell(61697, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    break;
+                case CLASS_SHAMAN:
+                    addSpell(61783, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        }
+        case HUNTER_PET:
+        {
+            addSpell(34902, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+            addSpell(34903, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+            addSpell(34904, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+            addSpell(61017, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+            break;
+        }
+        default:
+            break;
+    }
+
 }
 
 void Pet::CastPetAuras(bool current)
 {
+    CastPetPassiveSpells(current);
+
     Unit* owner = GetOwner();
 
     if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
@@ -1929,20 +1974,40 @@ void Pet::CastPetAura(PetAura const* aura)
     if(!auraId)
         return;
 
-    Unit* owner = GetOwner();
-
-    if(!owner)
-        return;
-
     DEBUG_LOG("Cast pet aura %u", auraId);
 
-    if(owner->GetTypeId() != TYPEID_PLAYER)
+    CastPetPassiveSpell(auraId, aura->GetDamage());
+}
+
+void Pet::CastPetPassiveSpells(bool current)
+{
+    for (PetSpellMap::const_iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
-        CastSpell(this, auraId, true);
+        if(itr->second.state == PETSPELL_REMOVED
+           || itr->second.active !=ACT_PASSIVE ) continue;
+
+        if(!current && HasAura(itr->first))
+            RemoveAurasDueToSpell(itr->first);
+        else
+        {
+            CastPetPassiveSpell(itr->first);
+            DEBUG_LOG("Cast passive pet spell %u", itr->first);
+        }
+    }
+}
+
+void Pet::CastPetPassiveSpell(uint32 SpellID, int damage)
+{
+    Unit* owner = GetOwner();
+
+    if(!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    {
+        CastSpell(this, SpellID, true);
         return;
     }
 
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(auraId);
+    SpellEntry const *spellInfo = sSpellStore.LookupEntry(SpellID);
+
     if (!spellInfo)
         return;
 
@@ -1951,43 +2016,96 @@ void Pet::CastPetAura(PetAura const* aura)
     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         basePoints[i] = spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
 
-    switch (auraId)
+    switch (SpellID)
     {
         case 54566: // DK pet scaling 01
         {
-            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA)*0.3f);
-            basePoints[EFFECT_INDEX_1] = int32(owner->GetStat(STAT_STRENGTH)*0.7f);
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetTotalStatValue(STAT_STAMINA)*0.3f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetTotalStatValue(STAT_STRENGTH)*0.7f);
+            if (owner->HasSpell(48965))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(owner->GetTotalStatValue(STAT_STAMINA)*0.2f);
+                basePoints[EFFECT_INDEX_1] += int32(owner->GetTotalStatValue(STAT_STRENGTH)*0.2f);
+            };
+            if (owner->HasSpell(49571))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(owner->GetTotalStatValue(STAT_STAMINA)*0.2f);
+                basePoints[EFFECT_INDEX_1] += int32(owner->GetTotalStatValue(STAT_STRENGTH)*0.2f);
+            };
+            if (owner->HasSpell(49572))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(owner->GetTotalStatValue(STAT_STAMINA)*0.2f);
+                basePoints[EFFECT_INDEX_1] += int32(owner->GetTotalStatValue(STAT_STRENGTH)*0.2f);
+            };
+            if (owner->HasSpell(58721))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(owner->GetTotalStatValue(STAT_STAMINA)*0.4f);
+                basePoints[EFFECT_INDEX_1] += int32(owner->GetTotalStatValue(STAT_STRENGTH)*0.4f);
+            };
             break;
         }
         case 51996: // DK pet scaling 02
         {
-//            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA)*(aura->GetDamage()+1)/10.0f
-//                                - GetCreateStat(STAT_STAMINA));
-//            basePoints[EFFECT_INDEX_2] = int32(owner->GetAttackTime(BASE_ATTACK))*k; //Mod attack speed
+//            basePoints[EFFECT_INDEX_0] = 150; Need research
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetAttackTime(BASE_ATTACK) / BASE_ATTACK_TIME * 100);
+//            basePoints[EFFECT_INDEX_2] = immunity mechanic, need research
             break;
         }
         case 61697: // DK pet scaling 03
         {
+            basePoints[EFFECT_INDEX_0] = int32(owner->m_modMeleeHitChance*100.0f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->m_modSpellHitChance*100.0f);
             break;
         }
         case 34902: // Hunter pet scaling 01
         {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetTotalStatValue(STAT_STAMINA)*0.3f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.22f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.1287f);
+            if (owner->HasSpell(62758))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(basePoints[EFFECT_INDEX_0]*0.2f);
+                basePoints[EFFECT_INDEX_1] += int32(basePoints[EFFECT_INDEX_1]*0.15f);
+                basePoints[EFFECT_INDEX_2] += int32(basePoints[EFFECT_INDEX_2]*0.15f);
+            };
+            if (owner->HasSpell(62762))
+            {
+                basePoints[EFFECT_INDEX_0] += int32(basePoints[EFFECT_INDEX_0]*0.2f);
+                basePoints[EFFECT_INDEX_1] += int32(basePoints[EFFECT_INDEX_1]*0.15f);
+                basePoints[EFFECT_INDEX_2] += int32(basePoints[EFFECT_INDEX_2]*0.15f);
+            };
             break;
         }
         case 34903: // Hunter pet scaling 02
         {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_FIRE)) * 0.4f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_FROST)) * 0.4f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_NATURE)) * 0.4f);
             break;
         }
         case 34904: // Hunter pet scaling 03
         {
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_SHADOW)) * 0.4f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_ARCANE)) * 0.4f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetArmor() * 0.35f);
             break;
         }
         case 61017: // Hunter pet scaling 04
         {
+        // Hit chance
+            basePoints[EFFECT_INDEX_0] = int32(owner->m_modMeleeHitChance*100.0f);
+        // Spell hit chance
+            basePoints[EFFECT_INDEX_1] = int32(owner->m_modSpellHitChance*100.0f);
+        // Expertize - pet currently not have expertize :(
             break;
         }
         case 61783: // Feral spirit pet scaling 04
         {
+            basePoints[EFFECT_INDEX_0] = int32(owner->m_modMeleeHitChance*100.0f);
+            basePoints[EFFECT_INDEX_1] = int32(owner->m_modSpellHitChance*100.0f);
+            basePoints[EFFECT_INDEX_2] = int32(owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.3f);
+            if (owner->HasAura(63271))
+                basePoints[EFFECT_INDEX_2] += int32(owner->GetTotalAttackPowerValue(BASE_ATTACK) * 0.3f);
             break;
         }
         case 34947: // Warlock pet scaling 01
@@ -1997,16 +2115,15 @@ void Pet::CastPetAura(PetAura const* aura)
             int32 maxpower  = (fire > shadow) ? fire : shadow;
             if(maxpower < 0)
                  maxpower = 0;
-            DEBUG_LOG("Clculated damage %u", int32(maxpower));
 
-            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_STAMINA) * 0.3f - GetCreateStat(STAT_STAMINA));
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetTotalStatValue(STAT_STAMINA) * 0.75f);
             basePoints[EFFECT_INDEX_1] = int32(maxpower * 0.15f);
             basePoints[EFFECT_INDEX_2] = int32(maxpower * 0.57f);
             break;
         }
         case 34956: // Warlock pet scaling 02
         {
-            basePoints[EFFECT_INDEX_0] = int32(owner->GetStat(STAT_INTELLECT) * 0.3f);
+            basePoints[EFFECT_INDEX_0] = int32(owner->GetTotalStatValue(STAT_INTELLECT) * 0.3f);
             basePoints[EFFECT_INDEX_1] = int32(owner->GetArmor() * 0.35f);
             basePoints[EFFECT_INDEX_2] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_FIRE)) * 0.4f);
             break;
@@ -2021,16 +2138,25 @@ void Pet::CastPetAura(PetAura const* aura)
         case 34958: // Warlock pet scaling 04
         {
             basePoints[EFFECT_INDEX_0] = int32(owner->GetResistance(SpellSchools(SPELL_SCHOOL_SHADOW)) * 0.4f);
-//            basePoints[EFFECT_INDEX_1]
-            basePoints[EFFECT_INDEX_2] = 10;
+//            basePoints[EFFECT_INDEX_1] Power regen - need research
+            basePoints[EFFECT_INDEX_2] = int32(owner->m_modSpellHitChance*100.0f);
+            break;
+        }
+        case 61013: // Warlock pet scaling 05
+        {
+        // Hit chance
+            basePoints[EFFECT_INDEX_0] = int32(owner->m_modMeleeHitChance*100.0f);
+        // Spell hit chance
+            basePoints[EFFECT_INDEX_1] = int32(owner->m_modSpellHitChance*100.0f);
+        // Expertize - pet currently not have expertize :(
             break;
         }
         case 35696: // Demonic Knowledge
         {
-            basePoints[EFFECT_INDEX_0] = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
+            basePoints[EFFECT_INDEX_0] = int32(damage * (GetTotalStatValue(STAT_STAMINA) + GetTotalStatValue(STAT_INTELLECT)) / 100);
             break;
         }
-        case 18739: // Tamed pet stats scaling
+        case 18739: // Tamed pet stats scaling. Need more research.
         case 17206:
         case 17208:
         case 17216:
@@ -2078,10 +2204,10 @@ void Pet::CastPetAura(PetAura const* aura)
         case 17222:
         case 17223:
         default:
-            CastSpell(this, auraId, true);
+            CastSpell(this, SpellID, true);
             return;
     }
-    CastCustomSpell(this, auraId, &basePoints[EFFECT_INDEX_0], &basePoints[EFFECT_INDEX_1], &basePoints[EFFECT_INDEX_2] , true);
+    CastCustomSpell(this, SpellID, &basePoints[EFFECT_INDEX_0], &basePoints[EFFECT_INDEX_1], &basePoints[EFFECT_INDEX_2] , true);
 
 }
 

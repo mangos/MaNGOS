@@ -2554,9 +2554,11 @@ void ObjectMgr::LoadPetLevelInfo()
     // Fill gaps and check integrity
     for (PetLevelInfoMap::iterator itr = petInfo.begin(); itr != petInfo.end(); ++itr)
     {
+        if (itr->first == 1) continue; // No fill data for default pet! _Must_ be exist!
+
         PetLevelInfo* pInfo = itr->second;
 
-        // fatal error if no level 1 data
+        // fatal error if no level 1 and max health data
         if(!pInfo || pInfo[0].health == 0 || pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health == 0 )
         {
             sLog.outErrorDb("Creature %u does not have pet stats data for Levels 1 and %u!",itr->first, CONFIG_UINT32_MAX_PLAYER_LEVEL);
@@ -2567,33 +2569,46 @@ void ObjectMgr::LoadPetLevelInfo()
         // fill level gaps
         for (uint32 level = 1; level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
         {
-            if(pInfo[level].health == 0)
+            if(   pInfo[level].health == 0
+               || pInfo[level].mana == 0
+               || pInfo[level].armor == 0
+               || pInfo[level].mindmg == 0
+               || pInfo[level].maxdmg == 0
+               || pInfo[level].stats[STAT_STRENGTH] == 0
+               || pInfo[level].stats[STAT_STAMINA] == 0
+               || pInfo[level].stats[STAT_AGILITY] == 0
+               || pInfo[level].stats[STAT_INTELLECT] == 0
+               || pInfo[level].stats[STAT_SPIRIT] == 0
+            )
             {
+                sLog.outErrorDb("Creature %u has no full data set for Level %i pet stats data, using approximated (from default pet progression) data",itr->first,level+1);
+
                 pInfo[level].health = uint16(pInfo[level-1].health * (level+1)/level +1);
-                sLog.outErrorDb("Creature %u has no data for Level %i pet stats data, using data of Level %i.",itr->first,level+1, level);
+                if(pInfo[level].health == 0)
+                    pInfo[level].health = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health * (petBaseInfo[level].health / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health));
+
+                if(pInfo[level].mana == 0)
+                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mana * (petBaseInfo[level].mana / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mana));
+
+                if(pInfo[level].armor == 0)
+                    pInfo[level].armor = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].armor * (petBaseInfo[level].armor / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].armor));
+
+                if(pInfo[level].mindmg == 0)
+                    pInfo[level].mindmg = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mindmg * (petBaseInfo[level].mindmg / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mindmg));
+
+                if(pInfo[level].maxdmg == 0)
+                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].maxdmg * (petBaseInfo[level].maxdmg / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].maxdmg));
+
+                if(pInfo[level].attackpower == 0)
+                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].attackpower * (petBaseInfo[level].attackpower / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].attackpower));
+
+                for (int i = 0; i < MAX_STATS; i++)
+                {
+                    if(pInfo[level].stats[i] == 0)
+                        pInfo[level].stats[i] = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].stats[i] * (petBaseInfo[level].stats[i] / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].stats[i]));
+                }
+
             }
-
-            if(pInfo[level].mana == 0)
-                pInfo[level].mana = uint16(pInfo[level-1].mana * (level+1)/level + 1);
-
-            if(pInfo[level].armor == 0)
-                pInfo[level].armor = uint16(pInfo[level-1].armor * (level+1)/level + 1);
-
-            if(pInfo[level].mindmg == 0)
-                pInfo[level].mindmg = uint32(pInfo[level-1].mindmg * (level+1)/level + 1);
-
-            if(pInfo[level].maxdmg == 0)
-                pInfo[level].maxdmg = uint32(pInfo[level-1].maxdmg * (level+1)/level + 1);
-
-            if(pInfo[level].attackpower == 0)
-                pInfo[level].attackpower = uint32(pInfo[level-1].attackpower * (level+1)/level + 1);
-
-            for (int i = 0; i < MAX_STATS; i++)
-            {
-                if(pInfo[level].stats[i] == 0)
-                    pInfo[level].stats[i] = uint16(float(pInfo[level-1].stats[i]) * (level+1)/level + 1);
-            }
-
         }
     }
 }

@@ -4260,7 +4260,6 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
                         // set timer for unsummon
                         if (duration > 0)
                             creature->SetDuration(duration);
-                        creature->LoadCreaturesAddon(true);
                         DEBUG_LOG("Pet (guidlow %d, entry %d) summoned. Counter is %d ",
                                      creature->GetGUIDLow(), creature->GetEntry(), creature->GetPetCounter());
                     }
@@ -4290,6 +4289,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         creature->SetOwnerGUID(summoner->GetGUID());
         creature->SetCreatorGUID(m_caster->GetGUID());
         creature->setFaction(m_caster->getFaction());
+        summoner->SetPet(creature);
 
         if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
         {
@@ -4339,12 +4339,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         creature->SetName( name );
 
         map->Add((Creature*)creature);
-        creature->LoadCreaturesAddon(true);
 
-        // re-init stats because of GetOwner returning null before adding to map
-//        creature->InitStatsForLevel(level, m_caster);
-
-        summoner->SetPet(creature);
         creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
 
         if (m_caster->GetTypeId() == TYPEID_PLAYER && creature->getPetType() == SUMMON_PET)
@@ -5296,11 +5291,6 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
             else
                 ++itr;
         }
-
-        // Summoned creature is ghoul.
-        if (NewSummon->GetEntry() == 26125)
-            // He must have energy bar instead of mana
-            NewSummon->setPowerType(POWER_ENERGY);
 
         // generate new name for summon pet
         std::string new_name = sObjectMgr.GeneratePetName(petentry);
