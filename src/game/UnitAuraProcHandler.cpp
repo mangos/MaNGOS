@@ -1554,6 +1554,12 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggered_spell_id = 54755;
                     break;
                 }
+                // Glyph of Rake
+                case 54821:
+                {
+                    triggered_spell_id = 54820;
+                    break;
+                }
                 // Item - Druid T10 Restoration 4P Bonus (Rejuvenation)
                 case 70664:
                 {
