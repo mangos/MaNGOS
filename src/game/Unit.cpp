@@ -207,6 +207,7 @@ Unit::Unit()
     m_transform = 0;
     m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
+    m_canModifyStatsLock = ACE_Process_Mutex();
 
     for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
         m_spellImmune[i].clear();
@@ -11542,3 +11543,13 @@ void Unit::SheduleAINotify(uint32 delay)
     RelocationNotifyEvent *notify = new RelocationNotifyEvent(*this);
     m_Events.AddEvent(notify, m_Events.CalculateTime(delay));
 }
+
+void Unit::SetCanModifyStats(bool modifyStats)
+{
+    m_canModifyStats = modifyStats;
+
+    if (!modifyStats)
+        m_canModifyStatsLock.acquire();
+    else
+        m_canModifyStatsLock.release();
+};

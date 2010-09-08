@@ -4207,7 +4207,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
     uint8 petindex = 0;
 
-    if (summoner->GetTypeId()==TYPEID_PLAYER) // Temporary disabled
+    if (summoner->GetTypeId()==TYPEID_PLAYER)
     {
         QueryResult* result = CharacterDatabase.PQuery("SELECT id FROM character_pet WHERE owner = '%u' AND entry = '%u'",
             summoner->GetGUIDLow(), pet_entry);
@@ -4259,7 +4259,10 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
                          --amount;
                         // set timer for unsummon
                         if (duration > 0)
+                        {
                             creature->SetDuration(duration);
+                            creature->GetCharmInfo()->SetReactState( REACT_AGGRESSIVE );
+                        }
                         DEBUG_LOG("Pet (guidlow %d, entry %d) summoned. Counter is %d ",
                                      creature->GetGUIDLow(), creature->GetEntry(), creature->GetPetCounter());
                     }
@@ -4276,7 +4279,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         Pet* creature = new Pet(SUMMON_PET);
         creature->SetPetCounter(amount - count - 1);
 
-        Map *map = summoner->GetMap();
+        Map* map = summoner->GetMap();
         uint32 pet_number = sObjectMgr.GeneratePetNumber();
         if (!creature->Create(map->GenerateLocalLowGuid(HIGHGUID_PET), map, summoner->GetPhaseMask(),
             m_spellInfo->EffectMiscValue[eff_idx], pet_number))
@@ -4311,7 +4314,12 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
 
         // set timer for unsummon
         if (duration > 0)
+        {
             creature->SetDuration(duration);
+            creature->GetCharmInfo()->SetReactState( REACT_AGGRESSIVE );
+        }
+        else
+            creature->GetCharmInfo()->SetReactState( REACT_DEFENSIVE );
 
         creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
         creature->SetUInt32Value(UNIT_FIELD_FLAGS, 0);

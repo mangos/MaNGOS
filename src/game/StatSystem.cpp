@@ -46,11 +46,7 @@ bool Player::UpdateStats(Stats stat)
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                {
-                    _pet->CastPetPassiveSpells(false);
-                    _pet->CastPetPassiveSpells(true);
                     _pet->UpdateStats(stat);
-                }
         }
     }
 
@@ -118,6 +114,18 @@ void Player::UpdateSpellDamageAndHealingBonus()
     // Get damage bonus for all schools
     for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, SpellBaseDamageBonusDone(SpellSchoolMask(1 << i)));
+
+    if(Pet* pet = GetPet())
+    {
+        GroupPetList m_groupPets = GetPets();
+        if (!m_groupPets.empty())
+        {
+            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                if (Pet* _pet = GetMap()->GetPet(*itr))
+                    _pet->UpdateAttackPowerAndDamage();
+        }
+    }
+
 }
 
 bool Player::UpdateAllStats()
@@ -165,11 +173,7 @@ void Player::UpdateResistances(uint32 school)
             {
                 for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                     if (Pet* _pet = GetMap()->GetPet(*itr))
-                    {
-                        _pet->CastPetPassiveSpells(false);
-                        _pet->CastPetPassiveSpells(true);
                         _pet->UpdateResistances(school);
-                    }
             }
         }
     }
@@ -207,11 +211,7 @@ void Player::UpdateArmor()
             {
                 for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                     if (Pet* _pet = GetMap()->GetPet(*itr))
-                    {
-                        _pet->CastPetPassiveSpells(false);
-                        _pet->CastPetPassiveSpells(true);
                         _pet->UpdateArmor();
-                    }
             }
         }
 
@@ -409,10 +409,6 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
     if(ranged)
     {
         UpdateDamagePhysical(RANGED_ATTACK);
-
-        Pet *pet = GetPet();                                //update pet's AP
-        if(pet)
-            pet->UpdateAttackPowerAndDamage();
     }
     else
     {
@@ -420,6 +416,18 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
         if(CanDualWield() && haveOffhandWeapon())           //allow update offhand damage only if player knows DualWield Spec and has equipped offhand weapon
             UpdateDamagePhysical(OFF_ATTACK);
     }
+
+    if(Pet* pet = GetPet())
+    {
+        GroupPetList m_groupPets = GetPets();
+        if (!m_groupPets.empty())
+        {
+            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                if (Pet* _pet = GetMap()->GetPet(*itr))
+                    _pet->UpdateAttackPowerAndDamage();
+        }
+    }
+
 }
 
 void Player::UpdateShieldBlockValue()
@@ -898,9 +906,13 @@ bool Pet::UpdateStats(Stats stat)
     if(stat > STAT_SPIRIT || stat < STAT_STRENGTH )
         return false;
 
+    ApplyStatBonus(stat, true);
+
+    SetCanModifyStats(false);
     // value = ((create_value + base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
     SetStat(stat, int32(value));
+    SetCanModifyStats(true);
 
     switch(stat)
     {
@@ -941,10 +953,14 @@ bool Pet::UpdateAllStats()
 
 void Pet::UpdateResistances(uint32 school)
 {
+    ApplyResistanceBonus(school, true);
+
     if(school > SPELL_SCHOOL_NORMAL)
     {
+        SetCanModifyStats(false);
         SetResistance(SpellSchools(school),
                       int32(GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school))));
+        SetCanModifyStats(true);
     }
     else
         UpdateArmor();
@@ -952,6 +968,10 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
+    ApplyResistanceBonus(SPELL_SCHOOL_NORMAL, true);
+
+    SetCanModifyStats(false);
+
     float value = 0.0f;
     UnitMods unitMod = UNIT_MOD_ARMOR;
 
@@ -961,10 +981,12 @@ void Pet::UpdateArmor()
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetArmor(int32(value));
+    SetCanModifyStats(true);
 }
 
 void Pet::UpdateMaxHealth()
 {
+    SetCanModifyStats(false);
     UnitMods unitMod = UNIT_MOD_HEALTH;
     float stamina = GetStat(STAT_STAMINA) - GetCreateStat(STAT_STAMINA);
 
@@ -974,10 +996,12 @@ void Pet::UpdateMaxHealth()
     value  *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetMaxHealth((uint32)value);
+    SetCanModifyStats(true);
 }
 
 void Pet::UpdateMaxPower(Powers power)
 {
+    SetCanModifyStats(false);
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float intellectAdd = (power == POWER_MANA) ? GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT) : 0.0f;
@@ -988,13 +1012,16 @@ void Pet::UpdateMaxPower(Powers power)
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetMaxPower(power, uint32(value));
+    SetCanModifyStats(true);
 }
 
 void Pet::UpdateAttackPowerAndDamage(bool ranged)
 {
-    if(ranged)
-        return;
+//    if(ranged)
+//        return;
+    ApplyAttackPowerBonus(true);
 
+    SetCanModifyStats(false);
     float baseAP       = 0.0f;
 
     UnitMods unitMod;
@@ -1028,6 +1055,7 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
         SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, attPowerMultiplier);
         UpdateDamagePhysical(RANGED_ATTACK);
     }
+    SetCanModifyStats(true);
 }
 
 void Pet::UpdateDamagePhysical(WeaponAttackType attType)
@@ -1036,6 +1064,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     if(attType > BASE_ATTACK)
         return;
 
+    SetCanModifyStats(false);
     UnitMods unitMod;
 
     if (attType == BASE_ATTACK)
@@ -1079,4 +1108,6 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);
+    SetCanModifyStats(true);
 }
+
