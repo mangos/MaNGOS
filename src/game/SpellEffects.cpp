@@ -2554,8 +2554,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 for (Unit::AuraList::const_iterator itr = dummyList.begin(); itr != dummyList.end(); ++itr)
                 {
                     if ((*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (*itr)->GetSpellProto()->SpellIconID == 2710)
+                    {
                         if (roll_chance_i((*itr)->GetModifier()->m_amount)) // don't consume if found
                             return;
+                        else
+                            break;
+                    }
                 }
 
                 // consume diseases
