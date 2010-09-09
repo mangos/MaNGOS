@@ -207,6 +207,7 @@ class Pet : public Creature
         void ApplyStatBonus(Stats stat, bool apply);
         void ApplyResistanceBonus(uint32 school, bool apply);
         void ApplyAttackPowerBonus(bool apply);
+        void ApplySpellPowerBonus(int32 amount, bool apply);
         void ApplyOtherBonuses(bool apply);
         void ApplyAllBonuses(bool apply);
 
@@ -273,9 +274,12 @@ class Pet : public Creature
         bool    m_needSave;                                 // is pet needed to be saved in DB
         float   m_petFollowAngle;                           // follow angle for the pet
         uint8   m_petCounter;
-        int32   m_baseStatBonus[MAX_STATS];
-        int32   m_baseResistanceBonus[MAX_SPELL_SCHOOL];
-        int32   m_baseAPBonus;
+        int16   m_baseStatBonus[MAX_STATS];
+        int16   m_baseResistanceBonus[MAX_SPELL_SCHOOL];
+        int16   m_baseAPBonus;
+        int16   m_baseRatingValue[MAX_COMBAT_RATING];
+        uint16  m_baseSpellPower;
+        uint16  m_basePowerRegen;
 
         DeclinedName *m_declinedname;
 

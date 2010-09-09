@@ -1017,8 +1017,7 @@ void Pet::UpdateMaxPower(Powers power)
 
 void Pet::UpdateAttackPowerAndDamage(bool ranged)
 {
-//    if(ranged)
-//        return;
+
     ApplyAttackPowerBonus(true);
 
     SetCanModifyStats(false);
@@ -1027,14 +1026,17 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
     UnitMods unitMod;
 
     if (!ranged)
+    {
        unitMod  = UNIT_MOD_ATTACK_POWER;
-    else
-       unitMod  = UNIT_MOD_ATTACK_POWER_RANGED;
-
     if(GetEntry() == 416)                                   // imp's attack power
         baseAP = GetStat(STAT_STRENGTH) - 10.0f;
     else
         baseAP = 2 * GetStat(STAT_STRENGTH) - 20.0f;
+    }
+    else
+    {
+       unitMod  = UNIT_MOD_ATTACK_POWER_RANGED;
+    }
 
     //in BASE_VALUE of UNIT_MOD_ATTACK_POWER for creatures we store data of meleeattackpower field in DB
     float base_attPower      = (GetModifierValue(unitMod, BASE_VALUE) + baseAP) * GetModifierValue(unitMod, BASE_PCT);

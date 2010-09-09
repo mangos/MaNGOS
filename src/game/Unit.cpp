@@ -11546,10 +11546,10 @@ void Unit::SheduleAINotify(uint32 delay)
 
 void Unit::SetCanModifyStats(bool modifyStats)
 {
-    m_canModifyStats = modifyStats;
-
     if (!modifyStats)
         m_canModifyStatsLock.acquire();
     else
         m_canModifyStatsLock.release();
+
+    m_canModifyStats = modifyStats;
 };

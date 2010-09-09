@@ -238,6 +238,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
     SetCreatorGUID(owner->GetGUID());
+    SetOwnerGUID(owner->GetGUID());
 
     m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
 
@@ -288,12 +289,12 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(getPowerType(), GetMaxPower(getPowerType()));
     }
     else
     {
         SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-        SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+        SetPower(getPowerType(), savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
     }
 
     UpdateWalkMode(owner);
@@ -944,10 +945,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         if (pInfo->mindmg)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->mindmg));
         else
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(createStats[MAX_STATS+3]));
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(createStats[MAX_STATS+3]));
 
         if (pInfo->maxdmg)
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->maxdmg));
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->maxdmg));
         else
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(createStats[MAX_STATS+4]));
 
@@ -1938,6 +1939,9 @@ void Pet::LearnPetPassives()
                     addSpell(34904, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
                     addSpell(61783, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
                     break;
+                case CLASS_MAGE:
+                    addSpell(34947, ACT_PASSIVE, PETSPELL_NEW, PETSPELL_FAMILY);
+                    break;
                 default:
                     break;
             }
@@ -2125,9 +2129,16 @@ void Pet::CastPetPassiveSpell(uint32 SpellID, int damage)
         }
         case 34947: // Warlock pet scaling 01
         {
-            basePoints[EFFECT_INDEX_0] = int32(m_baseStatBonus[STAT_STAMINA] * 0.75f);
-            basePoints[EFFECT_INDEX_1] = int32(m_baseAPBonus * 0.15f);
-            basePoints[EFFECT_INDEX_2] = int32(m_baseAPBonus * 0.57f);
+            if (owner->getClass() == CLASS_WARLOCK)
+            {
+                basePoints[EFFECT_INDEX_0] = int32(m_baseStatBonus[STAT_STAMINA] * 0.75f);
+                basePoints[EFFECT_INDEX_1] = int32(m_baseAPBonus * 0.15f);
+                basePoints[EFFECT_INDEX_2] = int32(m_baseAPBonus * 0.57f);
+            }
+            else if (owner->getClass() == CLASS_MAGE)
+            {
+                basePoints[EFFECT_INDEX_1] = int32(m_baseAPBonus * 0.4f);
+            };
             if (owner->HasSpell(57277) && GetEntry() == 416)
             {
                 basePoints[EFFECT_INDEX_0] = int32(basePoints[EFFECT_INDEX_0]*1.2f);
@@ -2173,6 +2184,8 @@ void Pet::CastPetPassiveSpell(uint32 SpellID, int damage)
             CastSpell(this, SpellID, true);
             return;
     }
+    if (HasAura(SpellID))
+        RemoveAurasDueToSpell(SpellID);
     CastCustomSpell(this, SpellID, &basePoints[EFFECT_INDEX_0], &basePoints[EFFECT_INDEX_1], &basePoints[EFFECT_INDEX_2] , true);
 
 }
@@ -2241,6 +2254,8 @@ bool Pet::SetSummonPosition(float x, float y, float z)
     if (!owner)
         return false;
 
+    float px, py, pz;
+
     // Summon in dest location
     if (GetPetCounter() == 1)
         SetPetFollowAngle(PET_FOLLOW_ANGLE*3);
@@ -2250,18 +2265,12 @@ bool Pet::SetSummonPosition(float x, float y, float z)
         SetPetFollowAngle(PET_FOLLOW_ANGLE);
 
 
-    if (x != 0.0f && y != 0.0f && z != 0.0f)
-    {
-//        owner->GetRandomPoint(x, y, z, 1, px, py, pz);
-        Relocate(x, y, z, -owner->GetOrientation());
-        SetSummonPoint(x, y, z, -owner->GetOrientation());
-    }
-    else
-    {
+    if (x == 0.0f && y == 0.0f && z == 0.0f)
         owner->GetClosePoint(x, y, z, GetObjectBoundingRadius(), PET_FOLLOW_DIST, GetPetFollowAngle());
-        Relocate(x, y, z, -owner->GetOrientation());
-        SetSummonPoint(x, y, z, -owner->GetOrientation());
-    }
+
+    owner->GetRandomPoint(x, y, z, 1, px, py, pz);
+    Relocate(px, py, pz, -owner->GetOrientation());
+    SetSummonPoint(px, py, pz, -owner->GetOrientation());
 
     if (!IsPositionValid()) return false;
         else return true;
@@ -2310,7 +2319,6 @@ void Pet::ApplyStatBonus(Stats stat, bool apply)
         if(needReapply)
         {
             SetCanModifyStats(false);
-            RemoveAurasDueToSpell(itr->first);
             CastPetPassiveSpell(itr->first);
             SetCanModifyStats(true);
         }
@@ -2361,7 +2369,6 @@ void Pet::ApplyResistanceBonus(uint32 school, bool apply)
         if(needReapply)
         {
             SetCanModifyStats(false);
-            RemoveAurasDueToSpell(itr->first);
             CastPetPassiveSpell(itr->first);
             SetCanModifyStats(true);
         }
@@ -2398,6 +2405,13 @@ void Pet::ApplyAttackPowerBonus(bool apply)
                 case CLASS_SHAMAN:
                     newAPBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
                     break;
+                case CLASS_MAGE:
+                {
+                   newAPBonus = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST);
+                   if(newAPBonus < 0)
+                       newAPBonus = 0;
+                   break;
+                }
                 default:
                     break;
             }
@@ -2437,7 +2451,6 @@ void Pet::ApplyAttackPowerBonus(bool apply)
         if(needReapply)
         {
             SetCanModifyStats(false);
-            RemoveAurasDueToSpell(itr->first);
             CastPetPassiveSpell(itr->first);
             SetCanModifyStats(true);
         }
@@ -2460,3 +2473,10 @@ void Pet::ApplyAllBonuses(bool apply)
 void Pet::ApplyOtherBonuses(bool apply)
 {
 }
+
+/*
+void Player::ApplySpellPowerBonus(int32 amount, bool apply)
+{
+    m_baseSpellPower += apply ? amount : -amount;
+}
+*/
