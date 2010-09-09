@@ -119,7 +119,7 @@ Creature::Creature(CreatureSubtype subtype) :
 Unit(), i_AI(NULL),
 lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
 m_lootMoney(0), m_lootGroupRecipientId(0),
-m_deathTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
+m_corpseDecayTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
 m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_DBTableGuid(0), m_equipmentId(0),
 m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
 m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false), m_needNotify(false),
@@ -172,7 +172,7 @@ void Creature::RemoveCorpse()
     if ((getDeathState() != CORPSE && !m_isDeadByDefault) || (getDeathState() != ALIVE && m_isDeadByDefault))
         return;
 
-    m_deathTimer = 0;
+    m_corpseDecayTimer = 0;
     setDeathState(DEAD);
     UpdateObjectVisibility();
 
@@ -180,11 +180,14 @@ void Creature::RemoveCorpse()
     StopGroupLoot();
 
     loot.clear();
-    uint32 respawnDelay = m_respawnDelay;
+    uint32 respawnDelay = 0;
+
     if (AI())
         AI()->CorpseRemoved(respawnDelay);
 
-    m_respawnTime = time(NULL) + respawnDelay;
+    // script can set time (in seconds) explicit, override the original
+    if (respawnDelay)
+        m_respawnTime = time(NULL) + respawnDelay;
 
     float x, y, z, o;
     GetRespawnCoord(x, y, z, &o);
@@ -468,7 +471,7 @@ void Creature::Update(uint32 diff)
             if (m_isDeadByDefault)
                 break;
 
-            if( m_deathTimer <= diff )
+            if (m_corpseDecayTimer <= diff)
             {
                 // since pool system can fail to roll unspawned object, this one can remain spawned, so must set respawn nevertheless
                 uint16 poolid = GetDBTableGUIDLow() ? sPoolMgr.IsPartOfAPool<Creature>(GetDBTableGUIDLow()) : 0;
@@ -483,7 +486,7 @@ void Creature::Update(uint32 diff)
             }
             else
             {
-                m_deathTimer -= diff;
+                m_corpseDecayTimer -= diff;
                 if (m_groupLootId)
                 {
                     if(diff < m_groupLootTimer)
@@ -499,7 +502,7 @@ void Creature::Update(uint32 diff)
         {
             if (m_isDeadByDefault)
             {
-                if( m_deathTimer <= diff )
+                if (m_corpseDecayTimer <= diff)
                 {
                     // since pool system can fail to roll unspawned object, this one can remain spawned, so must set respawn nevertheless
                     uint16 poolid = GetDBTableGUIDLow() ? sPoolMgr.IsPartOfAPool<Creature>(GetDBTableGUIDLow()) : 0;
@@ -517,7 +520,7 @@ void Creature::Update(uint32 diff)
                 }
                 else
                 {
-                    m_deathTimer -= diff;
+                    m_corpseDecayTimer -= diff;
                 }
             }
 
@@ -856,33 +859,36 @@ void Creature::PrepareBodyLootState()
 {
     loot.clear();
 
-    // if have normal loot then prepare it access
-    if (!isAlive() && !lootForBody)
+    // only dead
+    if (!isAlive())
     {
-        // have normal loot
-        if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
-            // ... or can have skinning after
-            GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW))
+        // if have normal loot then prepare it access
+        if (!lootForBody)
         {
-            SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            return;
+            // have normal loot
+            if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
+                // ... or can have skinning after
+                GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW))
+            {
+                SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                return;
+            }
         }
-    }
 
-    // if not have normal loot allow skinning if need
-    if (!isAlive() && !lootForSkin && GetCreatureInfo()->SkinLootId)
-    {
         lootForBody = true;                                 // pass this loot mode
 
-        RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-        return;
+        // if not have normal loot allow skinning if need
+        if (!lootForSkin && GetCreatureInfo()->SkinLootId)
+        {
+            RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+            return;
+        }
     }
 
     RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 }
-
 
 /**
  * Return original player who tap creature, it can be different from player/group allowed to loot so not use it for loot code
@@ -1371,7 +1377,8 @@ void Creature::setDeathState(DeathState s)
 {
     if ((s == JUST_DIED && !m_isDeadByDefault) || (s == JUST_ALIVED && m_isDeadByDefault))
     {
-        m_deathTimer = m_corpseDelay*IN_MILLISECONDS;
+        m_corpseDecayTimer = m_corpseDelay*IN_MILLISECONDS; // the max/default time for corpse decay (before creature is looted/AllLootRemovedFromCorpse() is called)
+        m_respawnTime = time(NULL) + m_respawnDelay;        // respawn delay (spawntimesecs)
 
         // always save boss respawn time at death to prevent crash cheating
         if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY) || isWorldBoss())
@@ -1640,7 +1647,7 @@ bool Creature::IsVisibleInGridForPlayer(Player* pl) const
     // Live player (or with not release body see live creatures or death creatures with corpse disappearing time > 0
     if(pl->isAlive() || pl->GetDeathTimer() > 0)
     {
-        return (isAlive() || m_deathTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
+        return (isAlive() || m_corpseDecayTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
     }
 
     // Dead player see live creatures near own corpse
@@ -1772,8 +1779,8 @@ void Creature::SaveRespawnTime()
 
     if(m_respawnTime > time(NULL))                          // dead (no corpse)
         sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), m_respawnTime);
-    else if(m_deathTimer > 0)                               // dead (corpse)
-        sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), time(NULL) + m_respawnDelay + m_deathTimer / IN_MILLISECONDS);
+    else if (m_corpseDecayTimer > 0)                        // dead (corpse)
+        sObjectMgr.SaveCreatureRespawnTime(m_DBTableGuid, GetInstanceId(), time(NULL) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
 }
 
 bool Creature::IsOutOfThreatArea(Unit* pVictim) const
@@ -2059,8 +2066,8 @@ time_t Creature::GetRespawnTimeEx() const
     time_t now = time(NULL);
     if(m_respawnTime > now)                                 // dead (no corpse)
         return m_respawnTime;
-    else if(m_deathTimer > 0)                               // dead (corpse)
-        return now + m_respawnDelay + m_deathTimer / IN_MILLISECONDS;
+    else if (m_corpseDecayTimer > 0)                        // dead (corpse)
+        return now + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS;
     else
         return now;
 }
@@ -2097,18 +2104,48 @@ void Creature::AllLootRemovedFromCorpse()
 {
     if (lootForBody && !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE))
     {
-        uint32 nDeathTimer;
+        uint32 corpseLootedDelay;
 
-        // corpse was not skinned -> apply corpse looted timer
-        if (!lootForSkin)
-            nDeathTimer = (uint32)((m_corpseDelay * IN_MILLISECONDS) * sWorld.getConfig(CONFIG_FLOAT_RATE_CORPSE_DECAY_LOOTED));
-        // corpse was skinned, corpse will despawn next update
+        if (!lootForSkin)                                   // corpse was not skinned -> apply corpseLootedDelay
+        {
+            // use a static spawntimesecs/3 modifier (guessed/made up value) unless config are more than 0.0
+            // spawntimesecs=3min:  corpse decay after 1min
+            // spawntimesecs=4hour: corpse decay after 1hour 20min
+            if (sWorld.getConfig(CONFIG_FLOAT_RATE_CORPSE_DECAY_LOOTED) > 0.0f)
+                corpseLootedDelay = (uint32)((m_corpseDelay * IN_MILLISECONDS) * sWorld.getConfig(CONFIG_FLOAT_RATE_CORPSE_DECAY_LOOTED));
+            else
+                corpseLootedDelay = (m_respawnDelay*IN_MILLISECONDS) /3;
+        }
+        else                                                // corpse was skinned, corpse will despawn next update
+            corpseLootedDelay = 0;
+
+        // if m_respawnTime is not expired already
+        if (m_respawnTime >= time(NULL))
+        {
+            // if spawntimesecs is larger than default corpse delay always use corpseLootedDelay
+            if (m_respawnDelay > m_corpseDelay)
+            {
+                m_corpseDecayTimer = corpseLootedDelay;
+            }
+            else
+            {
+                // if m_respawnDelay is relatively short and corpseDecayTimer is larger than corpseLootedDelay
+                if (m_corpseDecayTimer > corpseLootedDelay)
+                    m_corpseDecayTimer = corpseLootedDelay;
+            }
+        }
         else
-            nDeathTimer = 0;
+        {
+            m_corpseDecayTimer = 0;
 
-        // update death timer only if looted timer is shorter
-        if (m_deathTimer > nDeathTimer)
-            m_deathTimer = nDeathTimer;
+            // TODO: reaching here, means mob will respawn at next tick.
+            // This might be a place to set some aggro delay so creature has
+            // ~5 seconds before it can react to hostile surroundings.
+
+            // It's worth noting that it will not be fully correct either way.
+            // At this point another "instance" of the creature are presumably expected to
+            // be spawned already, while this corpse will not appear in respawned form.
+        }
     }
 }
 

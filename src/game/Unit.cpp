@@ -797,7 +797,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                 cVictim->DeleteThreatList();
                 // only lootable if it has loot or can drop gold
                 cVictim->PrepareBodyLootState();
+                // may have no loot, so update death timer if allowed
+                cVictim->AllLootRemovedFromCorpse();
             }
+
             // Call creature just died function
             if (cVictim->AI())
                 cVictim->AI()->JustDied(this);
