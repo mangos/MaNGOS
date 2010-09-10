@@ -71,6 +71,12 @@ class HostileRefManager : public RefManager<Unit, ThreatManager>
             m_redirectionMod = pct/100.0f;
         }
 
+        void ResetThreatRedirection()
+        {
+            m_redirectionTargetGuid.Clear();
+            m_redirectionMod = 0.0f;
+        }
+
         float GetThreatRedirectionMod() const { return m_redirectionMod; }
         Unit*  GetThreatRedirectionTarget() const;
 
