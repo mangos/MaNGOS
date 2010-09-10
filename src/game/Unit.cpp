@@ -283,6 +283,8 @@ Unit::~Unit()
     if (m_charmInfo)
         delete m_charmInfo;
 
+    m_canModifyStatsLock.remove();
+
     // those should be already removed at "RemoveFromWorld()" call
     MANGOS_ASSERT(m_gameObj.size() == 0);
     MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
