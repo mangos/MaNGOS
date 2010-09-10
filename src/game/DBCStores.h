@@ -115,7 +115,7 @@ extern DBCStorage <GtChanceToSpellCritEntry>     sGtChanceToSpellCritStore;
 //extern DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore;
 extern DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore;
 extern DBCStorage <HolidaysEntry>                sHolidaysStore;
-extern DBCStorage <ItemEntry>                    sItemStore;
+//extern DBCStorage <ItemEntry>                    sItemStore;
 extern DBCStorage <ItemArmorQualityEntry>        sItemArmorQualityStore;
 extern DBCStorage <ItemArmorShieldEntry>         sItemArmorShieldStore;
 extern DBCStorage <ItemArmorTotalEntry>          sItemArmorTotalStore;

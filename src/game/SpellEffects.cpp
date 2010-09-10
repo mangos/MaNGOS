@@ -2580,13 +2580,13 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                 return;
             }
             // Obliterate
-            else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0002000000000000))
+            else if (dkClassOptions && dkClassOptions->SpellFamilyFlags & UI64LIT(0x0002000000000000))
             {
                 // search for Annihilation
                 Unit::AuraList const& dummyList = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                 for (Unit::AuraList::const_iterator itr = dummyList.begin(); itr != dummyList.end(); ++itr)
                 {
-                    if ((*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (*itr)->GetSpellProto()->SpellIconID == 2710)
+                    if ((*itr)->GetSpellProto()->GetSpellFamilyName() == SPELLFAMILY_DEATHKNIGHT && (*itr)->GetSpellProto()->SpellIconID == 2710)
                     {
                         if (roll_chance_i((*itr)->GetModifier()->m_amount)) // don't consume if found
                             return;
@@ -5717,9 +5717,10 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
 
                     if (Item* pItem = ((Player*)unitTarget)->GetWeaponForAttack(BASE_ATTACK))
                     {
-                        if (const ItemEntry *dbcitem = sItemStore.LookupEntry(pItem->GetProto()->ItemId))
+                        //if (const ItemEntry *dbcitem = sItemStore.LookupEntry(pItem->GetProto()->ItemId))
+                        if(ItemPrototype const* dbcitem = sItemStorage.LookupEntry<ItemPrototype>(pItem->GetProto()->ItemId))
                         {
-                            m_caster->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, dbcitem->ID);
+                            m_caster->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, dbcitem->ItemId);
 
                             // Unclear what this spell should do
                             unitTarget->CastSpell(m_caster, m_spellInfo->CalculateSimpleValue(SpellEffectIndex(effect->EffectIndex)), true);
@@ -5832,9 +5833,10 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
 
                     if (Item* pItem = ((Player*)unitTarget)->GetWeaponForAttack(OFF_ATTACK))
                     {
-                        if (const ItemEntry *dbcitem = sItemStore.LookupEntry(pItem->GetProto()->ItemId))
+                        //if (const ItemEntry *dbcitem = sItemStore.LookupEntry(pItem->GetProto()->ItemId))
+                        if(ItemPrototype const* dbcitem = sItemStorage.LookupEntry<ItemPrototype>(pItem->GetProto()->ItemId))
                         {
-                            m_caster->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, dbcitem->ID);
+                            m_caster->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, dbcitem->ItemId);
 
                             // Unclear what this spell should do
                             unitTarget->CastSpell(m_caster, m_spellInfo->CalculateSimpleValue(SpellEffectIndex(effect->EffectIndex)), true);

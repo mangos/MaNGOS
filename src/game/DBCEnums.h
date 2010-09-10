@@ -207,8 +207,15 @@ enum AchievementCriteriaTypes
     // 123
     // 124 spend gold on guild repairs
     // 125 reach guild level
-    // 0..125 => 126 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 126,
+    // 126 craft x items
+    // 127 catch x fish from pools
+    // 128 purchase x guild bank tabs
+    // 129 earn x guild achievement points
+    // 130 win x rated battlegrounds
+    // 131
+    // 132 reach x rated battleground rating
+    // 0..132 => 133 criteria types total
+    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 133,
 };
 
 enum AchievementCriteriaMoreReqType

@@ -528,6 +528,7 @@ struct AreaTableEntry
     //uint32 unk21;                                         // 21 4.0.0
     //uint32 unk22;                                         // 22 4.0.0
     //uint32 unk23;                                         // 23 4.0.0
+    //uint32 unk24;                                         // 24 4.0.1, may be worldStateId
 };
 
 struct AreaGroupEntry
@@ -598,6 +599,7 @@ struct BattlemasterListEntry
     uint32 HolidayWorldStateId;                             // 13 new 3.1
     uint32 minLevel;                                        // 14, min level (sync with PvPDifficulty.dbc content)
     uint32 maxLevel;                                        // 15, max level (sync with PvPDifficulty.dbc content)
+    //uint32 maxGroupSizeRated;                             // 16 4.0.1
 };
 
 /*struct Cfg_CategoriesEntry
@@ -1163,21 +1165,22 @@ struct MapEntry
     //char*       internalname;                             // 1 unused
     uint32  map_type;                                       // 2
     //uint32 mapFlags;                                      // 3 some kind of flags (0x100 - CAN_CHANGE_PLAYER_DIFFICULTY)
-    //uint32 isPvP;                                         // 4 0 or 1 for battlegrounds (not arenas)
-    DBCString name;                                         // 5
-    uint32  linked_zone;                                    // 6 common zone for instance and continent map
-    //char*     hordeIntro;                                 // 7 text for PvP Zones
-    //char*     allianceIntro;                              // 8 text for PvP Zones
-    uint32  multimap_id;                                    // 9 index in  LoadingScreens.dbc
-    //float   BattlefieldMapIconScale;                      // 10 BattlefieldMapIconScale
-    int32   ghost_entrance_map;                             // 11 map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
-    float   ghost_entrance_x;                               // 12 entrance x coordinate in ghost mode  (in most cases = normal entrance)
-    float   ghost_entrance_y;                               // 13 entrance y coordinate in ghost mode  (in most cases = normal entrance)
-    //uint32  timeOfDayOverride;                            // 14 time of day override
-    uint32  addon;                                          // 15 expansion
-    //uint32 unkTime;                                       // 16 some kind of time?
-    //uint32 maxPlayers;                                    // 17 max players
-    //uint32 unk400;                                        // 18 new 4.0.0, mapid, related to phasing
+    //uint32 unk4;                                          // 4 4.0.1
+    //uint32 isPvP;                                         // 5 0 or 1 for battlegrounds (not arenas)
+    DBCString name;                                         // 6
+    uint32  linked_zone;                                    // 7 common zone for instance and continent map
+    //char*     hordeIntro;                                 // 8 text for PvP Zones
+    //char*     allianceIntro;                              // 9 text for PvP Zones
+    uint32  multimap_id;                                    // 10 index in  LoadingScreens.dbc
+    //float   BattlefieldMapIconScale;                      // 11 BattlefieldMapIconScale
+    int32   ghost_entrance_map;                             // 12 map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
+    float   ghost_entrance_x;                               // 13 entrance x coordinate in ghost mode  (in most cases = normal entrance)
+    float   ghost_entrance_y;                               // 14 entrance y coordinate in ghost mode  (in most cases = normal entrance)
+    //uint32  timeOfDayOverride;                            // 15 time of day override
+    uint32  addon;                                          // 16 expansion
+    //uint32 unkTime;                                       // 17 some kind of time?
+    //uint32 maxPlayers;                                    // 18 max players
+    //uint32 unk400;                                        // 19 new 4.0.0, mapid, related to phasing
 
     // Helpers
     uint32 Expansion() const { return addon; }

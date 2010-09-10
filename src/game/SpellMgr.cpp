@@ -316,12 +316,16 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
     {
         for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if (spellInfo_1->Effect[i] == spellInfo_2->Effect[j]
-                && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j]
-                && spellInfo_1->EffectMiscValue[i] == spellInfo_2->EffectMiscValue[j]
-                && spellInfo_1->EffectItemType[i] == spellInfo_2->EffectItemType[j]
-                && (spellInfo_1->Effect[i] != 0 || spellInfo_1->EffectApplyAuraName[i] != 0 || 
-                    spellInfo_1->EffectMiscValue[i] != 0 || spellInfo_1->EffectItemType[i] != 0))
+            SpellEffectEntry const* effect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
+            SpellEffectEntry const* effect_2 = spellInfo_2->GetSpellEffect(SpellEffectIndex(j));
+            if(!effect_1 || !effect_2)
+                continue;
+            if (effect_1->Effect == effect_2->Effect
+                && effect_1->EffectApplyAuraName == effect_2->EffectApplyAuraName
+                && effect_1->EffectMiscValue == effect_2->EffectMiscValue
+                && effect_1->EffectItemType == effect_2->EffectItemType
+                && (effect_1->Effect != 0 || effect_1->EffectApplyAuraName != 0 || 
+                    effect_1->EffectMiscValue != 0 || effect_1->EffectItemType != 0))
                 return true;
         }
     }

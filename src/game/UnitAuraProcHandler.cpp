@@ -1654,7 +1654,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     SpellClassOptionsEntry const* itrClassOptions = spellProto->GetSpellClassOptions();
                     if (itrClassOptions && itrClassOptions->SpellFamilyName == SPELLFAMILY_ROGUE &&
                         (itrClassOptions->SpellFamilyFlags & UI64LIT(0x0000000000040000)))
-                    }
+                    {
                         (*itr)->GetHolder()->RefreshHolder();
                         return SPELL_AURA_PROC_OK;
                     }

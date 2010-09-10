@@ -385,7 +385,7 @@ m_positive(false), m_isPeriodic(false), m_isAreaAura(false), m_in_use(0)
 
     m_spellEffect = spellproto->GetSpellEffect(m_effIndex);
 
-    ASSERT(m_spellEffect);                                  // need testing...
+    MANGOS_ASSERT(m_spellEffect);                           // need testing...
 
     bool isPassive = IsPassiveSpell(GetSpellProto());
     bool isPermanent = false;
@@ -2129,7 +2129,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
 
                 // Earth Shield
-                else if (classOptions && (classOptions->SpellFamilyFlags & UI64LIT(0x40000000000)))
+                if (classOptions && (classOptions->SpellFamilyFlags & UI64LIT(0x40000000000)))
                 {
                     // prevent double apply bonuses
                     if (target->GetTypeId() != TYPEID_PLAYER || !((Player*)target)->GetSession()->PlayerLoading())
@@ -6002,7 +6002,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 Unit::AuraList const& modAuras = target->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
                 for (Unit::AuraList::const_iterator i = modAuras.begin(); i != modAuras.end(); ++i)
                 {
-                    if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_DRUID &&
+                    if ((*i)->GetSpellProto()->GetSpellFamilyName() == SPELLFAMILY_DRUID &&
                         (*i)->GetSpellProto()->SpellIconID == 961)
                     {
                         int32 bp = (*i)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
