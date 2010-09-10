@@ -11177,7 +11177,10 @@ void Unit::EnterVehicle(VehicleKit *vehicle, int8 seatId)
         if (BattleGround *bg = player->GetBattleGround())
             bg->EventPlayerDroppedFlag(player);
 
-        WorldPacket data(SMSG_BREAK_TARGET, 8);
+        WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA);
+        player->GetSession()->SendPacket(&data);
+
+        data.Initialize(SMSG_BREAK_TARGET, 8);
         data << vehicle->GetBase()->GetPackGUID();
         player->GetSession()->SendPacket(&data);
     }
