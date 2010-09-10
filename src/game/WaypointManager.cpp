@@ -16,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "WaypointManager.h"
 #include "Database/DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Policies/SingletonImp.h"
-#include "WaypointManager.h"
 #include "ProgressBar.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
@@ -125,7 +125,7 @@ void WaypointManager::Load()
             WaypointPath &path  = m_pathMap[id];
 
             // the cleanup queries make sure the following is true
-            ASSERT(point >= 1 && point <= path.size());
+            MANGOS_ASSERT(point >= 1 && point <= path.size());
 
             WaypointNode &node  = path[point-1];
 
@@ -298,7 +298,7 @@ void WaypointManager::Load()
             WaypointPath &path  = m_pathTemplateMap[entry];
 
             // the cleanup queries make sure the following is true
-            ASSERT(point >= 1 && point <= path.size());
+            MANGOS_ASSERT(point >= 1 && point <= path.size());
 
             WaypointNode &node  = path[point-1];
 
@@ -408,7 +408,7 @@ void WaypointManager::Cleanup()
 
         sLog.outErrorDb("Table `creature_movement` was auto corrected for using points out of order (invalid or points missing)");
 
-        ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
     }
 
     if (QueryResult *result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1"))
@@ -423,7 +423,7 @@ void WaypointManager::Cleanup()
 
         sLog.outErrorDb("Table `creature_movement_template` was auto corrected for using points out of order (invalid or points missing)");
 
-        ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1")));
+        MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1")));
     }
 }
 

@@ -45,6 +45,9 @@ ConfVersion=2010062001
 #
 #    BindIP
 #        Bind World Server to IP/hostname
+#        This option is useful for running multiple worldd/realmd instances
+#        on different IP addresses using default ports.
+#        DO NOT CHANGE THIS UNLESS YOU _REALLY_ KNOW WHAT YOU'RE DOING
 #
 ###################################################################################################################
 
@@ -866,12 +869,12 @@ TalentsInspecting = 1
 #    Corpse.Decay.ELITE
 #    Corpse.Decay.RAREELITE
 #    Corpse.Decay.WORLDBOSS
-#        Seconds until creature corpse will decay without being looted or skinned.
-#        Default: 60, 300, 300, 300, 3600
+#        Seconds until creature corpse will decay without being looted or skinned (not used when creature does not have loot initially)
+#        Default: 300, 900, 600, 1200, 3600
 #
 #    Rate.Corpse.Decay.Looted
 #         Controls how long the creature corpse stays after it had been looted, as a multiplier of its Corpse.Decay.* config.
-#         Default: 0.1
+#         Default: 0.0 (will use modifier /3 of the creatures spawntimesecs when 0.0)
 #
 #    Rate.Creature.Normal.Damage
 #    Rate.Creature.Elite.Elite.Damage
@@ -919,12 +922,12 @@ CreatureFamilyAssistanceDelay = 1500
 CreatureFamilyFleeDelay = 7000
 WorldBossLevelDiff = 3
 Corpse.EmptyLootShow = 1
-Corpse.Decay.NORMAL = 60
-Corpse.Decay.RARE = 300
-Corpse.Decay.ELITE = 300
-Corpse.Decay.RAREELITE = 300
+Corpse.Decay.NORMAL = 300
+Corpse.Decay.RARE = 900
+Corpse.Decay.ELITE = 600
+Corpse.Decay.RAREELITE = 1200
 Corpse.Decay.WORLDBOSS = 3600
-Rate.Corpse.Decay.Looted = 0.1
+Rate.Corpse.Decay.Looted = 0.0
 Rate.Creature.Normal.Damage = 1
 Rate.Creature.Elite.Elite.Damage = 1
 Rate.Creature.Elite.RAREELITE.Damage = 1

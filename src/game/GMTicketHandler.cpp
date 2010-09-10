@@ -25,15 +25,15 @@
 #include "Player.h"
 #include "Chat.h"
 
-void WorldSession::SendGMTicketGetTicket(uint32 status, char const* text)
+void WorldSession::SendGMTicketGetTicket(uint32 status, GMTicket *ticket /*= NULL*/)
 {
-    int len = text ? strlen(text) : 0;
+    int len = ticket ? strlen(ticket->GetText()) : 0;
     WorldPacket data( SMSG_GMTICKET_GETTICKET, (4+len+1+4+2+4+4) );
     data << uint32(status);                                 // standard 0x0A, 0x06 if text present
-    if(status == 6)
+    if (status == 6)
     {
         data << uint32(123);                                // unk
-        data << text;                                       // ticket text
+        data << (ticket ? ticket->GetText() : "");          // ticket text
         data << uint8(0x7);                                 // ticket category
         data << float(0);                                   // tickets in queue?
         data << float(0);                                   // if > "tickets in queue" then "We are currently experiencing a high volume of petitions."
@@ -41,7 +41,7 @@ void WorldSession::SendGMTicketGetTicket(uint32 status, char const* text)
         data << uint8(0);                                   // if == 2 and next field == 1 then "Your ticket has been escalated"
         data << uint8(0);                                   // const
     }
-    SendPacket( &data );
+    SendPacket(&data);
 }
 
 void WorldSession::SendGMResponse(GMTicket *ticket)
@@ -68,10 +68,10 @@ void WorldSession::HandleGMTicketGetTicketOpcode( WorldPacket & /*recv_data*/ )
         if(ticket->HasResponse())
             SendGMResponse(ticket);
         else
-            SendGMTicketGetTicket(0x06, ticket->GetText());
+            SendGMTicketGetTicket(0x06, ticket);
     }
     else
-        SendGMTicketGetTicket(0x0A, 0);
+        SendGMTicketGetTicket(0x0A);
 }
 
 void WorldSession::HandleGMTicketUpdateTextOpcode( WorldPacket & recv_data )
@@ -93,7 +93,7 @@ void WorldSession::HandleGMTicketDeleteTicketOpcode( WorldPacket & /*recv_data*/
     data << uint32(9);
     SendPacket( &data );
 
-    SendGMTicketGetTicket(0x0A, 0);
+    SendGMTicketGetTicket(0x0A);
 }
 
 void WorldSession::HandleGMTicketCreateOpcode( WorldPacket & recv_data )

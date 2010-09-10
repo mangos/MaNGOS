@@ -385,10 +385,15 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     break;
                 case EVENT_T_FRIENDLY_MISSING_BUFF:
                 {
-                    SpellEntry const* pSpell = sSpellStore.LookupEntry(temp.spell_hit.spellId);
+                    SpellEntry const* pSpell = sSpellStore.LookupEntry(temp.friendly_buff.spellId);
                     if (!pSpell)
                     {
-                        sLog.outErrorDb("CreatureEventAI:  Creature %u has nonexistent SpellID(%u) defined in event %u.", temp.creature_id, temp.spell_hit.spellId, i);
+                        sLog.outErrorDb("CreatureEventAI:  Creature %u has nonexistent SpellID(%u) defined in event %u.", temp.creature_id, temp.friendly_buff.spellId, i);
+                        continue;
+                    }
+                    if (temp.friendly_buff.radius <= 0)
+                    {
+                        sLog.outErrorDb("CreatureEventAI:  Creature %u has wrong radius (%u) for EVENT_T_FRIENDLY_MISSING_BUFF defined in event %u.", temp.creature_id, temp.friendly_buff.radius, i);
                         continue;
                     }
                     if (temp.friendly_buff.repeatMax < temp.friendly_buff.repeatMin)
@@ -457,11 +462,17 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
 
                 case EVENT_T_BUFFED:
                 case EVENT_T_TARGET_BUFFED:
+                case EVENT_T_MISSING_BUFF:
                 {
                     SpellEntry const* pSpell = sSpellStore.LookupEntry(temp.buffed.spellId);
                     if (!pSpell)
                     {
-                        sLog.outErrorDb("CreatureEventAI:  Creature %u has nonexistent SpellID(%u) defined in event %u.", temp.creature_id, temp.spell_hit.spellId, i);
+                        sLog.outErrorDb("CreatureEventAI:  Creature %u has nonexistent SpellID(%u) defined in event %u.", temp.creature_id, temp.buffed.spellId, i);
+                        continue;
+                    }
+                    if (temp.buffed.amount < 1)
+                    {
+                        sLog.outErrorDb("CreatureEventAI:  Creature %u has wrong spell stack size (%u) defined in event %u.", temp.creature_id, temp.buffed.amount, i);
                         continue;
                     }
                     if (temp.buffed.repeatMax < temp.buffed.repeatMin)

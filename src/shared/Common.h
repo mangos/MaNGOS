@@ -87,6 +87,7 @@
 #include <sstream>
 #include <algorithm>
 
+#include "Errors.h"
 #include "LockedQueue.h"
 #include "Threading.h"
 

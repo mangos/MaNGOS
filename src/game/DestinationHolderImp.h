@@ -83,7 +83,7 @@ DestinationHolder<TRAVELLER>::StartTravel(TRAVELLER &traveller, bool sendMove)
     i_fromY = traveller.GetPositionY();
     i_fromZ = traveller.GetPositionZ();
 
-    i_totalTravelTime = traveller.GetTotalTrevelTimeTo(i_destX,i_destY,i_destZ);
+    i_totalTravelTime = traveller.GetTotalTravelTimeTo(i_destX,i_destY,i_destZ);
     i_timeElapsed = 0;
     if(sendMove)
     {

@@ -1057,7 +1057,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
         return false;
 
     int32 spawntimeSecs;
-    if (!ExtractInt32(&args, spawntimeSecs))
+    if (!ExtractOptInt32(&args, spawntimeSecs, 0))
         return false;
 
     const GameObjectInfo *gInfo = ObjectMgr::GetGameObjectInfo(id);
@@ -2789,7 +2789,7 @@ bool ChatHandler::HandleDelTicketCommand(char *args)
         //notify player
         if (Player* pl = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, lowguid)))
         {
-            pl->GetSession()->SendGMTicketGetTicket(0x0A, 0);
+            pl->GetSession()->SendGMTicketGetTicket(0x0A);
             PSendSysMessage(LANG_COMMAND_TICKETPLAYERDEL, GetNameLink(pl).c_str());
         }
         else
@@ -2809,7 +2809,7 @@ bool ChatHandler::HandleDelTicketCommand(char *args)
 
     // notify players about ticket deleting
     if (target)
-        target->GetSession()->SendGMTicketGetTicket(0x0A, 0);
+        target->GetSession()->SendGMTicketGetTicket(0x0A);
 
     std::string nameLink = playerLink(target_name);
 

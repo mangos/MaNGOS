@@ -249,9 +249,9 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
 
                 if (res)
                 {
-                    FactionStateList::iterator itr = m_factions.find(factionEntry->reputationListID);
-                    if (itr != m_factions.end())
-                        SendState(&itr->second);
+                    FactionStateList::iterator itrstate = m_factions.find(factionEntryCalc->reputationListID);
+                    if (itrstate != m_factions.end())
+                        SendState(&itrstate->second);
                 }
             }
         }

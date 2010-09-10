@@ -733,7 +733,7 @@ void Guild::Roster(WorldSession *session /*= NULL*/)
     {
         if (Player *pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
         {
-            data << uint64(pl->GetGUID());
+            data << pl->GetObjectGuid();
             data << uint8(1);
             data << pl->GetName();
             data << uint32(itr->second.RankId);
@@ -838,10 +838,10 @@ void Guild::DisplayGuildEventLog(WorldSession *session)
         // Event type
         data << uint8(itr->EventType);
         // Player 1
-        data << uint64(itr->PlayerGuid1);
+        data << ObjectGuid(HIGHGUID_PLAYER, itr->PlayerGuid1);
         // Player 2 not for left/join guild events
         if (itr->EventType != GUILD_EVENT_LOG_JOIN_GUILD && itr->EventType != GUILD_EVENT_LOG_LEAVE_GUILD)
-            data << uint64(itr->PlayerGuid2);
+            data << ObjectGuid(HIGHGUID_PLAYER, itr->PlayerGuid2);
         // New Rank - only for promote/demote guild events
         if (itr->EventType == GUILD_EVENT_LOG_PROMOTE_PLAYER || itr->EventType == GUILD_EVENT_LOG_DEMOTE_PLAYER)
             data << uint8(itr->NewRank);
@@ -879,7 +879,7 @@ void Guild::LoadGuildEventLogFromDB()
         NewEvent.TimeStamp = fields[5].GetUInt64();
 
         // There can be a problem if more events have same TimeStamp the ORDER can be broken when fields[0].GetUInt32() == configCount, but
-        // events with same timestamp can appear when there is lag, and we naivly suppose that mangos isn't laggy
+        // events with same timestamp can appear when there is lag, and we naively suppose that mangos isn't laggy
         // but if problem appears, player will see set of guild events that have same timestamp in bad order
 
         // Add entry to list

@@ -102,7 +102,7 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
  * Collects all GUIDs (and related info) from deleted characters which are still in the database.
  *
  * @param foundList    a reference to an std::list which will be filled with info data
- * @param searchString the search string which either contains a player GUID or a part fo the character-name
+ * @param searchString the search string which either contains a player GUID (low part) or a part of the character-name
  * @return             returns false if there was a problem while selecting the characters (e.g. player name not normalizeable)
  */
 bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
@@ -112,7 +112,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::s
     {
         // search by GUID
         if (isNumeric(searchString))
-            resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND guid = %u", uint64(atoi(searchString.c_str())));
+            resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND guid = %u", uint32(atoi(searchString.c_str())));
         // search by name
         else
         {
@@ -225,7 +225,7 @@ void ChatHandler::HandleCharacterDeletedListHelper(DeletedInfoList const& foundL
  * @see ChatHandler::HandleCharacterDeletedDeleteCommand
  * @see ChatHandler::DeletedInfoList
  *
- * @param args the search string which either contains a player GUID or a part fo the character-name
+ * @param args the search string which either contains a player GUID or a part of the character-name
  */
 bool ChatHandler::HandleCharacterDeletedListCommand(char* args)
 {
@@ -354,7 +354,7 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
  * @see ChatHandler::HandleCharacterDeletedListCommand
  * @see ChatHandler::HandleCharacterDeletedRestoreCommand
  *
- * @param args the search string which either contains a player GUID or a part fo the character-name
+ * @param args the search string which either contains a player GUID or a part of the character-name
  */
 bool ChatHandler::HandleCharacterDeletedDeleteCommand(char* args)
 {
@@ -391,7 +391,7 @@ bool ChatHandler::HandleCharacterDeletedDeleteCommand(char* args)
  * @see ChatHandler::HandleCharacterDeletedListCommand
  * @see ChatHandler::HandleCharacterDeletedRestoreCommand
  *
- * @param args the search string which either contains a player GUID or a part fo the character-name
+ * @param args the search string which either contains a player GUID or a part of the character-name
  */
 bool ChatHandler::HandleCharacterDeletedOldCommand(char* args)
 {

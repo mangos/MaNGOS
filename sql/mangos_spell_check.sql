@@ -575,6 +575,10 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (67333,-1,                -1,        -1,  -1,  -1,  -1, 31, -1,-1,'Meteor Fists',                       'Spell::EffectWeaponDmg'),
 (67485, 0,                -1,        -1,  -1,  -1,  -1,  2, -1,-1,'Hand of Rekoning',                   'Spell::EffectSchoolDMG'),
 (67485,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Hand of Rekoning',                   'Spell::cast'),
+(67486,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Healing Potion Injector',            'Spell::EffectHeal'),
+(67487,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mana Potion Injector',               'Spell::EffectEnergize'),
+(67489,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Runic Healing Injector',             'Spell::EffectHeal'),
+(67490,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Runic Mana Injector',                'Spell::EffectEnergize'),
 (67700, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Penetrating Cold',                   'Spell::SetTargetMap'),
 (68082,-1,                -1,        -1,  -1,  -1,  -1, 30, -1,-1,'Glyph of Seal of Command',           'Spell::EffectEnergize'),
 (68509, 0,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Penetrating Cold',                   'Spell::SetTargetMap'),
@@ -610,6 +614,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 
 /* sorted by spell names */
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
+(    0,15,                -1,        -1,2710,  -1,  -1, -1,  4,-1,'Annihilation',                 		'Spell::EffectDummy'),
 (    0, 3,0x0000000020000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Blast',                       'Spell::EffectSchoolDMG'),
 (    0, 3,0x0000000000200080,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Arcane Missles / Blizzard',          'Spell::prepareDataForTriggerSystem'),
 (    0, 9,0x0000000000000800,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Arcane Shot',                        'Spell::EffectSchoolDMG'),
@@ -684,6 +689,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 6,0x0000000000002000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Mind Blast',                         'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000000000002,0x00000000,  -1, 342,  -1,  2, -1,-1,'Mongoose Bite',                      'Spell::EffectSchoolDMG'),
 (    0, 8,0x0020000000000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Mutilate',                           'Spell::CheckCast'),
+(    0,15,0x0002000000000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Obliterate',                         'Spell::EffectDummy'),
 (    0, 6,0x0080000000000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Penance',                            'Spell::EffectDummy'),
 (    0, 6,0x0001800000800000,0x00000040,  -1,  -1,  -1, -1, -1,-1,'Penance,Mind Sear,Mind Flay',        'Spell::prepareDataForTriggerSystem'),
 (    0,15,0x0000000000000001,0x00000000,  -1,  -1,  -1, 31, -1,-1,'Plague Strike',                      'Spell::EffectWeaponDmg'),
@@ -720,6 +726,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Steady Shot',                        'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Steady Shot',                        'Spell::EffectDummy'),
 (    0,-1,                -1,        -1,1989,  -1,  -1, -1, 42, 0,'Sudden Death',                       'Spell::EffectDummy'),
+(    0, 7,                -1,        -1, 961,  -1,  -1, -1,137,-1,'Survival of the Fittest',            'Aura::HandleShapeshiftBoosts'),
 (    0, 7,0x0010000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Swipe',                              'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000004000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Totem of Wrath',                     'Spell::cast'),

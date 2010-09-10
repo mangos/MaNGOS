@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "CreatureAISelector.h"
 #include "Creature.h"
 #include "CreatureAIImpl.h"
-#include "CreatureAISelector.h"
 #include "NullCreatureAI.h"
 #include "Policies/SingletonImp.h"
 #include "MovementGenerator.h"
@@ -69,7 +69,7 @@ namespace FactorySelector
             {
                 const CreatureAICreator *factory = iter->second;
                 const SelectableAI *p = dynamic_cast<const SelectableAI *>(factory);
-                ASSERT( p != NULL );
+                MANGOS_ASSERT( p != NULL );
                 int val = p->Permit(creature);
                 if( val > best_val )
                 {
@@ -89,7 +89,7 @@ namespace FactorySelector
     MovementGenerator* selectMovementGenerator(Creature *creature)
     {
         MovementGeneratorRegistry &mv_registry(MovementGeneratorRepository::Instance());
-        ASSERT( creature->GetCreatureInfo() != NULL );
+        MANGOS_ASSERT( creature->GetCreatureInfo() != NULL );
         MovementGeneratorCreator const * mv_factory = mv_registry.GetRegistryItem(
             IS_PLAYER_GUID(creature->GetOwnerGUID()) ? FOLLOW_MOTION_TYPE : creature->GetDefaultMovementType());
 

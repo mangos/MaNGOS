@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "Chat.h"
 #include "Language.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
@@ -28,7 +28,6 @@
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "UpdateMask.h"
-#include "Chat.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "AccountMgr.h"
@@ -775,6 +774,12 @@ ChatCommand * ChatHandler::getCommandTable()
     return commandTable;
 }
 
+ChatHandler::ChatHandler(WorldSession* session) : m_session(session) {}
+
+ChatHandler::ChatHandler(Player* player) : m_session(player->GetSession()) {}
+
+ChatHandler::~ChatHandler() {}
+
 const char *ChatHandler::GetMangosString(int32 entry) const
 {
     return m_session->GetMangosString(entry);
@@ -794,6 +799,11 @@ bool ChatHandler::isAvailable(ChatCommand const& cmd) const
 {
     // check security level only for simple  command (without child commands)
     return GetAccessLevel() >= (AccountTypes)cmd.SecurityLevel;
+}
+
+std::string ChatHandler::GetNameLink() const
+{
+    return GetNameLink(m_session->GetPlayer());
 }
 
 bool ChatHandler::HasLowerSecurity(Player* target, uint64 guid, bool strong)
@@ -995,6 +1005,7 @@ ChatCommand const* ChatHandler::FindCommand(char const* text)
  * @param parentCommand Output arg for optional return parent command for command arg.
  * @param cmdNamePtr    Output arg for optional return last parsed command name.
  * @param allAvailable  Optional arg (with false default value) control use command access level checks while command search.
+ * @param exactlyName   Optional arg (with false default value) control use exactly name in checks while command search.
  *
  * @return one from enum value of ChatCommandSearchResult. Output args return values highly dependent from this return result:
  *
@@ -1013,7 +1024,7 @@ ChatCommand const* ChatHandler::FindCommand(char const* text)
  *                              parentCommand have parent of command in command arg or NULL
  *                              cmdNamePtr store command name that not found as it extracted from command line
  */
-ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const* &text, ChatCommand*& command, ChatCommand** parentCommand /*= NULL*/, std::string* cmdNamePtr /*= NULL*/, bool allAvailable /*= false*/)
+ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const* &text, ChatCommand*& command, ChatCommand** parentCommand /*= NULL*/, std::string* cmdNamePtr /*= NULL*/, bool allAvailable /*= false*/, bool exactlyName /*= false*/)
 {
     std::string cmd = "";
 
@@ -1029,15 +1040,23 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
     // search first level command in table
     for(uint32 i = 0; table[i].Name != NULL; ++i)
     {
-        if (!hasStringAbbr(table[i].Name, cmd.c_str()))
-            continue;
-
+        if (exactlyName)
+        {
+            size_t len = strlen(table[i].Name);
+            if (strncmp(table[i].Name, cmd.c_str(), len+1) != 0)
+                continue;
+        }
+        else
+        {
+            if (!hasStringAbbr(table[i].Name, cmd.c_str()))
+                continue;
+        }
         // select subcommand from child commands list
         if (table[i].ChildCommands != NULL)
         {
             char const* oldchildtext = text;
             ChatCommand* parentSubcommand = NULL;
-            ChatCommandSearchResult res = FindCommand(table[i].ChildCommands, text, command, &parentSubcommand, cmdNamePtr, allAvailable);
+            ChatCommandSearchResult res = FindCommand(table[i].ChildCommands, text, command, &parentSubcommand, cmdNamePtr, allAvailable, exactlyName);
 
             switch(res)
             {
@@ -1200,7 +1219,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
     ChatCommand* command = NULL;
     std::string cmdName;
 
-    ChatCommandSearchResult res = FindCommand(commandTable, text, command, NULL, &cmdName, true);
+    ChatCommandSearchResult res = FindCommand(commandTable, text, command, NULL, &cmdName, true, true);
 
     switch(res)
     {
@@ -1235,8 +1254,8 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
 
 bool ChatHandler::ParseCommands(const char* text)
 {
-    ASSERT(text);
-    ASSERT(*text);
+    MANGOS_ASSERT(text);
+    MANGOS_ASSERT(*text);
 
     //if(m_session->GetSecurity() == SEC_PLAYER)
     //    return false;
@@ -1948,7 +1967,7 @@ void ChatHandler::FillMessageData( WorldPacket *data, WorldSession* session, uin
         case CHAT_MSG_RAID_BOSS_EMOTE:
         case CHAT_MSG_BATTLENET:
         {
-            *data << uint64(speaker->GetGUID());
+            *data << speaker->GetObjectGuid();
             *data << uint32(0);                             // 2.1.0
             *data << uint32(strlen(speaker->GetName()) + 1);
             *data << speaker->GetName();
@@ -1975,7 +1994,7 @@ void ChatHandler::FillMessageData( WorldPacket *data, WorldSession* session, uin
 
     if (type == CHAT_MSG_CHANNEL)
     {
-        ASSERT(channelName);
+        MANGOS_ASSERT(channelName);
         *data << channelName;
     }
 
@@ -2261,9 +2280,10 @@ char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
  * Function extract quote-like string (any characters guarded by some special character, in our cases ['")
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     quote-like string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractQuotedArg( char** args )
+char* ChatHandler::ExtractQuotedArg( char** args, bool asis /*= false*/ )
 {
     if (!*args || !**args)
         return NULL;
@@ -2271,32 +2291,50 @@ char* ChatHandler::ExtractQuotedArg( char** args )
     if (**args != '\'' && **args != '"' && **args != '[')
         return NULL;
 
-    char guard[2] = " ";                                    // guard[1] == '\0'
+    char guard = (*args)[0];
 
-    guard[0] = (*args)[0];
+    if (guard == '[')
+        guard = ']';
 
-    if (guard[0] == '[')
-        guard[0] = ']';
+    char* tail = (*args)+1;                                 // start scan after first quote symbol
+    char* head = asis ? *args : tail;                       // start arg
 
-    char* str = strtok((*args)+1, guard);                   // skip start guard symbol
+    while (*tail && *tail != guard)
+        ++tail;
 
-    char* tail = strtok(NULL, "");
-    *args = tail ? tail : (char*)"";                        // *args don't must be NULL
+    if (!*tail || tail[1] && !isWhiteSpace(tail[1]))        // fail
+        return NULL;
+
+    if (!tail[1])                                           // quote is last char in string
+    {
+        if (!asis)
+            *tail = '\0';
+    }
+    else                                                    // quote isn't last char
+    {
+        if (asis)
+            ++tail;
+
+        *tail = '\0';
+    }
+
+    *args = tail+1;
 
     SkipWhiteSpaces(args);
 
-    return str;
+    return head;
 }
 
 /**
  * Function extract quote-like string or literal if quote not detected
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     quote/literal string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractQuotedOrLiteralArg(char** args)
+char* ChatHandler::ExtractQuotedOrLiteralArg(char** args, bool asis /*= false*/)
 {
-    char *arg = ExtractQuotedArg(args);
+    char *arg = ExtractQuotedArg(args, asis);
     if (!arg)
         arg = ExtractLiteralArg(args);
     return arg;
@@ -2518,14 +2556,15 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
  * Function extract name/number/quote/shift-link-like string
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
+ * @param asis control save quote string wrappers
  * @return     extracted arg string, or NULL if args empty or not appropriate content.
  */
-char* ChatHandler::ExtractArg( char** args )
+char* ChatHandler::ExtractArg( char** args, bool asis /*= false*/ )
 {
     if (!*args || !**args)
         return NULL;
 
-    char* arg = ExtractQuotedOrLiteralArg(args);
+    char* arg = ExtractQuotedOrLiteralArg(args, asis);
     if (!arg)
         arg = ExtractLinkArg(args);
 
@@ -2541,7 +2580,7 @@ char* ChatHandler::ExtractArg( char** args )
  */
 char* ChatHandler::ExtractOptNotLastArg(char** args)
 {
-    char* arg = ExtractArg(args);
+    char* arg = ExtractArg(args, true);
 
     // have more data
     if (*args && **args)
@@ -2721,9 +2760,12 @@ uint32 ChatHandler::ExtractSpellIdFromLink(char** text)
             if(!talentEntry)
                 return 0;
 
-            uint32 rank;
-            if (!ExtractUInt32(&param1_str, rank))
+            int32 rank;
+            if (!ExtractInt32(&param1_str, rank))
                 return 0;
+
+            if (rank < 0)                                   // unlearned talent have in shift-link field -1 as rank
+                rank = 0;
 
             return rank < MAX_TALENT_RANK ? talentEntry->RankID[rank] : 0;
         }
@@ -3217,6 +3259,11 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
         *targetIfNullArg = NULL;
 
     return account_id;
+}
+
+std::string ChatHandler::GetNameLink(Player* chr) const
+{
+    return playerLink(chr->GetName());
 }
 
 bool ChatHandler::needReportToTarget(Player* chr) const

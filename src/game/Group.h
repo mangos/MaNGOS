@@ -19,6 +19,8 @@
 #ifndef MANGOSSERVER_GROUP_H
 #define MANGOSSERVER_GROUP_H
 
+#include "Common.h"
+#include "ObjectGuid.h"
 #include "GroupReference.h"
 #include "GroupRefManager.h"
 #include "BattleGround.h"
@@ -29,8 +31,13 @@
 #include <vector>
 
 struct ItemPrototype;
+
+class WorldSession;
+class Map;
 class BattleGround;
 class InstanceSave;
+class Field;
+class Unit;
 
 #define MAX_GROUP_SIZE 5
 #define MAX_RAID_SIZE 40
@@ -234,7 +241,7 @@ class MANGOS_DLL_SPEC Group
         // member manipulation methods
         bool IsMember(ObjectGuid guid) const { return _getMemberCSlot(guid) != m_memberSlots.end(); }
         bool IsLeader(ObjectGuid guid) const { return GetLeaderGuid() == guid; }
-        ObjectGuid GetMemberGUID(const std::string& name)
+        ObjectGuid GetMemberGuid(const std::string& name)
         {
             for(member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
                 if (itr->name == name)

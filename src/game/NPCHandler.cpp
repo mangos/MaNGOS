@@ -246,7 +246,7 @@ void WorldSession::HandleTrainerBuySpellOpcode( WorldPacket & recv_data )
     SendPacket(&data);
 
     data.Initialize(SMSG_PLAY_SPELL_IMPACT, 12);            // visual effect on player
-    data << uint64(_player->GetGUID());
+    data << _player->GetObjectGuid();
     data << uint32(0x016A);                                 // index from SpellVisualKit.dbc
     SendPacket(&data);
 
@@ -453,7 +453,7 @@ void WorldSession::SendBindPoint(Creature *npc)
     npc->CastSpell(_player, 3286, true);                    // Bind
 
     WorldPacket data( SMSG_TRAINER_BUY_SUCCEEDED, (8+4));
-    data << uint64(npc->GetGUID());
+    data << npc->GetObjectGuid();
     data << uint32(3286);                                   // Bind
     SendPacket( &data );
 

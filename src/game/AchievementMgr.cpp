@@ -56,9 +56,9 @@ namespace MaNGOS
 
                 data << uint8(i_msgtype);
                 data << uint32(LANG_UNIVERSAL);
-                data << uint64(i_player.GetGUID());
+                data << i_player.GetObjectGuid();
                 data << uint32(5);
-                data << uint64(i_player.GetGUID());
+                data << i_player.GetObjectGuid();
                 data << uint32(strlen(text)+1);
                 data << text;
                 data << uint8(0);
@@ -245,10 +245,10 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
                 return false;
             }
             return true;
-        case ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM_LVL:
+        case ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL:
             if(equipped_item.item_quality >= MAX_ITEM_QUALITY)
             {
-                sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM (%u) have unknown quality state in value1 (%u), ignore.",
+                sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL (%u) have unknown quality state in value1 (%u), ignore.",
                     criteria->ID, criteria->requiredType,requirementType,equipped_item.item_quality);
                 return false;
             }
@@ -351,7 +351,7 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
             }
             return data->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
         }
-        case ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM_LVL:
+        case ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL:
         {
             Item* item = source->GetItemByPos(INVENTORY_SLOT_BAG_0,miscvalue1);
             if (!item)
@@ -640,7 +640,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement)
         // broadcast realm first reached
         WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, strlen(GetPlayer()->GetName())+1+8+4+4);
         data << GetPlayer()->GetName();
-        data << uint64(GetPlayer()->GetGUID());
+        data << GetPlayer()->GetObjectGuid();
         data << uint32(achievement->ID);
         data << uint32(0);                                  // 1=link supplied string as player name, 0=display plain string
         sWorld.SendGlobalMessage(&data);
@@ -2165,7 +2165,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         if(!criteria)
             continue;
 
-        ASSERT(criteria->requiredType < ACHIEVEMENT_CRITERIA_TYPE_TOTAL && "Not updated ACHIEVEMENT_CRITERIA_TYPE_TOTAL?");
+        MANGOS_ASSERT(criteria->requiredType < ACHIEVEMENT_CRITERIA_TYPE_TOTAL && "Not updated ACHIEVEMENT_CRITERIA_TYPE_TOTAL?");
 
         m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
         m_AchievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);

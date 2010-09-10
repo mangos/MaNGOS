@@ -16,14 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
+#include "AuctionHouseMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/SQLStorage.h"
 #include "DBCStores.h"
 #include "ProgressBar.h"
 
 #include "AccountMgr.h"
-#include "AuctionHouseMgr.h"
 #include "Item.h"
 #include "Language.h"
 #include "Log.h"
@@ -439,8 +438,8 @@ void AuctionHouseMgr::LoadAuctions()
 
 void AuctionHouseMgr::AddAItem( Item* it )
 {
-    ASSERT( it );
-    ASSERT( mAitems.find(it->GetGUIDLow()) == mAitems.end());
+    MANGOS_ASSERT( it );
+    MANGOS_ASSERT( mAitems.find(it->GetGUIDLow()) == mAitems.end());
     mAitems[it->GetGUIDLow()] = it;
 }
 
@@ -687,13 +686,13 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket & data) const
     data << uint32(pItem->GetCount());                      //item->count
     data << uint32(pItem->GetSpellCharges());               //item->charge FFFFFFF
     data << uint32(0);                                      //Unknown
-    data << uint64(owner);                                  //Auction->owner
+    data << ObjectGuid(HIGHGUID_PLAYER, owner);             //Auction->owner
     data << uint32(startbid);                               //Auction->startbid (not sure if useful)
     data << uint32(bid ? GetAuctionOutBid() : 0);
     //minimal outbid
     data << uint32(buyout);                                 //auction->buyout
     data << uint32((expire_time-time(NULL))*IN_MILLISECONDS);//time left
-    data << uint64(bidder) ;                                //auction->bidder current
+    data << ObjectGuid(HIGHGUID_PLAYER, bidder);            //auction->bidder current
     data << uint32(bid);                                    //current bid
     return true;
 }

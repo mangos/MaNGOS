@@ -24,14 +24,21 @@
 #include "ObjectGuid.h"
 
 struct AchievementEntry;
+struct AchievementCriteriaEntry;
 struct AreaTrigger;
+struct AreaTriggerEntry;
 struct FactionEntry;
 struct FactionState;
 struct GameTele;
+struct SpellEntry;
 
+class QueryResult;
 class ChatHandler;
 class WorldSession;
+class WorldPacket;
 class GMTicket;
+class Object;
+class GameObject;
 class Creature;
 class Player;
 class Unit;
@@ -57,9 +64,9 @@ enum ChatCommandSearchResult
 class ChatHandler
 {
     public:
-        explicit ChatHandler(WorldSession* session) : m_session(session) {}
-        explicit ChatHandler(Player* player) : m_session(player->GetSession()) {}
-        ~ChatHandler() {}
+        explicit ChatHandler(WorldSession* session);
+        explicit ChatHandler(Player* player);
+        ~ChatHandler();
 
         static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, uint64 target_guid, const char *message, Unit *speaker);
 
@@ -97,7 +104,7 @@ class ChatHandler
         virtual uint32 GetAccountId() const;
         virtual AccountTypes GetAccessLevel() const;
         virtual bool isAvailable(ChatCommand const& cmd) const;
-        virtual std::string GetNameLink() const { return GetNameLink(m_session->GetPlayer()); }
+        virtual std::string GetNameLink() const;
         virtual bool needReportToTarget(Player* chr) const;
         virtual LocaleConstant GetSessionDbcLocale() const;
         virtual int GetSessionDbLocaleIndex() const;
@@ -111,7 +118,7 @@ class ChatHandler
         void ExecuteCommand(const char* text);
         bool ShowHelpForCommand(ChatCommand *table, const char* cmd);
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);
-        ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = NULL, std::string* cmdNamePtr = NULL, bool allAvailable = false);
+        ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = NULL, std::string* cmdNamePtr = NULL, bool allAvailable = false, bool exactlyName = false);
 
         void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         ChatCommand* getCommandTable();
@@ -572,14 +579,15 @@ class ChatHandler
         bool  ExtractOptUInt32(char** args, uint32& val, uint32 defVal);
         bool  ExtractFloat(char** args, float& val);
         bool  ExtractOptFloat(char** args, float& val, float defVal);
-        char* ExtractQuotedArg(char** args);                // string with " or [] or ' around
+        char* ExtractQuotedArg(char** args, bool asis = false);
+                                                            // string with " or [] or ' around
         char* ExtractLiteralArg(char** args, char const* lit = NULL);
                                                             // literal string (until whitespace and not started from "['|), any or 'lit' if provided
-        char* ExtractQuotedOrLiteralArg(char** args);
+        char* ExtractQuotedOrLiteralArg(char** args, bool asis = false);
         bool  ExtractOnOff(char** args, bool& value);
         char* ExtractLinkArg(char** args, char const* const* linkTypes = NULL, int* foundIdx = NULL, char** keyPair = NULL, char** somethingPair = NULL);
                                                             // shift-link like arg (with aditional info if need)
-        char* ExtractArg(char** args);                      // any name/number/quote/shift-link strings
+        char* ExtractArg(char** args, bool asis = false);   // any name/number/quote/shift-link strings
         char* ExtractOptNotLastArg(char** args);            // extract name/number/quote/shift-link arg only if more data in args for parse
 
         char* ExtractKeyFromLink(char** text, char const* linkType, char** something1 = NULL);
@@ -596,7 +604,7 @@ class ChatHandler
                                                             // select by arg (name/link) or in-game selection online/offline player
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
-        std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
+        std::string GetNameLink(Player* chr) const;
 
         GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
 

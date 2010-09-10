@@ -270,7 +270,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket & recv_data)
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
     data << uint64(petitionguid);                           // petition guid
-    data << uint64(_player->GetGUID());                     // owner guid
+    data << _player->GetObjectGuid();                       // owner guid
     data << uint32(petitionguid_low);                       // guild guid (in mangos always same as GUID_LOPART(petitionguid)
     data << uint8(signs);                                   // sign's count
 
@@ -317,7 +317,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
         "  type "
         "FROM petition WHERE petitionguid = '%u'", petitionLowGuid, petitionLowGuid);
 
-    if(result)
+    if (result)
     {
         Field* fields = result->Fetch();
         ownerguid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
@@ -333,11 +333,11 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
     }
 
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4+8+name.size()+1+1+4*12+2+10));
-    data << uint32(petitionLowGuid);                                // guild/team guid (in mangos always same as GUID_LOPART(petition guid)
+    data << uint32(petitionLowGuid);                        // guild/team guid (in mangos always same as GUID_LOPART(petition guid)
     data << ownerguid;                                      // charter owner guid
     data << name;                                           // name (guild/arena team)
     data << uint8(0);                                       // some string
-    if(type == 9)
+    if (type == 9)
     {
         data << uint32(9);
         data << uint32(9);
@@ -363,7 +363,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 
     data << uint32(0);                                      // 14
 
-    if(type == 9)
+    if (type == 9)
         data << uint32(0);                                  // 15 0 - guild, 1 - arena team
     else
         data << uint32(1);
@@ -687,7 +687,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recv_data)
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+signs+signs*12));
     data << uint64(petitionguid);                           // petition guid
-    data << uint64(_player->GetGUID());                     // owner guid
+    data << _player->GetObjectGuid();                       // owner guid
     data << uint32(GUID_LOPART(petitionguid));              // guild guid (in mangos always same as GUID_LOPART(petition guid)
     data << uint8(signs);                                   // sign's count
 
