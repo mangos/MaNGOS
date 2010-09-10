@@ -10,15 +10,4 @@
 # MaNGOS generated files at Windows build
 #
 
-*.ncb
-*.suo
-*.sdf
-*.opensdf
 bin
-
-# CMake files
-
-CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
-

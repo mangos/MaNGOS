@@ -11,10 +11,3 @@
 #
 
 bin
-
-# CMake files
-
-CMakeFiles
-CMakeCache.txt
-cmake_install.cmake
-
