@@ -906,6 +906,9 @@ bool Pet::UpdateStats(Stats stat)
     if(stat > STAT_SPIRIT || stat < STAT_STRENGTH )
         return false;
 
+    if (!CanModifyStats()) 
+        return true;
+
     ApplyStatBonus(stat, true);
 
     SetCanModifyStats(false);
@@ -953,6 +956,9 @@ bool Pet::UpdateAllStats()
 
 void Pet::UpdateResistances(uint32 school)
 {
+    if (!CanModifyStats()) 
+        return;
+
     ApplyResistanceBonus(school, true);
 
     if(school > SPELL_SCHOOL_NORMAL)
@@ -968,6 +974,9 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
+    if (!CanModifyStats()) 
+        return;
+
     ApplyResistanceBonus(SPELL_SCHOOL_NORMAL, true);
 
     SetCanModifyStats(false);
@@ -986,6 +995,9 @@ void Pet::UpdateArmor()
 
 void Pet::UpdateMaxHealth()
 {
+    if (!CanModifyStats()) 
+        return;
+
     SetCanModifyStats(false);
     UnitMods unitMod = UNIT_MOD_HEALTH;
     float stamina = GetStat(STAT_STAMINA) - GetCreateStat(STAT_STAMINA);
@@ -1001,6 +1013,9 @@ void Pet::UpdateMaxHealth()
 
 void Pet::UpdateMaxPower(Powers power)
 {
+    if (!CanModifyStats()) 
+        return;
+
     SetCanModifyStats(false);
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
@@ -1017,6 +1032,8 @@ void Pet::UpdateMaxPower(Powers power)
 
 void Pet::UpdateAttackPowerAndDamage(bool ranged)
 {
+    if (!CanModifyStats()) 
+        return;
 
     ApplyAttackPowerBonus(true);
 
@@ -1064,6 +1081,9 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
 {
     // Temporary not support for ranged attack
     if(attType > BASE_ATTACK)
+        return;
+
+    if (!CanModifyStats()) 
         return;
 
     SetCanModifyStats(false);

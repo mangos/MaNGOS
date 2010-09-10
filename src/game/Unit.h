@@ -30,7 +30,6 @@
 #include "FollowerReference.h"
 #include "FollowerRefManager.h"
 #include "Utilities/EventProcessor.h"
-#include "ace/Process_Mutex.h"
 #include "MapManager.h"
 #include "MotionMaster.h"
 #include "DBCStructure.h"
@@ -1659,7 +1658,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Stats GetStatByAuraGroup(UnitMods unitMod) const;
         Powers GetPowerTypeByAuraGroup(UnitMods unitMod) const;
         bool CanModifyStats() const { return m_canModifyStats; }
-        void SetCanModifyStats(bool modifyStats);
+        void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
         virtual bool UpdateStats(Stats stat) = 0;
         virtual bool UpdateAllStats() = 0;
         virtual void UpdateResistances(uint32 school) = 0;
@@ -1994,7 +1993,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_auraModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_END];
         float m_weaponDamage[MAX_ATTACK][2];
         bool m_canModifyStats;
-        ACE_Process_Mutex m_canModifyStatsLock;
 
         //std::list< spellEffectPair > AuraSpells[TOTAL_AURAS];  // TODO: use this if ok for mem
         VisibleAuraMap m_visibleAuras;

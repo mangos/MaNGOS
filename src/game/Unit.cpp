@@ -208,15 +208,6 @@ Unit::Unit()
     m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
 
-#if defined(__GNUC__)
-    m_canModifyStatsLock = ACE_Process_Mutex();
-#else
-
-    char _semaname[32];
-    sprintf(_semaname,"%d", rand32());
-    m_canModifyStatsLock = ACE_Process_Mutex(_semaname);
-#endif
-
     for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
         m_spellImmune[i].clear();
     for (int i = 0; i < UNIT_MOD_END; ++i)
@@ -282,8 +273,6 @@ Unit::~Unit()
 
     if (m_charmInfo)
         delete m_charmInfo;
-
-    m_canModifyStatsLock.remove();
 
     // those should be already removed at "RemoveFromWorld()" call
     MANGOS_ASSERT(m_gameObj.size() == 0);
@@ -11563,13 +11552,3 @@ void Unit::SheduleAINotify(uint32 delay)
     RelocationNotifyEvent *notify = new RelocationNotifyEvent(*this);
     m_Events.AddEvent(notify, m_Events.CalculateTime(delay));
 }
-
-void Unit::SetCanModifyStats(bool modifyStats)
-{
-    if (!modifyStats)
-        m_canModifyStatsLock.acquire();
-    else
-        m_canModifyStatsLock.release();
-
-    m_canModifyStats = modifyStats;
-};
