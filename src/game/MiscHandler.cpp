@@ -1287,19 +1287,22 @@ void WorldSession::HandleFarSightOpcode( WorldPacket & recv_data )
     DEBUG_LOG("WORLD: CMSG_FAR_SIGHT");
     //recv_data.hexlike();
 
-    uint8 unk;
-    recv_data >> unk;
+    uint8 op;
+    recv_data >> op;
 
-    switch(unk)
+    WorldObject* obj = _player->GetMap()->GetWorldObject(_player->GetFarSightGuid());
+    if (!obj)
+        return;
+
+    switch(op)
     {
         case 0:
-            //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0)
-            //SendPacket(&data);
-            //_player->SetUInt64Value(PLAYER_FARSIGHT, 0);
             DEBUG_LOG("Removed FarSight from %s", _player->GetObjectGuid().GetString().c_str());
+            _player->GetCamera().ResetView(false);
             break;
         case 1:
             DEBUG_LOG("Added FarSight %s to %s", _player->GetFarSightGuid().GetString().c_str(), _player->GetObjectGuid().GetString().c_str());
+            _player->GetCamera().SetView(obj, false);
             break;
     }
 }
