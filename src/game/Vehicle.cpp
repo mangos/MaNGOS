@@ -149,7 +149,7 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
         passenger->SendMessageToSet(&data, true);
     }
 
-    if (seatInfo->m_flags & SEAT_FLAG_MAIN_RIDER)
+    if (seatInfo->m_flags & SEAT_FLAG_CAN_CONTROL)
     {
         m_pBase->StopMoving();
         m_pBase->GetMotionMaster()->Clear();
@@ -206,7 +206,7 @@ void VehicleKit::RemovePassenger(Unit *passenger)
     passenger->m_movementInfo.ClearTransportData();
     passenger->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
 
-    if (seat->second.seatInfo->m_flags & SEAT_FLAG_MAIN_RIDER)
+    if (seat->second.seatInfo->m_flags & SEAT_FLAG_CAN_CONTROL)
     {
         passenger->SetCharm(NULL);
         passenger->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
