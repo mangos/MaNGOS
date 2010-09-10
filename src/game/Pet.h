@@ -257,6 +257,7 @@ class Pet : public Creature
         uint8 GetPetCounter() { return m_petCounter; }
         void SetPetCounter(uint8 counter) { m_petCounter = counter; }
         bool SetSummonPosition(float x = 0.0f, float y = 0.0f, float z = 0.0f);
+        bool Summon(int32 duration = 0, uint8 counter = 0);
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }

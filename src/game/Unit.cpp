@@ -207,7 +207,15 @@ Unit::Unit()
     m_transform = 0;
     m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
+
+#if defined(__GNUC__)
     m_canModifyStatsLock = ACE_Process_Mutex();
+#else
+
+    char _semaname[32];
+    sprintf(_semaname,"%d", rand32());
+    m_canModifyStatsLock = ACE_Process_Mutex(_semaname);
+#endif
 
     for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
         m_spellImmune[i].clear();

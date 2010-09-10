@@ -231,9 +231,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         SetFFAPvP(true);
 
     SetCanModifyStats(true);
+    ApplyAllBonuses(false);
     InitStatsForLevel(petlevel);
     InitTalentForLevel();                                   // set original talents points before spell loading
-    ApplyAllBonuses(false);
 
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
@@ -280,11 +280,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         // Temporary summoned pets always have initial spell list at load
         InitPetCreateSpells();
     }
-    else
-    {
-        LearnPetPassives();
-        CastPetAuras(current);
-    }
+
+    LearnPetPassives();
+    CastPetAuras(current);
 
     if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
     {
@@ -341,8 +339,8 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     }
 
     m_loading = false;
-
     SynchronizeLevelWithOwner();
+
     return true;
 }
 
@@ -2472,6 +2470,107 @@ void Pet::ApplyAllBonuses(bool apply)
 
 void Pet::ApplyOtherBonuses(bool apply)
 {
+}
+
+bool Pet::Summon(int32 duration, uint8 counter)
+{
+    Unit* owner = GetOwner();
+
+    if (!owner)
+        return false;
+
+    Map* map = owner->GetMap();
+
+    if (!map)
+        return false;
+                              // Undefined reason set SUMMON_PET  from clean core...
+    setPetType(SUMMON_PET);
+
+    SetPetCounter(counter);
+
+    setFaction(owner->getFaction());
+    UpdateWalkMode(owner);
+
+    if ( duration > 0 || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->isTotem()))
+        GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+    else
+        GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+
+    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+    SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
+    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+
+
+
+    if(owner->IsPvP())
+        SetPvP(true);
+
+    if(owner->IsFFAPvP())
+        SetFFAPvP(true);
+
+    SetCanModifyStats(true);
+    InitStatsForLevel(owner->getLevel(), owner);
+    InitTalentForLevel();
+    InitPetCreateSpells();
+    ApplyAllBonuses(false);
+    AIM_Initialize();
+
+    if(getPetType() == SUMMON_PET)
+    {
+        // generate new name for summon pet
+        std::string new_name = sObjectMgr.GeneratePetName(GetEntry());
+        if(!new_name.empty())
+            SetName(new_name);
+    }
+    else if(getPetType() == HUNTER_PET)
+    {
+        RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+        SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
+    }
+
+    SynchronizeLevelWithOwner();
+
+    SetHealth(GetMaxHealth());
+    SetPower(getPowerType(), GetMaxPower(getPowerType()));
+
+    map->Add((Creature*)this);
+
+    if(owner->GetTypeId() == TYPEID_PLAYER)
+    {
+
+        if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
+        {
+            LearnPetPassives();
+            CastPetAuras(true);
+            InitLevelupSpellsForLevel();
+            CleanupActionBar();                                     // remove unknown spells from action bar after load
+        }
+
+        SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+
+        ((Player*)owner)->PetSpellInitialize();
+
+        if(((Player*)owner)->GetGroup())
+            ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
+
+        ((Player*)owner)->SendTalentsInfoData(true);
+
+        if (!GetPetCounter())
+            SavePetToDB(PET_SAVE_AS_CURRENT);
+        else
+            SavePetToDB(PET_SAVE_NOT_IN_SLOT);
+    }
+    else
+        SetNeedSave(false);
+
+    if (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->AI())
+        ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
+
+    return true;
+
 }
 
 /*
