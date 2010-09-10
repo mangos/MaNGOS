@@ -80,6 +80,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         bool IsDeathPersistent() const { return m_isDeathPersist; }
         bool IsPersistent() const;
         bool IsPositive() const;
+        bool IsAreaAura() const;                            // if one from auras of holder applied as area aura
         bool IsWeaponBuffCoexistableWith(SpellAuraHolder* ref);
         bool IsNeedVisibleSlot(Unit const* caster) const;
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
