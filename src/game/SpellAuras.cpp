@@ -360,7 +360,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //307 absorb healing?
     &Aura::HandleNULL,                                      //308 new aura for hunter traps
     &Aura::HandleNULL,                                      //309 absorb healing?
-    &Aura::HandleNoImmediateEffect,                         //310 pet avoidance passive                 implemented in Unit::MagicSpellHitResult
+    &Aura::HandleNULL,                                      //310 pet avoidance passive?
     &Aura::HandleNULL,                                      //311 0 spells in 3.3
     &Aura::HandleNULL,                                      //312 0 spells in 3.3
     &Aura::HandleNULL,                                      //313 0 spells in 3.3
