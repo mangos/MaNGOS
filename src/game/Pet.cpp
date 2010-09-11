@@ -2512,10 +2512,10 @@ bool Pet::Summon(int32 duration, uint8 counter)
         SetFFAPvP(true);
 
     SetCanModifyStats(true);
+    ApplyAllBonuses(false);
     InitStatsForLevel(owner->getLevel(), owner);
     InitTalentForLevel();
     InitPetCreateSpells();
-    ApplyAllBonuses(false);
     AIM_Initialize();
 
     if(getPetType() == SUMMON_PET)
@@ -2532,6 +2532,8 @@ bool Pet::Summon(int32 duration, uint8 counter)
     }
 
     SynchronizeLevelWithOwner();
+    LearnPetPassives();
+    CastPetAuras(true);
 
     SetHealth(GetMaxHealth());
     SetPower(getPowerType(), GetMaxPower(getPowerType()));
@@ -2543,8 +2545,6 @@ bool Pet::Summon(int32 duration, uint8 counter)
 
         if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
         {
-            LearnPetPassives();
-            CastPetAuras(true);
             InitLevelupSpellsForLevel();
             CleanupActionBar();                                     // remove unknown spells from action bar after load
         }
