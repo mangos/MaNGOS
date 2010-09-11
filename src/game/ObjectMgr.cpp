@@ -2561,7 +2561,7 @@ void ObjectMgr::LoadPetLevelInfo()
         // fatal error if no level 1 and max health data
         if(!pInfo || pInfo[0].health == 0 || pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].health == 0 )
         {
-            sLog.outErrorDb("Creature %u does not have pet stats data for Levels 1 and %u!",itr->first, sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
+            sLog.outErrorDb("Creature %u does not have pet stats data for Levels 1 or %u! Must be exist!",itr->first, sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
             Log::WaitBeforeContinueIfNeed();
             exit(1);
         }
@@ -2581,31 +2581,30 @@ void ObjectMgr::LoadPetLevelInfo()
                || pInfo[level].stats[STAT_SPIRIT] == 0
             )
             {
-                sLog.outErrorDb("Creature %u has no full data set for Level %i pet stats data, using approximated (from default pet progression) data",itr->first,level+1);
+                DEBUG_LOG("Creature %u has no full data set for Level %i pet stats data, using approximated (from default pet progression) data",itr->first,level+1);
 
-                pInfo[level].health = uint16(pInfo[level-1].health * (level+1)/level +1);
                 if(pInfo[level].health == 0)
-                    pInfo[level].health = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health * (petBaseInfo[level].health / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].health));
+                    pInfo[level].health = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].health * (petBaseInfo[level].health / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].health));
 
                 if(pInfo[level].mana == 0)
-                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mana * (petBaseInfo[level].mana / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mana));
+                    pInfo[level].mana = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].mana * (petBaseInfo[level].mana / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].mana));
 
                 if(pInfo[level].armor == 0)
-                    pInfo[level].armor = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].armor * (petBaseInfo[level].armor / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].armor));
+                    pInfo[level].armor = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].armor * (petBaseInfo[level].armor / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].armor));
 
                 if(pInfo[level].mindmg == 0)
-                    pInfo[level].mindmg = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mindmg * (petBaseInfo[level].mindmg / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].mindmg));
+                    pInfo[level].mindmg = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].mindmg * (petBaseInfo[level].mindmg / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].mindmg));
 
                 if(pInfo[level].maxdmg == 0)
-                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].maxdmg * (petBaseInfo[level].maxdmg / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].maxdmg));
+                    pInfo[level].mana = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].maxdmg * (petBaseInfo[level].maxdmg / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].maxdmg));
 
                 if(pInfo[level].attackpower == 0)
-                    pInfo[level].mana = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].attackpower * (petBaseInfo[level].attackpower / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].attackpower));
+                    pInfo[level].mana = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].attackpower * (petBaseInfo[level].attackpower / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].attackpower));
 
                 for (int i = 0; i < MAX_STATS; i++)
                 {
                     if(pInfo[level].stats[i] == 0)
-                        pInfo[level].stats[i] = uint16(pInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].stats[i] * (petBaseInfo[level].stats[i] / petBaseInfo[CONFIG_UINT32_MAX_PLAYER_LEVEL-1].stats[i]));
+                        pInfo[level].stats[i] = uint16(pInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].stats[i] * (petBaseInfo[level].stats[i] / petBaseInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)-1].stats[i]));
                 }
 
             }
