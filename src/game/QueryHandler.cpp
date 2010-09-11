@@ -451,7 +451,7 @@ void WorldSession::HandlePageTextQueryOpcode( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
+void WorldSession::HandleCorpseMapPositionQueryOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG( "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY" );
 
@@ -466,7 +466,7 @@ void WorldSession::HandleCorpseMapPositionQuery( WorldPacket & recv_data )
     SendPacket(&data);
 }
 
-void WorldSession::HandleQueryQuestsCompleted( WorldPacket & /*recv_data */)
+void WorldSession::HandleQueryQuestsCompletedOpcode( WorldPacket & /*recv_data */)
 {
     uint32 count = 0;
 
@@ -485,7 +485,7 @@ void WorldSession::HandleQueryQuestsCompleted( WorldPacket & /*recv_data */)
     SendPacket(&data);
 }
 
-void WorldSession::HandleQuestPOIQuery(WorldPacket& recv_data)
+void WorldSession::HandleQuestPOIQueryOpcode(WorldPacket& recv_data)
 {
     uint32 count;
     recv_data >> count;                                     // quest count, max=25

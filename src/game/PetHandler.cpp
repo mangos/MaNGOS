@@ -93,7 +93,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
         pet->DoPetAction(_player, flag, spellid, guid1, guid2);
 }
 
-void WorldSession::HandlePetStopAttack(WorldPacket & recv_data)
+void WorldSession::HandlePetStopAttackOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_PET_STOP_ATTACK");
 
@@ -131,7 +131,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandlePetNameQuery( WorldPacket & recv_data )
+void WorldSession::HandlePetNameQueryOpcode( WorldPacket & recv_data )
 {
     DETAIL_LOG( "HandlePetNameQuery. CMSG_PET_NAME_QUERY" );
 

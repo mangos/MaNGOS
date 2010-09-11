@@ -149,7 +149,7 @@ void WorldSession::HandleGMTicketSystemStatusOpcode( WorldPacket & /*recv_data*/
     SendPacket( &data );
 }
 
-void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
+void WorldSession::HandleGMSurveySubmitOpcode( WorldPacket & recv_data)
 {
     // GM survey is shown after SMSG_GM_TICKET_STATUS_UPDATE with status = 3
     uint32 x;
@@ -181,7 +181,7 @@ void WorldSession::HandleGMSurveySubmit( WorldPacket & recv_data)
     // TODO: chart this data in some way
 }
 
-void WorldSession::HandleGMResponseResolve(WorldPacket & recv_data)
+void WorldSession::HandleGMResponseResolveOpcode(WorldPacket & recv_data)
 {
     // empty opcode
     DEBUG_LOG("WORLD: %s", LookupOpcodeName(recv_data.GetOpcode()));

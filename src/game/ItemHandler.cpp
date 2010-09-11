@@ -439,7 +439,7 @@ void WorldSession::HandleItemQuerySingleOpcode( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandleReadItem( WorldPacket & recv_data )
+void WorldSession::HandleReadItemOpcode( WorldPacket & recv_data )
 {
     //DEBUG_LOG( "WORLD: CMSG_READ_ITEM");
 
