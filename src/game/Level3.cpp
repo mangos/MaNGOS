@@ -3733,7 +3733,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
         uint32 absorb = 0;
         uint32 resist = 0;
 
-        target->CalculateAbsorbAndResist(m_session->GetPlayer(),schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
+        target->CalculateDamageAbsorbAndResist(m_session->GetPlayer(),schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
 
         if (damage <= absorb + resist)
             return true;

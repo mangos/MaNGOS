@@ -285,7 +285,7 @@ void Spell::EffectEnvironmentalDMG(SpellEffectIndex eff_idx)
     // currently each enemy selected explicitly and self cast damage, we prevent apply self casted spell bonuses/etc
     damage = m_spellInfo->CalculateSimpleValue(eff_idx);
 
-    m_caster->CalculateAbsorbAndResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
+    m_caster->CalculateDamageAbsorbAndResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist);
 
     m_caster->SendSpellNonMeleeDamageLog(m_caster, m_spellInfo->Id, damage, GetSpellSchoolMask(m_spellInfo), absorb, resist, false, 0, false);
     if(m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -3309,7 +3309,10 @@ void Spell::EffectHealPct(SpellEffectIndex /*eff_idx*/)
         addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL);
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
 
-        int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo);
+        uint32 absorb = 0;
+        unitTarget->CalculateHealAbsorb(addhealth, &absorb);
+
+        int32 gain = caster->DealHeal(unitTarget, addhealth - absorb, m_spellInfo, false, absorb);
         unitTarget->getHostileRefManager().threatAssist(m_caster, float(gain) * 0.5f, m_spellInfo);
     }
 }
@@ -3327,7 +3330,10 @@ void Spell::EffectHealMechanical(SpellEffectIndex /*eff_idx*/)
         uint32 addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, damage, HEAL);
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
 
-        caster->DealHeal(unitTarget, addhealth, m_spellInfo);
+        uint32 absorb = 0;
+        unitTarget->CalculateHealAbsorb(addhealth, &absorb);
+
+        caster->DealHeal(unitTarget, addhealth, m_spellInfo, false, absorb);
     }
 }
 
@@ -3358,7 +3364,10 @@ void Spell::EffectHealthLeech(SpellEffectIndex eff_idx)
     {
         heal = m_caster->SpellHealingBonusTaken(m_caster, m_spellInfo, heal, HEAL);
 
-        m_caster->DealHeal(m_caster, heal, m_spellInfo);
+        uint32 absorb = 0;
+        m_caster->CalculateHealAbsorb(heal, &absorb);
+
+        m_caster->DealHeal(m_caster, heal - absorb, m_spellInfo, false, absorb);
     }
 }
 
