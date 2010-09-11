@@ -2272,6 +2272,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 35079:                                     // Misdirection, triggered buff
+            case 59628:                                     // Tricks of the Trade, triggered buff
+            case 59665:                                     // Vigilance, redirection spell
+            {
+                if (Unit* pCaster = GetCaster())
+                    pCaster->getHostileRefManager().ResetThreatRedirection();
+                return;
+            }
             case 36730:                                     // Flame Strike
             {
                 target->CastSpell(target, 36731, true, NULL, this);
@@ -2667,7 +2675,39 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             break;
         }
+        case SPELLFAMILY_ROGUE:
+            switch(GetId())
+            {
+                case 57934:                                 // Tricks of the Trade, main spell
+                {
+                    if (apply)
+                        GetHolder()->SetAuraCharges(1);     // not have proper charges set in spell data
+                    else
+                    {
+                        // used for direct in code aura removes and spell proc event charges expire
+                        if (m_removeMode != AURA_REMOVE_BY_DEFAULT)
+                            target->getHostileRefManager().ResetThreatRedirection();
+                    }
+                    return;
+                }
+            }
+            break;
         case SPELLFAMILY_HUNTER:
+            switch(GetId())
+            {
+                case 34477:                                 // Misdirection, main spell
+                {
+                    if (apply)
+                        GetHolder()->SetAuraCharges(1);     // not have proper charges set in spell data
+                    else
+                    {
+                        // used for direct in code aura removes and spell proc event charges expire
+                        if (m_removeMode != AURA_REMOVE_BY_DEFAULT)
+                            target->getHostileRefManager().ResetThreatRedirection();
+                    }
+                    return;
+                }
+            }
             break;
         case SPELLFAMILY_PALADIN:
             switch(GetId())
