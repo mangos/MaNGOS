@@ -8537,15 +8537,10 @@ void Spell::EffectRestoreItemCharges( SpellEffectIndex eff_idx )
 
 void Spell::EffectRedirectThreat(SpellEffectIndex eff_idx)
 {
-    if(unitTarget)
-    {
-        m_caster->SetThreatRedirectionTarget(unitTarget->GetGUID(), (uint32)damage);
-
-        // Tricks of trade hacky buff applying (15% damage increase)
-        if( m_spellInfo->Id == 57934 )
-            unitTarget->CastSpell(unitTarget, 57933, true);
-    }
+    if (unitTarget)
+        m_caster->getHostileRefManager().SetThreatRedirection(unitTarget->GetObjectGuid(), uint32(damage));
 }
+
 void Spell::EffectTeachTaxiNode( SpellEffectIndex eff_idx )
 {
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
