@@ -23,5 +23,6 @@ INSERT INTO `npc_vendor` VALUES (99321, 47241, 0, 0 ,2589);
 INSERT INTO `npc_vendor` VALUES (99321, 47241, 0, 0 ,2637);
 INSERT INTO `npc_vendor` VALUES (99321, 47241, 0, 0 ,2743);
 INSERT INTO `npc_vendor` VALUES (99321, 49426, 0, 0 ,2723);
+INSERT INTO `npc_vendor` VALUES (99321, 43589, 0, 0 ,2707);
 -- INSERT INTO `npc_vendor` VALUES (99321, ??, 0, 0 ,2707); //1 эмблема триумфа
 -- INSERT INTO `npc_vendor` VALUES (99321, ??, 0, 0 ,2723); //15 эмблем триумфа

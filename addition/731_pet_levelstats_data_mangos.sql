@@ -586,3 +586,10 @@ INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, 
 (26125, 78, 4437, 2082, 4399, 0, 0, 0, 174, 93, 90, 97, 85),
 (26125, 79, 4494, 2108, 4456, 0, 0, 0, 176, 94, 91, 98, 86),
 (26125, 80, 4551, 2134, 4513, 310, 504, 622, 178, 95, 92, 99, 87);
+
+-- Spirit wols
+DELETE FROM `pet_levelstats` WHERE `creature_entry` = 26294;
+INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+(26294, 1, 42, 1, 20, 2, 3, 10, 22, 20, 22, 20, 20),
+(26294, 70, 3200, 2100, 3800, 320, 650, 800, 85, 82, 79, 92, 88),
+(26294, 80, 5600, 3800, 4500, 410, 850, 1100, 105, 122, 87, 101, 94);
