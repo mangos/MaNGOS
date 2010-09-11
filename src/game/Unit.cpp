@@ -6667,13 +6667,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
         AuraList const& avoidAuras = GetAurasByType(SPELL_AURA_MOD_AOE_DAMAGE_AVOIDANCE);
         for(AuraList::const_iterator itr = avoidAuras.begin(); itr != avoidAuras.end(); ++itr)
             TakenTotalMod *= ((*itr)->GetModifier()->m_amount + 100.0f) / 100.0f;
-
-        if (GetTypeId() == TYPEID_UNIT)
-        {
-            AuraList const& avoidPetAuras = GetAurasByType(SPELL_AURA_MOD_PET_AOE_DAMAGE_AVOIDANCE);
-            for(AuraList::const_iterator itr2 = avoidPetAuras.begin(); itr2 != avoidPetAuras.end(); ++itr2)
-                TakenTotalMod *= ((*itr2)->GetModifier()->m_amount + 100.0f) / 100.0f;
-        }
     }
 
     // Taken fixed damage bonus auras
