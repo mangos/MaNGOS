@@ -271,7 +271,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandlePetNameQuery( WorldPacket & recv_data )
+void WorldSession::HandlePetNameQueryOpcode( WorldPacket & recv_data )
 {
     DETAIL_LOG( "HandlePetNameQuery. CMSG_PET_NAME_QUERY" );
 
