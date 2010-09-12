@@ -1952,14 +1952,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool CreateVehicleKit(uint32 vehicleId);
         void RemoveVehicleKit();
 
-        void SheduleAINotify(uint32 delay);
-
-        bool m_notify_sheduled;
-        struct 
-        {
-            float x, y, z;
-        } m_last_notified_position;
-
     protected:
         explicit Unit ();
 
