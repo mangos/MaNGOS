@@ -6691,7 +6691,7 @@ void Aura::PeriodicTick()
             uint32 absorbHeal = 0;
             pCaster->CalculateHealAbsorb(heal, &absorbHeal);
             
-            int32 gain = pCaster->DealHeal(pCaster, heal, spellProto, false, absorbHeal);
+            int32 gain = pCaster->DealHeal(pCaster, heal - absorbHeal, spellProto, false, absorbHeal);
             pCaster->getHostileRefManager().threatAssist(pCaster, gain * 0.5f, spellProto);
             break;
         }
