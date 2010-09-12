@@ -2573,6 +2573,20 @@ bool Pet::Summon(int32 duration, uint8 counter)
 
 }
 
+Unit* Pet::GetOwner() const
+{
+    Unit* pOwner = Unit::GetOwner();
+
+    if (pOwner) return pOwner;
+
+    else if (!IsInWorld())
+        if (uint64 ownerguid = GetOwnerGUID())
+            if (Map* pMap = GetMap())
+                return pMap->GetAnyTypeCreature(ownerguid);
+
+    return NULL;
+}
+
 /*
 void Player::ApplySpellPowerBonus(int32 amount, bool apply)
 {
