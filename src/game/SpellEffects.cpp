@@ -3371,7 +3371,7 @@ void Spell::EffectHealMechanical(SpellEffectIndex /*eff_idx*/)
         uint32 absorb = 0;
         unitTarget->CalculateHealAbsorb(addhealth, &absorb);
 
-        caster->DealHeal(unitTarget, addhealth, m_spellInfo, false, absorb);
+        caster->DealHeal(unitTarget, addhealth - absorb, m_spellInfo, false, absorb);
     }
 }
 
@@ -5221,16 +5221,16 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
             // Ghostly Strike
             else if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Id == 14278)
             {
-               Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
-               if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                   totalDamagePercentMod *= 1.44f; // 144% to daggers
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.44f;         // 144% to daggers
             }
             // Hemorrhage
             else if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x2000000)))
             {
-               Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
-               if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                   totalDamagePercentMod *= 1.45f; // 145% to daggers
+                Item* weapon = ((Player*)m_caster)->GetWeaponForAttack(m_attackType,true,true);
+                if (weapon && weapon->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                    totalDamagePercentMod *= 1.45f;         // 145% to daggers
             }
             break;
         }
