@@ -959,16 +959,23 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!roll_chance_i(triggerAmount))
                         return SPELL_AURA_PROC_FAILED;
 
-                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(71905);
-                    if (aurHolder && uint32(aurHolder->GetStackAmount() + 1) >= aurHolder->GetSpellProto()->StackAmount)
+                    triggered_spell_id = 71905;             // Soul Fragment
+
+                    SpellAuraHolder *aurHolder = GetSpellAuraHolder(triggered_spell_id);
+
+                    // will added first to stack
+                    if (!aurHolder)
+                        CastSpell(this, 72521, true);       // Shadowmourne Visual Low
+                    // half stack
+                    else if (aurHolder->GetStackAmount() + 1 == 6)
+                        CastSpell(this, 72523, true);       // Shadowmourne Visual High
+                    // full stack
+                    else if (aurHolder->GetStackAmount() + 1 >= aurHolder->GetSpellProto()->StackAmount)
                     {
-                        RemoveAurasDueToSpell(71905);
+                        RemoveAurasDueToSpell(triggered_spell_id);
                         CastSpell(this, 71904, true);       // Chaos Bane
                         return SPELL_AURA_PROC_OK;
                     }
-                    else
-                        triggered_spell_id = 71905;
-
                     break;
                 }
             }

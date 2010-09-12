@@ -8289,14 +8289,33 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     {
         case SPELLFAMILY_GENERIC:
         {
-            // Illusionary Barrier
-            if(GetId() == 57350 && !apply && m_target->getPowerType() == POWER_MANA)
+            switch(GetId())
             {
-                cast_at_remove = true;
-                spellId1 = 60242;                           // Darkmoon Card: Illusion
+                case 57350:                                 // Illusionary Barrier
+                {
+                    if (!apply && m_target->getPowerType() == POWER_MANA)
+                    {
+                        cast_at_remove = true;
+                        spellId1 = 60242;                   // Darkmoon Card: Illusion
+                    }
+                    else
+                        return;
+                    break;
+                }
+                case 71905:                                 // Soul Fragment
+                {
+                    if (!apply)
+                    {
+                        spellId1 = 72521;                   // Shadowmourne Visual Low
+                        spellId2 = 72523;                   // Shadowmourne Visual High
+                    }
+                    else
+                        return;
+                    break;
+                }
+                default:
+                    return;
             }
-            else
-                return;
             break;
         }
         case SPELLFAMILY_MAGE:
