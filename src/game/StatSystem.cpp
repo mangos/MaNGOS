@@ -906,16 +906,11 @@ bool Pet::UpdateStats(Stats stat)
     if(stat > STAT_SPIRIT || stat < STAT_STRENGTH )
         return false;
 
-    if (!CanModifyStats()) 
-        return true;
-
     ApplyStatBonus(stat, true);
 
-    SetCanModifyStats(false);
     // value = ((create_value + base_value * base_pct) + total_value) * total_pct
     float value  = GetTotalStatValue(stat);
     SetStat(stat, int32(value));
-    SetCanModifyStats(true);
 
     switch(stat)
     {
@@ -956,17 +951,12 @@ bool Pet::UpdateAllStats()
 
 void Pet::UpdateResistances(uint32 school)
 {
-    if (!CanModifyStats()) 
-        return;
-
     ApplyResistanceBonus(school, true);
 
     if(school > SPELL_SCHOOL_NORMAL)
     {
-        SetCanModifyStats(false);
         SetResistance(SpellSchools(school),
                       int32(GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school))));
-        SetCanModifyStats(true);
     }
     else
         UpdateArmor();
@@ -974,12 +964,7 @@ void Pet::UpdateResistances(uint32 school)
 
 void Pet::UpdateArmor()
 {
-    if (!CanModifyStats()) 
-        return;
-
     ApplyResistanceBonus(SPELL_SCHOOL_NORMAL, true);
-
-    SetCanModifyStats(false);
 
     float value = 0.0f;
     UnitMods unitMod = UNIT_MOD_ARMOR;
@@ -990,15 +975,13 @@ void Pet::UpdateArmor()
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetArmor(int32(value));
-    SetCanModifyStats(true);
 }
 
 void Pet::UpdateMaxHealth()
 {
-    if (!CanModifyStats()) 
+    if (!CanModifyStats())
         return;
 
-    SetCanModifyStats(false);
     UnitMods unitMod = UNIT_MOD_HEALTH;
     float stamina = GetStat(STAT_STAMINA) - GetCreateStat(STAT_STAMINA);
 
@@ -1008,7 +991,6 @@ void Pet::UpdateMaxHealth()
     value  *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetMaxHealth((uint32)value);
-    SetCanModifyStats(true);
 }
 
 void Pet::UpdateMaxPower(Powers power)
@@ -1016,7 +998,6 @@ void Pet::UpdateMaxPower(Powers power)
     if (!CanModifyStats()) 
         return;
 
-    SetCanModifyStats(false);
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
     float intellectAdd = (power == POWER_MANA) ? GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT) : 0.0f;
@@ -1027,17 +1008,12 @@ void Pet::UpdateMaxPower(Powers power)
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetMaxPower(power, uint32(value));
-    SetCanModifyStats(true);
 }
 
 void Pet::UpdateAttackPowerAndDamage(bool ranged)
 {
-    if (!CanModifyStats()) 
-        return;
-
     ApplyAttackPowerBonus(true);
 
-    SetCanModifyStats(false);
     float baseAP       = 0.0f;
 
     UnitMods unitMod;
@@ -1074,7 +1050,6 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
         SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, attPowerMultiplier);
         UpdateDamagePhysical(RANGED_ATTACK);
     }
-    SetCanModifyStats(true);
 }
 
 void Pet::UpdateDamagePhysical(WeaponAttackType attType)
@@ -1083,10 +1058,6 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     if(attType > BASE_ATTACK)
         return;
 
-    if (!CanModifyStats()) 
-        return;
-
-    SetCanModifyStats(false);
     UnitMods unitMod;
 
     if (attType == BASE_ATTACK)
@@ -1130,6 +1101,5 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
 
     SetStatFloatValue(UNIT_FIELD_MINDAMAGE, mindamage);
     SetStatFloatValue(UNIT_FIELD_MAXDAMAGE, maxdamage);
-    SetCanModifyStats(true);
 }
 

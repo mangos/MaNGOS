@@ -2281,7 +2281,8 @@ void Pet::ApplyStatBonus(Stats stat, bool apply)
 
     Unit* owner = GetOwner();
 
-    if (!owner)
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     UnitMods unitMod = UnitMods(stat);
@@ -2330,7 +2331,8 @@ void Pet::ApplyResistanceBonus(uint32 school, bool apply)
 
     Unit* owner = GetOwner();
 
-    if (!owner)
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     int32 newResistance;
@@ -2377,7 +2379,8 @@ void Pet::ApplyAttackPowerBonus(bool apply)
 {
     Unit* owner = GetOwner();
 
-    if (!owner)
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     int32 newAPBonus;
@@ -2470,6 +2473,12 @@ void Pet::ApplyAllBonuses(bool apply)
 
 void Pet::ApplyOtherBonuses(bool apply)
 {
+    Unit* owner = GetOwner();
+
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
 }
 
 bool Pet::Summon(int32 duration, uint8 counter)
@@ -2587,9 +2596,7 @@ Unit* Pet::GetOwner() const
     return NULL;
 }
 
-/*
-void Player::ApplySpellPowerBonus(int32 amount, bool apply)
+void Pet::ApplySpellPowerBonus(int32 amount, bool apply)
 {
     m_baseSpellPower += apply ? amount : -amount;
 }
-*/
