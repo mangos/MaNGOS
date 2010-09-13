@@ -7055,11 +7055,17 @@ void Aura::PeriodicTick()
             // This method can modify pdamage
             bool isCrit = IsCritFromAbilityAura(pCaster, pdamage);
 
-            DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %u (TypeId: %u) heal of %u (TypeId: %u) for %u health inflicted by %u",
-                GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), pdamage, GetId());
+            uint32 absorbHeal = 0;
+            pCaster->CalculateHealAbsorb(pdamage, &absorbHeal);
+            pdamage -= absorbHeal;
+
+            DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %u (TypeId: %u) heal of %u (TypeId: %u) for %u health  (absorbed %u) inflicted by %u",
+                GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), pdamage, absorbHeal, GetId());
+
+
 
             int32 gain = target->ModifyHealth(pdamage);
-            SpellPeriodicAuraLogInfo pInfo(this, pdamage, (pdamage - uint32(gain)), 0, 0, 0.0f, isCrit);
+            SpellPeriodicAuraLogInfo pInfo(this, pdamage, (pdamage - uint32(gain)), absorbHeal, 0, 0.0f, isCrit);
             target->SendPeriodicAuraLog(&pInfo);
 
             // Set trigger flag
@@ -8738,34 +8744,63 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     {
         case SPELLFAMILY_GENERIC:
         {
-            // Illusionary Barrier
-            if(GetId() == 57350 && !apply && m_target->getPowerType() == POWER_MANA)
+            switch(GetId())
             {
-                cast_at_remove = true;
-                spellId1 = 60242;                           // Darkmoon Card: Illusion
+                case 57350:                                 // Illusionary Barrier
+                {
+                    if (!apply && m_target->getPowerType() == POWER_MANA)
+                    {
+                        cast_at_remove = true;
+                        spellId1 = 60242;                   // Darkmoon Card: Illusion
+                    }
+                    else
+                        return;
+                    break;
+                }
+                case 71905:                                 // Soul Fragment
+                {
+                    if (!apply)
+                    {
+                        spellId1 = 72521;                   // Shadowmourne Visual Low
+                        spellId2 = 72523;                   // Shadowmourne Visual High
+                    }
+                    else
+                        return;
+                    break;
+                }
+                case 69674:
+                {
+                    if (!apply)
+                    {
+                        if (m_removeMode == AURA_REMOVE_BY_DISPEL)
+                        {
+                            cast_at_remove = true;
+                            spellId1 = 69706;
+                        }
+                    }
+                    break;
+                }
+                case 69260:
+                {
+                    if (!apply)
+                    {
+                        if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                        {
+                             cast_at_remove = true;
+                             spellId1 = 69291;
+                             // Cast unknown spell - spore explode (override)
+                             float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(GetSpellProto()->EffectRadiusIndex[EFFECT_INDEX_0]));
+                             Map::PlayerList const& pList = m_target->GetMap()->GetPlayers();
+                             for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                                 if (itr->getSource() && itr->getSource()->IsWithinDistInMap(m_target,radius))
+                                     itr->getSource()->CastSpell(itr->getSource(), spellId1, true);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    return;
             }
-            else
-            // SPELL_MUTATED_INFECTION - ICC boss Rotface
-            if (GetId() == 69674 && !apply && m_removeMode == AURA_REMOVE_BY_DISPEL)
-            {
-                cast_at_remove = true;
-                spellId1 = 69706;
-            }
-            else
-            // SPELL_GAS_SPORE - ICC boss Festergut
-            if (GetId() == 69290 && !apply && m_removeMode == AURA_REMOVE_BY_EXPIRE)
-            {
-                cast_at_remove = true;
-                spellId1 = 69291;
-                // Cast unknown spell - spore explode (override)
-                float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(GetSpellProto()->EffectRadiusIndex[EFFECT_INDEX_0]));
-                Map::PlayerList const& pList = m_target->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                    if (itr->getSource() && itr->getSource()->IsWithinDistInMap(m_target,radius))
-                       itr->getSource()->CastSpell(itr->getSource(), spellId1, true);
-            }
-            else
-                return;
             break;
         }
         case SPELLFAMILY_MAGE:
