@@ -1891,14 +1891,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Movement info
         MovementInfo m_movementInfo;
 
-        void SheduleAINotify(uint32 delay);
-
-        bool m_notify_sheduled;
-        struct 
-        {
-            float x, y, z;
-        } m_last_notified_position;
-
     protected:
         explicit Unit ();
 
