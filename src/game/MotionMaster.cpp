@@ -352,6 +352,27 @@ void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
     }
 }
 
+void MotionMaster::MoveWaypoint()
+{
+    if (m_owner->GetTypeId() == TYPEID_UNIT)
+    {
+        if (GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+        {
+            sLog.outError("Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetObjectGuid().GetString().c_str(), m_owner->GetEntry());
+            return;
+        }
+
+        Creature* creature = (Creature*)m_owner;
+
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature %s (Entry %u) start MoveWaypoint()", m_owner->GetObjectGuid().GetString().c_str(), m_owner->GetEntry());
+        Mutate(new WaypointMovementGenerator<Creature>(*creature));
+    }
+    else
+    {
+        sLog.outError("Non-creature %s attempt to MoveWaypoint()", m_owner->GetObjectGuid().GetString().c_str());
+    }
+}
+
 void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
 {
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
