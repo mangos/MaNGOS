@@ -1891,7 +1891,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         triggered_spell_id = 31803;         // Holy Vengeance
 
                     // Add 5-stack effect from Holy Vengeance
-                    int8 stacks = 0;
+                    uint32 stacks = 0;
                     AuraList const& auras = target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                     {
@@ -1901,7 +1901,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                             break;
                         }
                     }
-                    if(stacks >= 5)
+                    if (stacks >= 5)
                         CastSpell(target,42463,true,NULL,triggeredByAura);
                     break;
                 }
@@ -1993,7 +1993,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         triggered_spell_id = 53742;         // Blood Corruption
 
                     // Add 5-stack effect from Blood Corruption
-                    int8 stacks = 0;
+                    uint32 stacks = 0;
                     AuraList const& auras = target->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                     {
@@ -2003,7 +2003,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                             break;
                         }
                     }
-                    if(stacks >= 5)
+                    if (stacks >= 5)
                         CastSpell(target,53739,true,NULL,triggeredByAura);
                     break;
                 }
@@ -3127,7 +3127,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
 
                 Aura * dummy = GetDummyAura(37658);
                 // release at 3 aura in stack (cont contain in basepoint of trigger aura)
-                if(!dummy || dummy->GetStackAmount() < triggerAmount)
+                if(!dummy || dummy->GetStackAmount() < uint32(triggerAmount))
                     return SPELL_AURA_PROC_FAILED;
 
                 RemoveAurasDueToSpell(37658);
@@ -3152,7 +3152,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 // counting
                 Aura * dummy = GetDummyAura(54842);
                 // release at 3 aura in stack (cont contain in basepoint of trigger aura)
-                if(!dummy || dummy->GetStackAmount() < triggerAmount)
+                if(!dummy || dummy->GetStackAmount() < uint32(triggerAmount))
                     return SPELL_AURA_PROC_FAILED;
 
                 RemoveAurasDueToSpell(54842);

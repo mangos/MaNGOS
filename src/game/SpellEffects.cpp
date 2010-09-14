@@ -1691,7 +1691,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     if (Aura* pAura = m_caster->GetAura(spellShrink, EFFECT_INDEX_0))
                     {
-                        uint8 stackNum = pAura->GetStackAmount();
+                        uint32 stackNum = pAura->GetStackAmount();
 
                         // chance to become pygmified (5, 10, 15 etc)
                         if (roll_chance_i(stackNum*5))

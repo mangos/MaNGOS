@@ -8136,15 +8136,15 @@ bool SpellAuraHolder::ModStackAmount(int32 num)
     return false;
 }
 
-void SpellAuraHolder::SetStackAmount(uint8 stackAmount)
+void SpellAuraHolder::SetStackAmount(uint32 stackAmount)
 {
     Unit *target = GetTarget();
     Unit *caster = GetCaster();
     if (!target || !caster)
         return;
 
-    bool refresh = stackAmount >= m_stackAmount;
-    if (stackAmount != m_stackAmount)
+    bool refresh = stackAmount >= uint32(m_stackAmount);
+    if (stackAmount != uint32(m_stackAmount))
     {
         m_stackAmount = stackAmount;
 
