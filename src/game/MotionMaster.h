@@ -53,8 +53,8 @@ enum MovementGeneratorType
 enum MMCleanFlag
 {
     MMCF_NONE   = 0,
-    MMCF_UPDATE = 1, // Clear or Expire called from update
-    MMCF_RESET  = 2  // Flag if need top()->Reset()
+    MMCF_UPDATE = 1,                                        // Clear or Expire called from update
+    MMCF_RESET  = 2                                         // Flag if need top()->Reset()
 };
 
 class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
@@ -64,7 +64,7 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         typedef std::vector<MovementGenerator *> ExpireList;
     public:
 
-        explicit MotionMaster(Unit *unit) : i_owner(unit), m_expList(NULL), m_cleanFlag(MMCF_NONE) {}
+        explicit MotionMaster(Unit *unit) : m_owner(unit), m_expList(NULL), m_cleanFlag(MMCF_NONE) {}
         ~MotionMaster();
 
         void Initialize();
@@ -104,6 +104,7 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         void MovePoint(uint32 id, float x,float y,float z);
         void MoveSeekAssistance(float x,float y,float z);
         void MoveSeekAssistanceDistract(uint32 timer);
+        void MoveWaypoint();
         void MoveTaxiFlight(uint32 path, uint32 pathnode);
         void MoveDistract(uint32 timeLimit);
 
@@ -124,7 +125,7 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         void DirectExpire(bool reset);
         void DelayedExpire(bool reset);
 
-        Unit       *i_owner;
+        Unit       *m_owner;
         ExpireList *m_expList;
         uint8       m_cleanFlag;
 };
