@@ -4663,7 +4663,28 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     continue;
                 }
                 break;
-           }
+            }
+            case SCRIPT_COMMAND_MOVEMENT:
+            {
+                if (tmp.datalong >= MAX_DB_MOTION_TYPE)
+                {
+                    sLog.outErrorDb("Table `%s` SCRIPT_COMMAND_MOVEMENT has invalid MovementType %u for script id %u",
+                        tablename, tmp.datalong, tmp.id);
+                    continue;
+                }
+                if (tmp.datalong2 && !GetCreatureTemplate(tmp.datalong2))
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_MOVEMENT for script id %u, but this creature_template does not exist.", tablename, tmp.datalong2, tmp.id);
+                    continue;
+                }
+                if (tmp.datalong2 && !tmp.datalong3)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_MOVEMENT for script id %u, but search radius is too small (datalong3 = %u).", tablename, tmp.datalong2, tmp.id, tmp.datalong3);
+                    continue;
+                }
+
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

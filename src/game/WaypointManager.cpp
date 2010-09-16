@@ -599,4 +599,48 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
             }
         }
     }
+
+    WaypointPathTemplateMap::const_iterator wptItr = m_pathTemplateMap.begin();
+    for ( ; wptItr != m_pathTemplateMap.end(); ++wptItr)
+    {
+        for (size_t i = 0; i < wptItr->second.size(); ++i)
+        {
+            WaypointBehavior* be = wptItr->second[i].behavior;
+            if (!be)
+                continue;
+
+            // Now we check text existence and put all zero texts ids to the end of array
+
+            // Counting leading zeros for futher textid shift
+            int zeroCount = 0;
+            for (int j = 0; j < MAX_WAYPOINT_TEXT; ++j)
+            {
+                if (!be->textid[j])
+                {
+                    ++zeroCount;
+                    continue;
+                }
+                else
+                {
+                    if (!sObjectMgr.GetMangosStringLocale(be->textid[j]))
+                    {
+                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
+                        be->textid[j] = 0;
+                        ++zeroCount;
+                        continue;
+                    }
+                    else
+                        ids.erase(be->textid[j]);
+
+                    // Shifting check
+                    if (zeroCount)
+                    {
+                        // Correct textid but some zeros leading, so move it forward.
+                        be->textid[j-zeroCount] = be->textid[j];
+                        be->textid[j] = 0;
+                    }
+                }
+            }
+        }
+    }
 }

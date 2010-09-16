@@ -2876,6 +2876,66 @@ void Map::ScriptsProcess()
 
                 break;
             }
+            case SCRIPT_COMMAND_MOVEMENT:
+            {
+                if (!source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for NULL source.", step.script->id);
+                    break;
+                }
+
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
+                {
+                    sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
+
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pMover = NULL;
+
+                if (!step.script->datalong2)                // No buddy defined, so try use source (or target where source is player)
+                {
+                    if (pSource->GetTypeId() != TYPEID_UNIT)
+                    {
+                        // we can't move source being non-creature, so see if target is creature
+                        if (target && target->GetTypeId() == TYPEID_UNIT)
+                            pMover = (Creature*)target;
+                    }
+                    else if (pSource->GetTypeId() == TYPEID_UNIT)
+                        pMover = (Creature*)pSource;
+                }
+                else                                        // If step has a buddy entry defined, search for it
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->datalong2, true, step.script->datalong3);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pMover, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->datalong3);
+                }
+
+                if (!pMover)
+                {
+                    sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for non-creature (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", step.script->id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                // Consider add additional checks for cases where creature should not change movementType
+                // (pet? in combat? already using same MMgen as script try to apply?)
+
+                switch(step.script->datalong)
+                {
+                    case IDLE_MOTION_TYPE:
+                        pMover->GetMotionMaster()->MoveIdle();
+                        break;
+                    case RANDOM_MOTION_TYPE:
+                        pMover->GetMotionMaster()->MoveRandom();
+                        break;
+                    case WAYPOINT_MOTION_TYPE:
+                        pMover->GetMotionMaster()->MoveWaypoint();
+                        break;
+                }
+
+                break;
+            }
             default:
                 sLog.outError("Unknown SCRIPT_COMMAND_ %u called for script id %u.",step.script->command, step.script->id);
                 break;

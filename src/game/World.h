@@ -399,11 +399,12 @@ enum RealmZone
                                                             // data_flags = flag_target_player_as_source    = 0x01
                                                             //              flag_original_source_as_target  = 0x02
                                                             //              flag_buddy_as_target            = 0x04
-#define SCRIPT_COMMAND_EMOTE                 1              // source = unit, datalong = anim_id
-#define SCRIPT_COMMAND_FIELD_SET             2              // source = any, datalong = field_id, datalog2 = value
-#define SCRIPT_COMMAND_MOVE_TO               3              // source = Creature, datalog2 = time, x/y/z
-#define SCRIPT_COMMAND_FLAG_SET              4              // source = any, datalong = field_id, datalog2 = bitmask
-#define SCRIPT_COMMAND_FLAG_REMOVE           5              // source = any, datalong = field_id, datalog2 = bitmask
+                                                            // dataint = text entry from db_script_string -table
+#define SCRIPT_COMMAND_EMOTE                 1              // source = unit, datalong = emote_id
+#define SCRIPT_COMMAND_FIELD_SET             2              // source = any, datalong = field_id, datalong2 = value
+#define SCRIPT_COMMAND_MOVE_TO               3              // source = Creature, datalong2 = time, x/y/z
+#define SCRIPT_COMMAND_FLAG_SET              4              // source = any, datalong = field_id, datalong2 = bitmask
+#define SCRIPT_COMMAND_FLAG_REMOVE           5              // source = any, datalong = field_id, datalong2 = bitmask
 #define SCRIPT_COMMAND_TELEPORT_TO           6              // source or target with Player, datalong = map_id, x/y/z
 #define SCRIPT_COMMAND_QUEST_EXPLORED        7              // one from source or target must be Player, another GO/Creature, datalong=quest_id, datalong2=distance or 0
 #define SCRIPT_COMMAND_KILL_CREDIT           8              // source or target with Player, datalong = creature entry, datalong2 = bool (0=personal credit, 1=group credit)
@@ -418,6 +419,8 @@ enum RealmZone
 #define SCRIPT_COMMAND_CREATE_ITEM          17              // source or target must be player, datalong = item entry, datalong2 = amount
 #define SCRIPT_COMMAND_DESPAWN_SELF         18              // source or target must be creature, datalong = despawn delay
 #define SCRIPT_COMMAND_PLAY_MOVIE           19              // target can only be a player, datalog = movie id
+#define SCRIPT_COMMAND_MOVEMENT             20              // source or target must be creature. datalong = MovementType (0:idle, 1:random or 2:waypoint)
+                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
 
 /// Storage class for commands issued for delayed execution
 struct CliCommandHolder
