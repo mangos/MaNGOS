@@ -284,6 +284,7 @@ libmangosgame_a_SOURCES = \
 	UpdateFields.h \
 	UpdateMask.h \
 	Vehicle.cpp \
+	VehicleHandler.cpp \
 	Vehicle.h \
 	VoiceChatHandler.cpp \
 	WaypointManager.cpp \
