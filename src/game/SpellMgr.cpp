@@ -2994,6 +2994,14 @@ void SpellMgr::LoadSpellPetAuras()
         uint32 pet = fields[2].GetUInt32();
         uint32 aura = fields[3].GetUInt32();
 
+        if (!spell)
+        {
+            // Creating lists of pet passive auras (spell == 0)
+            PetAura pa(pet, aura, eff, 0);
+            mSpellPetPassiveAuraMap[pet].push_back(pa);
+            continue;
+        }
+
         if (eff >= MAX_EFFECT_INDEX)
         {
             sLog.outErrorDb("Spell %u listed in `spell_pet_auras` with wrong spell effect index (%u)", spell, eff);

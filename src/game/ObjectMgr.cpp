@@ -2624,6 +2624,99 @@ PetLevelInfo const* ObjectMgr::GetPetLevelInfo(uint32 creature_id, uint32 level)
     return &itr->second[level-1];                           // data for level 1 stored in [0] array element, ...
 }
 
+void ObjectMgr::LoadPetScalingData()
+{
+    // Loading scaling data
+    //                                                 0               1     2           3       4          5       6    7    8    9     10
+    QueryResult *result  = WorldDatabase.Query("SELECT creature_entry, aura, healthbase, health, powerbase, power,  str, agi, sta, inte, spi,"
+    //                                          11     12           13           14           15           16           17
+                                               "armor, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6," 
+    //                                          18      19           20           21      22          23   24         25           26
+                                               "apbase, apbasescale, attackpower, damage, spellpower, hit, expertize, attackspeed, crit FROM pet_scaling_data");
+
+    uint32 count = 0;
+
+    if (!result)
+    {
+        barGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u level pet scaling data definitions", count);
+        sLog.outErrorDb("Error loading `pet_scaling_data` table or empty table.");
+        return;
+    }
+
+    barGoLink bar( (int)result->GetRowCount() );
+
+    m_PetScalingData.clear();
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 creature_id = fields[0].GetUInt32();
+
+        if(creature_id && !sCreatureStorage.LookupEntry<CreatureInfo>(creature_id)) // in 0 creature_id storing default values. _must_ be exist.
+        {
+            sLog.outErrorDb("Wrong creature id %u in `pet_scaling_data` table, ignoring.",creature_id);
+            continue;
+        }
+
+        PetScalingDataList*& pScalingDataList = m_PetScalingData[creature_id];
+
+        if (pScalingDataList == NULL)
+                pScalingDataList =  new PetScalingDataList;
+
+        PetScalingData* pScalingDataEntry = new PetScalingData;
+
+        pScalingDataEntry->creatureID = fields[0].GetUInt32();
+        pScalingDataEntry->requiredAura = fields[1].GetUInt32();
+        pScalingDataEntry->healthBasepoint = fields[2].GetInt32();
+        pScalingDataEntry->healthScale = fields[3].GetInt32();
+        pScalingDataEntry->powerBasepoint = fields[4].GetInt32();
+        pScalingDataEntry->powerScale = fields[5].GetInt32();
+        for (int i = 0; i < MAX_STATS; i++)
+        {
+            pScalingDataEntry->statScale[i] = fields[i+6].GetInt32();
+        }
+        for (int i = 0; i < MAX_SPELL_SCHOOL; i++)
+        {
+            pScalingDataEntry->resistanceScale[i] = fields[i+11].GetInt32();
+        }
+        pScalingDataEntry->APBasepoint = fields[18].GetInt32();
+        pScalingDataEntry->APBaseScale = fields[19].GetInt32();
+        pScalingDataEntry->attackpowerScale = fields[20].GetInt32();
+        pScalingDataEntry->damageScale = fields[21].GetInt32();
+        pScalingDataEntry->spellpowerScale = fields[22].GetInt32();
+        pScalingDataEntry->hitScale = fields[23].GetInt32();
+        pScalingDataEntry->expertizeScale = fields[24].GetInt32();
+        pScalingDataEntry->attackspeedScale = fields[25].GetInt32();
+        pScalingDataEntry->critScale = fields[26].GetInt32();
+
+        pScalingDataList->push_back(pScalingDataEntry);
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u level pet scaling data definitions", count );
+}
+
+PetScalingDataList const* ObjectMgr::GetPetScalingData(uint32 creature_id) const
+{
+    PetScalingDataMap::const_iterator itr = m_PetScalingData.find(creature_id);
+
+    if (itr == m_PetScalingData.end())
+        return NULL;
+    else
+        return itr->second;
+}
+
+
 void ObjectMgr::LoadPlayerInfo()
 {
     // Load playercreate

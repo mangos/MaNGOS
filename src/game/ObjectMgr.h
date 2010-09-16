@@ -228,6 +228,38 @@ struct PetLevelInfo
     uint32 attackpower;
 };
 
+struct PetScalingData
+{
+    PetScalingData() : creatureID(0), requiredAura(0),
+    healthBasepoint(0), healthScale(0), powerBasepoint(0), powerScale(0),
+    attackpowerScale(0), damageScale(0), spellpowerScale(0),
+    hitScale(0), expertizeScale(0), attackspeedScale(0), critScale(0)
+    {
+        for(int i=0; i < MAX_STATS; ++i ) statScale[i] = 0;
+        for(int i=0; i < MAX_SPELL_SCHOOL; ++i ) resistanceScale[i] = 0;
+    }
+
+    uint32 creatureID;
+    uint32 requiredAura;
+    int32  healthBasepoint;
+    int32  healthScale;
+    int32  powerBasepoint;
+    int32  powerScale;
+    int32  APBasepoint;
+    int32  APBaseScale;
+    int32  statScale[MAX_STATS];
+    int32  resistanceScale[MAX_SPELL_SCHOOL];
+    int32  attackpowerScale;
+    int32  damageScale;
+    int32  spellpowerScale;
+    int32  hitScale;
+    int32  expertizeScale;
+    int32  attackspeedScale;
+    int32  critScale;
+};
+
+typedef std::vector<PetScalingData*> PetScalingDataList;
+
 struct MailLevelReward
 {
     MailLevelReward() : raceMask(0), mailTemplateId(0), senderEntry(0) {}
@@ -545,6 +577,8 @@ class ObjectMgr
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 
+        PetScalingDataList const* GetPetScalingData(uint32 creature_id) const;
+
         PlayerClassInfo const* GetPlayerClassInfo(uint32 class_) const
         {
             if(class_ >= MAX_CLASSES) return NULL;
@@ -726,6 +760,7 @@ class ObjectMgr
 
         void LoadPlayerInfo();
         void LoadPetLevelInfo();
+        void LoadPetScalingData();
         void LoadExplorationBaseXP();
         void LoadPetNames();
         void LoadPetNumber();
@@ -1122,6 +1157,9 @@ class ObjectMgr
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]
         PetLevelInfoMap petInfo;                            // [creature_id][level]
+
+        typedef std::map<uint32, PetScalingDataList*> PetScalingDataMap;
+        PetScalingDataMap m_PetScalingData;                 // [creature_id]
 
         PlayerClassInfo playerClassInfo[MAX_CLASSES];
 

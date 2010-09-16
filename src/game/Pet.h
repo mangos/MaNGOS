@@ -133,6 +133,7 @@ typedef std::vector<uint32> AutoSpellList;
 #define PET_FOLLOW_ANGLE M_PI_F/2
 
 class Player;
+class PetScalingData;
 
 class Pet : public Creature
 {
@@ -202,14 +203,16 @@ class Pet : public Creature
         void LearnPetPassives();
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
-        void CastPetPassiveSpells(bool current = true);
-        void CastPetPassiveSpell(uint32 SpellID, int damage = 0);
-        void ApplyStatBonus(Stats stat, bool apply);
-        void ApplyResistanceBonus(uint32 school, bool apply);
-        void ApplyAttackPowerBonus(bool apply);
-        void ApplySpellPowerBonus(int32 amount, bool apply);
-        void ApplyOtherBonuses(bool apply);
-        void ApplyAllBonuses(bool apply);
+
+        void CastPetPassiveAuras(bool current);
+        void ApplyStatScalingBonus(Stats stat, bool apply);
+        void ApplyResistanceScalingBonus(uint32 school, bool apply);
+        void ApplyAttackPowerScalingBonus(bool apply);
+        void ApplySpellPowerScalingBonus(int32 amount, bool apply);
+        void ApplyOtherScalingBonuses(bool apply);
+        void ApplyAllScalingBonuses(bool apply);
+        bool ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints);
+        PetScalingData* CalculateScalingData( bool recalculate = false );
 
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
@@ -282,6 +285,7 @@ class Pet : public Creature
         int16   m_baseRatingValue[MAX_COMBAT_RATING];
         uint16  m_baseSpellPower;
         uint16  m_basePowerRegen;
+        PetScalingData*  m_PetScalingData;
 
         DeclinedName *m_declinedname;
 

@@ -4773,7 +4773,7 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
         spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
         spawnCreature->SetCanModifyStats(true);
-        spawnCreature->ApplyAllBonuses(false);
+        spawnCreature->ApplyAllScalingBonuses(false);
         spawnCreature->InitPetCreateSpells();
         spawnCreature->InitStatsForLevel(level, m_caster);
         spawnCreature->GetCharmInfo()->SetPetNumber(pet_number, false);
