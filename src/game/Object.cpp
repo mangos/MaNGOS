@@ -661,7 +661,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     else
                     {
                         // flag only for original loot recipent
-                        if (target == ((Creature*)this)->GetOriginalLootRecipient())
+                        if (target->GetObjectGuid() == ((Creature*)this)->GetLootRecipientGuid())
                             *data << m_uint32Values[ index ];
                         else
                             *data << (m_uint32Values[ index ] & ~(UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER));
