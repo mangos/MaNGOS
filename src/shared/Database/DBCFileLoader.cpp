@@ -43,7 +43,7 @@ bool DBCFileLoader::Load(const char *filename, const char *fmt)
     FILE * f=fopen(filename,"rb");
     if(!f)return false;
 
-    if(fread(&header,4,1,f)!=1)                             // Number of records
+    if(fread(&header,4,1,f)!=1)                             // Signature
         return false;
 
     EndianConvert(header);

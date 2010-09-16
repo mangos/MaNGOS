@@ -1670,7 +1670,7 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32 SpellShapeshiftId;                               // 43       SpellShapeshift.dbc
     uint32 SpellTargetRestrictionsId;                       // 44       SpellTargetRestrictions.dbc
     uint32 SpellTotemsId;                                   // 45       SpellTotems.dbc
-    //uint32 unk2;                                          // 46
+    //uint32 ResearchProject;                               // 46       ResearchProject.dbc
 
     // helpers
     int32 CalculateSimpleValue(SpellEffectIndex eff) const;
