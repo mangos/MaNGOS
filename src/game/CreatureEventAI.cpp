@@ -1173,9 +1173,9 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
                     case EVENT_T_TARGET_CASTING:
                     case EVENT_T_FRIENDLY_HP:
                     case EVENT_T_BUFFED:
-                    case EVENT_T_TARGET_BUFFED:
+                    case EVENT_T_TARGET_BUFFED:             //FIXME: not work in this way
                     case EVENT_T_MISSING_BUFF:
-                    case EVENT_T_TARGET_MISSING_BUFF:
+                    case EVENT_T_TARGET_MISSING_BUFF:       //FIXME: not work in this way
                         if (Combat)
                             ProcessEvent(*i);
                         break;
