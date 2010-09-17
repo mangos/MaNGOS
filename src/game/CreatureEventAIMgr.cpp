@@ -463,6 +463,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                 case EVENT_T_BUFFED:
                 case EVENT_T_TARGET_BUFFED:
                 case EVENT_T_MISSING_BUFF:
+                case EVENT_T_TARGET_MISSING_BUFF:
                 {
                     SpellEntry const* pSpell = sSpellStore.LookupEntry(temp.buffed.spellId);
                     if (!pSpell)
