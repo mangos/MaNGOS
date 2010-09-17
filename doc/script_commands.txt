@@ -43,7 +43,7 @@ The action to execute.
 ## dataint
 -- --------------------------
 
-1 multipurpose field, store raw data as signed values
+4 multipurpose fields, store raw data as signed values
 Note: currently used only for text id
 
 -- --------------------------
@@ -96,7 +96,7 @@ spell_scripts
                                         * data_flags =  flag_target_player_as_source    = 0x01
                                                         flag_original_source_as_target  = 0x02
                                                         flag_buddy_as_target            = 0x04
-                                        * dataint = text entry from db_script_string -table
+                                        * dataint = text entry from db_script_string -table. dataint2-dataint4 optionally, for random selection of text
 
  1 SCRIPT_COMMAND_EMOTE                 source = unit
                                         * datalong = emote_id

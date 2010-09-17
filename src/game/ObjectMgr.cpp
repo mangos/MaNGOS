@@ -4383,7 +4383,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
     scripts.clear();                                        // need for reload support
 
-    QueryResult *result = WorldDatabase.PQuery( "SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, data_flags, dataint, x, y, z, o FROM %s", tablename );
+    QueryResult *result = WorldDatabase.PQuery( "SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o FROM %s", tablename );
 
     uint32 count = 0;
 
@@ -4414,10 +4414,13 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
         tmp.raw.data[3] = fields[6].GetUInt32();
         tmp.raw.data[4] = fields[7].GetUInt32();
         tmp.raw.data[5] = fields[8].GetInt32();
-        tmp.x           = fields[9].GetFloat();
-        tmp.y           = fields[10].GetFloat();
-        tmp.z           = fields[11].GetFloat();
-        tmp.o           = fields[12].GetFloat();
+        tmp.raw.data[6] = fields[9].GetInt32();
+        tmp.raw.data[7] = fields[10].GetInt32();
+        tmp.raw.data[8] = fields[11].GetInt32();
+        tmp.x           = fields[12].GetFloat();
+        tmp.y           = fields[13].GetFloat();
+        tmp.z           = fields[14].GetFloat();
+        tmp.o           = fields[15].GetFloat();
 
         // generic command args check
         switch(tmp.command)
@@ -4439,15 +4442,19 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_TALK for script id %u, but search radius is too small (datalong3 = %u).", tablename, tmp.talk.creatureEntry, tmp.id, tmp.talk.searchRadius);
                     continue;
                 }
-                if (tmp.talk.textId == 0)
+                if (tmp.talk.textId[0] == 0)
                 {
                     sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId, tmp.id);
                     continue;
                 }
-                if (tmp.talk.textId < MIN_DB_SCRIPT_STRING_ID || tmp.talk.textId >= MAX_DB_SCRIPT_STRING_ID)
+
+                for(int i = 0; i < MAX_TEXT_ID; ++i)
                 {
-                    sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId, MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, tmp.id);
-                    continue;
+                    if (tmp.talk.textId[i] && (tmp.talk.textId[i] < MIN_DB_SCRIPT_STRING_ID || tmp.talk.textId[i] >= MAX_DB_SCRIPT_STRING_ID))
+                    {
+                        sLog.outErrorDb("Table `%s` has out of range text id (dataint = %i expected %u-%u) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId[i], MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, tmp.id);
+                        continue;
+                    }
                 }
 
                 // if(!GetMangosStringLocale(tmp.dataint)) will checked after db_script_string loading
@@ -9059,15 +9066,15 @@ void ObjectMgr::CheckScriptTexts(ScriptMapMap const& scripts,std::set<int32>& id
     {
         for(ScriptMap::const_iterator itrM = itrMM->second.begin(); itrM != itrMM->second.end(); ++itrM)
         {
-            switch(itrM->second.command)
+            if (itrM->second.command == SCRIPT_COMMAND_TALK)
             {
-                case SCRIPT_COMMAND_TALK:
+                for(int i = 0; i < MAX_TEXT_ID; ++i)
                 {
-                    if(!GetMangosStringLocale (itrM->second.talk.textId))
-                        sLog.outErrorDb( "Table `db_script_string` is missing string id %u, used in database script id %u.", itrM->second.talk.textId, itrMM->first);
+                    if (itrM->second.talk.textId[i] && !GetMangosStringLocale (itrM->second.talk.textId[i]))
+                        sLog.outErrorDb( "Table `db_script_string` is missing string id %u, used in database script id %u.", itrM->second.talk.textId[i], itrMM->first);
 
-                    if (ids.find(itrM->second.talk.textId) != ids.end())
-                        ids.erase(itrM->second.talk.textId);
+                    if (ids.find(itrM->second.talk.textId[i]) != ids.end())
+                        ids.erase(itrM->second.talk.textId[i]);
                 }
             }
         }

@@ -2260,20 +2260,35 @@ void Map::ScriptsProcess()
                     target = source;
 
                 uint64 unit_target = target ? target->GetGUID() : 0;
+                int32 textId = step.script->talk.textId[0];
+
+                // May have text for random
+                if (step.script->talk.textId[1])
+                {
+                    int i = 2;
+                    for(; i < MAX_TEXT_ID; ++i)
+                    {
+                        if (!step.script->talk.textId[i])
+                            break;
+                    }
+
+                    // Use one random
+                    textId = step.script->talk.textId[rand() % i];
+                }
 
                 switch(step.script->talk.chatType)
                 {
                     case CHAT_TYPE_SAY:
-                        pSource->MonsterSay(step.script->talk.textId, LANG_UNIVERSAL, unit_target);
+                        pSource->MonsterSay(textId, LANG_UNIVERSAL, unit_target);
                         break;
                     case CHAT_TYPE_YELL:
-                        pSource->MonsterYell(step.script->talk.textId, LANG_UNIVERSAL, unit_target);
+                        pSource->MonsterYell(textId, LANG_UNIVERSAL, unit_target);
                         break;
                     case CHAT_TYPE_TEXT_EMOTE:
-                        pSource->MonsterTextEmote(step.script->talk.textId, unit_target);
+                        pSource->MonsterTextEmote(textId, unit_target);
                         break;
                     case CHAT_TYPE_BOSS_EMOTE:
-                        pSource->MonsterTextEmote(step.script->talk.textId, unit_target, true);
+                        pSource->MonsterTextEmote(textId, unit_target, true);
                         break;
                     case CHAT_TYPE_WHISPER:
                         if (!unit_target || !IS_PLAYER_GUID(unit_target))
@@ -2281,7 +2296,7 @@ void Map::ScriptsProcess()
                             sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->talk.chatType);
                             break;
                         }
-                        pSource->MonsterWhisper(step.script->talk.textId, unit_target);
+                        pSource->MonsterWhisper(textId, unit_target);
                         break;
                     case CHAT_TYPE_BOSS_WHISPER:
                         if (!unit_target || !IS_PLAYER_GUID(unit_target))
@@ -2289,10 +2304,10 @@ void Map::ScriptsProcess()
                             sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->talk.chatType);
                             break;
                         }
-                        pSource->MonsterWhisper(step.script->talk.textId, unit_target, true);
+                        pSource->MonsterWhisper(textId, unit_target, true);
                         break;
                     case CHAT_TYPE_ZONE_YELL:
-                        pSource->MonsterYellToZone(step.script->talk.textId, LANG_UNIVERSAL, unit_target);
+                        pSource->MonsterYellToZone(textId, LANG_UNIVERSAL, unit_target);
                         break;
                     default:
                         break;                              // must be already checked at load

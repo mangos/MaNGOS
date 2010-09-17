@@ -76,7 +76,7 @@ enum eScriptCommand
                                                             // data_flags = flag_target_player_as_source    = 0x01
                                                             //              flag_original_source_as_target  = 0x02
                                                             //              flag_buddy_as_target            = 0x04
-                                                            // dataint = text entry from db_script_string -table
+                                                            // dataint = text entry from db_script_string -table. dataint2-4 optional for random selected text.
     SCRIPT_COMMAND_EMOTE                = 1,                // source = unit, datalong = emote_id
     SCRIPT_COMMAND_FIELD_SET            = 2,                // source = any, datalong = field_id, datalong2 = value
     SCRIPT_COMMAND_MOVE_TO              = 3,                // source = Creature, datalong2 = time, x/y/z
@@ -100,6 +100,8 @@ enum eScriptCommand
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
 };
 
+#define MAX_TEXT_ID                     4                   // used for SCRIPT_COMMAND_TALK
+
 struct ScriptInfo
 {
     uint32 id;
@@ -115,7 +117,7 @@ struct ScriptInfo
             uint32 searchRadius;                            // datalong3
             uint32 unused1;                                 // datalong4
             uint32 flags;                                   // data_flags
-            int32  textId;                                  // dataint
+            int32  textId[MAX_TEXT_ID];                     // dataint to dataint4
         } talk;
 
         struct                                              // SCRIPT_COMMAND_EMOTE (1)
@@ -233,7 +235,7 @@ struct ScriptInfo
 
         struct
         {
-            uint32 data[6];
+            uint32 data[9];
         } raw;
     };
 
