@@ -77,4 +77,5 @@ INSERT INTO `spell_pet_auras` VALUES
 -- Mage water elemental
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 37995;
 INSERT INTO `spell_pet_auras` VALUES
-(0,0,37995,34947);
+(0,0,37995,34947),
+(0,0,37995,34956);

@@ -47,7 +47,7 @@ bool Player::UpdateStats(Stats stat)
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyStatScalingBonus(stat, true);
+                    _pet->ApplyStatScalingBonus(stat, false);
         }
     }
 
@@ -112,7 +112,10 @@ void Player::ApplySpellPowerBonus(int32 amount, bool apply)
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyAttackPowerScalingBonus(true);
+                {
+                    _pet->ApplyAttackPowerScalingBonus(false);
+                    _pet->ApplyDamageScalingBonus(false);
+                }
         }
     }
 }
@@ -134,7 +137,7 @@ void Player::UpdateSpellDamageAndHealingBonus()
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyAttackPowerScalingBonus(true);
+                    _pet->ApplyAttackPowerScalingBonus(false);
         }
     }
 
@@ -189,7 +192,7 @@ void Player::UpdateResistances(uint32 school)
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyResistanceScalingBonus(SpellSchools(school),true);
+                    _pet->ApplyResistanceScalingBonus(SpellSchools(school),false);
         }
     }
 
@@ -225,7 +228,7 @@ void Player::UpdateArmor()
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyResistanceScalingBonus(SPELL_SCHOOL_NORMAL,true);
+                    _pet->ApplyResistanceScalingBonus(SPELL_SCHOOL_NORMAL,false);
         }
     }
     UpdateAttackPowerAndDamage();                           // armor dependent auras update for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
@@ -437,7 +440,10 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->UpdateAttackPowerAndDamage();
+                {
+                    _pet->ApplyAttackPowerScalingBonus(false);
+                    _pet->ApplyDamageScalingBonus(false);
+                }
         }
     }
 
@@ -925,12 +931,17 @@ bool Pet::UpdateStats(Stats stat)
 
     switch(stat)
     {
-        case STAT_STRENGTH:         UpdateAttackPowerAndDamage();        break;
+        case STAT_STRENGTH:
+            UpdateAttackPowerAndDamage();
+            break;
         case STAT_AGILITY:
 //            UpdateAllCritPercentages();
+            UpdateAttackPowerAndDamage(true);
             UpdateArmor();
             break;
-        case STAT_STAMINA:          UpdateMaxHealth();                   break;
+        case STAT_STAMINA:
+            UpdateMaxHealth();
+            break;
         case STAT_INTELLECT:
             UpdateMaxPower(POWER_MANA);
 //            UpdateAllSpellCritChances();
@@ -939,10 +950,6 @@ bool Pet::UpdateStats(Stats stat)
         default:
             break;
     }
-
-    // Need update (exist AP from stat auras)
-    UpdateAttackPowerAndDamage();
-    UpdateAttackPowerAndDamage(true);
     return true;
 }
 
@@ -956,6 +963,10 @@ bool Pet::UpdateAllStats()
 
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
+
+    UpdateAttackPowerAndDamage();
+    UpdateAttackPowerAndDamage(true);
+    UpdateSpellPower();
 
     return true;
 }
@@ -1025,13 +1036,18 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
     if (!ranged)
     {
         unitMod  = UNIT_MOD_ATTACK_POWER;
+        baseAP = (CalculateScalingData()->APBaseScale / 100.0f) * (GetStat(STAT_STRENGTH) - CalculateScalingData()->APBasepoint);
     }
     else
     {
-       unitMod  = UNIT_MOD_ATTACK_POWER_RANGED;
+        unitMod  = UNIT_MOD_ATTACK_POWER_RANGED;
+        baseAP = (CalculateScalingData()->APBaseScale / 100.0f) * (GetStat(STAT_AGILITY) - CalculateScalingData()->APBasepoint);
     }
 
-    baseAP = (CalculateScalingData()->APBaseScale / 100.0f) * (GetStat(STAT_STRENGTH) - CalculateScalingData()->APBasepoint);
+
+    if ((baseAP) < 0.0f)
+        baseAP = 0.0f;
+
     SetModifierValue(unitMod, BASE_VALUE, baseAP);
 
     //in BASE_VALUE of UNIT_MOD_ATTACK_POWER for creatures we store data of meleeattackpower field in DB
@@ -1060,9 +1076,11 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     UnitMods unitMod;
 
     if (attType == BASE_ATTACK)
-       unitMod  = UNIT_MOD_DAMAGE_MAINHAND;
+        unitMod  = UNIT_MOD_DAMAGE_MAINHAND;
     else if (attType == RANGED_ATTACK)
        unitMod  = UNIT_MOD_DAMAGE_RANGED;
+    else
+        return;
 
     float att_speed = float(GetAttackTime(attType))/1000.0f;
 
@@ -1105,9 +1123,17 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     }
     else if (attType == RANGED_ATTACK)
     {
-        SetStatFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE, mindamage);
-        SetStatFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE, maxdamage);
+        SetStatFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, mindamage);
+        SetStatFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, maxdamage);
     }
-
 }
 
+void Pet::UpdateSpellPower()
+{
+    Unit* owner = GetOwner();
+
+    if(!owner || owner->GetTypeId()!=TYPEID_PLAYER)
+        return;
+                                                  // Only for displaying in client!
+    owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SPELL));
+}
