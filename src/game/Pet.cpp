@@ -809,6 +809,9 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         }
     }
 
+    if (!petlevel)
+        petlevel = owner->getLevel();
+
     SetLevel(petlevel);
 
     PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(cinfo->Entry, petlevel);
@@ -1962,8 +1965,14 @@ void Pet::learnSpellHighRank(uint32 spellid)
 void Pet::SynchronizeLevelWithOwner()
 {
     Unit* owner = GetOwner();
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner)
         return;
+
+    if (owner->GetTypeId() != TYPEID_PLAYER)
+    {
+        GivePetLevel(owner->getLevel());
+        return;
+    }
 
     switch(getPetType())
     {
@@ -2424,8 +2433,8 @@ bool Pet::Summon(int32 duration, uint8 counter)
         SetFFAPvP(true);
 
     SetCanModifyStats(true);
+    InitStatsForLevel(owner->getLevel(), owner);
     SynchronizeLevelWithOwner();
-    InitStatsForLevel(getLevel(), owner);
     InitPetCreateSpells();
     InitLevelupSpellsForLevel();
     InitTalentForLevel();
