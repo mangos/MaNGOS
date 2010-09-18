@@ -1,4 +1,4 @@
-## Event 89 - Under Attack PvP Arena Gurubashi
+## Event 109 - Under Attack PvP Arena Gurubashi
 ## ======================
 ## Название: Under Attack PvP Arena Gurubashi
 ## Версия: 1.0k
@@ -32,18 +32,22 @@
 # _Event_ -------------------------------------------------------------------------------
 INSERT INTO `game_event` 
 (`entry`, `start_time`,          `end_time`,            `occurence`, `length`, `Holiday`, `description`) VALUES 
-('89',    '2009-03-22 18:00:30', '2019-02-24 06:00:00', '10080',     '150',     '0',      'Under Attack PvP Arena Gurubashi');
+('109',    '2009-03-22 18:00:30', '2019-02-24 06:00:00', '10080',     '150',     '0',      'Under Attack PvP Arena Gurubashi');
 
 # Teleport ------------------------------------------------------------------------------
 INSERT INTO `gameobject_template` 
 (`entry`, `type`, `displayId`, `name`,                          `castBarCaption`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `ScriptName`) VALUES 
-( 500000,  22,     6955,       'Portal to PVP Arena Gurubashi', '',                0,         0,       1,      10000,    0,       0,       0,       0,       0,       0,       0,       0,       0,       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,       '');
-INSERT INTO `areatrigger_teleport` 
-(`id`,   `name`,                         `required_level`, `required_item`, `required_item2`, `heroic_key`, `heroic_key2`, `required_quest_done`, `required_failed_text`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES 
-( 10000, 'Portal to PVP Arena Gurubashi', 0,                0,               0,                0,            0,             0,                     NULL,                   0,            -13232.8,            218.2,               31.82,               1.133);
-INSERT INTO `spell_target_position` 
-(`id`,  `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES 
-( 10000, 0,            -13232.8,            218.2,               31.82,               1.133);
+( 500000,  1,     6955,       'Portal to PVP Arena Gurubashi', '',                0,          0,       1,      0,       0,       0,       0,       0,       0,       0,       0,       0,       0,       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,        0,       '');
+INSERT INTO `gameobject_scripts` 
+(`id`, `delay`,`command`,`datalong`,`x`,     `y`,   `z`,   `o`) VALUE
+(500010,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500011,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500012,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500013,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500014,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500015,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500016,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133),
+(500017,0,      6,        0,        -13232.8, 218.2, 31.82, 1.133);
 INSERT INTO `gameobject` VALUES 
 ('500010', '500000', '1', '1', '1', '-1277.71', '119.821', '131.183', '5.28871', '0', '0', '0.477', '-0.878903', '25', '0', '1'),
 ('500011', '500000', '0', '1', '1', '1804.87', '247.557', '60.587', '0.0268662', '0', '0', '0.0134327', '0.99991', '25', '0', '1'),
@@ -54,23 +58,25 @@ INSERT INTO `gameobject` VALUES
 ('500016', '500000', '1', '1', '1', '1535.18', '-4412.6', '11.3752', '3.24601', '0', '0', '0.998637', '-0.052185', '25', '0', '1'),
 ('500017', '500000', '0', '1', '1', '-8994.24', '489.263', '96.6113', '3.81739', '0', '0', '0.943454', '-0.331503', '25', '0', '1');
 INSERT INTO `game_event_gameobject` VALUES 
-('500010', '89'), 
-('500011', '89'), 
-('500012', '89'), 
-('500013', '89'), 
-('500014', '89'), 
-('500015', '89'), 
-('500016', '89'), 
-('500017', '89');
+('500010', '109'), 
+('500011', '109'), 
+('500012', '109'), 
+('500013', '109'), 
+('500014', '109'), 
+('500015', '109'), 
+('500016', '109'), 
+('500017', '109');
 
 # Monstr --------------------------------------------------------------------------------
 INSERT INTO `creature_template` 
 (`entry`, `modelid_1`, `modelid_2`, `modelid_3`, `modelid_4`, `name`,       `subname`, `IconName`, `minlevel`, `maxlevel`, `minhealth`, `maxhealth`, `minmana`, `maxmana`, `armor`, `faction_A`, `faction_H`, `npcflag`, `speed_walk`, `speed_run`,`scale`, `rank`, `mindmg`, `maxdmg`, `dmgschool`, `attackpower`, `baseattacktime`, `rangeattacktime`, `unit_flags`, `dynamicflags`, `family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `minrangedmg`, `maxrangedmg`, `rangedattackpower`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `spell1`, `spell2`, `spell3`, `spell4`, `PetSpellDataId`, `mingold`, `maxgold`, `AIName`, `MovementType`, `InhabitType`, `RacialLeader`, `RegenHealth`, `equipment_id`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`) VALUES 
-( 500010,  21254,       0,           21254,       0,          'Under Boss', 'Attacker','',          83,         83,         10000000,    10000000,    5000000,   5000000,   15000,   14,          14,          0,         1,            1.5,        1.5,     3,      9000,     12000,    0,           9000,          0,                0,                 0,            0,              0,        0,              0,               0,               0,              0,             0,             0,                   0,      8,            500010,   0,                0,          0,             0,             0,             0,             0,             0,             0,        0,        0,        0,        0,                1000,      100000,   '',        0,              3,             0,              1,             0,              549526032,              0,            '');
+( 500010,  21254,       0,           21254,       0,          'Under Boss', 'Attacker','',          83,         83,         10000000,    10000000,    5000000,   5000000,   15000,   14,          14,          0,         0.7,          1.1,        1.5,     3,      9000,     12000,    0,           9000,          0,                0,                 0,            0,              0,        0,              0,               0,               0,              0,             0,             0,                   0,      8,            500010,   0,                0,          0,             0,             0,             0,             0,             0,             0,        0,        0,        0,        0,                1000,      100000,   '',        0,              3,             0,              1,             0,              549526032,              0,            '');
 #DELETE FROM `creature_loot_template` WHERE `entry` = 500010;
 INSERT INTO `creature_loot_template` VALUES (500010, 22485, 100.5, 0, 1, 1, 0, 0, 0);
-INSERT INTO `creature` VALUES ('500010', '500010', '0', '1', '1', '0', '0', '-13205.5', '272.942', '21.858', '4.2155', '25', '0', '0', '10000000', '5000000', '0', '0');
-INSERT INTO `game_event_creature` VALUES ('500010', '89');
+INSERT INTO `creature` 
+(`guid`,   `id`,     `map`, `spawnMask`,`phaseMask`,`modelId`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`, `DeathState`,`MovementType`)VALUES 
+('500010', '500010', '0',   '1',        '1',        '0',      '0',          '-13205.5',   '272.942',   '21.858',    '4.2155',     '150',          '5',        '0',              '10000000', '5000000', '0',         '1');
+INSERT INTO `game_event_creature` VALUES ('500010', '109');
 
 # QuestGiver ----------------------------------------------------------------------------
 INSERT INTO `creature_template` 
@@ -79,8 +85,8 @@ INSERT INTO `creature_template`
 INSERT INTO `creature_questrelation`    (`id`, `quest`) VALUES (500011, 500000);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES (500011, 500000);
 INSERT INTO `creature` VALUES ('500011', '500011', '0', '1', '1', '0', '0', '-13225.1', '235.282', '33.4367', '4.2376', '25', '0', '0', '10000', '5000', '0', '0');
-INSERT INTO `game_event_creature` VALUES ('500011', '89');
-INSERT INTO `game_event_creature_quest` VALUES ('500011', '500000', '89');
+INSERT INTO `game_event_creature` VALUES ('500011', '109');
+INSERT INTO `game_event_creature_quest` VALUES ('500011', '500000', '109');
 
 # Stone ---------------------------------------------------------------------------------
 INSERT INTO `item_template` 
@@ -116,7 +122,7 @@ INSERT INTO `quest_template` (
 (500000,2,     0,     0,     80, 
  80,    0,     0,     0,     0, 
  0,     0,     0,     0,     0, 
- 0,     0,     2,     0,     0, 
+ 0,     750,   2,     0,     0, 
  0,     0,     0,     0,     0, 
  0,     0,     0,     0,     'Under Attack PvP Arena Gurubashi', 
 'Well hi, the man of courage.', 
@@ -143,3 +149,5 @@ INSERT INTO `quest_template` (
  0,     0,     0,     0,     0);
 
 # *The_END*
+
+
