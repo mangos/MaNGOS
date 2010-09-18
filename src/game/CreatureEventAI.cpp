@@ -344,6 +344,20 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
             break;
         }
+        case EVENT_T_TARGET_MISSING_BUFF:
+        {
+            //Prevent event from occuring on no unit
+            if (!pActionInvoker)
+                return false;
+
+            SpellAuraHolder* holder = pActionInvoker->GetSpellAuraHolder(event.buffed.spellId);
+            if (holder && holder->GetStackAmount() >= event.buffed.amount)
+                return false;
+
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
+            break;
+        }
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
@@ -1159,6 +1173,10 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
                     case EVENT_T_TARGET_HP:
                     case EVENT_T_TARGET_CASTING:
                     case EVENT_T_FRIENDLY_HP:
+                    case EVENT_T_BUFFED:
+                    case EVENT_T_TARGET_BUFFED:             //FIXME: not work in this way
+                    case EVENT_T_MISSING_BUFF:
+                    case EVENT_T_TARGET_MISSING_BUFF:       //FIXME: not work in this way
                         if (Combat)
                             ProcessEvent(*i);
                         break;
