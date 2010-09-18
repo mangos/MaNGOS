@@ -57,10 +57,11 @@ enum EventAI_Type
     EVENT_T_REACHED_HOME            = 21,                   // NONE
     EVENT_T_RECEIVE_EMOTE           = 22,                   // EmoteId, Condition, CondValue1, CondValue2
     EVENT_T_BUFFED                  = 23,                   // Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
-    EVENT_T_TARGET_BUFFED           = 24,                   // Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
+    EVENT_T_TARGET_BUFFED           = 24,                   // (NOT WORK) Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
     EVENT_T_SUMMONED_JUST_DIED      = 25,                   // CreatureId, RepeatMin, RepeatMax
     EVENT_T_SUMMONED_JUST_DESPAWN   = 26,                   // CreatureId, RepeatMin, RepeatMax
     EVENT_T_MISSING_BUFF            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
+    EVENT_T_TARGET_MISSING_BUFF     = 28,                   // (NOT WORK) Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
 
     EVENT_T_END,
 };
@@ -108,7 +109,7 @@ enum EventAI_ActionType
     ACTION_T_ZONE_COMBAT_PULSE          = 38,               // No Params
     ACTION_T_CALL_FOR_HELP              = 39,               // Radius
     ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive,1-melee,2-ranged)
-    ACTION_T_FORCE_DESPAWN              = 41,               // No Params
+    ACTION_T_FORCE_DESPAWN              = 41,               // Delay (0-instant despawn)
     ACTION_T_SET_INVINCIBILITY_HP_LEVEL = 42,               // MinHpValue, format(0-flat,1-percent from max health)
     ACTION_T_MOUNT_TO_ENTRY_OR_MODEL    = 43,               // Creature_template entry(param1) OR ModelId (param2) (or 0 for both to unmount)
     ACTION_T_END,
@@ -521,6 +522,7 @@ struct CreatureEventAI_Event
         // EVENT_T_BUFFED                                   = 23
         // EVENT_T_TARGET_BUFFED                            = 24
         // EVENT_T_MISSING_BUFF                             = 27
+        // EVENT_T_TARGET_MISSING_BUFF                      = 28
         struct
         {
             uint32 spellId;
