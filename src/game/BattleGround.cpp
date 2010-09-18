@@ -288,8 +288,8 @@ BattleGround::~BattleGround()
     if (GetInstanceID())                                    // not spam by useless queries in case BG templates
     {
         // delete creature and go respawn times
-        WorldDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'",GetInstanceID());
-        WorldDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'",GetInstanceID());
+        CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", GetInstanceID());
+        CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", GetInstanceID());
         // delete instance from db
         CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'",GetInstanceID());
         // remove from battlegrounds
