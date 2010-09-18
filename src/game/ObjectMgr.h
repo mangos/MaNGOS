@@ -232,6 +232,7 @@ struct PetScalingData
 {
     PetScalingData() : creatureID(0), requiredAura(0),
     healthBasepoint(0), healthScale(0), powerBasepoint(0), powerScale(0),
+    APBasepoint(0), APBaseScale(0),
     attackpowerScale(0), damageScale(0), spellpowerScale(0),
     hitScale(0), expertizeScale(0), attackspeedScale(0), critScale(0)
     {
