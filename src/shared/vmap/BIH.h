@@ -35,6 +35,8 @@
 
 #ifdef _MSC_VER
     #define isnan(x) _isnan(x)
+#elif defined(__sun__)
+    #define isnan(x) ((x) != (x))
 #else
     #define isnan(x) std::isnan(x)
 #endif
