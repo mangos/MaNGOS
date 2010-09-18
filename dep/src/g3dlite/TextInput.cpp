@@ -1012,7 +1012,7 @@ TextInput::TextInput(const std::string& filename, const Settings& opt) : options
 }
 
 
-TextInput::TextInput(FS fs, const std::string& str, const Settings& opt) : options(opt) {
+TextInput::TextInput(FSs fs, const std::string& str, const Settings& opt) : options(opt) {
     (void)fs;
     init();
     if (options.sourceFileName.empty()) {

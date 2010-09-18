@@ -74,7 +74,7 @@ public:
 
             return InterlockedExchangeAdd(&m_value, x);
 
-#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD)
+#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
 
             int32 old;
             asm volatile ("lock; xaddl %0,%1"
@@ -101,7 +101,7 @@ public:
 #       if defined(G3D_WIN32)
             // Note: returns the newly incremented value
             InterlockedIncrement(&m_value);
-#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD)
+#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
             add(1);
 #       elif defined(G3D_OSX)
             // Note: returns the newly incremented value
@@ -114,7 +114,7 @@ public:
 #       if defined(G3D_WIN32)
             // Note: returns the newly decremented value
             return InterlockedDecrement(&m_value);
-#       elif defined(G3D_LINUX)  || defined(G3D_FREEBSD)
+#       elif defined(G3D_LINUX)  || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
             unsigned char nz;
 
             asm volatile ("lock; decl %1;\n\t"
@@ -142,7 +142,7 @@ public:
     int32 compareAndSet(const int32 comperand, const int32 exchange) {
 #       if defined(G3D_WIN32)
             return InterlockedCompareExchange(&m_value, exchange, comperand);
-#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD) || defined(G3D_OSX)
+#       elif defined(G3D_LINUX) || defined(G3D_FREEBSD) || defined(G3D_OSX) || defined(G3D_SOLARIS)
             // Based on Apache Portable Runtime
             // http://koders.com/c/fid3B6631EE94542CDBAA03E822CA780CBA1B024822.aspx
             int32 ret;

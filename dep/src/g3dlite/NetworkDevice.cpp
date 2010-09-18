@@ -21,7 +21,7 @@
 
 #include <cstring>
 
-#if defined(G3D_LINUX) || defined(G3D_OSX) || defined(G3D_FREEBSD)
+#if defined(G3D_LINUX) || defined(G3D_OSX) || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
 #   include <sys/types.h>
 #   include <sys/socket.h>
 #   include <ifaddrs.h>
@@ -394,7 +394,7 @@ bool NetworkDevice::init() {
 #endif
 
 
-#if defined(G3D_LINUX) || defined(G3D_OSX) || defined(G3D_FREEBSD)
+#if defined(G3D_LINUX) || defined(G3D_OSX) || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
 
 const sockaddr_in* castToIP4(const sockaddr* addr) {
     if (addr == NULL) {

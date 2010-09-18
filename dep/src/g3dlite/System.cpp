@@ -61,6 +61,20 @@
 #   include <sys/time.h>
 #   include <pthread.h>
 
+#elif defined(G3D_SOLARIS)
+
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+    #include <errno.h>
+    #include <sys/types.h>
+    #include <sys/select.h>
+    #include <termios.h>
+    #include <unistd.h>
+    #include <sys/ioctl.h>
+    #include <sys/time.h>
+    #include <pthread.h>
+
 #elif defined(G3D_OSX)
 
     #include <stdlib.h>
@@ -252,7 +266,7 @@ void System::init() {
             m_operatingSystem = "Windows";
         }
     
-#    elif defined(G3D_LINUX) || defined(G3D_FREEBSD)
+#    elif defined(G3D_LINUX) || defined(G3D_FREEBSD) || defined(G3D_SOLARIS)
 
         {
             // Find the operating system using the 'uname' command
@@ -882,11 +896,13 @@ void System::initTime() {
     
         time_t local = gmt;
         
+    #ifndef G3D_SOLARIS
         if (localTimeVals) {
             // tm_gmtoff is already corrected for daylight savings.
             local = local + localTimeVals->tm_gmtoff;
         }
-        
+    #endif
+
         m_realWorldGetTickTime0 = local;
     #endif
 }

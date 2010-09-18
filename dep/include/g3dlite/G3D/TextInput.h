@@ -544,11 +544,11 @@ public:
 
     TextInput(const std::string& filename, const Settings& settings = Settings());
 
-    enum FS {FROM_STRING};
+    enum FSs {FROM_STRING};
     /** Creates input directly from a string.  The first argument must be
         TextInput::FROM_STRING.
     */
-    TextInput(FS fs, const std::string& str, const Settings& settings = Settings());
+    TextInput(FSs fs, const std::string& str, const Settings& settings = Settings());
 
     /** Returns true while there are tokens remaining. */
     bool hasMore();

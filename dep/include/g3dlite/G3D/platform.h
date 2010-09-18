@@ -56,6 +56,8 @@
    // Prevent OS X fp.h header from being included; it defines
    // pi as a constant, which creates a conflict with G3D
 #define __FP__
+#elif defined(sun) || defined(__sun__)
+    #define G3D_SOLARIS
 #else
     #error Unknown platform
 #endif
@@ -100,6 +102,22 @@
 
 #endif
 
+#ifdef G3D_SOLARIS
+#   define G3D_DEPRECATED __attribute__((__deprecated__))
+
+#   ifndef __cdecl
+#       define __cdecl __attribute__((cdecl))
+#   endif
+
+#   ifndef __stdcall
+#       define __stdcall __attribute__((stdcall))
+#   endif
+
+#   define G3D_CHECK_PRINTF_METHOD_ARGS   __attribute__((__format__(__printf__, 2, 3)))
+#   define G3D_CHECK_VPRINTF_METHOD_ARGS  __attribute__((__format__(__printf__, 2, 0)))
+#   define G3D_CHECK_PRINTF_ARGS          __attribute__((__format__(__printf__, 1, 2)))
+#   define G3D_CHECK_VPRINTF_ARGS         __attribute__((__format__(__printf__, 1, 0)))
+#endif
 
 #ifdef _MSC_VER
 // Microsoft Visual C++ 8.0 ("Express")       = 1400
