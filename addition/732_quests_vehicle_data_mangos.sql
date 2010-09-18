@@ -69,3 +69,20 @@ UPDATE creature_template SET minhealth = 26140, maxhealth = 26140, dynamicflags 
 INSERT IGNORE INTO spell_script_target VALUES (52576, 1, 28834);
 INSERT IGNORE INTO spell_script_target VALUES (52576, 1, 28886);
 INSERT IGNORE INTO spell_script_target VALUES (52576, 1, 28850);
+
+-- From Lanc
+-- quest 12953
+UPDATE `creature_template` SET
+    spell1 = 55812,
+    spell2 = 0,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 213
+WHERE entry IN (30066);
+
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (30066);
+INSERT INTO `npc_spellclick_spells` VALUES
+(30066, 44002, 12953, 1, 12953, 1);
+INSERT IGNORE INTO `spell_script_target` VALUES (55812, 1, 30096);
