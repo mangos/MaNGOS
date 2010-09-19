@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10332_02_characters_pet_aura` bit(1) default NULL
+  `required_10503_02_characters_gameobject_respawn` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1017,6 +1017,50 @@ CREATE TABLE `corpse` (
 LOCK TABLES `corpse` WRITE;
 /*!40000 ALTER TABLE `corpse` DISABLE KEYS */;
 /*!40000 ALTER TABLE `corpse` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `creature_respawn`
+--
+
+DROP TABLE IF EXISTS `creature_respawn`;
+CREATE TABLE `creature_respawn` (
+  `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
+  `respawntime` bigint(20) NOT NULL default '0',
+  `instance` mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`guid`,`instance`),
+  KEY `instance` (`instance`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Grid Loading System';
+
+--
+-- Dumping data for table `creature_respawn`
+--
+
+LOCK TABLES `creature_respawn` WRITE;
+/*!40000 ALTER TABLE `creature_respawn` DISABLE KEYS */;
+/*!40000 ALTER TABLE `creature_respawn` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `gameobject_respawn`
+--
+
+DROP TABLE IF EXISTS `gameobject_respawn`;
+CREATE TABLE `gameobject_respawn` (
+  `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
+  `respawntime` bigint(20) NOT NULL default '0',
+  `instance` mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`guid`,`instance`),
+  KEY `instance` (`instance`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Grid Loading System';
+
+--
+-- Dumping data for table `gameobject_respawn`
+--
+
+LOCK TABLES `gameobject_respawn` WRITE;
+/*!40000 ALTER TABLE `gameobject_respawn` DISABLE KEYS */;
+/*!40000 ALTER TABLE `gameobject_respawn` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
