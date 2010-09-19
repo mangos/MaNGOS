@@ -68,7 +68,28 @@ patches-*
 #
 bin/*
 
+#
+# VS temporary files
+#
+*.ncb
+*.suo
+*.sdf
+*.opensdf
+*.sln.cache
+*.vsp
+ipch
+*.user
+
+#
+# CMake temporary files
+#
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+
+#
 # OS specific
+#
 # MacOS
 .DS_Store
 

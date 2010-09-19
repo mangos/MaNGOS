@@ -796,7 +796,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     delete holder;
 }
 
-void WorldSession::HandleSetFactionAtWar( WorldPacket & recv_data )
+void WorldSession::HandleSetFactionAtWarOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG( "WORLD: Received CMSG_SET_FACTION_ATWAR" );
 
@@ -809,14 +809,14 @@ void WorldSession::HandleSetFactionAtWar( WorldPacket & recv_data )
     GetPlayer()->GetReputationMgr().SetAtWar(repListID, flag);
 }
 
-void WorldSession::HandleMeetingStoneInfo( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleMeetingStoneInfoOpcode( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG( "WORLD: Received CMSG_MEETING_STONE_INFO" );
 
     SendLfgUpdate(0, 0, 0);
 }
 
-void WorldSession::HandleTutorialFlag( WorldPacket & recv_data )
+void WorldSession::HandleTutorialFlagOpcode( WorldPacket & recv_data )
 {
     uint32 iFlag;
     recv_data >> iFlag;
@@ -836,13 +836,13 @@ void WorldSession::HandleTutorialFlag( WorldPacket & recv_data )
     //DEBUG_LOG("Received Tutorial Flag Set {%u}.", iFlag);
 }
 
-void WorldSession::HandleTutorialClear( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleTutorialClearOpcode( WorldPacket & /*recv_data*/ )
 {
     for (int i = 0; i < 8; ++i)
         SetTutorialInt( i, 0xFFFFFFFF );
 }
 
-void WorldSession::HandleTutorialReset( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleTutorialResetOpcode( WorldPacket & /*recv_data*/ )
 {
     for (int i = 0; i < 8; ++i)
         SetTutorialInt( i, 0x00000000 );
@@ -960,7 +960,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
     session->SendPacket(&data);
 }
 
-void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recv_data)
+void WorldSession::HandleSetPlayerDeclinedNamesOpcode(WorldPacket& recv_data)
 {
     uint64 guid;
 
@@ -1047,7 +1047,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleAlterAppearance( WorldPacket & recv_data )
+void WorldSession::HandleAlterAppearanceOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG("CMSG_ALTER_APPEARANCE");
 
@@ -1095,7 +1095,7 @@ void WorldSession::HandleAlterAppearance( WorldPacket & recv_data )
     _player->SetStandState(0);                              // stand up
 }
 
-void WorldSession::HandleRemoveGlyph( WorldPacket & recv_data )
+void WorldSession::HandleRemoveGlyphOpcode( WorldPacket & recv_data )
 {
     uint32 slot;
     recv_data >> slot;
@@ -1114,7 +1114,7 @@ void WorldSession::HandleRemoveGlyph( WorldPacket & recv_data )
     }
 }
 
-void WorldSession::HandleCharCustomize(WorldPacket& recv_data)
+void WorldSession::HandleCharCustomizeOpcode(WorldPacket& recv_data)
 {
     uint64 guid;
     std::string newname;
@@ -1206,7 +1206,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
+void WorldSession::HandleEquipmentSetSaveOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("CMSG_EQUIPMENT_SET_SAVE");
 
@@ -1250,7 +1250,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket &recv_data)
     _player->SetEquipmentSet(index, eqSet);
 }
 
-void WorldSession::HandleEquipmentSetDelete(WorldPacket &recv_data)
+void WorldSession::HandleEquipmentSetDeleteOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("CMSG_EQUIPMENT_SET_DELETE");
 
@@ -1261,7 +1261,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket &recv_data)
     _player->DeleteEquipmentSet(setGuid.GetRawValue());
 }
 
-void WorldSession::HandleEquipmentSetUse(WorldPacket &recv_data)
+void WorldSession::HandleEquipmentSetUseOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("CMSG_EQUIPMENT_SET_USE");
     recv_data.hexlike();

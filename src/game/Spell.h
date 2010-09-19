@@ -304,6 +304,7 @@ class Spell
         void EffectCharge(SpellEffectEntry const* effect);
         void EffectCharge2(SpellEffectEntry const* effect);
         void EffectProspecting(SpellEffectEntry const* effect);
+        void EffectRedirectThreat(SpellEffectEntry const* effect);
         void EffectMilling(SpellEffectEntry const* effect);
         void EffectRenamePet(SpellEffectEntry const* effect);
         void EffectSendTaxi(SpellEffectEntry const* effect);

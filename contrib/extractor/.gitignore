@@ -7,17 +7,12 @@
 # command after changing this file, to see if there are
 # any tracked files which get ignored after the change.
 #
-# Extractor generated files at Windows build
+# MaNGOS generated files at Windows build
 #
 
 *.bsc
-*.ncb
 *.pdb
-*.suo
-*.sdf
 debug
 release
-ipch
-*.user
 *.ilk
 ad_debug.exe

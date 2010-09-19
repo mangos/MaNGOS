@@ -407,7 +407,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 
 UpdateMask Player::updateVisualBits;
 
-Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputationMgr(this), m_mover(this), m_camera(this)
+Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m_achievementMgr(this), m_reputationMgr(this)
 {
     m_transport = 0;
 
@@ -967,9 +967,9 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     uint32 absorb = 0;
     uint32 resist = 0;
     if (type == DAMAGE_LAVA)
-        CalculateAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist);
+        CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist);
     else if (type == DAMAGE_SLIME)
-        CalculateAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist);
+        CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist);
 
     damage-=absorb+resist;
 
@@ -15646,7 +15646,11 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
 
 bool Player::isAllowedToLoot(Creature* creature)
 {
-    if(Player* recipient = creature->GetLootRecipient())
+    // never tapped by any (mob solo kill)
+    if (!creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED))
+        return false;
+
+    if (Player* recipient = creature->GetLootRecipient())
     {
         if (recipient == this)
             return true;

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10457_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_10503_04_mangos_gameobject_respawn` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1063,10 +1063,14 @@ CREATE TABLE `creature_movement_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -1160,28 +1164,6 @@ CREATE TABLE `creature_questrelation` (
 LOCK TABLES `creature_questrelation` WRITE;
 /*!40000 ALTER TABLE `creature_questrelation` DISABLE KEYS */;
 /*!40000 ALTER TABLE `creature_questrelation` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `creature_respawn`
---
-
-DROP TABLE IF EXISTS `creature_respawn`;
-CREATE TABLE `creature_respawn` (
-  `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL default '0',
-  `instance` mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`,`instance`),
-  KEY `instance` (`instance`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Grid Loading System';
-
---
--- Dumping data for table `creature_respawn`
---
-
-LOCK TABLES `creature_respawn` WRITE;
-/*!40000 ALTER TABLE `creature_respawn` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creature_respawn` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1480,10 +1462,14 @@ CREATE TABLE `event_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -1924,28 +1910,6 @@ LOCK TABLES `gameobject_questrelation` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `gameobject_respawn`
---
-
-DROP TABLE IF EXISTS `gameobject_respawn`;
-CREATE TABLE `gameobject_respawn` (
-  `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL default '0',
-  `instance` mediumint(8) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`,`instance`),
-  KEY `instance` (`instance`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Grid Loading System';
-
---
--- Dumping data for table `gameobject_respawn`
---
-
-LOCK TABLES `gameobject_respawn` WRITE;
-/*!40000 ALTER TABLE `gameobject_respawn` DISABLE KEYS */;
-/*!40000 ALTER TABLE `gameobject_respawn` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `gameobject_scripts`
 --
 
@@ -1960,10 +1924,14 @@ CREATE TABLE `gameobject_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -2133,10 +2101,14 @@ CREATE TABLE `gossip_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -13812,10 +13784,14 @@ CREATE TABLE `quest_end_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -13890,10 +13866,14 @@ CREATE TABLE `quest_start_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -17391,10 +17371,14 @@ CREATE TABLE `spell_scripts` (
   `datalong4` int(10) unsigned NOT NULL default '0',
   `data_flags` tinyint(3) unsigned NOT NULL default '0',
   `dataint` int(11) NOT NULL default '0',
+  `dataint2` int(11) NOT NULL default '0',
+  `dataint3` int(11) NOT NULL default '0',
+  `dataint4` int(11) NOT NULL default '0',
   `x` float NOT NULL default '0',
   `y` float NOT NULL default '0',
   `z` float NOT NULL default '0',
-  `o` float NOT NULL default '0'
+  `o` float NOT NULL default '0',
+  `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --

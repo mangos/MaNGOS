@@ -1029,13 +1029,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         else
             procEx |= PROC_EX_NORMAL_HIT;
 
+        uint32 absorb = 0;
+        unitTarget->CalculateHealAbsorb(addhealth, &absorb);
+        addhealth -= absorb;
+
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger && missInfo != SPELL_MISS_REFLECT)
         {
             caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, addhealth, m_attackType, m_spellInfo);
         }
 
-        int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo, crit);
+        int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo, crit, absorb);
 
         if (real_caster)
             unitTarget->getHostileRefManager().threatAssist(real_caster, float(gain) * 0.5f, m_spellInfo);
@@ -2879,7 +2883,7 @@ void Spell::cast(bool skipCheck)
                 AddTriggeredSpell(60089);
             // Berserk (Bear Mangle part)
             else if (m_spellInfo->Id == 50334)
-                AddTriggeredSpell(58923); 
+                AddTriggeredSpell(58923);
             break;
         }
         case SPELLFAMILY_ROGUE:
@@ -3339,7 +3343,11 @@ void Spell::finish(bool ok)
 
     // Heal caster for all health leech from all targets
     if (m_healthLeech)
-        m_caster->DealHeal(m_caster, uint32(m_healthLeech), m_spellInfo);
+    {
+        uint32 absorb = 0;
+        m_caster->CalculateHealAbsorb(uint32(m_healthLeech), &absorb);
+        m_caster->DealHeal(m_caster, uint32(m_healthLeech) - absorb, m_spellInfo, false, absorb);
+    }
 
     if (IsMeleeAttackResetSpell())
     {
@@ -6307,7 +6315,7 @@ void Spell::DelayedChannel()
         if ((*ihit).missCondition == SPELL_MISS_NONE)
         {
             if (Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
-                unit->DelaySpellAuraHolder(m_spellInfo->Id, delaytime);
+                unit->DelaySpellAuraHolder(m_spellInfo->Id, delaytime, unit->GetGUID());
         }
     }
 

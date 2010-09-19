@@ -19,7 +19,7 @@
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "ChannelMgr.h"
 
-void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
+void WorldSession::HandleJoinChannelOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
 
@@ -39,7 +39,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
             chn->Join(_player->GetGUID(), pass.c_str());
 }
 
-void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
+void WorldSession::HandleLeaveChannelOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -60,7 +60,7 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleChannelList(WorldPacket& recvPacket)
+void WorldSession::HandleChannelListOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -72,7 +72,7 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
             chn->List(_player);
 }
 
-void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
+void WorldSession::HandleChannelPasswordOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -86,7 +86,7 @@ void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
             chn->Password(_player->GetGUID(), pass.c_str());
 }
 
-void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
+void WorldSession::HandleChannelSetOwnerOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -103,7 +103,7 @@ void WorldSession::HandleChannelSetOwner(WorldPacket& recvPacket)
             chn->SetOwner(_player->GetGUID(), newp.c_str());
 }
 
-void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
+void WorldSession::HandleChannelOwnerOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -114,7 +114,7 @@ void WorldSession::HandleChannelOwner(WorldPacket& recvPacket)
             chn->SendWhoOwner(_player->GetGUID());
 }
 
-void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
+void WorldSession::HandleChannelModeratorOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -131,7 +131,7 @@ void WorldSession::HandleChannelModerator(WorldPacket& recvPacket)
             chn->SetModerator(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
+void WorldSession::HandleChannelUnmoderatorOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -148,7 +148,7 @@ void WorldSession::HandleChannelUnmoderator(WorldPacket& recvPacket)
             chn->UnsetModerator(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
+void WorldSession::HandleChannelMuteOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -165,7 +165,7 @@ void WorldSession::HandleChannelMute(WorldPacket& recvPacket)
             chn->SetMute(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
+void WorldSession::HandleChannelUnmuteOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -183,7 +183,7 @@ void WorldSession::HandleChannelUnmute(WorldPacket& recvPacket)
             chn->UnsetMute(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
+void WorldSession::HandleChannelInviteOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -200,7 +200,7 @@ void WorldSession::HandleChannelInvite(WorldPacket& recvPacket)
             chn->Invite(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
+void WorldSession::HandleChannelKickOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -216,7 +216,7 @@ void WorldSession::HandleChannelKick(WorldPacket& recvPacket)
             chn->Kick(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
+void WorldSession::HandleChannelBanOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -233,7 +233,7 @@ void WorldSession::HandleChannelBan(WorldPacket& recvPacket)
             chn->Ban(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
+void WorldSession::HandleChannelUnbanOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -251,7 +251,7 @@ void WorldSession::HandleChannelUnban(WorldPacket& recvPacket)
             chn->UnBan(_player->GetGUID(), otp.c_str());
 }
 
-void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
+void WorldSession::HandleChannelAnnouncementsOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -262,7 +262,7 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
             chn->Announce(_player->GetGUID());
 }
 
-void WorldSession::HandleChannelModerate(WorldPacket& recvPacket)
+void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -273,7 +273,7 @@ void WorldSession::HandleChannelModerate(WorldPacket& recvPacket)
             chn->Moderate(_player->GetGUID());
 }
 
-void WorldSession::HandleChannelDisplayListQuery(WorldPacket &recvPacket)
+void WorldSession::HandleChannelDisplayListQueryOpcode(WorldPacket &recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -284,7 +284,7 @@ void WorldSession::HandleChannelDisplayListQuery(WorldPacket &recvPacket)
             chn->List(_player);
 }
 
-void WorldSession::HandleGetChannelMemberCount(WorldPacket &recvPacket)
+void WorldSession::HandleGetChannelMemberCountOpcode(WorldPacket &recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
@@ -303,7 +303,7 @@ void WorldSession::HandleGetChannelMemberCount(WorldPacket &recvPacket)
     }
 }
 
-void WorldSession::HandleSetChannelWatch(WorldPacket &recvPacket)
+void WorldSession::HandleSetChannelWatchOpcode(WorldPacket &recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();

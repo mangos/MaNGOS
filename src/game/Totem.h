@@ -42,7 +42,7 @@ class Totem : public Creature
         TotemType GetTotemType() const { return m_type; }
         void SetTypeBySummonSpell(SpellEntry const * spellProto);
         void SetDuration(uint32 dur) { m_duration = dur; }
-        void SetOwner(uint64 guid);
+        void SetOwner(Unit* owner);
 
         bool UpdateStats(Stats /*stat*/) { return true; }
         bool UpdateAllStats() { return true; }

@@ -751,8 +751,6 @@ void Group::StartLootRool(Creature* lootTarget, LootMethod method, Loot* loot, u
 
     LootItem const& lootItem =  loot->items[itemSlot];
 
-    ItemPrototype const* item = ObjectMgr::GetItemPrototype(lootItem.itemid);
-
     Roll* r = new Roll(lootTarget->GetGUID(), method, lootItem);
 
     //a vector is filled with only near party members
