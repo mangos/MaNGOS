@@ -72,7 +72,7 @@ typedef UNORDERED_MAP<uint32, GameTele > GameTeleMap;
 enum eScriptCommand
 {
     SCRIPT_COMMAND_TALK                     = 0,            // source = WorldObject, target = any/none, datalong (see enum ChatType for supported CHAT_TYPE_'s)
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
+                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius, datalong4 = language
                                                             // data_flags = flag_target_player_as_source    = 0x01
                                                             //              flag_original_source_as_target  = 0x02
                                                             //              flag_buddy_as_target            = 0x04
@@ -132,7 +132,7 @@ struct ScriptInfo
             uint32 chatType;                                // datalong
             uint32 creatureEntry;                           // datalong2
             uint32 searchRadius;                            // datalong3
-            uint32 unused1;                                 // datalong4
+            uint32 language;                                // datalong4
             uint32 flags;                                   // data_flags
             int32  textId[MAX_TEXT_ID];                     // dataint to dataint4
         } talk;
