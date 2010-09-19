@@ -1,5 +1,5 @@
 -- Pet scaling data table from /dev/rsa
-
+DROP TABLE IF EXISTS `pet_scaling_data`;
 CREATE TABLE IF NOT EXISTS `pet_scaling_data` (
   `creature_entry` mediumint(8) unsigned NOT NULL,
   `aura` mediumint(8) unsigned NOT NULL default '0',
