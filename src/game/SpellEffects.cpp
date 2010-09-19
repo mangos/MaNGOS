@@ -8112,7 +8112,7 @@ void Spell::EffectRestoreItemCharges(SpellEffectEntry const* effect)
     item->RestoreCharges();
 }
 
-void Spell::EffectRedirectThreat(SpellEffectIndex eff_idx)
+void Spell::EffectRedirectThreat(SpellEffectEntry const* effect)
 {
     if (unitTarget)
         m_caster->getHostileRefManager().SetThreatRedirection(unitTarget->GetObjectGuid(), uint32(damage));
