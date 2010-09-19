@@ -56,16 +56,24 @@ enum AchievementFactionFlags
 
 enum AchievementFlags
 {
-    ACHIEVEMENT_FLAG_COUNTER           = 0x00000001,        // Just count statistic (never stop and complete)
-    ACHIEVEMENT_FLAG_UNK2              = 0x00000002,        // not used
-    ACHIEVEMENT_FLAG_STORE_MAX_VALUE   = 0x00000004,        // Store only max value? used only in "Reach level xx"
-    ACHIEVEMENT_FLAG_SUMM              = 0x00000008,        // Use summ criteria value from all reqirements (and calculate max value)
-    ACHIEVEMENT_FLAG_MAX_USED          = 0x00000010,        // Show max criteria (and calculate max value ??)
-    ACHIEVEMENT_FLAG_REQ_COUNT         = 0x00000020,        // Use not zero req count (and calculate max value)
-    ACHIEVEMENT_FLAG_AVERAGE           = 0x00000040,        // Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
-    ACHIEVEMENT_FLAG_BAR               = 0x00000080,        // Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
-    ACHIEVEMENT_FLAG_REALM_FIRST_REACH = 0x00000100,        //
-    ACHIEVEMENT_FLAG_REALM_FIRST_KILL  = 0x00000200,        //
+    ACHIEVEMENT_FLAG_NONE                   = 0x00000000,
+    ACHIEVEMENT_FLAG_COUNTER                = 0x00000001,   // ACHIEVEMENT_FLAG_STATISTIC Just count statistic (never stop and complete)
+    ACHIEVEMENT_FLAG_UNK2                   = 0x00000002,   // ACHIEVEMENT_FLAG_HIDDEN not used
+    ACHIEVEMENT_FLAG_STORE_MAX_VALUE        = 0x00000004,   // ACHIEVEMENT_FLAG_HIDDEN_TILL_AWARDED Store only max value? used only in "Reach level xx"
+    ACHIEVEMENT_FLAG_SUMM                   = 0x00000008,   // ACHIEVEMENT_FLAG_CUMULATIVE Use summ criteria value from all requirements (and calculate max value)
+    ACHIEVEMENT_FLAG_MAX_USED               = 0x00000010,   // ACHIEVEMENT_FLAG_DISPLAY_HIGHEST Show max criteria (and calculate max value ??)
+    ACHIEVEMENT_FLAG_REQ_COUNT              = 0x00000020,   // ACHIEVEMENT_FLAG_CRITERIA_COUNT Use not zero req count (and calculate max value)
+    ACHIEVEMENT_FLAG_AVERAGE                = 0x00000040,   // ACHIEVEMENT_FLAG_AVG_PER_DAY Show as average value (value / time_in_days) depend from other flag (by def use last criteria value)
+    ACHIEVEMENT_FLAG_BAR                    = 0x00000080,   // ACHIEVEMENT_FLAG_HAS_PROGRESS_BAR Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
+    ACHIEVEMENT_FLAG_REALM_FIRST_REACH      = 0x00000100,   // ACHIEVEMENT_FLAG_SERVER_FIRST
+    ACHIEVEMENT_FLAG_REALM_FIRST_KILL       = 0x00000200,   //
+    ACHIEVEMENT_FLAG_UNK3                   = 0x00000400,   // ACHIEVEMENT_FLAG_HIDE_NAME_IN_TIE
+    ACHIEVEMENT_FLAG_REALM_FIRST_GUILD      = 0x00000800,   // first guild on realm done something
+    ACHIEVEMENT_FLAG_UNK4                   = 0x00001000,   // as guild group?
+    ACHIEVEMENT_FLAG_UNK5                   = 0x00002000,   // as guild group?
+    ACHIEVEMENT_FLAG_GUILD                  = 0x00004000,   //
+    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS	    = 0x00008000,   //
+    ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS  = 0x00010000,   //
 };
 
 enum AchievementCriteriaCondition
@@ -201,21 +209,22 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS = 114,
     ACHIEVEMENT_CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS = 115,
     ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS = 119,
-    // 120
-    // 121
-    // 122
-    // 123
-    // 124 spend gold on guild repairs
-    // 125 reach guild level
-    // 126 craft x items
-    // 127 catch x fish from pools
-    // 128 purchase x guild bank tabs
-    // 129 earn x guild achievement points
-    // 130 win x rated battlegrounds
-    // 131
-    // 132 reach x rated battleground rating
-    // 0..132 => 133 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 133,
+    // 120 unused
+    // 121 unused
+    // 122 unused
+    // 123 unused
+    // 124 Spend X gold on guildmember repairs.
+    // 125 Reach guild level X
+    // 126 Craft X items
+    // 127 Catch X fish from fishing pools.
+    // 128 Purchase the X guild bank tab.
+    // 129 Earn X guild achievement points.
+    // 130 Win X rated battlegrounds.
+    // 131 unused
+    // 132 Earn a battleground rating of X.
+    // 133 Create and purchase a guild crest.
+    // 0..133 => 134 criteria types total
+    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 134,
 };
 
 enum AchievementCriteriaMoreReqType

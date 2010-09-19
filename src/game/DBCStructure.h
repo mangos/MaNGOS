@@ -52,7 +52,7 @@ struct AchievementEntry
     //uint32 OrderInCategory;                               // 8
     uint32    flags;                                        // 9
     //uint32    icon;                                       // 10 icon (from SpellIcon.dbc)
-    //char *titleReward;                                    // 11
+    //char *reward;                                         // 11
     uint32 count;                                           // 12 - need this count of completed criterias (own or referenced achievement criterias)
     uint32 refAchievement;                                  // 13 - referenced achievement (counting of all completed criterias)
 };
@@ -600,6 +600,7 @@ struct BattlemasterListEntry
     uint32 minLevel;                                        // 14, min level (sync with PvPDifficulty.dbc content)
     uint32 maxLevel;                                        // 15, max level (sync with PvPDifficulty.dbc content)
     //uint32 maxGroupSizeRated;                             // 16 4.0.1
+    //uint32 maxPlayers;                                    // 17 4.0.1
 };
 
 /*struct Cfg_CategoriesEntry
@@ -2025,6 +2026,7 @@ struct VehicleSeatEntry
                                                             // 46-57 added in 3.1, floats mostly
     //uint32 unk[6];                                        // 58-63
     //uint32 unk2;                                          // 64 4.0.0
+    //uint32 unk3;                                          // 65 4.0.1
 };
 
 struct WMOAreaTableEntry
