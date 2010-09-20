@@ -423,8 +423,6 @@ class MANGOS_DLL_SPEC Aura
         void ApplyModifier(bool apply, bool Real = false);
 
         void UpdateAura(uint32 diff) { SetInUse(true); Update(diff); SetInUse(false); }
-        void _AddAura();
-        bool _RemoveAura();
 
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
 
