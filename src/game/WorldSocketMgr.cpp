@@ -54,9 +54,9 @@ class ReactorRunnable : protected ACE_Task_Base
     public:
 
         ReactorRunnable () :
-            m_ThreadId (-1),
+            m_Reactor (0),
             m_Connections (0),
-            m_Reactor (0)
+            m_ThreadId (-1)
         {
             ACE_Reactor_Impl* imp = 0;
 
@@ -207,8 +207,8 @@ class ReactorRunnable : protected ACE_Task_Base
 };
 
 WorldSocketMgr::WorldSocketMgr () :
-    m_NetThreadsCount (0),
     m_NetThreads (0),
+    m_NetThreadsCount (0),
     m_SockOutKBuff (-1),
     m_SockOutUBuff (65536),
     m_UseNoDelay (true),

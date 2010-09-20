@@ -98,6 +98,8 @@ struct ClientPktHeader
 
 WorldSocket::WorldSocket (void) :
 WorldHandler (),
+m_LastPingTime (ACE_Time_Value::zero),
+m_OverSpeedPings (0),
 m_Session (0),
 m_RecvWPct (0),
 m_RecvPct (),
@@ -105,9 +107,7 @@ m_Header (sizeof (ClientPktHeader)),
 m_OutBuffer (0),
 m_OutBufferSize (65536),
 m_OutActive (false),
-m_Seed (static_cast<uint32> (rand32 ())),
-m_OverSpeedPings (0),
-m_LastPingTime (ACE_Time_Value::zero)
+m_Seed (static_cast<uint32> (rand32 ()))
 {
     reference_counting_policy ().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
