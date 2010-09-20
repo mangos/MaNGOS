@@ -460,10 +460,10 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     break;
                 }
 
-                case EVENT_T_BUFFED:
-                case EVENT_T_TARGET_BUFFED:
-                case EVENT_T_MISSING_BUFF:
-                case EVENT_T_TARGET_MISSING_BUFF:
+                case EVENT_T_AURA:
+                case EVENT_T_TARGET_AURA:
+                case EVENT_T_MISSING_AURA:
+                case EVENT_T_TARGET_MISSING_AURA:
                 {
                     SpellEntry const* pSpell = sSpellStore.LookupEntry(temp.buffed.spellId);
                     if (!pSpell)
