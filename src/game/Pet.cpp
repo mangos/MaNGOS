@@ -37,9 +37,11 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
 };
 
 Pet::Pet(PetType type) :
-Creature(CREATURE_SUBTYPE_PET), m_removed(false), m_petType(type), m_happinessTimer(7500), m_duration(0), m_resetTalentsCost(0),
-m_resetTalentsTime(0), m_usedTalentCount(0), m_auraUpdateMask(0), m_loading(false),
-m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
+Creature(CREATURE_SUBTYPE_PET),
+m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
+m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
+m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false),
+m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT)
 m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0),m_baseAPBonus(0), m_PetScalingData(NULL),
 m_baseDamageBonus(0), m_basePowerRegen(0)
 {
@@ -1598,9 +1600,6 @@ bool Pet::resetTalents(bool no_cost)
         return false;
 
     Player *player = (Player *)owner;
-
-    uint32 level = getLevel();
-    uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
 
     if (m_usedTalentCount == 0)
     {
