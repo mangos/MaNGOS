@@ -1794,7 +1794,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             Pet* tmpUnit = m_caster->GetPet();
             if (!tmpUnit) break;
-            targetUnitMap.push_back(tmpUnit);
+            GroupPetList m_groupPets = m_caster->GetPets();
+            if (!m_groupPets.empty())
+            {
+                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                    if (Pet* _pet = m_caster->GetMap()->GetPet(*itr))
+                        targetUnitMap.push_back(_pet);
+            }
             break;
         }
         case TARGET_CHAIN_DAMAGE:
@@ -2251,8 +2257,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                             targetUnitMap.push_back(Target);
 
                         if(Pet* pet = Target->GetPet())
-                            if( pTarget->IsWithinDistInMap(pet, radius) )
-                                targetUnitMap.push_back(pet);
+                        {
+                            GroupPetList m_groupPets = Target->GetPets();
+                            if (!m_groupPets.empty())
+                            {
+                                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                    if (Pet* _pet = Target->GetMap()->GetPet(*itr))
+                                        if( pTarget->IsWithinDistInMap(_pet, radius) )
+                                            targetUnitMap.push_back(_pet);
+                            }
+                        }
                     }
                 }
             }
@@ -6877,9 +6891,17 @@ void Spell::FillRaidOrPartyTargets(UnitList &targetUnitMap, Unit* member, Unit* 
 
                 if (withPets)
                     if (Pet* pet = Target->GetPet())
-                        if ((pet == center || center->IsWithinDistInMap(pet, radius)) &&
-                            (withcaster || pet != m_caster))
-                            targetUnitMap.push_back(pet);
+                    {
+                        GroupPetList m_groupPets = Target->GetPets();
+                        if (!m_groupPets.empty())
+                        {
+                            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                if (Pet* _pet = Target->GetMap()->GetPet(*itr))
+                                    if ((_pet == center || center->IsWithinDistInMap(_pet, radius)) &&
+                                    (withcaster || _pet != m_caster))
+                                         targetUnitMap.push_back(_pet);
+                        }
+                    }
             }
         }
     }

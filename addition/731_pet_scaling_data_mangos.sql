@@ -85,7 +85,12 @@ DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 17252;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellpower`, `hit`, `expertize`, `attackspeed`, `crit`) VALUES
 (17252, 0, 0, 1100, 0, 1150, 0, 0, 75, 30, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 57, 15, 0, 100, 100, 100, 0);
 
--- Pet 37995 - Mage water elemental
-DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 37995;
+-- Pet 37994 - Mage water elemental
+DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 37994;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellpower`, `hit`, `expertize`, `attackspeed`, `crit`) VALUES
-(37995, 0, 0, 1000, 0, 1500, 0, 0, 30, 30, 0, 35, 0, 0, 0, 0, 0, 0, 20, 200, 0, 40, 0, 100, 100, 100, 0);
+(37994, 0, 0, 1000, 0, 1500, 0, 0, 30, 30, 0, 35, 0, 0, 0, 0, 0, 0, 20, 200, 0, 40, 0, 100, 100, 100, 0);
+
+-- Pet 19668 - Priest  Shadowfiend
+DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 19668;
+INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellpower`, `hit`, `expertize`, `attackspeed`, `crit`) VALUES
+(19668, 0, 0, 1000, 0, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 200, 0, 36, 0, 100, 100, 100, 0);

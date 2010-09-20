@@ -140,12 +140,12 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     bool is_temporary_summoned = spellInfo && GetSpellDuration(spellInfo) > 0;
 
     // check temporary summoned pets like mage water elemental
-    if (current && is_temporary_summoned)
+/*    if (current && is_temporary_summoned)
     {
         delete result;
         return false;
     }
-
+*/
     PetType pet_type = PetType(fields[18].GetUInt8());
     if(pet_type == HUNTER_PET)
     {
@@ -174,12 +174,12 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return false;
     }
 
-    float px, py, pz;
-    owner->GetClosePoint(px, py, pz, GetObjectBoundingRadius(), PET_FOLLOW_DIST, PET_DEFAULT_FOLLOW_ANGLE);
+    setPetType(pet_type);
+    setFaction(owner->getFaction());
+    SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
+    SetOwnerGUID(owner->GetGUID());
 
-    Relocate(px, py, pz, owner->GetOrientation());
-
-    if (!IsPositionValid())
+    if (!SetSummonPosition())
     {
         sLog.outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
             GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
@@ -187,9 +187,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return false;
     }
 
-    setPetType(pet_type);
-    setFaction(owner->getFaction());
-    SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     CreatureInfo const *cinfo = GetCreatureInfo();
     if (cinfo->type == CREATURE_TYPE_CRITTER)
@@ -202,7 +199,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     m_charmInfo->SetPetNumber(pet_number, IsPermanentPetFor(owner));
 
-    SetOwnerGUID(owner->GetGUID());
     SetDisplayId(fields[3].GetUInt32());
     SetNativeDisplayId(fields[3].GetUInt32());
     uint32 petlevel = fields[4].GetUInt32();
@@ -291,15 +287,16 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     InitLevelupSpellsForLevel();
     LearnPetPassives();
     _LoadSpellCooldowns();
-    AIM_Initialize();
 
-    CleanupActionBar();                                     // remove unknown spells from action bar after load
+    if (getPetType() == SUMMON_PET)
+        CastPetAuras(true);
+    else
+        CastPetAuras(current);
 
     CastPetPassiveAuras(true);
-    CastPetAuras(current);
-
     ApplyAllScalingBonuses(true);
-    if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
+
+    if (getPetType() == SUMMON_PET)             //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
         SetPower(getPowerType(), GetMaxPower(getPowerType()));
@@ -307,19 +304,21 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     else
     {
         SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-        SetPower(getPowerType(), savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+        SetPower(getPowerType(), savedmana > GetMaxPower(getPowerType()) ? GetMaxPower(getPowerType()) : savedmana);
     }
 
     UpdateWalkMode(owner);
+    AIM_Initialize();
 
     map->Add((Creature*)this);
 
-
     owner->SetPet(this);                                    // in DB stored only full controlled creature
+
     DEBUG_LOG("New Pet has guid %u", GetGUIDLow());
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
+        CleanupActionBar();                                     // remove unknown spells from action bar after load
         ((Player*)owner)->PetSpellInitialize();
         if(((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
@@ -2073,7 +2072,7 @@ void Pet::ApplyStatScalingBonus(Stats stat, bool apply)
     for (AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
     {
         Aura* _aura = (*itr);
-        if (!_aura)
+        if (!_aura || _aura->IsInUse())
             continue;
 
         SpellAuraHolder* holder = _aura->GetHolder();
@@ -2137,7 +2136,7 @@ void Pet::ApplyResistanceScalingBonus(uint32 school, bool apply)
     for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
     {
         Aura* _aura = (*itr);
-        if (!_aura)
+        if (!_aura || _aura->IsInUse())
             continue;
 
         SpellAuraHolder* holder = _aura->GetHolder();
@@ -2239,7 +2238,7 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
     for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
     {
         Aura* _aura = (*itr);
-        if (!_aura)
+        if (!_aura || _aura->IsInUse())
             continue;
 
         SpellAuraHolder* holder = _aura->GetHolder();
@@ -2298,6 +2297,13 @@ void Pet::ApplyDamageScalingBonus(bool apply)
                        newDamageBonus = 0;
                     break;
                 }
+                case CLASS_PRIEST:
+                {
+                   newDamageBonus = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW);
+                   if(newDamageBonus < 0)
+                       newDamageBonus = 0;
+                    break;
+                }
                 case CLASS_DEATH_KNIGHT:
                     newDamageBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
                     break;
@@ -2340,8 +2346,7 @@ void Pet::ApplyDamageScalingBonus(bool apply)
     for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
     {
         Aura* _aura = (*itr);
-
-        if (!_aura)
+        if (!_aura || _aura->IsInUse())
             continue;
 
         SpellAuraHolder* holder = _aura->GetHolder();
@@ -2408,9 +2413,10 @@ bool Pet::Summon(int32 duration, uint8 counter)
 
     if (!map)
         return false;
-                              // Undefined reason set SUMMON_PET  from clean core...
-    setPetType(SUMMON_PET);
+
     SetPetCounter(counter);
+    // set timer for unsummon
+    SetDuration(duration);
     setFaction(owner->getFaction());
     UpdateWalkMode(owner);
 
@@ -2418,6 +2424,7 @@ bool Pet::Summon(int32 duration, uint8 counter)
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+
 
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
     SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
@@ -2432,8 +2439,10 @@ bool Pet::Summon(int32 duration, uint8 counter)
     if(owner->IsFFAPvP())
         SetFFAPvP(true);
 
+    uint16 level = getLevel() ? getLevel() : owner->getLevel();
+
     SetCanModifyStats(true);
-    InitStatsForLevel(owner->getLevel(), owner);
+    InitStatsForLevel(level, owner);
     SynchronizeLevelWithOwner();
     InitPetCreateSpells();
     InitLevelupSpellsForLevel();
@@ -2463,14 +2472,16 @@ bool Pet::Summon(int32 duration, uint8 counter)
 
     map->Add((Creature*)this);
 
+
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
+        owner->SetPet(this);
 
-        if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET)
+        if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
         {
             CleanupActionBar();                                     // remove unknown spells from action bar after load
-            ((Player*)owner)->PetSpellInitialize();
             ((Player*)owner)->SendTalentsInfoData(true);
+            ((Player*)owner)->PetSpellInitialize();
         }
 
         SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
@@ -2512,7 +2523,7 @@ Unit* Pet::GetOwner() const
 
 bool Pet::ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints)
 {
-    if (!holder || holder->IsDeleted() || holder->IsEmptyHolder())
+    if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->IsInUse())
         return false;
 
     holder->SetInUse(true);

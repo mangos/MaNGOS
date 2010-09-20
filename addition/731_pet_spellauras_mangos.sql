@@ -72,10 +72,11 @@ INSERT INTO `spell_pet_auras` VALUES
 -- Shadowfiend
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 19668;
 INSERT INTO `spell_pet_auras` VALUES
+(0,0,19668,34947),
 (0,0,19668,34902);
 
 -- Mage water elemental
-DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 37995;
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 37994;
 INSERT INTO `spell_pet_auras` VALUES
-(0,0,37995,34947),
-(0,0,37995,34956);
+(0,0,37994,34947),
+(0,0,37994,34956);

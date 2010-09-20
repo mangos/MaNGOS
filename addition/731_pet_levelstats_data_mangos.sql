@@ -594,3 +594,9 @@ INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, 
 (29264, 21, 820, 390, 80, 43, 37, 100, 36, 32, 29, 27, 26),
 (29264, 70, 4200, 2100, 3800, 320, 650, 800, 85, 82, 79, 92, 88),
 (29264, 80, 8600, 3800, 4800, 410, 850, 1100, 105, 122, 87, 101, 94);
+
+-- Water elemental
+DELETE FROM `pet_levelstats` WHERE `creature_entry` = 37994;
+INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+(37994, 1,  42, 22, 20, 2, 3, 10, 22, 20, 22, 20, 20),
+(37994, 80, 3200, 2800, 4000, 410, 850, 820, 62, 86, 92, 101, 94);
