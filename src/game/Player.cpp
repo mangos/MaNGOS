@@ -404,7 +404,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 
 UpdateMask Player::updateVisualBits;
 
-Player::Player (WorldSession *session): Unit(), m_achievementMgr(this), m_reputationMgr(this), m_mover(this), m_camera(this)
+Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m_achievementMgr(this), m_reputationMgr(this)
 {
     m_transport = 0;
 
