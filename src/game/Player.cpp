@@ -19003,46 +19003,6 @@ void Player::UpdatePotionCooldown(Spell* spell)
     m_lastPotionId = 0;
 }
 
-bool Player::HasGlobalCooldown(SpellEntry const* spellInfo) const
-{
-    GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
-    return itr != m_globalCooldowns.end() && itr->second > getMSTime();
-}
-
-uint32 Player::GetGlobalCooldownDelay(SpellEntry const* spellInfo) const
-{
-    GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
-    if (itr == m_globalCooldowns.end())
-        return 0;
-    uint32 t = getMSTime();
-    return itr->second > t ? itr->second - t : 0;
-}
-
-void Player::AddGlobalCooldown(SpellEntry const* spellInfo)
-{
-    int32 gcd = spellInfo->StartRecoveryTime;
-    if (gcd)
-    {
-        // gcd modifier auras
-        ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME_OLD, gcd);
-        // apply haste rating
-        gcd = int32(float(gcd) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-        if (gcd < 0)
-            gcd = 0;
-        // substract player latency from total time
-        int32 latency = GetSession()->GetLatency();
-        if (latency < gcd)
-            gcd -= latency;
-        else
-        {
-            sLog.outError("Player::AddGlobalCooldown: Player %s (guid: %u, account %u) has latency of %u ms that invalidates GCD check for spell %u (%u ms)",
-                GetName(), GetGUIDLow(), GetSession()->GetAccountId(), latency, spellInfo->Id, gcd);
-            gcd = 0;
-        }
-    }
-    m_globalCooldowns[spellInfo->StartRecoveryCategory] = gcd + getMSTime();
-}
-
                                                            //slot to be excluded while counting
 bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
 {
