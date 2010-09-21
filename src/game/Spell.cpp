@@ -2674,6 +2674,10 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
 
         // will show cast bar
         SendSpellStart();
+
+        // trigger global cooldown
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            static_cast<Player*>(m_caster)->AddGlobalCooldown(m_spellInfo);
     }
     // execute triggered without cast time explicitly in call point
     else if(m_timer == 0)
@@ -2695,6 +2699,10 @@ void Spell::cancel()
     switch (m_spellState)
     {
         case SPELL_STATE_PREPARING:
+            // cancel global cooldown when interrupting current cast
+            if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) == this)
+                static_cast<Player*>(m_caster)->CancelGlobalCooldown(m_spellInfo);
+            //(no break)
         case SPELL_STATE_DELAYED:
         {
             SendInterrupted(0);
@@ -4220,6 +4228,11 @@ SpellCastResult Spell::CheckCast(bool strict)
         else
             return SPELL_FAILED_NOT_READY;
     }
+
+    // check global cooldown
+    if (strict && !m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER &&
+        static_cast<Player*>(m_caster)->HasGlobalCooldown(m_spellInfo))
+        return SPELL_FAILED_NOT_READY;
 
     // only allow triggered spells if at an ended battleground
     if (!m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER)
