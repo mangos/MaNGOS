@@ -571,7 +571,7 @@ namespace MaNGOS
     {
         public:
             ExplodeCorpseObjectCheck(WorldObject const* fobj, float range) : i_fobj(fobj), i_range(range) {}
-            WorldObject const& GetFocisObject() const { return *i_fobj; }
+            WorldObject const& GetFocusObject() const { return *i_fobj; }
             bool operator()(Player* u)
             {
                 if (u->getDeathState()!=CORPSE || u->IsTaxiFlying() ||
