@@ -688,6 +688,11 @@ LogColors = ""
 #        Default: 0 - recheck offhand slot weapon only at zone update
 #                 1 - recheck offhand slot weapon at talent reset also
 #
+#    PetUnsummonAtMount
+#        Persmanent pet will unsummoned at player mount
+#                 0 - unsummon only for flying mounts
+#        Default: 1 - unsummon for any mount
+#
 #    ClientCacheVersion
 #        Client cache version for client cache data reset. Use any different from DB value and not recently used for triggering reset.
 #        Default: 0 (use DB value from world DB db_version.cache_id field)

@@ -7492,8 +7492,11 @@ void Unit::Mount(uint32 mount, uint32 spellId)
             // Normal case (Unsummon only permanent pet)
             else if (Pet* pet = GetPet())
             {
-                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena())
+                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena() &&
+                    sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
+                {
                     ((Player*)this)->UnsummonPetTemporaryIfAny();
+                }
                 else
                     pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);
             }
