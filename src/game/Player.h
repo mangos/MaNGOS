@@ -146,7 +146,17 @@ struct SpellCooldown
 };
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
-typedef UNORDERED_MAP<uint32 /*category*/, uint32 /*MSTime*/> GlobalCooldowns;
+
+struct GlobalCooldown
+{
+    uint32 duration;
+    uint32 cast_time;
+
+    explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0):
+        duration(_dur), cast_time(_time) {}
+};
+
+typedef UNORDERED_MAP<uint32 /*category*/, GlobalCooldown> GlobalCooldowns;
 
 enum TrainerSpellState
 {
@@ -1745,6 +1755,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasGlobalCooldown(SpellEntry const* spellInfo) const;
         uint32 GetGlobalCooldownDelay(SpellEntry const* spellInfo) const;
         void AddGlobalCooldown(SpellEntry const* spellInfo);
+        void CancelGlobalCooldown(SpellEntry const* spellInfo);
 
         void RemoveArenaSpellCooldowns();
         void RemoveAllSpellCooldown();

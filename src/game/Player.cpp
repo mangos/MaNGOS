@@ -19392,7 +19392,7 @@ void Player::UpdatePotionCooldown(Spell* spell)
 bool Player::HasGlobalCooldown(SpellEntry const* spellInfo) const
 {
     GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
-    return itr != m_globalCooldowns.end() && itr->second > getMSTime();
+    return itr != m_globalCooldowns.end() && getMSTimeDiff(itr->second.cast_time, getMSTime()) < itr->second.duration;
 }
 
 uint32 Player::GetGlobalCooldownDelay(SpellEntry const* spellInfo) const
@@ -19400,8 +19400,8 @@ uint32 Player::GetGlobalCooldownDelay(SpellEntry const* spellInfo) const
     GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
     if (itr == m_globalCooldowns.end())
         return 0;
-    uint32 t = getMSTime();
-    return itr->second > t ? itr->second - t : 0;
+    uint32 dt = getMSTimeDiff(itr->second.cast_time, getMSTime());
+    return dt < itr->second.duration ? itr->second.duration - dt : 0;
 }
 
 void Player::AddGlobalCooldown(SpellEntry const* spellInfo)
@@ -19415,18 +19415,13 @@ void Player::AddGlobalCooldown(SpellEntry const* spellInfo)
         gcd = int32(float(gcd) * GetFloatValue(UNIT_MOD_CAST_SPEED));
         if (gcd < 0)
             gcd = 0;
-        // substract player latency from total time
-        int32 latency = GetSession()->GetLatency();
-        if (latency < gcd)
-            gcd -= latency;
-        else
-        {
-            sLog.outError("Player::AddGlobalCooldown: Player %s (guid: %u, account %u) has latency of %u ms that invalidates GCD check for spell %u (%u ms)",
-                GetName(), GetGUIDLow(), GetSession()->GetAccountId(), latency, spellInfo->Id, gcd);
-            gcd = 0;
-        }
     }
-    m_globalCooldowns[spellInfo->StartRecoveryCategory] = gcd + getMSTime();
+    m_globalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, getMSTime());
+}
+
+void Player::CancelGlobalCooldown(SpellEntry const* spellInfo)
+{
+    m_globalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
 }
 
                                                            //slot to be excluded while counting

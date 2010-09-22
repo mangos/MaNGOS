@@ -2830,6 +2830,10 @@ void Spell::cancel()
     switch (m_spellState)
     {
         case SPELL_STATE_PREPARING:
+            // cancel global cooldown when interrupting current cast
+            if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) == this)
+                static_cast<Player*>(m_caster)->CancelGlobalCooldown(m_spellInfo);
+            //(no break)
         case SPELL_STATE_DELAYED:
         {
             SendInterrupted(0);
