@@ -774,6 +774,7 @@ MailDeliveryDelay = 3600
 SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
+PetUnsummonAtMount = 1
 ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
