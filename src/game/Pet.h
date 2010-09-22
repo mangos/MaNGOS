@@ -189,6 +189,7 @@ class Pet : public Creature
         void UpdateAttackPowerAndDamage(bool ranged = false);
         void UpdateDamagePhysical(WeaponAttackType attType);
         void UpdateSpellPower();
+        void UpdateManaRegen();
 
         bool CanTakeMoreActiveSpells(uint32 SpellIconID);
         void ToggleAutocast(uint32 spellid, bool apply);
@@ -202,12 +203,16 @@ class Pet : public Creature
         void CastPetAuras(bool current);
         void CastPetAura(PetAura const* aura);
 
+        void Regenerate(Powers power, uint32 diff);
         void CastPetPassiveAuras(bool current);
         void ApplyStatScalingBonus(Stats stat, bool apply);
         void ApplyResistanceScalingBonus(uint32 school, bool apply);
         void ApplyAttackPowerScalingBonus(bool apply);
         void ApplyDamageScalingBonus(bool apply);
-        void ApplyOtherScalingBonuses(bool apply);
+        void ApplyHitScalingBonus(bool apply);
+        void ApplySpellHitScalingBonus(bool apply);
+        void ApplyExpertizeScalingBonus(bool apply);
+        void ApplyPowerregenScalingBonus(bool apply);
         void ApplyAllScalingBonuses(bool apply);
         bool ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints);
         PetScalingData* CalculateScalingData( bool recalculate = false );
@@ -276,13 +281,8 @@ class Pet : public Creature
         bool    m_needSave;                                 // is pet needed to be saved in DB
         float   m_petFollowAngle;                           // follow angle for the pet
         uint8   m_petCounter;
-        int16   m_baseStatBonus[MAX_STATS];
-        int16   m_baseResistanceBonus[MAX_SPELL_SCHOOL];
-        int16   m_baseAPBonus;
-        int16   m_baseRatingValue[MAX_COMBAT_RATING];
-        uint16  m_baseDamageBonus;
-        uint16  m_basePowerRegen;
         PetScalingData*  m_PetScalingData;
+        PetScalingData*  m_baseBonusData;
 
         DeclinedName *m_declinedname;
 

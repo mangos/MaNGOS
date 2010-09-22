@@ -42,18 +42,12 @@ m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
 m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
 m_auraUpdateMask(0), m_loading(false),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
-m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0),m_baseAPBonus(0), m_PetScalingData(NULL),
-m_baseDamageBonus(0), m_basePowerRegen(0)
+m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL)
 {
     m_name = "Pet";
     m_regenTimer = 4000;
 
-    for (uint8 i = 0; i < MAX_STATS; ++i)
-        m_baseStatBonus[i] = 0;
-    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
-       m_baseResistanceBonus[i] = 0;
-    for (uint8 i = 0; i < MAX_COMBAT_RATING; ++i)
-       m_baseRatingValue[i] = 0;
+    m_baseBonusData = new PetScalingData;
 
     // pets always have a charminfo, even if they are not actually charmed
     CharmInfo* charmInfo = InitCharmInfo(this);
@@ -71,6 +65,9 @@ Pet::~Pet()
 
     if (m_PetScalingData)
         delete m_PetScalingData;
+
+    if (m_baseBonusData)
+        delete m_baseBonusData;
 }
 
 void Pet::AddToWorld()
@@ -567,16 +564,8 @@ void Pet::Update(uint32 diff)
             //regenerate focus for hunter pets or energy for deathknight's ghoul
             if(m_regenTimer <= diff)
             {
-                switch (getPowerType())
-                {
-                    case POWER_FOCUS:
-                    case POWER_ENERGY:
-                        Regenerate(getPowerType());
-                        break;
-                    default:
-                        break;
-                }
-                m_regenTimer = 4000;
+                Regenerate(getPowerType(), diff);
+                m_regenTimer = 2000;
             }
             else
                 m_regenTimer -= diff;
@@ -2054,12 +2043,12 @@ void Pet::ApplyStatScalingBonus(Stats stat, bool apply)
 
     int32 newStat  = owner->GetTotalStatValue(stat);
 
-    if (m_baseStatBonus[stat] == newStat && !apply)
+    if (m_baseBonusData->statScale[stat] == newStat && !apply)
         return;
 
-    m_baseStatBonus[stat] = newStat;
+    m_baseBonusData->statScale[stat] = newStat;
 
-    int32 basePoints = int32(m_baseStatBonus[stat] * (CalculateScalingData()->statScale[stat] / 100.0f));
+    int32 basePoints = int32(m_baseBonusData->statScale[stat] * (CalculateScalingData()->statScale[stat] / 100.0f));
 
     bool needRecalculateStat = false;
 
@@ -2118,12 +2107,12 @@ void Pet::ApplyResistanceScalingBonus(uint32 school, bool apply)
     else
         newResistance = owner->GetResistance(SpellSchools(school));
 
-    if (m_baseResistanceBonus[school] == newResistance && !apply)
+    if (m_baseBonusData->resistanceScale[school] == newResistance && !apply)
         return;
 
-    m_baseResistanceBonus[school] = newResistance;
+    m_baseBonusData->resistanceScale[school] = newResistance;
 
-    int32 basePoints = int32(m_baseResistanceBonus[school] * (CalculateScalingData()->resistanceScale[school] / 100.0f));
+    int32 basePoints = int32(m_baseBonusData->resistanceScale[school] * (CalculateScalingData()->resistanceScale[school] / 100.0f));
 
     bool needRecalculateStat = false;
 
@@ -2220,12 +2209,12 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
             break;
     }
 
-    if (m_baseAPBonus == newAPBonus && !apply)
+    if (m_baseBonusData->attackpowerScale == newAPBonus && !apply)
         return;
 
-    m_baseAPBonus = newAPBonus;
+    m_baseBonusData->attackpowerScale = newAPBonus;
 
-    int32 basePoints = int32(m_baseAPBonus * (CalculateScalingData()->attackpowerScale / 100.0f));
+    int32 basePoints = int32(m_baseBonusData->attackpowerScale * (CalculateScalingData()->attackpowerScale / 100.0f));
 
     bool needRecalculateStat = false;
 
@@ -2272,7 +2261,7 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
 void Pet::ApplyDamageScalingBonus(bool apply)
 {
     // SpellPower for pets exactly same DamageBonus.
-    //    m_baseDamageBonus
+    //    m_baseBonusData->damageScale
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
@@ -2328,12 +2317,12 @@ void Pet::ApplyDamageScalingBonus(bool apply)
             break;
     }
 
-    if (m_baseDamageBonus == newDamageBonus && !apply)
+    if (m_baseBonusData->damageScale == newDamageBonus && !apply)
         return;
 
-    m_baseDamageBonus = newDamageBonus;
+    m_baseBonusData->damageScale = newDamageBonus;
 
-    int32 basePoints = int32(m_baseDamageBonus * (CalculateScalingData()->damageScale / 100.0f));
+    int32 basePoints = int32(m_baseBonusData->damageScale * (CalculateScalingData()->damageScale / 100.0f));
 
     bool needRecalculateStat = false;
 
@@ -2388,10 +2377,69 @@ void Pet::ApplyAllScalingBonuses(bool apply)
 
     ApplyDamageScalingBonus(apply);
 
-    ApplyOtherScalingBonuses(apply);
+    ApplyHitScalingBonus(apply);
+
+    ApplySpellHitScalingBonus(apply);
+
+    ApplyExpertizeScalingBonus(apply);
+
+    ApplyPowerregenScalingBonus(apply);
 }
 
-void Pet::ApplyOtherScalingBonuses(bool apply)
+void Pet::ApplyHitScalingBonus(bool apply)
+{
+    Unit* owner = GetOwner();
+
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+    int32 m_MeleeHitChance = owner->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
+    m_MeleeHitChance +=  ((Player*)owner)->GetRatingBonusValue(CR_HIT_MELEE);
+
+    if (m_baseBonusData->meleeHitScale == m_MeleeHitChance && !apply)
+        return;
+
+    m_baseBonusData->meleeHitScale = m_MeleeHitChance;
+
+    int32 basePoints = int32(m_baseBonusData->meleeHitScale * (CalculateScalingData()->meleeHitScale / 100.0f));
+
+    bool needRecalculateStat = false;
+
+    if (basePoints == 0)
+        needRecalculateStat = true;
+
+    AuraList const& scalingAuras = GetAurasByType(SPELL_AURA_MOD_HIT_CHANCE);
+
+    for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
+    {
+        Aura* _aura = (*itr);
+        if (!_aura || _aura->IsInUse())
+            continue;
+
+        SpellAuraHolder* holder = _aura->GetHolder();
+
+        if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->GetCasterGUID() != GetGUID())
+            continue;
+
+        SpellEntry const *spellproto = holder->GetSpellProto();
+
+        if (!spellproto)
+            continue;
+
+        SpellEffectIndex i = _aura->GetEffIndex();
+
+        if (spellproto->EffectBasePoints[i] == 0)
+        {
+            SetCanModifyStats(false);
+            if (ReapplyScalingAura(holder, spellproto, i, basePoints))
+                needRecalculateStat = true;
+            SetCanModifyStats(true);
+            break;
+        }
+    }
+}
+
+void Pet::ApplySpellHitScalingBonus(bool apply)
 {
     Unit* owner = GetOwner();
 
@@ -2399,6 +2447,159 @@ void Pet::ApplyOtherScalingBonuses(bool apply)
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
+    int32 m_SpellHitChance = owner->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+    m_SpellHitChance += ((Player*)owner)->GetRatingBonusValue(CR_HIT_SPELL);
+
+    if (m_baseBonusData->spellHitScale == m_SpellHitChance && !apply)
+        return;
+
+    m_baseBonusData->spellHitScale = m_SpellHitChance;
+
+    int32 basePoints = int32(m_baseBonusData->spellHitScale * (CalculateScalingData()->spellHitScale / 100.0f));
+
+    bool needRecalculateStat = false;
+
+    if (basePoints == 0)
+        needRecalculateStat = true;
+
+    AuraList const& scalingAuras = GetAurasByType(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+
+    for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
+    {
+        Aura* _aura = (*itr);
+        if (!_aura || _aura->IsInUse())
+            continue;
+
+        SpellAuraHolder* holder = _aura->GetHolder();
+
+        if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->GetCasterGUID() != GetGUID())
+            continue;
+
+        SpellEntry const *spellproto = holder->GetSpellProto();
+
+        if (!spellproto)
+            continue;
+
+        SpellEffectIndex i = _aura->GetEffIndex();
+
+        if (spellproto->EffectBasePoints[i] == 0)
+        {
+            SetCanModifyStats(false);
+            if (ReapplyScalingAura(holder, spellproto, i, basePoints))
+                needRecalculateStat = true;
+            SetCanModifyStats(true);
+            break;
+        }
+    }
+}
+
+void Pet::ApplyExpertizeScalingBonus(bool apply)
+{
+    Unit* owner = GetOwner();
+
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+    int32 m_expertize = owner->GetUInt32Value(PLAYER_EXPERTISE);
+
+    if (m_baseBonusData->expertizeScale == m_expertize && !apply)
+        return;
+
+    m_baseBonusData->expertizeScale = m_expertize;
+
+    int32 basePoints = int32(m_baseBonusData->expertizeScale * (CalculateScalingData()->expertizeScale / 100.0f));
+
+    bool needRecalculateStat = false;
+
+    if (basePoints == 0)
+        needRecalculateStat = true;
+
+    AuraList const& scalingAuras = GetAurasByType(SPELL_AURA_MOD_EXPERTISE);
+
+    for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
+    {
+        Aura* _aura = (*itr);
+        if (!_aura || _aura->IsInUse())
+            continue;
+
+        SpellAuraHolder* holder = _aura->GetHolder();
+
+        if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->GetCasterGUID() != GetGUID())
+            continue;
+
+        SpellEntry const *spellproto = holder->GetSpellProto();
+
+        if (!spellproto)
+            continue;
+
+        SpellEffectIndex i = _aura->GetEffIndex();
+
+        if (spellproto->EffectBasePoints[i] == 0)
+        {
+            SetCanModifyStats(false);
+            if (ReapplyScalingAura(holder, spellproto, i, basePoints))
+                needRecalculateStat = true;
+            SetCanModifyStats(true);
+            break;
+        }
+    }
+
+}
+
+void Pet::ApplyPowerregenScalingBonus(bool apply)
+{
+    Unit* owner = GetOwner();
+
+    // Don't apply scaling bonuses if no owner or owner is not player
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    int32 m_manaregen = int32(owner->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER));
+
+    if (m_baseBonusData->powerregenScale == m_manaregen && !apply)
+        return;
+
+    m_baseBonusData->powerregenScale = m_manaregen;
+
+    int32 basePoints = int32(m_baseBonusData->powerregenScale * (CalculateScalingData()->powerregenScale / 100.0f));
+
+    bool needRecalculateStat = false;
+
+    if (basePoints == 0)
+        needRecalculateStat = true;
+
+    AuraList const& scalingAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
+
+    for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
+    {
+        Aura* _aura = (*itr);
+        if (!_aura || _aura->IsInUse())
+            continue;
+
+        SpellAuraHolder* holder = _aura->GetHolder();
+
+        if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->GetCasterGUID() != GetGUID())
+            continue;
+
+        SpellEntry const *spellproto = holder->GetSpellProto();
+
+        if (!spellproto)
+            continue;
+
+        SpellEffectIndex i = _aura->GetEffIndex();
+
+        if (spellproto->EffectBasePoints[i] == 0)
+        {
+            SetCanModifyStats(false);
+            if (ReapplyScalingAura(holder, spellproto, i, basePoints))
+                needRecalculateStat = true;
+            SetCanModifyStats(true);
+            break;
+        }
+    }
+
+    if(needRecalculateStat)
+        UpdateManaRegen();
 }
 
 bool Pet::Summon(int32 duration, uint8 counter)
@@ -2626,11 +2827,12 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
              m_PetScalingData->APBaseScale      += pData->APBaseScale;
              m_PetScalingData->attackpowerScale += pData->attackpowerScale;
              m_PetScalingData->damageScale      += pData->damageScale;
-             m_PetScalingData->spellpowerScale  += pData->spellpowerScale;
-             m_PetScalingData->hitScale         += pData->hitScale;
+             m_PetScalingData->spellHitScale    += pData->spellHitScale;
+             m_PetScalingData->meleeHitScale    += pData->meleeHitScale;
              m_PetScalingData->expertizeScale   += pData->expertizeScale;
              m_PetScalingData->attackspeedScale += pData->attackspeedScale;
              m_PetScalingData->critScale        += pData->critScale;
+             m_PetScalingData->powerregenScale  += pData->powerregenScale;
              for (int i = 0; i < MAX_STATS; i++)
              {
                   m_PetScalingData->statScale[i] = pData->statScale[i];
@@ -2642,4 +2844,80 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
          }
     }
     return m_PetScalingData;
+}
+
+// diff contains the time in milliseconds since last regen.
+void Pet::Regenerate(Powers power, uint32 diff)
+{
+    uint32 curValue = GetPower(power);
+    uint32 maxValue = GetMaxPower(power);
+
+    float addvalue = 0.0f;
+
+    switch (power)
+    {
+        case POWER_MANA:
+        {
+            bool recentCast = IsUnderLastManaUseEffect();
+            float ManaIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_MANA);
+            if (recentCast)
+            {
+                // Mangos Updates Mana in intervals of 2s, which is correct
+                addvalue = GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 2.00f;
+            }
+            else
+            {
+                addvalue = GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 2.00f;
+            }
+        }   break;
+        case POWER_RAGE:                                    // Regenerate rage ?
+        {
+            float RageDecreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
+            addvalue = 20 * RageDecreaseRate;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+        }   break;
+        case POWER_ENERGY:                                  // Regenerate energy (ghoul)
+        {
+            float EnergyRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
+            addvalue = 20 * EnergyRate;
+            break;
+        }
+        case POWER_FOCUS:                                   // Hunter pets
+        {
+            addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
+            break;
+        }
+        case POWER_RUNIC_POWER:
+        case POWER_RUNE:
+        case POWER_HAPPINESS:
+        case POWER_HEALTH:
+            break;
+    }
+
+    // Mana regen calculated in Pet::UpdateManaRegen()
+    // Exist only for POWER_MANA, POWER_ENERGY, POWER_FOCUS auras
+    if(power != POWER_MANA)
+    {
+        AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+        for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
+            if ((*i)->GetModifier()->m_miscvalue == power)
+                addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
+    }
+
+    // addvalue computed on a 2sec basis. => update to diff time
+    addvalue *= float(diff) / REGEN_TIME_FULL;
+
+    if (power != POWER_RAGE )
+    {
+        curValue += uint32(addvalue);
+        if (curValue > maxValue)
+            curValue = maxValue;
+    }
+    else
+    {
+        if(curValue <= uint32(addvalue))
+            curValue = 0;
+        else
+            curValue -= uint32(addvalue);
+    }
+    SetPower(power, curValue);
 }

@@ -459,9 +459,8 @@ struct PetScalingData
 {
     PetScalingData() : creatureID(0), requiredAura(0),
     healthBasepoint(0), healthScale(0), powerBasepoint(0), powerScale(0),
-    APBasepoint(0), APBaseScale(0),
-    attackpowerScale(0), damageScale(0), spellpowerScale(0),
-    hitScale(0), expertizeScale(0), attackspeedScale(0), critScale(0)
+    APBasepoint(0), APBaseScale(0), attackpowerScale(0), damageScale(0), spellHitScale(0),
+    meleeHitScale(0), expertizeScale(0), attackspeedScale(0), critScale(0), powerregenScale(0)
     {
         for(int i=0; i < MAX_STATS; ++i ) statScale[i] = 0;
         for(int i=0; i < MAX_SPELL_SCHOOL; ++i ) resistanceScale[i] = 0;
@@ -479,11 +478,12 @@ struct PetScalingData
     int32  resistanceScale[MAX_SPELL_SCHOOL];
     int32  attackpowerScale;
     int32  damageScale;
-    int32  spellpowerScale;
-    int32  hitScale;
+    int32  spellHitScale;
+    int32  meleeHitScale;
     int32  expertizeScale;
     int32  attackspeedScale;
     int32  critScale;
+    int32  powerregenScale;
 };
 
 typedef std::vector<PetScalingData*> PetScalingDataList;
