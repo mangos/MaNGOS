@@ -7518,8 +7518,11 @@ void Unit::Mount(uint32 mount, uint32 spellId)
             // Normal case (Unsummon only permanent pet)
             else if (Pet* pet = GetPet())
             {
-                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena())
+                if (pet->IsPermanentPetFor((Player*)this) && !((Player*)this)->InArena() &&
+                    sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
+                {
                     ((Player*)this)->UnsummonPetTemporaryIfAny();
+                }
                 else
                     pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);
             }
@@ -10129,7 +10132,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /
     std::list<Unit *> targets;
 
     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, radius);
-    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
     Cell::VisitAllObjects(this, searcher, radius);
 
     // remove current target
@@ -10167,7 +10170,7 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*=
     std::list<Unit *> targets;
 
     MaNGOS::AnyFriendlyUnitInObjectRangeCheck u_check(this, radius);
-    MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyFriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
 
     Cell::VisitAllObjects(this, searcher, radius);
     // remove current target

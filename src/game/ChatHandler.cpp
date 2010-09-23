@@ -494,7 +494,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleEmoteOpcode( WorldPacket & recv_data )
 {
-    if(!GetPlayer()->isAlive())
+    if(!GetPlayer()->isAlive() || GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         return;
 
     uint32 emote;
@@ -567,8 +567,14 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
         case EMOTE_ONESHOT_NONE:
             break;
         default:
+        {
+            // in feign death state allowed only text emotes.
+            if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+                break;
+
             GetPlayer()->HandleEmoteCommand(emote_id);
             break;
+        }
     }
 
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
