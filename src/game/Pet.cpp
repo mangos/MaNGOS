@@ -42,7 +42,7 @@ m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
 m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
 m_auraUpdateMask(0), m_loading(false),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
-m_petFollowAngle(PET_DEFAULT_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL)
+m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL)
 {
     m_name = "Pet";
     m_regenTimer = 4000;
@@ -479,20 +479,6 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
                 ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-        }
-        // send cooldown for summon spell if necessary
-        if (Player* p_owner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            SpellEntry const *spellInfo = sSpellStore.LookupEntry(GetUInt32Value(UNIT_CREATED_BY_SPELL));
-
-            if (!spellInfo) return;
-
-            if (spellInfo && spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
-                p_owner->SendCooldownEvent(spellInfo);
-            // Raise Dead hack
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
-                if (spellInfo = sSpellStore.LookupEntry(46584))
-                    p_owner->SendCooldownEvent(spellInfo);
         }
     }
     else if(getDeathState()==ALIVE)

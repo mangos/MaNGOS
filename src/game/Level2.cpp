@@ -2146,7 +2146,7 @@ bool ChatHandler::HandleNpcFollowCommand(char* /*args*/)
     }
 
     // Follow player - Using pet's default dist and angle
-    creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_DEFAULT_FOLLOW_ANGLE);
+    creature->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     PSendSysMessage(LANG_CREATURE_FOLLOW_YOU_NOW, creature->GetName());
     return true;

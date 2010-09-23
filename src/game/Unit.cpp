@@ -9948,7 +9948,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                     break;
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
                     AttackStop();
-                    GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,((Creature*)this)->isPet() ? ((Pet*)this)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE);
+                    GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,((Creature*)this)->isPet() ? ((Pet*)this)->GetPetFollowAngle() : PET_FOLLOW_ANGLE);
                     GetCharmInfo()->SetCommandState( COMMAND_FOLLOW );
                     break;
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK

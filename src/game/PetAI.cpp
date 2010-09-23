@@ -120,7 +120,7 @@ void PetAI::_stopAttack()
 
     if(owner && m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
     {
-        m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE);
+        m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_FOLLOW_ANGLE);
     }
     else
     {
@@ -193,7 +193,7 @@ void PetAI::UpdateAI(const uint32 diff)
         {
             if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW) )
             {
-                m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_DEFAULT_FOLLOW_ANGLE);
+                m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST, m_creature->isPet() ? ((Pet*)m_creature)->GetPetFollowAngle() : PET_FOLLOW_ANGLE);
             }
         }
     }
