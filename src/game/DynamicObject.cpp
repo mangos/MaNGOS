@@ -179,7 +179,7 @@ void DynamicObject::Delay(int32 delaytime)
             ++iter;
         }
         else
-            m_affected.erase(iter);
+            m_affected.erase(iter++);
     }
 }
 
