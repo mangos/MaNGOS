@@ -147,9 +147,40 @@ void DynamicObject::Delete()
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
-    for(AffectedSet::iterator iunit= m_affected.begin(); iunit != m_affected.end(); ++iunit)
-        if (*iunit)
-            (*iunit)->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGUID());
+    for(AffectedSet::iterator iter = m_affected.begin(); iter != m_affected.end(); )
+    {
+        Unit *target = GetMap()->GetUnit((*iter));
+        if (target)
+        {
+            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGUID());
+            if (!holder)
+            {
+                ++iter;
+                continue;
+            }
+
+            bool foundAura = false;
+            for (int32 i = m_effIndex + 1; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if ((holder->GetSpellProto()->Effect[i] == SPELL_EFFECT_PERSISTENT_AREA_AURA || holder->GetSpellProto()->Effect[i] == SPELL_EFFECT_ADD_FARSIGHT) && holder->m_auras[i])
+                {
+                    foundAura = true;
+                    break;
+                }
+            }
+            
+            if (foundAura)
+            {
+                ++iter;
+                continue;
+            }
+
+            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGUID());
+            ++iter;
+        }
+        else
+            m_affected.erase(iter++);
+    }
 }
 
 bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
