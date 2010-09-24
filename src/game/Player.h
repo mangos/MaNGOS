@@ -1757,6 +1757,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddGlobalCooldown(SpellEntry const* spellInfo);
         void CancelGlobalCooldown(SpellEntry const* spellInfo);
 
+        GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
+
         void RemoveArenaSpellCooldowns();
         void RemoveAllSpellCooldown();
         void _LoadSpellCooldowns(QueryResult *result);
@@ -2568,6 +2570,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         SpellCooldowns m_spellCooldowns;
         GlobalCooldowns m_globalCooldowns;
         uint32 m_lastPotionId;                              // last used health/mana potion in combat, that block next potion use
+
+        GlobalCooldownMgr m_GlobalCooldownMgr;
 
         uint8 m_activeSpec;
         uint8 m_specsCount;

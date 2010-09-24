@@ -19424,7 +19424,7 @@ void Player::CancelGlobalCooldown(SpellEntry const* spellInfo)
     m_globalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
 }
 
-                                                           //slot to be excluded while counting
+                                                            //slot to be excluded while counting
 bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
 {
     if(!enchantmentcondition)
