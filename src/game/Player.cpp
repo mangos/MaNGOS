@@ -19003,41 +19003,6 @@ void Player::UpdatePotionCooldown(Spell* spell)
     m_lastPotionId = 0;
 }
 
-bool Player::HasGlobalCooldown(SpellEntry const* spellInfo) const
-{
-    GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
-    return itr != m_globalCooldowns.end() && getMSTimeDiff(itr->second.cast_time, getMSTime()) < itr->second.duration;
-}
-
-uint32 Player::GetGlobalCooldownDelay(SpellEntry const* spellInfo) const
-{
-    GlobalCooldowns::const_iterator itr = m_globalCooldowns.find(spellInfo->StartRecoveryCategory);
-    if (itr == m_globalCooldowns.end())
-        return 0;
-    uint32 dt = getMSTimeDiff(itr->second.cast_time, getMSTime());
-    return dt < itr->second.duration ? itr->second.duration - dt : 0;
-}
-
-void Player::AddGlobalCooldown(SpellEntry const* spellInfo)
-{
-    int32 gcd = spellInfo->StartRecoveryTime;
-    if (gcd)
-    {
-        // gcd modifier auras
-        ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME_OLD, gcd);
-        // apply haste rating
-        gcd = int32(float(gcd) * GetFloatValue(UNIT_MOD_CAST_SPEED));
-        if (gcd < 0)
-            gcd = 0;
-    }
-    m_globalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, getMSTime());
-}
-
-void Player::CancelGlobalCooldown(SpellEntry const* spellInfo)
-{
-    m_globalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
-}
-
                                                            //slot to be excluded while counting
 bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
 {
