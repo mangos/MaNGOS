@@ -10051,8 +10051,6 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
         case ACT_ENABLED:                                   // 0xC1    spell
         {
             Unit* unit_target = NULL;
-            if (((Creature*)this)->GetGlobalCooldown() > 0)
-                return;
 
             if(guid2)
                 unit_target = owner->GetMap()->GetUnit(guid2);
@@ -10064,6 +10062,9 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                 sLog.outError("WORLD: unknown PET spell id %i", spellid);
                 return;
             }
+
+            if (GetCharmInfo() && GetCharmInfo()->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
+                return;
 
             for(int i = 0; i < MAX_EFFECT_INDEX;++i)
             {
