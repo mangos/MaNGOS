@@ -560,7 +560,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_spells[CREATURE_MAX_SPELLS];
         CreatureSpellCooldowns m_CreatureSpellCooldowns;
         CreatureSpellCooldowns m_CreatureCategoryCooldowns;
-        uint32 m_GlobalCooldown;
 
         float GetAttackDistance(Unit const* pl) const;
 
@@ -628,8 +627,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetSummonPoint(float fX, float fY, float fZ, float fOrient) { m_summonXpoint = fX; m_summonYpoint = fY; m_summonZpoint = fZ; m_summonOrientation = fOrient; }
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonXpoint; fY = m_summonYpoint; fZ = m_summonZpoint; fOrient = m_summonOrientation; }
-
-        uint32 GetGlobalCooldown() const { return m_GlobalCooldown; }
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
 
