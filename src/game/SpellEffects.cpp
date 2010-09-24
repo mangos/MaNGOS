@@ -1635,6 +1635,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Creature*)unitTarget)->ForcedDespawn(5000);
                     return;
                 }
+                case 51858:                                 // Siphon of Acherus - Complete Quest
+                {
+                    if (!m_caster || !m_caster->isAlive())
+                        return;
+
+                    ((Player*)m_originalCaster->GetCharmer())->KilledMonsterCredit(m_caster->GetEntry(), m_caster->GetGUID());
+                        return;
+                }
                 case 51866:                                 // Kick Nass
                 {
                     // It is possible that Nass Heartbeat (spell id 61438) is involved in this
@@ -4183,9 +4191,16 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
         }
         case SUMMON_PROP_GROUP_CONTROLLABLE:
         {
-            // no type here
-            // maybe wrong - but thats the handler currently used for those
-            DoSummonGuardian(eff_idx, summon_prop->FactionId);
+            switch(prop_id)
+            {
+                case 65:
+                case 428:
+                    EffectSummonPossessed(eff_idx);
+                    break;
+                default:
+                    DoSummonGuardian(eff_idx, summon_prop->FactionId);
+                break;
+            }
             break;
         }
         case SUMMON_PROP_GROUP_VEHICLE:
@@ -4343,6 +4358,54 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         ++petindex;
     }
 
+}
+
+void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
+{
+    uint32 creature_entry = m_spellInfo->EffectMiscValue[eff_idx];
+    if(!creature_entry)
+        return;
+
+    int32 duration = GetSpellDuration(m_spellInfo);
+
+        float px, py, pz;
+    // If dest location if present
+    if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+    {
+        // Summon 1 unit in dest location
+        px = m_targets.m_destX;
+        py = m_targets.m_destY;
+        pz = m_targets.m_destZ;
+    }
+    // Summon if dest location not present near caster
+    else
+        m_caster->GetClosePoint(px,py,pz,1.0f);
+
+    TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
+    Creature *summon = m_caster->SummonCreature(creature_entry,px,py,pz,m_caster->GetOrientation(),summonType,duration);
+
+    summon->addUnitState(UNIT_STAT_CONTROLLED);
+    summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    summon->SetCharmerGUID(m_caster->GetGUID());
+    summon->setFaction(m_caster->getFaction());
+
+    ((Player*)m_caster)->GetCamera().SetView(summon);
+
+    m_caster->SetCharm(summon);
+    ((Player*)m_caster)->SetClientControl(summon, 1);
+    ((Player*)m_caster)->SetMover(summon);
+
+    summon->CombatStop(true);
+    summon->DeleteThreatList();
+
+    if(CharmInfo *charmInfo = summon->InitCharmInfo(summon))
+    {
+        charmInfo->InitPossessCreateSpells();
+        charmInfo->SetReactState(REACT_PASSIVE);
+        charmInfo->SetCommandState(COMMAND_STAY);
+    }
+
+    ((Player*)m_caster)->PossessSpellInitialize();
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
@@ -6347,6 +6410,36 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             ((Player*)m_caster)->RemovePet(pPet, PET_SAVE_NOT_IN_SLOT);
                     }
                     return;
+                }
+                case 51904:                                 // Summon Ghouls Of Scarlet Crusade
+                {
+                    if(!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 54522, true);
+                    break;
+                }
+                case 52694:                                 // Recall Eye of Acherus
+                {
+                    if(!m_caster || m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    Unit *target = m_caster->GetCharmer();
+
+                    if(!target || target->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    m_caster->SetCharmerGUID(0);
+                    target->RemoveAurasDueToSpell(51852);
+                    target->SetCharm(NULL);
+
+                    ((Player*)target)->GetCamera().ResetView();
+                    ((Player*)target)->SetClientControl(m_caster,0);
+                    ((Player*)target)->SetMover(NULL);
+
+                    m_caster->CleanupsBeforeDelete();
+                    m_caster->AddObjectToRemoveList();
+                        return;
                 }
                 case 52751:                                 // Death Gate
                 {

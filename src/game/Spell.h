@@ -253,6 +253,7 @@ class Spell
         void EffectProficiency(SpellEffectIndex eff_idx);
         void EffectApplyAreaAura(SpellEffectIndex eff_idx);
         void EffectSummonType(SpellEffectIndex eff_idx);
+        void EffectSummonPossessed(SpellEffectIndex eff_idx);
         void EffectLearnSpell(SpellEffectIndex eff_idx);
         void EffectDispel(SpellEffectIndex eff_idx);
         void EffectDualWield(SpellEffectIndex eff_idx);
