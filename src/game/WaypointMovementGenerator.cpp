@@ -82,6 +82,13 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
         creature.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
 
     const WaypointNode &node = i_path->at(i_currentNode);
+
+    if (node.script_id)
+    {
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for creature %u (entry %u).", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetDBTableGUIDLow(), creature.GetEntry());
+        creature.GetMap()->ScriptsStart(sCreatureMovementScripts, node.script_id, &creature, &creature);
+    }
+
     i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
     i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
 }
