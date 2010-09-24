@@ -21,8 +21,8 @@
 
 #include "Object.h"
 #include "DBCEnums.h"
+#include "Unit.h"
 
-class Unit;
 struct SpellEntry;
 
 class DynamicObject : public WorldObject
