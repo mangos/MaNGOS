@@ -2656,13 +2656,13 @@ bool Pet::Summon(int32 duration, uint8 counter)
     SetHealth(GetMaxHealth());
     SetPower(getPowerType(), GetMaxPower(getPowerType()));
 
+    owner->SetPet(this);
+
     map->Add((Creature*)this);
 
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
-        owner->SetPet(this);
-
         if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
         {
             CleanupActionBar();                                     // remove unknown spells from action bar after load
