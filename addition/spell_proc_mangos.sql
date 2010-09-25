@@ -12,10 +12,9 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 /*http://ru.wowhead.com/item=50343*/
 DELETE FROM `spell_proc_event` WHERE `entry` IN(71541, 71540);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
-(71541, 0, 0, 0, 0, 0, 0, 0, 0, 30, 45),
 (71540, 0, 0, 0, 0, 0, 0, 0, 0, 30, 45);
 
--- (65005) –Â¯ËÏÓÒÚ¸ ÒÚËıËÈ
+-- (65005) –†–µ—à–∏–º–æ—Å—Ç—å —Å—Ç–∏—Ö–∏–π
 DELETE FROM `spell_proc_event` WHERE `entry` IN (65005);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
 VALUES (65005, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0, 10, 45);
@@ -28,7 +27,7 @@ VALUES (67389, 0x00, 0x0B, 0x00000000, 0x00000000, 0x00000000, 0x00004000, 0x000
 -- (71402) Item - Icecrown 10 Normal Melee Trinket
 DELETE FROM `spell_proc_event` WHERE `entry` IN (71402);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (71402, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00051154, 0x00000000, 0, 35, 45);
+VALUES (71402, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45);
 
 -- (71540) Item - Icecrown 10 Heroic Melee Trinket
 DELETE FROM `spell_proc_event` WHERE `entry` IN (71540);
@@ -43,12 +42,12 @@ VALUES (71602, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x000
 -- (71606) Item - Icecrown 25 Normal Caster Trinket 2
 DELETE FROM `spell_proc_event` WHERE `entry` IN (71606);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (71606, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00040000, 0x00000000, 0, 30, 45);
+VALUES (71606, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45);
 
 -- (71637) Item - Icecrown 25 Heroic Caster Trinket 2
 DELETE FROM `spell_proc_event` WHERE `entry` IN (71637);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (71637, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00040000, 0x00000000, 0, 30, 45);
+VALUES (71637, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45);
 
 -- (71645) Item - Icecrown 25 Heroic Caster Trinket 1 Base
 DELETE FROM `spell_proc_event` WHERE `entry` IN (71645);
@@ -61,7 +60,7 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 
 /*Item - Paladin T10 Protection 4P Bonus*/
 DELETE FROM `spell_proc_event` WHERE entry = 70761;
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70761','0','10','0',0x80004000,'0',0x00004000,'0','0','0','0');
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70761','0','10','0',0x80004000,'0',0x00000000,'0','0','0','0');
 
 /*Item - Paladin T10 Holy 4P Bonus*/
 DELETE FROM `spell_proc_event` WHERE entry = 70756;
@@ -74,10 +73,6 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 /*Item - Hunter T10 4P Bonus*/
 DELETE FROM `spell_proc_event` WHERE entry = 70730;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70730','0','9',0x00004000,0x00001000,'0','0','0','0','0','0');
-
-/* Item - Priest T10 Healer 4P Bonus*/
-DELETE FROM `spell_proc_event` WHERE entry = 70798;
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES('70798','0','6',0x00000800,'0','0','0','0','0','0','0');
 
 /*Item - Shaman T10 Restoration 4P Bonus*/
 DELETE FROM `spell_proc_event` WHERE entry = 70808;
@@ -114,7 +109,7 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `Spell
 /*Item - Shaman T9 Elemental Relic (Lightning Bolt)*/
 DELETE FROM `spell_proc_event` WHERE `entry` IN (67386);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (67386, 0x00, 0x0B, 0x00000001, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0, 70, 6);
+VALUES (67386, 0x00, 0x0B, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 6);
 
 -- (64952) Item - Druid T8 Feral Relic ()
 DELETE FROM `spell_proc_event` WHERE `entry` IN (64952);
@@ -139,20 +134,20 @@ VALUES (67672, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00000044, 0x000000
 -- (67667) Coliseum 5 Healer Trinket ()
 DELETE FROM `spell_proc_event` WHERE `entry` IN (67667);
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (67667, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00004000, 0x00000000, 0.000000, 0.000000, 45);
+VALUES (67667, 0x00, 0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 45);
 
 -- http://getmangos.com/community/showthread.php?14325-FIX-Some-trinkets-proc_events
 DELETE FROM `spell_proc_event` WHERE `entry` IN (65005, 67389, 71402, 71540, 71602, 71606, 71637, 71645, 62114, 67670);
 
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
-(65005, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0, 10, 45),
-(67389, 0x00, 0x0B, 0x00000000, 0x00000000, 0x00000000, 0x00004000, 0x00000000, 0, 70, 45),
-(71402, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00051154, 0x00000000, 0, 35, 45),
-(71540, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00051154, 0x00000000, 0, 35, 45),
-(71602, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45),
-(71606, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00040000, 0x00000000, 0, 30, 45),
-(71637, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00040000, 0x00000000, 0, 30, 45),
-(71645, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45);
+(65005, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(67389, 0x00, 0x0B, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71402, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71540, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71602, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71606, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71637, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45),
+(71645, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0, 0, 45);
 -- (62114, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45),
 -- (67670, 0x00, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45);
 
@@ -168,7 +163,7 @@ INSERT INTO spell_proc_event (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFa
 (51692, 0x00,  8, 0x00000204, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0);
 
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskA1`, `SpellFamilyMaskA2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`) VALUES
-(62114, 0x01, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45),
+(62114, 0x01, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 0, 45),
 (67670, 0x01, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00014000, 0x00000000, 0, 10, 45);
 
 /* Val'anyr, Hammer of Ancient Kings */
@@ -181,7 +176,7 @@ INSERT INTO `spell_proc_event` VALUES ('71562', '0', '0', '0', '0', '0', '0', '0
 INSERT INTO `spell_proc_event` VALUES ('71519', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '60');
 
 DELETE FROM `spell_proc_event` WHERE `entry` IN ('70723', '70808');
-INSERT INTO `spell_proc_event` VALUES ('70723',	'72', '7', '5',	'5', '5', '0', '0',	'0', '0', '0', '0', '65536', '2', '0', '0', '0');
+INSERT INTO `spell_proc_event` VALUES ('70723',	'72', '7', '5',	'5', '5', '0', '0',	'0', '0', '0', '0', '0', '2', '0', '0', '0');
 INSERT INTO `spell_proc_event` VALUES ('70808',	'8', '11', '400', '400', '400', '0', '0', '0', '0', '0', '0', '0', '2', '0', '0', '0');
 
 /* Item - Paladin T10 Holy 4P Bonus */
@@ -209,6 +204,44 @@ INSERT INTO `spell_proc_event` VALUES ('70755', '2', '10', '0', '0', '0', '0x800
 DELETE FROM `spell_proc_event` WHERE `entry` = 47230;
 INSERT INTO `spell_proc_event` VALUES (47230, 0x7F,  5, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0);
 
-/* 58872, 58874 from virusav */
-DELETE FROM `spell_proc_event` WHERE `entry` = 58872;
-INSERT INTO `spell_proc_event` (`entry`, `procEx`) VALUES (58872, '0x00002043');
+DELETE FROM `spell_proc_event` WHERE `entry`=58872;
+
+--  Chill of the Grave (49149) 
+DELETE FROM `spell_proc_event` WHERE `entry` IN (49149);
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (49149, 0x00, 0x0F, 0x00000006, 0x00020002, 0x00000000, 0x00015410, 0x00000000, 0, 100, 0);
+
+-- (49004) Scent of Blood 
+DELETE FROM `spell_proc_event` WHERE entry = 49004;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (49004, 0x00, 0x0F, 0x00000000, 0x00000000, 0x00000000, 0x00000008, 0x00000031, 0, 15, 0);
+
+-- (51123) Killing Machine
+DELETE FROM `spell_proc_event` WHERE entry = 51123;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (51123, 0x00, 0x0F, 0x00000000, 0x00000000, 0x00000000, 0x00000004, 0x00000000, 5, 100, 0);
+
+-- (48988) Bloody Vengeance
+DELETE FROM `spell_proc_event` WHERE entry = 48988;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (48988, 0x00, 0x0F, 0x00000000, 0x00000000, 0x00000000, 0x00011154, 0x00000002, 0, 100, 0);
+
+-- (49149) Chill of the Grave
+DELETE FROM `spell_proc_event` WHERE entry = 49149;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (49149, 0x00, 0x0F, 0x00000006, 0x00020002, 0x00000000, 0x00015410, 0x00000000, 0, 100, 0);
+
+-- (49223) Dirge
+DELETE FROM `spell_proc_event` WHERE entry = 49223;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (49223, 0x00, 0x0F, 0x00000011, 0x08000000, 0x00000000, 0x00015410, 0x00000000, 0, 100, 0);
+
+-- (55666) Desecration
+DELETE FROM `spell_proc_event` WHERE entry = 55666;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (55666, 0x00, 0x0F, 0x00000001, 0x08000000, 0x00000000, 0x00000010, 0x00000000, 0, 100, 0);
+
+-- (50880) Icy Talons
+DELETE FROM `spell_proc_event` WHERE entry = 50880;
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
+VALUES (50880, 0x00, 0x0F, 0x00000000, 0x04000000, 0x00000000, 0x00070000, 0x00000000, 0, 100, 0);
