@@ -1873,6 +1873,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if( (spellInfo_1->SpellIconID == 456 && spellInfo_2->SpellIconID == 2006) ||
                     (spellInfo_2->SpellIconID == 456 && spellInfo_1->SpellIconID == 2006) )
                     return false;
+
+                // Taste of Blood and Sudden Death
+                if( (spellInfo_1->Id == 52437 && spellInfo_2->Id == 60503) ||
+                    (spellInfo_2->Id == 52437 && spellInfo_1->Id == 60503) )
+                    return false;
             }
             break;
         case SPELLFAMILY_PRIEST:
