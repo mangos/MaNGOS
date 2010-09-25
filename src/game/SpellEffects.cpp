@@ -7198,7 +7198,7 @@ void Spell::EffectLeapForward(SpellEffectIndex eff_idx)
             fx = fx2;
             fy = fy2;
             fz = fz2;
-            unitTarget->UpdateGroundPositionZ(fx, fy, fz);
+            unitTarget->UpdateAllowedPositionZ(fx, fy, fz);
         }
 
         unitTarget->NearTeleportTo(fx, fy, fz, unitTarget->GetOrientation(), unitTarget == m_caster);
