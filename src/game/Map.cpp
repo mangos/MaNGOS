@@ -1233,14 +1233,6 @@ GridMapLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiq
     return result;
 }
 
-float Map::GetWaterLevel(float x, float y ) const
-{
-    if(GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
-        return gmap->getLiquidLevel(x, y);
-    else
-        return 0;
-}
-
 uint32 Map::GetAreaIdByAreaFlag(uint16 areaflag,uint32 map_id)
 {
     AreaTableEntry const *entry = GetAreaEntryByAreaFlagAndMap(areaflag,map_id);
@@ -1293,6 +1285,57 @@ bool Map::IsUnderWater(float x, float y, float z) const
             return true;
     }
     return false;
+}
+
+/**
+ * Function find higher form water or ground height for current floor
+ *
+ * @param x, y, z    Coordinates original point at floor level
+ *
+ * @param pGround    optional arg for retrun calculated by function work ground height, it let avoid in caller code recalculate height for point if it need
+ *
+ * @param swim       z coordinate can be calculated for select above/at or under z coordinate (for fly or swim/walking by bottom)
+ *                   in last cases for in water returned under water height for avoid client set swimming unit as saty at water.
+ *
+ * @return           calculated z coordinate
+ */
+float Map::GetWaterOrGroundLevel(float x, float y, float z, float* pGround /*= NULL*/, bool swim /*= false*/) const
+{
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        // we need ground level (including grid height version) for proper return water level in point
+        float ground_z = GetHeight(x, y, z, true, DEFAULT_WATER_SEARCH);
+        if (pGround)
+            *pGround = ground_z;
+
+        GridMapLiquidData liquid_status;
+
+        GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        return res ? ( swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z;
+    }
+
+    return VMAP_INVALID_HEIGHT_VALUE;
+}
+
+float Map::GetWaterLevel(float x, float y, float z, float* pGround /*= NULL*/) const
+{
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        // we need ground level (including grid height version) for proper return water level in point
+        float ground_z = GetHeight(x, y, z, true, DEFAULT_WATER_SEARCH);
+        if (pGround)
+            *pGround = ground_z;
+
+        GridMapLiquidData liquid_status;
+
+        GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        if (!res)
+            return VMAP_INVALID_HEIGHT_VALUE;
+
+        return liquid_status.level;
+    }
+
+    return VMAP_INVALID_HEIGHT_VALUE;
 }
 
 bool Map::CheckGridIntegrity(Creature* c, bool moved) const

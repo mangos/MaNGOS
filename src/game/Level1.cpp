@@ -2027,7 +2027,7 @@ bool ChatHandler::HandleGoHelper( Player* player, uint32 mapid, float x, float y
         }
 
         Map const *map = sMapMgr.CreateBaseMap(mapid);
-        z = std::max(map->GetHeight(x, y, MAX_HEIGHT), map->GetWaterLevel(x, y));
+        z = map->GetWaterOrGroundLevel(x, y, MAX_HEIGHT);
     }
 
     // stop flight if need

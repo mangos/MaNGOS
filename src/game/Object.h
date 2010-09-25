@@ -360,10 +360,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetOrientation( ) const { return m_orientation; }
         void GetNearPoint2D( float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
-        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0) const
+        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, const WorldObject* obj = NULL ) const
         {
             // angle calculated from current orientation
-            GetNearPoint(NULL, x, y, z, bounding_radius, distance2d, GetOrientation() + angle);
+            GetNearPoint(obj, x, y, z, bounding_radius, distance2d, GetOrientation() + angle);
         }
         void GetContactPoint( const WorldObject* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const
         {
@@ -375,6 +375,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         bool IsPositionValid() const;
         void UpdateGroundPositionZ(float x, float y, float &z) const;
+        void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
         void GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z ) const;
 
