@@ -140,7 +140,6 @@ bool Group::Create(ObjectGuid guid, const char * name)
         {
             m_dungeonDifficulty = leader->GetDungeonDifficulty();
             m_raidDifficulty = leader->GetRaidDifficulty();
-            m_creatorRace = leader->getRace();
         }
 
         Player::ConvertInstancesToGroup(leader, this, guid);
@@ -180,10 +179,6 @@ bool Group::LoadGroupFromDB(Field* fields)
     // group leader not exist
     if (!sObjectMgr.GetPlayerNameByGUID(m_leaderGuid, m_leaderName))
         return false;
-
-    if (Player *leader = sObjectMgr.GetPlayer(m_leaderGuid))
-        m_creatorRace = leader->getRace();
-        else m_creatorRace = 0;
 
     m_groupType  = GroupType(fields[13].GetUInt8());
 
@@ -339,17 +334,6 @@ bool Group::AddMember(ObjectGuid guid, const char* name)
                     player->SendRaidDifficulty(true);
                 }
             }
-            // Group Interfactions interactions (test)
-             if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-             {
-                 Group *group = player->GetGroup();
-                 if(group->GetCreatorRace())
-                 {
-                     player->setFactionForRace(group->GetCreatorRace());
-                     sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction changed (AddMember)" );
-                 } else sLog.outDebug( "WORLD: Group Interfaction Interactions - Faction NOT changed (CreatorRace is NULL)" );
-             }
-
         }
         player->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
         UpdatePlayerOutOfRange(player);
@@ -394,13 +378,6 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 method)
                 data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
                 data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
-            }
-
-          // Restore original faction if needed
-          if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (RemoveMember)" );
             }
 
             _homebindIfInstance(player);
@@ -458,13 +435,6 @@ void Group::Disband(bool hideDestroy)
             else
                 player->SetGroup(NULL);
         }
-
-          // Restore original faction if needed
-          if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                player->setFactionForRace(player->getRace());
-                sLog.outDebug( "WORLD: Group Interfaction Interactions - Restore original faction (RemoveMember)" );
-            }
 
         // quest related GO state dependent from raid membership
         if(isRaidGroup())

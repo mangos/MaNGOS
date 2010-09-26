@@ -16720,15 +16720,6 @@ void Player::_LoadGroup(QueryResult *result)
                 SetDungeonDifficulty(group->GetDungeonDifficulty());
                 SetRaidDifficulty(group->GetRaidDifficulty());
             }
-            // Group Interfactions interactions (test)
-            if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-            {
-                if (group->GetCreatorRace())
-                {
-                    setFactionForRace(group->GetCreatorRace());
-                    sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - Faction changed (LoadPlayer)" );
-                } else sLog.outDebug( "PLAYER LOAD: Group Interfaction Interactions - cannot change faction, CreatorRace is NULL" );
-            }
         }
     }
 }

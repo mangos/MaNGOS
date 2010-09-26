@@ -233,7 +233,6 @@ class MANGOS_DLL_SPEC Group
         bool isBGGroup()   const { return m_bgGroup != NULL; }
         bool IsCreated()   const { return GetMembersCount() > 0; }
         ObjectGuid GetLeaderGuid() const { return m_leaderGuid; }
-        const uint8& GetCreatorRace() const { return m_creatorRace; }
         const char * GetLeaderName() const { return m_leaderName.c_str(); }
         LootMethod    GetLootMethod() const { return m_lootMethod; }
         ObjectGuid GetLooterGuid() const { return m_looterGuid; }
@@ -441,7 +440,6 @@ class MANGOS_DLL_SPEC Group
         GroupRefManager     m_memberMgr;
         InvitesList         m_invitees;
         ObjectGuid          m_leaderGuid;
-        uint8               m_creatorRace;
         std::string         m_leaderName;
         ObjectGuid          m_mainTankGuid;
         ObjectGuid          m_mainAssistantGuid;
