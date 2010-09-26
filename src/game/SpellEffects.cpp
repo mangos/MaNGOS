@@ -2731,6 +2731,19 @@ void Spell::EffectTriggerSpell(SpellEffectIndex effIndex)
                 pet->CastSpell(pet, 28305, true);
             return;
         }
+        // Empower Rune Weapon
+        case 53258:
+        {
+            // remove cooldown of frost/death, undead/blood activated in main spell
+            if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+            {
+                bool res1 = ((Player*)unitTarget)->ActivateRunes(RUNE_FROST, 2);
+                bool res2 = ((Player*)unitTarget)->ActivateRunes(RUNE_DEATH, 2);
+                if (res1 || res2)
+                    ((Player*)unitTarget)->ResyncRunes();
+            }
+            return;
+        }
     }
 
     // normal case
@@ -7913,8 +7926,8 @@ void Spell::EffectActivateRune(SpellEffectIndex eff_idx)
         return;
 
     int32 count = damage;                                   // max amount of reset runes
-    plr->ActivateRunes(RuneType(m_spellInfo->EffectMiscValue[eff_idx]), count);
-    plr->ResyncRunes();
+    if (plr->ActivateRunes(RuneType(m_spellInfo->EffectMiscValue[eff_idx]), count))
+        plr->ResyncRunes();
 }
 
 void Spell::EffectTitanGrip(SpellEffectIndex eff_idx)
