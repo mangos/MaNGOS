@@ -188,3 +188,34 @@ UPDATE `creature_template` SET `VehicleId` = 318, IconName = 'vehichleCursor' WH
 UPDATE `creature_template` SET `VehicleId` = 312, IconName = 'vehichleCursor' WHERE `entry` IN (32633, 32640, 31857, 31858, 31861, 31862, 32212, 32213);
 -- X-53 Touring Rocket
 UPDATE `creature_template` SET `VehicleId` = 774, IconName = 'vehichleCursor' WHERE `entry` = 40725;
+
+# Sniffed by zergtmn
+UPDATE `creature_template` SET `VehicleId` = 328 WHERE `entry` = 32930;
+UPDATE `creature_template` SET `VehicleId` = 380 WHERE `entry` = 32934;
+UPDATE `creature_template` SET `VehicleId` = 336 WHERE `entry` = 33060;
+UPDATE `creature_template` SET `VehicleId` = 335 WHERE `entry` = 33062;
+UPDATE `creature_template` SET `VehicleId` = 337 WHERE `entry` = 33067;
+UPDATE `creature_template` SET `VehicleId` = 347 WHERE `entry` = 33108;
+UPDATE `creature_template` SET `VehicleId` = 338 WHERE `entry` = 33109;
+UPDATE `creature_template` SET `VehicleId` = 387 WHERE `entry` = 33113;
+UPDATE `creature_template` SET `VehicleId` = 341 WHERE `entry` = 33114;
+UPDATE `creature_template` SET `VehicleId` = 342 WHERE `entry` = 33118;
+UPDATE `creature_template` SET `VehicleId` = 345 WHERE `entry` = 33167;
+UPDATE `creature_template` SET `VehicleId` = 348 WHERE `entry` = 33214;
+UPDATE `creature_template` SET `VehicleId` = 381 WHERE `entry` = 33288;
+UPDATE `creature_template` SET `VehicleId` = 353 WHERE `entry` = 33293;
+UPDATE `creature_template` SET `VehicleId` = 356 WHERE `entry` = 33364;
+UPDATE `creature_template` SET `VehicleId` = 357 WHERE `entry` = 33366;
+UPDATE `creature_template` SET `VehicleId` = 358 WHERE `entry` = 33369;
+UPDATE `creature_template` SET `VehicleId` = 370 WHERE `entry` = 33432;
+UPDATE `creature_template` SET `VehicleId` = 371 WHERE `entry` = 33651;
+UPDATE `creature_template` SET `VehicleId` = 372 WHERE `entry` = 33669;
+UPDATE `creature_template` SET `VehicleId` = 373 WHERE `entry` = 33670;
+UPDATE `creature_template` SET `VehicleId` = 108 WHERE `entry` = 33778;
+UPDATE `creature_template` SET `VehicleId` = 385 WHERE `entry` = 33983;
+UPDATE `creature_template` SET `VehicleId` = 390 WHERE `entry` = 34120;
+UPDATE `creature_template` SET `VehicleId` = 392 WHERE `entry` = 34146;
+UPDATE `creature_template` SET `VehicleId` = 395 WHERE `entry` = 34150;
+UPDATE `creature_template` SET `VehicleId` = 396 WHERE `entry` = 34151;
+UPDATE `creature_template` SET `VehicleId` = 397 WHERE `entry` = 34161;
+UPDATE `creature_template` SET `VehicleId` = 399 WHERE `entry` = 34183;
