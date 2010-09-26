@@ -21002,16 +21002,20 @@ void Player::ConvertRune(uint8 index, RuneType newType)
     GetSession()->SendPacket(&data);
 }
 
-void Player::ActivateRunes(RuneType type, uint32 count)
+bool Player::ActivateRunes(RuneType type, uint32 count)
 {
+    bool modify = false;
     for(uint32 j = 0; count > 0 && j < MAX_RUNES; ++j)
     {
         if (GetRuneCooldown(j) && GetCurrentRune(j) == type)
         {
             SetRuneCooldown(j, 0);
             --count;
+            modify = true;
         }
     }
+
+    return modify;
 }
 
 void Player::ResyncRunes()
