@@ -604,11 +604,13 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetTeam() !=_player->GetTeam() )
+    // Frozen Mod
+    /* if (pOther->GetTeam() !=_player->GetTeam() )
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
         return;
-    }
+    } */
+    // Frozen Mod
 
     if (!pOther->IsWithinDistInMap(_player,10.0f,false))
     {

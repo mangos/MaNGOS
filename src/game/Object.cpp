@@ -674,6 +674,53 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                             *data << (m_uint32Values[ index ] & ~(UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER));
                     }
                 }
+                // Frozen Mod
+                else if(index == UNIT_FIELD_BYTES_2 || index == UNIT_FIELD_FACTIONTEMPLATE)
+                {
+                    bool ch = false;
+
+                    if((GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT) && target != this)
+                    {
+                        bool forcefriendly = false; // bool for pets/totems to offload more code from the big if below
+
+                        if(GetTypeId() == TYPEID_UNIT)
+                        {
+                            forcefriendly = (((Creature*)this)->isTotem() || ((Creature*)this)->isPet())
+                            && ((Creature*)this)->GetOwner()->GetTypeId() == TYPEID_PLAYER
+                            && ((Creature*)this)->GetOwner()->IsFriendlyTo(target) // pet owner must be friendly to target
+                            && ((Creature*)this)->GetOwner() != target // no need to send hackfix to pet owner
+                            && (target->IsInSameGroupWith((Player*)((Creature*)this)->GetOwner()) || target->IsInSameRaidWith((Player*)((Creature*)this)->GetOwner()));
+                        }
+
+                        if(((Unit*)this)->IsSpoofSamePlayerFaction() || forcefriendly || (target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && (target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))))
+                        {
+                            if(index == UNIT_FIELD_BYTES_2)
+                            {
+                                DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (flag)", target->GetName(), ((Unit*)this)->GetName());
+                                *data << ( m_uint32Values[ index ] & (UNIT_BYTE2_FLAG_SANCTUARY << 8) ); // this flag is at uint8 offset 1 !!
+                                ch = true;
+                            }
+                            else if(index == UNIT_FIELD_FACTIONTEMPLATE)
+                            {
+                                FactionTemplateEntry const *ft1, *ft2;
+                                ft1 = ((Unit*)this)->getFactionTemplateEntry();
+                                ft2 = ((Unit*)target)->getFactionTemplateEntry();
+
+                                if(ft1 && ft2 && (!ft1->IsFriendlyTo(*ft2) || ((Unit*)this)->IsSpoofSamePlayerFaction()))
+                                {
+                                    uint32 faction = ((Player*)target)->getFaction(); // pretend that all other HOSTILE players have own faction, to allow follow, heal, rezz (trade wont work)
+                                    DEBUG_LOG("-- VALUES_UPDATE: Sending '%s' the blue-group-fix from '%s' (faction %u)", target->GetName(), ((Unit*)this)->GetName(), faction);
+                                    *data << uint32(faction);
+                                    ch = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if(!ch)
+                        *data << m_uint32Values[ index ];
+                }
+                // Frozen Mod
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)
@@ -2202,3 +2249,18 @@ void WorldObject::SetLootRecipient(Unit *unit)
         m_lootGroupRecipientId = group->GetId();
 
 }
+
+// Frozen Mod
+void Object::ForceValuesUpdateAtIndex(uint32 i)
+{
+    m_uint32Values_mirror[i] = GetUInt32Value(i) + 1; // makes server think the field changed
+    if(m_inWorld)
+    {
+        if(!m_objectUpdated)
+        {
+            AddToClientUpdateList();
+            m_objectUpdated = true;
+        }
+    }
+}
+// Frozen Mod

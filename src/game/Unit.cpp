@@ -277,6 +277,11 @@ Unit::Unit()
 
     m_pVehicle = NULL;
     m_pVehicleKit = NULL;
+
+    // Frozen Mod
+    m_spoofSamePlayerFaction = false;
+    // Frozen Mod
+
 }
 
 Unit::~Unit()

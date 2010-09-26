@@ -1944,6 +1944,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void AddPetAura(PetAura const* petSpell);
         void RemovePetAura(PetAura const* petSpell);
 
+        // Frozen Mod
+        inline void SetSpoofSamePlayerFaction(bool b) { m_spoofSamePlayerFaction = b; }
+        inline bool IsSpoofSamePlayerFaction(void)    { return m_spoofSamePlayerFaction; }
+        // Frozen Mod
+
         void SetThreatRedirectionTarget(uint64 guid, uint32 pct)
         {
             m_misdirectionTargetGUID = guid;
@@ -2025,11 +2030,16 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_regenTimer;
         uint32 m_lastManaUseTimer;
 
+        // Frozen Mod
+        bool m_spoofSamePlayerFaction : 1;
+        // Frozen Mod
+
         // Transports
         Transport* m_transport;
 
         VehicleKit* m_pVehicle;
         VehicleKit* m_pVehicleKit;
+
     private:
         void CleanupDeletedAuras();
 
@@ -2065,6 +2075,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint64 m_misdirectionTargetGUID;
 
         uint64 m_TotemSlot[MAX_TOTEM_SLOT];
+
 };
 
 template<typename Func>
