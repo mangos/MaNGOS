@@ -193,6 +193,9 @@ struct ScriptInfo
         {
             uint32 creatureEntry;                           // datalong
             uint32 despawnDelay;                            // datalong2
+            uint32 unused1;                                 // datalong3
+            uint32 unused2;                                 // datalong4
+            uint32 flags;                                   // data_flags
         } summonCreature;
 
         struct                                              // SCRIPT_COMMAND_OPEN_DOOR (11)

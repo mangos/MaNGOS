@@ -486,7 +486,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType &);
 
-        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime);
+        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime, bool asActiveObject = false);
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 
