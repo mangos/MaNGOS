@@ -2146,7 +2146,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     }
 
                     int32 extra_attack_power = CalculateSpellDamage(pVictim, windfurySpellEntry, EFFECT_INDEX_1);
-                    
+
                     // Totem of Splintering
                     if (Aura* aura = GetAura(60764, EFFECT_INDEX_0))
                         extra_attack_power += aura->GetModifier()->m_amount;
@@ -3304,12 +3304,18 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 return SPELL_AURA_PROC_FAILED;
             break;                                   // continue normal case
         }
-        // Finish movies that add combo
+        // Finishing moves that add combo points
         case 14189: // Seal Fate (Netherblade set)
         case 14157: // Ruthlessness
+        case 70802: // Mayhem (Shadowblade sets)
         {
-            // Need add combopoint AFTER finish movie (or they dropped in finish phase)
-            break;
+            // Need add combopoint AFTER finishing move (or they get dropped in finish phase)
+            if (Spell* spell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
+            {
+                spell->AddTriggeredSpell(trigger_spell_id);
+                return SPELL_AURA_PROC_OK;
+            }
+            return SPELL_AURA_PROC_FAILED;
         }
         // Bloodthirst (($m/100)% of max health)
         case 23880:
