@@ -1647,7 +1647,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             float angle = 2.0f * M_PI_F * rand_norm_f();
             float dest_x = m_targets.m_destX + cos(angle) * radius;
             float dest_y = m_targets.m_destY + sin(angle) * radius;
-            float dest_z = m_caster->GetPositionZ();
+            float dest_z = m_targets.m_destZ;
             m_caster->UpdateGroundPositionZ(dest_x, dest_y, dest_z);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
