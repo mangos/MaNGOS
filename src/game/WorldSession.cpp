@@ -528,7 +528,7 @@ const char * WorldSession::GetMangosString( int32 entry ) const
 
 void WorldSession::Handle_NULL( WorldPacket& recvPacket )
 {
-    sLog.outError( "SESSION: received unhandled opcode %s (0x%.4X)",
+    DEBUG_LOG("SESSION: received unimplemented opcode %s (0x%.4X)",
         LookupOpcodeName(recvPacket.GetOpcode()),
         recvPacket.GetOpcode());
 }
@@ -542,7 +542,7 @@ void WorldSession::Handle_EarlyProccess( WorldPacket& recvPacket )
 
 void WorldSession::Handle_ServerSide( WorldPacket& recvPacket )
 {
-    sLog.outError( "SESSION: received server-side opcode %s (0x%.4X)",
+    sLog.outError("SESSION: received server-side opcode %s (0x%.4X)",
         LookupOpcodeName(recvPacket.GetOpcode()),
         recvPacket.GetOpcode());
 }
