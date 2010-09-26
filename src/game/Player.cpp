@@ -20984,11 +20984,23 @@ void Player::ConvertRune(uint8 index, RuneType newType)
     GetSession()->SendPacket(&data);
 }
 
-void Player::ResyncRunes(uint8 count)
+void Player::ActivateRunes(RuneType type, uint32 count)
 {
-    WorldPacket data(SMSG_RESYNC_RUNES, 4 + count * 2);
-    data << uint32(count);
-    for(uint32 i = 0; i < count; ++i)
+    for(uint32 j = 0; count > 0 && j < MAX_RUNES; ++j)
+    {
+        if (GetRuneCooldown(j) && GetCurrentRune(j) == type)
+        {
+            SetRuneCooldown(j, 0);
+            --count;
+        }
+    }
+}
+
+void Player::ResyncRunes()
+{
+    WorldPacket data(SMSG_RESYNC_RUNES, 4 + MAX_RUNES * 2);
+    data << uint32(MAX_RUNES);
+    for(uint32 i = 0; i < MAX_RUNES; ++i)
     {
         data << uint8(GetCurrentRune(i));                   // rune type
         data << uint8(255 - ((GetRuneCooldown(i) / REGEN_TIME_FULL) * 51));     // passed cooldown time (0-255)
