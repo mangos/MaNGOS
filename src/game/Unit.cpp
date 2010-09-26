@@ -1323,8 +1323,16 @@ void Unit::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 cons
     if (castItem)
         DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if(originalCaster.IsEmpty() && triggeredByAura)
-        originalCaster = triggeredByAura->GetCasterGUID();
+    if (originalCaster.IsEmpty() && triggeredByAura)
+    {
+        if (triggeredByAura->GetCasterGUID())
+            originalCaster = triggeredByAura->GetCaster()->GetObjectGuid();
+        else
+        {
+            sLog.outError("CastCustomSpell: spell %i triggered by aura %u (eff %u), but OriginalCaster is NULL.",spellInfo->Id, triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+            return;
+        }
+    }
 
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster);
 
