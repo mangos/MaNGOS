@@ -177,6 +177,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     setFaction(owner->getFaction());
     SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
     SetOwnerGUID(owner->GetGUID());
+    SetCreatorGUID(owner->GetGUID());
 
     if (!SetSummonPosition())
     {
@@ -240,8 +241,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
-    SetCreatorGUID(owner->GetGUID());
-    SetOwnerGUID(owner->GetGUID());
 
     m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
 
@@ -313,7 +312,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     owner->SetPet(this);                                    // in DB stored only full controlled creature
 
-    DEBUG_LOG("New Pet has guid %u", GetGUIDLow());
+    DEBUG_LOG("New pet (loaded from DB) has guid %u", GetGUIDLow());
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
@@ -384,7 +383,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         uint32 curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
-        if (mode != PET_SAVE_AS_CURRENT)
+        if (getPetType() == HUNTER_PET && mode != PET_SAVE_AS_CURRENT)
             RemoveAllAuras();
 
         _SaveSpells();
@@ -512,6 +511,7 @@ void Pet::Update(uint32 diff)
 
             if(!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID()))) || (isControlled() && !owner->GetPetGUID()))
             {
+                sLog.outError("Pet %d lost control, removed.", GetGUID());
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
                 return;
             }
@@ -531,6 +531,7 @@ void Pet::Update(uint32 diff)
 
                 if (needdelete)
                 {
+                    sLog.outError("Pet %d controlled, but not in list, removed.", GetGUID());
                     Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
                     return;
                 }
@@ -542,6 +543,7 @@ void Pet::Update(uint32 diff)
                     m_duration -= (int32)diff;
                 else
                 {
+                    DEBUG_LOG("Pet %d removed with duration expired.", GetGUID());
                     Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
                     return;
                 }
@@ -644,7 +646,7 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
         if(owner->GetTypeId()==TYPEID_PLAYER)
         {
             ((Player*)owner)->RemovePet(this,mode,returnreagent);
-
+            owner->RemovePetFromList(this);
             return;
         }
 
@@ -2600,24 +2602,65 @@ bool Pet::Summon(int32 duration, uint8 counter)
     if (!map)
         return false;
 
+    uint16 level = getLevel() ? getLevel() : owner->getLevel();;
+
     SetPetCounter(counter);
     // set timer for unsummon
     SetDuration(duration);
-    setFaction(owner->getFaction());
-    UpdateWalkMode(owner);
 
     if ( duration > 0 || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->isTotem()))
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
 
-
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
-    SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
-    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+    switch (getPetType())
+    {
+        case GUARDIAN_PET:
+        {
+            SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
+            SetUInt32Value(UNIT_FIELD_FLAGS, 0);
+            SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
+            owner->AddGuardian(this);
+            break;
+        }
+        case SUMMON_PET:
+        {
+            level = owner->getLevel();
+            SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
+            SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            // generate new name for summon pet
+            std::string new_name = sObjectMgr.GeneratePetName(GetEntry());
+            if(!new_name.empty())
+                SetName(new_name);
+            owner->SetPet(this);
+            break;
+        }
+        case HUNTER_PET:
+        {
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
+            SetSheath(SHEATH_STATE_MELEE);
+            RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
+            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
+            SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
+            SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE);
+            owner->SetPet(this);
+            break;
+        }
+        default:
+        {
+            sLog.outError("Pet have incorrect type (%u) for pet creating.", getPetType());
+            return false;
+        }
+    }
 
     if(owner->IsPvP())
         SetPvP(true);
@@ -2625,49 +2668,35 @@ bool Pet::Summon(int32 duration, uint8 counter)
     if(owner->IsFFAPvP())
         SetFFAPvP(true);
 
-    uint16 level = getLevel() ? getLevel() : owner->getLevel();
-
     SetCanModifyStats(true);
     InitStatsForLevel(level, owner);
-    SynchronizeLevelWithOwner();
-    InitPetCreateSpells();
-    InitLevelupSpellsForLevel();
     InitTalentForLevel();
+    InitPetCreateSpells();
+    SynchronizeLevelWithOwner();
+    InitLevelupSpellsForLevel();
     LearnPetPassives();
-    AIM_Initialize();
-
-    if(getPetType() == SUMMON_PET)
-    {
-        // generate new name for summon pet
-        std::string new_name = sObjectMgr.GeneratePetName(GetEntry());
-        if(!new_name.empty())
-            SetName(new_name);
-    }
-    else if(getPetType() == HUNTER_PET)
-    {
-        RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
-        SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
-    }
-
-    CastPetPassiveAuras(true);
     CastPetAuras(true);
-    ApplyAllScalingBonuses(true);
+
+    if (owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        CastPetPassiveAuras(true);
+        ApplyAllScalingBonuses(true);
+    }
 
     SetHealth(GetMaxHealth());
     SetPower(getPowerType(), GetMaxPower(getPowerType()));
-
-    owner->SetPet(this);
+    UpdateWalkMode(owner);
+    AIM_Initialize();
 
     map->Add((Creature*)this);
-
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
         {
             CleanupActionBar();                                     // remove unknown spells from action bar after load
-            ((Player*)owner)->SendTalentsInfoData(true);
             ((Player*)owner)->PetSpellInitialize();
+            ((Player*)owner)->SendTalentsInfoData(true);
         }
 
         SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
@@ -2678,8 +2707,10 @@ bool Pet::Summon(int32 duration, uint8 counter)
 
         if (!GetPetCounter() && getPetType() == HUNTER_PET)
             SavePetToDB(PET_SAVE_AS_CURRENT);
-        else
+        else if (getPetType() != GUARDIAN_PET)
             SavePetToDB(PET_SAVE_NOT_IN_SLOT);
+        else
+            SetNeedSave(false);
     }
     else
     {
@@ -2687,7 +2718,6 @@ bool Pet::Summon(int32 duration, uint8 counter)
         if (((Creature*)owner)->AI())
             ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
     }
-
     return true;
 
 }

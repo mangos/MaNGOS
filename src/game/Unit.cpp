@@ -6162,8 +6162,10 @@ void Unit::SetPet(Pet* pet)
         if(GetTypeId() == TYPEID_PLAYER)
             ((Player*)this)->SendPetGUIDs();
     }
-    else
+    else if (m_groupPets.empty())
         SetPetGUID(0);
+    else
+        SetPetGUID(*m_groupPets.begin());
 }
 
 void Unit::SetCharm(Unit* pet)

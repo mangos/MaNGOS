@@ -600,3 +600,9 @@ DELETE FROM `pet_levelstats` WHERE `creature_entry` = 37994;
 INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
 (37994, 1,  42, 22, 20, 2, 3, 10, 22, 20, 22, 20, 20),
 (37994, 80, 3200, 2800, 4000, 410, 850, 820, 62, 86, 92, 101, 94);
+
+-- Mirror image
+DELETE FROM `pet_levelstats` WHERE `creature_entry` = 31216;
+INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+(31216, 1,  42, 22, 20, 2, 3, 10, 22, 20, 22, 20, 20),
+(31216, 80, 2680, 2400, 8600, 182, 216, 110, 72, 86, 152, 191, 94);
