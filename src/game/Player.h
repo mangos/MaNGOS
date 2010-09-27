@@ -2404,7 +2404,9 @@ class MANGOS_DLL_SPEC Player : public Unit
             if (spellid != 0)
                 SetConvertedBy(index, spellid);
         }
-        void ResyncRunes(uint8 count);
+        void ConvertRune(uint8 index, RuneType newType);
+        bool ActivateRunes(RuneType type, uint32 count);
+        void ResyncRunes();
         void AddRunePower(uint8 index);
         void InitRunes();
 

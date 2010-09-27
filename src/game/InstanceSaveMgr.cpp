@@ -345,6 +345,10 @@ void InstanceResetScheduler::Update()
 
                 time_t next_reset = InstanceResetScheduler::CalculateNextResetTime(mapDiff, resetTime);
 
+                CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty = '%u'", uint64(next_reset), uint32(event.mapid), uint32(event.difficulty));
+
+                SetResetTimeFor(event.mapid, event.difficulty, next_reset);
+
                 ResetEventType type = RESET_EVENT_INFORM_1;
                 for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type+1))
                     if (next_reset - resetEventTypeDelay[type] > now)
