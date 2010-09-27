@@ -669,8 +669,8 @@ MovementFlags const movementOrTurningFlagsMask = MovementFlags(
 enum MovementFlags2
 {
     MOVEFLAG2_NONE              = 0x0000,
-    MOVEFLAG2_UNK1              = 0x0001,
-    MOVEFLAG2_UNK2              = 0x0002,
+    MOVEFLAG2_NO_STRAFE         = 0x0001,
+    MOVEFLAG2_NO_JUMPING        = 0x0002,
     MOVEFLAG2_UNK3              = 0x0004,
     MOVEFLAG2_FULLSPEEDTURNING  = 0x0008,
     MOVEFLAG2_FULLSPEEDPITCHING = 0x0010,

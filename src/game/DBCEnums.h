@@ -428,4 +428,21 @@ enum SpellEffectIndex
 
 #define MAX_EFFECT_INDEX 3
 
+enum VehicleFlags
+{
+    VEHICLE_FLAG_ADJUST_AIM_ANGLE   = 0x00000400,           // Lua_IsVehicleAimAngleAdjustable
+    VEHICLE_FLAG_ADJUST_AIM_POWER   = 0x00000800,           // Lua_IsVehicleAimPowerAdjustable
+    VEHICLE_FLAG_CUSTOM_PITCH       = 0x00000040,           // If set use pitchMin and pitchMax from DBC, otherwise pitchMin = -pi/2, pitchMax = pi/2
+};
+
+enum VehicleSeatFlags
+{
+    SEAT_FLAG_HIDE_PASSENGER        = 0x00000200,           // Passenger is hidden
+    SEAT_FLAG_CAN_CONTROL           = 0x00000800,           // Lua_UnitInVehicleControlSeat
+    SEAT_FLAG_CAN_ATTACK            = 0x00004000,           // Can attack, cast spells and use items from vehicle?
+    SEAT_FLAG_USABLE                = 0x02000000,           // Lua_CanExitVehicle
+    SEAT_FLAG_CAN_SWITCH            = 0x04000000,           // Lua_CanSwitchVehicleSeats
+    SEAT_FLAG_CAN_CAST              = 0x20000000,           // Lua_UnitHasVehicleUI
+};
+
 #endif

@@ -1704,6 +1704,8 @@ struct TotemCategoryEntry
     uint32    categoryMask;                                 // 19 (compatibility mask for same type: different for totems, compatible from high to low for rods)
 };
 
+#define MAX_VEHICLE_SEAT 8
+
 struct VehicleEntry
 {
     uint32  m_ID;                                           // 0
@@ -1712,7 +1714,7 @@ struct VehicleEntry
     float   m_pitchSpeed;                                   // 3
     float   m_pitchMin;                                     // 4
     float   m_pitchMax;                                     // 5
-    uint32  m_seatID[8];                                    // 6-13
+    uint32  m_seatID[MAX_VEHICLE_SEAT];                     // 6-13
     float   m_mouseLookOffsetPitch;                         // 14
     float   m_cameraFadeDistScalarMin;                      // 15
     float   m_cameraFadeDistScalarMax;                      // 16
@@ -1736,7 +1738,7 @@ struct VehicleEntry
     uint32  m_uiLocomotionType;                             // 34
     float   m_msslTrgtImpactTexRadius;                      // 35
     uint32  m_uiSeatIndicatorType;                          // 36
-                                                            // 37, new in 3.1
+                                                            // 37, new in 3.1 - powerType
                                                             // 38, new in 3.1
                                                             // 39, new in 3.1
 };
