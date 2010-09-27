@@ -683,13 +683,13 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     {
                         bool forcefriendly = false; // bool for pets/totems to offload more code from the big if below
 
-                        if(GetTypeId() == TYPEID_UNIT)
+                        if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->GetOwner())
                         {
                             forcefriendly = (((Creature*)this)->isTotem() || ((Creature*)this)->isPet())
-                            && ((Creature*)this)->GetOwner()->GetTypeId() == TYPEID_PLAYER
-                            && ((Creature*)this)->GetOwner()->IsFriendlyTo(target) // pet owner must be friendly to target
-                            && ((Creature*)this)->GetOwner() != target // no need to send hackfix to pet owner
-                            && (target->IsInSameGroupWith((Player*)((Creature*)this)->GetOwner()) || target->IsInSameRaidWith((Player*)((Creature*)this)->GetOwner()));
+                            && (((Creature*)this)->GetOwner()->GetTypeId() == TYPEID_PLAYER
+                                && ((Creature*)this)->GetOwner()->IsFriendlyTo(target)
+                                && ((Creature*)this)->GetOwner() != target
+                                && (target->IsInSameGroupWith((Player*)((Creature*)this)->GetOwner()) || target->IsInSameRaidWith((Player*)((Creature*)this)->GetOwner())));
                         }
 
                         if(((Unit*)this)->IsSpoofSamePlayerFaction() || forcefriendly || (target->GetTypeId() == TYPEID_PLAYER && GetTypeId() == TYPEID_PLAYER && (target->IsInSameGroupWith((Player*)this) || target->IsInSameRaidWith((Player*)this))))
