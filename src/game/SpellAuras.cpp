@@ -7824,9 +7824,6 @@ void Aura::PeriodicDummyTick()
             // Summon Gargoyle
 //            if (spell->SpellFamilyFlags & UI64LIT(0x0000008000000000))
 //                return;
-            // Death Rune Mastery
-//            if (spell->SpellFamilyFlags & UI64LIT(0x0000000000004000))
-//                return;
             // Bladed Armor
             if (spell->SpellIconID == 2653)
             {
@@ -7837,44 +7834,24 @@ void Aura::PeriodicDummyTick()
                 return;
             }
             // Death Rune Mastery
-            if (spell->SpellIconID == 2622)
+            // Reaping
+            // Blood of the North
+            if (spell->SpellIconID == 22 || spell->SpellIconID == 3041 || spell->SpellIconID == 30412)
             {
-                if (target->GetTypeId() != TYPEID_PLAYER || target->isInCombat())
+                if (target->GetTypeId() != TYPEID_PLAYER)
+                    return;
+                if (target->isInCombat())
                     return;
 
-                Player *player = (Player*)target;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
+                Player *plr = (Player*)GetTarget();
+                for(uint32 i = 0; i < MAX_RUNES; ++i)
                 {
-                    if (!player->GetRuneCooldown(i))
-                    {
-                        RuneType type = player->GetBaseRune(i);
-                        if (player->GetCurrentRune(i) == RUNE_DEATH && (type == RUNE_FROST || type == RUNE_UNHOLY) && player->IsRuneConvertedBy(i, spell->Id))
-                        {
-                            player->ConvertRune(i, type);
-                            player->ClearConvertedBy(i);
-                        }
-                    }
+                    RuneType rune = plr->GetCurrentRune(i);
+                    if (rune == RUNE_DEATH)
+                        plr->ConvertRune(i, plr->GetBaseRune(i));
                 }
-            }
-            // Blood of the North and Reaping
-            if (spell->SpellIconID == 3041 || spell->SpellIconID == 22)
-            {
-                if (target->GetTypeId() != TYPEID_PLAYER || target->isInCombat())
-                    return;
 
-                Player *player = (Player*)target;
-                for (uint32 i = 0; i < MAX_RUNES; ++i)
-                {
-                    if (!player->GetRuneCooldown(i) && player->IsRuneConvertedBy(i, spell->Id))
-                    {
-                        RuneType type = player->GetBaseRune(i);
-                        if (player->GetCurrentRune(i) == RUNE_DEATH && type == RUNE_BLOOD)
-                        {
-                            player->ConvertRune(i, type);
-                            player->ClearConvertedBy(i);
-                        }
-                    }
-                }
+                return;
             }
             break;
         }
