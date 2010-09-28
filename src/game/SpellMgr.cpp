@@ -2088,6 +2088,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Blood Presence and Blood Presence (triggered)
                 if (spellInfo_1->SpellIconID == 2636 && spellInfo_2->SpellIconID == 2636)
                     return false;
+
+                // Crypt Fever and Ebon Plague
+                if((spellInfo_1->SpellIconID == 264 && spellInfo_2->SpellIconID == 1933) ||
+                   (spellInfo_2->SpellIconID == 264 && spellInfo_1->SpellIconID == 1933))
+                    return true;
             }
             break;
         default:

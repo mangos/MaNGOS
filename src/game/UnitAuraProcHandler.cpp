@@ -4196,6 +4196,40 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
             }
             break;
         }
+        case 7282:                                          // Crypt Fever & Ebon Plaguebringer
+        {
+            if (!procSpell || pVictim == this)
+                return SPELL_AURA_PROC_FAILED;
+
+            bool HasEP = false;
+            Unit::AuraList const& scriptAuras = GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for(Unit::AuraList::const_iterator i = scriptAuras.begin(); i != scriptAuras.end(); ++i)
+            {
+                if ((*i)->GetSpellProto()->SpellIconID == 1766)
+                {
+                    HasEP = true;
+                    break;
+                }
+            }
+
+            if (!HasEP)
+                switch(triggeredByAura->GetId())
+                {
+                    case 49032: triggered_spell_id = 50508; break;
+                    case 49631: triggered_spell_id = 50509; break;
+                    case 49632: triggered_spell_id = 50510; break;
+                    default: return SPELL_AURA_PROC_FAILED;
+                }
+            else
+                switch(triggeredByAura->GetId())
+                {
+                    case 51099: triggered_spell_id = 51726; break;
+                    case 51160: triggered_spell_id = 51734; break;
+                    case 51161: triggered_spell_id = 51735; break;
+                    default: return SPELL_AURA_PROC_FAILED;
+                }
+            break;
+        }
     }
 
     // not processed
