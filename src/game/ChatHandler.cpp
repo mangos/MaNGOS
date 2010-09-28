@@ -453,17 +453,21 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
             std::string msg;
             recv_data >> msg;
 
-            if((msg.empty() || !_player->isAFK()) && !_player->isInCombat() )
+            if (!_player->isInCombat())
             {
-                if(!_player->isAFK())
+                if (!msg.empty() || !_player->isAFK())
                 {
-                    if(msg.empty())
-                        msg  = GetMangosString(LANG_PLAYER_AFK_DEFAULT);
-                    _player->afkMsg = msg;
+                    if (msg.empty())
+                        _player->afkMsg = GetMangosString(LANG_PLAYER_AFK_DEFAULT);
+                    else
+                        _player->afkMsg = msg;
                 }
-                _player->ToggleAFK();
-                if(_player->isAFK() && _player->isDND())
-                    _player->ToggleDND();
+                if (msg.empty() || !_player->isAFK())
+                {
+                    _player->ToggleAFK();
+                    if (_player->isAFK() && _player->isDND())
+                        _player->ToggleDND();
+                }
             }
         } break;
 
@@ -472,16 +476,17 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
             std::string msg;
             recv_data >> msg;
 
-            if(msg.empty() || !_player->isDND())
+            if (!msg.empty() || !_player->isDND())
             {
-                if(!_player->isDND())
-                {
-                    if(msg.empty())
-                        msg  = GetMangosString(LANG_PLAYER_DND_DEFAULT);
+                if (msg.empty())
+                    _player->dndMsg = GetMangosString(LANG_PLAYER_DND_DEFAULT);
+                else
                     _player->dndMsg = msg;
-                }
+            }
+            if (msg.empty() || !_player->isDND())
+            {
                 _player->ToggleDND();
-                if(_player->isDND() && _player->isAFK())
+                if (_player->isDND() && _player->isAFK())
                     _player->ToggleAFK();
             }
         } break;
@@ -494,7 +499,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleEmoteOpcode( WorldPacket & recv_data )
 {
-    if(!GetPlayer()->isAlive())
+    if(!GetPlayer()->isAlive() || GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         return;
 
     uint32 emote;
@@ -567,8 +572,14 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
         case EMOTE_ONESHOT_NONE:
             break;
         default:
+        {
+            // in feign death state allowed only text emotes.
+            if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+                break;
+
             GetPlayer()->HandleEmoteCommand(emote_id);
             break;
+        }
     }
 
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);

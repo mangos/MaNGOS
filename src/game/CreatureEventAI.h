@@ -56,12 +56,12 @@ enum EventAI_Type
     EVENT_T_QUEST_COMPLETE          = 20,                   //
     EVENT_T_REACHED_HOME            = 21,                   // NONE
     EVENT_T_RECEIVE_EMOTE           = 22,                   // EmoteId, Condition, CondValue1, CondValue2
-    EVENT_T_BUFFED                  = 23,                   // Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
-    EVENT_T_TARGET_BUFFED           = 24,                   // (NOT WORK) Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
+    EVENT_T_AURA                    = 23,                   // Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
+    EVENT_T_TARGET_AURA             = 24,                   // Param1 = SpellID, Param2 = Number of time stacked, Param3/4 Repeat Min/Max
     EVENT_T_SUMMONED_JUST_DIED      = 25,                   // CreatureId, RepeatMin, RepeatMax
     EVENT_T_SUMMONED_JUST_DESPAWN   = 26,                   // CreatureId, RepeatMin, RepeatMax
-    EVENT_T_MISSING_BUFF            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
-    EVENT_T_TARGET_MISSING_BUFF     = 28,                   // (NOT WORK) Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
+    EVENT_T_MISSING_AURA            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
+    EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
 
     EVENT_T_END,
 };
@@ -519,10 +519,10 @@ struct CreatureEventAI_Event
             uint32 conditionValue1;
             uint32 conditionValue2;
         } receive_emote;
-        // EVENT_T_BUFFED                                   = 23
-        // EVENT_T_TARGET_BUFFED                            = 24
-        // EVENT_T_MISSING_BUFF                             = 27
-        // EVENT_T_TARGET_MISSING_BUFF                      = 28
+        // EVENT_T_AURA                                     = 23
+        // EVENT_T_TARGET_AURA                              = 24
+        // EVENT_T_MISSING_AURA                             = 27
+        // EVENT_T_TARGET_MISSING_AURA                      = 28
         struct
         {
             uint32 spellId;

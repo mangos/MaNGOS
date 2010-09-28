@@ -2702,7 +2702,7 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
     if(!obj && sObjectMgr.GetGOData(lowguid))                   // guid is DB guid of object
     {
         MaNGOS::GameObjectWithDbGUIDCheck go_check(*pl,lowguid);
-        MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(pl,obj,go_check);
+        MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(obj,go_check);
         Cell::VisitGridObjects(pl,checker, pl->GetMap()->GetVisibilityDistance());
     }
 

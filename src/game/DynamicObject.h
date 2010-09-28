@@ -21,14 +21,14 @@
 
 #include "Object.h"
 #include "DBCEnums.h"
+#include "Unit.h"
 
-class Unit;
 struct SpellEntry;
 
 class DynamicObject : public WorldObject
 {
     public:
-        typedef std::set<Unit*> AffectedSet;
+        typedef std::set<ObjectGuid> AffectedSet;
         explicit DynamicObject();
 
         void AddToWorld();
@@ -43,9 +43,9 @@ class DynamicObject : public WorldObject
         uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
         Unit* GetCaster() const;
         float GetRadius() const { return m_radius; }
-        bool IsAffecting(Unit *unit) const { return m_affected.find(unit) != m_affected.end(); }
-        void AddAffected(Unit *unit) { m_affected.insert(unit); }
-        void RemoveAffected(Unit *unit) { m_affected.erase(unit); }
+        bool IsAffecting(Unit *unit) const { return m_affected.find(unit->GetObjectGuid()) != m_affected.end(); }
+        void AddAffected(Unit *unit) { m_affected.insert(unit->GetObjectGuid()); }
+        void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
         void Delay(int32 delaytime);
 
         bool IsHostileTo(Unit const* unit) const;

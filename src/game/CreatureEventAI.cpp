@@ -310,7 +310,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_REACHED_HOME:
         case EVENT_T_RECEIVE_EMOTE:
             break;
-        case EVENT_T_BUFFED:
+        case EVENT_T_AURA:
         {
             SpellAuraHolder* holder = m_creature->GetSpellAuraHolder(event.buffed.spellId);
             if (!holder || holder->GetStackAmount() < event.buffed.amount)
@@ -320,13 +320,12 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
             break;
         }
-        case EVENT_T_TARGET_BUFFED:
+        case EVENT_T_TARGET_AURA:
         {
-            //Prevent event from occuring on no unit
-            if (!pActionInvoker)
+            if (!m_creature->isInCombat() || !m_creature->getVictim())
                 return false;
 
-            SpellAuraHolder* holder = pActionInvoker->GetSpellAuraHolder(event.buffed.spellId);
+            SpellAuraHolder* holder = m_creature->getVictim()->GetSpellAuraHolder(event.buffed.spellId);
             if(!holder || holder->GetStackAmount() < event.buffed.amount)
                 return false;
 
@@ -334,7 +333,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
             break;
         }
-        case EVENT_T_MISSING_BUFF:
+        case EVENT_T_MISSING_AURA:
         {
             SpellAuraHolder* holder = m_creature->GetSpellAuraHolder(event.buffed.spellId);
             if (holder && holder->GetStackAmount() >= event.buffed.amount)
@@ -344,13 +343,12 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature,event.buffed.repeatMin,event.buffed.repeatMax);
             break;
         }
-        case EVENT_T_TARGET_MISSING_BUFF:
+        case EVENT_T_TARGET_MISSING_AURA:
         {
-            //Prevent event from occuring on no unit
-            if (!pActionInvoker)
+            if (!m_creature->isInCombat() || !m_creature->getVictim())
                 return false;
 
-            SpellAuraHolder* holder = pActionInvoker->GetSpellAuraHolder(event.buffed.spellId);
+            SpellAuraHolder* holder = m_creature->getVictim()->GetSpellAuraHolder(event.buffed.spellId);
             if (holder && holder->GetStackAmount() >= event.buffed.amount)
                 return false;
 
@@ -1172,10 +1170,10 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
                     case EVENT_T_TARGET_HP:
                     case EVENT_T_TARGET_CASTING:
                     case EVENT_T_FRIENDLY_HP:
-                    case EVENT_T_BUFFED:
-                    case EVENT_T_TARGET_BUFFED:             //FIXME: not work in this way
-                    case EVENT_T_MISSING_BUFF:
-                    case EVENT_T_TARGET_MISSING_BUFF:       //FIXME: not work in this way
+                    case EVENT_T_AURA:
+                    case EVENT_T_TARGET_AURA:
+                    case EVENT_T_MISSING_AURA:
+                    case EVENT_T_TARGET_MISSING_AURA:
                         if (Combat)
                             ProcessEvent(*i);
                         break;
@@ -1260,8 +1258,8 @@ Unit* CreatureEventAI::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
 {
     Unit* pUnit = NULL;
 
-    MaNGOS::MostHPMissingInRange u_check(m_creature, range, MinHPDiff);
-    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRange> searcher(m_creature, pUnit, u_check);
+    MaNGOS::MostHPMissingInRangeCheck u_check(m_creature, range, MinHPDiff);
+    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
 
     /*
     typedef TYPELIST_4(GameObject, Creature*except pets*, DynamicObject, Corpse*Bones*) AllGridObjectTypes;
@@ -1273,15 +1271,15 @@ Unit* CreatureEventAI::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
 
 void CreatureEventAI::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
 {
-    MaNGOS::FriendlyCCedInRange u_check(m_creature, range);
-    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyCCedInRange> searcher(m_creature, _list, u_check);
+    MaNGOS::FriendlyCCedInRangeCheck u_check(m_creature, range);
+    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyCCedInRangeCheck> searcher(_list, u_check);
     Cell::VisitGridObjects(m_creature, searcher, range);
 }
 
 void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, float range, uint32 spellid)
 {
-    MaNGOS::FriendlyMissingBuffInRange u_check(m_creature, range, spellid);
-    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyMissingBuffInRange> searcher(m_creature, _list, u_check);
+    MaNGOS::FriendlyMissingBuffInRangeCheck u_check(m_creature, range, spellid);
+    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyMissingBuffInRangeCheck> searcher(_list, u_check);
     Cell::VisitGridObjects(m_creature,searcher, range);
 }
 

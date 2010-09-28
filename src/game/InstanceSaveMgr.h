@@ -164,7 +164,7 @@ class InstanceResetScheduler
         }
 
         static uint32 GetMaxResetTimeFor(MapDifficulty const* mapDiff);
-
+        static time_t CalculateNextResetTime(MapDifficulty const* mapDiff, time_t prevResetTime);
     public:                                                 // modifiers
         void SetResetTimeFor(uint32 mapid, Difficulty d, time_t t)
         {

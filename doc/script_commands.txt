@@ -137,6 +137,7 @@ spell_scripts
 10 SCRIPT_COMMAND_TEMP_SUMMON_CREATURE      source = any (summoner)
                                             * datalong = creature entry
                                             * datalong2 = despawn_delay
+                                            * data_flags = summon_as_active_object = 0x01
 
 11 SCRIPT_COMMAND_OPEN_DOOR                 source = unit
                                             * datalong = db_guid

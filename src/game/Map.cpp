@@ -1233,14 +1233,6 @@ GridMapLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiq
     return result;
 }
 
-float Map::GetWaterLevel(float x, float y ) const
-{
-    if(GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
-        return gmap->getLiquidLevel(x, y);
-    else
-        return 0;
-}
-
 uint32 Map::GetAreaIdByAreaFlag(uint16 areaflag,uint32 map_id)
 {
     AreaTableEntry const *entry = GetAreaEntryByAreaFlagAndMap(areaflag,map_id);
@@ -1293,6 +1285,57 @@ bool Map::IsUnderWater(float x, float y, float z) const
             return true;
     }
     return false;
+}
+
+/**
+ * Function find higher form water or ground height for current floor
+ *
+ * @param x, y, z    Coordinates original point at floor level
+ *
+ * @param pGround    optional arg for retrun calculated by function work ground height, it let avoid in caller code recalculate height for point if it need
+ *
+ * @param swim       z coordinate can be calculated for select above/at or under z coordinate (for fly or swim/walking by bottom)
+ *                   in last cases for in water returned under water height for avoid client set swimming unit as saty at water.
+ *
+ * @return           calculated z coordinate
+ */
+float Map::GetWaterOrGroundLevel(float x, float y, float z, float* pGround /*= NULL*/, bool swim /*= false*/) const
+{
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        // we need ground level (including grid height version) for proper return water level in point
+        float ground_z = GetHeight(x, y, z, true, DEFAULT_WATER_SEARCH);
+        if (pGround)
+            *pGround = ground_z;
+
+        GridMapLiquidData liquid_status;
+
+        GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        return res ? ( swim ? liquid_status.level - 2.0f : liquid_status.level) : ground_z;
+    }
+
+    return VMAP_INVALID_HEIGHT_VALUE;
+}
+
+float Map::GetWaterLevel(float x, float y, float z, float* pGround /*= NULL*/) const
+{
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        // we need ground level (including grid height version) for proper return water level in point
+        float ground_z = GetHeight(x, y, z, true, DEFAULT_WATER_SEARCH);
+        if (pGround)
+            *pGround = ground_z;
+
+        GridMapLiquidData liquid_status;
+
+        GridMapLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        if (!res)
+            return VMAP_INVALID_HEIGHT_VALUE;
+
+        return liquid_status.level;
+    }
+
+    return VMAP_INVALID_HEIGHT_VALUE;
 }
 
 bool Map::CheckGridIntegrity(Creature* c, bool moved) const
@@ -2233,7 +2276,7 @@ void Map::ScriptsProcess()
                 if (step.script->talk.creatureEntry)
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->talk.creatureEntry, true, step.script->talk.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pBuddy, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pBuddy, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->talk.searchRadius);
                 }
@@ -2522,7 +2565,7 @@ void Map::ScriptsProcess()
                 int32 time_to_despawn = step.script->respawnGo.despawnDelay < 5 ? 5 : step.script->respawnGo.despawnDelay;
 
                 MaNGOS::GameObjectWithDbGUIDCheck go_check(*summoner, step.script->respawnGo.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(summoner, go, go_check);
+                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(go, go_check);
                 Cell::VisitGridObjects(summoner, checker, GetVisibilityDistance());
 
                 if (!go)
@@ -2576,7 +2619,7 @@ void Map::ScriptsProcess()
                 float z = step.script->z;
                 float o = step.script->o;
 
-                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, step.script->summonCreature.despawnDelay);
+                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, step.script->summonCreature.despawnDelay, (step.script->summonCreature.flags & 0x01) ? true: false);
                 if (!pCreature)
                 {
                     sLog.outError("SCRIPT_COMMAND_TEMP_SUMMON (script id %u) failed for creature (entry: %u).", step.script->id, step.script->summonCreature.creatureEntry);
@@ -2611,7 +2654,7 @@ void Map::ScriptsProcess()
                 int32 time_to_close = step.script->openDoor.resetDelay < 15 ? 15 : step.script->openDoor.resetDelay;
 
                 MaNGOS::GameObjectWithDbGUIDCheck go_check(*caster, step.script->openDoor.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(caster, door, go_check);
+                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(door, go_check);
                 Cell::VisitGridObjects(caster, checker, GetVisibilityDistance());
 
                 if (!door)
@@ -2662,7 +2705,7 @@ void Map::ScriptsProcess()
                 int32 time_to_open = step.script->closeDoor.resetDelay < 15 ? 15 : step.script->closeDoor.resetDelay;
 
                 MaNGOS::GameObjectWithDbGUIDCheck go_check(*caster, step.script->closeDoor.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(caster, door, go_check);
+                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(door, go_check);
                 Cell::VisitGridObjects(caster, checker, GetVisibilityDistance());
 
                 if (!door)
@@ -2922,7 +2965,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->movement.creatureEntry, true, step.script->movement.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pMover, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pMover, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->movement.searchRadius);
                 }
@@ -2983,7 +3026,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->activeObject.creatureEntry, true, step.script->activeObject.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pOwner, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->activeObject.searchRadius);
                 }
@@ -3029,7 +3072,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->faction.creatureEntry, true, step.script->faction.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pOwner, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->faction.searchRadius);
                 }
@@ -3079,7 +3122,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->morph.creatureEntry, true, step.script->morph.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pOwner, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->morph.searchRadius);
                 }
@@ -3136,7 +3179,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->mount.creatureEntry, true, step.script->mount.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pOwner, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->mount.searchRadius);
                 }
@@ -3193,7 +3236,7 @@ void Map::ScriptsProcess()
                 else                                        // If step has a buddy entry defined, search for it
                 {
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->run.creatureEntry, true, step.script->run.searchRadius);
-                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pSource, pOwner, u_check);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
 
                     Cell::VisitGridObjects(pSource, searcher, step.script->run.searchRadius);
                 }

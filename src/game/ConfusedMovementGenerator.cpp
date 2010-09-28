@@ -59,7 +59,7 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
             i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
         }
 
-        unit.UpdateGroundPositionZ(i_waypoints[idx][0],i_waypoints[idx][1],z);
+        unit.UpdateAllowedPositionZ(i_waypoints[idx][0],i_waypoints[idx][1],z);
         i_waypoints[idx][2] =  z;
     }
 
