@@ -2071,9 +2071,8 @@ struct WorldMapOverlayEntry
     uint32    ID;                                           // 0
     //uint32    worldMapAreaId;                             // 1 idx in WorldMapArea.dbc
     uint32    areatableID[MAX_WORLD_MAP_OVERLAY_AREA_IDX];  // 2-5
-                                                            // 6-7 always 0, possible part of areatableID[]
-    //char* internal_name                                   // 8
-                                                            // 9-16 some ints
+    //char* internal_name                                   // 6
+                                                            // 7-14 some ints
 };
 
 struct WorldSafeLocsEntry
