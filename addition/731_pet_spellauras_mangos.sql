@@ -72,8 +72,7 @@ INSERT INTO `spell_pet_auras` VALUES
 -- Shadowfiend
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 19668;
 INSERT INTO `spell_pet_auras` VALUES
-(0,0,19668,34947),
-(0,0,19668,34902);
+(0,0,19668,34947);
 
 -- Mage water elemental
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 37994;
@@ -84,5 +83,9 @@ INSERT INTO `spell_pet_auras` VALUES
 -- Mage mirror image
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 31216;
 INSERT INTO `spell_pet_auras` VALUES
-(0,0,31216,34947),
-(0,0,31216,34902);
+(0,0,31216,34947);
+
+-- DK Bloodworms
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 28017;
+INSERT INTO `spell_pet_auras` VALUES
+(0,0,28017,50453);

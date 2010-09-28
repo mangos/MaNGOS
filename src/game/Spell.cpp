@@ -2973,9 +2973,6 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_WARRIOR:
         {
-            // Shattering Throw
-            if (m_spellInfo->Id == 64382)
-                AddTriggeredSpell(64380);                   // Shattering Throw
             // Shield Slam
             if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000020000000000)) && m_spellInfo->Category==1209)
                 if (m_caster->HasAura(58375))               // Glyph of Blocking

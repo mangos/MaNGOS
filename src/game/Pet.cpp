@@ -643,10 +643,10 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
 
     if(owner)
     {
+        owner->RemovePetFromList(this);
         if(owner->GetTypeId()==TYPEID_PLAYER)
         {
             ((Player*)owner)->RemovePet(this,mode,returnreagent);
-            owner->RemovePetFromList(this);
             return;
         }
 
@@ -2261,25 +2261,16 @@ void Pet::ApplyDamageScalingBonus(bool apply)
     switch(getPetType())
     {
         case SUMMON_PET:
+        case GUARDIAN_PET:
         {
             switch(owner->getClass())
             {
                 case CLASS_WARLOCK:
-                {
-                   int32 fire  = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
-                   int32 shadow = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW);
-                   newDamageBonus  = (fire > shadow) ? fire : shadow;
-                   if(newDamageBonus < 0)
-                       newDamageBonus = 0;
+                    newDamageBonus = std::max(owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW),owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE));
                     break;
-                }
                 case CLASS_PRIEST:
-                {
-                   newDamageBonus = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW);
-                   if(newDamageBonus < 0)
-                       newDamageBonus = 0;
+                    newDamageBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
                     break;
-                }
                 case CLASS_DEATH_KNIGHT:
                     newDamageBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
                     break;
@@ -2287,13 +2278,10 @@ void Pet::ApplyDamageScalingBonus(bool apply)
                     newDamageBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
                     break;
                 case CLASS_MAGE:
-                {
-                   newDamageBonus = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST);
-                   if(newDamageBonus < 0)
-                       newDamageBonus = 0;
-                   break;
-                }
+                    newDamageBonus = std::max(owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST),owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE));
+                    break;
                 default:
+                    newDamageBonus = 0;
                     break;
             }
             break;
@@ -2302,8 +2290,12 @@ void Pet::ApplyDamageScalingBonus(bool apply)
             newDamageBonus = owner->GetTotalAttackPowerValue(RANGED_ATTACK);
             break;
         default:
+            newDamageBonus = 0;
             break;
     }
+
+    if (newDamageBonus < 0)
+        newDamageBonus = 0;
 
     if (m_baseBonusData->damageScale == newDamageBonus && !apply)
         return;
@@ -2677,6 +2669,9 @@ bool Pet::Summon(int32 duration, uint8 counter)
     LearnPetPassives();
     CastPetAuras(true);
 
+    if (!m_loading)
+        LoadCreaturesAddon(true);
+
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         CastPetPassiveAuras(true);
@@ -2770,6 +2765,7 @@ void Pet::CastPetPassiveAuras(bool current)
     switch(getPetType())
     {
         case SUMMON_PET:
+        case GUARDIAN_PET:
             creature_id = GetEntry();
             break;
         case HUNTER_PET:
@@ -2818,14 +2814,19 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
         pScalingDataList = sObjectMgr.GetPetScalingData(0);
     else if (getPetType() == HUNTER_PET)                      // Using creature_id = 1 for hunter pets
         pScalingDataList = sObjectMgr.GetPetScalingData(1);
-    else if (getPetType() == GUARDIAN_PET)                    // Using creature_id = 0 for guardians
-        pScalingDataList = sObjectMgr.GetPetScalingData(0);
-    else
-        pScalingDataList = sObjectMgr.GetPetScalingData(GetEntry());
-
-    if (!pScalingDataList)
+    else if (getPetType() == SUMMON_PET || getPetType() == GUARDIAN_PET)
     {
-        pScalingDataList = sObjectMgr.GetPetScalingData(0);   // if no records in DB ising record for creature_id = 0. Must be exist.
+        pScalingDataList = sObjectMgr.GetPetScalingData(GetEntry());
+        if (!pScalingDataList)
+        {
+            DEBUG_LOG("No data list for pet %u! Get zero values", GetEntry());
+            pScalingDataList = sObjectMgr.GetPetScalingData(0);
+        }
+    }
+    else
+    {
+        DEBUG_LOG("No selection type data list for pet %u! Get zero values", GetEntry());
+        pScalingDataList = sObjectMgr.GetPetScalingData(0);
     }
 
     if (!pScalingDataList || pScalingDataList->empty())                            // Zero values...
