@@ -89,3 +89,8 @@ INSERT INTO `spell_pet_auras` VALUES
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 28017;
 INSERT INTO `spell_pet_auras` VALUES
 (0,0,28017,50453);
+
+-- DK Gargoyle
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 27829;
+INSERT INTO `spell_pet_auras` VALUES
+(0,0,27829,54566);

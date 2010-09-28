@@ -2328,10 +2328,9 @@ void Pet::ApplyDamageScalingBonus(bool apply)
             continue;
 
         SpellEffectIndex i = _aura->GetEffIndex();
-                                                                            // Damage scaling auras has only 126 && 127 school_mask
+                                                                            // First scan aura with 127 mask
         if (spellproto->EffectBasePoints[i] == 0
-            && (spellproto->EffectMiscValue[i] == SPELL_SCHOOL_MASK_MAGIC
-                || spellproto->EffectMiscValue[i] == SPELL_SCHOOL_MASK_ALL))
+                && spellproto->EffectMiscValue[i] == SPELL_SCHOOL_MASK_ALL)
         {
             SetCanModifyStats(false);
             if (ReapplyScalingAura(holder, spellproto, i, basePoints))
@@ -2341,7 +2340,37 @@ void Pet::ApplyDamageScalingBonus(bool apply)
         }
     }
 
-    if(needRecalculateStat)
+    if (!needRecalculateStat)                                              // If not found - scan auras with 126 mask
+        for(AuraList::const_iterator itr = scalingAuras.begin(); itr != scalingAuras.end(); ++itr)
+        {
+            Aura* _aura = (*itr);
+            if (!_aura || _aura->IsInUse())
+                continue;
+
+            SpellAuraHolder* holder = _aura->GetHolder();
+
+            if (!holder || holder->IsDeleted() || holder->IsEmptyHolder() || holder->GetCasterGUID() != GetGUID())
+                continue;
+
+            SpellEntry const *spellproto = holder->GetSpellProto();
+
+            if (!spellproto)
+                continue;
+
+            SpellEffectIndex i = _aura->GetEffIndex();
+
+            if (spellproto->EffectBasePoints[i] == 0
+                && spellproto->EffectMiscValue[i] == SPELL_SCHOOL_MASK_MAGIC)
+            {
+                SetCanModifyStats(false);
+                if (ReapplyScalingAura(holder, spellproto, i, basePoints))
+                    needRecalculateStat = true;
+                SetCanModifyStats(true);
+                break;
+            }
+        }
+
+    if (needRecalculateStat)
         UpdateSpellPower();
 }
 

@@ -1995,6 +1995,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 target = this;
                 break;
             }
+            // Guard Dog
+            else if (dummySpell->SpellIconID == 201 && procSpell->SpellIconID == 201)
+            {
+                triggered_spell_id = 54445;
+                target = this;
+                if (pVictim)
+                    pVictim->AddThreat(this,procSpell->EffectBasePoints[0] * triggerAmount / 100.0f);
+                break;
+            }
             break;
         }
         case SPELLFAMILY_PALADIN:
@@ -2936,7 +2945,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     break;
                 }
                 else
-					return SPELL_AURA_PROC_FAILED;
+                    return SPELL_AURA_PROC_FAILED;
             }
             // Mark of Blood
             if (dummySpell->Id == 49005)
@@ -3089,7 +3098,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             {
                 if (!target || !target->isAlive() || this->GetTypeId() != TYPEID_PLAYER)
                     return SPELL_AURA_PROC_FAILED;
-                
+
                 // get highest rank of Death Coil spell
                 const PlayerSpellMap& sp_list = ((Player*)this)->GetSpellMap();
                 for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
@@ -3195,6 +3204,24 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             {
                 if (procSpell && procSpell->Dispel == DISPEL_DISEASE)
                     return SPELL_AURA_PROC_FAILED;
+            }
+            break;
+        }
+        case SPELLFAMILY_PET:
+        {
+            // Improved Cower
+            if (dummySpell->SpellIconID == 958 && procSpell->SpellIconID == 958)
+            {
+                triggered_spell_id = dummySpell->Id == 53180 ? 54200 : 54201;
+                target = this;
+                break;
+            }
+            // Silverback
+            if (dummySpell->SpellIconID == 1582 && procSpell->SpellIconID == 201)
+            {
+                triggered_spell_id = dummySpell->Id == 62764 ? 62800 : 62801;
+                target = this;
+                break;
             }
             break;
         }
