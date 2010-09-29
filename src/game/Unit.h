@@ -1668,7 +1668,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetBaseWeaponDamage(WeaponAttackType attType ,WeaponDamageRange damageRange, float value) { m_weaponDamage[attType][damageRange] = value; }
 
         void SetInFront(Unit const* target);
-        void SetFacingTo(float ori);
+        void SetFacingTo(float ori, bool bToSelf = false);
         void SetFacingToObject(WorldObject* pObject);
 
         // Visibility system
