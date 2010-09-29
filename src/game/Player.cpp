@@ -17968,7 +17968,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     if (pet && m_temporaryUnsummonedPetNumber && m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber() && mode == PET_SAVE_AS_CURRENT)
         mode = PET_SAVE_NOT_IN_SLOT;
 
-    if (returnreagent && pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
+    if (pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;      // this is nonsense, pet will always be != NULL here
@@ -17993,14 +17993,17 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                     }
                 }
             }
+            // Raise Dead hack
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
+                if (SpellEntry const *spellInfo2 = sSpellStore.LookupEntry(46584))
+                {
+                    SendCooldownEvent(spellInfo);
+                    SendCooldownEvent(spellInfo2);
+                }
             // cooldown, only if pet is not death already (corpse)
             if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && pet->getDeathState() != CORPSE)
             {
                 SendCooldownEvent(spellInfo);
-                // Raise Dead hack
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
-                    if (spellInfo = sSpellStore.LookupEntry(46584))
-                        SendCooldownEvent(spellInfo);
             }
         }
     }
@@ -18017,10 +18020,10 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         default:
             if (GetPetGUID() == pet->GetGUID())
                 SetPet(NULL);
-            RemovePetFromList(pet);
             break;
     }
 
+    RemovePetFromList(pet);
     pet->CombatStop();
 
     if (pet->GetNeedSave())

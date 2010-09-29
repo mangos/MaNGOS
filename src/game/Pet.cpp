@@ -42,7 +42,7 @@ m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
 m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
 m_auraUpdateMask(0), m_loading(false),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
-m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL)
+m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL), m_createSpellID(0)
 {
     m_name = "Pet";
     m_regenTimer = 4000;
@@ -133,19 +133,16 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return false;
     }
 
-    uint32 summon_spell_id = fields[17].GetUInt32();
-    SpellEntry const* spellInfo = sSpellStore.LookupEntry(summon_spell_id);
+    if (!GetCreateSpellID())
+        SetCreateSpellID(fields[17].GetUInt32());
 
-    bool is_temporary_summoned = spellInfo && GetSpellDuration(spellInfo) > 0;
+    SpellEntry const* spellInfo = sSpellStore.LookupEntry(GetCreateSpellID());
 
-    // check temporary summoned pets like mage water elemental
-/*    if (current && is_temporary_summoned)
-    {
-        delete result;
-        return false;
-    }
-*/
+    if (spellInfo && GetSpellDuration(spellInfo) > 0 )
+        SetDuration(GetSpellDuration(spellInfo));
+
     PetType pet_type = PetType(fields[18].GetUInt8());
+
     if(pet_type == HUNTER_PET)
     {
         CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petentry);
@@ -175,9 +172,10 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     setPetType(pet_type);
     setFaction(owner->getFaction());
-    SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
     SetOwnerGUID(owner->GetGUID());
     SetCreatorGUID(owner->GetGUID());
+    SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
+
 
     if (!SetSummonPosition())
     {
@@ -273,7 +271,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     delete result;
 
     //init AB
-    if (is_temporary_summoned)
+    if (isTemporarySummoned())
     {
         // Temporary summoned pets always have initial spell list at load
         InitPetCreateSpells();
@@ -2626,10 +2624,12 @@ bool Pet::Summon(int32 duration, uint8 counter)
     uint16 level = getLevel() ? getLevel() : owner->getLevel();;
 
     SetPetCounter(counter);
+    if (GetCreateSpellID())
+        SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
     // set timer for unsummon
     SetDuration(duration);
 
-    if ( duration > 0 || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->isTotem()))
+    if ( isTemporarySummoned() || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->isTotem()))
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
@@ -2883,11 +2883,11 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
              m_PetScalingData->powerregenScale  += pData->powerregenScale;
              for (int i = 0; i < MAX_STATS; i++)
              {
-                  m_PetScalingData->statScale[i] = pData->statScale[i];
+                  m_PetScalingData->statScale[i] += pData->statScale[i];
              }
              for (int i = 0; i < MAX_SPELL_SCHOOL; i++)
              {
-                  m_PetScalingData->resistanceScale[i] = pData->resistanceScale[i];
+                  m_PetScalingData->resistanceScale[i] += pData->resistanceScale[i];
              }
          }
     }

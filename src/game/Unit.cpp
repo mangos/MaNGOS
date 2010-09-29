@@ -6193,7 +6193,8 @@ void Unit::RemoveGuardian( Pet* pet )
 
     if(GetTypeId() == TYPEID_PLAYER)
     {
-        SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+        uint32 SpellID = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        SpellEntry const *spellInfo = sSpellStore.LookupEntry(SpellID);
         if (spellInfo && spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
             ((Player*)this)->AddSpellAndCategoryCooldowns(spellInfo, 0, NULL,true);
     }

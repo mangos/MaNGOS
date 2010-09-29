@@ -264,6 +264,8 @@ class Pet : public Creature
         void SetPetCounter(uint8 counter) { m_petCounter = counter; }
         bool SetSummonPosition(float x = 0.0f, float y = 0.0f, float z = 0.0f);
         bool Summon(int32 duration = 0, uint8 counter = 0);
+        void SetCreateSpellID(uint32 SpellID) { m_createSpellID = SpellID; }
+        uint32 GetCreateSpellID() { return m_createSpellID; }
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }
@@ -282,6 +284,7 @@ class Pet : public Creature
         uint8   m_petCounter;
         PetScalingData*  m_PetScalingData;
         PetScalingData*  m_baseBonusData;
+        uint32  m_createSpellID;
 
         DeclinedName *m_declinedname;
 
