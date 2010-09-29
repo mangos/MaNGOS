@@ -36,6 +36,11 @@ uint32 urand (uint32 min, uint32 max)
     return mtRand->randInt (max - min) + min;
 }
 
+float frand (float min, float max)
+{
+    return mtRand->randExc (max - min) + min;
+}
+
 int32 rand32 ()
 {
     return mtRand->randInt ();
