@@ -40,17 +40,15 @@ INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`
 -- Pet 1 - default hunter pet
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 1;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellhit`, `hit`, `expertize`, `attackspeed`, `crit`, `regen`) VALUES
-(1, 0, 0, 1000, 0, 1500, 0, 0, 30, 0, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 22, 13, 100, 100, 100, 100, 0, 0),
-(1, 62758, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 0, 0, 0, 0),
-(1, 62762, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 0, 0, 0, 0);
+(1,     0, 0, 1050, 0, 1500, 0, 0, 45, 0, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 22, 13, 100, 100, 100, 100, 0, 0),
+(1, 62758, 0,    0, 0,    0, 0, 0,  9, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,   0,  6,  3,   0,   0,   0,   0, 0, 0),
+(1, 62762, 0,    0, 0,    0, 0, 0, 18, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,   0, 12,  6,   0,   0,   0,   0, 0, 0);
 
 -- Pet 26611 - shaman spirit wolf
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 29264;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellhit`, `hit`, `expertize`, `attackspeed`, `crit`, `regen`) VALUES
-(29264, 0, 0, 1000, 0, 1500, 0, 0, 30, 0, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 22, 13, 100, 100, 100, 100, 0, 0),
-(29264, 62758, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 0, 0, 0, 0),
-(29264, 62762, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 15, 0, 0, 0, 0, 0, 0),
-(29264, 63271, 0, 0, 0, 0, 0, 0, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(29264,     0, 0, 1000, 0, 1500, 0, 0, 30, 0, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 22, 13, 100, 100, 100, 100, 0, 0),
+(29264, 63271, 0,    0, 0,    0, 0, 0, 30, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,   0,   0,   0,   0, 0, 0);
 
 -- Pet 26125 - DK ghoul
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 26125;
@@ -74,8 +72,8 @@ INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`
 -- Pet 1860 - warlock voidwalker
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 1860;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spellhit`, `hit`, `expertize`, `attackspeed`, `crit`, `regen`) VALUES
-(1860, 0, 0, 1100, 0, 1150, 0, 0, 75, 30, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 57, 15, 100, 100, 100, 100, 0, 20),
-(1860, 57277, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(1860,     0, 0, 1100, 0, 1150, 0, 0, 75, 30, 0, 35, 40, 40, 40, 40, 40, 40, 20, 200, 57, 15, 100, 100, 100, 100, 0, 20),
+(1860, 57277, 0,    0, 0,    0, 0, 0, 20,  0, 0,  0,  0,  0,  0,  0,  0,  0,  0,   0,  0,  0,   0,   0,   0,   0, 0,  0);
 
 -- Pet 1863 - warlock succubus
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 1863;
