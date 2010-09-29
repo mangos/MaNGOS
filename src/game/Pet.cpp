@@ -1861,10 +1861,6 @@ bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint3
     if(getPetType() == MINI_PET)                            // always non-attackable
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-    // Bloodworms
-    if (GetEntry() == 28017)
-        CastSpell(this, 50453, true);
-
     return true;
 }
 
