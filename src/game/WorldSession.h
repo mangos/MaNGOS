@@ -642,6 +642,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         //Pet
         void HandlePetAction( WorldPacket & recv_data );
+        void HandlePetStopAttack(WorldPacket& recv_data);
         void HandlePetNameQueryOpcode( WorldPacket & recv_data );
         void HandlePetSetAction( WorldPacket & recv_data );
         void HandlePetAbandon( WorldPacket & recv_data );
