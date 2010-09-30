@@ -57,6 +57,7 @@ INSERT INTO `spell_pet_auras` VALUES
 -- Shaman wolf
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 29264;
 INSERT INTO `spell_pet_auras` VALUES
+(0,0,29264,58877),
 (0,0,29264,34902),
 (0,0,29264,34903),
 (0,0,29264,34904),

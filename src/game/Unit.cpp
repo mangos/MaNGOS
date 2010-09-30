@@ -6154,8 +6154,7 @@ void Unit::SetPet(Pet* pet)
 {
     if (pet)
     {
-        if (!pet->GetPetCounter())
-            SetPetGUID(pet->GetGUID()) ;  //Using last pet guid for player
+        SetPetGUID(pet->GetGUID()) ;  //Using last pet guid for player
 
         AddPetToList(pet);
 

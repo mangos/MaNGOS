@@ -150,8 +150,7 @@ class Pet : public Creature
 
         bool IsPermanentPetFor(Player* owner);              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-        bool Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
-        bool CreateBaseAtCreature(Creature* creature);
+        bool CreateBaseAtCreature(Creature* creature, Unit* owner);
         bool LoadPetFromDB( Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false );
         void SavePetToDB(PetSaveMode mode);
         void Remove(PetSaveMode mode, bool returnreagent = false);
@@ -263,9 +262,11 @@ class Pet : public Creature
         uint8 GetPetCounter() { return m_petCounter; }
         void SetPetCounter(uint8 counter) { m_petCounter = counter; }
         bool SetSummonPosition(float x = 0.0f, float y = 0.0f, float z = 0.0f);
-        bool Summon(int32 duration = 0, uint8 counter = 0);
+        bool Summon();
         void SetCreateSpellID(uint32 SpellID) { m_createSpellID = SpellID; }
         uint32 GetCreateSpellID() { return m_createSpellID; }
+        bool Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number, Unit* owner);
+        bool Create (Unit* owner, uint32 Entry);
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }

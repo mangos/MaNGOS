@@ -17971,10 +17971,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if (pet && mode != PET_SAVE_AS_CURRENT && !InBattleGround())
     {
-        //returning of reagents only for players, so best done here
-        uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;      // this is nonsense, pet will always be != NULL here
-
-        if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId))
+        if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetCreateSpellID()))
         {
             // returning of reagents
             if (returnreagent)
@@ -17994,13 +17991,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                     }
                 }
             }
-            // Raise Dead hack
-            if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
-                if (SpellEntry const *spellInfo2 = sSpellStore.LookupEntry(46584))
-                {
-                    SendCooldownEvent(spellInfo);
-                    SendCooldownEvent(spellInfo2);
-                }
             // cooldown, only if pet is not death already (corpse)
             if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && pet->getDeathState() != CORPSE)
             {
@@ -18009,6 +17999,15 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         }
     }
 
+    // Raise Dead hack
+    if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetCreateSpellID()))
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
+            if (SpellEntry const *spellInfo2 = sSpellStore.LookupEntry(46584))
+            {
+                AddSpellAndCategoryCooldowns(spellInfo,0,NULL,true);
+                SendCooldownEvent(spellInfo);
+                SendCooldownEvent(spellInfo2);
+            }
     // only if current pet in slot
     switch(pet->getPetType())
     {
