@@ -31,31 +31,29 @@
 
 void WorldSession::HandlePetAction( WorldPacket & recv_data )
 {
-    DEBUG_LOG("WORLD: Received CMSG_PET_ACTION");
-    recv_data.hexlike();
-
-    uint64 guid1;
+    ObjectGuid petGuid;
     uint32 data;
-    uint64 guid2;
-    recv_data >> guid1;                                     //pet guid
+    ObjectGuid targetGuid;
+    recv_data >> petGuid;
     recv_data >> data;
-    recv_data >> guid2;                                     //tag guid
+    recv_data >> targetGuid;
 
     uint32 spellid = UNIT_ACTION_BUTTON_ACTION(data);
     uint8 flag = UNIT_ACTION_BUTTON_TYPE(data);             //delete = 0x07 CastSpell = C1
 
+    DETAIL_LOG("HandlePetAction: %s flag is %u, spellid is %u, target %s.", petGuid.GetString().c_str(), uint32(flag), spellid, targetGuid.GetString().c_str());
+
     // used also for charmed creature/player
-    Unit* pet = _player->GetMap()->GetUnit(guid1);
-    DETAIL_LOG("HandlePetAction.Pet %u flag is %u, spellid is %u, target %u.", uint32(GUID_LOPART(guid1)), uint32(flag), spellid, uint32(GUID_LOPART(guid2)) );
+    Unit* pet = _player->GetMap()->GetUnit(petGuid);
     if (!pet)
     {
-        sLog.outError( "Pet %u not exist.", uint32(GUID_LOPART(guid1)) );
+        sLog.outError("HandlePetAction: %s not exist.", petGuid.GetString().c_str());
         return;
     }
 
-    if (pet != GetPlayer()->GetPet() && pet != GetPlayer()->GetCharm())
+    if (GetPlayer()->GetGUID() != pet->GetCharmerOrOwnerGUID())
     {
-        sLog.outError("HandlePetAction.Pet %u isn't pet of player %s.", uint32(GUID_LOPART(guid1)), GetPlayer()->GetName() );
+        sLog.outError("HandlePetAction: %s isn't controlled by %s.", petGuid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
         return;
     }
 
@@ -87,48 +85,44 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
     {
         for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
              if (Pet* _pet = _player->GetMap()->GetPet(*itr))
-                 _pet->DoPetAction(_player, flag, spellid, _pet->GetGUID(), guid2);
+                 _pet->DoPetAction(_player, flag, spellid, _pet->GetObjectGuid(), targetGuid);
     }
     else
-        pet->DoPetAction(_player, flag, spellid, guid1, guid2);
+        pet->DoPetAction(_player, flag, spellid, petGuid, targetGuid);
 }
 
-void WorldSession::HandlePetStopAttackOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_PET_STOP_ATTACK");
 
     ObjectGuid petGuid;
     recv_data >> petGuid;
 
-    // used also for charmed creature/player
-    Unit* pet = ObjectAccessor::GetUnit(*GetPlayer(), petGuid);
-
+    Unit* pet = GetPlayer()->GetMap()->GetUnit(petGuid);    // pet or controlled creature/player
     if (!pet)
     {
         sLog.outError("%s doesn't exist.", petGuid.GetString().c_str());
         return;
     }
 
-    if (pet != GetPlayer()->GetPet() && pet != GetPlayer()->GetCharm())
+    if (GetPlayer()->GetGUID() != pet->GetCharmerOrOwnerGUID())
     {
-        sLog.outError("%s isn't pet or charm of player %s.", petGuid.GetString().c_str(), GetPlayer()->GetName());
+        sLog.outError("HandlePetStopAttack: %s isn't charm/pet of %s.", petGuid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
         return;
     }
 
     if (!pet->isAlive())
         return;
 
-    GroupPetList m_groupPets = _player->GetPets();
+    GroupPetList m_groupPets = GetPlayer()->GetPets();
     if (!m_groupPets.empty())
     {
         for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
              if (Pet* _pet = GetPlayer()->GetMap()->GetPet(*itr))
-             {
                  _pet->AttackStop();
-                 _pet->StopMoving();
-                 _pet->GetMotionMaster()->Clear();
-             }
     }
+    else
+        pet->AttackStop();
 }
 
 void WorldSession::HandlePetNameQueryOpcode( WorldPacket & recv_data )
@@ -494,12 +488,12 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 
     DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, cast_count: %u, spellid %u, unk_flags %u", cast_count, spellid, unk_flags);
 
-    if (!_player->GetPet() && !_player->GetCharm())
+    if (!GetPlayer()->GetPet() && !GetPlayer()->GetCharm())
         return;
 
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
 
-    if (!pet || (pet != _player->GetPet() && pet!= _player->GetCharm()))
+    if (!pet || (pet != GetPlayer()->GetPet() && pet != GetPlayer()->GetCharm()))
     {
         sLog.outError( "HandlePetCastSpellOpcode: Pet %u isn't pet of player %s .", uint32(GUID_LOPART(guid)),GetPlayer()->GetName() );
         return;

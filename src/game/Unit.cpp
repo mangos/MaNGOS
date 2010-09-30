@@ -9994,13 +9994,13 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
     }
 }
 
-void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1, uint64 guid2 )
+void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid petGuid, ObjectGuid targetGuid)
 {
     switch(flag)
     {
         case ACT_COMMAND:                                   //0x07
        // Maybe exists some flag that disable it at client side
-            if (GUID_HIPART(guid1) == HIGHGUID_VEHICLE)
+            if (petGuid.IsVehicle())
                 return;
 
             switch(spellid)
@@ -10018,8 +10018,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                     break;
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
                 {
-                    const uint64& selguid = owner->GetSelection();
-                    Unit *TargetUnit = owner->GetMap()->GetUnit(selguid);
+                    Unit *TargetUnit = owner->GetMap()->GetUnit(targetGuid);
                     if(!TargetUnit)
                         return;
 
@@ -10039,7 +10038,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                         if (hasUnitState(UNIT_STAT_CONTROLLED))
                         {
                             Attack(TargetUnit, true);
-                            SendPetAIReaction(guid1);
+                            SendPetAIReaction();
                         }
                         else
                         {
@@ -10054,7 +10053,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                             else
                             {
                                 // 90% chance for pet and 100% chance for charmed creature
-                                SendPetAIReaction(guid1);
+                                SendPetAIReaction();
                             }
                         }
 
@@ -10094,8 +10093,8 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
         {
             Unit* unit_target = NULL;
 
-            if(guid2)
-                unit_target = owner->GetMap()->GetUnit(guid2);
+            if (!targetGuid.IsEmpty())
+                unit_target = owner->GetMap()->GetUnit(targetGuid);
 
             // do not cast unknown spells
             SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellid );
@@ -10156,9 +10155,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                 if(((Creature*)this)->isPet() && (((Pet*)this)->getPetType() == SUMMON_PET) && (this != unit_target) && (urand(0, 100) < 10))
                     SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
                 else
-                {
-                    SendPetAIReaction(guid1);
-                }
+                    SendPetAIReaction();
 
                 if( unit_target && !owner->IsFriendlyTo(unit_target) && !HasAuraType(SPELL_AURA_MOD_POSSESS))
                 {
@@ -10217,7 +10214,7 @@ void Unit::DoPetCastSpell( Player *owner, uint8 cast_count, SpellCastTargets tar
             if(((Pet*)pet)->getPetType() == SUMMON_PET && (urand(0, 100) < 10))
                 pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
             else
-                pet->SendPetAIReaction(pet->GetGUID());
+                pet->SendPetAIReaction();
         }
 
         spell->prepare(&(spell->m_targets));
@@ -10516,14 +10513,14 @@ void Unit::SendPetTalk (uint32 pettalk)
     ((Player*)owner)->GetSession()->SendPacket(&data);
 }
 
-void Unit::SendPetAIReaction(uint64 guid)
+void Unit::SendPetAIReaction()
 {
     Unit* owner = GetOwner();
     if(!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     WorldPacket data(SMSG_AI_REACTION, 8 + 4);
-    data << uint64(guid);
+    data << GetObjectGuid();
     data << uint32(AI_REACTION_HOSTILE);
     ((Player*)owner)->GetSession()->SendPacket(&data);
 }
