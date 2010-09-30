@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10503_02_characters_gameobject_respawn` bit(1) default NULL
+  `required_10568_01_characters_character_tutorial` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -964,7 +964,6 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `character_tutorial`;
 CREATE TABLE `character_tutorial` (
   `account` bigint(20) unsigned NOT NULL auto_increment COMMENT 'Account Identifier',
-  `realmid` int(11) unsigned NOT NULL default '0' COMMENT 'Realm Identifier',
   `tut0` int(11) unsigned NOT NULL default '0',
   `tut1` int(11) unsigned NOT NULL default '0',
   `tut2` int(11) unsigned NOT NULL default '0',
@@ -973,8 +972,7 @@ CREATE TABLE `character_tutorial` (
   `tut5` int(11) unsigned NOT NULL default '0',
   `tut6` int(11) unsigned NOT NULL default '0',
   `tut7` int(11) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`account`,`realmid`),
-  KEY acc_key (`account`)
+  PRIMARY KEY  (`account`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
 --
