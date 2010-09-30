@@ -1880,7 +1880,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 64385:                                 // Spinning (from Unusual Compass)
                 {
-                    m_caster->SetFacingTo(frand(0, M_PI*2), true);
+                    m_caster->SetFacingTo(frand(0, M_PI_F*2), true);
                     return;
                 }
                 case 67019:                                 // Flask of the North

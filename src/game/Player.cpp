@@ -523,10 +523,6 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_ammoDPS = 0.0f;
 
     m_temporaryUnsummonedPetNumber = 0;
-    //cache for UNIT_CREATED_BY_SPELL to allow
-    //returning reagents for temporarily removed pets
-    //when dying/logging out
-    m_oldpetspell = 0;
 
     ////////////////////Rest System/////////////////////
     time_inn_enter=0;
@@ -21968,10 +21964,7 @@ void Player::UnsummonPetTemporaryIfAny()
         return;
 
     if(!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned() )
-    {
         m_temporaryUnsummonedPetNumber = pet->GetCharmInfo()->GetPetNumber();
-        m_oldpetspell = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-    }
 
     RemovePet(pet, PET_SAVE_AS_CURRENT);
 }

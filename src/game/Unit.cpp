@@ -10007,13 +10007,13 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
             {
                 case COMMAND_STAY:                          //flat=1792  //STAY
                     StopMoving();
-                    GetMotionMaster()->Clear();
+                    GetMotionMaster()->Clear(false);
                     GetMotionMaster()->MoveIdle();
                     GetCharmInfo()->SetCommandState( COMMAND_STAY );
                     break;
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
                     AttackStop();
-                    GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,((Creature*)this)->isPet() ? ((Pet*)this)->GetPetFollowAngle() : PET_FOLLOW_ANGLE);
+                    GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,((Pet*)this)->GetPetFollowAngle());
                     GetCharmInfo()->SetCommandState( COMMAND_FOLLOW );
                     break;
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
@@ -10036,14 +10036,20 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                         if (getVictim())
                             AttackStop();
 
-                        if(GetTypeId() != TYPEID_PLAYER)
+                        if (hasUnitState(UNIT_STAT_CONTROLLED))
+                        {
+                            Attack(TargetUnit, true);
+                            SendPetAIReaction(guid1);
+                        }
+                        else
                         {
                             GetMotionMaster()->Clear();
+
                             if (((Creature*)this)->AI())
                                 ((Creature*)this)->AI()->AttackStart(TargetUnit);
 
-                            //10% chance to play special pet attack talk, else growl
-                            if(((Creature*)this)->isPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != TargetUnit && urand(0, 100) < 10)
+                            // 10% chance to play special pet attack talk, else growl
+                            if(((Creature*)this)->isPet() && ((Pet*)this)->getPetType() == SUMMON_PET && this != TargetUnit && roll_chance_i(10))
                                 SendPetTalk((uint32)PET_TALK_ATTACK);
                             else
                             {
@@ -10051,11 +10057,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, uint64 guid1,
                                 SendPetAIReaction(guid1);
                             }
                         }
-                        else                                // charmed player
-                        {
-                            Attack(TargetUnit,true);
-                            SendPetAIReaction(guid1);
-                        }
+
                     }
                     break;
                 }
