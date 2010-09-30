@@ -2691,7 +2691,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         // Temporary removed pet cache
         uint32 m_temporaryUnsummonedPetNumber;
-        uint32 m_oldpetspell;
 
         AchievementMgr m_achievementMgr;
         ReputationMgr  m_reputationMgr;
