@@ -1507,6 +1507,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetTargetGUID(uint64 targetGuid) { SetUInt64Value(UNIT_FIELD_TARGET, targetGuid); }
         uint64 GetChannelObjectGUID() const { return GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGUID(uint64 targetGuid) { SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
+        void SetCritterGUID(uint64 critter) { SetUInt64Value(UNIT_FIELD_CRITTER, critter); }
+        uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
 
         uint64 GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
         uint64 GetCharmerOrOwnerOrOwnGUID() const
