@@ -1018,6 +1018,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\VehicleHandler.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\VoiceChatHandler.cpp"
 				>
 			</File>
