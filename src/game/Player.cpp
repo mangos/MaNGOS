@@ -593,7 +593,6 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_summon_y = 0.0f;
     m_summon_z = 0.0f;
 
-    m_miniPet = 0;
     m_contestedPvPTimer = 0;
 
     m_declinedname = NULL;
@@ -18004,54 +18003,8 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                 SendCooldownEvent(spellInfo);
                 SendCooldownEvent(spellInfo2);
             }
-    // only if current pet in slot
-    switch(pet->getPetType())
-    {
-        case MINI_PET:
-            m_miniPet = 0;
-            break;
-        case GUARDIAN_PET:
-            RemoveGuardian(pet);
-            break;
-        default:
-            if (GetPetGUID() == pet->GetGUID())
-                SetPet(NULL);
-            break;
-    }
 
-    RemovePetFromList(pet);
-    pet->CombatStop();
-
-    if (pet->GetNeedSave())
-        pet->SavePetToDB(mode);
-
-    pet->AddObjectToRemoveList();
-    pet->m_removed = true;
-
-    if (pet->isControlled())
-    {
-        RemovePetActionBar();
-
-        if(GetGroup())
-            SetGroupUpdateFlag(GROUP_UPDATE_PET);
-    }
-}
-
-void Player::RemoveMiniPet()
-{
-    if (Pet* pet = GetMiniPet())
-    {
-        pet->Remove(PET_SAVE_AS_DELETED);
-        m_miniPet = 0;
-    }
-}
-
-Pet* Player::GetMiniPet() const
-{
-    if (!m_miniPet)
-        return NULL;
-
-    return GetMap()->GetPet(m_miniPet);
+    pet->_Remove(mode, returnreagent);
 }
 
 void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const

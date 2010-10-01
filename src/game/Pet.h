@@ -267,6 +267,8 @@ class Pet : public Creature
         uint32 GetCreateSpellID() { return m_createSpellID; }
         bool Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number, Unit* owner);
         bool Create (Unit* owner, uint32 Entry);
+        bool IsInWorld() const { return ( !m_loading && !m_removed && Object::IsInWorld()); }
+        void _Remove(PetSaveMode mode, bool returnreagent = false);
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }

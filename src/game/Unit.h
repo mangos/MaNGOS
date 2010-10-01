@@ -1509,6 +1509,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetChannelObjectGUID(uint64 targetGuid) { SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
         void SetCritterGUID(uint64 critter) { SetUInt64Value(UNIT_FIELD_CRITTER, critter); }
         uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
+        void RemoveMiniPet();
+        Pet* GetMiniPet() const;
+        void SetMiniPet(Unit* pet) { SetCritterGUID(pet->GetGUID()); }
 
         uint64 GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
         uint64 GetCharmerOrOwnerOrOwnGUID() const
@@ -1565,9 +1568,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void _RemoveTotem(Totem* totem);                    // only for call from Totem class
 
         template<typename Func>
-        void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms);
+        void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet = false);
         template<typename Func>
-        bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const;
+        bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet = false) const;
 
         bool AddSpellAuraHolder(SpellAuraHolder *holder);
         void AddAuraToModList(Aura *aura);
@@ -2082,10 +2085,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 };
 
 template<typename Func>
-void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms)
+void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet)
 {
-    if (Pet* pet = GetPet())
-        func(pet);
+   for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+       if (Pet* pet = _GetPet(*itr))
+           func(pet);
 
     if (withGuardians)
     {
@@ -2104,15 +2108,20 @@ void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool wit
     if (withCharms)
         if (Unit* charm = GetCharm())
             func(charm);
+
+    if (withMiniPet)
+        if(Unit* mini = GetMiniPet())
+            func(mini);
 }
 
-
 template<typename Func>
-bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const
+bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet) const
 {
-    if (Pet const* pet = GetPet())
-        if (func(pet))
-            return true;
+
+   for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+       if (Pet* pet = _GetPet(*itr))
+           if (func(pet))
+               return true;
 
     if (withGuardians)
     {
@@ -2134,6 +2143,11 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
     if (withCharms)
         if (Unit const* charm = GetCharm())
             if (func(charm))
+                return true;
+
+    if (withMiniPet)
+        if(Unit const* mini = GetMiniPet())
+            if (func(mini))
                 return true;
 
     return false;

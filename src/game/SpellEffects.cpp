@@ -2695,12 +2695,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     return;
-                if (m_caster->GetPet())
-                {
-                    SendCastResult(SPELL_FAILED_ALREADY_HAVE_SUMMON);
-                    ((Player*)m_caster)->SendCooldownEvent(m_spellInfo);
-                    return;
-                }
 
                 uint32 SpellID = 0;
                 if (m_caster->HasSpell(52143))
@@ -2708,14 +2702,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 else
                     SpellID = m_spellInfo->EffectBasePoints[EFFECT_INDEX_1]+1;
 
-                if (m_caster->HasAura(60200))
+                if (unitTarget && !unitTarget->isAlive())
                 {
-                    m_caster->CastSpell(m_caster,SpellID,true);
+                    m_caster->CastSpell(unitTarget->GetPositionX(),unitTarget->GetPositionY(),unitTarget->GetPositionZ(),SpellID,true);
+                    unitTarget->RemoveFromWorld();
                     return;
                 }
-                if (unitTarget && unitTarget->GetObjectGuid().IsCorpse())
+                else if (m_caster->HasAura(60200))
                 {
-                    unitTarget->RemoveFromWorld();
                     m_caster->CastSpell(m_caster,SpellID,true);
                     return;
                 }
@@ -2726,9 +2720,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
                 else
+                {
                     SendCastResult(SPELL_FAILED_REAGENTS);
                     ((Player*)m_caster)->SendCooldownEvent(m_spellInfo);
-                return;
+                    finish();
+                    return;
+                }
             }
             // Death Grip
             else if (m_spellInfo->Id == 49576)
@@ -7164,6 +7161,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     break;
                 }
+                // Raise dead effect - prevent ScriptEffect execution
+                case 46584:
+                       return;
                 default:
                     break;
             }

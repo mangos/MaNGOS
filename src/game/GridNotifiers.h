@@ -551,12 +551,17 @@ namespace MaNGOS
         public:
             RaiseDeadObjectCheck(Player const* fobj, float range) : i_fobj(fobj), i_range(range) {}
             WorldObject const& GetFocusObject() const { return *i_fobj; }
+            bool operator()(Player* u)
+            {
+                if( u->isAlive() || u->IsTaxiFlying() )
+                    return false;
+
+                return i_fobj->IsWithinDistInMap(u, i_range);
+            }
             bool operator()(Creature* u)
             {
-                if (i_fobj->isHonorOrXPTarget(u) ||
-                    u->getDeathState() != CORPSE || u->isDeadByDefault() || u->IsTaxiFlying() ||
-                    ( u->GetCreatureTypeMask() & (1 << (CREATURE_TYPE_HUMANOID-1)) )==0 ||
-                    (u->GetDisplayId() != u->GetNativeDisplayId()))
+                if ( u->isAlive() || u->IsTaxiFlying() ||
+                    ( u->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD ) == 0)
                     return false;
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
@@ -574,16 +579,14 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_fobj; }
             bool operator()(Player* u)
             {
-                if (u->getDeathState()!=CORPSE || u->IsTaxiFlying() ||
-                    u->HasAuraType(SPELL_AURA_GHOST) || (u->GetDisplayId() != u->GetNativeDisplayId()))
+                if( u->isAlive() || u->IsTaxiFlying() || u->HasAuraType(SPELL_AURA_GHOST)  )
                     return false;
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
             }
             bool operator()(Creature* u)
             {
-                if (u->getDeathState()!=CORPSE || u->IsTaxiFlying() || u->isDeadByDefault() ||
-                    (u->GetDisplayId() != u->GetNativeDisplayId()) ||
+                if (u->isAlive() || u->IsTaxiFlying() ||
                     (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL)!=0)
                     return false;
 

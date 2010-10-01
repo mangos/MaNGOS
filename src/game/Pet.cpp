@@ -297,6 +297,8 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
 
     DEBUG_LOG("New pet (loaded from DB) has guid %u", GetGUIDLow());
 
+    m_loading = false;
+
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         CleanupActionBar();                                     // remove unknown spells from action bar after load
@@ -325,8 +327,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         }
     }
 
-    m_loading = false;
-
+ 
     return true;
 }
 
@@ -472,7 +473,7 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
 
 void Pet::Update(uint32 diff)
 {
-    if(m_removed || m_loading || !IsInWorld())                                          // pet already removed or loading, just wait in remove queue, no updates
+    if(!IsInWorld())                                          // pet already removed or loading, just wait in remove queue, no updates
         return;
 
     switch( m_deathState )
@@ -525,6 +526,13 @@ void Pet::Update(uint32 diff)
                     return;
                 }
             }
+            else if (getPetType() == MINI_PET || getPetType() == GUARDIAN_PET)
+                if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()))
+                {
+                    sLog.outError("Not controlled pet %d lost view from owner, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGUID());
+                    Remove(PET_SAVE_AS_DELETED);
+                    return;
+                }
 
             if(m_duration > 0)
             {
@@ -629,23 +637,51 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 void Pet::Remove(PetSaveMode mode, bool returnreagent)
 {
     Unit* owner = GetOwner();
+    m_removed = true;
+
+    if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        ((Player*)owner)->RemovePet(this,mode,returnreagent);
+
+        if(isControlled() && !GetPetCounter())
+        {
+            ((Player*)owner)->RemovePetActionBar();
+
+            if(((Player*)owner)->GetGroup())
+               ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
+        }
+    }
+    else
+        _Remove(mode, returnreagent);
+}
+
+void Pet::_Remove(PetSaveMode mode, bool returnreagent)
+{
+    Unit* owner = GetOwner();
+    m_removed = true;
+
+    CombatStop();
 
     if(owner)
     {
-        owner->RemovePetFromList(this);
-        if(owner->GetTypeId()==TYPEID_PLAYER)
+        switch(getPetType())
         {
-            ((Player*)owner)->RemovePet(this,mode,returnreagent);
-            return;
+            case MINI_PET:
+                owner->SetCritterGUID(0);
+                break;
+            case GUARDIAN_PET:
+                owner->RemoveGuardian(this);
+                break;
+            default:
+                owner->RemovePetFromList(this);
+                if(owner->GetPetGUID() == GetGUID())
+                    owner->SetPet(0);
+                break;
         }
-
-        // only if current pet in slot
-        if(owner->GetPetGUID()==GetGUID())
-            owner->SetPet(0);
+        if (GetNeedSave())
+            SavePetToDB(mode);
     }
-
     AddObjectToRemoveList();
-    m_removed = true;
 }
 
 void Pet::GivePetXP(uint32 xp)
@@ -2022,11 +2058,14 @@ bool Pet::SetSummonPosition(float x, float y, float z)
     else
         SetPetFollowAngle(PET_FOLLOW_ANGLE);
 
+    if (getPetType() == MINI_PET)
+        SetPetFollowAngle(M_PI_F*1.25f);
+
 
     if (x == 0.0f && y == 0.0f && z == 0.0f)
-        owner->GetClosePoint(x, y, z, GetObjectBoundingRadius(), PET_FOLLOW_DIST, GetPetFollowAngle());
+        owner->GetClosePoint(x, y, z, GetObjectBoundingRadius()*4, PET_FOLLOW_DIST, GetPetFollowAngle());
 
-    GetRandomPoint(x, y, z, GetObjectBoundingRadius()*2, px, py, pz);
+    GetRandomPoint(x, y, z, GetObjectBoundingRadius()*4, px, py, pz);
 
     Relocate(px, py, pz, -owner->GetOrientation());
     SetSummonPoint(px, py, pz, -owner->GetOrientation());
@@ -2043,7 +2082,7 @@ void Pet::ApplyStatScalingBonus(Stats stat, bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     UnitMods unitMod = UnitMods(stat);
@@ -2106,7 +2145,7 @@ void Pet::ApplyResistanceScalingBonus(uint32 school, bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     int32 newResistance;
@@ -2173,7 +2212,7 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     int32 newAPBonus;
@@ -2274,7 +2313,7 @@ void Pet::ApplyDamageScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     int32 newDamageBonus;
@@ -2421,7 +2460,7 @@ void Pet::ApplyHitScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
     int32 m_MeleeHitChance = owner->GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
     m_MeleeHitChance +=  ((Player*)owner)->GetRatingBonusValue(CR_HIT_MELEE);
@@ -2474,7 +2513,7 @@ void Pet::ApplySpellHitScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     int32 m_SpellHitChance = owner->GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
@@ -2528,7 +2567,7 @@ void Pet::ApplyExpertizeScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
     int32 m_expertize = owner->GetUInt32Value(PLAYER_EXPERTISE);
 
@@ -2581,7 +2620,7 @@ void Pet::ApplyPowerregenScalingBonus(bool apply)
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
-    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER || m_removed)
         return;
 
     int32 m_manaregen = int32(owner->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER));
@@ -2662,6 +2701,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_FLAGS, 0);
             SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
             owner->AddGuardian(this);
             break;
         }
@@ -2702,6 +2742,8 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 ((Player*)owner)->SetMiniPet(this);
+            else
+                SetCritterGUID(GetGUID());
             InitPetCreateSpells();
             AIM_Initialize();
             map->Add((Creature*)this);
@@ -2747,6 +2789,8 @@ bool Pet::Summon()
 
     map->Add((Creature*)this);
 
+    m_loading = false;
+
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
@@ -2756,11 +2800,8 @@ bool Pet::Summon()
             ((Player*)owner)->SendTalentsInfoData(true);
         }
 
-        SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-
         if(((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
-
 
         if (!GetPetCounter() && getPetType() == HUNTER_PET)
             SavePetToDB(PET_SAVE_AS_CURRENT);
@@ -2775,8 +2816,6 @@ bool Pet::Summon()
         if (((Creature*)owner)->AI())
             ((Creature*)owner)->AI()->JustSummoned((Creature*)this);
     }
-
-    m_loading = false;
 
     return true;
 }
@@ -2955,13 +2994,11 @@ void Pet::Regenerate(Powers power, uint32 diff)
         }   break;
         case POWER_RAGE:                                    // Regenerate rage ?
         {
-            float RageDecreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
-            addvalue = 20 * RageDecreaseRate;               // 2 rage by tick (= 2 seconds => 1 rage/sec)
+            addvalue = 20 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
         }   break;
         case POWER_ENERGY:                                  // Regenerate energy (ghoul)
         {
-            float EnergyRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
-            addvalue = 20 * EnergyRate;
+            addvalue = 20 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
             break;
         }
         case POWER_FOCUS:                                   // Hunter pets
@@ -2973,6 +3010,8 @@ void Pet::Regenerate(Powers power, uint32 diff)
         case POWER_RUNE:
         case POWER_HAPPINESS:
         case POWER_HEALTH:
+        default:
+            addvalue = 0.0f;
             break;
     }
 

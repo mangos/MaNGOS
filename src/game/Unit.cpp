@@ -6117,6 +6117,19 @@ Pet* Unit::_GetPet(ObjectGuid guid) const
     return GetMap()->GetPet(guid);
 }
 
+void Unit::RemoveMiniPet()
+{
+    if (Pet* pet = GetMiniPet())
+        pet->Remove(PET_SAVE_AS_DELETED);
+    else
+        SetCritterGUID(0);
+}
+
+Pet* Unit::GetMiniPet() const
+{
+    return GetMap()->GetPet(GetCritterGUID());
+}
+
 Unit* Unit::GetCharm() const
 {
     if (uint64 charm_guid = GetCharmGUID())
@@ -10003,6 +10016,19 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
         }
     }
 }
+
+struct DoPetActionWithHelper
+{
+    explicit DoPetActionWithHelper( Player* _owner, uint8 _flag, uint32 _spellid, ObjectGuid _petGuid, ObjectGuid _targetGuid) :
+             owner(_owner), flag(_flag), spellid(_spellid), petGuid(_petGuid), targetGuid(_targetGuid)
+    {}
+    void operator()(Unit* unit) const { unit->DoPetAction(owner, flag, spellid, petGuid, targetGuid); }
+    Player* owner;
+    uint8 flag;
+    uint32 spellid;
+    ObjectGuid petGuid;
+    ObjectGuid targetGuid;
+};
 
 void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid petGuid, ObjectGuid targetGuid)
 {

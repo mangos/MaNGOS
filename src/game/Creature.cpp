@@ -551,9 +551,11 @@ void Creature::Update(uint32 diff)
             if (!isInCombat() || IsPolymorphed())
                 RegenerateHealth();
 
-            Regenerate(getPowerType());
-
-            m_regenTimer = REGEN_TIME_FULL;
+            if (!isPet())                           // Regenerated before
+            {
+                Regenerate(getPowerType());
+                m_regenTimer = REGEN_TIME_FULL;
+            }
             break;
         }
         case DEAD_FALLING:

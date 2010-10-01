@@ -93,8 +93,8 @@ class MANGOS_DLL_SPEC ViewPoint
         {
             for(std::list<Camera*>::iterator itr = m_cameras.begin(); itr != m_cameras.end();)
             {
-                Camera *c = *(itr++);
-                (c->*handler)();
+                if (Camera *c = *(itr++))
+                    (c->*handler)();
             }
         }
     }
