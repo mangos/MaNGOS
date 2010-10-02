@@ -8659,12 +8659,10 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
     FillInitialWorldState(data, count, 0x8d5, 0x0);         // 2261 4
     FillInitialWorldState(data, count, 0x8d4, 0x0);         // 2260 5
     FillInitialWorldState(data, count, 0x8d3, 0x0);         // 2259 6
-                                                            // 3191 7 1 - Arena season in progress, 0 - end of season
-                                                            //        Expected value=8 for this state, not bool 0/1 (as of sept 2010)
-    FillInitialWorldState(data, count, 0xC77, sWorld.getConfig(CONFIG_BOOL_ARENA_SEASON_IN_PROGRESS));
-                                                            // 3901 8 Arena season id
-                                                            //        Expected value=7 for this state (as of sept 2010)
-    FillInitialWorldState(data, count, 0xF3D, sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID));
+                                                            // 3191 7 Current arena season
+    FillInitialWorldState(data, count, 0xC77, sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID));
+                                                            // 3901 8 Previous arena season
+    FillInitialWorldState(data, count, 0xF3D, sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_PREVIOUS_ID));
 
     if(mapid == 530)                                        // Outland
     {
