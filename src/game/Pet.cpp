@@ -1902,6 +1902,8 @@ bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint3
 
     if(owner->GetTypeId() == TYPEID_PLAYER)
         m_charmInfo->SetPetNumber(pet_number, IsPermanentPetFor((Player*)owner));
+    else
+        m_charmInfo->SetPetNumber(pet_number, false);
 
     setFaction(owner->getFaction());
                                    // Faction be owerwritten later, if ForceFaction present

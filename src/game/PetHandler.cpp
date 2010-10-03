@@ -152,7 +152,6 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
     }
     else if (pet)
     {
-        DEBUG_LOG( "SendPetNameQuery, pet GUID is %d", pet->GetGUID());
         std::string name = pet->GetName();
 
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
