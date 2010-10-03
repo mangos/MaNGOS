@@ -19720,7 +19720,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             {
                 SendAurasForTarget((Unit*)target);
                 WorldPacket data;
-                ((Unit*)target)->BuildHeartBeatMsg(&data);
+                ((Unit*)target)->BuildHeartBeatMsg(data);
                 GetSession()->SendPacket(&data);
             }
 
