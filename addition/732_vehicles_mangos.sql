@@ -228,3 +228,11 @@ UPDATE `creature_template` SET `VehicleId` = 370 WHERE `entry` = 33432; -- Levia
 UPDATE `creature_template` SET `VehicleId` = 373 WHERE `entry` = 33670; -- Aerial Command Unit
 
 UPDATE `creature_template` SET `VehicleId` = 736 WHERE `entry` = 40305; -- Spirit of the Tiger
+
+#
+UPDATE `creature_template` SET `VehicleId` = 220 WHERE `entry` = 30161;
+UPDATE `creature_template` SET `VehicleId` = 224 WHERE `entry` = 30234;
+UPDATE `creature_template` SET `VehicleId` = 223 WHERE `entry` = 30248;
+
+# full fix
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor' WHERE `VehicleId` > 0 AND `IconName` IS NULL;
