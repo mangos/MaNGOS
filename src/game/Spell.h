@@ -115,6 +115,7 @@ class SpellCastTargets
             m_GOTargetGUID     = target.m_GOTargetGUID;
             m_CorpseTargetGUID = target.m_CorpseTargetGUID;
             m_itemTargetGUID   = target.m_itemTargetGUID;
+            m_transportGUID    = target.m_transportGUID;
 
             m_itemTargetEntry  = target.m_itemTargetEntry;
 
@@ -179,6 +180,7 @@ class SpellCastTargets
         ObjectGuid m_GOTargetGUID;
         ObjectGuid m_CorpseTargetGUID;
         ObjectGuid m_itemTargetGUID;
+        ObjectGuid m_transportGUID;
         uint32 m_itemTargetEntry;
 };
 

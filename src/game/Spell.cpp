@@ -113,10 +113,6 @@ SpellCastTargets::SpellCastTargets()
     m_itemTarget = NULL;
     m_GOTarget   = NULL;
 
-    m_unitTargetGUID   = 0;
-    m_GOTargetGUID     = 0;
-    m_CorpseTargetGUID = 0;
-    m_itemTargetGUID   = 0;
     m_itemTargetEntry  = 0;
 
     m_srcX = m_srcY = m_srcZ = m_destX = m_destY = m_destZ = 0.0f;
@@ -242,17 +238,17 @@ void SpellCastTargets::read( ByteBuffer& data, Unit *caster )
     if( m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE ) )
         data >> m_CorpseTargetGUID.ReadAsPacked();
 
-    if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
+    if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
-        data >> m_unitTargetGUID.ReadAsPacked();
+        data >> m_transportGUID.ReadAsPacked();
         data >> m_srcX >> m_srcY >> m_srcZ;
         if(!MaNGOS::IsValidMapCoord(m_srcX, m_srcY, m_srcZ))
             throw ByteBufferException(false, data.rpos(), 0, data.size());
     }
 
-    if( m_targetMask & TARGET_FLAG_DEST_LOCATION )
+    if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
-        data >> m_unitTargetGUID.ReadAsPacked();
+        data >> m_transportGUID.ReadAsPacked();
         data >> m_destX >> m_destY >> m_destZ;
         if(!MaNGOS::IsValidMapCoord(m_destX, m_destY, m_destZ))
             throw ByteBufferException(false, data.rpos(), 0, data.size());
@@ -299,19 +295,15 @@ void SpellCastTargets::write( ByteBuffer& data ) const
             data << uint8(0);
     }
 
-    if( m_targetMask & TARGET_FLAG_SOURCE_LOCATION )
+    if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
-        if(m_unitTarget)
-            data << m_unitTarget->GetPackGUID();
-        else
-            data << uint8(0);
-
+        data << m_transportGUID.WriteAsPacked();
         data << m_srcX << m_srcY << m_srcZ;
     }
 
-    if( m_targetMask & TARGET_FLAG_DEST_LOCATION )
+    if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
-        data << uint8(0);                                   // no known cases with target pguid
+        data << m_transportGUID.WriteAsPacked();
         data << m_destX << m_destY << m_destZ;
     }
 
