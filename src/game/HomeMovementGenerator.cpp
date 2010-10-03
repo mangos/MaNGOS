@@ -76,7 +76,7 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
             {
                 owner.SetOrientation(data->orientation);
                 WorldPacket packet;
-                owner.BuildHeartBeatMsg(&packet);
+                owner.BuildHeartBeatMsg(packet);
                 owner.SendMessageToSet(&packet, false);
             }
         }

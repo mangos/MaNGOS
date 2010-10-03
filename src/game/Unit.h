@@ -1484,7 +1484,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendThreatRemove(HostileReference* pHostileReference);
         void SendThreatUpdate();
 
-        void BuildHeartBeatMsg( WorldPacket *data ) const;
+        void BuildHeartBeatMsg(WorldPacket& data) const;
 
         virtual void MoveOutOfRange(Player &) {  };
 
