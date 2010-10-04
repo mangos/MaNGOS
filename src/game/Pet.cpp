@@ -169,6 +169,14 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return false;
     }
 
+    SetDisplayId(fields[3].GetUInt32());
+    SetNativeDisplayId(fields[3].GetUInt32());
+    uint32 petlevel = fields[4].GetUInt32();
+    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    SetName(std::string(fields[8].GetCppString()));
+    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
+    m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
+
     if (!SetSummonPosition())
     {
         sLog.outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
@@ -176,7 +184,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         delete result;
         return false;
     }
-
 
     CreatureInfo const *cinfo = GetCreatureInfo();
 
@@ -188,14 +195,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return true;
     }
 
-
-    SetDisplayId(fields[3].GetUInt32());
-    SetNativeDisplayId(fields[3].GetUInt32());
-    uint32 petlevel = fields[4].GetUInt32();
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-    SetName(fields[8].GetString());
-    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
-    m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
 
     switch (getPetType())
     {
@@ -473,7 +472,7 @@ void Pet::setDeathState(DeathState s)                       // overwrite virtual
 
 void Pet::Update(uint32 diff)
 {
-    if(!IsInWorld())                                          // pet already removed or loading, just wait in remove queue, no updates
+    if (m_removed || m_loading)                               // pet already removed, just wait in remove queue, no updates
         return;
 
     switch( m_deathState )
@@ -639,7 +638,7 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
     Unit* owner = GetOwner();
     m_removed = true;
 
-    if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+    if (owner && owner->GetTypeId() == TYPEID_PLAYER && owner->GetPetGUID() == GetGUID())
     {
         ((Player*)owner)->RemovePet(this,mode,returnreagent);
 
@@ -2796,6 +2795,9 @@ bool Pet::Summon()
         {
             SelectLevel(GetCreatureInfo());
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
+            std::string name = owner->GetName();
+            name.append(petTypeSuffix[getPetType()]);
+            SetName( name );
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 ((Player*)owner)->SetMiniPet(this);
             else

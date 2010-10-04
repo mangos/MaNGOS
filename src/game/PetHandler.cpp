@@ -134,7 +134,7 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
 {
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(petguid);
 
-    if (!pet || !pet->IsInWorld() || !pet->isPet() || !pet->GetCharmInfo() || !pet->GetCharmInfo()->GetPetNumber() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
+    if (!pet ||  !pet->isPet() ||!((Pet*)pet)->IsInWorld() || !pet->GetCharmInfo() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
     {
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+1));
         data << uint32(petnumber);

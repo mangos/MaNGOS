@@ -10080,7 +10080,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid pe
                     {
                         Pet* p = (Pet*)this;
                         if(p->getPetType() == HUNTER_PET)
-                            owner->RemovePet(p,PET_SAVE_AS_DELETED);
+                            p->Remove(PET_SAVE_AS_DELETED);
                         else
                             //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                             p->setDeathState(CORPSE);
