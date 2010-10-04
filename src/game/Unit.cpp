@@ -10009,19 +10009,6 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
     }
 }
 
-struct DoPetActionWithHelper
-{
-    explicit DoPetActionWithHelper( Player* _owner, uint8 _flag, uint32 _spellid, ObjectGuid _petGuid, ObjectGuid _targetGuid) :
-             owner(_owner), flag(_flag), spellid(_spellid), petGuid(_petGuid), targetGuid(_targetGuid)
-    {}
-    void operator()(Unit* unit) const { unit->DoPetAction(owner, flag, spellid, petGuid, targetGuid); }
-    Player* owner;
-    uint8 flag;
-    uint32 spellid;
-    ObjectGuid petGuid;
-    ObjectGuid targetGuid;
-};
-
 void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid petGuid, ObjectGuid targetGuid)
 {
     switch(flag)
@@ -10221,7 +10208,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid pe
 
 }
 
-void Unit::DoPetCastSpell( Player *owner, uint8 cast_count, SpellCastTargets targets, SpellEntry const* spellInfo )
+void Unit::DoPetCastSpell( Player *owner, uint8 cast_count, SpellCastTargets* targets, SpellEntry const* spellInfo )
 {
     Creature* pet = dynamic_cast<Creature*>(this);
 
@@ -10229,7 +10216,7 @@ void Unit::DoPetCastSpell( Player *owner, uint8 cast_count, SpellCastTargets tar
 
     Spell *spell = new Spell(pet, spellInfo, false);
     spell->m_cast_count = cast_count;                       // probably pending spell cast
-    spell->m_targets = targets;
+    spell->m_targets = *targets;
 
     SpellCastResult result = spell->CheckPetCast(NULL);
     if (result == SPELL_CAST_OK)

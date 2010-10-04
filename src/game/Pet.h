@@ -203,15 +203,16 @@ class Pet : public Creature
 
         void Regenerate(Powers power, uint32 diff);
         void CastPetPassiveAuras(bool current);
+        void ApplyAllScalingBonuses(bool apply);
         void ApplyStatScalingBonus(Stats stat, bool apply);
         void ApplyResistanceScalingBonus(uint32 school, bool apply);
         void ApplyAttackPowerScalingBonus(bool apply);
         void ApplyDamageScalingBonus(bool apply);
+        void ApplySpellDamageScalingBonus(bool apply);
         void ApplyHitScalingBonus(bool apply);
         void ApplySpellHitScalingBonus(bool apply);
         void ApplyExpertizeScalingBonus(bool apply);
         void ApplyPowerregenScalingBonus(bool apply);
-        void ApplyAllScalingBonuses(bool apply);
         bool ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints);
         PetScalingData* CalculateScalingData( bool recalculate = false );
 
@@ -303,4 +304,56 @@ class Pet : public Creature
             MANGOS_ASSERT(false);
         }
 };
+
+enum ScalingTarget
+{
+    SCALING_TARGET_ALL          = 0,
+    SCALING_TARGET_STAT,
+    SCALING_TARGET_RESISTANCE,
+    SCALING_TARGET_ATTACKPOWER,
+    SCALING_TARGET_DAMAGE,
+    SCALING_TARGET_SPELLDAMAGE,
+    SCALING_TARGET_HIT,
+    SCALING_TARGET_SPELLHIT,
+    SCALING_TARGET_EXPERTIZE,
+    SCALING_TARGET_POWERREGEN,
+    SCALING_TARGET_MAX
+};
+
+struct ApplyScalingBonusWithHelper
+{
+    explicit ApplyScalingBonusWithHelper(ScalingTarget _target, uint32 _stat, bool _apply ) :
+                                         target(_target), stat(_stat), apply(_apply)
+    {}
+    void operator()(Unit* unit) const;
+    ScalingTarget target;
+    uint32 stat;
+    bool apply;
+};
+
+struct DoPetActionWithHelper
+{
+    explicit DoPetActionWithHelper( Player* _owner, uint8 _flag, uint32 _spellid, ObjectGuid _petGuid, ObjectGuid _targetGuid) :
+             owner(_owner), flag(_flag), spellid(_spellid), petGuid(_petGuid), targetGuid(_targetGuid)
+    {}
+    void operator()(Unit* unit) const { unit->DoPetAction(owner, flag, spellid, petGuid, targetGuid); }
+    Player* owner;
+    uint8 flag;
+    uint32 spellid;
+    ObjectGuid petGuid;
+    ObjectGuid targetGuid;
+};
+
+struct DoPetCastWithHelper
+{
+    explicit DoPetCastWithHelper( Player* _owner, uint8 _cast_count, SpellCastTargets* _targets, SpellEntry const* _spellInfo ) :
+             owner(_owner), cast_count(_cast_count), targets(_targets), spellInfo(_spellInfo)
+    {}
+    void operator()(Unit* unit) const { unit->DoPetCastSpell(owner,cast_count,targets,spellInfo ); }
+    Player* owner;
+    uint8 cast_count;
+    SpellCastTargets* targets;
+    SpellEntry const* spellInfo;
+};
+
 #endif

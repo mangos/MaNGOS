@@ -1,5 +1,5 @@
 -- Known vehicles from zergtmn
-UPDATE `creature_template` SET `VehicleId` = 0;
+#UPDATE `creature_template` SET `VehicleId` = 0;
 --
 UPDATE `creature_template` SET `VehicleId` = 23 WHERE `entry` = 23693;
 UPDATE `creature_template` SET `VehicleId` = 108 WHERE `entry` = 24083;

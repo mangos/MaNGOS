@@ -40,16 +40,7 @@ bool Player::UpdateStats(Stats stat)
 
     SetStat(stat, int32(value));
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyStatScalingBonus(stat, false);
-        }
-    }
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_STAT, stat, false),false,false,false);
 
     switch(stat)
     {
@@ -105,19 +96,8 @@ void Player::ApplySpellPowerBonus(int32 amount, bool apply)
     for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, amount, apply);;
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                {
-                    _pet->ApplyAttackPowerScalingBonus(false);
-                    _pet->ApplyDamageScalingBonus(false);
-                }
-        }
-    }
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
 }
 
 void Player::UpdateSpellDamageAndHealingBonus()
@@ -130,17 +110,8 @@ void Player::UpdateSpellDamageAndHealingBonus()
     for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         SetStatInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, SpellBaseDamageBonusDone(SpellSchoolMask(1 << i)));
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyAttackPowerScalingBonus(false);
-        }
-    }
-
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
 }
 
 bool Player::UpdateAllStats()
@@ -185,17 +156,7 @@ void Player::UpdateResistances(uint32 school)
     else
         UpdateArmor();
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if  (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyResistanceScalingBonus(SpellSchools(school),false);
-        }
-    }
-
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_RESISTANCE, school, false),false,false,false);
 }
 
 void Player::UpdateArmor()
@@ -221,16 +182,6 @@ void Player::UpdateArmor()
 
     SetArmor(int32(value));
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if  (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyResistanceScalingBonus(SPELL_SCHOOL_NORMAL,false);
-        }
-    }
     UpdateAttackPowerAndDamage();                           // armor dependent auras update for SPELL_AURA_MOD_ATTACK_POWER_OF_ARMOR
 }
 
@@ -433,20 +384,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
             UpdateDamagePhysical(OFF_ATTACK);
     }
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                {
-                    _pet->ApplyAttackPowerScalingBonus(false);
-                    _pet->ApplyDamageScalingBonus(false);
-                }
-        }
-    }
-
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_DAMAGE, 0, false),false,false,false);
 }
 
 void Player::UpdateShieldBlockValue()
@@ -669,16 +609,7 @@ void Player::UpdateMeleeHitChances()
     m_modMeleeHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_HIT_CHANCE);
     m_modMeleeHitChance+=  GetRatingBonusValue(CR_HIT_MELEE);
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyHitScalingBonus(false);
-        }
-    }
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_HIT, 0, false),false,false,false);
 }
 
 void Player::UpdateRangedHitChances()
@@ -692,16 +623,7 @@ void Player::UpdateSpellHitChances()
     m_modSpellHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
     m_modSpellHitChance+= GetRatingBonusValue(CR_HIT_SPELL);
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplySpellHitScalingBonus(false);
-        }
-    }
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLHIT, 0, false),false,false,false);
 }
 
 void Player::UpdateAllSpellCritChances()
@@ -740,17 +662,7 @@ void Player::UpdateExpertise(WeaponAttackType attack)
         default: break;
     }
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyExpertizeScalingBonus(false);
-        }
-    }
-
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_EXPERTIZE, 0, false),false,false,false);
 }
 
 void Player::UpdateArmorPenetration()
@@ -813,17 +725,7 @@ void Player::UpdateManaRegen()
 
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, power_regen_mp5 + power_regen);
 
-    if(Pet* pet = GetPet())
-    {
-        GroupPetList m_groupPets = GetPets();
-        if (!m_groupPets.empty())
-        {
-            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                if (Pet* _pet = GetMap()->GetPet(*itr))
-                    _pet->ApplyPowerregenScalingBonus(false);
-        }
-    }
-
+    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_POWERREGEN, 0, false),false,false,false);
 }
 
 void Player::_ApplyAllStatBonuses()
@@ -981,7 +883,6 @@ bool Pet::UpdateStats(Stats stat)
             UpdateAttackPowerAndDamage();
             break;
         case STAT_AGILITY:
-//            UpdateAllCritPercentages();
             UpdateAttackPowerAndDamage(true);
             UpdateArmor();
             break;
@@ -990,7 +891,6 @@ bool Pet::UpdateStats(Stats stat)
             break;
         case STAT_INTELLECT:
             UpdateMaxPower(POWER_MANA);
-//            UpdateAllSpellCritChances();
             break;
         case STAT_SPIRIT:
         default:
@@ -1012,6 +912,7 @@ bool Pet::UpdateAllStats()
 
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
+    UpdateManaRegen();
     UpdateSpellPower();
 
     return true;
@@ -1194,20 +1095,10 @@ void Pet::UpdateManaRegen()
     // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
     float power_regen_mp5 = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
 
-    // Get bonus from SPELL_AURA_MOD_MANA_REGEN_FROM_STAT aura
-    AuraList const& regenAura = GetAurasByType(SPELL_AURA_MOD_MANA_REGEN_FROM_STAT);
-    for(AuraList::const_iterator i = regenAura.begin();i != regenAura.end(); ++i)
-    {
-        Modifier* mod = (*i)->GetModifier();
-        power_regen_mp5 += GetStat(Stats(mod->m_miscvalue)) * mod->m_amount / 500.0f;
-    }
-
     // Set regen rate in cast state apply only on spirit based regen
     int32 modManaRegenInterrupt = GetTotalAuraModifier(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
-    if (modManaRegenInterrupt > 100)
-        modManaRegenInterrupt = 100;
+
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, power_regen_mp5 + power_regen * modManaRegenInterrupt / 100.0f);
 
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, power_regen_mp5 + power_regen);
-
 }

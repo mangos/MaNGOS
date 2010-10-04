@@ -155,6 +155,12 @@ void PetAI::UpdateAI(const uint32 diff)
             _stopAttack();
             return;
         }
+        else if (!m_creature->getVictim()->isAlive())        // Stop attack if target dead
+        {
+            m_creature->InterruptNonMeleeSpells(false);
+            _stopAttack();
+            return;
+        }
         else if (m_creature->IsStopped() || m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
         {
             // required to be stopped cases

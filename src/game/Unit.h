@@ -1932,7 +1932,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendPetAIReaction();
         ///----------End of Pet responses methods----------
         void DoPetAction (Player* owner, uint8 flag, uint32 spellid, ObjectGuid petGuid, ObjectGuid targetGuid);
-        void DoPetCastSpell (Player *owner, uint8 cast_count, SpellCastTargets targets, SpellEntry const* spellInfo);
+        void DoPetCastSpell (Player *owner, uint8 cast_count, SpellCastTargets* targets, SpellEntry const* spellInfo);
 
         void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
