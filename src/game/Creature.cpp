@@ -42,7 +42,6 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
-#include "TemporarySummon.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -1476,12 +1475,6 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
 
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
         return;
-    }
-
-    if (isTemporarySummon())
-    {
-        ((TemporarySummon*)this)->UnSummon();
-            return;
     }
 
     if (isAlive())
