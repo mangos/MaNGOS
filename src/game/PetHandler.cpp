@@ -28,6 +28,7 @@
 #include "CreatureAI.h"
 #include "Util.h"
 #include "Pet.h"
+#include "Threading.h"
 
 void WorldSession::HandlePetAction( WorldPacket & recv_data )
 {
@@ -132,14 +133,27 @@ void WorldSession::HandlePetNameQueryOpcode( WorldPacket & recv_data )
 
 void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
 {
-    Creature* pet = _player->GetMap()->GetAnyTypeCreature(petguid);
+    Creature* _pet = GetPlayer()->GetMap()->GetAnyTypeCreature(petguid);
 
-    if (!pet ||  !pet->isPet() ||!((Pet*)pet)->IsInWorld() || !pet->GetCharmInfo() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
+    if (!_pet ||  !_pet->isPet())
+        return;
+
+    Pet* pet = (Pet*)_pet;
+
+    uint32 sleeptime = 0;
+
+    while (!pet->IsInWorld() && sleeptime < 5000)
+    {
+        ACE_Based::Thread::Sleep(100);
+        sleeptime += 100;
+    }
+
+    if (!pet->IsInWorld() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
     {
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+1));
         data << uint32(petnumber);
         data << uint8(0);
-        _player->GetSession()->SendPacket(&data);
+        GetPlayer()->GetSession()->SendPacket(&data);
         return;
     }
     else if (pet)
@@ -160,7 +174,7 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
         else
             data << uint8(0);
 
-        _player->GetSession()->SendPacket(&data);
+        GetPlayer()->GetSession()->SendPacket(&data);
     }
 }
 
