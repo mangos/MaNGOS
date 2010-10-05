@@ -4323,7 +4323,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
         pet->SetCreateSpellID(m_spellInfo->Id);
         pet->SetDuration(duration);
 
-        if (!pet->Create(m_caster, m_spellInfo->EffectMiscValue[eff_idx]))
+        if (!pet->Create(m_caster, uint32(m_spellInfo->EffectMiscValue[eff_idx])))
         {
             sLog.outErrorDb("Spell::EffectSummonGroupPets: no such creature entry %u",m_spellInfo->EffectMiscValue[eff_idx]);
             delete pet;
@@ -4384,6 +4384,7 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
     TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
     Creature *summon = m_caster->SummonCreature(creature_entry,px,py,pz,m_caster->GetOrientation(),summonType,duration);
 
+    summon->CombatStop(true);
     summon->addUnitState(UNIT_STAT_CONTROLLED);
     summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     summon->SetCharmerGUID(m_caster->GetGUID());
@@ -4394,9 +4395,6 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
     m_caster->SetCharm(summon);
     ((Player*)m_caster)->SetClientControl(summon, 1);
     ((Player*)m_caster)->SetMover(summon);
-
-    summon->CombatStop(true);
-    summon->DeleteThreatList();
 
     if(CharmInfo *charmInfo = summon->InitCharmInfo(summon))
     {
@@ -5190,6 +5188,10 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
     // if pet requested type already exist
     if( OldSummon )
     {
+        // Preview summon is loading or deleting
+        if(!OldSummon->IsInWorld())
+            return;
+
         if(petentry == 0 || OldSummon->GetEntry() == petentry)
         {
             // pet in corpse state can't be summoned
@@ -5197,6 +5199,8 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
                 return;
 
             OldSummon->GetMap()->Remove((Creature*)OldSummon,false);
+
+            OldSummon->SetMap(m_caster->GetMap());
 
             OldSummon->SetSummonPosition();
 

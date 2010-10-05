@@ -2087,13 +2087,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 template<typename Func>
 void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet)
 {
-   for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-   {
-       if (Pet* pet = _GetPet(*itr))
-           func(pet);
-       if (m_groupPets.empty())           // special case for pet abandon command
-           break;
-   }
+    if (!m_groupPets.empty())
+        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+        {
+            if (Pet* pet = _GetPet(*itr))
+                func(pet);
+            if (m_groupPets.empty())           // special case for pet abandon command
+                break;
+        }
 
     if (withGuardians)
     {

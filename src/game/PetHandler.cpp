@@ -81,7 +81,10 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
         return;
     }
 
-    GetPlayer()->CallForAllControlledUnits(DoPetActionWithHelper(GetPlayer(), flag, spellid, petGuid, targetGuid),false,false,false);
+    if (((Creature*)pet)->isPet())
+        GetPlayer()->CallForAllControlledUnits(DoPetActionWithHelper(GetPlayer(), flag, spellid, petGuid, targetGuid),false,false,false);
+    else if (pet->isCharmed())
+        GetPlayer()->DoPetAction(GetPlayer(), flag, spellid, petGuid, targetGuid);
 }
 
 void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
@@ -381,15 +384,15 @@ void WorldSession::HandlePetRename( WorldPacket & recv_data )
 
 void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;                                      //pet guid
-    DETAIL_LOG( "HandlePetAbandon. CMSG_PET_ABANDON pet guid is %u", GUID_LOPART(guid) );
+    DETAIL_LOG( "HandlePetAbandon. CMSG_PET_ABANDON pet guid is %u", guid.GetCounter());
 
     if(!_player->IsInWorld())
         return;
 
     // pet/charmed
-    if (Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid))
+    if (Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(guid))
     {
         if(pet->isPet())
         {
@@ -399,11 +402,11 @@ void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
                 pet->SetPower(POWER_HAPPINESS ,(feelty-50000) > 0 ?(feelty-50000) : 0);
             }
 
-            _player->RemovePet((Pet*)pet,PET_SAVE_AS_DELETED);
+            GetPlayer()->RemovePet((Pet*)pet,PET_SAVE_AS_DELETED);
         }
-        else if(pet->GetGUID() == _player->GetCharmGUID())
+        else if(pet->GetGUID() == GetPlayer()->GetCharmGUID())
         {
-            _player->Uncharm();
+            GetPlayer()->Uncharm();
         }
     }
 }
@@ -488,7 +491,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 {
     DETAIL_LOG("WORLD: CMSG_PET_CAST_SPELL");
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellid;
     uint8  cast_count;
     uint8  unk_flags;                                       // flags (if 0x02 - some additional data are received)
@@ -500,11 +503,11 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
     if (!GetPlayer()->GetPet() && !GetPlayer()->GetCharm())
         return;
 
-    Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
+    Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(guid);
 
     if (!pet || (pet != GetPlayer()->GetPet() && pet != GetPlayer()->GetCharm()))
     {
-        sLog.outError( "HandlePetCastSpellOpcode: Pet %u isn't pet of player %s .", uint32(GUID_LOPART(guid)),GetPlayer()->GetName() );
+        sLog.outError( "HandlePetCastSpellOpcode: Pet %u isn't pet of player %s .", guid.GetCounter(),GetPlayer()->GetName() );
         return;
     }
 
@@ -523,11 +526,17 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
     if (!pet->HasSpell(spellid) || IsPassiveSpell(spellInfo))
         return;
 
-    SpellCastTargets* targets;
+    SpellCastTargets* targets = new SpellCastTargets;
 
     recvPacket >> targets->ReadForCaster(pet);
 
-    GetPlayer()->CallForAllControlledUnits(DoPetCastWithHelper(GetPlayer(), cast_count, targets, spellInfo ),false,false,false);
+    if (pet->isPet())
+        GetPlayer()->CallForAllControlledUnits(DoPetCastWithHelper(GetPlayer(), cast_count, targets, spellInfo ),false,false,false);
+    else if (pet->isCharmed())
+        pet->DoPetCastSpell(GetPlayer(), cast_count, targets, spellInfo);
+
+    if (targets)
+       delete targets;
 }
 
 void WorldSession::SendPetNameInvalid(uint32 error, const std::string& name, DeclinedName *declinedName)

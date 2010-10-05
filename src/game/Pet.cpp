@@ -326,7 +326,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         }
     }
 
- 
     return true;
 }
 
@@ -2048,6 +2047,7 @@ void Pet::ApplyModeFlags(PetModeFlags mode, bool apply)
 bool Pet::SetSummonPosition(float x, float y, float z)
 {
     Unit* owner = GetOwner();
+
     if (!owner)
         return false;
 
