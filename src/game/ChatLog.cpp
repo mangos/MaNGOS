@@ -726,9 +726,6 @@ void ChatLog::ChatBadLexicsAction(Player* player, std::string& msg)
 
     if (LexicsCutterNoActionOnGM && player->GetSession()->GetSecurity()) return;
 
-    // special action
-    const SpellEntry* sl;
-
     switch (LexicsCutterAction)
     {
         case LEXICS_ACTION_SHEEP:

@@ -4316,7 +4316,7 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
     }
 
     // Pet not found in database
-    for (int32 count = 0; count < amount; ++count)
+    for (uint32 count = 0; count < amount; ++count)
     {
         Pet* pet = new Pet(SUMMON_PET);
         pet->SetPetCounter(amount - count - 1);
