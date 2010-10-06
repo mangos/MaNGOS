@@ -953,7 +953,10 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
 
 void Aura::ReapplyAffectedPassiveAuras( Unit* target, bool owner_mode )
 {
-    std::set<uint32> affectedSelf;
+    // we need store cast item guids for self casted spells
+    // expected that not exist permanent auras from stackable auras from different items
+    std::map<uint32, ObjectGuid> affectedSelf;
+
     std::set<uint32> affectedAuraCaster;
 
     for(Unit::SpellAuraHolderMap::const_iterator itr = target->GetSpellAuraHolderMap().begin(); itr != target->GetSpellAuraHolderMap().end(); ++itr)
@@ -968,16 +971,22 @@ void Aura::ReapplyAffectedPassiveAuras( Unit* target, bool owner_mode )
         {
             // only applied by self or aura caster
             if (itr->second->GetCasterGUID() == target->GetGUID())
-                affectedSelf.insert(itr->second->GetId());
+                affectedSelf[itr->second->GetId()] = itr->second->GetCastItemGUID();
             else if (itr->second->GetCasterGUID() == GetCasterGUID())
                 affectedAuraCaster.insert(itr->second->GetId());
         }
     }
 
-    for(std::set<uint32>::const_iterator set_itr = affectedSelf.begin(); set_itr != affectedSelf.end(); ++set_itr)
+    if (!affectedSelf.empty())
     {
-        target->RemoveAurasDueToSpell(*set_itr);
-        target->CastSpell(GetTarget(), *set_itr, true);
+        Player* pTarget = target->GetTypeId() == TYPEID_PLAYER ? (Player*)target : NULL;
+
+        for(std::map<uint32, ObjectGuid>::const_iterator map_itr = affectedSelf.begin(); map_itr != affectedSelf.end(); ++map_itr)
+        {
+            Item* item = pTarget && !map_itr->second.IsEmpty() ? pTarget->GetItemByGuid(map_itr->second) : NULL;
+            target->RemoveAurasDueToSpell(map_itr->first);
+            target->CastSpell(target, map_itr->first, true, item);
+        }
     }
 
     if (!affectedAuraCaster.empty())
