@@ -642,9 +642,17 @@ void AreaAura::Update(uint32 diff)
                             {
                                 if(caster->IsWithinDistInMap(Target, m_radius))
                                     targets.push_back(Target);
-                                Pet *pet = Target->GetPet();
-                                if(pet && pet->isAlive() && caster->IsWithinDistInMap(pet, m_radius))
-                                    targets.push_back(pet);
+                                if (Pet *pet = Target->GetPet())
+                                {
+                                    GroupPetList m_groupPets = Target->GetPets();
+                                    if (!m_groupPets.empty())
+                                    {
+                                        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                            if (Pet* _pet = Target->GetMap()->GetPet(*itr))
+                                                if(_pet && _pet->isAlive() && caster->IsWithinDistInMap(_pet, m_radius))
+                                                    targets.push_back(_pet);
+                                    }
+                                }
                             }
                         }
                     }
@@ -654,9 +662,17 @@ void AreaAura::Update(uint32 diff)
                         if( owner != caster && caster->IsWithinDistInMap(owner, m_radius) )
                             targets.push_back(owner);
                         // add caster's pet
-                        Unit* pet = caster->GetPet();
-                        if( pet && caster->IsWithinDistInMap(pet, m_radius))
-                            targets.push_back(pet);
+                        if (Pet *pet = caster->GetPet())
+                        {
+                            GroupPetList m_groupPets = caster->GetPets();
+                            if (!m_groupPets.empty())
+                            {
+                                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                    if (Pet* _pet = caster->GetMap()->GetPet(*itr))
+                                        if(_pet && caster->IsWithinDistInMap(_pet, m_radius))
+                                            targets.push_back(_pet);
+                            }
+                        }
                     }
                     break;
                 }
@@ -676,9 +692,17 @@ void AreaAura::Update(uint32 diff)
                             {
                                 if(caster->IsWithinDistInMap(Target, m_radius))
                                     targets.push_back(Target);
-                                Pet *pet = Target->GetPet();
-                                if(pet && pet->isAlive() && caster->IsWithinDistInMap(pet, m_radius))
-                                    targets.push_back(pet);
+                                if (Pet *pet = Target->GetPet())
+                                {
+                                    GroupPetList m_groupPets = Target->GetPets();
+                                    if (!m_groupPets.empty())
+                                    {
+                                        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                            if (Pet* _pet = caster->GetMap()->GetPet(*itr))
+                                                if(_pet && caster->IsWithinDistInMap(_pet, m_radius))
+                                                    targets.push_back(_pet);
+                                    }
+                                }
                             }
                         }
                     }
@@ -688,9 +712,17 @@ void AreaAura::Update(uint32 diff)
                         if( owner != caster && caster->IsWithinDistInMap(owner, m_radius) )
                             targets.push_back(owner);
                         // add caster's pet
-                        Unit* pet = caster->GetPet();
-                        if( pet && caster->IsWithinDistInMap(pet, m_radius))
-                            targets.push_back(pet);
+                        if (Pet *pet = caster->GetPet())
+                        {
+                            GroupPetList m_groupPets = caster->GetPets();
+                            if (!m_groupPets.empty())
+                            {
+                                for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                                    if (Pet* _pet = caster->GetMap()->GetPet(*itr))
+                                        if(_pet && caster->IsWithinDistInMap(_pet, m_radius))
+                                            targets.push_back(_pet);
+                            }
+                        }
                     }
                     break;
                 }

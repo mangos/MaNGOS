@@ -40,7 +40,7 @@ Pet::Pet(PetType type) :
 Creature(CREATURE_SUBTYPE_PET),
 m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
 m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
-m_auraUpdateMask(0), m_loading(false),
+m_auraUpdateMask(0), m_loading(true),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
 m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL), m_createSpellID(0)
 {
@@ -301,11 +301,13 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         CleanupActionBar();                                     // remove unknown spells from action bar after load
-        ((Player*)owner)->PetSpellInitialize();
+        if (!GetPetCounter())
+            ((Player*)owner)->PetSpellInitialize();
         if(((Player*)owner)->GetGroup())
             ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
 
-        ((Player*)owner)->SendTalentsInfoData(true);
+        if (!GetPetCounter())
+            ((Player*)owner)->SendTalentsInfoData(true);
     }
 
     if (owner->GetTypeId() == TYPEID_PLAYER && getPetType() == HUNTER_PET)
@@ -1548,11 +1550,11 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     // if remove last rank or non-ranked then update action bar at server and client if need
     if (clear_ab && !learn_prev && m_charmInfo->RemoveSpellFromActionBar(spell_id))
     {
-        if(!m_loading)
+        if(IsInWorld())
         {
             // need update action bar for last removed rank
             if (Unit* owner = GetOwner())
-                if (owner->GetTypeId() == TYPEID_PLAYER)
+                if (owner->GetTypeId() == TYPEID_PLAYER && !GetPetCounter())
                     ((Player*)owner)->PetSpellInitialize();
         }
     }
@@ -2854,7 +2856,8 @@ bool Pet::Summon()
         if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
         {
             CleanupActionBar();                                     // remove unknown spells from action bar after load
-            ((Player*)owner)->PetSpellInitialize();
+            if (!GetPetCounter())
+                ((Player*)owner)->PetSpellInitialize();
             ((Player*)owner)->SendTalentsInfoData(true);
         }
 
