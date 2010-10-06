@@ -499,9 +499,9 @@ void Pet::Update(uint32 diff)
                 return;
             }
 
-            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || (isControlled() && !owner->GetPetGUID()))
+            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || (isControlled() && !owner->GetPetGUID()) || (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID())))
             {
-                sLog.outError("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGUID());
+                DEBUG_LOG("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGUID());
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
                 return;
             }

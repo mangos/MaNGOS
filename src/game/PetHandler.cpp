@@ -151,7 +151,7 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
         sleeptime += 100;
     }
 
-    if (!pet->IsInWorld() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
+    if (!pet || !pet->IsInWorld() || (!pet->GetPetCounter() && pet->GetCharmInfo()->GetPetNumber() != petnumber))
     {
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+1));
         data << uint32(petnumber);
