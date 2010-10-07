@@ -44,8 +44,8 @@ m_auraUpdateMask(0), m_loading(true),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
 m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL), m_createSpellID(0)
 {
-    m_name = "Pet";
-    m_regenTimer = 4000;
+    SetName("Pet");
+    m_regenTimer = 2000;
 
     m_baseBonusData = new PetScalingData;
 
@@ -572,6 +572,13 @@ void Pet::Update(uint32 diff)
             break;
     }
 
+    // Update scaling auras from queue
+    while (!m_scalingQueue.empty())
+    {
+        ApplyScalingBonus(&m_scalingQueue.front());
+        m_scalingQueue.pop();
+    };
+
     if (IsInWorld())
         Creature::Update(diff);
 }
@@ -775,7 +782,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature, Unit* owner)
     SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
     SetPower(POWER_HAPPINESS, 166500);
     setPowerType(POWER_FOCUS);
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->getLevel()));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -2752,6 +2759,8 @@ bool Pet::Summon()
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
 
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
+
     switch (getPetType())
     {
         case GUARDIAN_PET:
@@ -2759,7 +2768,6 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
             SetUInt32Value(UNIT_FIELD_FLAGS, 0);
             SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
             owner->AddGuardian(this);
             break;
@@ -2770,7 +2778,6 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
             SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             // generate new name for summon pet
@@ -2786,7 +2793,6 @@ bool Pet::Summon()
             SetSheath(SHEATH_STATE_MELEE);
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
-            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
@@ -3105,47 +3111,55 @@ void Pet::Regenerate(Powers power, uint32 diff)
     SetPower(power, curValue);
 }
 
-void ApplyScalingBonusWithHelper::operator() (Unit* unit) const
+void Pet::ApplyScalingBonus(ScalingAction* action)
 {
-    if (!unit || !unit->GetObjectGuid().IsPet())
-        return;
-
-    Pet* pet = (Pet*)unit;
-
-    switch (target)
+    switch (action->target)
     {
         case SCALING_TARGET_ALL:
-            pet->ApplyAllScalingBonuses(apply);
+            ApplyAllScalingBonuses(action->apply);
             break;
         case SCALING_TARGET_STAT:
-            pet->ApplyStatScalingBonus(Stats(stat), apply);
+            ApplyStatScalingBonus(Stats(action->stat),action->apply);
             break;
         case SCALING_TARGET_RESISTANCE:
-            pet->ApplyResistanceScalingBonus(stat, apply);
+            ApplyResistanceScalingBonus(action->stat, action->apply);
             break;
         case SCALING_TARGET_ATTACKPOWER:
-            pet->ApplyAttackPowerScalingBonus(apply);
+            ApplyAttackPowerScalingBonus(action->apply);
             break;
         case SCALING_TARGET_DAMAGE:
-            pet->ApplyDamageScalingBonus(apply);
+            ApplyDamageScalingBonus(action->apply);
             break;
         case SCALING_TARGET_SPELLDAMAGE:
-            pet->ApplySpellDamageScalingBonus(apply);
+            ApplySpellDamageScalingBonus(action->apply);
             break;
         case SCALING_TARGET_HIT:
-            pet->ApplyHitScalingBonus(apply);
+            ApplyHitScalingBonus(action->apply);
             break;
         case SCALING_TARGET_SPELLHIT:
-            pet->ApplySpellHitScalingBonus(apply);
+            ApplySpellHitScalingBonus(action->apply);
             break;
         case SCALING_TARGET_EXPERTIZE:
-            pet->ApplyExpertizeScalingBonus(apply);
+            ApplyExpertizeScalingBonus(action->apply);
             break;
         case SCALING_TARGET_POWERREGEN:
-            pet->ApplyPowerregenScalingBonus(apply);
+            ApplyPowerregenScalingBonus(action->apply);
             break;
         case SCALING_TARGET_MAX:
         default:
             break;
     }
+}
+
+void Pet::AddScalingAction(ScalingTarget target, uint32 stat, bool apply)
+{
+    m_scalingQueue.push(ScalingAction(target,stat,apply));
+}
+
+void ApplyScalingBonusWithHelper::operator() (Unit* unit) const
+{
+    if (!unit || !unit->GetObjectGuid().IsPet())
+        return;
+    Pet* pet = (Pet*)unit;
+    pet->AddScalingAction(target, stat, apply);
 }

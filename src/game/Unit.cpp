@@ -10011,6 +10011,9 @@ void CharmInfo::SetSpellAutocast( uint32 spell_id, bool state )
 
 void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid petGuid, ObjectGuid targetGuid)
 {
+    if ((((Creature*)this)->isPet() && !((Pet*)this)->IsInWorld()) || !GetCharmInfo())
+        return;
+
     switch(flag)
     {
         case ACT_COMMAND:                                   //0x07
@@ -10098,8 +10101,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid pe
                 case REACT_PASSIVE:                         //passive
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
-                    if (GetCharmInfo())
-                        GetCharmInfo()->SetReactState( ReactStates(spellid) );
+                    GetCharmInfo()->SetReactState( ReactStates(spellid) );
                     break;
             }
             break;

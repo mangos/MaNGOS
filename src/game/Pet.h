@@ -121,6 +121,31 @@ enum PetNameInvalidReason
     PET_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME              = 16
 };
 
+enum ScalingTarget
+{
+    SCALING_TARGET_ALL          = 0,
+    SCALING_TARGET_STAT,
+    SCALING_TARGET_RESISTANCE,
+    SCALING_TARGET_ATTACKPOWER,
+    SCALING_TARGET_DAMAGE,
+    SCALING_TARGET_SPELLDAMAGE,
+    SCALING_TARGET_HIT,
+    SCALING_TARGET_SPELLHIT,
+    SCALING_TARGET_EXPERTIZE,
+    SCALING_TARGET_POWERREGEN,
+    SCALING_TARGET_MAX
+};
+
+struct ScalingAction
+{
+    explicit ScalingAction(ScalingTarget _target, uint32 _stat, bool _apply ) :
+                                         target(_target), stat(_stat), apply(_apply)
+    {}
+    ScalingTarget target;
+    uint32        stat;
+    bool          apply;
+};
+
 typedef UNORDERED_MAP<uint32, PetSpell> PetSpellMap;
 typedef std::vector<uint32> AutoSpellList;
 
@@ -203,6 +228,7 @@ class Pet : public Creature
 
         void Regenerate(Powers power, uint32 diff);
         void CastPetPassiveAuras(bool current);
+        void ApplyScalingBonus(ScalingAction* action);
         void ApplyAllScalingBonuses(bool apply);
         void ApplyStatScalingBonus(Stats stat, bool apply);
         void ApplyResistanceScalingBonus(uint32 school, bool apply);
@@ -215,6 +241,7 @@ class Pet : public Creature
         void ApplyPowerregenScalingBonus(bool apply);
         bool ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints);
         PetScalingData* CalculateScalingData( bool recalculate = false );
+        void AddScalingAction(ScalingTarget target, uint32 stat, bool apply);
 
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
@@ -289,6 +316,7 @@ class Pet : public Creature
         PetScalingData*  m_PetScalingData;
         PetScalingData*  m_baseBonusData;
         uint32  m_createSpellID;
+        std::queue<ScalingAction> m_scalingQueue;
 
         DeclinedName *m_declinedname;
 
@@ -305,20 +333,6 @@ class Pet : public Creature
         }
 };
 
-enum ScalingTarget
-{
-    SCALING_TARGET_ALL          = 0,
-    SCALING_TARGET_STAT,
-    SCALING_TARGET_RESISTANCE,
-    SCALING_TARGET_ATTACKPOWER,
-    SCALING_TARGET_DAMAGE,
-    SCALING_TARGET_SPELLDAMAGE,
-    SCALING_TARGET_HIT,
-    SCALING_TARGET_SPELLHIT,
-    SCALING_TARGET_EXPERTIZE,
-    SCALING_TARGET_POWERREGEN,
-    SCALING_TARGET_MAX
-};
 
 struct ApplyScalingBonusWithHelper
 {
