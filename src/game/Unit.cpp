@@ -9788,6 +9788,7 @@ CharmInfo::CharmInfo(Unit* unit)
 {
     for(int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_charmspells[i].SetActionAndType(0,ACT_DISABLED);
+    m_petnumber = 0;
 }
 
 void CharmInfo::InitPetActionBar()
