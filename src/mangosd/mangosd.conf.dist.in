@@ -3,7 +3,7 @@
 #####################################
 
 [MangosdConf]
-ConfVersion=2010062001
+ConfVersion=2010100901
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -196,9 +196,8 @@ ChangeWeatherInterval = 600000
 PlayerSave.Interval = 900000
 PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
-vmap.enableLOS = 0
-vmap.enableHeight = 0
-vmap.ignoreMapIds = ""
+vmap.enableLOS = 1
+vmap.enableHeight = 1
 vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 DetectPosCollision = 1
