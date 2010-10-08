@@ -686,8 +686,6 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 {
                     // GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY can have lo flag = 2
                     //      most likely related to "can enter map" and then should be 0 if can not enter
-                    // GAMEOBJECT_TYPE_QUESTGIVER can have lo flag = 1
-                    //      most likely related to can take/finish quest at
 
                     // GO_DYNFLAG_ACTIVATE      = 0x01
                     // GO_DYNFLAG_ANIMATE       = 0x02
@@ -698,6 +696,10 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     {
                         switch(((GameObject*)this)->GetGoType())
                         {
+                            case GAMEOBJECT_TYPE_QUESTGIVER:
+                                *data << uint16(1);
+                                *data << uint16(-1);
+                                break;
                             case GAMEOBJECT_TYPE_CHEST:
                                 // enable quest object. Represent 9, but 1 for client before 2.3.0
                                 *data << uint16(9);

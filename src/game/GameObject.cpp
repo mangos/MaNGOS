@@ -725,6 +725,34 @@ bool GameObject::ActivateToQuest(Player *pTarget)const
 
     switch(GetGoType())
     {
+        case GAMEOBJECT_TYPE_QUESTGIVER:
+        {
+            // Not fully clear when GO's can activate/deactivate
+            // For cases where GO has additional (except quest itself),
+            // these conditions are not sufficient/will fail.
+            // Never expect flags|4 for these GO's? (NF-note: It doesn't appear it's expected)
+
+            const QuestRelations &qRel = sObjectMgr.mGOQuestRelations;
+
+            for(QuestRelations::const_iterator itr = qRel.lower_bound(GetEntry()); itr != qRel.upper_bound(GetEntry()); ++itr)
+            {
+                const Quest *qInfo = sObjectMgr.GetQuestTemplate(itr->second);
+
+                if (pTarget->CanTakeQuest(qInfo, false))
+                    return true;
+            }
+
+            const QuestRelations &qInRel = sObjectMgr.mGOQuestInvolvedRelations;
+
+            for(QuestRelations::const_iterator itr = qInRel.lower_bound(GetEntry()); itr != qInRel.upper_bound(GetEntry()); ++itr)
+            {
+                if ((pTarget->GetQuestStatus(itr->second) == QUEST_STATUS_INCOMPLETE || pTarget->GetQuestStatus(itr->second) == QUEST_STATUS_COMPLETE)
+                    && !pTarget->GetQuestRewardStatus(itr->second))
+                    return true;
+            }
+
+            break;
+        }
         // scan GO chest with loot including quest items
         case GAMEOBJECT_TYPE_CHEST:
         {
