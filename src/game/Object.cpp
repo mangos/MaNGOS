@@ -736,9 +736,19 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
             if( updateMask->GetBit( index ) )
             {
                 // send in current format (float as float, uint32 as uint32)
-                if ( index == GAMEOBJECT_DYNAMIC )
+                if (index == GAMEOBJECT_DYNAMIC)
                 {
-                    if(IsActivateToQuest )
+                    // GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY can have lo flag = 2
+                    //      most likely related to "can enter map" and then should be 0 if can not enter
+                    // GAMEOBJECT_TYPE_QUESTGIVER can have lo flag = 1
+                    //      most likely related to can take/finish quest at
+
+                    // GO_DYNFLAG_ACTIVATE      = 0x01
+                    // GO_DYNFLAG_ANIMATE       = 0x02
+                    // GO_DYNFLAG_NO_INTERACT   = 0x04
+                    // GO_DYNFLAG_SPARKLE       = 0x08
+
+                    if (IsActivateToQuest)
                     {
                         switch(((GameObject*)this)->GetGoType())
                         {
@@ -748,7 +758,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GOOBER:
-                                *data << uint16(1);
+                                *data << uint16(9);
                                 *data << uint16(-1);
                                 break;
                             default:
