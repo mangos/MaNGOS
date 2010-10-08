@@ -7875,6 +7875,21 @@ void ObjectMgr::LoadGameObjectForQuests()
 
         switch(goInfo->type)
         {
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+            {
+                if (mGOQuestRelations.find(go_entry) != mGOQuestRelations.end())
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    ++count;
+                }
+                else if (mGOQuestInvolvedRelations.find(go_entry) != mGOQuestInvolvedRelations.end())
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    ++count;
+                }
+
+                break;
+            }
             case GAMEOBJECT_TYPE_CHEST:
             {
                 // scan GO chest with loot including quest items
