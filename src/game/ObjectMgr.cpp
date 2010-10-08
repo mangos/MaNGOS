@@ -7875,19 +7875,13 @@ void ObjectMgr::LoadGameObjectForQuests()
 
         switch(goInfo->type)
         {
-            // scan GO chest with loot including quest items
             case GAMEOBJECT_TYPE_CHEST:
             {
+                // scan GO chest with loot including quest items
                 uint32 loot_id = goInfo->GetLootId();
 
-                // always activate to quest, GO may not have loot
-                if (goInfo->chest.questId)
-                {
-                    mGameObjectForQuestSet.insert(go_entry);
-                    ++count;
-                }
-                // find quest loot for GO
-                else if (LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                // always activate to quest, GO may not have loot, OR find if GO has loot for quest.
+                if (goInfo->chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
                 {
                     mGameObjectForQuestSet.insert(go_entry);
                     ++count;
