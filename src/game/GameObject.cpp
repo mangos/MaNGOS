@@ -735,6 +735,12 @@ bool GameObject::ActivateToQuest( Player *pTarget)const
             }
             break;
         }
+        case GAMEOBJECT_TYPE_GENERIC:
+        {
+            if (pTarget->GetQuestStatus(GetGOInfo()->_generic.questID) == QUEST_STATUS_INCOMPLETE)
+                return true;
+            break;
+        }
         case GAMEOBJECT_TYPE_GOOBER:
         {
             if(pTarget->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
