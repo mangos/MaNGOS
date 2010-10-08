@@ -580,7 +580,8 @@ void Aura::Update(uint32 diff)
         // all spells with manaPerSecond/manaPerSecondPerLevel have aura in effect 0
         if (GetEffIndex() == EFFECT_INDEX_0 && m_timeCla <= 0)
         {
-            if(Unit* caster = GetCaster())
+            Unit* caster = GetCaster();
+            if (caster && caster->IsInWorld())
             {
                 Powers powertype = Powers(GetSpellProto()->powerType);
                 int32 manaPerSecond = GetSpellProto()->manaPerSecond + GetSpellProto()->manaPerSecondPerLevel * caster->getLevel();

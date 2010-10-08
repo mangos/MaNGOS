@@ -242,6 +242,7 @@ class Pet : public Creature
         bool ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellproto, SpellEffectIndex index, int32 basePoints);
         PetScalingData* CalculateScalingData( bool recalculate = false );
         void AddScalingAction(ScalingTarget target, uint32 stat, bool apply);
+        void ApplyHappinessBonus(bool apply);
 
         void _LoadSpellCooldowns();
         void _SaveSpellCooldowns();
@@ -317,6 +318,7 @@ class Pet : public Creature
         PetScalingData*  m_baseBonusData;
         uint32  m_createSpellID;
         std::queue<ScalingAction> m_scalingQueue;
+        uint8   m_HappinessState;
 
         DeclinedName *m_declinedname;
 

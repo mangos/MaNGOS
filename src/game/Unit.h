@@ -2088,13 +2088,14 @@ template<typename Func>
 void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet)
 {
     if (!m_groupPets.empty())
-        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+    {
+        GroupPetList m_groupPetsTmp = GetPets();  // Original list may be modified in this function
+        for (GroupPetList::const_iterator itr = m_groupPetsTmp.begin(); itr != m_groupPetsTmp.end(); ++itr)
         {
             if (Pet* pet = _GetPet(*itr))
                 func(pet);
-            if (m_groupPets.empty())           // special case for pet abandon command
-                break;
         }
+    }
 
     if (withGuardians)
     {

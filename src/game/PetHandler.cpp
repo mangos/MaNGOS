@@ -141,9 +141,14 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
     if (!pet)
         return;
 
-    if ((!((Creature*)pet)->isPet() && pet->isCharmed()) || !pet->GetCharmInfo() || (pet->GetCharmInfo()->GetPetNumber() && pet->GetCharmInfo()->GetPetNumber() != petnumber))
+    if (!pet->IsInWorld() || !pet->isPet() || !pet->GetCharmInfo() || !pet->GetCharmInfo()->GetPetNumber() ||
+         (pet->isPet() && !((Pet*)pet)->GetPetCounter() && pet->GetCharmInfo()->GetPetNumber() != petnumber))
     {
-        std::string name = ((Creature*)pet)->GetName();
+        std::string name = "";
+        if (pet->IsInWorld())
+            name = std::string(pet->GetName());
+        else
+            name = "Controlled creature";
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
         data << uint32(petnumber);
         data << name.c_str();
@@ -388,7 +393,7 @@ void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
     {
         if(pet->isPet())
         {
-            if(pet->GetGUID() == _player->GetPetGUID())
+            if(pet->GetGUID() == GetPlayer()->GetPetGUID())
             {
                 uint32 feelty = pet->GetPower(POWER_HAPPINESS);
                 pet->SetPower(POWER_HAPPINESS ,(feelty-50000) > 0 ?(feelty-50000) : 0);

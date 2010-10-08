@@ -42,7 +42,7 @@ m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
 m_removed(false), m_happinessTimer(7500), m_petType(type), m_duration(0),
 m_auraUpdateMask(0), m_loading(true),
 m_declinedname(NULL), m_petModeFlags(PET_MODE_DEFAULT),
-m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL), m_createSpellID(0)
+m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScalingData(NULL), m_createSpellID(0),m_HappinessState(0)
 {
     SetName("Pet");
     m_regenTimer = 2000;
@@ -562,6 +562,7 @@ void Pet::Update(uint32 diff)
             {
                 LooseHappiness();
                 m_happinessTimer = 7500;
+                ApplyHappinessBonus(true);
             }
             else
                 m_happinessTimer -= diff;
@@ -3070,7 +3071,7 @@ void Pet::Regenerate(Powers power, uint32 diff)
         }
         case POWER_FOCUS:                                   // Hunter pets
         {
-            addvalue = 12 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
+            addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
             break;
         }
         case POWER_RUNIC_POWER:
@@ -3086,6 +3087,11 @@ void Pet::Regenerate(Powers power, uint32 diff)
     // Exist only for POWER_MANA, POWER_ENERGY, POWER_FOCUS auras
     if(power != POWER_MANA)
     {
+        AuraList const& ModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
+        for(AuraList::const_iterator i = ModPowerRegenAuras.begin(); i != ModPowerRegenAuras.end(); ++i)
+            if ((*i)->GetModifier()->m_miscvalue == power)
+                addvalue += (*i)->GetModifier()->m_amount;
+
         AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
         for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
             if ((*i)->GetModifier()->m_miscvalue == power)
@@ -3162,4 +3168,42 @@ void ApplyScalingBonusWithHelper::operator() (Unit* unit) const
         return;
     Pet* pet = (Pet*)unit;
     pet->AddScalingAction(target, stat, apply);
+}
+
+void Pet::ApplyHappinessBonus(bool apply)
+{
+    if (GetHappinessState() == m_HappinessState)
+        return;
+    else
+        m_HappinessState = GetHappinessState();
+
+    if (apply)
+    {
+        RemoveAurasDueToSpell(8875);
+        int32 basePoints = 0;
+        switch (HappinessState(m_HappinessState))
+        {
+            case HAPPY:
+                // 125% of normal damage
+                basePoints = 25;
+                break;
+            case CONTENT:
+                // 100% of normal damage, nothing to modify
+                basePoints = 0;
+                break;
+            case UNHAPPY:
+                // 75% of normal damage
+                basePoints = -25;
+                break;
+            default:
+                basePoints = 0;
+                break;
+        }
+
+        CastCustomSpell(this, 8875, &basePoints, NULL, NULL, true);
+
+        UpdateDamagePhysical(BASE_ATTACK);
+        UpdateDamagePhysical(RANGED_ATTACK);
+        UpdateSpellPower();
+    }
 }
