@@ -7880,11 +7880,35 @@ void ObjectMgr::LoadGameObjectForQuests()
             {
                 uint32 loot_id = goInfo->GetLootId();
 
-                // find quest loot for GO
-                if(LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                // always activate to quest, GO may not have loot
+                if (goInfo->chest.questId)
                 {
                     mGameObjectForQuestSet.insert(go_entry);
                     ++count;
+                }
+                // find quest loot for GO
+                else if (LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    ++count;
+                }
+                break;
+            }
+            case GAMEOBJECT_TYPE_GENERIC:
+            {
+                if (goInfo->_generic.questID)               // quest related objects, has visual effects
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    count++;
+                }
+                break;
+            }
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+            {
+                if (goInfo->spellFocus.questID)             // quest related objects, has visual effect
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    count++;
                 }
                 break;
             }

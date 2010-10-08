@@ -757,6 +757,14 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                                 *data << uint16(9);
                                 *data << uint16(-1);
                                 break;
+                            case GAMEOBJECT_TYPE_GENERIC:
+                                *data << uint16(8);         // unclear if 0x01 should be added
+                                *data << uint16(-1);
+                                break;
+                            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+                                *data << uint16(9);
+                                *data << uint16(-1);
+                                break;
                             case GAMEOBJECT_TYPE_GOOBER:
                                 *data << uint16(9);
                                 *data << uint16(-1);
