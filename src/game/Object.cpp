@@ -1072,6 +1072,44 @@ void Object::RemoveByteFlag( uint16 index, uint8 offset, uint8 oldFlag )
     }
 }
 
+void Object::SetShortFlag(uint16 index, bool highpart, uint16 newFlag)
+{
+    MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
+
+    if (!(uint16(m_uint32Values[index] >> (highpart ? 16 : 0)) & newFlag))
+    {
+        m_uint32Values[index] |= uint32(uint32(newFlag) << (highpart ? 16 : 0));
+
+        if (m_inWorld)
+        {
+            if (!m_objectUpdated)
+            {
+                AddToClientUpdateList();
+                m_objectUpdated = true;
+            }
+        }
+    }
+}
+
+void Object::RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag)
+{
+    MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
+
+    if (uint16(m_uint32Values[index] >> (highpart ? 16 : 0)) & oldFlag)
+    {
+        m_uint32Values[index] &= ~uint32(uint32(oldFlag) << (highpart ? 16 : 0));
+
+        if (m_inWorld)
+        {
+            if (!m_objectUpdated)
+            {
+                AddToClientUpdateList();
+                m_objectUpdated = true;
+            }
+        }
+    }
+}
+
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
     sLog.outError("Attempt %s nonexistent value field: %u (count: %u) for object typeid: %u type mask: %u",(set ? "set value to" : "get value from"),index,m_valuesCount,GetTypeId(),m_objectType);
