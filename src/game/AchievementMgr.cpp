@@ -2421,9 +2421,8 @@ void AchievementGlobalMgr::LoadRewards()
         // GENDER_NONE must be single (so or already in and none must be attempt added new data or just adding and none in)
         // other duplicate cases prevented by DB primary key
         bool dup = false;
-        AchievementRewards::const_iterator iter_low = m_achievementRewards.lower_bound(entry);
-        AchievementRewards::const_iterator iter_up  = m_achievementRewards.upper_bound(entry);
-        for (AchievementRewards::const_iterator iter = iter_low; iter != iter_up; ++iter)
+        AchievementRewardsMapBounds bounds = m_achievementRewards.equal_range(entry);
+        for (AchievementRewardsMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
         {
             if (iter->second.gender == GENDER_NONE || reward.gender == GENDER_NONE)
             {
@@ -2495,7 +2494,7 @@ void AchievementGlobalMgr::LoadRewards()
             }
         }
 
-        m_achievementRewards.insert(AchievementRewards::value_type(entry,reward));
+        m_achievementRewards.insert(AchievementRewardsMap::value_type(entry, reward));
         ++count;
 
     } while (result->NextRow());
@@ -2548,9 +2547,8 @@ void AchievementGlobalMgr::LoadRewardLocales()
         // GENDER_NONE must be single (so or already in and none must be attempt added new data or just adding and none in)
         // other duplicate cases prevented by DB primary key
         bool dup = false;
-        AchievementRewardLocales::const_iterator iter_low = m_achievementRewardLocales.lower_bound(entry);
-        AchievementRewardLocales::const_iterator iter_up  = m_achievementRewardLocales.upper_bound(entry);
-        for (AchievementRewardLocales::const_iterator iter = iter_low; iter != iter_up; ++iter)
+        AchievementRewardLocalesMapBounds bounds = m_achievementRewardLocales.equal_range(entry);
+        for (AchievementRewardLocalesMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
         {
             if (iter->second.gender == GENDER_NONE || data.gender == GENDER_NONE)
             {
@@ -2590,7 +2588,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
             }
         }
 
-        m_achievementRewardLocales.insert(AchievementRewardLocales::value_type(entry,data));
+        m_achievementRewardLocales.insert(AchievementRewardLocalesMap::value_type(entry, data));
 
     } while (result->NextRow());
 

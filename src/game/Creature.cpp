@@ -1290,10 +1290,10 @@ void Creature::LoadEquipment(uint32 equip_entry, bool force)
 
 bool Creature::hasQuest(uint32 quest_id) const
 {
-    QuestRelations const& qr = sObjectMgr.mCreatureQuestRelations;
-    for(QuestRelations::const_iterator itr = qr.lower_bound(GetEntry()); itr != qr.upper_bound(GetEntry()); ++itr)
+    QuestRelationsMapBounds bounds = sObjectMgr.GetCreatureQuestRelationsMapBounds(GetEntry());
+    for(QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
-        if(itr->second==quest_id)
+        if (itr->second == quest_id)
             return true;
     }
     return false;
@@ -1301,10 +1301,10 @@ bool Creature::hasQuest(uint32 quest_id) const
 
 bool Creature::hasInvolvedQuest(uint32 quest_id) const
 {
-    QuestRelations const& qr = sObjectMgr.mCreatureQuestInvolvedRelations;
-    for(QuestRelations::const_iterator itr = qr.lower_bound(GetEntry()); itr != qr.upper_bound(GetEntry()); ++itr)
+    QuestRelationsMapBounds bounds = sObjectMgr.GetCreatureQuestInvolvedRelationsMapBounds(GetEntry());
+    for(QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
-        if(itr->second == quest_id)
+        if (itr->second == quest_id)
             return true;
     }
     return false;
