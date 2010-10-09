@@ -656,6 +656,7 @@ struct ItemPrototype
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAGS_CONJURED); }
 };
 
+// By unknown reason GCC generate wrong code for locale structures declared in header after pack pragma
 struct ItemLocale
 {
     std::vector<std::string> Name;
