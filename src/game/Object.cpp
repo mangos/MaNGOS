@@ -570,7 +570,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYNAMIC);
-            updateMask->SetBit(GAMEOBJECT_BYTES_1);
+            updateMask->SetBit(GAMEOBJECT_BYTES_1);         // why do we need this here?
         }
         else if (isType(TYPEMASK_UNIT))
         {
@@ -687,33 +687,31 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     // GAMEOBJECT_TYPE_DUNGEON_DIFFICULTY can have lo flag = 2
                     //      most likely related to "can enter map" and then should be 0 if can not enter
 
-                    // GO_DYNFLAG_ACTIVATE      = 0x01
-                    // GO_DYNFLAG_ANIMATE       = 0x02
-                    // GO_DYNFLAG_NO_INTERACT   = 0x04
-                    // GO_DYNFLAG_SPARKLE       = 0x08
-
                     if (IsActivateToQuest)
                     {
                         switch(((GameObject*)this)->GetGoType())
                         {
                             case GAMEOBJECT_TYPE_QUESTGIVER:
-                                *data << uint16(1);
+                                // GO also seen with GO_DYNFLAG_LO_SPARKLE explicit, relation/reason unclear (192861)
+                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_CHEST:
-                                *data << uint16(9);         // 1 for client before 2.3.0
+                                // GO_DYNFLAG_LO_ACTIVATE only, before client 2.3.0
+                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GENERIC:
-                                *data << uint16(8);         // unclear if 0x01 should be added
+                                // unclear if GO_DYNFLAG_LO_ACTIVATE should be added
+                                *data << uint16(GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_SPELL_FOCUS:
-                                *data << uint16(9);
+                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_GOOBER:
-                                *data << uint16(9);
+                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
                                 break;
                             default:
