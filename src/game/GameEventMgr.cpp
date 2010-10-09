@@ -795,16 +795,15 @@ void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
     QuestRelList::iterator itr;
     for (itr = mGameEventQuests[event_id].begin();itr != mGameEventQuests[event_id].end();++itr)
     {
-        QuestRelations &CreatureQuestMap = sObjectMgr.mCreatureQuestRelations;
+        QuestRelationsMap &CreatureQuestMap = sObjectMgr.GetCreatureQuestRelationsMap();
+
         if (Activate)                                       // Add the pair(id,quest) to the multimap
-            CreatureQuestMap.insert(QuestRelations::value_type(itr->first, itr->second));
+            CreatureQuestMap.insert(QuestRelationsMap::value_type(itr->first, itr->second));
         else
         {                                                   // Remove the pair(id,quest) from the multimap
-            QuestRelations::iterator qitr = CreatureQuestMap.find(itr->first);
-            if (qitr == CreatureQuestMap.end())
-                continue;
-            QuestRelations::iterator lastElement = CreatureQuestMap.upper_bound(itr->first);
-            for ( ;qitr != lastElement;++qitr)
+            std::pair<QuestRelationsMap::iterator, QuestRelationsMap::iterator> bounds = CreatureQuestMap.equal_range(itr->first);
+
+            for(QuestRelationsMap::iterator qitr = bounds.first; qitr != bounds.second; ++qitr)
             {
                 if (qitr->second == itr->second)
                 {

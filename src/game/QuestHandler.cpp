@@ -553,33 +553,33 @@ uint32 WorldSession::getDialogStatus(Player *pPlayer, Object* questgiver, uint32
 {
     uint32 dialogStatus = defstatus;
 
-    QuestRelations const* qir;
-    QuestRelations const* qr;
+    QuestRelationsMapBounds rbounds;
+    QuestRelationsMapBounds irbounds;
 
     switch(questgiver->GetTypeId())
     {
-        case TYPEID_GAMEOBJECT:
-        {
-            qir = &sObjectMgr.mGOQuestInvolvedRelations;
-            qr  = &sObjectMgr.mGOQuestRelations;
-            break;
-        }
         case TYPEID_UNIT:
         {
-            qir = &sObjectMgr.mCreatureQuestInvolvedRelations;
-            qr  = &sObjectMgr.mCreatureQuestRelations;
+            rbounds = sObjectMgr.GetCreatureQuestRelationsMapBounds(questgiver->GetEntry());
+            irbounds = sObjectMgr.GetCreatureQuestInvolvedRelationsMapBounds(questgiver->GetEntry());
+            break;
+        }
+        case TYPEID_GAMEOBJECT:
+        {
+            rbounds = sObjectMgr.GetGOQuestRelationsMapBounds(questgiver->GetEntry());
+            irbounds = sObjectMgr.GetGOQuestInvolvedRelationsMapBounds(questgiver->GetEntry());
             break;
         }
         default:
-            //its imposible, but check ^)
+            //it's impossible, but check ^)
             sLog.outError("Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }
 
-    for(QuestRelations::const_iterator i = qir->lower_bound(questgiver->GetEntry()); i != qir->upper_bound(questgiver->GetEntry()); ++i)
+    for(QuestRelationsMap::const_iterator itr = irbounds.first; itr != irbounds.second; ++itr)
     {
         uint32 dialogStatusNew = 0;
-        uint32 quest_id = i->second;
+        uint32 quest_id = itr->second;
         Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest_id);
 
         if (!pQuest)
@@ -602,10 +602,10 @@ uint32 WorldSession::getDialogStatus(Player *pPlayer, Object* questgiver, uint32
             dialogStatus = dialogStatusNew;
     }
 
-    for(QuestRelations::const_iterator i = qr->lower_bound(questgiver->GetEntry()); i != qr->upper_bound(questgiver->GetEntry()); ++i)
+    for(QuestRelationsMap::const_iterator itr = rbounds.first; itr != rbounds.second; ++itr)
     {
         uint32 dialogStatusNew = 0;
-        uint32 quest_id = i->second;
+        uint32 quest_id = itr->second;
         Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest_id);
 
         if (!pQuest)

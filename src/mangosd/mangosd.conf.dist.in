@@ -3,7 +3,7 @@
 #####################################
 
 [MangosdConf]
-ConfVersion=2010062001
+ConfVersion=2010100901
 
 ###################################################################################################################
 # CONNECTIONS AND DIRECTORIES
@@ -137,12 +137,6 @@ BindIP = "0.0.0.0"
 #        Default: 0 (disable)
 #                 1 (enable)
 #
-#    vmap.ignoreMapIds
-#        Map id that will be ignored by VMaps
-#        List of ids with delimiter ','
-#        If more then one id is defined and spaces are included, the string has to be enclosed by "
-#        Example: "369,0,1,530"
-#
 #    vmap.ignoreSpellIds
 #        These spells are ignored for LoS calculation
 #        List of ids with delimiter ','
@@ -202,9 +196,8 @@ ChangeWeatherInterval = 600000
 PlayerSave.Interval = 900000
 PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
-vmap.enableLOS = 0
-vmap.enableHeight = 0
-vmap.ignoreMapIds = ""
+vmap.enableLOS = 1
+vmap.enableHeight = 1
 vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 DetectPosCollision = 1
