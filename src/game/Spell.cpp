@@ -6920,14 +6920,14 @@ bool Spell::HasGlobalCooldown()
 
 void Spell::TriggerGlobalCooldown()
 {
-    int32 gcd = m_spellInfo->StartRecoveryTime;
+    int32 gcd = m_spellInfo->GetStartRecoveryTime();
     if (!gcd)
         return;
 
     // global cooldown can't leave range 1..1.5 secs (if it it)
     // exist some spells (mostly not player directly casted) that have < 1 sec and > 1.5 sec global cooldowns
     // but its as test show not affected any spell mods.
-    if (m_spellInfo->StartRecoveryTime >= 1000 && m_spellInfo->StartRecoveryTime <= 1500)
+    if (gcd >= 1000 && gcd <= 1500)
     {
         // gcd modifier auras applied only to self spells and only player have mods for this
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -6951,7 +6951,7 @@ void Spell::TriggerGlobalCooldown()
 
 void Spell::CancelGlobalCooldown()
 {
-    if (!m_spellInfo->StartRecoveryTime)
+    if (!m_spellInfo->GetStartRecoveryTime())
         return;
 
     // cancel global cooldown when interrupting current cast

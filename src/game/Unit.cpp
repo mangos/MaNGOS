@@ -163,18 +163,18 @@ void MovementInfo::Write(ByteBuffer &data) const
 
 bool GlobalCooldownMgr::HasGlobalCooldown(SpellEntry const* spellInfo) const
 {
-    GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
+    GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->GetStartRecoveryCategory());
     return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, getMSTime()) < itr->second.duration;
 }
 
 void GlobalCooldownMgr::AddGlobalCooldown(SpellEntry const* spellInfo, uint32 gcd)
 {
-    m_GlobalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, getMSTime());
+    m_GlobalCooldowns[spellInfo->GetStartRecoveryCategory()] = GlobalCooldown(gcd, getMSTime());
 }
 
 void GlobalCooldownMgr::CancelGlobalCooldown(SpellEntry const* spellInfo)
 {
-    m_GlobalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
+    m_GlobalCooldowns[spellInfo->GetStartRecoveryCategory()].duration = 0;
 }
 
 ////////////////////////////////////////////////////////////
