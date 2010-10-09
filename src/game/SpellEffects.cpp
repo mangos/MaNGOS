@@ -4236,7 +4236,7 @@ void Spell::EffectDispel(SpellEffectEntry const* effect)
                     continue;
             }
             // Unholy Blight prevents dispel of diseases from target
-            else if (holder->GetSpellProto()->Dispel == DISPEL_DISEASE)
+            else if (holder->GetSpellProto()->GetDispel() == DISPEL_DISEASE)
                 if (unitTarget->HasAura(50536))
                     continue;
 
