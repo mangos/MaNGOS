@@ -225,6 +225,9 @@ class MANGOS_DLL_SPEC Object
         void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
         void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
 
+        void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
+        void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
+
         void ToggleFlag( uint16 index, uint8 offset, uint8 flag )
         {
             if(HasByteFlag(index, offset, flag))

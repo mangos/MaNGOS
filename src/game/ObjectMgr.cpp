@@ -939,7 +939,9 @@ uint32 ObjectMgr::GetModelForRace(uint32 sourceModelId, uint32 racemask)
 {
     uint32 modelId = 0;
 
-    for(CreatureModelRaceMap::const_iterator itr = m_mCreatureModelRaceMap.lower_bound(sourceModelId); itr != m_mCreatureModelRaceMap.upper_bound(sourceModelId); ++itr)
+    CreatureModelRaceMapBounds bounds = m_mCreatureModelRaceMap.equal_range(sourceModelId);
+
+    for(CreatureModelRaceMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
         if (!(itr->second.racemask & racemask))
             continue;
@@ -3557,9 +3559,10 @@ void ObjectMgr::LoadQuests()
     // For reload case
     for(QuestMap::const_iterator itr=mQuestTemplates.begin(); itr != mQuestTemplates.end(); ++itr)
         delete itr->second;
+
     mQuestTemplates.clear();
 
-    mExclusiveQuestGroups.clear();
+    m_ExclusiveQuestGroups.clear();
 
     //                                                0      1       2           3             4         5           6     7              8
     QueryResult *result = WorldDatabase.Query("SELECT entry, Method, ZoneOrSort, SkillOrClass, MinLevel, QuestLevel, Type, RequiredRaces, RequiredSkillValue,"
@@ -4193,7 +4196,8 @@ void ObjectMgr::LoadQuests()
         }
 
         if (qinfo->ExclusiveGroup)
-            mExclusiveQuestGroups.insert(std::pair<int32, uint32>(qinfo->ExclusiveGroup, qinfo->GetQuestId()));
+            m_ExclusiveQuestGroups.insert(ExclusiveQuestGroupsMap::value_type(qinfo->ExclusiveGroup, qinfo->GetQuestId()));
+
         if (qinfo->LimitTime)
             qinfo->SetFlag(QUEST_MANGOS_FLAGS_TIMED);
     }
@@ -5795,9 +5799,9 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
     //     then check faction
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
-    GraveYardMap::const_iterator graveLow  = mGraveYardMap.lower_bound(zoneId);
-    GraveYardMap::const_iterator graveUp   = mGraveYardMap.upper_bound(zoneId);
-    if(graveLow==graveUp)
+    GraveYardMapBounds bounds = mGraveYardMap.equal_range(zoneId);
+
+    if (bounds.first == bounds.second)
     {
         sLog.outErrorDb("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.",zoneId,team);
         return NULL;
@@ -5818,7 +5822,7 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
 
     MapEntry const* mapEntry = sMapStore.LookupEntry(MapId);
 
-    for(GraveYardMap::const_iterator itr = graveLow; itr != graveUp; ++itr)
+    for(GraveYardMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
         GraveYardData const& data = itr->second;
 
@@ -5896,14 +5900,13 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
     return entryFar;
 }
 
-GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId)
+GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId) const
 {
-    GraveYardMap::const_iterator graveLow  = mGraveYardMap.lower_bound(zoneId);
-    GraveYardMap::const_iterator graveUp   = mGraveYardMap.upper_bound(zoneId);
+    GraveYardMapBounds bounds = mGraveYardMap.equal_range(zoneId);
 
-    for(GraveYardMap::const_iterator itr = graveLow; itr != graveUp; ++itr)
+    for(GraveYardMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
-        if(itr->second.safeLocId==id)
+        if (itr->second.safeLocId == id)
             return &itr->second;
     }
 
@@ -7387,7 +7390,7 @@ void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_
     cell_guids.corpses.erase(player_guid);
 }
 
-void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map,char const* table)
+void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table)
 {
     map.clear();                                            // need for reload case
 
@@ -7422,7 +7425,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map,char const* table)
             continue;
         }
 
-        map.insert(QuestRelations::value_type(id,quest));
+        map.insert(QuestRelationsMap::value_type(id, quest));
 
         ++count;
     } while (result->NextRow());
@@ -7435,56 +7438,56 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map,char const* table)
 
 void ObjectMgr::LoadGameobjectQuestRelations()
 {
-    LoadQuestRelationsHelper(mGOQuestRelations,"gameobject_questrelation");
+    LoadQuestRelationsHelper(m_GOQuestRelations, "gameobject_questrelation");
 
-    for(QuestRelations::iterator itr = mGOQuestRelations.begin(); itr != mGOQuestRelations.end(); ++itr)
+    for(QuestRelationsMap::iterator itr = m_GOQuestRelations.begin(); itr != m_GOQuestRelations.end(); ++itr)
     {
         GameObjectInfo const* goInfo = GetGameObjectInfo(itr->first);
-        if(!goInfo)
+        if (!goInfo)
             sLog.outErrorDb("Table `gameobject_questrelation` have data for nonexistent gameobject entry (%u) and existing quest %u",itr->first,itr->second);
-        else if(goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
+        else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
             sLog.outErrorDb("Table `gameobject_questrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER",itr->first,itr->second);
     }
 }
 
 void ObjectMgr::LoadGameobjectInvolvedRelations()
 {
-    LoadQuestRelationsHelper(mGOQuestInvolvedRelations,"gameobject_involvedrelation");
+    LoadQuestRelationsHelper(m_GOQuestInvolvedRelations, "gameobject_involvedrelation");
 
-    for(QuestRelations::iterator itr = mGOQuestInvolvedRelations.begin(); itr != mGOQuestInvolvedRelations.end(); ++itr)
+    for(QuestRelationsMap::iterator itr = m_GOQuestInvolvedRelations.begin(); itr != m_GOQuestInvolvedRelations.end(); ++itr)
     {
         GameObjectInfo const* goInfo = GetGameObjectInfo(itr->first);
-        if(!goInfo)
+        if (!goInfo)
             sLog.outErrorDb("Table `gameobject_involvedrelation` have data for nonexistent gameobject entry (%u) and existing quest %u",itr->first,itr->second);
-        else if(goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
+        else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
             sLog.outErrorDb("Table `gameobject_involvedrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER",itr->first,itr->second);
     }
 }
 
 void ObjectMgr::LoadCreatureQuestRelations()
 {
-    LoadQuestRelationsHelper(mCreatureQuestRelations,"creature_questrelation");
+    LoadQuestRelationsHelper(m_CreatureQuestRelations, "creature_questrelation");
 
-    for(QuestRelations::iterator itr = mCreatureQuestRelations.begin(); itr != mCreatureQuestRelations.end(); ++itr)
+    for(QuestRelationsMap::iterator itr = m_CreatureQuestRelations.begin(); itr != m_CreatureQuestRelations.end(); ++itr)
     {
         CreatureInfo const* cInfo = GetCreatureTemplate(itr->first);
-        if(!cInfo)
+        if (!cInfo)
             sLog.outErrorDb("Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u",itr->first,itr->second);
-        else if(!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
+        else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
             sLog.outErrorDb("Table `creature_questrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER",itr->first,itr->second);
     }
 }
 
 void ObjectMgr::LoadCreatureInvolvedRelations()
 {
-    LoadQuestRelationsHelper(mCreatureQuestInvolvedRelations,"creature_involvedrelation");
+    LoadQuestRelationsHelper(m_CreatureQuestInvolvedRelations, "creature_involvedrelation");
 
-    for(QuestRelations::iterator itr = mCreatureQuestInvolvedRelations.begin(); itr != mCreatureQuestInvolvedRelations.end(); ++itr)
+    for(QuestRelationsMap::iterator itr = m_CreatureQuestInvolvedRelations.begin(); itr != m_CreatureQuestInvolvedRelations.end(); ++itr)
     {
         CreatureInfo const* cInfo = GetCreatureTemplate(itr->first);
-        if(!cInfo)
+        if (!cInfo)
             sLog.outErrorDb("Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u",itr->first,itr->second);
-        else if(!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
+        else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
             sLog.outErrorDb("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER",itr->first,itr->second);
     }
 }
@@ -7714,7 +7717,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 {
     mGameObjectForQuestSet.clear();                         // need for reload case
 
-    if( !sGOStorage.MaxEntry )
+    if (!sGOStorage.MaxEntry)
     {
         barGoLink bar( 1 );
         bar.step();
@@ -7723,35 +7726,64 @@ void ObjectMgr::LoadGameObjectForQuests()
         return;
     }
 
-    barGoLink bar( sGOStorage.MaxEntry - 1 );
+    barGoLink bar(sGOStorage.MaxEntry - 1);
     uint32 count = 0;
 
     // collect GO entries for GO that must activated
     for(uint32 go_entry = 1; go_entry < sGOStorage.MaxEntry; ++go_entry)
     {
         bar.step();
-        GameObjectInfo const* goInfo = sGOStorage.LookupEntry<GameObjectInfo>(go_entry);
-        if(!goInfo)
+        GameObjectInfo const* goInfo = GetGameObjectInfo(go_entry);
+        if (!goInfo)
             continue;
 
         switch(goInfo->type)
         {
-            // scan GO chest with loot including quest items
+            case GAMEOBJECT_TYPE_QUESTGIVER:
+            {
+                if (m_GOQuestRelations.find(go_entry) != m_GOQuestRelations.end() ||
+                    m_GOQuestInvolvedRelations.find(go_entry) != m_GOQuestInvolvedRelations.end())
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    ++count;
+                }
+
+                break;
+            }
             case GAMEOBJECT_TYPE_CHEST:
             {
+                // scan GO chest with loot including quest items
                 uint32 loot_id = goInfo->GetLootId();
 
-                // find quest loot for GO
-                if(LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
+                // always activate to quest, GO may not have loot, OR find if GO has loot for quest.
+                if (goInfo->chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
                 {
                     mGameObjectForQuestSet.insert(go_entry);
                     ++count;
                 }
                 break;
             }
+            case GAMEOBJECT_TYPE_GENERIC:
+            {
+                if (goInfo->_generic.questID)               // quest related objects, has visual effects
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    count++;
+                }
+                break;
+            }
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:
+            {
+                if (goInfo->spellFocus.questID)             // quest related objects, has visual effect
+                {
+                    mGameObjectForQuestSet.insert(go_entry);
+                    count++;
+                }
+                break;
+            }
             case GAMEOBJECT_TYPE_GOOBER:
             {
-                if(goInfo->goober.questId)                  //quests objects
+                if (goInfo->goober.questId)                 //quests objects
                 {
                     mGameObjectForQuestSet.insert(go_entry);
                     count++;
