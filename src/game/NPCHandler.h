@@ -34,7 +34,13 @@ struct PageText
     uint32 Next_Page;
 };
 
-// By unknown reason GCC generate wrong code for locale structures declared in header after pack pragma
+// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
+#if defined( __GNUC__ )
+#pragma pack()
+#else
+#pragma pack(pop)
+#endif
+
 struct PageTextLocale
 {
     std::vector<std::string> Text;
@@ -47,13 +53,6 @@ struct NpcTextLocale
     std::vector<std::vector<std::string> > Text_0;
     std::vector<std::vector<std::string> > Text_1;
 };
-
-// GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
-#pragma pack()
-#else
-#pragma pack(pop)
-#endif
 
 struct QEmote
 {
