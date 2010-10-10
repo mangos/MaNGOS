@@ -660,17 +660,17 @@ struct ItemPrototype
     }
 };
 
-// By unknown reason GCC generate wrong code for locale structures declared in header after pack pragma
-struct ItemLocale
-{
-    std::vector<std::string> Name;
-    std::vector<std::string> Description;
-};
-
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
 #if defined( __GNUC__ )
 #pragma pack()
 #else
 #pragma pack(pop)
 #endif
+
+struct ItemLocale
+{
+    std::vector<std::string> Name;
+    std::vector<std::string> Description;
+};
+
 #endif
