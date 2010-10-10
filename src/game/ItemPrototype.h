@@ -660,6 +660,7 @@ struct ItemPrototype
     }
 };
 
+// By unknown reason GCC generate wrong code for locale structures declared in header after pack pragma
 struct ItemLocale
 {
     std::vector<std::string> Name;

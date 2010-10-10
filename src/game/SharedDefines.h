@@ -1219,6 +1219,14 @@ enum GameObjectFlags
     GO_FLAG_UNK_11          = 0x00000400                    //? Seen on type 33, possibly meaning "destructed"
 };
 
+enum GameObjectDynamicLowFlags
+{
+    GO_DYNFLAG_LO_ACTIVATE          = 0x01,                 // enables interaction with GO
+    GO_DYNFLAG_LO_ANIMATE           = 0x02,                 // possibly more distinct animation of GO
+    GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
+    GO_DYNFLAG_LO_SPARKLE           = 0x08,                 // makes GO sparkle
+};
+
 enum TextEmotes
 {
     TEXTEMOTE_AGREE                = 1,
