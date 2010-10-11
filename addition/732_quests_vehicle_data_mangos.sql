@@ -86,3 +86,53 @@ DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (30066);
 INSERT INTO `npc_spellclick_spells` VALUES
 (30066, 44002, 12953, 1, 12953, 1);
 INSERT IGNORE INTO `spell_script_target` VALUES (55812, 1, 30096);
+
+-- From lanc
+/* 7th Legion Chain Gun */
+UPDATE creature_template SET
+    IconName = 'Gunner',
+    spell1 = 49190,
+    spell2 = 49550,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 68
+WHERE entry IN (27714);
+
+DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27714);
+INSERT INTO npc_spellclick_spells VALUES
+(27714, 67373, 0, 0, 0, 1);
+
+/* Broken-down Shredder */
+UPDATE creature_template SET
+    IconName = 'vehichleCursor',
+    spell1 = 48558,
+    spell2 = 48604,
+    spell3 = 48548,
+    spell4 = 0,
+    spell5 = 48610,
+    spell6 = 0,
+    VehicleId = 49
+WHERE entry IN (27354);
+
+DELETE FROM npc_spellclick_spells WHERE npc_entry IN (27354);
+INSERT INTO npc_spellclick_spells VALUES
+(27354, 67373, 0, 0, 0, 1);
+INSERT IGNORE INTO spell_script_target VALUES (48610, 1, 27396);
+
+/* Forsaken Blight Spreader */
+UPDATE creature_template SET
+    IconName = 'vehichleCursor',
+    spell1 = 48211,
+    spell2 = 0,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 36
+WHERE entry IN (26523);
+
+DELETE FROM npc_spellclick_spells WHERE npc_entry IN (26523);
+INSERT INTO npc_spellclick_spells VALUES
+(26523, 47961, 0, 0, 0, 1);

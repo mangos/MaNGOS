@@ -226,11 +226,6 @@ DELETE FROM `spell_proc_event` WHERE entry = 48988;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
 VALUES (48988, 0x00, 0x0F, 0x00000000, 0x00000000, 0x00000000, 0, 0x00000002, 0, 0, 0);
 
--- (49149) Chill of the Grave
-DELETE FROM `spell_proc_event` WHERE entry = 49149;
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
-VALUES (49149, 0x00, 0x0F, 0x00000006, 0x00020002, 0x00000000, 0x00015410, 0x00000000, 0, 100, 0);
-
 -- (49223) Dirge
 DELETE FROM `spell_proc_event` WHERE entry = 49223;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMaskA0`, `SpellFamilyMaskB0`, `SpellFamilyMaskC0`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`)
