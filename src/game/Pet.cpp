@@ -50,12 +50,13 @@ m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScal
     m_baseBonusData = new PetScalingData;
 
     // pets always have a charminfo, even if they are not actually charmed
-    CharmInfo* charmInfo = InitCharmInfo(this);
+    if (!GetCharmInfo())
+        InitCharmInfo(this);
 
-    if(type == MINI_PET)                                    // always passive
-        charmInfo->SetReactState(REACT_PASSIVE);
-    else if(type == GUARDIAN_PET)                           // always aggressive
-        charmInfo->SetReactState(REACT_AGGRESSIVE);
+    if (type == MINI_PET)                                    // always passive
+        GetCharmInfo()->SetReactState(REACT_PASSIVE);
+    else if (type == GUARDIAN_PET)                           // always aggressive
+        GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
 
 }
 
@@ -201,15 +202,15 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         case SUMMON_PET:
             petlevel=owner->getLevel();
 
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
             SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
             SetSheath(SHEATH_STATE_MELEE);
-            SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
-
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, (fields[9].GetUInt8() == 0) ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                                                             // this enables popup window (pet abandon, cancel)
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
@@ -276,10 +277,11 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     CastPetPassiveAuras(true);
     ApplyAllScalingBonuses(true);
 
-    if (getPetType() == SUMMON_PET)             //all (?) summon pets come with full health when called, but not when they are current
+    if (getPetType() != HUNTER_PET)             //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
         SetPower(getPowerType(), GetMaxPower(getPowerType()));
+        LoadCreaturesAddon(true);
     }
     else
     {
@@ -772,6 +774,11 @@ bool Pet::CreateBaseAtCreature(Creature* creature, Unit* owner)
         return false;
     }
 
+    if(CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
+        SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
+    else
+        SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
+
     if(cinfo->type == CREATURE_TYPE_CRITTER)
     {
         setPetType(MINI_PET);
@@ -780,26 +787,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature, Unit* owner)
 
     SetDisplayId(creature->GetDisplayId());
     SetNativeDisplayId(creature->GetNativeDisplayId());
-    SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
-    SetPower(POWER_HAPPINESS, 166500);
-    setPowerType(POWER_FOCUS);
-    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
-    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->getLevel()));
-    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-    if(CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
-        SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
-    else
-        SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
-
-    if(cinfo->type == CREATURE_TYPE_BEAST)
-    {
-        SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
-        SetSheath(SHEATH_STATE_MELEE);
-        SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
-        SetUInt32Value(UNIT_MOD_CAST_SPEED, creature->GetUInt32Value(UNIT_MOD_CAST_SPEED));
-    }
     return true;
 }
 
@@ -1245,8 +1233,6 @@ void Pet::_LoadAuras(uint32 timediff)
 
         delete result;
     }
-    else if (getPetType() != HUNTER_PET)
-        LoadCreaturesAddon(true);
 }
 
 void Pet::_SaveAuras()
@@ -2788,15 +2774,16 @@ bool Pet::Summon()
             owner->SetPet(this);
             break;
         }
-        case HUNTER_PET:
+        case HUNTER_PET:  // Called only if new tamed pet created
         {
-            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
             SetSheath(SHEATH_STATE_MELEE);
-            RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
-            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
-            SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
+            SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+            SetUInt32Value(UNIT_FIELD_BYTES_0, 0x02020100);
+            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+            SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(getLevel()));
+            SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE);
             owner->SetPet(this);
@@ -2827,6 +2814,9 @@ bool Pet::Summon()
         }
     }
 
+    if (owner->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)owner)->AddKnownPetName(GetCharmInfo()->GetPetNumber(),GetName());
+
     if(owner->IsPvP())
         SetPvP(true);
 
@@ -2841,7 +2831,8 @@ bool Pet::Summon()
     InitLevelupSpellsForLevel();
     LearnPetPassives();
     CastPetAuras(true);
-    LoadCreaturesAddon(true);
+    if (getPetType() != HUNTER_PET)
+        LoadCreaturesAddon(true);
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
@@ -3005,7 +2996,7 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
 
     for (PetScalingDataList::const_iterator itr = pScalingDataList->begin(); itr != pScalingDataList->end(); ++itr)
     {
-         PetScalingData* pData = *itr;
+         const PetScalingData* pData = &*itr;
 
          if (!pData->creatureID || (owner && (!pData->requiredAura || owner->HasSpell(pData->requiredAura) || owner->HasAura(pData->requiredAura))))
          {

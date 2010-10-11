@@ -372,4 +372,6 @@ struct DoPetCastWithHelper
     SpellEntry const* spellInfo;
 };
 
+typedef std::map<uint32,std::string> KnownPetNames;
+
 #endif

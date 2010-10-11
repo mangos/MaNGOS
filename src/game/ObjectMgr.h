@@ -493,7 +493,7 @@ struct PetScalingData
     int32  powerregenScale;
 };
 
-typedef std::vector<PetScalingData*> PetScalingDataList;
+typedef std::vector<PetScalingData> PetScalingDataList;
 
 struct MailLevelReward
 {
