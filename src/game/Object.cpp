@@ -751,19 +751,8 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                                 *data << uint16(-1);
                                 break;
                             case GAMEOBJECT_TYPE_CHEST:
-                                // GO_DYNFLAG_LO_ACTIVATE only, before client 2.3.0
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
-                                *data << uint16(-1);
-                                break;
                             case GAMEOBJECT_TYPE_GENERIC:
-                                // unclear if GO_DYNFLAG_LO_ACTIVATE should be added
-                                *data << uint16(GO_DYNFLAG_LO_SPARKLE);
-                                *data << uint16(-1);
-                                break;
                             case GAMEOBJECT_TYPE_SPELL_FOCUS:
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
-                                *data << uint16(-1);
-                                break;
                             case GAMEOBJECT_TYPE_GOOBER:
                                 *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
                                 *data << uint16(-1);
