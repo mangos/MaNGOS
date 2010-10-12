@@ -1291,39 +1291,69 @@ void AuctionHouseBot::Commands(uint32 command, uint32 ahMapID, uint32 col, char*
 
 void AuctionHouseBot::LoadValues(AHBConfig *config)
 {
+    QueryResult* result;
+//                                                        0       1           2           3          4          5                        6
+    result = CharacterDatabase.PQuery("SELECT `auctionhouse`, `name`, `minitems`, `maxitems`, `mintime`, `maxtime`, `percentgreytradegoods`, "
+//                                                           7                         8                        9                         10
+                                      "`percentwhitetradegoods`, `percentgreentradegoods`, `percentbluetradegoods`, `percentpurpletradegoods`, "
+//                                                           11                         12                  13                   14                   15
+                                      "`percentorangetradegoods`, `percentyellowtradegoods`, `percentgreyitems`, `percentwhiteitems`, `percentgreenitems`, "
+//                                                    16                    17                    18                    19              20              21
+                                      "`percentblueitems`, `percentpurpleitems`, `percentorangeitems`, `percentyellowitems`, `minpricegrey`, `maxpricegrey`, "
+//                                                 22               23               24               25              26              27                28
+                                      "`minpricewhite`, `maxpricewhite`, `minpricegreen`, `maxpricegreen`, `minpriceblue`, `maxpriceblue`, `minpricepurple`, "
+//                                                  29                30                31                32                33                 34
+                                      "`maxpricepurple`, `minpriceorange`, `maxpriceorange`, `minpriceyellow`, `maxpriceyellow`, `minbidpricegrey`, "
+//                                                   35                  36                  37                  38                  39                 40
+                                      "`maxbidpricegrey`, `minbidpricewhite`, `maxbidpricewhite`, `minbidpricegreen`, `maxbidpricegreen`, `minbidpriceblue`, "
+//                                                   41                   42                   43                   44                   45                   46
+                                      "`maxbidpriceblue`, `minbidpricepurple`, `maxbidpricepurple`, `minbidpriceorange`, `maxbidpriceorange`, `minbidpriceyellow`, "
+//                                                     47              48               49               50              51                52                53
+                                      "`maxbidpriceyellow`, `maxstackgrey`, `maxstackwhite`, `maxstackgreen`, `maxstackblue`, `maxstackpurple`, `maxstackorange`, "
+//                                                  54                55                 56                 57                58                  59
+                                      "`maxstackyellow`, `buyerpricegrey`, `buyerpricewhite`, `buyerpricegreen`, `buyerpriceblue`, `buyerpricepurple`, "
+//                                                    60                  61                      62                      63
+                                      "`buyerpriceorange`, `buyerpriceyellow`, `buyerbiddinginterval`, `buyerbidsperinterval` FROM `auctionhousebot` "
+                                      "WHERE auctionhouse = %u",config->GetAHID());
+
+    if(!result)
+        return;
+
+    Field* fields = result->Fetch();
+
     if (AHBSeller)
     {
         //load min and max items
-        config->SetMinItems(CharacterDatabase.PQuery("SELECT minitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxItems(CharacterDatabase.PQuery("SELECT maxitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinItems(fields[2].GetUInt32());
+        config->SetMaxItems(fields[3].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minItems = %u", config->GetMinItems());
             sLog.outError("maxItems = %u", config->GetMaxItems());
         }
         //load min and max auction times
-        config->SetMinTime(CharacterDatabase.PQuery("SELECT mintime FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxTime(CharacterDatabase.PQuery("SELECT maxtime FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinTime(fields[4].GetUInt32());
+        config->SetMaxTime(fields[5].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minTime = %u", config->GetMinTime());
             sLog.outError("maxTime = %u", config->GetMaxTime());
         }
         //load percentages
-        uint32 greytg = CharacterDatabase.PQuery("SELECT percentgreytradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 whitetg = CharacterDatabase.PQuery("SELECT percentwhitetradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 greentg = CharacterDatabase.PQuery("SELECT percentgreentradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 bluetg = CharacterDatabase.PQuery("SELECT percentbluetradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 purpletg = CharacterDatabase.PQuery("SELECT percentpurpletradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 orangetg = CharacterDatabase.PQuery("SELECT percentorangetradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 yellowtg = CharacterDatabase.PQuery("SELECT percentyellowtradegoods FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 greyi = CharacterDatabase.PQuery("SELECT percentgreyitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 whitei = CharacterDatabase.PQuery("SELECT percentwhiteitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 greeni = CharacterDatabase.PQuery("SELECT percentgreenitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 bluei = CharacterDatabase.PQuery("SELECT percentblueitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 purplei = CharacterDatabase.PQuery("SELECT percentpurpleitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 orangei = CharacterDatabase.PQuery("SELECT percentorangeitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
-        uint32 yellowi = CharacterDatabase.PQuery("SELECT percentyellowitems FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32();
+        uint32 greytg   = fields[6].GetUInt32();
+        uint32 whitetg  = fields[7].GetUInt32();
+        uint32 greentg  = fields[8].GetUInt32();
+        uint32 bluetg   = fields[9].GetUInt32();
+        uint32 purpletg = fields[10].GetUInt32();
+        uint32 orangetg = fields[11].GetUInt32();
+        uint32 yellowtg = fields[12].GetUInt32();
+        uint32 greyi    = fields[13].GetUInt32();
+        uint32 whitei   = fields[14].GetUInt32();
+        uint32 greeni   = fields[15].GetUInt32();
+        uint32 bluei    = fields[16].GetUInt32();
+        uint32 purplei  = fields[17].GetUInt32();
+        uint32 orangei  = fields[18].GetUInt32();
+        uint32 yellowi  = fields[19].GetUInt32();
         config->SetPercentages(greytg, whitetg, greentg, bluetg, purpletg, orangetg, yellowtg, greyi, whitei, greeni, bluei, purplei, orangei, yellowi);
         if (debug_Out)
         {
@@ -1343,172 +1373,134 @@ void AuctionHouseBot::LoadValues(AHBConfig *config)
             sLog.outError("percentYellowItems = %u", config->GetPercentages(AHB_YELLOW_I));
         }
         //load min and max prices
-        config->SetMinPrice(AHB_GREY, CharacterDatabase.PQuery("SELECT minpricegrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_GREY, CharacterDatabase.PQuery("SELECT maxpricegrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_GREY, fields[20].GetUInt32());
+        config->SetMaxPrice(AHB_GREY, fields[21].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceGrey = %u", config->GetMinPrice(AHB_GREY));
             sLog.outError("maxPriceGrey = %u", config->GetMaxPrice(AHB_GREY));
         }
-        config->SetMinPrice(AHB_WHITE, CharacterDatabase.PQuery("SELECT minpricewhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_WHITE, CharacterDatabase.PQuery("SELECT maxpricewhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_WHITE, fields[22].GetUInt32());
+        config->SetMaxPrice(AHB_WHITE, fields[23].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceWhite = %u", config->GetMinPrice(AHB_WHITE));
             sLog.outError("maxPriceWhite = %u", config->GetMaxPrice(AHB_WHITE));
         }
-        config->SetMinPrice(AHB_GREEN, CharacterDatabase.PQuery("SELECT minpricegreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_GREEN, CharacterDatabase.PQuery("SELECT maxpricegreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_GREEN, fields[24].GetUInt32());
+        config->SetMaxPrice(AHB_GREEN, fields[25].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceGreen = %u", config->GetMinPrice(AHB_GREEN));
             sLog.outError("maxPriceGreen = %u", config->GetMaxPrice(AHB_GREEN));
         }
-        config->SetMinPrice(AHB_BLUE, CharacterDatabase.PQuery("SELECT minpriceblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_BLUE, CharacterDatabase.PQuery("SELECT maxpriceblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_BLUE, fields[26].GetUInt32());
+        config->SetMaxPrice(AHB_BLUE, fields[27].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceBlue = %u", config->GetMinPrice(AHB_BLUE));
             sLog.outError("maxPriceBlue = %u", config->GetMaxPrice(AHB_BLUE));
         }
-        config->SetMinPrice(AHB_PURPLE, CharacterDatabase.PQuery("SELECT minpricepurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_PURPLE, CharacterDatabase.PQuery("SELECT maxpricepurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_PURPLE, fields[28].GetUInt32());
+        config->SetMaxPrice(AHB_PURPLE, fields[29].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPricePurple = %u", config->GetMinPrice(AHB_PURPLE));
             sLog.outError("maxPricePurple = %u", config->GetMaxPrice(AHB_PURPLE));
         }
-        config->SetMinPrice(AHB_ORANGE, CharacterDatabase.PQuery("SELECT minpriceorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_ORANGE, CharacterDatabase.PQuery("SELECT maxpriceorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_ORANGE, fields[30].GetUInt32());
+        config->SetMaxPrice(AHB_ORANGE, fields[31].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceOrange = %u", config->GetMinPrice(AHB_ORANGE));
             sLog.outError("maxPriceOrange = %u", config->GetMaxPrice(AHB_ORANGE));
         }
-        config->SetMinPrice(AHB_YELLOW, CharacterDatabase.PQuery("SELECT minpriceyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetMaxPrice(AHB_YELLOW, CharacterDatabase.PQuery("SELECT maxpriceyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinPrice(AHB_YELLOW, fields[32].GetUInt32());
+        config->SetMaxPrice(AHB_YELLOW, fields[33].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minPriceYellow = %u", config->GetMinPrice(AHB_YELLOW));
             sLog.outError("maxPriceYellow = %u", config->GetMaxPrice(AHB_YELLOW));
         }
         //load min and max bid prices
-        config->SetMinBidPrice(AHB_GREY, CharacterDatabase.PQuery("SELECT minbidpricegrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_GREY, fields[34].GetUInt32());
+        config->SetMaxBidPrice(AHB_GREY, fields[35].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceGrey = %u", config->GetMinBidPrice(AHB_GREY));
-        }
-        config->SetMaxBidPrice(AHB_GREY, CharacterDatabase.PQuery("SELECT maxbidpricegrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPriceGrey = %u", config->GetMaxBidPrice(AHB_GREY));
         }
-        config->SetMinBidPrice(AHB_WHITE, CharacterDatabase.PQuery("SELECT minbidpricewhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_WHITE, fields[36].GetUInt32());
+        config->SetMaxBidPrice(AHB_WHITE, fields[37].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceWhite = %u", config->GetMinBidPrice(AHB_WHITE));
-        }
-        config->SetMaxBidPrice(AHB_WHITE, CharacterDatabase.PQuery("SELECT maxbidpricewhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPriceWhite = %u", config->GetMaxBidPrice(AHB_WHITE));
         }
-        config->SetMinBidPrice(AHB_GREEN, CharacterDatabase.PQuery("SELECT minbidpricegreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_GREEN, fields[38].GetUInt32());
+        config->SetMaxBidPrice(AHB_GREEN, fields[39].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceGreen = %u", config->GetMinBidPrice(AHB_GREEN));
-        }
-        config->SetMaxBidPrice(AHB_GREEN, CharacterDatabase.PQuery("SELECT maxbidpricegreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPriceGreen = %u", config->GetMaxBidPrice(AHB_GREEN));
         }
-        config->SetMinBidPrice(AHB_BLUE, CharacterDatabase.PQuery("SELECT minbidpriceblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_BLUE, fields[40].GetUInt32());
+        config->SetMaxBidPrice(AHB_BLUE, fields[41].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceBlue = %u", config->GetMinBidPrice(AHB_BLUE));
-        }
-        config->SetMaxBidPrice(AHB_BLUE, CharacterDatabase.PQuery("SELECT maxbidpriceblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPriceBlue = %u", config->GetMinBidPrice(AHB_BLUE));
         }
-        config->SetMinBidPrice(AHB_PURPLE, CharacterDatabase.PQuery("SELECT minbidpricepurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_PURPLE, fields[42].GetUInt32());
+        config->SetMaxBidPrice(AHB_PURPLE, fields[43].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPricePurple = %u", config->GetMinBidPrice(AHB_PURPLE));
-        }
-        config->SetMaxBidPrice(AHB_PURPLE, CharacterDatabase.PQuery("SELECT maxbidpricepurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPricePurple = %u", config->GetMaxBidPrice(AHB_PURPLE));
         }
-        config->SetMinBidPrice(AHB_ORANGE, CharacterDatabase.PQuery("SELECT minbidpriceorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_ORANGE, fields[44].GetUInt32());
+        config->SetMaxBidPrice(AHB_ORANGE, fields[45].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceOrange = %u", config->GetMinBidPrice(AHB_ORANGE));
-        }
-        config->SetMaxBidPrice(AHB_ORANGE, CharacterDatabase.PQuery("SELECT maxbidpriceorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxBidPriceOrange = %u", config->GetMaxBidPrice(AHB_ORANGE));
         }
-        config->SetMinBidPrice(AHB_YELLOW, CharacterDatabase.PQuery("SELECT minbidpriceyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMinBidPrice(AHB_YELLOW,  fields[46].GetUInt32());
+        config->SetMaxBidPrice(AHB_YELLOW,  fields[47].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("minBidPriceYellow = %u", config->GetMinBidPrice(AHB_YELLOW));
-        }
-        config->SetMaxBidPrice(AHB_YELLOW, CharacterDatabase.PQuery("SELECT maxbidpriceyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {sLog.outError("maxBidPriceYellow = %u", config->GetMaxBidPrice(AHB_YELLOW));
+            sLog.outError("maxBidPriceYellow = %u", config->GetMaxBidPrice(AHB_YELLOW));
         }
         //load max stacks
-        config->SetMaxStack(AHB_GREY, CharacterDatabase.PQuery("SELECT maxstackgrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetMaxStack(AHB_GREY, fields[48].GetUInt32());
+        config->SetMaxStack(AHB_WHITE, fields[49].GetUInt32());
+        config->SetMaxStack(AHB_GREEN, fields[50].GetUInt32());
+        config->SetMaxStack(AHB_BLUE, fields[51].GetUInt32());
+        config->SetMaxStack(AHB_PURPLE, fields[52].GetUInt32());
+        config->SetMaxStack(AHB_ORANGE, fields[53].GetUInt32());
+        config->SetMaxStack(AHB_YELLOW, fields[54].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("maxStackGrey = %u", config->GetMaxStack(AHB_GREY));
-        }
-        config->SetMaxStack(AHB_WHITE, CharacterDatabase.PQuery("SELECT maxstackwhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackWhite = %u", config->GetMaxStack(AHB_WHITE));
-        }
-        config->SetMaxStack(AHB_GREEN, CharacterDatabase.PQuery("SELECT maxstackgreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackGreen = %u", config->GetMaxStack(AHB_GREEN));
-        }
-        config->SetMaxStack(AHB_BLUE, CharacterDatabase.PQuery("SELECT maxstackblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackBlue = %u", config->GetMaxStack(AHB_BLUE));
-        }
-        config->SetMaxStack(AHB_PURPLE, CharacterDatabase.PQuery("SELECT maxstackpurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackPurple = %u", config->GetMaxStack(AHB_PURPLE));
-        }
-        config->SetMaxStack(AHB_ORANGE, CharacterDatabase.PQuery("SELECT maxstackorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackOrange = %u", config->GetMaxStack(AHB_ORANGE));
-        }
-        config->SetMaxStack(AHB_YELLOW, CharacterDatabase.PQuery("SELECT maxstackyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("maxStackYellow = %u", config->GetMaxStack(AHB_YELLOW));
         }
     }
     if (AHBBuyer)
     {
         //load buyer bid prices
-        config->SetBuyerPrice(AHB_GREY, CharacterDatabase.PQuery("SELECT buyerpricegrey FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_WHITE, CharacterDatabase.PQuery("SELECT buyerpricewhite FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_GREEN, CharacterDatabase.PQuery("SELECT buyerpricegreen FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_BLUE, CharacterDatabase.PQuery("SELECT buyerpriceblue FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_PURPLE, CharacterDatabase.PQuery("SELECT buyerpricepurple FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_ORANGE, CharacterDatabase.PQuery("SELECT buyerpriceorange FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        config->SetBuyerPrice(AHB_YELLOW, CharacterDatabase.PQuery("SELECT buyerpriceyellow FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetBuyerPrice(AHB_GREY,  fields[55].GetUInt32());
+        config->SetBuyerPrice(AHB_WHITE,  fields[56].GetUInt32());
+        config->SetBuyerPrice(AHB_GREEN,  fields[57].GetUInt32());
+        config->SetBuyerPrice(AHB_BLUE,  fields[58].GetUInt32());
+        config->SetBuyerPrice(AHB_PURPLE,  fields[59].GetUInt32());
+        config->SetBuyerPrice(AHB_ORANGE,  fields[60].GetUInt32());
+        config->SetBuyerPrice(AHB_YELLOW,  fields[61].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("buyerPriceGrey = %u", config->GetBuyerPrice(AHB_GREY));
@@ -1520,16 +1512,15 @@ void AuctionHouseBot::LoadValues(AHBConfig *config)
             sLog.outError("buyerPriceYellow = %u", config->GetBuyerPrice(AHB_YELLOW));
         }
         //load bidding interval
-        config->SetBiddingInterval(CharacterDatabase.PQuery("SELECT buyerbiddinginterval FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
+        config->SetBiddingInterval(fields[62].GetUInt32());
+        config->SetBidsPerInterval(fields[63].GetUInt32());
         if (debug_Out)
         {
             sLog.outError("buyerBiddingInterval = %u", config->GetBiddingInterval());
-        }
-        //load bids per interval
-        config->SetBidsPerInterval(CharacterDatabase.PQuery("SELECT buyerbidsperinterval FROM auctionhousebot WHERE auctionhouse = %u",config->GetAHID())->Fetch()->GetUInt32());
-        if (debug_Out)
-        {
             sLog.outError("buyerBidsPerInterval = %u", config->GetBidsPerInterval());
         }
     }
+
+    if (result)
+        delete result;
 }
