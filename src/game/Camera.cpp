@@ -31,7 +31,7 @@ Camera::Camera(Player* pl) : m_owner(*pl), m_source(pl)
 Camera::~Camera()
 {
     // view of camera should be already reseted to owner (RemoveFromWorld -> Event_RemovedFromWorld -> ResetView)
-    // MANGOS_ASSERT(m_source == &m_owner);
+    MANGOS_ASSERT(m_source == &m_owner);
 
     // for symmetry with constructor and way to make viewpoint's list empty
     m_source->GetViewPoint().Detach(this);
@@ -157,5 +157,6 @@ ViewPoint::~ViewPoint()
     if (!m_cameras.empty())
     {
         sLog.outError("ViewPoint destructor called, but some cameras referenced to it");
+        m_cameras.clear();
     }
 }
