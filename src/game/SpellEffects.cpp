@@ -4231,6 +4231,7 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
         {
             // TODO
             // EffectSummonVehicle(i);
+               DoSummonVehicle(eff_idx, summon_prop->FactionId);
             break;
         }
         default:
@@ -4819,6 +4820,48 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
         DEBUG_LOG("Guardian pet (guidlow %d, entry %d) summoned (default). Counter is %d ", spawnCreature->GetGUIDLow(), spawnCreature->GetEntry(), spawnCreature->GetPetCounter());
     }
+}
+
+void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
+{
+    uint32 vehicle_entry = m_spellInfo->EffectMiscValue[eff_idx];
+
+    if (!vehicle_entry)
+        return;
+
+    uint32 mountSpellID = m_spellInfo->EffectBasePoints[eff_idx]+1;
+
+    float px, py, pz;
+    // If dest location if present
+    if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+    {
+        px = m_targets.m_destX;
+        py = m_targets.m_destY;
+        pz = m_targets.m_destZ;
+    }
+    // Summon if dest location not present near caster
+    else
+        m_caster->GetClosePoint(px, py, pz,m_caster->GetObjectBoundingRadius());
+
+    TempSummonType summonType = (GetSpellDuration(m_spellInfo) == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
+    Creature* vehicle = m_caster->SummonCreature(vehicle_entry,px,py,pz,m_caster->GetOrientation(),summonType,GetSpellDuration(m_spellInfo),true);
+
+    if (!vehicle->GetObjectGuid().IsVehicle())
+    {
+        sLog.outError("DoSommonVehicle: Creature (guidlow %d, entry %d) summoned, but this is not vehicle. Correct VehicleId in creature_template.", vehicle->GetGUIDLow(), vehicle->GetEntry());
+        vehicle->ForcedDespawn();
+        return;
+    }
+
+    if (vehicle)
+    {
+        vehicle->setFaction(forceFaction ? forceFaction : m_caster->getFaction());
+        vehicle->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
+        DEBUG_LOG("Vehicle (guidlow %d, entry %d) summoned. ", vehicle->GetGUIDLow(), vehicle->GetEntry());
+        m_caster->CastSpell(vehicle, mountSpellID, true);
+    }
+    else
+        sLog.outError("Vehicle (guidlow %d, entry %d) NOT summoned by undefined reason. ", vehicle->GetGUIDLow(), vehicle->GetEntry());
 }
 
 void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx)
