@@ -136,3 +136,28 @@ WHERE entry IN (26523);
 DELETE FROM npc_spellclick_spells WHERE npc_entry IN (26523);
 INSERT INTO npc_spellclick_spells VALUES
 (26523, 47961, 0, 0, 0, 1);
+
+/* Argent Tournament mount */
+UPDATE creature_template SET
+    spell1 = 62544,
+    spell2 = 62575,
+    spell3 = 63010,
+    spell4 = 62552,
+    spell5 = 64077,
+    spell6 = 62863,
+    VehicleId = 349
+WHERE entry IN (33844, 33845);
+UPDATE creature_template SET KillCredit1 = 33340 WHERE entry IN (33272);
+UPDATE creature_template SET KillCredit1 = 33339 WHERE entry IN (33243);
+
+DELETE FROM npc_spellclick_spells WHERE npc_entry IN (33842, 33843);
+INSERT INTO npc_spellclick_spells VALUES
+(33842, 63791, 13829, 1, 0, 3),
+(33842, 63791, 13839, 1, 0, 3),
+(33842, 63791, 13838, 1, 0, 3),
+(33843, 63792, 13828, 1, 0, 3),
+(33843, 63792, 13837, 1, 0, 3),
+(33843, 63792, 13835, 1, 0, 3);
+
+DELETE FROM creature WHERE id IN (33844,33845);
+UPDATE creature_template SET speed_run = '1.5', unit_flags = 8 WHERE entry IN (33844,33845);
