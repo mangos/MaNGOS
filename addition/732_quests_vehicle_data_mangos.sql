@@ -161,3 +161,20 @@ INSERT INTO npc_spellclick_spells VALUES
 
 DELETE FROM creature WHERE id IN (33844,33845);
 UPDATE creature_template SET speed_run = '1.5', unit_flags = 8 WHERE entry IN (33844,33845);
+
+-- Quest vehicles Support: Going Bearback (12851)
+UPDATE `creature_template` SET
+    spell1 = 54897,
+    spell2 = 54907,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 308
+WHERE entry IN (29598);
+
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (29598);
+INSERT INTO `npc_spellclick_spells` VALUES
+(29598, 54908, 12851, 1, 12851, 1);
+
+INSERT IGNORE INTO `spell_script_target` VALUES (54897, 1, 29358);
