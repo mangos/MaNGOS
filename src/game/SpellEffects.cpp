@@ -6710,6 +6710,17 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, spellId, true); 
                     return; 
                 }
+                case 64104:                                 // Quest Credit - Trigger - Dummy - 01
+                case 64107:                                 // Quest Credit - Trigger - Dummy - 02
+                {
+                    if (!unitTarget)
+                        return;
+
+                    if (Unit* charmer = unitTarget->GetCharmer())
+                        charmer->CastSpell(charmer, damage, true);
+
+                    return;
+                }
                 case 66477:                                 // Bountiful Feast
                 {
                     if (!unitTarget)
