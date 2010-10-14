@@ -974,6 +974,12 @@ void GameObject::Use(Unit* user)
 
             return;
         }
+        case GAMEOBJECT_TYPE_GENERIC:                       // 5
+        {
+            // No known way to exclude some - only different approach is to select despawnable GOs by Entry
+            SetLootState(GO_JUST_DEACTIVATED);
+            return;
+        }
         case GAMEOBJECT_TYPE_CHAIR:                         //7 Sitting: Wooden bench, chairs
         {
             GameObjectInfo const* info = GetGOInfo();

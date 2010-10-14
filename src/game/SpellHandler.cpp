@@ -285,6 +285,13 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     if(!obj)
         return;
 
+    // Never expect this opcode for some type GO's
+    if (obj->GetGoType() == GAMEOBJECT_TYPE_GENERIC)
+    {
+        sLog.outError("HandleGameObjectUseOpcode: CMSG_GAMEOBJ_USE for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
+        return;
+    }
+
     obj->Use(_player);
 }
 
