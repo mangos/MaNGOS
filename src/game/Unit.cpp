@@ -3018,13 +3018,23 @@ float Unit::CalculateLevelPenalty(SpellEntry const* spellProto) const
     if(!spellProto->spellLevel || !spellProto->maxLevel)
         return 1.0f;
 
-    if (getLevel() < spellProto->maxLevel)
+    if(spellProto->maxLevel <= 0)
+        return 1.0f;
+    //if caster level is lower that max caster level
+    if(getLevel() < spellProto->maxLevel)
         return 1.0f;
 
-    if (22 + spellProto->maxLevel > getLevel())
-        return (22 + spellProto->maxLevel - getLevel()) / 20.0f;
-    else
+    float LvlPenalty = 0.0f;
+
+    LvlPenalty = (22.0f + float (spellProto->maxLevel) - float (getLevel())) / 20.0f;
+    //to prevent positive effect
+    if(LvlPenalty > 1.0f)
+        return 1.0f;
+    //level penalty is capped at 0
+    if(LvlPenalty < 0.0f)
         return 0.0f;
+
+    return LvlPenalty;
 }
 
 void Unit::SendMeleeAttackStart(Unit* pVictim)
