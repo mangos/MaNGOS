@@ -579,6 +579,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         // Save value of further damage
                         m_currentBasePoints[1] = damagetick * 2 / 3;
                         damage += damagetick * 3;
+
                         // Glyph of Conflagrate
                         if (!m_caster->HasAura(56235))
                             unitTarget->RemoveAurasByCasterSpell(aura->GetId(), m_caster->GetGUID());
