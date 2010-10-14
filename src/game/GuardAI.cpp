@@ -38,7 +38,7 @@ GuardAI::GuardAI(Creature *c) : CreatureAI(c), i_victimGuid(0), i_state(STATE_NO
 void GuardAI::MoveInLineOfSight(Unit *u)
 {
     // Ignore Z for flying creatures
-    if (!m_creature->canFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE)
+    if (!m_creature->CanFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE)
         return;
 
     if (!m_creature->getVictim() && u->isTargetableForAttack() &&

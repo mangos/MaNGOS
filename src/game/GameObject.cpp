@@ -635,7 +635,7 @@ GameObjectInfo const *GameObject::GetGOInfo() const
 /*********************************************************/
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
-bool GameObject::hasQuest(uint32 quest_id) const
+bool GameObject::HasQuest(uint32 quest_id) const
 {
     QuestRelationsMapBounds bounds = sObjectMgr.GetGOQuestRelationsMapBounds(GetEntry());
     for(QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
@@ -646,7 +646,7 @@ bool GameObject::hasQuest(uint32 quest_id) const
     return false;
 }
 
-bool GameObject::hasInvolvedQuest(uint32 quest_id) const
+bool GameObject::HasInvolvedQuest(uint32 quest_id) const
 {
     QuestRelationsMapBounds bounds = sObjectMgr.GetGOQuestInvolvedRelationsMapBounds(GetEntry());
     for(QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)

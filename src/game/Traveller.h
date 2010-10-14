@@ -93,7 +93,7 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
 
-    if (i_traveller.canFly())
+    if (i_traveller.CanFly())
     {
         float dz = z - GetPositionZ();
         return sqrt((dx*dx) + (dy*dy) + (dz*dz));

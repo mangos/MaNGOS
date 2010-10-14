@@ -394,56 +394,56 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void RemoveFromWorld();
 
         bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data = NULL);
-        bool LoadCreaturesAddon(bool reload = false);
+        bool LoadCreatureAddon(bool reload = false);
         void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
         char const* GetSubName() const { return GetCreatureInfo()->SubName; }
 
-        void Update( uint32 time );                         // overwrited Unit::Update
+        void Update(uint32 time);                           // overwrite Unit::Update
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = NULL, float* dist =NULL) const;
         uint32 GetEquipmentId() const { return m_equipmentId; }
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
-        bool isPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
-        bool isVehicle() const { return m_subtype == CREATURE_SUBTYPE_VEHICLE; }
-        bool isTotem() const { return m_subtype == CREATURE_SUBTYPE_TOTEM; }
-        bool isTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
+        bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }
+        bool IsVehicle() const { return m_subtype == CREATURE_SUBTYPE_VEHICLE; }
+        bool IsTotem() const { return m_subtype == CREATURE_SUBTYPE_TOTEM; }
+        bool IsTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
 
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
-        bool isRacialLeader() const { return GetCreatureInfo()->RacialLeader; }
-        bool isCivilian() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
-        bool canWalk() const { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
-        bool canSwim() const { return GetCreatureInfo()->InhabitType & INHABIT_WATER; }
-        bool canFly()  const { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
-        ///// TODO RENAME THIS!!!!!
-        bool isCanTrainingOf(Player* player, bool msg) const;
-        bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
-        bool isCanTrainingAndResetTalentsOf(Player* pPlayer) const;
+        bool IsRacialLeader() const { return GetCreatureInfo()->RacialLeader; }
+        bool IsCivilian() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
+        bool CanWalk() const { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
+        bool CanSwim() const { return GetCreatureInfo()->InhabitType & INHABIT_WATER; }
+        bool CanFly()  const { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
+
+        bool IsTrainerOf(Player* player, bool msg) const;
+        bool CanInteractWithBattleMaster(Player* player, bool msg) const;
+        bool CanTrainAndResetTalentsOf(Player* pPlayer) const;
         bool IsOutOfThreatArea(Unit* pVictim) const;
-        bool IsImmunedToSpell(SpellEntry const* spellInfo);
-                                                            // redefine Unit::IsImmunedToSpell
-        bool IsImmunedToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const;
-                                                            // redefine Unit::IsImmunedToSpellEffect
-        bool isElite() const
+        bool IsImmuneToSpell(SpellEntry const* spellInfo);
+                                                            // redefine Unit::IsImmuneToSpell
+        bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const;
+                                                            // redefine Unit::IsImmuneToSpellEffect
+        bool IsElite() const
         {
-            if(isPet())
+            if(IsPet())
                 return false;
 
             uint32 rank = GetCreatureInfo()->rank;
             return rank != CREATURE_ELITE_NORMAL && rank != CREATURE_ELITE_RARE;
         }
 
-        bool isWorldBoss() const
+        bool IsWorldBoss() const
         {
-            if(isPet())
+            if(IsPet())
                 return false;
 
             return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;
         }
 
-        uint32 getLevelForTarget(Unit const* target) const; // overwrite Unit::getLevelForTarget for boss level support
+        uint32 GetLevelForTarget(Unit const* target) const; // overwrite Unit::GetLevelForTarget for boss level support
 
         bool IsInEvadeMode() const;
 
@@ -477,7 +477,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SendMonsterMoveWithSpeedToCurrentDestination(Player* player = NULL);
 
-        uint32 GetShieldBlockValue() const                  //dunno mob block value
+        uint32 GetShieldBlockValue() const                  // dunno mob block value
         {
             return (getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
         }
@@ -529,7 +529,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // overwrite WorldObject function for proper name localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const;
 
-        void setDeathState(DeathState s);                   // overwrite virtual Unit::setDeathState
+        void SetDeathState(DeathState s);                   // overwrite virtual Unit::SetDeathState
         bool FallGround();
 
         bool LoadFromDB(uint32 guid, Map *map);
@@ -554,8 +554,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AllLootRemovedFromCorpse();
         Player* GetOriginalLootRecipient() const;           // ignore group changes/etc, not for looting
 
-        SpellEntry const *reachWithSpellAttack(Unit *pVictim);
-        SpellEntry const *reachWithSpellCure(Unit *pVictim);
+        SpellEntry const *ReachWithSpellAttack(Unit *pVictim);
+        SpellEntry const *ReachWithSpellCure(Unit *pVictim);
 
         uint32 m_spells[CREATURE_MAX_SPELLS];
         CreatureSpellCooldowns m_CreatureSpellCooldowns;
@@ -584,7 +584,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsVisibleInGridForPlayer(Player* pl) const;
 
         void RemoveCorpse();
-        bool isDeadByDefault() const { return m_isDeadByDefault; };
+        bool IsDeadByDefault() const { return m_isDeadByDefault; };
 
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
@@ -608,11 +608,11 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         Unit* SelectAttackingTarget(AttackingTarget target, uint32 position) const;
 
-        bool hasQuest(uint32 quest_id) const;
-        bool hasInvolvedQuest(uint32 quest_id)  const;
+        bool HasQuest(uint32 quest_id) const;
+        bool HasInvolvedQuest(uint32 quest_id)  const;
 
         GridReference<Creature> &GetGridRef() { return m_gridRef; }
-        bool isRegeneratingHealth() { return m_regenHealth; }
+        bool IsRegeneratingHealth() { return m_regenHealth; }
         virtual uint8 GetPetAutoSpellSize() const { return CREATURE_MAX_SPELLS; }
         virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
         {

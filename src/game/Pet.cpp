@@ -452,9 +452,9 @@ void Pet::DeleteFromDB(uint32 guidlow)
     CharacterDatabase.PExecute("DELETE FROM pet_spell_cooldown WHERE guid = '%u'", guidlow);
 }
 
-void Pet::setDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
+void Pet::SetDeathState(DeathState s)                       // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
 {
-    Creature::setDeathState(s);
+    Creature::SetDeathState(s);
     if(getDeathState()==CORPSE)
     {
         //remove summoned pet (no corpse)

@@ -4849,7 +4849,7 @@ bool ChatHandler::HandleResetTalentsCommand(char* args)
     {
         // Try reset talents as Hunter Pet
         Creature* creature = getSelectedCreature();
-        if (!*args && creature && creature->isPet())
+        if (!*args && creature && creature->IsPet())
         {
             Unit *owner = creature->GetOwner();
             if(owner && owner->GetTypeId() == TYPEID_PLAYER && ((Pet *)creature)->IsPermanentPetFor((Player*)owner))
