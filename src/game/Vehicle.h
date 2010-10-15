@@ -49,6 +49,7 @@ public:
     void RemovePassenger(Unit *passenger);
     void RelocatePassengers(float x, float y, float z, float ang);
     void RemoveAllPassengers();
+    VehicleSeatEntry const* GetSeatInfo(Unit* passenger);
 
     uint32 GetVehicleId() const { return m_vehicleInfo->m_ID; }
     VehicleEntry const* GetVehicleInfo() const { return m_vehicleInfo; }

@@ -352,7 +352,8 @@ enum SummonPropGroup
     SUMMON_PROP_GROUP_FRIENDLY       = 1,
     SUMMON_PROP_GROUP_PETS           = 2,
     SUMMON_PROP_GROUP_CONTROLLABLE   = 3,
-    SUMMON_PROP_GROUP_VEHICLE        = 4
+    SUMMON_PROP_GROUP_VEHICLE        = 4,
+    SUMMON_PROP_GROUP_UNCONTROLLABLE_VEHICLE        = 5
 };
 
 // SummonProperties.dbc, col 3
@@ -437,8 +438,16 @@ enum VehicleFlags
 
 enum VehicleSeatFlags
 {
+    SEAT_FLAG_NONE                  = 0x00000000,           //
+    SEAT_FLAG_UNK1                  = 0x00000001,           //
+    SEAT_FLAG_UNK2                  = 0x00000002,           //
+    SEAT_FLAG_UNK3                  = 0x00000004,           //
+    SEAT_FLAG_UNK4                  = 0x00000008,           //
+    SEAT_FLAG_UNK5                  = 0x00000010,           //
+    SEAT_FLAG_UNK6                  = 0x00000020,           //
     SEAT_FLAG_HIDE_PASSENGER        = 0x00000200,           // Passenger is hidden
     SEAT_FLAG_CAN_CONTROL           = 0x00000800,           // Lua_UnitInVehicleControlSeat
+    SEAT_FLAG_UNCONTROLLED          = 0x00002000,           // Seat uncontrolled for passenger?
     SEAT_FLAG_CAN_ATTACK            = 0x00004000,           // Can attack, cast spells and use items from vehicle?
     SEAT_FLAG_USABLE                = 0x02000000,           // Lua_CanExitVehicle
     SEAT_FLAG_CAN_SWITCH            = 0x04000000,           // Lua_CanSwitchVehicleSeats

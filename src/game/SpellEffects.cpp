@@ -4245,6 +4245,7 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
             break;
         }
         case SUMMON_PROP_GROUP_VEHICLE:
+        case SUMMON_PROP_GROUP_UNCONTROLLABLE_VEHICLE:
         {
             // TODO
             // EffectSummonVehicle(i);
@@ -4866,19 +4867,31 @@ void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
     TempSummonType summonType = (GetSpellDuration(m_spellInfo) == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
     Creature* vehicle = m_caster->SummonCreature(vehicle_entry,px,py,pz,m_caster->GetOrientation(),summonType,GetSpellDuration(m_spellInfo),true);
 
-    if (!vehicle->GetObjectGuid().IsVehicle())
+    if (vehicle && !vehicle->GetObjectGuid().IsVehicle())
     {
         sLog.outError("DoSommonVehicle: Creature (guidlow %d, entry %d) summoned, but this is not vehicle. Correct VehicleId in creature_template.", vehicle->GetGUIDLow(), vehicle->GetEntry());
         vehicle->ForcedDespawn();
         return;
     }
 
-    if (vehicle)
+    if (vehicle && mountSpellID)
     {
         vehicle->setFaction(forceFaction ? forceFaction : m_caster->getFaction());
         vehicle->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
         DEBUG_LOG("Vehicle (guidlow %d, entry %d) summoned. ", vehicle->GetGUIDLow(), vehicle->GetEntry());
         m_caster->CastSpell(vehicle, mountSpellID, true);
+    }
+    else if (vehicle && forceFaction && !mountSpellID)
+    {
+        vehicle->setFaction(forceFaction);
+        vehicle->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
+        if (VehicleKit* pVehicle = vehicle->GetVehicleKit())
+        {
+            m_caster->EnterVehicle(pVehicle);
+            DEBUG_LOG("Player (guidlow %d) now on uncontrolled vehicle (guidlow %d, entry %d). ", m_caster->GetGUIDLow(), vehicle->GetGUIDLow(), vehicle->GetEntry());
+        }
+        else
+            vehicle->ForcedDespawn();
     }
     else
         sLog.outError("Vehicle (guidlow %d, entry %d) NOT summoned by undefined reason. ", vehicle->GetGUIDLow(), vehicle->GetEntry());

@@ -112,7 +112,7 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
     if (seatId < 0) // no specific seat requirement
     {
         for (seat = m_Seats.begin(); seat != m_Seats.end(); ++seat)
-            if (!seat->second.passenger && seat->second.seatInfo->IsUsable())
+            if (!seat->second.passenger && (seat->second.seatInfo->IsUsable() || (seat->second.seatInfo->m_flags & SEAT_FLAG_UNCONTROLLED)))
                 break;
 
         if (seat == m_Seats.end()) // no available seat
@@ -276,4 +276,15 @@ void VehicleKit::RelocatePassengers(float x, float y, float z, float ang)
             passenger->SetPosition(px, py, pz, po);
         }
     }
+}
+
+VehicleSeatEntry const* VehicleKit::GetSeatInfo(Unit* passenger)
+{
+    for (SeatMap::iterator itr = m_Seats.begin(); itr != m_Seats.end(); ++itr)
+    {
+        if (Unit *_passenger = itr->second.passenger)
+            if (_passenger = passenger)
+                return itr->second.seatInfo;
+    }
+    return NULL;
 }
