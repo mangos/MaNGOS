@@ -73,8 +73,8 @@ ConfusedMovementGenerator<Creature>::_InitSpecific(Creature &creature, bool &is_
 {
     creature.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
 
-    is_water_ok = creature.canSwim();
-    is_land_ok  = creature.canWalk();
+    is_water_ok = creature.CanSwim();
+    is_land_ok  = creature.CanWalk();
 }
 
 template<>

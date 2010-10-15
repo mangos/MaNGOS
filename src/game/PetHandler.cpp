@@ -67,7 +67,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
         if (!(flag == ACT_COMMAND && spellid == COMMAND_ATTACK))
             return;
     }
-    else if (((Creature*)pet)->isPet())
+    else if (((Creature*)pet)->IsPet())
     {
         // pet can have action bar disabled
         if(((Pet*)pet)->GetModeFlags() & PET_MODE_DISABLE_ACTIONS)
@@ -81,7 +81,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
         return;
     }
 
-    if (((Creature*)pet)->isPet())
+    if (((Creature*)pet)->IsPet())
         GetPlayer()->CallForAllControlledUnits(DoPetActionWithHelper(GetPlayer(), flag, spellid, petGuid, targetGuid),false,false,false);
     else if (pet->isCharmed())
         GetPlayer()->DoPetAction(GetPlayer(), flag, spellid, petGuid, targetGuid);
@@ -140,7 +140,7 @@ void WorldSession::SendPetNameQuery( ObjectGuid petguid, uint32 petnumber)
 
     std::string name = GetPlayer()->GetKnownPetName(petnumber);
 
-    if (pet && pet->isPet() && ((Pet*)pet)->IsInWorld() && pet->GetCharmInfo()->GetPetNumber() == petnumber)
+    if (pet && pet->IsPet() && ((Pet*)pet)->IsInWorld() && pet->GetCharmInfo()->GetPetNumber() == petnumber)
     {
         name = pet->GetName();
         WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
@@ -205,7 +205,7 @@ void WorldSession::HandlePetSetAction( WorldPacket & recv_data )
     }
 
     // pet can have action bar disabled
-    if(pet->isPet() && ((Pet*)pet)->GetModeFlags() & PET_MODE_DISABLE_ACTIONS)
+    if(pet->IsPet() && ((Pet*)pet)->GetModeFlags() & PET_MODE_DISABLE_ACTIONS)
         return;
 
     CharmInfo *charmInfo = pet->GetCharmInfo();
@@ -400,7 +400,7 @@ void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
     // pet/charmed
     if (Creature* pet = GetPlayer()->GetMap()->GetAnyTypeCreature(guid))
     {
-        if(pet->isPet())
+        if(pet->IsPet())
         {
             if(pet->GetGUID() == GetPlayer()->GetPetGUID())
             {
@@ -536,7 +536,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 
     recvPacket >> targets->ReadForCaster(pet);
 
-    if (pet->isPet())
+    if (pet->IsPet())
         GetPlayer()->CallForAllControlledUnits(DoPetCastWithHelper(GetPlayer(), cast_count, targets, spellInfo ),false,false,false);
     else if (pet->isCharmed())
         pet->DoPetCastSpell(GetPlayer(), cast_count, targets, spellInfo);

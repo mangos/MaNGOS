@@ -312,8 +312,8 @@ FleeingMovementGenerator<Creature>::_Init(Creature &owner)
 {
     owner.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
     owner.SetTargetGUID(0);
-    is_water_ok = owner.canSwim();
-    is_land_ok  = owner.canWalk();
+    is_water_ok = owner.CanSwim();
+    is_land_ok  = owner.CanWalk();
 }
 
 template<>

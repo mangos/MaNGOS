@@ -281,7 +281,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     {
         SetHealth(GetMaxHealth());
         SetPower(getPowerType(), GetMaxPower(getPowerType()));
-        LoadCreaturesAddon(true);
+        LoadCreatureAddon(true);
     }
     else
     {
@@ -443,9 +443,9 @@ void Pet::DeleteFromDB(uint32 guidlow)
     CharacterDatabase.PExecute("DELETE FROM pet_spell_cooldown WHERE guid = '%u'", guidlow);
 }
 
-void Pet::setDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
+void Pet::SetDeathState(DeathState s)                       // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
 {
-    Creature::setDeathState(s);
+    Creature::SetDeathState(s);
     if(getDeathState()==CORPSE)
     {
         //remove summoned pet (no corpse)
@@ -2741,7 +2741,7 @@ bool Pet::Summon()
     if (GetCreateSpellID())
         SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
 
-    if ( isTemporarySummoned() || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->isTotem()))
+    if ( isTemporarySummoned() || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->IsTotem()))
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
@@ -2832,7 +2832,7 @@ bool Pet::Summon()
     LearnPetPassives();
     CastPetAuras(true);
     if (getPetType() != HUNTER_PET)
-        LoadCreaturesAddon(true);
+        LoadCreatureAddon(true);
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {

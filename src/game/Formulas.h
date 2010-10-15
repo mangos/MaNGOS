@@ -111,7 +111,7 @@ namespace MaNGOS
         inline uint32 Gain(Player *pl, Unit *u)
         {
             if(u->GetTypeId()==TYPEID_UNIT && (
-                ((Creature*)u)->isTotem() || ((Creature*)u)->isPet() ||
+                ((Creature*)u)->IsTotem() || ((Creature*)u)->IsPet() ||
                 (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ))
                 return 0;
 
@@ -119,7 +119,7 @@ namespace MaNGOS
             if( xp_gain == 0 )
                 return 0;
 
-            if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->isElite())
+            if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsElite())
                 xp_gain *= 2;
 
             return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));

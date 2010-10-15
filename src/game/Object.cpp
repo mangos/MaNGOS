@@ -268,7 +268,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                 /*if (((Creature*)unit)->hasUnitState(UNIT_STAT_MOVING))
                     unit->m_movementInfo.SetMovementFlags(MOVEFLAG_FORWARD);*/
 
-                if (((Creature*)unit)->canFly())
+                if (((Creature*)unit)->CanFly())
                 {
                     // (ok) most seem to have this
                     unit->m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
@@ -613,7 +613,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
                         if (appendValue & UNIT_NPC_FLAG_TRAINER)
                         {
-                            if (!((Creature*)this)->isCanTrainingOf(target, false))
+                            if (!((Creature*)this)->IsTrainerOf(target, false))
                                 appendValue &= ~(UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS | UNIT_NPC_FLAG_TRAINER_PROFESSION);
                         }
 
@@ -685,7 +685,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
                         if(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->GetOwner())
                         {
-                            forcefriendly = (((Creature*)this)->isTotem() || ((Creature*)this)->isPet())
+                            forcefriendly = (((Creature*)this)->IsTotem() || ((Creature*)this)->IsPet())
                             && (((Creature*)this)->GetOwner()->GetTypeId() == TYPEID_PLAYER
                                 && ((Creature*)this)->GetOwner()->IsFriendlyTo(target)
                                 && ((Creature*)this)->GetOwner() != target
@@ -1558,11 +1558,11 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
         {
             // non fly unit don't must be in air
             // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
-            if (!((Creature const*)this)->canFly())
+            if (!((Creature const*)this)->CanFly())
             {
-                bool canSwim = ((Creature const*)this)->canSwim();
+                bool CanSwim = ((Creature const*)this)->CanSwim();
                 float ground_z = z;
-                float max_z = canSwim
+                float max_z = CanSwim
                     ? GetBaseMap()->GetWaterOrGroundLevel(x, y, z, &ground_z, !((Unit const*)this)->HasAuraType(SPELL_AURA_WATER_WALK))
                     : ((ground_z = GetBaseMap()->GetHeight(x, y, z, true)));
                 if (max_z > INVALID_HEIGHT)
