@@ -103,8 +103,8 @@ UPDATE `creature_template` SET `VehicleId` = 284 WHERE `entry` = 31702;
 UPDATE `creature_template` SET `VehicleId` = 174 WHERE `entry` = 31722;
 UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 31857;
 UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 31858;
-UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 31861;
-UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 31862;
+UPDATE `creature_template` SET `VehicleId` = 315 WHERE `entry` = 31861;
+UPDATE `creature_template` SET `VehicleId` = 315 WHERE `entry` = 31862;
 UPDATE `creature_template` SET `VehicleId` = 290 WHERE `entry` = 31881;
 UPDATE `creature_template` SET `VehicleId` = 291 WHERE `entry` = 31884;
 UPDATE `creature_template` SET `VehicleId` = 294 WHERE `entry` = 32189;
@@ -118,7 +118,7 @@ UPDATE `creature_template` SET `VehicleId` = 165 WHERE `entry` = 32535;
 UPDATE `creature_template` SET `VehicleId` = 324 WHERE `entry` = 32627;
 UPDATE `creature_template` SET `VehicleId` = 116 WHERE `entry` = 32629;
 UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 32633;
-UPDATE `creature_template` SET `VehicleId` = 312 WHERE `entry` = 32640;
+UPDATE `creature_template` SET `VehicleId` = 313 WHERE `entry` = 32640;
 UPDATE `creature_template` SET `VehicleId` = 160 WHERE `entry` = 32795;
 UPDATE `creature_template` SET `VehicleId` = 158 WHERE `entry` = 32796;
 UPDATE `creature_template` SET `VehicleId` = 328 WHERE `entry` = 32930;
@@ -242,6 +242,15 @@ UPDATE creature_template SET IconName="vehichleCursor" WHERE entry IN
 
 UPDATE creature_template SET IconName="Gunner" WHERE entry IN
 (28319,28366,28833,30236,32629,33067,33080,33139,33264,34111);
+
+-- From Timmit
+-- bone spike
+UPDATE `creature_template` SET `VehicleId` = 647 WHERE `entry` IN (38711,38970,38971,38972);
+UPDATE `creature_template` SET `VehicleId` = 533 WHERE `entry` IN (36619,38233,38459,38460);
+
+-- Putricide
+UPDATE `creature_template` SET `VehicleId` = 587 WHERE `entry` IN (36678,38431,38585,38586);
+UPDATE `creature_template` SET `VehicleId` = 591 WHERE `entry` IN (37672,38605,38786,38787);
 
 # full fix
 UPDATE `creature_template` SET `IconName` = 'vehichleCursor' WHERE `VehicleId` > 0 AND `IconName` IS NULL;
