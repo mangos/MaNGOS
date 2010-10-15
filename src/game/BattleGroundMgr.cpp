@@ -1151,7 +1151,7 @@ void BattleGroundMgr::DeleteAllBattleGrounds()
 }
 
 // used to update running battlegrounds, and delete finished ones
-void BattleGroundMgr::Update(uint32 diff)
+void BattleGroundMgr::Update(const uint32 diff)
 {
     // update scheduled queues
     if (!m_QueueUpdateScheduler.empty())

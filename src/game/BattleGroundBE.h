@@ -34,7 +34,7 @@ class BattleGroundBE : public BattleGround
     public:
         BattleGroundBE();
         ~BattleGroundBE();
-        void Update(uint32 diff);
+        void Update(const uint32 diff);
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);

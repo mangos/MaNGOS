@@ -240,7 +240,7 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
 }
 
 void
-MapManager::Update(uint32 diff)
+MapManager::Update(const uint32 diff)
 {
     i_timer.Update(diff);
     if( !i_timer.Passed() )

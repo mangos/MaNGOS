@@ -35,7 +35,7 @@ BattleGroundIC::~BattleGroundIC()
 
 }
 
-void BattleGroundIC::Update(uint32 diff)
+void BattleGroundIC::Update(const uint32 diff)
 {
     BattleGround::Update(diff);
 }

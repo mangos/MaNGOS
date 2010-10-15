@@ -35,7 +35,7 @@ BattleGroundSA::~BattleGroundSA()
 
 }
 
-void BattleGroundSA::Update(uint32 diff)
+void BattleGroundSA::Update(const uint32 diff)
 {
     BattleGround::Update(diff);
 }

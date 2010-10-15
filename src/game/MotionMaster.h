@@ -78,7 +78,7 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         const_iterator begin() const { return Impl::c.begin(); }
         const_iterator end() const { return Impl::c.end(); }
 
-        void UpdateMotion(uint32 diff);
+        void UpdateMotion(const uint32 diff);
         void Clear(bool reset = true, bool all = false)
         {
             if (m_cleanFlag & MMCF_UPDATE)

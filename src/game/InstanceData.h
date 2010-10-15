@@ -48,7 +48,7 @@ class MANGOS_DLL_SPEC InstanceData
         void SaveToDB();
 
         //Called every map update
-        virtual void Update(uint32 /*diff*/) {}
+        virtual void Update(const uint32 /*diff*/) {}
 
         //Used by the map's CanEnter function.
         //This is to prevent players from entering during boss encounters.

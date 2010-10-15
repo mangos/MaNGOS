@@ -291,7 +291,7 @@ Unit::~Unit()
     MANGOS_ASSERT(m_deletedHolders.size() == 0);
 }
 
-void Unit::Update( uint32 p_time )
+void Unit::Update(const uint32 p_time)
 {
     if(!IsInWorld())
         return;

@@ -305,7 +305,7 @@ class BattleGroundAV : public BattleGround
     public:
         BattleGroundAV();
         ~BattleGroundAV();
-        void Update(uint32 diff);
+        void Update(const uint32 diff);
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);

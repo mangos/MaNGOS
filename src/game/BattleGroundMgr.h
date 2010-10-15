@@ -187,7 +187,7 @@ class BattleGroundMgr
         /* Construction */
         BattleGroundMgr();
         ~BattleGroundMgr();
-        void Update(uint32 diff);
+        void Update(const uint32 diff);
 
         /* Packet Building */
         void BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Player *plr);

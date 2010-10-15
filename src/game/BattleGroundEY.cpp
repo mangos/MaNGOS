@@ -48,7 +48,7 @@ BattleGroundEY::~BattleGroundEY()
 {
 }
 
-void BattleGroundEY::Update(uint32 diff)
+void BattleGroundEY::Update(const uint32 diff)
 {
     BattleGround::Update(diff);
 
