@@ -39,7 +39,7 @@ INSERT IGNORE INTO spell_script_target VALUES (52349, 1, 28782);
 DELETE FROM creature_involvedrelation WHERE quest in (12687);
 INSERT INTO creature_involvedrelation (id, quest) VALUES (28788, 12687);
 UPDATE creature_template SET npcflag=npcflag|2 WHERE entry=28788;
-UPDATE quest_template SET SpecialFlags = 0 , SuggestedPlayers = 0 , Method = 1 WHERE entry IN (12687);
+UPDATE quest_template SET SpecialFlags = 0 , SuggestedPlayers = 1 , Method = 2 WHERE entry IN (12687);
 
 -- Massacre at Light's point quest
 UPDATE creature_template SET
