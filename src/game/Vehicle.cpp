@@ -56,7 +56,7 @@ void Vehicle::SetDeathState(DeathState s)                       // overwrite vir
     Creature::SetDeathState(s);
 }
 
-void Vehicle::Update(const uint32 diff)
+void Vehicle::Update(uint32 diff)
 {
     Creature::Update(diff);
 }

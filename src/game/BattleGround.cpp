@@ -310,7 +310,7 @@ BattleGround::~BattleGround()
         delete itr->second;
 }
 
-void BattleGround::Update(const uint32 diff)
+void BattleGround::Update(uint32 diff)
 {
     if (!GetPlayersSize())
     {

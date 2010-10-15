@@ -42,7 +42,7 @@ BattleGroundNA::~BattleGroundNA()
 
 }
 
-void BattleGroundNA::Update(const uint32 diff)
+void BattleGroundNA::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 

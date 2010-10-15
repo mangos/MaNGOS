@@ -40,7 +40,7 @@ BattleGroundDS::~BattleGroundDS()
 
 }
 
-void BattleGroundDS::Update(const uint32 diff)
+void BattleGroundDS::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 }

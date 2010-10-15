@@ -106,7 +106,7 @@ Unit* DynamicObject::GetCaster() const
     return ObjectAccessor::GetUnit(*this, GetCasterGUID());
 }
 
-void DynamicObject::Update(const uint32 p_time)
+void DynamicObject::Update(uint32 p_time)
 {
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
     Unit* caster = GetCaster();
@@ -168,7 +168,7 @@ void DynamicObject::Delay(int32 delaytime)
                     break;
                 }
             }
-
+            
             if (foundAura)
             {
                 ++iter;

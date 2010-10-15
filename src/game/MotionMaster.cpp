@@ -63,7 +63,7 @@ MotionMaster::~MotionMaster()
     DirectClean(false,true);
 }
 
-void MotionMaster::UpdateMotion(const uint32 diff)
+void MotionMaster::UpdateMotion(uint32 diff)
 {
     if (m_owner->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         return;

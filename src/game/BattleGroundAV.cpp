@@ -232,7 +232,7 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamId team, int32 points )
     UpdateWorldState(((team == BG_TEAM_HORDE) ? BG_AV_Horde_Score : BG_AV_Alliance_Score), m_TeamScores[team]);
 }
 
-void BattleGroundAV::Update(const uint32 diff)
+void BattleGroundAV::Update(uint32 diff)
 {
     BattleGround::Update(diff);
     if (GetStatus() != STATUS_IN_PROGRESS)

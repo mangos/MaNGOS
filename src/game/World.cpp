@@ -1373,7 +1373,7 @@ void World::DetectDBCLang()
 }
 
 /// Update the World !
-void World::Update(const uint32 diff)
+void World::Update(uint32 diff)
 {
     ///- Update the different timers
     for(int i = 0; i < WUPDATE_COUNT; ++i)
@@ -1857,7 +1857,7 @@ void World::SendServerMessage(ServerMessageType type, const char *text, Player* 
         SendGlobalMessage( &data );
 }
 
-void World::UpdateSessions(const uint32 diff)
+void World::UpdateSessions( uint32 diff )
 {
     ///- Add new sessions
     WorldSession* sess;

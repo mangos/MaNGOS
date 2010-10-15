@@ -40,7 +40,7 @@ BattleGroundAA::~BattleGroundAA()
 
 }
 
-void BattleGroundAA::Update(const uint32 diff)
+void BattleGroundAA::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 }

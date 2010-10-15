@@ -35,7 +35,7 @@ BattleGroundRB::~BattleGroundRB()
 
 }
 
-void BattleGroundRB::Update(const uint32 diff)
+void BattleGroundRB::Update(uint32 diff)
 {
     BattleGround::Update(diff);
 }

@@ -404,7 +404,7 @@ uint32 Creature::ChooseDisplayId(const CreatureInfo *cinfo, const CreatureData *
     return display_id;
 }
 
-void Creature::Update(const uint32 diff)
+void Creature::Update(uint32 diff)
 {
     if (m_needNotify)
     {
