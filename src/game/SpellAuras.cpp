@@ -312,7 +312,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //259 corrupt healing over time spell
     &Aura::HandleNoImmediateEffect,                         //260 SPELL_AURA_SCREEN_EFFECT (miscvalue = id in ScreenEffect.dbc) not required any code
     &Aura::HandlePhase,                                     //261 SPELL_AURA_PHASE undetectable invisibility?     implemented in Unit::isVisibleForOrDetect
-    &Aura::HandleIgnoreUnitState,                           //262 SPELL_AURA_IGNORE_UNIT_STATE Allows some abilities which are avaible only in some cases.... implemented in Unit::isIgnoreUnitState & Spell::CheckCast
+    &Aura::HandleIgnoreUnitState,                           //262 SPELL_AURA_IGNORE_UNIT_STATE                    implemented in Unit::isIgnoreUnitState & Spell::CheckCast
     &Aura::HandleNoImmediateEffect,                         //263 SPELL_AURA_ALLOW_ONLY_ABILITY                   implemented in Spell::CheckCasterAuras
     &Aura::HandleUnused,                                    //264 unused (3.0.8a-3.2.2a)
     &Aura::HandleUnused,                                    //265 unused (3.0.8a-3.2.2a)
@@ -2210,11 +2210,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 // hack for Fingers of Frost stacks
                 if (GetId() == 74396)
                 {
-                    if (SpellAuraHolder* holder = target->GetSpellAuraHolder(74396))
-                    {
-                        if (holder->GetStackAmount() < 3)
-                            holder->SetAuraCharges(3);
-                    }
+                    if (Aura *aura = target->GetAura(74396, EFFECT_INDEX_0))
+                        aura->GetHolder()->SetAuraCharges(2);
                 }
                 break;
             }
@@ -2428,8 +2425,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 return;
             case 74396:                                     // Fingers of Frost effect remove
             {
-                if (GetHolder()->GetAuraCharges() <= 0)
-                    target->RemoveAurasDueToSpell(44544);
+                target->RemoveAurasDueToSpell(44544);
                 return;
             }
         }
@@ -8157,6 +8153,16 @@ void Aura::HandlePhase(bool apply, bool Real)
     // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
     if(target->GetVisibility() != VISIBILITY_OFF)
         target->SetVisibility(target->GetVisibility());
+}
+
+void Aura::HandleIgnoreUnitState(bool apply, bool Real)
+{
+    if(GetTarget()->GetTypeId() != TYPEID_PLAYER || !Real)
+        return;
+
+    // for alowing charge/intercept/intervene in different stances
+    if (GetId() == 57499 && apply)
+        GetHolder()->SetAuraFlags(19);
 }
 
 void Aura::HandleAuraSafeFall( bool Apply, bool Real )

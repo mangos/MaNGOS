@@ -11579,14 +11579,8 @@ bool Unit::isIgnoreUnitState(SpellEntry const *spell)
         return false;
 
     if(spell->SpellFamilyName == SPELLFAMILY_MAGE)
-    {
-        // Ice Lance
-        if(spell->SpellIconID == 186)
-            return true;
-        // Shatter
-        if(spell->Id == 11170 || spell->Id == 12982 || spell->Id == 12983)
-            return true;
-    }
+        return true; 
+
     Unit::AuraList const& stateAuras = GetAurasByType(SPELL_AURA_IGNORE_UNIT_STATE);
     for(Unit::AuraList::const_iterator j = stateAuras.begin();j != stateAuras.end(); ++j)
     {
