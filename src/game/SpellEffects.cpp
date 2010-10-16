@@ -4850,10 +4850,12 @@ void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
     if (!vehicle_entry)
         return;
 
-    uint32 mountSpellID = m_spellInfo->EffectBasePoints[eff_idx]+1;
+    uint32 mountSpellID = (m_spellInfo->EffectBasePoints[eff_idx] <= 1) ?
+                           46598 : m_spellInfo->EffectBasePoints[eff_idx]+1;
+    // Used MiscValue mount spell, if not present - hardcoded (by Blzz).
 
     float px, py, pz;
-    // If dest location if present
+    // If dest location present
     if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
         px = m_targets.m_destX;
@@ -4865,6 +4867,7 @@ void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
         m_caster->GetClosePoint(px, py, pz,m_caster->GetObjectBoundingRadius());
 
     TempSummonType summonType = (GetSpellDuration(m_spellInfo) == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_OR_DEAD_DESPAWN;
+
     Creature* vehicle = m_caster->SummonCreature(vehicle_entry,px,py,pz,m_caster->GetOrientation(),summonType,GetSpellDuration(m_spellInfo),true);
 
     if (vehicle && !vehicle->GetObjectGuid().IsVehicle())
@@ -4874,24 +4877,12 @@ void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
         return;
     }
 
-    if (vehicle && mountSpellID)
+    if (vehicle)
     {
         vehicle->setFaction(forceFaction ? forceFaction : m_caster->getFaction());
         vehicle->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
-        DEBUG_LOG("Vehicle (guidlow %d, entry %d) summoned. ", vehicle->GetGUIDLow(), vehicle->GetEntry());
         m_caster->CastSpell(vehicle, mountSpellID, true);
-    }
-    else if (vehicle && forceFaction && !mountSpellID)
-    {
-        vehicle->setFaction(forceFaction);
-        vehicle->SetUInt32Value(UNIT_CREATED_BY_SPELL,m_spellInfo->Id);
-        if (VehicleKit* pVehicle = vehicle->GetVehicleKit())
-        {
-            m_caster->EnterVehicle(pVehicle);
-            DEBUG_LOG("Player (guidlow %d) now on uncontrolled vehicle (guidlow %d, entry %d). ", m_caster->GetGUIDLow(), vehicle->GetGUIDLow(), vehicle->GetEntry());
-        }
-        else
-            vehicle->ForcedDespawn();
+        DEBUG_LOG("Caster (guidlow %d) summon vehicle (guidlow %d, entry %d) and mounted with spell %d ", m_caster->GetGUIDLow(), vehicle->GetGUIDLow(), vehicle->GetEntry(), mountSpellID);
     }
     else
         sLog.outError("Vehicle (guidlow %d, entry %d) NOT summoned by undefined reason. ", vehicle->GetGUIDLow(), vehicle->GetEntry());
