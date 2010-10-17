@@ -178,3 +178,27 @@ INSERT INTO `npc_spellclick_spells` VALUES
 (29598, 54908, 12851, 1, 12851, 1);
 
 INSERT IGNORE INTO `spell_script_target` VALUES (54897, 1, 29358);
+
+* Scourge Gryphon */
+UPDATE creature_template SET
+    spell1 = 0,
+    spell2 = 0,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 146
+WHERE entry IN (28864);
+
+/* Frostbrood Vanquisher */
+UPDATE creature_template SET
+    spell1 = 53114,
+    spell2 = 53110,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 156
+WHERE entry IN (28670);
+
+UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, InhabitType = 3 WHERE entry = 28670;
