@@ -174,11 +174,11 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
     {
         // Put the packet on the buffer.
         if (m_OutBuffer->copy ((char*) header.header, header.getHeaderLength()) == -1)
-            ACE_ASSERT (false);
+            MANGOS_ASSERT (false);
 
         if (!pct.empty ())
             if (m_OutBuffer->copy ((char*) pct.contents (), pct.size ()) == -1)
-                ACE_ASSERT (false);
+                MANGOS_ASSERT (false);
     }
     else
     {
@@ -466,9 +466,9 @@ int WorldSocket::Update (void)
 
 int WorldSocket::handle_input_header (void)
 {
-    ACE_ASSERT (m_RecvWPct == NULL);
+    MANGOS_ASSERT (m_RecvWPct == NULL);
 
-    ACE_ASSERT (m_Header.length () == sizeof (ClientPktHeader));
+    MANGOS_ASSERT (m_Header.length () == sizeof (ClientPktHeader));
 
     m_Crypt.DecryptRecv ((uint8*) m_Header.rd_ptr (), sizeof (ClientPktHeader));
 
@@ -497,7 +497,7 @@ int WorldSocket::handle_input_header (void)
     }
     else
     {
-        ACE_ASSERT(m_RecvPct.space() == 0);
+        MANGOS_ASSERT(m_RecvPct.space() == 0);
     }
 
     return 0;
@@ -508,9 +508,9 @@ int WorldSocket::handle_input_payload (void)
     // set errno properly here on error !!!
     // now have a header and payload
 
-    ACE_ASSERT (m_RecvPct.space () == 0);
-    ACE_ASSERT (m_Header.space () == 0);
-    ACE_ASSERT (m_RecvWPct != NULL);
+    MANGOS_ASSERT (m_RecvPct.space () == 0);
+    MANGOS_ASSERT (m_Header.space () == 0);
+    MANGOS_ASSERT (m_RecvWPct != NULL);
 
     const int ret = ProcessIncoming (m_RecvWPct);
 
@@ -564,7 +564,7 @@ int WorldSocket::handle_input_missing_data (void)
             if (m_Header.space () > 0)
             {
                 // Couldn't receive the whole header this time.
-                ACE_ASSERT (message_block.length () == 0);
+                MANGOS_ASSERT (message_block.length () == 0);
                 errno = EWOULDBLOCK;
                 return -1;
             }
@@ -572,7 +572,7 @@ int WorldSocket::handle_input_missing_data (void)
             // We just received nice new header
             if (handle_input_header () == -1)
             {
-                ACE_ASSERT ((errno != EWOULDBLOCK) && (errno != EAGAIN));
+                MANGOS_ASSERT ((errno != EWOULDBLOCK) && (errno != EAGAIN));
                 return -1;
             }
         }
@@ -598,7 +598,7 @@ int WorldSocket::handle_input_missing_data (void)
             if (m_RecvPct.space () > 0)
             {
                 // Couldn't receive the whole data this time.
-                ACE_ASSERT (message_block.length () == 0);
+                MANGOS_ASSERT (message_block.length () == 0);
                 errno = EWOULDBLOCK;
                 return -1;
             }
@@ -607,7 +607,7 @@ int WorldSocket::handle_input_missing_data (void)
         //just received fresh new payload
         if (handle_input_payload () == -1)
         {
-            ACE_ASSERT ((errno != EWOULDBLOCK) && (errno != EAGAIN));
+            MANGOS_ASSERT ((errno != EWOULDBLOCK) && (errno != EAGAIN));
             return -1;
         }
     }
@@ -656,7 +656,7 @@ int WorldSocket::schedule_wakeup_output (GuardType& g)
 
 int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
 {
-    ACE_ASSERT (new_pct);
+    MANGOS_ASSERT (new_pct);
 
     // manage memory ;)
     ACE_Auto_Ptr<WorldPacket> aptr (new_pct);
