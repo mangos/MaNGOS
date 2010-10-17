@@ -44,23 +44,6 @@ inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
         iter->getSource()->Update(i_timeDiff);
 }
 
-inline void MaNGOS::PlayerRelocationNotifier::Visit(PlayerMapType &m)
-{
-    for(PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        if (&i_player==iter->getSource())
-            continue;
-
-        // visibility for players updated by ObjectAccessor::UpdateVisibilityFor calls in appropriate places
-
-        // Cancel Trade
-        if (i_player.GetTrader()==iter->getSource())
-                                                            // iteraction distance
-            if (!i_player.IsWithinDistInMap(iter->getSource(), INTERACTION_DISTANCE))
-                i_player.GetSession()->SendCancelTrade();   // will clode both side trade windows
-    }
-}
-
 inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPoint, Creature* c)
 {
     // update creature visibility at player/creature move
