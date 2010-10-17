@@ -277,7 +277,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     CastPetPassiveAuras(true);
     ApplyAllScalingBonuses(true);
 
-    if (getPetType() != HUNTER_PET)             //all (?) summon pets come with full health when called, but not when they are current
+    if (getPetType() != HUNTER_PET
+        && (owner->GetTypeId() == TYPEID_PLAYER && owner->GetTemporaryUnsummonedPetNumber() != pet_number))
+     //all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
         SetPower(getPowerType(), GetMaxPower(getPowerType()));
@@ -551,23 +553,17 @@ void Pet::Update(uint32 diff)
             //regenerate focus for hunter pets or energy for deathknight's ghoul
             if(m_regenTimer <= diff)
             {
-                Regenerate(getPowerType(), diff);
-                m_regenTimer = 2000;
+                Regenerate(getPowerType(), REGEN_TIME_FULL);
+                m_regenTimer = REGEN_TIME_FULL;
+
+                if(getPetType() == HUNTER_PET)
+                    Regenerate(POWER_HAPPINESS, REGEN_TIME_FULL);
+
+                if (!isInCombat() || IsPolymorphed())
+                RegenerateHealth();
             }
             else
                 m_regenTimer -= diff;
-
-            if(getPetType() != HUNTER_PET)
-                break;
-
-            if(m_happinessTimer <= diff)
-            {
-                LooseHappiness();
-                m_happinessTimer = 7500;
-                ApplyHappinessBonus(true);
-            }
-            else
-                m_happinessTimer -= diff;
 
             break;
         }
@@ -584,17 +580,6 @@ void Pet::Update(uint32 diff)
 
     if (IsInWorld())
         Creature::Update(diff);
-}
-
-void Pet::LooseHappiness()
-{
-    uint32 curValue = GetPower(POWER_HAPPINESS);
-    if (curValue <= 0)
-        return;
-    int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
-    if(isInCombat())                                        //we know in combat happiness fades faster, multiplier guess
-        addvalue = int32(addvalue * 1.5);
-    ModifyPower(POWER_HAPPINESS, -addvalue);
 }
 
 HappinessState Pet::GetHappinessState()
@@ -3031,7 +3016,7 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
 // diff contains the time in milliseconds since last regen.
 void Pet::Regenerate(Powers power, uint32 diff)
 {
-    uint32 curValue = GetPower(power);
+    int32 curValue = GetPower(power);
     uint32 maxValue = GetMaxPower(power);
 
     float addvalue = 0.0f;
@@ -3050,11 +3035,13 @@ void Pet::Regenerate(Powers power, uint32 diff)
             {
                 addvalue = GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 2.00f;
             }
-        }   break;
+            break;
+        }
         case POWER_RAGE:                                    // Regenerate rage ?
         {
-            addvalue = 20 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
-        }   break;
+            addvalue = -20 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS);
+            break;
+        }
         case POWER_ENERGY:                                  // Regenerate energy (ghoul)
         {
             addvalue = 20 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
@@ -3062,12 +3049,20 @@ void Pet::Regenerate(Powers power, uint32 diff)
         }
         case POWER_FOCUS:                                   // Hunter pets
         {
-            addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
+            addvalue = 10 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
+            break;
+        }
+
+        case POWER_HAPPINESS:
+        {
+            addvalue = -178.0f;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 2 secs)
+            if(isInCombat())                                     //we know in combat happiness fades faster, multiplier guess
+                addvalue = addvalue * 1.5f;
+            ApplyHappinessBonus(true);
             break;
         }
         case POWER_RUNIC_POWER:
         case POWER_RUNE:
-        case POWER_HAPPINESS:
         case POWER_HEALTH:
         default:
             addvalue = 0.0f;
@@ -3092,19 +3087,13 @@ void Pet::Regenerate(Powers power, uint32 diff)
     // addvalue computed on a 2sec basis. => update to diff time
     addvalue *= float(diff) / REGEN_TIME_FULL;
 
-    if (power != POWER_RAGE )
-    {
-        curValue += uint32(addvalue);
-        if (curValue > maxValue)
+    curValue += int32(addvalue);
+
+    if (curValue > maxValue)
             curValue = maxValue;
-    }
-    else
-    {
-        if(curValue <= uint32(addvalue))
-            curValue = 0;
-        else
-            curValue -= uint32(addvalue);
-    }
+    else if (curValue < 0)
+        curValue = 0;
+
     SetPower(power, curValue);
 }
 
