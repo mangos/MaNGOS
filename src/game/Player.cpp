@@ -6055,8 +6055,11 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
         z = GetPositionZ();
 
         // group update
-        if(GetGroup() && (old_x != x || old_y != y))
+        if (GetGroup() && (old_x != x || old_y != y))
             SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
+
+        if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
+            GetSession()->SendCancelTrade();   // will clode both side trade windows
     }
 
     // code block for underwater state update
