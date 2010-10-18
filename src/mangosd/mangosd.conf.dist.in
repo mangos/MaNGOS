@@ -1357,7 +1357,7 @@ Death.Bones.BattlegroundOrArena = 1
 #    BattleGround.PremadeGroupWaitForMatch
 #        The time in which premade group of 1 faction waits in BG Queue for premade group of other faction
 #        Default: 1800000 (30 minutes)
-#                 0 - disable (not recommended)
+#                 0 - disable premade group matches (group always added to bg team in normal way)
 #
 ###################################################################################################################
 

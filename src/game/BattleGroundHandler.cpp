@@ -31,6 +31,7 @@
 #include "ArenaTeam.h"
 #include "Language.h"
 #include "ScriptCalls.h"
+#include "World.h"
 
 void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
 {
@@ -150,7 +151,8 @@ void WorldSession::HandleBattlemasterJoinOpcode( WorldPacket & recv_data )
         if (grp->GetLeaderGuid() != _player->GetObjectGuid())
             return;
         err = grp->CanJoinBattleGroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
-        isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
+        isPremade = sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH) &&
+            (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam());
     }
     // if we're here, then the conditions to join a bg are met. We can proceed in joining.
 
