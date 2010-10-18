@@ -1643,7 +1643,6 @@ AuctionHouseBot.VendorItems = 0
 AuctionHouseBot.LootItems = 1
 AuctionHouseBot.OtherItems = 0
 AuctionHouseBot.No_Bind = 1
-AuctionHouseBot.MaxItemLevel = 200
 AuctionHouseBot.Bind_When_Picked_Up = 0
 AuctionHouseBot.Bind_When_Equipped = 1
 AuctionHouseBot.Bind_When_Use = 1
