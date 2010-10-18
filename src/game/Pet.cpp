@@ -2201,30 +2201,28 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
 
     switch(getPetType())
     {
+        case GUARDIAN_PET:
         case SUMMON_PET:
         {
             switch(owner->getClass())
             {
                 case CLASS_WARLOCK:
                 {
-                   int32 fire  = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FIRE);
-                   int32 shadow = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_SHADOW);
-                   newAPBonus  = (fire > shadow) ? fire : shadow;
-                   if(newAPBonus < 0)
-                       newAPBonus = 0;
+                    newAPBonus = std::max(owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW),owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE));
                     break;
                 }
                 case CLASS_DEATH_KNIGHT:
                     newAPBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
+                    break;
+                case CLASS_PRIEST:
+                    newAPBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
                     break;
                 case CLASS_SHAMAN:
                     newAPBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
                     break;
                 case CLASS_MAGE:
                 {
-                   newAPBonus = int32(owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST)) - owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG + SPELL_SCHOOL_FROST);
-                   if(newAPBonus < 0)
-                       newAPBonus = 0;
+                   newAPBonus = std::max(owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FROST),owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE));
                    break;
                 }
                 default:
@@ -2240,6 +2238,9 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
             newAPBonus = 0;
             break;
     }
+
+    if(newAPBonus < 0)
+        newAPBonus = 0;
 
     if (m_baseBonusData->attackpowerScale == newAPBonus && !apply)
         return;
@@ -2312,6 +2313,9 @@ void Pet::ApplyDamageScalingBonus(bool apply)
             {
                 case CLASS_DEATH_KNIGHT:
                     newDamageBonus = owner->GetTotalAttackPowerValue(BASE_ATTACK);
+                    break;
+                case CLASS_PRIEST:
+                    newDamageBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
                     break;
                 default:
                     newDamageBonus = 0;

@@ -606,3 +606,9 @@ DELETE FROM `pet_levelstats` WHERE `creature_entry` = 31216;
 INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
 (31216, 1,  42, 22, 20, 2, 3, 10, 22, 20, 22, 20, 20),
 (31216, 80, 2680, 2400, 8600, 182, 216, 110, 72, 86, 152, 191, 94);
+
+-- Priest Shadowfiend
+DELETE FROM `pet_levelstats` WHERE `creature_entry` = 19668;
+INSERT INTO `pet_levelstats` (`creature_entry`, `level`, `hp`, `mana`, `armor`, `mindmg`, `maxdmg`, `attackpower`, `str`, `agi`, `sta`, `inte`, `spi`) VALUES
+(19668, 1,  42, 22, 20, 2, 3, 10, 22, 20, 22, 20, 20),
+(19668, 80, 7266, 4759, 4500, 190, 620, 910, 62, 86, 92, 101, 102);

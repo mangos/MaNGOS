@@ -94,7 +94,7 @@ INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`
 -- Pet 19668 - Priest  Shadowfiend
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 19668;
 INSERT INTO `pet_scaling_data` (`creature_entry`, `aura`, `healthbase`, `health`, `powerbase`, `power`, `str`, `agi`, `sta`, `inte`, `spi`, `armor`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `apbase`, `apbasescale`, `attackpower`, `damage`, `spelldamage`, `spellhit`, `hit`, `expertize`, `attackspeed`, `crit`, `regen`) VALUES
-(19668, 0, 0, 1000, 0, 1500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 200, 0, 0, 36, 100, 100, 100, 100, 0, 0);
+(19668, 0, 0, 1000, 0, 1500, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 200, 400, 0, 67, 100, 100, 100, 100, 0, 0);
 
 -- Guardian 31216 - mage Mirror image
 DELETE FROM `pet_scaling_data` WHERE `creature_entry` = 31216;
