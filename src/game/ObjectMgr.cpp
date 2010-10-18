@@ -4453,7 +4453,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 if (tmp.talk.textId[0] == 0)
                 {
-                    sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId, tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid talk text id (dataint = %i) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId[0], tmp.id);
                     continue;
                 }
 
