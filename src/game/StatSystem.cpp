@@ -1066,8 +1066,7 @@ void Pet::UpdateSpellPower()
 
 void Pet::UpdateManaRegen()
 {
-
-    float power_regen = GetStat(STAT_SPIRIT) / 5.0f + 17.0f;
+    float power_regen = sqrt(GetStat(STAT_INTELLECT)) * OCTRegenMPPerSpirit();
 
     power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 

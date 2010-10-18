@@ -560,7 +560,7 @@ void Pet::Update(uint32 diff)
                     Regenerate(POWER_HAPPINESS, REGEN_TIME_FULL);
 
                 if (!isInCombat() || IsPolymorphed())
-                RegenerateHealth();
+                    RegenerateHealth(REGEN_TIME_FULL);
             }
             else
                 m_regenTimer -= diff;
@@ -2885,11 +2885,17 @@ bool Pet::ReapplyScalingAura(SpellAuraHolder* holder, SpellEntry const *spellpro
         return false;
 
     holder->SetInUse(true);
-    RemoveSingleAuraFromSpellAuraHolder(holder, index);
+
+    Aura* oldaura = holder->GetAuraByEffectIndex(index);
+
+    if (oldaura)
+    {
+//    RemoveSingleAuraFromSpellAuraHolder(holder, index, AURA_REMOVE_BY_STACK);
+        RemoveAura(oldaura, AURA_REMOVE_BY_STACK);
+    }
 
     Aura* aura = CreateAura(spellproto, index, &basePoints, holder, this, this, NULL);
     aura->SetAuraDuration(aura->GetAuraMaxDuration());
-
     holder->AddAura(aura, index);
     AddAuraToModList(aura);
     aura->ApplyModifier(true,true);
@@ -3097,6 +3103,44 @@ void Pet::Regenerate(Powers power, uint32 diff)
     SetPower(power, curValue);
 }
 
+void Pet::RegenerateHealth(uint32 diff)
+{
+    uint32 curValue = GetHealth();
+    uint32 maxValue = GetMaxHealth();
+
+    if (curValue >= maxValue)
+        return;
+
+    float addvalue = 0.0f;
+    float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
+
+    // polymorphed case
+    if ( IsPolymorphed() )
+        addvalue = (float)GetMaxHealth() / 3.0f;
+    // normal regen case (maybe partly in combat case)
+    else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) )
+    {
+        addvalue = OCTRegenHPPerSpirit() * HealthIncreaseRate;
+        if (!isInCombat())
+        {
+            AuraList const& mModHealthRegenPct = GetAurasByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
+            for(AuraList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
+                addvalue *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+        }
+        else if(HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
+            addvalue *= GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT) / 100.0f;
+    }
+    // always regeneration bonus (including combat)
+    addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT);
+
+    if(addvalue < 0)
+        addvalue = 0;
+
+    addvalue *= (float)diff / REGEN_TIME_FULL;
+
+    ModifyHealth(int32(addvalue));
+}
+
 void Pet::ApplyScalingBonus(ScalingAction* action)
 {
     switch (action->target)
@@ -3186,4 +3230,53 @@ void Pet::ApplyHappinessBonus(bool apply)
         UpdateDamagePhysical(RANGED_ATTACK);
         UpdateSpellPower();
     }
+}
+
+float Pet::OCTRegenHPPerSpirit()
+{
+    Unit* owner = GetOwner();
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return ( GetPower(POWER_MANA) > 0 ) ? (GetStat(STAT_SPIRIT) * 0.25f) : (GetStat(STAT_SPIRIT) * 0.80f);
+
+    uint32 level = ((Player*)owner)->getLevel();
+    uint32 pclass = ((Player*)owner)->getClass();
+
+    if (level > GT_MAX_LEVEL) level = GT_MAX_LEVEL;
+
+    GtOCTRegenHPEntry     const *baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+    GtRegenHPPerSptEntry  const *moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+
+    if (baseRatio == NULL || moreRatio == NULL)
+        return 0.0f;
+
+    // Formula from PaperDollFrame script
+    float spirit = GetStat(STAT_SPIRIT);
+    float baseSpirit = spirit;
+    if (baseSpirit > 50) baseSpirit = 50;
+    float moreSpirit = spirit - baseSpirit;
+    float regen = baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio;
+    return regen;
+}
+
+float Pet::OCTRegenMPPerSpirit()
+{
+    Unit* owner = GetOwner();
+
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        return (GetStat(STAT_SPIRIT) / 5.0f + 17.0f);
+
+    uint32 level = ((Player*)owner)->getLevel();
+    uint32 pclass = ((Player*)owner)->getClass();
+
+    if (level > GT_MAX_LEVEL) level = GT_MAX_LEVEL;
+
+    GtRegenMPPerSptEntry  const *moreRatio = sGtRegenMPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
+
+    if (moreRatio == NULL)
+        return 0.0f;
+
+    // Formula get from PaperDollFrame script
+    float spirit    = GetStat(STAT_SPIRIT);
+    float regen     = spirit * moreRatio->ratio;
+    return regen;
 }

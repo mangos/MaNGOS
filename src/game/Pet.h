@@ -226,6 +226,9 @@ class Pet : public Creature
         void CastPetAura(PetAura const* aura);
 
         void Regenerate(Powers power, uint32 diff);
+        void RegenerateHealth(uint32 diff);
+        float OCTRegenHPPerSpirit();
+        float OCTRegenMPPerSpirit();
         void CastPetPassiveAuras(bool current);
         void ApplyScalingBonus(ScalingAction* action);
         void ApplyAllScalingBonuses(bool apply);
