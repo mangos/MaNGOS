@@ -202,11 +202,12 @@ class Quest
         uint32 GetQuestId() const { return QuestId; }
         uint32 GetQuestMethod() const { return QuestMethod; }
         int32  GetZoneOrSort() const { return ZoneOrSort; }
-        int32  GetSkillOrClass() const { return SkillOrClass; }
         uint32 GetMinLevel() const { return MinLevel; }
         int32  GetQuestLevel() const { return QuestLevel; }
         uint32 GetType() const { return Type; }
+        uint32 GetRequiredClasses() const { return RequiredClasses; }
         uint32 GetRequiredRaces() const { return RequiredRaces; }
+        uint32 GetRequiredSkill() const { return RequiredSkill; }
         uint32 GetRequiredSkillValue() const { return RequiredSkillValue; }
         uint32 GetRepObjectiveFaction() const { return RepObjectiveFaction; }
         int32  GetRepObjectiveValue() const { return RepObjectiveValue; }
@@ -303,11 +304,12 @@ class Quest
         uint32 QuestId;
         uint32 QuestMethod;
         int32  ZoneOrSort;
-        int32  SkillOrClass;
         uint32 MinLevel;
         int32  QuestLevel;
         uint32 Type;
+        uint32 RequiredClasses;
         uint32 RequiredRaces;
+        uint32 RequiredSkill;
         uint32 RequiredSkillValue;
         uint32 RepObjectiveFaction;
         int32  RepObjectiveValue;
