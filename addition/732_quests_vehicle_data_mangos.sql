@@ -179,7 +179,7 @@ INSERT INTO `npc_spellclick_spells` VALUES
 
 INSERT IGNORE INTO `spell_script_target` VALUES (54897, 1, 29358);
 
-* Scourge Gryphon */
+/* Scourge Gryphon */
 UPDATE creature_template SET
     spell1 = 0,
     spell2 = 0,
