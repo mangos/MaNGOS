@@ -627,8 +627,8 @@ namespace MaNGOS
     {
         public:
             RespawnDo() {}
-            void operator()(Creature* u) const { u->Respawn(); }
-            void operator()(GameObject* u) const { u->Respawn(); }
+            void operator()(Creature* u) const;
+            void operator()(GameObject* u) const;
             void operator()(WorldObject*) const {}
             void operator()(Corpse*) const {}
     };
