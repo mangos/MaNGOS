@@ -17991,22 +17991,10 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
                 }
             }
             // cooldown, only if pet is not death already (corpse)
-            if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && pet->getDeathState() != CORPSE)
-            {
+            if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE && (!m_temporaryUnsummonedPetNumber || m_temporaryUnsummonedPetNumber != pet->GetCharmInfo()->GetPetNumber()))
                 SendCooldownEvent(spellInfo);
-            }
         }
     }
-
-    // Raise Dead hack
-    if(SpellEntry const *spellInfo = sSpellStore.LookupEntry(pet->GetCreateSpellID()))
-        if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && spellInfo->SpellFamilyFlags & 0x1000)
-            if (SpellEntry const *spellInfo2 = sSpellStore.LookupEntry(46584))
-            {
-                AddSpellAndCategoryCooldowns(spellInfo,0,NULL,true);
-                SendCooldownEvent(spellInfo);
-                SendCooldownEvent(spellInfo2);
-            }
 
     pet->_Remove(mode, returnreagent);
 }
@@ -22286,7 +22274,11 @@ void Player::ActivateSpec(uint8 specNum)
     if(specNum >= GetSpecsCount())
         return;
 
-    UnsummonPetTemporaryIfAny();
+    if (getClass() == CLASS_HUNTER || getClass() == CLASS_WARLOCK)
+        UnsummonPetTemporaryIfAny();
+    else if (Pet* pet = GetPet())
+        pet->Remove(PET_SAVE_NOT_IN_SLOT, true);
+
     SendActionButtons(2);
 
     ApplyGlyphs(false);

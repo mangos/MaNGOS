@@ -440,7 +440,7 @@ WorldObject* Spell::FindCorpseUsing()
     return result;
 }
 
-bool Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
+bool Spell::FillCustomTargetMap(SpellEffectIndex i, UnitList &targetUnitMap)
 {
     float radius;
 
@@ -454,20 +454,29 @@ bool Spell::FillCustomTargetMap(uint32 i, UnitList &targetUnitMap)
     {
         case 46584: // Raise Dead
             {
-            WorldObject* result = FindCorpseUsing <MaNGOS::RaiseDeadObjectCheck>  ();
+                WorldObject* result = FindCorpseUsing <MaNGOS::RaiseDeadObjectCheck>  ();
 
-            if(result)
-            {
-                switch(result->GetTypeId())
+                if (result)
                 {
-                    case TYPEID_UNIT:
-                        targetUnitMap.push_back((Unit*)result);
-                        break;
-                    default:
-                        break;
-                };
-            };
-            break;
+                    switch(result->GetTypeId())
+                    {
+                        case TYPEID_UNIT:
+                        case TYPEID_PLAYER:
+                            targetUnitMap.push_back((Unit*)result);
+                            break;
+                        case TYPEID_CORPSE:
+                            m_targets.setCorpseTarget((Corpse*)result);
+                            if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGUID()))
+                                targetUnitMap.push_back(owner);
+                            break;
+                        default:
+                            targetUnitMap.push_back(m_caster);
+                            break;
+                    };
+                }
+                else
+                    targetUnitMap.push_back(m_caster);
+                break;
             }
         break;
 
@@ -579,7 +588,7 @@ void Spell::FillTargetMap()
                         break;
                     case TARGET_AREAEFFECT_CUSTOM:
                     case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-                        if (FillCustomTargetMap(i,tmpUnitMap)) break;
+                        if (FillCustomTargetMap(SpellEffectIndex(i),tmpUnitMap)) break;
                     default:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
                         break;

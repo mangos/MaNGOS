@@ -6213,10 +6213,12 @@ void Unit::RemoveGuardian( Pet* pet )
 
     if(GetTypeId() == TYPEID_PLAYER)
     {
-        uint32 SpellID = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        uint32 SpellID = pet->GetCreateSpellID();
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(SpellID);
         if (spellInfo && spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
-            ((Player*)this)->AddSpellAndCategoryCooldowns(spellInfo, 0, NULL,true);
+        {
+            ((Player*)this)->SendCooldownEvent(spellInfo);
+        }
     }
 }
 
@@ -6227,8 +6229,6 @@ void Unit::RemoveGuardians()
         uint64 guid = *m_guardianPets.begin();
         if(Pet* pet = GetMap()->GetPet(guid))
             pet->Remove(PET_SAVE_AS_DELETED);
-
-        m_guardianPets.erase(guid);
     }
 }
 

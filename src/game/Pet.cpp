@@ -201,11 +201,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     {
         case SUMMON_PET:
             petlevel=owner->getLevel();
-
-            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
+//            SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_ABANDONED);
             SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                                            // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:
             SetSheath(SHEATH_STATE_MELEE);
@@ -545,7 +543,7 @@ void Pet::Update(uint32 diff)
                 else
                 {
                     DEBUG_LOG("Pet %d removed with duration expired.", GetGUID());
-                    Remove(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED:PET_SAVE_NOT_IN_SLOT);
+                    Remove(PET_SAVE_NOT_IN_SLOT);
                     return;
                 }
             }
@@ -1398,7 +1396,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     else
         m_charmInfo->AddSpellToActionBar(spell_id, ActiveStates(newspell.active));
 
-    if(newspell.active == ACT_ENABLED)
+    if(newspell.active == ACT_ENABLED || !isControlled())
         ToggleAutocast(spell_id, true);
 
     uint32 talentCost = GetTalentSpellCost(spell_id);
@@ -3099,10 +3097,10 @@ void Pet::Regenerate(Powers power, uint32 diff)
 
     curValue += int32(addvalue);
 
-    if (curValue > maxValue)
-            curValue = maxValue;
-    else if (curValue < 0)
+    if (curValue < 0)
         curValue = 0;
+    else if (curValue > maxValue)
+        curValue = maxValue;
 
     SetPower(power, curValue);
 }
@@ -3267,7 +3265,7 @@ float Pet::OCTRegenMPPerSpirit()
     Unit* owner = GetOwner();
 
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
-        return (GetStat(STAT_SPIRIT) / 5.0f + 17.0f);
+        return ((GetStat(STAT_SPIRIT) / 5.0f + 17.0f)/sqrt(GetStat(STAT_INTELLECT)));
 
     uint32 level = ((Player*)owner)->getLevel();
     uint32 pclass = ((Player*)owner)->getClass();
