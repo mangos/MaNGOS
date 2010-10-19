@@ -8028,18 +8028,6 @@ void Aura::HandleAuraOpenStable(bool apply, bool Real)
     // client auto close stable dialog at !apply aura
 }
 
-void Aura::HandleIgnoreUnitState(bool apply, bool Real)
-{
-    Unit* target = GetTarget();
-
-    if(target->GetTypeId() != TYPEID_PLAYER || !Real)
-        return;
-
-    // for alowing charge/intercept/intervene in different stances
-    if (GetId() == 57499 && apply)
-        GetHolder()->SetAuraFlags(19);
-}
-
 void Aura::HandleAuraConvertRune(bool apply, bool Real)
 {
     if(!Real)
