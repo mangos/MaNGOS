@@ -199,7 +199,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectHealPct,                                  //136 SPELL_EFFECT_HEAL_PCT
     &Spell::EffectEnergisePct,                              //137 SPELL_EFFECT_ENERGIZE_PCT
     &Spell::EffectLeapBack,                                 //138 SPELL_EFFECT_LEAP_BACK                Leap back
-    &Spell::EffectNULL,                                     //139 SPELL_EFFECT_CLEAR_QUEST              (misc - is quest ID)
+    &Spell::EffectClearQuest,                               //139 SPELL_EFFECT_CLEAR_QUEST              (misc - is quest ID)
     &Spell::EffectForceCast,                                //140 SPELL_EFFECT_FORCE_CAST
     &Spell::EffectNULL,                                     //141 SPELL_EFFECT_141                      damage and reduce speed?
     &Spell::EffectTriggerSpellWithValue,                    //142 SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE
@@ -2630,6 +2630,38 @@ void Spell::EffectTriggerRitualOfSummoning(SpellEffectIndex eff_idx)
     finish();
 
     m_caster->CastSpell(unitTarget,spellInfo,false);
+}
+
+void Spell::EffectClearQuest(SpellEffectIndex eff_idx)
+{
+    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    Player *player = (Player*)m_caster;
+
+    uint32 quest_id = m_spellInfo->EffectMiscValue[eff_idx];
+
+    if (!sObjectMgr.GetQuestTemplate(quest_id))
+    {
+        sLog.outError("Spell::EffectClearQuest spell entry %u attempt clear quest entry %u but this quest does not exist.", m_spellInfo->Id, quest_id);
+        return;
+    }
+
+    // remove quest possibly in quest log (is that expected?)
+    for(uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 quest = player->GetQuestSlotQuestId(slot);
+
+        if (quest == quest_id)
+        {
+            player->SetQuestSlot(slot, 0);
+            // ignore unequippable quest items in this case, it will still be equipped
+            player->TakeQuestSourceItem(quest_id, false);
+        }
+    }
+
+    player->SetQuestStatus(quest_id, QUEST_STATUS_NONE);
+    player->getQuestStatusMap()[quest_id].m_rewarded = false;
 }
 
 void Spell::EffectForceCast(SpellEffectIndex eff_idx)
