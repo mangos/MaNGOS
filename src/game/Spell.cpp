@@ -3516,39 +3516,6 @@ void Spell::finish(bool ok)
     // Stop Attack for some spells
     if( m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET )
         m_caster->AttackStop();
-
-    // hack for Fingers of Frost stacks remove
-    if(m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && !m_IsTriggeredSpell && m_caster->HasAura(74396))
-        if (SpellAuraHolder* holder = m_caster->GetSpellAuraHolder(74396))
-            if(holder->DropAuraCharge())
-                m_caster->RemoveSpellAuraHolder(holder);
-
-    // hack for SPELL_AURA_IGNORE_UNIT_STATE charges
-    bool break_for = false;
-    Unit::AuraList const& stateAuras = m_caster->GetAurasByType(SPELL_AURA_IGNORE_UNIT_STATE);
-    for(Unit::AuraList::const_iterator j = stateAuras.begin();j != stateAuras.end(); ++j)
-    {
-        switch((*j)->GetId())
-        {
-            case 52437:        //Sudden death should disappear after execute
-                if (m_spellInfo->SpellIconID == 1648)
-                {
-                    m_caster->RemoveAura((*j));
-                    break_for = true;
-                }
-                break;
-            case 60503:        // Taste for blood 
-            case 68051:        // Glyph of overpower - Both should disappear after overpower
-                if(m_spellInfo->Id == 7384)
-                {
-                    m_caster->RemoveAura((*j));
-                    break_for = true;
-                }
-                break;
-        }
-        if(break_for)
-            break;
-    }
 }
 
 void Spell::SendCastResult(SpellCastResult result)
