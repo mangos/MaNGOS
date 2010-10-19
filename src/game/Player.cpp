@@ -13565,7 +13565,7 @@ Quest const* Player::GetNextQuest(uint64 guid, Quest const *pQuest)
 
 bool Player::CanSeeStartQuest( Quest const *pQuest ) const
 {
-    if (SatisfyQuestRace( pQuest, false ) && SatisfyQuestSkillOrClass( pQuest, false ) &&
+    if (SatisfyQuestClass(pQuest, false) && SatisfyQuestRace(pQuest, false) && SatisfyQuestSkill(pQuest, false) &&
         SatisfyQuestExclusiveGroup( pQuest, false ) && SatisfyQuestReputation( pQuest, false ) &&
         SatisfyQuestPreviousQuest( pQuest, false ) && SatisfyQuestNextChain( pQuest, false ) &&
         SatisfyQuestPrevChain( pQuest, false ) && SatisfyQuestDay( pQuest, false ) && SatisfyQuestWeek( pQuest, false ))
@@ -13579,8 +13579,8 @@ bool Player::CanSeeStartQuest( Quest const *pQuest ) const
 bool Player::CanTakeQuest( Quest const *pQuest, bool msg ) const
 {
     return SatisfyQuestStatus( pQuest, msg ) && SatisfyQuestExclusiveGroup( pQuest, msg )
-        && SatisfyQuestRace( pQuest, msg ) && SatisfyQuestLevel( pQuest, msg )
-        && SatisfyQuestSkillOrClass( pQuest, msg ) && SatisfyQuestReputation( pQuest, msg )
+        && SatisfyQuestClass(pQuest, msg) && SatisfyQuestRace(pQuest, msg) && SatisfyQuestLevel(pQuest, msg)
+        && SatisfyQuestSkill(pQuest, msg) && SatisfyQuestReputation(pQuest, msg)
         && SatisfyQuestPreviousQuest( pQuest, msg ) && SatisfyQuestTimed( pQuest, msg )
         && SatisfyQuestNextChain( pQuest, msg ) && SatisfyQuestPrevChain( pQuest, msg )
         && SatisfyQuestDay( pQuest, msg ) && SatisfyQuestWeek( pQuest, msg );
@@ -13614,6 +13614,17 @@ bool Player::CanCompleteQuest( uint32 quest_id ) const
 
     if (!qInfo)
         return false;
+
+    // only used for "flag" quests and not real in-game quests
+    if (qInfo->HasFlag(QUEST_FLAGS_AUTO_REWARDED))
+    {
+        // a few checks, not all "satisfy" is needed
+        if (SatisfyQuestPreviousQuest(qInfo, false) && SatisfyQuestLevel(qInfo, false) &&
+            SatisfyQuestSkill(qInfo, false) && SatisfyQuestRace(qInfo, false) && SatisfyQuestClass(qInfo, false))
+            return true;
+
+        return false;
+    }
 
     // auto complete quest
     if (qInfo->IsAutoComplete() && CanTakeQuest(qInfo, false))
@@ -14057,47 +14068,21 @@ void Player::FailQuest(uint32 questId)
     }
 }
 
-bool Player::SatisfyQuestSkillOrClass( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestSkill(Quest const* qInfo, bool msg) const
 {
-    int32 zoneOrSort   = qInfo->GetZoneOrSort();
-    int32 skillOrClass = qInfo->GetSkillOrClass();
+    uint32 skill = qInfo->GetRequiredSkill();
 
-    // skip zone zoneOrSort and 0 case skillOrClass
-    if (zoneOrSort >= 0 && skillOrClass == 0)
+    // skip 0 case RequiredSkill
+    if (skill == 0)
         return true;
 
-    int32 questSort = -zoneOrSort;
-    uint8 reqSortClass = ClassByQuestSort(questSort);
-
-    // check class sort cases in zoneOrSort
-    if (reqSortClass != 0 && getClass() != reqSortClass)
+    // check skill value
+    if (GetSkillValue(skill) < qInfo->GetRequiredSkillValue())
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
-        return false;
-    }
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
 
-    // check class
-    if( skillOrClass < 0 )
-    {
-        uint8 reqClass = -int32(skillOrClass);
-        if(getClass() != reqClass)
-        {
-            if( msg )
-                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
-            return false;
-        }
-    }
-    // check skill
-    else if( skillOrClass > 0 )
-    {
-        uint32 reqSkill = skillOrClass;
-        if( GetSkillValue( reqSkill ) < qInfo->GetRequiredSkillValue() )
-        {
-            if( msg )
-                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
-            return false;
-        }
+        return false;
     }
 
     return true;
@@ -14217,6 +14202,24 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
         SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
 
     return false;
+}
+
+bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
+{
+    uint32 reqClass = qInfo->GetRequiredClasses();
+
+    if (reqClass == 0)
+        return true;
+
+    if ((reqClass & getClassMask()) == 0)
+    {
+        if (msg)
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+        return false;
+    }
+
+    return true;
 }
 
 bool Player::SatisfyQuestRace( Quest const* qInfo, bool msg ) const
@@ -19715,9 +19718,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
             if(target!=this && target->isType(TYPEMASK_UNIT))
             {
                 SendAurasForTarget((Unit*)target);
-                WorldPacket data;
-                ((Unit*)target)->BuildHeartBeatMsg(data);
-                GetSession()->SendPacket(&data);
+                ((Unit*)target)->SendHeartBeat(false);
             }
 
             if(target->GetTypeId()==TYPEID_UNIT && ((Creature*)target)->isAlive())
