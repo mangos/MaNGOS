@@ -414,7 +414,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     "id = %u AND active = 1 AND (unbandate > UNIX_TIMESTAMP() OR unbandate = bandate)", (*result)[1].GetUInt32());
                 if(banresult)
                 {
-                    if((*banresult)[0].GetUInt64() != (*banresult)[1].GetUInt64())
+                    if((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
                     {
                         pkt << (uint8) WOW_FAIL_BANNED;
                         BASIC_LOG("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
