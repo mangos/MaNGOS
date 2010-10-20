@@ -1385,7 +1385,7 @@ void Creature::SetDeathState(DeathState s)
 
     if (s == JUST_DIED)
     {
-        SetTargetGUID(0);                                   // remove target selection in any cases (can be set at aura remove in Unit::SetDeathState)
+        SetTargetGuid(ObjectGuid());                        // remove target selection in any cases (can be set at aura remove in Unit::SetDeathState)
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
         if (HasSearchedAssistance())

@@ -1579,8 +1579,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         QuestStatusMap& getQuestStatusMap() { return mQuestStatus; };
 
-        const uint64& GetSelection( ) const { return m_curSelection; }
-        void SetSelection(const uint64 &guid) { m_curSelection = guid; SetTargetGUID(guid); }
+        ObjectGuid const& GetSelectionGuid( ) const { return m_curSelectionGuid; }
+        void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
 
         uint8 GetComboPoints() { return m_comboPoints; }
         const uint64& GetComboTarget() const { return m_comboTarget; }
@@ -2510,7 +2510,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool m_itemUpdateQueueBlocked;
 
         uint32 m_ExtraFlags;
-        uint64 m_curSelection;
+        ObjectGuid m_curSelectionGuid;
 
         uint64 m_comboTarget;
         int8 m_comboPoints;

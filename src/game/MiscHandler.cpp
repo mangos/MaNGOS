@@ -382,14 +382,14 @@ void WorldSession::HandleZoneUpdateOpcode( WorldPacket & recv_data )
 void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
 {
     // When this packet send?
-    uint64 guid ;
+    ObjectGuid guid ;
     recv_data >> guid;
 
-    _player->SetTargetGUID(guid);
+    _player->SetTargetGuid(guid);
 
     // update reputation list if need
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid );
-    if(!unit)
+    Unit* unit = ObjectAccessor::GetUnit(*_player, guid );  // can select group members at diff maps
+    if (!unit)
         return;
 
     if(FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
@@ -398,14 +398,14 @@ void WorldSession::HandleSetTargetOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleSetSelectionOpcode( WorldPacket & recv_data )
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
-    _player->SetSelection(guid);
+    _player->SetSelectionGuid(guid);
 
     // update reputation list if need
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid );
-    if(!unit)
+    Unit* unit = ObjectAccessor::GetUnit(*_player, guid );  // can select group members at diff maps
+    if (!unit)
         return;
 
     if(FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
@@ -1075,11 +1075,11 @@ void WorldSession::HandlePlayedTime(WorldPacket& recv_data)
 
 void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
-    DEBUG_LOG("Inspected guid is (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
+    DEBUG_LOG("Inspected guid is %s", guid.GetString().c_str());
 
-    _player->SetSelection(guid);
+    _player->SetSelectionGuid(guid);
 
     Player *plr = sObjectMgr.GetPlayer(guid);
     if(!plr)                                                // wrong player

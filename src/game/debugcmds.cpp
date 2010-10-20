@@ -270,7 +270,7 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
         return false;
     }
 
-    if (m_session->GetPlayer()->GetSelection())
+    if (!m_session->GetPlayer()->GetSelectionGuid().IsEmpty())
         unit->PlayDistanceSound(dwSoundId,m_session->GetPlayer());
     else
         unit->PlayDirectSound(dwSoundId,m_session->GetPlayer());

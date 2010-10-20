@@ -101,8 +101,8 @@ bool ChatHandler::HandleNpcWhisperCommand(char* args)
     if (!ExtractPlayerTarget(&args, &target))
         return false;
 
-    uint64 guid = m_session->GetPlayer()->GetSelection();
-    if (!guid)
+    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
+    if (guid.IsEmpty())
         return false;
 
     Creature* pCreature = m_session->GetPlayer()->GetMap()->GetCreature(guid);
