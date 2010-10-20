@@ -42,8 +42,6 @@
 
 #define MAX_STEALTH_DETECT_RANGE    45.0f
 
-uint32 GuidHigh2TypeId(uint32 guid_hi);
-
 enum TempSummonType
 {
     TEMPSUMMON_TIMED_OR_DEAD_DESPAWN       = 1,             // despawns after a specified time OR when the creature disappears

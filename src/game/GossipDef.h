@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "QuestDef.h"
 #include "NPCHandler.h"
+#include "ObjectGuid.h"
 
 class WorldSession;
 
@@ -273,7 +274,7 @@ class MANGOS_DLL_SPEC PlayerMenu
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
-        void SendQuestGiverStatus( uint8 questStatus, uint64 npcGUID );
+        void SendQuestGiverStatus( uint8 questStatus, ObjectGuid npcGUID );
 
         void SendQuestGiverQuestList( QEmote eEmote, const std::string& Title, uint64 npcGUID );
 
