@@ -321,13 +321,14 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket & /*recv_data*/)
 void WorldSession::HandleNpcTextQueryOpcode( WorldPacket & recv_data )
 {
     uint32 textID;
-    uint64 guid;
+    ObjectGuid guid;
 
     recv_data >> textID;
+    recv_data >> guid;
+
     DETAIL_LOG("WORLD: CMSG_NPC_TEXT_QUERY ID '%u'", textID);
 
-    recv_data >> guid;
-    _player->SetTargetGUID(guid);
+    _player->SetTargetGuid(guid);
 
     GossipText const* pGossip = sObjectMgr.GetGossipText(textID);
 

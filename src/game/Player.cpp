@@ -428,9 +428,6 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     if(GetSession()->GetSecurity() == SEC_PLAYER)
         SetAcceptWhispers(true);
 
-    m_curSelection = 0;
-    m_lootGuid = 0;
-
     m_comboTarget = 0;
     m_comboPoints = 0;
 
@@ -1860,7 +1857,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 return true;
             }
 
-            SetSelection(0);
+            SetSelectionGuid(ObjectGuid());
 
             CombatStop();
 
@@ -13563,12 +13560,12 @@ Quest const* Player::GetNextQuest(uint64 guid, Quest const *pQuest)
     return NULL;
 }
 
-bool Player::CanSeeStartQuest( Quest const *pQuest ) const
+bool Player::CanSeeStartQuest(Quest const *pQuest) const
 {
     if (SatisfyQuestClass(pQuest, false) && SatisfyQuestRace(pQuest, false) && SatisfyQuestSkill(pQuest, false) &&
-        SatisfyQuestExclusiveGroup( pQuest, false ) && SatisfyQuestReputation( pQuest, false ) &&
-        SatisfyQuestPreviousQuest( pQuest, false ) && SatisfyQuestNextChain( pQuest, false ) &&
-        SatisfyQuestPrevChain( pQuest, false ) && SatisfyQuestDay( pQuest, false ) && SatisfyQuestWeek( pQuest, false ))
+        SatisfyQuestExclusiveGroup(pQuest, false) && SatisfyQuestReputation(pQuest, false) &&
+        SatisfyQuestPreviousQuest(pQuest, false) && SatisfyQuestNextChain(pQuest, false) &&
+        SatisfyQuestPrevChain(pQuest, false) && SatisfyQuestDay(pQuest, false) && SatisfyQuestWeek(pQuest, false))
     {
         return getLevel() + sWorld.getConfig(CONFIG_UINT32_QUEST_HIGH_LEVEL_HIDE_DIFF) >= pQuest->GetMinLevel();
     }
@@ -13576,19 +13573,19 @@ bool Player::CanSeeStartQuest( Quest const *pQuest ) const
     return false;
 }
 
-bool Player::CanTakeQuest( Quest const *pQuest, bool msg ) const
+bool Player::CanTakeQuest(Quest const *pQuest, bool msg) const
 {
-    return SatisfyQuestStatus( pQuest, msg ) && SatisfyQuestExclusiveGroup( pQuest, msg )
-        && SatisfyQuestClass(pQuest, msg) && SatisfyQuestRace(pQuest, msg) && SatisfyQuestLevel(pQuest, msg)
-        && SatisfyQuestSkill(pQuest, msg) && SatisfyQuestReputation(pQuest, msg)
-        && SatisfyQuestPreviousQuest( pQuest, msg ) && SatisfyQuestTimed( pQuest, msg )
-        && SatisfyQuestNextChain( pQuest, msg ) && SatisfyQuestPrevChain( pQuest, msg )
-        && SatisfyQuestDay( pQuest, msg ) && SatisfyQuestWeek( pQuest, msg );
+    return SatisfyQuestStatus(pQuest, msg) && SatisfyQuestExclusiveGroup(pQuest, msg) &&
+        SatisfyQuestClass(pQuest, msg) && SatisfyQuestRace(pQuest, msg) && SatisfyQuestLevel(pQuest, msg) &&
+        SatisfyQuestSkill(pQuest, msg) && SatisfyQuestReputation(pQuest, msg) &&
+        SatisfyQuestPreviousQuest(pQuest, msg) && SatisfyQuestTimed(pQuest, msg) &&
+        SatisfyQuestNextChain(pQuest, msg) && SatisfyQuestPrevChain(pQuest, msg) &&
+        SatisfyQuestDay(pQuest, msg) && SatisfyQuestWeek(pQuest, msg);
 }
 
-bool Player::CanAddQuest( Quest const *pQuest, bool msg ) const
+bool Player::CanAddQuest(Quest const *pQuest, bool msg) const
 {
-    if (!SatisfyQuestLog( msg ))
+    if (!SatisfyQuestLog(msg))
         return false;
 
     if (!CanGiveQuestSourceItem(pQuest))
@@ -13597,7 +13594,7 @@ bool Player::CanAddQuest( Quest const *pQuest, bool msg ) const
     return true;
 }
 
-bool Player::CanCompleteQuest( uint32 quest_id ) const
+bool Player::CanCompleteQuest(uint32 quest_id) const
 {
     if (!quest_id)
         return false;
@@ -13608,7 +13605,7 @@ bool Player::CanCompleteQuest( uint32 quest_id ) const
     QuestStatus status = q_itr != mQuestStatus.end() ? q_itr->second.m_status : QUEST_STATUS_NONE;
 
     if (status == QUEST_STATUS_COMPLETE)
-        return false;                                   // not allow re-complete quest
+        return false;                                       // not allow re-complete quest
 
     Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest_id);
 
@@ -13636,7 +13633,7 @@ bool Player::CanCompleteQuest( uint32 quest_id ) const
     // incomplete quest have status data
     QuestStatusData const& q_status = q_itr->second;
 
-    if (qInfo->HasFlag( QUEST_MANGOS_FLAGS_DELIVER ))
+    if (qInfo->HasFlag(QUEST_MANGOS_FLAGS_DELIVER))
     {
         for(int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
@@ -13657,10 +13654,10 @@ bool Player::CanCompleteQuest( uint32 quest_id ) const
         }
     }
 
-    if (qInfo->HasFlag( QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT ) && !q_status.m_explored)
+    if (qInfo->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT) && !q_status.m_explored)
         return false;
 
-    if (qInfo->HasFlag( QUEST_MANGOS_FLAGS_TIMED ) && q_status.m_timer == 0)
+    if (qInfo->HasFlag(QUEST_MANGOS_FLAGS_TIMED) && q_status.m_timer == 0)
         return false;
 
     if (qInfo->GetRewOrReqMoney() < 0)
@@ -13676,7 +13673,7 @@ bool Player::CanCompleteQuest( uint32 quest_id ) const
     return true;
 }
 
-bool Player::CanCompleteRepeatableQuest( Quest const *pQuest ) const
+bool Player::CanCompleteRepeatableQuest(Quest const *pQuest) const
 {
     // Solve problem that player don't have the quest and try complete it.
     // if repeatable she must be able to complete event if player don't have it.
@@ -13684,7 +13681,7 @@ bool Player::CanCompleteRepeatableQuest( Quest const *pQuest ) const
     if (!CanTakeQuest(pQuest, false))
         return false;
 
-    if (pQuest->HasFlag( QUEST_MANGOS_FLAGS_DELIVER) )
+    if (pQuest->HasFlag(QUEST_MANGOS_FLAGS_DELIVER))
         for(int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             if (pQuest->ReqItemId[i] && pQuest->ReqItemCount[i] && !HasItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i]))
                 return false;
@@ -13695,14 +13692,14 @@ bool Player::CanCompleteRepeatableQuest( Quest const *pQuest ) const
     return true;
 }
 
-bool Player::CanRewardQuest( Quest const *pQuest, bool msg ) const
+bool Player::CanRewardQuest(Quest const *pQuest, bool msg) const
 {
     // not auto complete quest and not completed quest (only cheating case, then ignore without message)
     if (!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;
 
     // daily quest can't be rewarded (25 daily quest already completed)
-    if (!SatisfyQuestDay(pQuest,true) || !SatisfyQuestWeek(pQuest,true))
+    if (!SatisfyQuestDay(pQuest, true) || !SatisfyQuestWeek(pQuest, true))
         return false;
 
     // rewarded and not repeatable quest (only cheating case, then ignore without message)
@@ -13718,7 +13715,8 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg ) const
                 GetItemCount(pQuest->ReqItemId[i]) < pQuest->ReqItemCount[i])
             {
                 if (msg)
-                    SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL, pQuest->ReqItemId[i]);
+                    SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL, pQuest->ReqItemId[i]);
+
                 return false;
             }
         }
@@ -13731,7 +13729,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, bool msg ) const
     return true;
 }
 
-bool Player::CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg ) const
+bool Player::CanRewardQuest(Quest const *pQuest, uint32 reward, bool msg) const
 {
     // prevent receive reward with quest items in bank or for not completed quest
     if (!CanRewardQuest(pQuest,msg))
@@ -13745,7 +13743,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg ) cons
             uint8 res = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward] );
             if (res != EQUIP_ERR_OK)
             {
-                SendEquipError( res, NULL, NULL, pQuest->RewChoiceItemId[reward] );
+                SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
                 return false;
             }
         }
@@ -13761,7 +13759,7 @@ bool Player::CanRewardQuest( Quest const *pQuest, uint32 reward, bool msg ) cons
                 uint8 res = CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, pQuest->RewItemId[i], pQuest->RewItemCount[i] );
                 if (res != EQUIP_ERR_OK)
                 {
-                    SendEquipError( res, NULL, NULL );
+                    SendEquipError(res, NULL, NULL);
                     return false;
                 }
             }
@@ -13853,46 +13851,46 @@ void Player::AddQuest( Quest const *pQuest, Object *questGiver )
     UpdateForQuestWorldObjects();
 }
 
-void Player::CompleteQuest( uint32 quest_id )
+void Player::CompleteQuest(uint32 quest_id)
 {
-    if( quest_id )
+    if (quest_id)
     {
-        SetQuestStatus( quest_id, QUEST_STATUS_COMPLETE );
+        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
 
-        uint16 log_slot = FindQuestSlot( quest_id );
-        if( log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot,QUEST_STATE_COMPLETE);
+        uint16 log_slot = FindQuestSlot(quest_id);
+        if (log_slot < MAX_QUEST_LOG_SIZE)
+            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
 
-        if(Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest_id))
+        if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest_id))
         {
-            if( qInfo->HasFlag(QUEST_FLAGS_AUTO_REWARDED) )
-                RewardQuest(qInfo,0,this,false);
+            if (qInfo->HasFlag(QUEST_FLAGS_AUTO_REWARDED))
+                RewardQuest(qInfo, 0, this, false);
             else
-                SendQuestComplete( quest_id );
+                SendQuestComplete(quest_id);
         }
     }
 }
 
-void Player::IncompleteQuest( uint32 quest_id )
+void Player::IncompleteQuest(uint32 quest_id)
 {
-    if( quest_id )
+    if (quest_id)
     {
-        SetQuestStatus( quest_id, QUEST_STATUS_INCOMPLETE );
+        SetQuestStatus(quest_id, QUEST_STATUS_INCOMPLETE);
 
         uint16 log_slot = FindQuestSlot( quest_id );
-        if( log_slot < MAX_QUEST_LOG_SIZE)
-            RemoveQuestSlotState(log_slot,QUEST_STATE_COMPLETE);
+        if (log_slot < MAX_QUEST_LOG_SIZE)
+            RemoveQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
     }
 }
 
-void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver, bool announce )
+void Player::RewardQuest(Quest const *pQuest, uint32 reward, Object* questGiver, bool announce)
 {
     uint32 quest_id = pQuest->GetQuestId();
 
     for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i )
     {
         if (pQuest->ReqItemId[i])
-            DestroyItemCount( pQuest->ReqItemId[i], pQuest->ReqItemCount[i], true);
+            DestroyItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i], true);
     }
 
     RemoveTimedQuest(quest_id);
@@ -13906,7 +13904,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
         if (uint32 itemId = pQuest->RewChoiceItemId[reward])
         {
             ItemPosCountVec dest;
-            if (CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward] ) == EQUIP_ERR_OK)
+            if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
                 Item* item = StoreNewItem( dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
                 SendNewItem(item, pQuest->RewChoiceItemCount[reward], true, false);
@@ -13921,7 +13919,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
             if (uint32 itemId = pQuest->RewItemId[i])
             {
                 ItemPosCountVec dest;
-                if (CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewItemCount[i] ) == EQUIP_ERR_OK)
+                if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewItemCount[i]) == EQUIP_ERR_OK)
                 {
                     Item* item = StoreNewItem( dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
                     SendNewItem(item, pQuest->RewItemCount[i], true, false);
@@ -13930,19 +13928,19 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
         }
     }
 
-    RewardReputation( pQuest );
+    RewardReputation(pQuest);
 
-    uint16 log_slot = FindQuestSlot( quest_id );
+    uint16 log_slot = FindQuestSlot(quest_id);
     if (log_slot < MAX_QUEST_LOG_SIZE)
         SetQuestSlot(log_slot,0);
 
     QuestStatusData& q_status = mQuestStatus[quest_id];
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = q_status.m_rewarded ? 0 : uint32(pQuest->XPValue( this )*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
+    uint32 XP = q_status.m_rewarded ? 0 : uint32(pQuest->XPValue(this)*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
 
     if (getLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        GiveXP( XP , NULL );
+        GiveXP(XP , NULL);
     else
     {
         uint32 money = uint32(pQuest->GetRewMoneyMaxLevel() * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY));
@@ -13953,7 +13951,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     if (pQuest->GetRewOrReqMoney())
     {
-        ModifyMoney( pQuest->GetRewOrReqMoney() );
+        ModifyMoney(pQuest->GetRewOrReqMoney());
 
         if (pQuest->GetRewOrReqMoney() > 0)
             GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_QUEST_REWARD, pQuest->GetRewOrReqMoney());
@@ -13972,7 +13970,7 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
 
     if (pQuest->GetBonusTalents())
     {
-        m_questRewardTalentCount+=pQuest->GetBonusTalents();
+        m_questRewardTalentCount += pQuest->GetBonusTalents();
         InitTalentForLevel();
     }
 
@@ -13999,16 +13997,17 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
         q_status.uState = QUEST_CHANGED;
 
     if (announce)
-        SendQuestReward( pQuest, XP, questGiver );
+        SendQuestReward(pQuest, XP, questGiver);
 
     // cast spells after mark quest complete (some spells have quest completed state reqyurements in spell_area data)
     if (pQuest->GetRewSpellCast() > 0)
-        CastSpell( this, pQuest->GetRewSpellCast(), true);
-    else if ( pQuest->GetRewSpell() > 0)
-        CastSpell( this, pQuest->GetRewSpell(), true);
+        CastSpell(this, pQuest->GetRewSpellCast(), true);
+    else if (pQuest->GetRewSpell() > 0)
+        CastSpell(this, pQuest->GetRewSpell(), true);
 
     if (pQuest->GetZoneOrSort() > 0)
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE, pQuest->GetZoneOrSort());
+
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST_COUNT);
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, pQuest->GetQuestId());
 
@@ -14017,26 +14016,26 @@ void Player::RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver
 
     // remove auras from spells with quest reward state limitations
     SpellAreaForQuestMapBounds saEndBounds = sSpellMgr.GetSpellAreaForQuestEndMapBounds(quest_id);
-    if(saEndBounds.first != saEndBounds.second)
+    if (saEndBounds.first != saEndBounds.second)
     {
         GetZoneAndAreaId(zone,area);
 
         for(SpellAreaForAreaMap::const_iterator itr = saEndBounds.first; itr != saEndBounds.second; ++itr)
-            if(!itr->second->IsFitToRequirements(this,zone,area))
+            if (!itr->second->IsFitToRequirements(this, zone, area))
                 RemoveAurasDueToSpell(itr->second->spellId);
     }
 
     // Some spells applied at quest reward
-    SpellAreaForQuestMapBounds saBounds = sSpellMgr.GetSpellAreaForQuestMapBounds(quest_id,false);
-    if(saBounds.first != saBounds.second)
+    SpellAreaForQuestMapBounds saBounds = sSpellMgr.GetSpellAreaForQuestMapBounds(quest_id, false);
+    if (saBounds.first != saBounds.second)
     {
-        if(!zone || !area)
-            GetZoneAndAreaId(zone,area);
+        if (!zone || !area)
+            GetZoneAndAreaId(zone, area);
 
         for(SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
-            if(itr->second->autocast && itr->second->IsFitToRequirements(this,zone,area))
+            if (itr->second->autocast && itr->second->IsFitToRequirements(this, zone, area))
                 if (!HasAura(itr->second->spellId, EFFECT_INDEX_0))
-                    CastSpell(this,itr->second->spellId,true);
+                    CastSpell(this, itr->second->spellId, true);
     }
 }
 
@@ -14088,18 +14087,20 @@ bool Player::SatisfyQuestSkill(Quest const* qInfo, bool msg) const
     return true;
 }
 
-bool Player::SatisfyQuestLevel( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestLevel(Quest const* qInfo, bool msg) const
 {
     if (getLevel() < qInfo->GetMinLevel())
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
         return false;
     }
+
     return true;
 }
 
-bool Player::SatisfyQuestLog( bool msg ) const
+bool Player::SatisfyQuestLog(bool msg) const
 {
     // exist free slot
     if (FindQuestSlot(0) < MAX_QUEST_LOG_SIZE)
@@ -14107,24 +14108,24 @@ bool Player::SatisfyQuestLog( bool msg ) const
 
     if (msg)
     {
-        WorldPacket data( SMSG_QUESTLOG_FULL, 0 );
-        GetSession()->SendPacket( &data );
-        DEBUG_LOG( "WORLD: Sent SMSG_QUESTLOG_FULL" );
+        WorldPacket data(SMSG_QUESTLOG_FULL, 0);
+        GetSession()->SendPacket(&data);
+        DEBUG_LOG("WORLD: Sent SMSG_QUESTLOG_FULL");
     }
     return false;
 }
 
-bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const
 {
     // No previous quest (might be first quest in a series)
     if (qInfo->prevQuests.empty())
         return true;
 
-    for(Quest::PrevQuests::const_iterator iter = qInfo->prevQuests.begin(); iter != qInfo->prevQuests.end(); ++iter )
+    for(Quest::PrevQuests::const_iterator iter = qInfo->prevQuests.begin(); iter != qInfo->prevQuests.end(); ++iter)
     {
         uint32 prevId = abs(*iter);
 
-        QuestStatusMap::const_iterator i_prevstatus = mQuestStatus.find( prevId );
+        QuestStatusMap::const_iterator i_prevstatus = mQuestStatus.find(prevId);
         Quest const* qPrevInfo = sObjectMgr.GetQuestTemplate(prevId);
 
         if (qPrevInfo && i_prevstatus != mQuestStatus.end())
@@ -14150,13 +14151,14 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
                     if (exclude_Id == prevId)
                         continue;
 
-                    QuestStatusMap::const_iterator i_exstatus = mQuestStatus.find( exclude_Id );
+                    QuestStatusMap::const_iterator i_exstatus = mQuestStatus.find(exclude_Id);
 
                     // alternative quest from group also must be completed and rewarded(reported)
                     if (i_exstatus == mQuestStatus.end() || !i_exstatus->second.m_rewarded)
                     {
                         if (msg)
-                            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+                            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
                         return false;
                     }
                 }
@@ -14187,7 +14189,8 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
                     if (!IsCurrentQuest(exclude_Id))
                     {
                         if (msg)
-                            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+                            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
                         return false;
                     }
                 }
@@ -14199,7 +14202,7 @@ bool Player::SatisfyQuestPreviousQuest( Quest const* qInfo, bool msg ) const
     // Has only positive prev. quests in non-rewarded state
     // and negative prev. quests in non-active state
     if (msg)
-        SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+        SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
 
     return false;
 }
@@ -14222,27 +14225,32 @@ bool Player::SatisfyQuestClass(Quest const* qInfo, bool msg) const
     return true;
 }
 
-bool Player::SatisfyQuestRace( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestRace(Quest const* qInfo, bool msg) const
 {
     uint32 reqraces = qInfo->GetRequiredRaces();
+
     if (reqraces == 0)
         return true;
+
     if ((reqraces & getRaceMask()) == 0)
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_QUEST_FAILED_WRONG_RACE );
+            SendCanTakeQuestResponse(INVALIDREASON_QUEST_FAILED_WRONG_RACE);
+
         return false;
     }
+
     return true;
 }
 
-bool Player::SatisfyQuestReputation( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestReputation(Quest const* qInfo, bool msg) const
 {
     uint32 fIdMin = qInfo->GetRequiredMinRepFaction();      //Min required rep
     if (fIdMin && GetReputationMgr().GetReputation(fIdMin) < qInfo->GetRequiredMinRepValue())
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
         return false;
     }
 
@@ -14250,22 +14258,26 @@ bool Player::SatisfyQuestReputation( Quest const* qInfo, bool msg ) const
     if (fIdMax && GetReputationMgr().GetReputation(fIdMax) >= qInfo->GetRequiredMaxRepValue())
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
         return false;
     }
 
     return true;
 }
 
-bool Player::SatisfyQuestStatus( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestStatus(Quest const* qInfo, bool msg) const
 {
-    QuestStatusMap::const_iterator itr = mQuestStatus.find( qInfo->GetQuestId() );
+    QuestStatusMap::const_iterator itr = mQuestStatus.find(qInfo->GetQuestId());
+
     if (itr != mQuestStatus.end() && itr->second.m_status != QUEST_STATUS_NONE)
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_QUEST_ALREADY_ON );
+            SendCanTakeQuestResponse(INVALIDREASON_QUEST_ALREADY_ON);
+
         return false;
     }
+
     return true;
 }
 
@@ -14278,6 +14290,7 @@ bool Player::SatisfyQuestTimed(Quest const* qInfo, bool msg) const
 
         return false;
     }
+
     return true;
 }
 
@@ -14289,7 +14302,7 @@ bool Player::SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg) const
 
     ExclusiveQuestGroupsMapBounds bounds = sObjectMgr.GetExclusiveQuestGroupsMapBounds(qInfo->GetExclusiveGroup());
 
-    MANGOS_ASSERT(bounds.first != bounds.second);           // always must be found if qInfo->ExclusiveGroup != 0
+    MANGOS_ASSERT(bounds.first != bounds.second);           // must always be found if qInfo->ExclusiveGroup != 0
 
     for(ExclusiveQuestGroupsMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
     {
@@ -14303,37 +14316,41 @@ bool Player::SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg) const
         Quest const* Nquest = sObjectMgr.GetQuestTemplate(exclude_Id);
         if (!SatisfyQuestDay(Nquest, false) || !SatisfyQuestWeek(Nquest, false))
         {
-            if( msg )
-                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            if (msg)
+                SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
             return false;
         }
 
-        QuestStatusMap::const_iterator i_exstatus = mQuestStatus.find( exclude_Id );
+        QuestStatusMap::const_iterator i_exstatus = mQuestStatus.find(exclude_Id);
 
         // alternative quest already started or completed
-        if (i_exstatus != mQuestStatus.end()
-            && (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE))
+        if (i_exstatus != mQuestStatus.end() &&
+            (i_exstatus->second.m_status == QUEST_STATUS_COMPLETE || i_exstatus->second.m_status == QUEST_STATUS_INCOMPLETE))
         {
             if (msg)
-                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+                SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
             return false;
         }
     }
+
     return true;
 }
 
-bool Player::SatisfyQuestNextChain( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestNextChain(Quest const* qInfo, bool msg) const
 {
     if (!qInfo->GetNextQuestInChain())
         return true;
 
     // next quest in chain already started or completed
-    QuestStatusMap::const_iterator itr = mQuestStatus.find( qInfo->GetNextQuestInChain() );
-    if (itr != mQuestStatus.end()
-        && (itr->second.m_status == QUEST_STATUS_COMPLETE || itr->second.m_status == QUEST_STATUS_INCOMPLETE))
+    QuestStatusMap::const_iterator itr = mQuestStatus.find(qInfo->GetNextQuestInChain());
+    if (itr != mQuestStatus.end() &&
+        (itr->second.m_status == QUEST_STATUS_COMPLETE || itr->second.m_status == QUEST_STATUS_INCOMPLETE))
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+            SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
         return false;
     }
 
@@ -14343,13 +14360,13 @@ bool Player::SatisfyQuestNextChain( Quest const* qInfo, bool msg ) const
     return true;
 }
 
-bool Player::SatisfyQuestPrevChain( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestPrevChain(Quest const* qInfo, bool msg) const
 {
     // No previous quest in chain
     if (qInfo->prevChainQuests.empty())
         return true;
 
-    for(Quest::PrevChainQuests::const_iterator iter = qInfo->prevChainQuests.begin(); iter != qInfo->prevChainQuests.end(); ++iter )
+    for(Quest::PrevChainQuests::const_iterator iter = qInfo->prevChainQuests.begin(); iter != qInfo->prevChainQuests.end(); ++iter)
     {
         uint32 prevId = *iter;
 
@@ -14357,7 +14374,8 @@ bool Player::SatisfyQuestPrevChain( Quest const* qInfo, bool msg ) const
         if (IsCurrentQuest(prevId))
         {
             if (msg)
-                SendCanTakeQuestResponse( INVALIDREASON_DONT_HAVE_REQ );
+                SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
             return false;
         }
 
@@ -14371,7 +14389,7 @@ bool Player::SatisfyQuestPrevChain( Quest const* qInfo, bool msg ) const
     return true;
 }
 
-bool Player::SatisfyQuestDay( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestDay(Quest const* qInfo, bool msg) const
 {
     if (!qInfo->IsDaily())
         return true;
@@ -14390,14 +14408,15 @@ bool Player::SatisfyQuestDay( Quest const* qInfo, bool msg ) const
     if (!have_slot)
     {
         if (msg)
-            SendCanTakeQuestResponse( INVALIDREASON_DAILY_QUESTS_REMAINING );
+            SendCanTakeQuestResponse(INVALIDREASON_DAILY_QUESTS_REMAINING);
+
         return false;
     }
 
     return true;
 }
 
-bool Player::SatisfyQuestWeek( Quest const* qInfo, bool msg ) const
+bool Player::SatisfyQuestWeek(Quest const* qInfo, bool msg) const
 {
     if (!qInfo->IsWeekly() || m_weeklyquests.empty())
         return true;
@@ -15689,14 +15708,13 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     std::string taxi_nodes = fields[37].GetCppString();
 
     // clear channel spell data (if saved at channel spell casting)
-    SetChannelObjectGUID(0);
+    SetChannelObjectGuid(ObjectGuid());
     SetUInt32Value(UNIT_CHANNEL_SPELL,0);
 
     // clear charm/summon related fields
     SetCharm(NULL);
     SetPet(NULL);
-    SetTargetGUID(0);
-    SetChannelObjectGUID(0);
+    SetTargetGuid(ObjectGuid());
     SetCharmerGUID(0);
     SetOwnerGUID(0);
     SetCreatorGUID(0);

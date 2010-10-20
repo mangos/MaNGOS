@@ -1368,7 +1368,7 @@ void GameObject::Use(Unit* user)
 
             Player* player = (Player*)user;
 
-            Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetSelection());
+            Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetSelectionGuid());
 
             // accept only use by player from same group for caster except caster itself
             if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameGroupWith(player))

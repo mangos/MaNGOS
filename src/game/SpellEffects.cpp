@@ -541,7 +541,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     uint32 counter = 0;
                     Unit::AuraList const& dotAuras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(Unit::AuraList::const_iterator itr = dotAuras.begin(); itr!=dotAuras.end(); ++itr)
-                        if ((*itr)->GetCasterGUID() == owner->GetGUID())
+                        if ((*itr)->GetCasterGuid() == owner->GetObjectGuid())
                             ++counter;
 
                     if (counter)
@@ -557,7 +557,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     {
                         // for caster applied auras only
                         if ((*i)->GetSpellProto()->SpellFamilyName != SPELLFAMILY_WARLOCK ||
-                            (*i)->GetCasterGUID()!=m_caster->GetGUID())
+                            (*i)->GetCasterGuid() != m_caster->GetObjectGuid())
                             continue;
 
                         // Immolate
@@ -651,9 +651,9 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         // Lookup for Deadly poison (only attacker applied)
                         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                         for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
-                            if( (*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE &&
+                            if ((*itr)->GetSpellProto()->SpellFamilyName==SPELLFAMILY_ROGUE &&
                                 ((*itr)->GetSpellProto()->SpellFamilyFlags & UI64LIT(0x10000)) &&
-                                (*itr)->GetCasterGUID()==m_caster->GetGUID() )
+                                (*itr)->GetCasterGuid() == m_caster->GetObjectGuid())
                             {
                                 poison = *itr;
                                 break;
@@ -808,7 +808,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
                     for(Unit::AuraList::const_iterator itr = auras.begin(); itr!=auras.end(); ++itr)
                     {
-                        if( ((*itr)->GetId() == debuf_id) && (*itr)->GetCasterGUID()==m_caster->GetGUID())
+                        if (((*itr)->GetId() == debuf_id) && (*itr)->GetCasterGuid()==m_caster->GetObjectGuid())
                         {
                             stacks = (*itr)->GetStackAmount();
                             break;
@@ -3054,7 +3054,7 @@ void Spell::EffectJump(SpellEffectIndex eff_idx)
             else if(unitTarget->getVictim())
                 pTarget = m_caster->getVictim();
             else if(m_caster->GetTypeId() == TYPEID_PLAYER)
-                pTarget = m_caster->GetMap()->GetUnit(((Player*)m_caster)->GetSelection());
+                pTarget = m_caster->GetMap()->GetUnit(((Player*)m_caster)->GetSelectionGuid());
 
             o = pTarget ? pTarget->GetOrientation() : m_caster->GetOrientation();
         }
@@ -3131,7 +3131,7 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
             else if(unitTarget->getVictim())
                 pTarget = unitTarget->getVictim();
             else if(unitTarget->GetTypeId() == TYPEID_PLAYER)
-                pTarget = unitTarget->GetMap()->GetUnit(((Player*)unitTarget)->GetSelection());
+                pTarget = unitTarget->GetMap()->GetUnit(((Player*)unitTarget)->GetSelectionGuid());
 
             // Init dest coordinates
             float x = m_targets.m_destX;
@@ -8447,7 +8447,7 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
     {
         case GAMEOBJECT_TYPE_FISHINGNODE:
         {
-            m_caster->SetChannelObjectGUID(pGameObj->GetGUID());
+            m_caster->SetChannelObjectGuid(pGameObj->GetObjectGuid());
             m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
 
             // end time of range when possible catch fish (FISHING_BOBBER_READY_TIME..GetDuration(m_spellInfo))

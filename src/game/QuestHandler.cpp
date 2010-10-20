@@ -32,7 +32,7 @@
 
 void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
     uint8 dialogStatus = DIALOG_STATUS_NONE;
 
@@ -40,16 +40,16 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 
     if (!questgiver)
     {
-        DETAIL_LOG("Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver (Typeid: %u GUID: %u)", GuidHigh2TypeId(GUID_HIPART(guid)), GUID_LOPART(guid));
+        DETAIL_LOG("Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver %s", guid.GetString().c_str());
         return;
     }
+
+    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for %s", guid.GetString().c_str());
 
     switch(questgiver->GetTypeId())
     {
         case TYPEID_UNIT:
         {
-            DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc, guid = %u", uint32(GUID_LOPART(guid)));
-
             Creature* cr_questgiver = (Creature*)questgiver;
 
             if (!cr_questgiver->IsHostileTo(_player))       // not show quest status to enemies
@@ -63,8 +63,6 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
         }
         case TYPEID_GAMEOBJECT:
         {
-            DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject guid = %u", uint32(GUID_LOPART(guid)));
-
             GameObject* go_questgiver = (GameObject*)questgiver;
             dialogStatus = Script->GODialogStatus(_player, go_questgiver);
 

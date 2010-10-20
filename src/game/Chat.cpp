@@ -1158,7 +1158,7 @@ void ChatHandler::ExecuteCommand(const char* text)
                     if (m_session)
                     {
                         Player* p = m_session->GetPlayer();
-                        ObjectGuid sel_guid = p->GetSelection();
+                        ObjectGuid sel_guid = p->GetSelectionGuid();
                         sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
                             fullcmd.c_str(),p->GetName(),GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
                             sel_guid.GetString().c_str());
@@ -2014,9 +2014,9 @@ Player * ChatHandler::getSelectedPlayer()
     if(!m_session)
         return NULL;
 
-    uint64 guid  = m_session->GetPlayer()->GetSelection();
+    ObjectGuid guid  = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid == 0)
+    if (guid.IsEmpty())
         return m_session->GetPlayer();
 
     return sObjectMgr.GetPlayer(guid);
@@ -2027,9 +2027,9 @@ Unit* ChatHandler::getSelectedUnit()
     if(!m_session)
         return NULL;
 
-    uint64 guid = m_session->GetPlayer()->GetSelection();
+    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid == 0)
+    if (guid.IsEmpty())
         return m_session->GetPlayer();
 
     // can be selected player at another map
@@ -2041,7 +2041,7 @@ Creature* ChatHandler::getSelectedCreature()
     if(!m_session)
         return NULL;
 
-    return m_session->GetPlayer()->GetMap()->GetAnyTypeCreature(m_session->GetPlayer()->GetSelection());
+    return m_session->GetPlayer()->GetMap()->GetAnyTypeCreature(m_session->GetPlayer()->GetSelectionGuid());
 }
 
 /**

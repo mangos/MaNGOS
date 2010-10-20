@@ -1201,16 +1201,16 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
-    uint64 guid = m_session->GetPlayer()->GetSelection();
+    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid == 0)
+    if (guid.IsEmpty())
     {
         SendSysMessage(LANG_NO_SELECTION);
         SetSentErrorMessage(true);
         return false;
     }
 
-    PSendSysMessage(LANG_OBJECT_GUID, GUID_LOPART(guid), GUID_HIPART(guid));
+    PSendSysMessage(LANG_OBJECT_GUID, guid.GetString().c_str());
     return true;
 }
 
