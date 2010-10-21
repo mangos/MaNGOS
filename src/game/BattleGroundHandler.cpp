@@ -587,7 +587,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode( WorldPacket & recv_data )
     if (!bg)
         return;
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -608,7 +608,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode( WorldPacket & recv_data )
     if (!bg)
         return;
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -626,7 +626,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
     DEBUG_LOG("WORLD: CMSG_BATTLEMASTER_JOIN_ARENA");
     //recv_data.hexlike();
 
-    uint64 guid;                                            // arena Battlemaster guid
+    ObjectGuid guid;                                        // arena Battlemaster guid
     uint8 arenaslot;                                        // 2v2, 3v3 or 5v5
     uint8 asGroup;                                          // asGroup
     uint8 isRated;                                          // isRated
