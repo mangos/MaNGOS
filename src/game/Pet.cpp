@@ -2743,6 +2743,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_FLAGS, 0);
             SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            SetNeedSave(false);
             owner->AddGuardian(this);
             break;
         }
@@ -2758,6 +2759,7 @@ bool Pet::Summon()
             std::string new_name = sObjectMgr.GeneratePetName(GetEntry());
             if(!new_name.empty())
                 SetName(new_name);
+            SetNeedSave(true);
             owner->SetPet(this);
             break;
         }
@@ -2773,6 +2775,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, time(NULL));
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE);
+            SetNeedSave(true);
             owner->SetPet(this);
             break;
         }
@@ -2789,6 +2792,7 @@ bool Pet::Summon()
                 SetCritterGUID(GetGUID());
             InitPetCreateSpells();
             AIM_Initialize();
+            SetNeedSave(false);
             map->Add((Creature*)this);
             m_loading = false;
             return true;
@@ -2872,8 +2876,7 @@ Unit* Pet::GetOwner() const
 
     if (pOwner) return pOwner;
 
-    else if (!IsInWorld())
-        if (uint64 ownerguid = GetOwnerGUID())
+    else if (uint64 ownerguid = GetOwnerGUID())
             if (Map* pMap = GetMap())
                 return pMap->GetAnyTypeCreature(ownerguid);
 

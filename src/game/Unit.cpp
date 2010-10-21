@@ -6200,6 +6200,14 @@ void Unit::AddPetToList(Pet* pet)
 void Unit::RemovePetFromList(Pet* pet)
 {
     m_groupPets.erase(pet->GetGUID());
+
+    GroupPetList m_groupPetsTmp = GetPets();
+    for(GroupPetList::const_iterator itr = m_groupPetsTmp.begin(); itr != m_groupPetsTmp.end(); ++itr)
+    {
+        Pet* _pet = GetMap()->GetPet(*itr);
+        if (!_pet)
+            m_groupPets.erase(*itr);
+    }
 }
 
 void Unit::AddGuardian( Pet* pet )
@@ -6209,8 +6217,6 @@ void Unit::AddGuardian( Pet* pet )
 
 void Unit::RemoveGuardian( Pet* pet )
 {
-    m_guardianPets.erase(pet->GetGUID());
-
     if(GetTypeId() == TYPEID_PLAYER)
     {
         uint32 SpellID = pet->GetCreateSpellID();
@@ -6220,6 +6226,7 @@ void Unit::RemoveGuardian( Pet* pet )
             ((Player*)this)->SendCooldownEvent(spellInfo);
         }
     }
+    m_guardianPets.erase(pet->GetGUID());
 }
 
 void Unit::RemoveGuardians()
@@ -6228,8 +6235,12 @@ void Unit::RemoveGuardians()
     {
         uint64 guid = *m_guardianPets.begin();
         if(Pet* pet = GetMap()->GetPet(guid))
-            pet->Remove(PET_SAVE_AS_DELETED);
+        {
+            pet->_Remove(PET_SAVE_AS_DELETED);
+            m_guardianPets.erase(guid);
+        }
     }
+    m_guardianPets.clear();
 }
 
 Pet* Unit::FindGuardianWithEntry(uint32 entry)
