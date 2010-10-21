@@ -582,7 +582,7 @@ void WorldSession::HandleTextEmoteOpcode( WorldPacket & recv_data )
         }
     }
 
-    Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
+    Unit* unit = GetPlayer()->GetMap()->GetUnit(guid);
 
     MaNGOS::EmoteChatBuilder emote_builder(*GetPlayer(), text_emote, emoteNum, unit);
     MaNGOS::LocalizedPacketDo<MaNGOS::EmoteChatBuilder > emote_do(emote_builder);
