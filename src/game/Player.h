@@ -1583,7 +1583,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
 
         uint8 GetComboPoints() { return m_comboPoints; }
-        const uint64& GetComboTarget() const { return m_comboTarget; }
+        ObjectGuid const& GetComboTargetGuid() const { return m_comboTargetGuid; }
 
         void AddComboPoints(Unit* target, int8 count);
         void ClearComboPoints();
@@ -2512,7 +2512,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_ExtraFlags;
         ObjectGuid m_curSelectionGuid;
 
-        uint64 m_comboTarget;
+        ObjectGuid m_comboTargetGuid;
         int8 m_comboPoints;
 
         QuestStatusMap mQuestStatus;
