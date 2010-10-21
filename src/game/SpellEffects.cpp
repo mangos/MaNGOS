@@ -4408,12 +4408,23 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
 
     if (summon)
     {
-        summon->AIM_Initialize();
-        // Prevent from AI reinitialized
-        summon->LockAI(true);
-        m_caster->CastSpell(summon, 530, true);
-        summon->LockAI(false);
+        summon->SetLevel(m_caster->getLevel());
+
+        if(CreatureAI* scriptedAI = Script->GetAI(summon))
+        {
+            // Prevent from ScriptedAI reinitialized
+            summon->LockAI(true);
+            m_caster->CastSpell(summon, 530, true);
+            summon->LockAI(false);
+        }
+        else
+            m_caster->CastSpell(summon, 530, true);
+
+        DEBUG_LOG("New possessed creature (guidlow %d, entry %d) summoned. Owner is %d ", summon->GetGUIDLow(), summon->GetEntry(), m_caster->GetGUIDLow());
     }
+    else
+        sLog.outError("New possessed creature (entry %d) NOT summoned. Owner is %d ", summon->GetEntry(), m_caster->GetGUIDLow());
+
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
