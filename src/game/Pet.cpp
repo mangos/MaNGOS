@@ -3148,6 +3148,9 @@ void Pet::RegenerateHealth(uint32 diff)
 
 void Pet::ApplyScalingBonus(ScalingAction* action)
 {
+    if (!IsInWorld())
+        return;
+
     switch (action->target)
     {
         case SCALING_TARGET_ALL:
@@ -3195,12 +3198,18 @@ void ApplyScalingBonusWithHelper::operator() (Unit* unit) const
 {
     if (!unit || !unit->GetObjectGuid().IsPet())
         return;
+
     Pet* pet = (Pet*)unit;
-    pet->AddScalingAction(target, stat, apply);
+
+    if (pet->IsInWorld())
+        pet->AddScalingAction(target, stat, apply);
 }
 
 void Pet::ApplyHappinessBonus(bool apply)
 {
+    if (!IsInWorld())
+        return;
+
     if (GetHappinessState() == m_HappinessState)
         return;
     else
