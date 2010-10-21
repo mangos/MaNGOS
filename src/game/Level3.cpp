@@ -4094,8 +4094,8 @@ bool ChatHandler::HandleNpcAddWeaponCommand(char* /*args*/)
     /*if (!*args)
     return false;
 
-    uint64 guid = m_session->GetPlayer()->GetSelection();
-    if (guid == 0)
+    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
+    if (guid.IsEmpty())
     {
         SendSysMessage(LANG_NO_SELECTION);
         return true;
@@ -4428,14 +4428,14 @@ bool ChatHandler::HandleAuctionCommand(char* /*args*/)
 
 bool ChatHandler::HandleBankCommand(char* /*args*/)
 {
-    m_session->SendShowBank( m_session->GetPlayer()->GetGUID() );
+    m_session->SendShowBank(m_session->GetPlayer()->GetObjectGuid());
 
     return true;
 }
 
 bool ChatHandler::HandleStableCommand(char* /*args*/)
 {
-    m_session->SendStablePet(m_session->GetPlayer()->GetGUID());
+    m_session->SendStablePet(m_session->GetPlayer()->GetObjectGuid());
 
     return true;
 }

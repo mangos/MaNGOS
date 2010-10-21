@@ -117,10 +117,10 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket &recv_data)
     //    if (count)
     //    {
     //        uint8 unk12,unk13;
-    //        uint64 guid;
+    //        ObjectGuid guid;
     //        for (int i=0;i<count;i++)
     //        {
-    //            recv_data.readPackGUID(guid);
+    //            recv_data >> guid.ReadAsPacked();
     //            recv_data >> (uint8)unk12;
     //            recv_data >> (uint8)unk13;
     //        }

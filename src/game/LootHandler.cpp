@@ -264,11 +264,11 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: CMSG_LOOT");
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     // Check possible cheat
-    if(!_player->isAlive())
+    if (!_player->isAlive())
         return;
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
