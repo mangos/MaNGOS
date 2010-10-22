@@ -2623,6 +2623,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     target = this;
                     break;
                 }
+                // Earthen Power
+                case 51523:
+                case 51524:
+                {
+                    triggered_spell_id = 63532;
+                    break;
+                }
                 // Glyph of Healing Wave
                 case 55440:
                 {
