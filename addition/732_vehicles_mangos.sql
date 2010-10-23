@@ -59,7 +59,6 @@ UPDATE `creature_template` SET `VehicleId` = 124 WHERE `entry` = 28614;
 UPDATE `creature_template` SET `VehicleId` = 156 WHERE `entry` = 28670;
 UPDATE `creature_template` SET `VehicleId` = 158 WHERE `entry` = 28781;
 UPDATE `creature_template` SET `VehicleId` = 135 WHERE `entry` = 28782;
-UPDATE `creature_template` SET `VehicleId` = 87 WHERE `entry` = 28817;
 UPDATE `creature_template` SET `VehicleId` = 79 WHERE `entry` = 28833;
 UPDATE `creature_template` SET `VehicleId` = 145 WHERE `entry` = 28851;
 UPDATE `creature_template` SET `VehicleId` = 143 WHERE `entry` = 28864;
@@ -254,3 +253,26 @@ UPDATE `creature_template` SET `VehicleId` = 591 WHERE `entry` IN (37672,38605,3
 
 # full fix
 UPDATE `creature_template` SET `IconName` = 'vehichleCursor' WHERE `VehicleId` > 0 AND `IconName` IS NULL;
+
+# spellclicks
+-- from zergtmn
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (33109, 33062, 33060);
+INSERT INTO `npc_spellclick_spells` VALUES
+(33109, 62309, 0, 0, 0, 1),  -- Demolisher
+(33062, 65030, 0, 0, 0, 1),  -- Chopper
+(33060, 65031, 0, 0, 0, 1);  -- Siege engine
+
+-- vehicle spells
+
+-- from me
+-- chopper
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3,
+`spell1` = 62974, `spell2` = 62286, `spell3` = 62299, `spell4` = 64460
+WHERE `entry` IN (33062);
+-- Siege engine
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor',  `PowerType` = 3,
+`spell1` = 62345, `spell2` = 62522, `spell3` = 62346
+WHERE `entry` IN (33060);
+-- demolisher
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3
+WHERE `entry` IN (33109);
