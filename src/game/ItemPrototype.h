@@ -101,43 +101,54 @@ enum ItemBondingType
 
 #define MAX_BIND_TYPE                             6
 
-// masks for ITEM_FIELD_FLAGS field
-enum ItemFlags
+// Mask for ItemPrototype.Flags field
+enum ItemPrototypeFlags
 {
-    ITEM_FLAGS_BINDED                         = 0x00000001, // set in game at binding, not set in template
-    ITEM_FLAGS_CONJURED                       = 0x00000002,
-    ITEM_FLAGS_OPENABLE                       = 0x00000004,
-    ITEM_FLAGS_WRAPPED                        = 0x00000008, // conflicts with heroic flag
-    ITEM_FLAGS_HEROIC                         = 0x00000008, // weird...
-    ITEM_FLAGS_BROKEN                         = 0x00000010, // appears red icon (like when item durability==0)
-    ITEM_FLAGS_INDESTRUCTIBLE                 = 0x00000020, // used for totem. Item can not be destroyed, except by using spell (item can be reagent for spell and then allowed)
-    ITEM_FLAGS_USABLE                         = 0x00000040, // ?
-    ITEM_FLAGS_NO_EQUIP_COOLDOWN              = 0x00000080, // ?
-    ITEM_FLAGS_UNK3                           = 0x00000100, // saw this on item 47115, 49295...
-    ITEM_FLAGS_WRAPPER                        = 0x00000200, // used or not used wrapper
-    ITEM_FLAGS_IGNORE_BAG_SPACE               = 0x00000400, // ignore bag space at new item creation?
-    ITEM_FLAGS_PARTY_LOOT                     = 0x00000800, // determines if item is party loot or not
-    ITEM_FLAGS_REFUNDABLE                     = 0x00001000, // item cost can be refunded within 2 hours after purchase
-    ITEM_FLAGS_CHARTER                        = 0x00002000, // arena/guild charter
-    ITEM_FLAGS_UNK4                           = 0x00008000, // a lot of items have this
-    ITEM_FLAGS_UNK1                           = 0x00010000, // a lot of items have this
-    ITEM_FLAGS_PROSPECTABLE                   = 0x00040000,
-    ITEM_FLAGS_UNIQUE_EQUIPPED                = 0x00080000,
-    ITEM_FLAGS_USEABLE_IN_ARENA               = 0x00200000,
-    ITEM_FLAGS_THROWABLE                      = 0x00400000, // not used in game for check trow possibility, only for item in game tooltip
-    ITEM_FLAGS_SPECIALUSE                     = 0x00800000, // last used flag in 2.3.0
-    ITEM_FLAGS_BOA                            = 0x08000000, // bind on account (set in template for items that can binded in like way)
-    ITEM_FLAGS_ENCHANT_SCROLL                 = 0x10000000, // for enchant scrolls
-    ITEM_FLAGS_MILLABLE                       = 0x20000000,
-    ITEM_FLAGS_BOP_TRADEABLE                  = 0x80000000
+    ITEM_FLAG_UNK0                            = 0x00000001, // not used
+    ITEM_FLAG_CONJURED                        = 0x00000002,
+    ITEM_FLAG_LOOTABLE                        = 0x00000004, // affect only non container items that can be "open" for loot. It or lockid set enable for client show "Right click to open". See also ITEM_DYNFLAG_UNLOCKED
+    ITEM_FLAG_HEROIC                          = 0x00000008, // heroic item version
+    ITEM_FLAG_UNK4                            = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
+    ITEM_FLAG_INDESTRUCTIBLE                  = 0x00000020, // used for totem. Item can not be destroyed, except by using spell (item can be reagent for spell and then allowed)
+    ITEM_FLAG_UNK6                            = 0x00000040, // ? old note: usable
+    ITEM_FLAG_NO_EQUIP_COOLDOWN               = 0x00000080,
+    ITEM_FLAG_UNK8                            = 0x00000100, // saw this on item 47115, 49295...
+    ITEM_FLAG_WRAPPER                         = 0x00000200, // used or not used wrapper
+    ITEM_FLAG_IGNORE_BAG_SPACE                = 0x00000400, // ignore bag space at new item creation?
+    ITEM_FLAG_PARTY_LOOT                      = 0x00000800, // determines if item is party loot or not
+    ITEM_FLAG_REFUNDABLE                      = 0x00001000, // item cost can be refunded within 2 hours after purchase
+    ITEM_FLAG_CHARTER                         = 0x00002000, // arena/guild charter
+    ITEM_FLAG_UNK14                           = 0x00004000,
+    ITEM_FLAG_UNK15                           = 0x00008000, // a lot of items have this
+    ITEM_FLAG_UNK16                           = 0x00010000, // a lot of items have this
+    ITEM_FLAG_UNK17                           = 0x00020000,
+    ITEM_FLAG_PROSPECTABLE                    = 0x00040000, // item can have prospecting loot (in fact some items expected have empty loot)
+    ITEM_FLAG_UNIQUE_EQUIPPED                 = 0x00080000,
+    ITEM_FLAG_UNK20                           = 0x00100000,
+    ITEM_FLAG_USEABLE_IN_ARENA                = 0x00200000,
+    ITEM_FLAG_THROWABLE                       = 0x00400000, // Only items of ITEM_SUBCLASS_WEAPON_THROWN have it but not all, so can't be used as in game check
+    ITEM_FLAG_SPECIALUSE                      = 0x00800000, // last used flag in 2.3.0
+    ITEM_FLAG_UNK24                           = 0x01000000,
+    ITEM_FLAG_UNK25                           = 0x02000000,
+    ITEM_FLAG_UNK26                           = 0x04000000,
+    ITEM_FLAG_BOA                             = 0x08000000, // bind on account (set in template for items that can binded in like way)
+    ITEM_FLAG_ENCHANT_SCROLL                  = 0x10000000, // for enchant scrolls
+    ITEM_FLAG_MILLABLE                        = 0x20000000, // item can have milling loot
+    ITEM_FLAG_UNK30                           = 0x04000000,
+    ITEM_FLAG_BOP_TRADEABLE                   = 0x80000000, // bound item that can be traded
 };
 
-enum ItemFlags2
+enum ItemPrototypeFlags2
 {
-    ITEM_FLAGS2_HORDE_ONLY                    = 0x00000001, // drop in loot, sell by vendor and equipping only for horde
-    ITEM_FLAGS2_ALLIANCE_ONLY                 = 0x00000002, // drop in loot, sell by vendor and equipping only for alliance
-    ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD        = 0x00000004, // item cost include gold part in case extended cost use also
-    ITEM_FLAGS2_NEED_ROLL_DISABLED            = 0x00000100, // need roll during looting is not allowed for this item
+    ITEM_FLAG2_HORDE_ONLY                     = 0x00000001, // drop in loot, sell by vendor and equipping only for horde
+    ITEM_FLAG2_ALLIANCE_ONLY                  = 0x00000002, // drop in loot, sell by vendor and equipping only for alliance
+    ITEM_FLAG2_EXT_COST_REQUIRES_GOLD         = 0x00000004, // item cost include gold part in case extended cost use also
+    ITEM_FLAG2_UNK4                           = 0x00000008,
+    ITEM_FLAG2_UNK5                           = 0x00000010,
+    ITEM_FLAG2_UNK6                           = 0x00000020,
+    ITEM_FLAG2_UNK7                           = 0x00000040,
+    ITEM_FLAG2_UNK8                           = 0x00000080,
+    ITEM_FLAG2_NEED_ROLL_DISABLED             = 0x00000100, // need roll during looting is not allowed for this item
 };
 
 enum BagFamilyMask
@@ -653,7 +664,7 @@ struct ItemPrototype
     }
 
     bool IsPotion() const { return Class==ITEM_CLASS_CONSUMABLE && SubClass==ITEM_SUBCLASS_POTION; }
-    bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAGS_CONJURED); }
+    bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform

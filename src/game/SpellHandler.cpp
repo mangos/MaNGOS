@@ -109,7 +109,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     // only allow conjured consumable, bandage, poisons (all should have the 2^21 item flag set in DB)
     if (proto->Class == ITEM_CLASS_CONSUMABLE &&
-        !(proto->Flags & ITEM_FLAGS_USEABLE_IN_ARENA) &&
+        !(proto->Flags & ITEM_FLAG_USEABLE_IN_ARENA) &&
         pUser->InArena())
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
@@ -241,7 +241,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         }
     }
 
-    if(pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))// wrapped?
+    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))// wrapped?
     {
         QueryResult *result = CharacterDatabase.PQuery("SELECT entry, flags FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
         if (result)

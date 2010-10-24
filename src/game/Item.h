@@ -202,6 +202,44 @@ enum ItemUpdateState
     ITEM_REMOVED                                 = 3
 };
 
+
+// masks for ITEM_FIELD_FLAGS field
+enum ItemDynFlags
+{
+    ITEM_DYNFLAG_BINDED                       = 0x00000001, // set in game at binding
+    ITEM_DYNFLAG_UNK1                         = 0x00000002,
+    ITEM_DYNFLAG_UNLOCKED                     = 0x00000004, // have meaning only for item with proto->LockId, if not set show as "Locked, req. lockpicking N"
+    ITEM_DYNFLAG_WRAPPED                      = 0x00000008, // mark item as wrapped into wrapper container
+    ITEM_DYNFLAG_UNK4                         = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
+    ITEM_DYNFLAG_UNK5                         = 0x00000020,
+    ITEM_DYNFLAG_UNK6                         = 0x00000040, // ? old note: usable
+    ITEM_DYNFLAG_UNK7                         = 0x00000080,
+    ITEM_DYNFLAG_UNK8                         = 0x00000100,
+    ITEM_DYNFLAG_READBLE                      = 0x00000200, // can be open for read, it or item proto pagetText make show "Right click to read"
+    ITEM_DYNFLAG_UNK10                        = 0x00000400,
+    ITEM_DYNFLAG_UNK11                        = 0x00000800,
+    ITEM_DYNFLAG_UNK12                        = 0x00001000,
+    ITEM_DYNFLAG_UNK13                        = 0x00002000,
+    ITEM_DYNFLAG_UNK14                        = 0x00004000,
+    ITEM_DYNFLAG_UNK15                        = 0x00008000,
+    ITEM_DYNFLAG_UNK16                        = 0x00010000,
+    ITEM_DYNFLAG_UNK17                        = 0x00020000,
+    ITEM_DYNFLAG_UNK18                        = 0x00040000,
+    ITEM_DYNFLAG_UNK19                        = 0x00080000,
+    ITEM_DYNFLAG_UNK20                        = 0x00100000,
+    ITEM_DYNFLAG_UNK21                        = 0x00200000,
+    ITEM_DYNFLAG_UNK22                        = 0x00400000,
+    ITEM_DYNFLAG_UNK23                        = 0x00800000,
+    ITEM_DYNFLAG_UNK24                        = 0x01000000,
+    ITEM_DYNFLAG_UNK25                        = 0x02000000,
+    ITEM_DYNFLAG_UNK26                        = 0x04000000,
+    ITEM_DYNFLAG_UNK27                        = 0x08000000,
+    ITEM_DYNFLAG_UNK28                        = 0x10000000,
+    ITEM_DYNFLAG_UNK29                        = 0x20000000,
+    ITEM_DYNFLAG_UNK30                        = 0x40000000,
+    ITEM_DYNFLAG_UNK31                        = 0x80000000
+};
+
 enum ItemRequiredTargetType
 {
     ITEM_TARGET_TYPE_CREATURE   = 1,
@@ -238,9 +276,9 @@ class MANGOS_DLL_SPEC Item : public Object
         void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS,ITEM_FLAGS_BINDED,val); }
-        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BINDED); }
-        bool IsBoundAccountWide() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_BOA); }
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED,val); }
+        bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED); }
+        bool IsBoundAccountWide() const { return GetProto()->Flags & ITEM_FLAG_BOA; }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();

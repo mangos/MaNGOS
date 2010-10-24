@@ -266,7 +266,6 @@ bool Item::Create( uint32 guidlow, uint32 itemid, Player const* owner)
     for(int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
         SetSpellCharges(i,itemProto->Spells[i].SpellCharges);
 
-    SetUInt32Value(ITEM_FIELD_FLAGS, itemProto->Flags);
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
 
     return true;
@@ -319,13 +318,13 @@ void Item::SaveToDB()
 
             CharacterDatabase.Execute( ss.str().c_str() );
 
-            if(HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
+            if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
                 CharacterDatabase.PExecute("UPDATE character_gifts SET guid = '%u' WHERE item_guid = '%u'", GUID_LOPART(GetOwnerGUID()),GetGUIDLow());
         } break;
         case ITEM_REMOVED:
         {
             CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", guid);
-            if(HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
+            if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
                 CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
             delete this;
             return;
@@ -401,7 +400,7 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
     // Remove bind flag for items vs NO_BIND set
     if (IsSoulBound() && proto->Bonding == NO_BIND)
     {
-        ApplyModFlag(ITEM_FIELD_FLAGS,ITEM_FLAGS_BINDED, false);
+        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, false);
         need_save = true;
     }
 
@@ -417,6 +416,20 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
     {
         SetOwnerGUID(owner_guid);
         need_save = true;
+    }
+
+    // set correct wrapped state
+    if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
+    {
+        // wrapped item must be wrapper (used version that not stackable)
+        if (!(proto->Flags & ITEM_FLAG_WRAPPER) || GetMaxStackCount() > 1)
+        {
+            RemoveFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
+            need_save = true;
+
+            // also cleanup for sure gift table
+            CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
+        }
     }
 
     if (need_save)                                          // normal item changed state set not work at loading
