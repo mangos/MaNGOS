@@ -3210,6 +3210,19 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 break;
             }
             break;
+            // Ferocious inspiration
+            if (dummySpell->SpellIconID == 2232 && procEx & PROC_EX_CRITICAL_HIT)
+            {
+                if (dummySpell->Id == 34455)
+                    triggered_spell_id = 75593;
+                else if (dummySpell->Id == 34459)
+                    triggered_spell_id = 75446;
+                else if (dummySpell->Id == 34460)
+                    triggered_spell_id = 75447;
+                target = this;
+                break;
+            }
+            break;
         }
         default:
             break;

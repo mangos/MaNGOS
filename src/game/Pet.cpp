@@ -303,13 +303,12 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
         CleanupActionBar();                                     // remove unknown spells from action bar after load
-        if (!GetPetCounter())
+        if (isControlled() && !GetPetCounter())
+        {
             ((Player*)owner)->PetSpellInitialize();
-        if(((Player*)owner)->GetGroup())
-            ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_PET);
-
-        if (!GetPetCounter())
             ((Player*)owner)->SendTalentsInfoData(true);
+        }
+
     }
 
     if (owner->GetTypeId() == TYPEID_PLAYER && getPetType() == HUNTER_PET)
@@ -2842,9 +2841,9 @@ bool Pet::Summon()
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
     {
-        if (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET && !GetPetCounter())
+        CleanupActionBar();                                     // remove unknown spells from action bar after load
+        if (isControlled() && !GetPetCounter())
         {
-            CleanupActionBar();                                     // remove unknown spells from action bar after load
             if (!GetPetCounter())
                 ((Player*)owner)->PetSpellInitialize();
             ((Player*)owner)->SendTalentsInfoData(true);
