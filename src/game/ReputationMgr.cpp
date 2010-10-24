@@ -58,7 +58,8 @@ int32 ReputationMgr::GetBaseReputation(FactionEntry const* factionEntry) const
     uint32 classMask = m_player->getClassMask();
     for (int i=0; i < 4; i++)
     {
-        if( (factionEntry->BaseRepRaceMask[i] & raceMask) &&
+        if( (factionEntry->BaseRepRaceMask[i]==0 ||
+            (factionEntry->BaseRepRaceMask[i] & raceMask) ) &&
             (factionEntry->BaseRepClassMask[i]==0 ||
             (factionEntry->BaseRepClassMask[i] & classMask) ) )
             return factionEntry->BaseRepValue[i];
