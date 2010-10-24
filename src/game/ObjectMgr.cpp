@@ -6320,6 +6320,13 @@ void ObjectMgr::SetHighestGuids()
         delete result;
     }
 
+    result = CharacterDatabase.Query( "SELECT MAX(id) FROM instance" );
+    if( result )
+    {
+        m_InstanceGuids.Set((*result)[0].GetUInt32()+1);
+        delete result;
+    }
+
     // Cleanup other tables from nonexistent guids (>=m_hiItemGuid)
     CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
@@ -6398,6 +6405,8 @@ uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
             return m_GameobjectGuids.Generate();
         case HIGHGUID_CORPSE:
             return m_CorpseGuids.Generate();
+        case HIGHGUID_INSTANCE:
+            return m_InstanceGuids.Generate();
         default:
             MANGOS_ASSERT(0);
     }

@@ -16914,7 +16914,7 @@ void Player::SendRaidInfo()
                 InstanceSave *save = itr->second.save;
                 data << uint32(save->GetMapId());           // map id
                 data << uint32(save->GetDifficulty());      // difficulty
-                data << uint64(save->GetInstanceId());      // instance id
+                data << ObjectGuid(save->GetInstanceGuid());// instance guid
                 data << uint8(1);                           // expired = 0
                 data << uint8(0);                           // extended = 1
                 data << uint32(save->GetResetTime() - now); // reset time

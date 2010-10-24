@@ -120,7 +120,7 @@ Map* MapInstanced::CreateInstance(Player * player)
     {
         // if no instanceId via group members or instance saves is found
         // the instance will be created for the first time
-        NewInstanceId = sMapMgr.GenerateInstanceId();
+        NewInstanceId = sObjectMgr.GenerateLowGuid(HIGHGUID_INSTANCE);
 
         Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
         map = CreateInstanceMap(NewInstanceId, diff);
