@@ -882,9 +882,6 @@ void World::SetInitialWorldSettings()
     ///- Initialize config settings
     LoadConfigSettings();
 
-    ///- Init highest guids before any table loading to prevent using not initialized guids in some code.
-    sObjectMgr.SetHighestGuids();
-
     ///- Check the existence of the map files for all races' startup areas.
     if(   !MapManager::ExistMapAndVMap(0,-6240.32f, 331.033f)
         ||!MapManager::ExistMapAndVMap(0,-8949.95f,-132.493f)
@@ -937,13 +934,16 @@ void World::SetInitialWorldSettings()
 
     ///- Clean up and pack instances
     sLog.outString( "Cleaning up instances..." );
-    sInstanceSaveMgr.CleanupInstances();                // must be called before `creature_respawn`/`gameobject_respawn` tables
+    sInstanceSaveMgr.CleanupInstances();                    // must be called before `creature_respawn`/`gameobject_respawn` tables
 
     sLog.outString( "Packing instances..." );
     sInstanceSaveMgr.PackInstances();
 
     sLog.outString( "Packing groups..." );
-    sObjectMgr.PackGroupIds();
+    sObjectMgr.PackGroupIds();                              // must be after CleanupInstances
+
+    ///- Init highest guids before any guid using table loading to prevent using not initialized guids in some code.
+    sObjectMgr.SetHighestGuids();                           // must be after packing instances
 
     sLog.outString();
     sLog.outString( "Loading Localization strings..." );
