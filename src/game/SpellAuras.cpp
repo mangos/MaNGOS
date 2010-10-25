@@ -9108,16 +9108,30 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
             break;
         case SPELLFAMILY_HUNTER:
         {
-            // The Beast Within and Bestial Wrath - immunity
-            if (GetId() == 19574 || GetId() == 34471)
+            switch (GetId())
             {
-                spellId1 = 24395;
-                spellId2 = 24396;
-                spellId3 = 24397;
-                spellId4 = 26592;
+                case 34455:          // Ferocious inspiration and ranks
+                    spellId1 = 75593;
+                    break;
+                case 34459:
+                    spellId1 = 75446;
+                    break;
+                case 34460:
+                    spellId1 = 75447;
+                    break;
+                case 19574:          // The Beast Within and Bestial Wrath - immunity
+                case 34471:
+                    spellId1 = 24395;
+                    spellId2 = 24396;
+                    spellId3 = 24397;
+                    spellId4 = 26592;
+                    break;
+                default:
+                    break;
             }
+
             // Freezing Trap Effect
-            else if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000008))
+            if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000008))
             {
                 if(!apply)
                 {
@@ -9402,22 +9416,6 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                 else
                     return;
                 break;
-            }
-            break;
-        }
-        case SPELLFAMILY_PET:
-        {
-            switch (GetId())
-            {
-                case 34455:
-                    spellId1 = 75593;
-                    break;
-                case 34459:
-                    spellId1 = 75446;
-                    break;
-                case 34460:
-                    spellId1 = 75447;
-                    break;
             }
             break;
         }
