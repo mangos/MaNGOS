@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-sunos5.6.h 81935 2008-06-12 22:01:53Z jtc $
+// $Id: config-sunos5.6.h 91581 2010-08-31 13:18:11Z shuston $
 
 // The following configuration file is designed to work for SunOS 5.6
 // platforms using the SunC++ 4.x or g++ compilers.
@@ -106,9 +106,6 @@
 #if !defined (ACE_POSIX_AIOCB_PROACTOR)
 #define ACE_POSIX_AIOCB_PROACTOR
 #endif /* ACE_POSIX_AIOCB_PROACTOR */
-
-// SunOS 5.6 has a buggy select
-#define ACE_HAS_LIMITED_SELECT
 
 // SunOS 5.6 introduced shm_open, but need to turn on POSIX.1b or higher
 // to pick it up.

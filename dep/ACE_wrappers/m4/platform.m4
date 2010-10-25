@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------------------
-dnl       $Id: platform.m4 82266 2008-07-08 16:09:00Z jtc $
+dnl       $Id: platform.m4 87480 2009-11-11 11:38:15Z olli $
 dnl
 dnl       platform.m4
 dnl
@@ -160,7 +160,7 @@ dnl  */
     AC_DEFINE([__NO_INCLUDE_WARN__])
     AC_DEFINE([ACE_MALLOC_ALIGN], [8])
     AC_DEFINE([ACE_MAP_PRIVATE], [ACE_MAP_SHARED])
-    AC_DEFINE([ACE_HAS_LYNXOS_SIGNALS])
+    AC_DEFINE([ACE_HAS_LYNXOS4_SIGNALS])
     AC_DEFINE([ACE_TIMER_SKEW], [(1000 * 10)])
     ;;
   *mvs*)

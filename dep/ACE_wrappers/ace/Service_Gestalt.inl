@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Service_Gestalt.inl 81388 2008-04-23 14:02:05Z johnnyw $
+// $Id: Service_Gestalt.inl 91158 2010-07-21 15:54:12Z mesnier_p $
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -11,10 +11,10 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_INLINE int
 ACE_Service_Gestalt::open (const ACE_TCHAR program_name[],
-                          const ACE_TCHAR *logger_key,
-                          bool ignore_static_svcs,
-                          bool ignore_default_svc_conf,
-                          bool ignore_debug_flag)
+                           const ACE_TCHAR *logger_key,
+                           bool ignore_static_svcs,
+                           bool ignore_default_svc_conf,
+                           bool ignore_debug_flag)
 {
   ACE_TRACE ("ACE_Service_Gestalt::open");
   this->no_static_svcs_ = ignore_static_svcs;
@@ -36,6 +36,8 @@ ACE_Service_Gestalt::open (int argc,
 {
   ACE_TRACE ("ACE_Service_Gestalt::open");
 
+  // Parsing argv may change no_static_svcs_ so set the default here, then
+  // parse, then pass the final value to open_i().
   this->no_static_svcs_ = ignore_static_svcs;
 
   if (this->parse_args_i (argc,
@@ -45,7 +47,7 @@ ACE_Service_Gestalt::open (int argc,
 
   return this->open_i (argv == 0 ? 0 : argv[0],
                        logger_key,
-                       ignore_static_svcs,
+                       this->no_static_svcs_,
                        ignore_default_svc_conf,
                        ignore_debug_flag);
 }

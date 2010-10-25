@@ -6,7 +6,7 @@
  *
  *  select types
  *
- *  $Id: os_select.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_select.h 85015 2009-04-03 12:27:59Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -32,9 +32,9 @@
 #  include /**/ <sys/select.h>
 #endif /* !ACE_LACKS_SYS_SELECT_H */
 
-#if defined (ACE_VXWORKS) && defined (ACE_LACKS_SYS_SELECT_H)
+#if defined (ACE_USES_SELECTLIB_H) && defined (ACE_LACKS_SYS_SELECT_H)
 #  include /**/ <selectLib.h>
-#endif /* ACE_VXWORKS */
+#endif /* ACE_USES_SELECTLIB_H && ACE_LACKS_SYS_SELECT_H */
 
 // Place all additions (especially function declarations) within extern "C" {}
 #ifdef __cplusplus
@@ -42,13 +42,15 @@ extern "C"
 {
 #endif /* __cplusplus */
 
+#if defined (ACE_LACKS_FD_MASK)
+   typedef long fd_mask;
+#endif /* __QNX__ */
+
 #if defined (ACE_WIN32)
    // This will help until we figure out everything:
 #  define NFDBITS 32 /* only used in unused functions... */
-#elif defined (__QNX__)
-#  if !defined (NFDBITS)
-#    define NFDBITS (sizeof(fd_mask) * NBBY)        /* bits per mask */
-#  endif /* ! NFDBITS */
+#elif defined (ACE_LACKS_NFDBITS)
+#  define NFDBITS (sizeof(fd_mask) * NBBY)        /* bits per mask */
 #endif /* ACE_WIN32 */
 
 #ifdef __cplusplus

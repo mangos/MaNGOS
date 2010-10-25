@@ -1,4 +1,4 @@
-// $Id: Token.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Token.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Token.h"
 
@@ -6,7 +6,7 @@
 # include "ace/Token.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, Token, "$Id: Token.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if defined (ACE_HAS_THREADS)
 
@@ -216,7 +216,7 @@ ACE_Token::shared_acquire (void (*sleep_hook_func)(void *),
     }
 
   // Do a quick check for "polling" behavior.
-  if (timeout != 0 && timeout->sec () == 0 && timeout->usec () == 0)
+  if (timeout != 0 && *timeout == ACE_Time_Value::zero)
     {
       errno = ETIME;
       return -1;

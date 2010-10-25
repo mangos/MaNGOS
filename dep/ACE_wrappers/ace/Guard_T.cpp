@@ -1,4 +1,4 @@
-// $Id: Guard_T.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Guard_T.cpp 85141 2009-04-22 08:48:30Z johnnyw $
 
 #ifndef ACE_GUARD_T_CPP
 #define ACE_GUARD_T_CPP
@@ -32,7 +32,7 @@ ACE_Guard<ACE_LOCK>::dump (void) const
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("mutex_ = %x\n"), this->lock_));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("owner_ = %d\n"), this->owner_));
-  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
+  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP, this));
 #endif /* ACE_HAS_DUMP */
 }
 

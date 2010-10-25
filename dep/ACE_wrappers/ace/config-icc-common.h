@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: config-icc-common.h 81935 2008-06-12 22:01:53Z jtc $
+// $Id: config-icc-common.h 91285 2010-08-05 08:29:30Z johnnyw $
 
 #ifndef ACE_LINUX_ICC_COMMON_H
 #define ACE_LINUX_ICC_COMMON_H
@@ -61,18 +61,7 @@
 # define ACE_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) __extension__ extern template class SINGLETON_TYPE<CLASS, LOCK>;
 #endif  /* ACE_HAS_CUSTOM_EXPORT_MACROS == 0 */
 
-// __EXCEPTIONS is defined with -fexceptions, the egcs default.  It
-// is not defined with -fno-exceptions, the ACE default for g++.
-// ACE_HAS_EXCEPTIONS is defined in
-// include/makeinclude/wrapper_macros.GNU, so this really isn't
-// necessary.  Just in case . . .
-# if defined (__EXCEPTIONS) && !defined (ACE_HAS_EXCEPTIONS)
-#   define ACE_HAS_EXCEPTIONS
-# endif /* __EXCEPTIONS && ! ACE_HAS_EXCEPTIONS */
-
-# if defined (ACE_HAS_EXCEPTIONS)
-#   define ACE_NEW_THROWS_EXCEPTIONS
-# endif /* ACE_HAS_EXCEPTIONS */
+#define ACE_NEW_THROWS_EXCEPTIONS
 
 #if (defined (i386) || defined (__i386__)) && !defined (ACE_SIZEOF_LONG_DOUBLE)
 # define ACE_SIZEOF_LONG_DOUBLE 12

@@ -1,4 +1,4 @@
-// $Id: MMAP_Memory_Pool.cpp 82513 2008-08-05 18:52:53Z parsons $
+// $Id: MMAP_Memory_Pool.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 // MMAP_Memory_Pool.cpp
 #include "ace/MMAP_Memory_Pool.h"
@@ -17,10 +17,6 @@
 #if !defined (__ACE_INLINE__)
 #include "ace/MMAP_Memory_Pool.inl"
 #endif /* __ACE_INLINE__ */
-
-ACE_RCSID(ace,
-          MMAP_Memory_Pool,
-          "$Id: MMAP_Memory_Pool.cpp 82513 2008-08-05 18:52:53Z parsons $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -44,7 +40,7 @@ ACE_MMAP_Memory_Pool::release (int destroy)
 #endif /* ACE_HAS_POSITION_INDEPENDENT_POINTERS == 1 */
 
   if (destroy)
-  this->mmap_.remove ();
+    this->mmap_.remove ();
   else
     this->mmap_.close ();
   return 0;
@@ -69,9 +65,8 @@ ACE_MMAP_Memory_Pool::sync (int flags)
   return this->mmap_.sync (len, flags);
 }
 
-// Sync <len> bytes of the memory region to the backing store starting
-// at <addr_>.
-
+/// Sync @a len bytes of the memory region to the backing store starting
+/// at <addr_>.
 int
 ACE_MMAP_Memory_Pool::sync (void *addr, size_t len, int flags)
 {
@@ -198,7 +193,7 @@ ACE_MMAP_Memory_Pool::ACE_MMAP_Memory_Pool (
     {
       if (this->signal_handler_.register_handler (SIGSEGV, this) == -1)
         ACE_ERROR ((LM_ERROR,
-                    "%p\n", this->backing_store_name_));
+                    ACE_TEXT("%p\n"), this->backing_store_name_));
     }
 #endif /* ACE_WIN32 */
 }
@@ -311,12 +306,12 @@ ACE_MMAP_Memory_Pool::map_file (size_t map_size)
     {
 #if (ACE_HAS_POSITION_INDEPENDENT_POINTERS == 1)
       this->base_addr_ = this->mmap_.addr ();
-      
+
       if (obase_addr && this->base_addr_ != obase_addr)
         {
           ACE_BASED_POINTER_REPOSITORY::instance ()->unbind (obase_addr);
         }
-        
+
       ACE_BASED_POINTER_REPOSITORY::instance ()->bind (this->base_addr_,
                                                        map_size);
 #endif /* ACE_HAS_POSITION_INDEPENDENT_POINTERS == 1 */

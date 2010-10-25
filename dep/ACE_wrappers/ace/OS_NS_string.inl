@@ -7,6 +7,12 @@
 #include "ace/OS_NS_wchar.h"
 #include "ace/os_include/os_string.h"
 
+// MaNGOS include begin
+#if defined (_MSC_VER)
+#  pragma warning(disable:4996)
+#endif
+// MaNGOS include end
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_INLINE const void *

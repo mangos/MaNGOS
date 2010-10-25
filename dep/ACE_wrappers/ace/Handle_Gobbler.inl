@@ -1,11 +1,12 @@
 // -*- C++ -*-
 //
-// $Id: Handle_Gobbler.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Handle_Gobbler.inl 90388 2010-06-02 15:27:59Z vzykov $
 
 // Since this is only included in Handle_Gobbler.h, these should be
 // inline, not ACE_INLINE.
 // FUZZ: disable check_for_inline
 
+#include "ace/ACE.h"
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_fcntl.h"
 
@@ -65,7 +66,7 @@ ACE_Handle_Gobbler::consume_handles (size_t n_handles_to_keep_available)
               break;
             }
         }
-      if (handle >= FD_SETSIZE)
+      if (handle >= static_cast<ACE_HANDLE>(FD_SETSIZE))
         break;
       this->handle_set_.set_bit (handle);
     }

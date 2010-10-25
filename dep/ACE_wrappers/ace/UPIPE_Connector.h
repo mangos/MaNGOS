@@ -4,7 +4,7 @@
 /**
  *  @file    UPIPE_Connector.h
  *
- *  $Id: UPIPE_Connector.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: UPIPE_Connector.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Gerhard Lenzer and Douglas C. Schmidt
  */
@@ -89,7 +89,7 @@ public:
                int perms = 0);
 
   /// Resets any event associations on this handle
-  int reset_new_handle (ACE_HANDLE handle);
+  bool reset_new_handle (ACE_HANDLE handle);
 
   // = Meta-type info
   typedef ACE_UPIPE_Addr PEER_ADDR;

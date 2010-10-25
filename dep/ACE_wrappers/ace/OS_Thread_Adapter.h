@@ -4,7 +4,7 @@
 /**
  *  @file OS_Thread_Adapter.h
  *
- *  $Id: OS_Thread_Adapter.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_Thread_Adapter.h 85341 2009-05-14 11:07:37Z johnnyw $
  *
  *  @author Carlos O'Ryan <coryan@uci.edu>
  */
@@ -63,7 +63,6 @@ protected:
 
   /// Ensure that this object is allocated on the heap.
   ~ACE_OS_Thread_Adapter (void);
-
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

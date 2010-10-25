@@ -4,7 +4,7 @@
 /**
  *  @file    Thread_Manager.h
  *
- *  $Id: Thread_Manager.h 82588 2008-08-11 13:37:41Z johnnyw $
+ *  $Id: Thread_Manager.h 83956 2008-12-03 07:57:38Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -328,11 +328,14 @@ private:
   /// The AT_Thread_Exit list
   ACE_At_Thread_Exit *at_exit_list_;
 
+#if 0
+/// Currently not used
   /**
    * Stores the cleanup info for a thread.
    * @note This should be generalized to be a stack of ACE_Cleanup_Info's.
    */
-  ACE_Cleanup_Info cleanup_info_;
+  ACE_Cleanup_Info_Node_List cleanup_info_;
+#endif
 
   /// Pointer to an ACE_Thread_Manager or NULL if there's no
   /// ACE_Thread_Manager>

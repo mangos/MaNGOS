@@ -4,7 +4,7 @@
 /**
  *  @file    Obstack_T.h
  *
- *  $Id: Obstack_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Obstack_T.h 88793 2010-02-01 17:50:34Z cleeland $
  *
  *  @author Doug Schmidt <schmidt@cs.wustl.edu>
  *  @author Nanbor Wang <nanbor@cs.wustl.edu>
@@ -34,12 +34,12 @@ class ACE_Allocator;
  * The implementation is similar to the GNU obstack utility,
  * which is used extensively in the GCC compiler.
  */
-template <class CHAR>
+template <class ACE_CHAR_T>
 class ACE_Obstack_T
 {
 public:
   // = Initialization and termination methods.
-  ACE_Obstack_T (size_t size = (4096 * sizeof (CHAR)) - sizeof (ACE_Obchunk),
+  ACE_Obstack_T (size_t size = (4096 * sizeof (ACE_CHAR_T)) - sizeof (ACE_Obchunk),
                  ACE_Allocator *allocator_strategy = 0);
   ~ACE_Obstack_T (void);
 
@@ -47,32 +47,32 @@ public:
   /// a new string.  Return -1 if fail, 0 if success.
   int request (size_t len);
 
-  /// Inserting a new CHAR \a c into the current building
+  /// Inserting a new ACE_CHAR_T \a c into the current building
   /// block without freezing (null terminating) the block.
   /// This function will create new chunk by checking the
   /// boundary of current Obchunk.  Return
   /// the location \a c gets inserted to, or 0 if error.
-  CHAR *grow (CHAR c);
+  ACE_CHAR_T *grow (ACE_CHAR_T c);
 
-  /// Inserting a new CHAR \a c into the current building
+  /// Inserting a new ACE_CHAR_T \a c into the current building
   /// block without freezing (null terminating) the block and without
   /// checking for out-of-bound error.
-  void grow_fast (CHAR c);
+  void grow_fast (ACE_CHAR_T c);
 
   /// Freeze the current building block by null terminating it.
   /// Return the starting address of the current building block, 0
   /// if error occurs.
-  CHAR *freeze (void);
+  ACE_CHAR_T *freeze (void);
 
   /// Copy the data into the current Obchunk and freeze the current
   /// block.  Return the starting address of the current building
   /// block, 0 if error occurs.  @a len specify the string length,
   /// not the actually data size.
-  CHAR *copy (const CHAR *data,
+  ACE_CHAR_T *copy (const ACE_CHAR_T *data,
               size_t len);
 
   /// Return the maximum @a length or @a size of a string that can be put
-  /// into this Obstack. @a size = @a length * sizeof (CHAR).
+  /// into this Obstack. @a size = @a length * sizeof (ACE_CHAR_T).
   ///
   /// @deprecated No need to use this function as you can put objects of
   /// arbitrary lengths into the obstack now.

@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_errno.h
  *
- *  $Id: OS_NS_errno.h 81286 2008-04-09 07:27:30Z johnnyw $
+ *  $Id: OS_NS_errno.h 85321 2009-05-12 08:31:31Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -58,7 +58,7 @@ namespace ACE_OS {
  * Some versions of CE don't support @c errno and some versions'
  * implementations are busted.  So we implement our own.
  * Our implementation takes up one Tls key, however, it does not
- * allocate memory fromt the heap so there's no problem with cleanin
+ * allocate memory from the heap so there's no problem with cleaning
  * up the errno when a thread exit.
  */
 class ACE_Export ACE_CE_Errno
@@ -82,8 +82,10 @@ private:
 
 #if defined (ACE_HAS_WINCE_BROKEN_ERRNO)
 #  define ACE_ERRNO_TYPE ACE_CE_Errno
+#  define ACE_ERRNO_GET ACE_CE_Errno::instance ()->operator int()
 #else
 #  define ACE_ERRNO_TYPE int
+#  define ACE_ERRNO_GET errno
 #endif /* ACE_HAS_WINCE_BROKEN_ERRNO */
 
 ACE_END_VERSIONED_NAMESPACE_DECL

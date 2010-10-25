@@ -4,7 +4,7 @@
 /**
  *  @file    Object_Manager_Base.h
  *
- *  $Id: Object_Manager_Base.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Object_Manager_Base.h 84163 2009-01-15 07:57:27Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -104,7 +104,7 @@ protected:
 
   /**
    * Flag indicating whether the ACE_Object_Manager was dynamically
-   * allocated by ACE.  (If is was dynamically allocated by the
+   * allocated by ACE. (If is was dynamically allocated by the
    * application, then the application is responsible for destroying
    * it.)
    */
@@ -205,7 +205,7 @@ public:
   static ACE_OS_Object_Manager *instance (void);
 
   /// For <ACE_OS::atexit> support.
-  int at_exit (ACE_EXIT_HOOK func);
+  int at_exit (ACE_EXIT_HOOK func, const char* name = 0);
 
 //private:
   /// Singleton instance pointer.

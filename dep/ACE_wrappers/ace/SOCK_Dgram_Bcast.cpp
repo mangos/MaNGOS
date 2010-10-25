@@ -1,4 +1,4 @@
-// $Id: SOCK_Dgram_Bcast.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: SOCK_Dgram_Bcast.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/SOCK_Dgram_Bcast.h"
 
@@ -13,7 +13,7 @@
 #include "ace/SOCK_Dgram_Bcast.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, SOCK_Dgram_Bcast, "$Id: SOCK_Dgram_Bcast.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -117,8 +117,8 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
                           SO_BROADCAST,
                           (char *) &one,
                           sizeof one) == -1)
-    ACE_ERROR_RETURN ((LM_ERROR, "%p\n",
-                      "ACE_SOCK_Dgram_Bcast::mk_broadcast: setsockopt failed"),
+    ACE_ERROR_RETURN ((LM_ERROR, ACE_TEXT("%p\n"),
+                      ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: setsockopt failed")),
                       -1);
 
 #if !defined (ACE_WIN32) && !defined(__INTERIX)
@@ -135,8 +135,8 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
   if (ACE_OS::ioctl (s,
                      SIOCGIFCONF,
                      (char *) &ifc) == -1)
-    ACE_ERROR_RETURN ((LM_ERROR, "%p\n",
-                      "ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get interface configuration)"),
+    ACE_ERROR_RETURN ((LM_ERROR, ACE_TEXT("%p\n"),
+                      ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get interface configuration)")),
                       ACE_INVALID_HANDLE);
 
   struct ifreq *ifr = ifc.ifc_req;
@@ -213,8 +213,8 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
           if (ifr->ifr_addr.sa_family != 0
               || ACE::debug ())
           ACE_DEBUG ((LM_DEBUG,
-                      "warning %p: sa_family: %d\n",
-                      "ACE_SOCK_Dgram_Bcast::mk_broadcast: Not AF_INET",
+                      ACE_TEXT("warning %p: sa_family: %d\n"),
+                      ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: Not AF_INET"),
                       ifr->ifr_addr.sa_family));
           continue;
         }
@@ -226,17 +226,17 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
                          SIOCGIFFLAGS,
                          (char *) &flags) == -1)
         {
-          ACE_ERROR ((LM_ERROR, "%p [%s]\n",
-                                                 "ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get interface flags)",
-                                                 flags.ifr_name));
+          ACE_ERROR ((LM_ERROR, ACE_TEXT("%p [%s]\n"),
+                     ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get interface flags)"),
+                     flags.ifr_name));
           continue;
         }
 
       if (ACE_BIT_ENABLED (flags.ifr_flags,
                            IFF_UP) == 0)
         {
-          ACE_ERROR ((LM_ERROR, "%p [%s]\n",
-                     "ACE_SOCK_Dgram_Bcast::mk_broadcast: Network interface is not up",
+          ACE_ERROR ((LM_ERROR, ACE_TEXT("%p [%s]\n"),
+                     ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: Network interface is not up"),
                      flags.ifr_name));
           continue;
         }
@@ -251,8 +251,8 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
           if (ACE_OS::ioctl (s,
                              SIOCGIFBRDADDR,
                              (char *) &if_req) == -1)
-            ACE_ERROR ((LM_ERROR, "%p [%s]\n",
-                       "ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get broadaddr)",
+            ACE_ERROR ((LM_ERROR, ACE_TEXT("%p [%s]\n"),
+                       ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: ioctl (get broadaddr)"),
                        flags.ifr_name));
           else
             {
@@ -268,8 +268,8 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
       else
         {
           if (host_name != 0)
-            ACE_ERROR ((LM_ERROR, "%p [%s]\n",
-                        "ACE_SOCK_Dgram_Bcast::mk_broadcast: Broadcast is not enable for this interface.",
+            ACE_ERROR ((LM_ERROR, ACE_TEXT("%p [%s]\n"),
+                        ACE_TEXT("ACE_SOCK_Dgram_Bcast::mk_broadcast: Broadcast is not enable for this interface."),
                         flags.ifr_name));
         }
     }

@@ -1,4 +1,4 @@
-// $Id: Log_Msg_NT_Event_Log.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Log_Msg_NT_Event_Log.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/config-all.h"
 
@@ -10,7 +10,7 @@
 #include "ace/OS_NS_stdio.h"
 #include "ace/OS_NS_string.h"
 
-ACE_RCSID(ace, Log_Msg_NT_Event_Log, "$Id: Log_Msg_NT_Event_Log.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -106,11 +106,16 @@ ACE_Log_Msg_NT_Event_Log::log (ACE_Log_Record &log_record)
   // CR-LF. Newline characters on their own do not appear correctly in
   // the event viewer. We allow for a doubling in the size of the msg
   // data for the worst case of all newlines.
-  const ACE_TCHAR* src_msg_data = log_record.msg_data ();
-  ACE_TCHAR msg_data [ACE_Log_Record::MAXLOGMSGLEN * 2];
+  const ACE_TCHAR *src_msg_data = log_record.msg_data ();
+  ACE_TCHAR msg_data [(ACE_Log_Record::MAXLOGMSGLEN * 2) + 1];
 
+  size_t maxlen = ACE_Log_Record::MAXLOGMSGLEN;
+  if (ACE_Log_Record::MAXLOGMSGLEN > log_record.msg_data_len ())
+    maxlen = log_record.msg_data_len ();
+
+  size_t end = 0;
   for (size_t i = 0, j = 0;
-       i < log_record.msg_data_len ();
+       i < maxlen;
        ++i)
     {
       if (src_msg_data[i] == '\n')
@@ -120,7 +125,10 @@ ACE_Log_Msg_NT_Event_Log::log (ACE_Log_Record &log_record)
         }
       else
         msg_data[j++] = src_msg_data[i];
+
+      end = j;
     }
+  msg_data[end] = '\0';
 
   // Map the ACE log record type to an event log type.
   WORD event_type;

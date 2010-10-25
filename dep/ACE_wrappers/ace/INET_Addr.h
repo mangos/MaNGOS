@@ -4,7 +4,7 @@
 /**
  *  @file    INET_Addr.h
  *
- *  $Id: INET_Addr.h 81799 2008-05-28 18:13:58Z jtc $
+ *  $Id: INET_Addr.h 91064 2010-07-12 10:11:24Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -64,23 +64,23 @@ public:
 
   /**
    * Creates an ACE_INET_Addr from a @a port_number and an Internet
-   * <ip_addr>.  This method assumes that @a port_number and <ip_addr>
+   * @a ip_addr.  This method assumes that @a port_number and @a ip_addr
    * are in host byte order. If you have addressing information in
    * network byte order, @see set().
    */
   explicit ACE_INET_Addr (u_short port_number,
                           ACE_UINT32 ip_addr = INADDR_ANY);
 
-  /// Uses <getservbyname> to create an ACE_INET_Addr from a
-  /// <port_name>, the remote @a host_name, and the @a protocol.
+  /// Uses getservbyname() to create an ACE_INET_Addr from a
+  /// @a port_name, the remote @a host_name, and the @a protocol.
   ACE_INET_Addr (const char port_name[],
                  const char host_name[],
                  const char protocol[] = "tcp");
 
   /**
-   * Uses <getservbyname> to create an ACE_INET_Addr from a
-   * <port_name>, an Internet <ip_addr>, and the @a protocol.  This
-   * method assumes that <ip_addr> is in host byte order.
+   * Uses getservbyname() to create an ACE_INET_Addr from a
+   * @a port_name, an Internet @a ip_addr, and the @a protocol.  This
+   * method assumes that @a ip_addr is in host byte order.
    */
   ACE_INET_Addr (const char port_name[],
                  ACE_UINT32 ip_addr,
@@ -149,8 +149,8 @@ public:
 
   /**
    * Uses <getservbyname> to initialize an ACE_INET_Addr from a
-   * <port_name>, an <ip_addr>, and the @a protocol.  This assumes that
-   * <ip_addr> is already in network byte order.
+   * <port_name>, an @a ip_addr, and the @a protocol.  This assumes that
+   * @a ip_addr is already in network byte order.
    */
   int set (const char port_name[],
            ACE_UINT32 ip_addr,
@@ -198,11 +198,11 @@ public:
 
   /**
    * Transform the current ACE_INET_Addr address into string format.
-   * If <ipaddr_format> is non-0 this produces "ip-number:port-number"
-   * (e.g., "128.252.166.57:1234"), whereas if <ipaddr_format> is 0
+   * If @a ipaddr_format is ttrue this produces "ip-number:port-number"
+   * (e.g., "128.252.166.57:1234"), whereas if @a ipaddr_format is false
    * this produces "ip-name:port-number" (e.g.,
    * "tango.cs.wustl.edu:1234").  Returns -1 if the @a size of the
-   * <buffer> is too small, else 0.
+   * @a buffer is too small, else 0.
    */
   virtual int addr_to_string (ACE_TCHAR buffer[],
                               size_t size,
@@ -237,12 +237,12 @@ public:
 
   /**
    * Sets the address without affecting the port number.  If
-   * @a encode is enabled then <ip_addr> is converted into network
+   * @a encode is enabled then @a ip_addr is converted into network
    * byte order, otherwise it is assumed to be in network byte order
    * already and are passed straight through.  The size of the address
    * is specified in the @a len parameter.
-   * If <map> is non-zero, IPv6 support has been compiled in, and
-   * <ip_addr> is an IPv4 address, then this address is set to the IPv4-mapped
+   * If @a map is non-zero, IPv6 support has been compiled in, and
+   * @a ip_addr is an IPv4 address, then this address is set to the IPv4-mapped
    * IPv6 address of it.
    */
   int set_address (const char *ip_addr,
@@ -263,9 +263,9 @@ public:
 
   /**
    * Return the character representation of the name of the host,
-   * storing it in the <hostname> (which is assumed to be
-   * <hostnamelen> bytes long).  This version is reentrant.  If
-   * <hostnamelen> is greater than 0 then <hostname> will be
+   * storing it in the @a hostname (which is assumed to be
+   * @a hostnamelen bytes long).  This version is reentrant.  If
+   * @a hostnamelen is greater than 0 then @a hostname will be
    * NUL-terminated even if -1 is returned.
    */
   int get_host_name (char hostname[],

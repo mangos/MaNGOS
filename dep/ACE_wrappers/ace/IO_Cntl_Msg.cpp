@@ -1,4 +1,4 @@
-// $Id: IO_Cntl_Msg.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: IO_Cntl_Msg.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/IO_Cntl_Msg.h"
 
@@ -6,7 +6,7 @@
 #include "ace/IO_Cntl_Msg.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, IO_Cntl_Msg, "$Id: IO_Cntl_Msg.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if 0
 // This is not meant to be used, it's just a place holder...

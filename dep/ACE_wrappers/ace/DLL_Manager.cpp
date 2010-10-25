@@ -1,4 +1,4 @@
-// $Id: DLL_Manager.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: DLL_Manager.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/DLL_Manager.h"
 
@@ -14,13 +14,7 @@
 #include "ace/OS_NS_dlfcn.h"
 #include "ace/OS_NS_string.h"
 
-ACE_RCSID (ace,
-           DLL_Manager,
-           "DLL_Manager.cpp,v 4.23 2003/11/05 23:30:46 shuston Exp")
-
-/******************************************************************/
-
-  ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 sig_atomic_t ACE_DLL_Handle::open_called_ = 0;
 
@@ -61,7 +55,7 @@ ACE_DLL_Handle::open (const ACE_TCHAR *dll_name,
         {
           if (ACE::debug ())
             ACE_ERROR ((LM_ERROR,
-                        ACE_TEXT ("(%P|%t) DLL_Handle::open: error, ")
+                        ACE_TEXT ("ACE (%P|%t) DLL_Handle::open: error, ")
                         ACE_TEXT ("tried to reopen %s with name %s\n"),
                         this->dll_name_,
                         dll_name));
@@ -151,9 +145,9 @@ ACE_DLL_Handle::open (const ACE_TCHAR *dll_name,
                 ACE_ERROR ((LM_ERROR,
                             ACE_TEXT ("ACE (%P|%t) DLL_Handle::open ")
                             ACE_TEXT ("(\'%s\') failed, errno=")
-                            ACE_TEXT ("%d: %s\n"),
+                            ACE_TEXT ("%d: <%s>\n"),
                             name->c_str (),
-                            errno,
+                            ACE_ERRNO_GET,
                             this->error ()->c_str ()));
 
 #if defined (AIX)
@@ -177,9 +171,9 @@ ACE_DLL_Handle::open (const ACE_TCHAR *dll_name,
                                   ACE_TEXT ("(\"%s\", 0x%x) -> %s: %s\n"),
                                   aix_pathname,
                                   open_mode,
-                                  ACE_TEXT ((this->handle_ != ACE_SHLIB_INVALID_HANDLE)
-                                                ? "succeeded"
-                                                : "failed"),
+                                  (this->handle_ != ACE_SHLIB_INVALID_HANDLE
+                                                ? ACE_TEXT ("succeeded")
+                                                : ACE_TEXT ("failed")),
                                   this->error()->c_str()));
                     }
 
@@ -370,7 +364,7 @@ ACE_DLL_Handle::get_handle (int become_owner)
 
   if (ACE::debug ())
     ACE_DEBUG ((LM_DEBUG,
-                ACE_TEXT ("ACE (%P|%t) ACE_DLL_Handle::get_handle: ")
+                ACE_TEXT ("ACE (%P|%t) DLL_Handle::get_handle: ")
                 ACE_TEXT ("post call: handle %s, refcount %d\n"),
                 this->handle_ == ACE_SHLIB_INVALID_HANDLE ?
                 ACE_TEXT ("invalid") : ACE_TEXT ("valid"),
@@ -437,7 +431,7 @@ ACE_DLL_Handle::get_dll_names (const ACE_TCHAR *dll_name,
   try_names.size (0);
   if ((try_names.max_size () - try_names.size ()) < 5)
     try_names.max_size (try_names.max_size () + 5);
-#if defined (ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
   ACE_TString decorator (ACE_LD_DECORATOR_STR);
 #endif
   ACE_TString suffix (ACE_DLL_SUFFIX);
@@ -446,7 +440,7 @@ ACE_DLL_Handle::get_dll_names (const ACE_TCHAR *dll_name,
   for (size_t i = 0; i < 5 && try_names.size () < try_names.max_size (); ++i)
     {
       ACE_TString try_this;
-      size_t j = try_names.size ();
+      size_t const j = try_names.size ();
       switch (i)
         {
         case 0:        // Name + decorator + suffix
@@ -455,7 +449,7 @@ ACE_DLL_Handle::get_dll_names (const ACE_TCHAR *dll_name,
         case 3:        // Prefix + name + suffix
           if (
               base_suffix.length () > 0
-#if !(defined(ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK))
+#if !(defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK))
               || (i == 1 || i == 3)    // No decorator desired; skip
 #endif
               )
@@ -468,7 +462,7 @@ ACE_DLL_Handle::get_dll_names (const ACE_TCHAR *dll_name,
             try_this += base_suffix;
           else
             {
-#if defined (ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
               try_this += decorator;
 #endif
               try_this += suffix;
@@ -537,7 +531,7 @@ ACE_DLL_Manager::ACE_DLL_Manager (int size)
 
   if (this->open (size) != 0 && ACE::debug ())
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("ACE_DLL_Manager ctor failed to allocate ")
+                ACE_TEXT ("ACE (%P|%t) DLL_Manager ctor failed to allocate ")
                 ACE_TEXT ("handle_vector_.\n")));
 }
 
@@ -547,7 +541,7 @@ ACE_DLL_Manager::~ACE_DLL_Manager (void)
 
   if (this->close () != 0 && ACE::debug ())
     ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("ACE_DLL_Manager dtor failed to close ")
+                ACE_TEXT ("ACE (%P|%t) DLL_Manager dtor failed to close ")
                 ACE_TEXT ("properly.\n")));
 }
 
@@ -583,7 +577,7 @@ ACE_DLL_Manager::open_dll (const ACE_TCHAR *dll_name,
           // Error while opening dll. Free temp handle
           if (ACE::debug ())
             ACE_ERROR ((LM_ERROR,
-                        ACE_TEXT ("ACE_DLL_Manager::open_dll: Could not ")
+                        ACE_TEXT ("ACE (%P|%t) DLL_Manager::open_dll: Could not ")
                         ACE_TEXT ("open dll %s.\n"),
                         dll_name));
 
@@ -766,7 +760,7 @@ ACE_DLL_Manager::unload_dll (ACE_DLL_Handle *dll_handle, int force_unload)
         {
           if (ACE::debug ())
             ACE_ERROR ((LM_ERROR,
-                        ACE_TEXT ("ACE_DLL_Manager::unload error.\n")));
+                        ACE_TEXT ("ACE (%P|%t) DLL_Manager::unload error.\n")));
 
           return -1;
         }
@@ -775,7 +769,7 @@ ACE_DLL_Manager::unload_dll (ACE_DLL_Handle *dll_handle, int force_unload)
     {
       if (ACE::debug ())
         ACE_ERROR ((LM_ERROR,
-                    ACE_TEXT ("ACE_DLL_Manager::unload_dll called with ")
+                    ACE_TEXT ("ACE (%P|%t) DLL_Manager::unload_dll called with ")
                     ACE_TEXT ("null pointer.\n")));
 
       return -1;

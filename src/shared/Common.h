@@ -98,7 +98,9 @@
 #include <ace/OS_NS_arpa_inet.h>
 
 #if PLATFORM == PLATFORM_WINDOWS
-#  define FD_SETSIZE 4096
+#  if !defined (FD_SETSIZE)
+#    define FD_SETSIZE 4096
+#  endif
 #  include <ace/config-all.h>
 // XP winver - needed to compile with standard leak check in MemoryLeaks.h
 // uncomment later if needed

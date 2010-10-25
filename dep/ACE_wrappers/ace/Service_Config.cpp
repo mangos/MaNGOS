@@ -1,4 +1,4 @@
-// $Id: Service_Config.cpp 81756 2008-05-22 09:47:33Z johnnyw $
+// $Id: Service_Config.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/Service_Config.h"
 
@@ -24,9 +24,6 @@
 #include "ace/Log_Msg.h"
 #include "ace/ACE.h"
 
-ACE_RCSID (ace,
-           Service_Config,
-           "$Id: Service_Config.cpp 81756 2008-05-22 09:47:33Z johnnyw $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -47,7 +44,7 @@ ACE_Threading_Helper<ACE_Thread_Mutex>::ACE_Threading_Helper ()
     {
       ACE_ERROR ((LM_ERROR,
                   ACE_TEXT ("(%P|%t) Failed to create thread key: %p\n"),
-                  ""));
+                  ACE_TEXT ("")));
     }
 }
 
@@ -56,8 +53,8 @@ ACE_Threading_Helper<ACE_Thread_Mutex>::set (void* p)
 {
   if (ACE_Thread::setspecific (key_, p) == -1)
     ACE_ERROR ((LM_ERROR,
-                       ACE_TEXT ("(%P|%t) Service Config failed to set thread key value: %p\n"),
-                       ""));
+               ACE_TEXT ("(%P|%t) Service Config failed to set thread key value: %p\n"),
+               ACE_TEXT("")));
 }
 
 void*
@@ -67,7 +64,7 @@ ACE_Threading_Helper<ACE_Thread_Mutex>::get (void)
   if (ACE_Thread::getspecific (key_, &temp) == -1)
     ACE_ERROR_RETURN ((LM_ERROR,
                        ACE_TEXT ("(%P|%t) Service Config failed to get thread key value: %p\n"),
-                       ""),
+                       ACE_TEXT("")),
                       0);
   return temp;
 }
@@ -110,7 +107,7 @@ ACE_Service_Config_Guard::ACE_Service_Config_Guard (ACE_Service_Gestalt * psg)
 {
   if (ACE::debug ())
     ACE_DEBUG ((LM_DEBUG,
-                ACE_TEXT ("ACE (%P|%t) SCG:<ctor=%@>")
+                ACE_TEXT ("ACE (%P|%t) - SCG:<ctor=%@>")
                 ACE_TEXT (" - config=%@ repo=%@ superceded by repo=%@\n"),
                 this,
                 this->saved_.get (),
@@ -183,11 +180,6 @@ ACE_Service_Config::parse_args_i (int argc, ACE_TCHAR *argv[])
                       ACE_Get_Opt::RETURN_IN_ORDER);
   //FUZZ: enable check_for_lack_ACE_OS
 
-  // Keep a list of all unknown arguments, begin with the
-  // executable's name
-  ACE_ARGV superargv;
-  superargv.add (argv[0]);
-
   //FUZZ: disable check_for_lack_ACE_OS
   for (int c; (c = getopt ()) != -1; )
   //FUZZ: enable check_for_lack_ACE_OS
@@ -216,19 +208,11 @@ ACE_Service_Config::parse_args_i (int argc, ACE_TCHAR *argv[])
 #endif /* ACE_LACKS_UNIX_SIGNALS */
           break;
         }
-      default:
-        superargv.add (argv[getopt.opt_ind () - 1], true);
+      default:; // unknown arguments are benign
+
       }
 
-  // Collect any argumets that were left
-  for (int c = getopt.opt_ind (); c < argc; ++c)
-    superargv.add (argv[c-1], true);
-
-  bool ignore_default_svc_conf_file = false;
-  return instance_->parse_args_i (superargv.argc (),
-                                  superargv.argv (),
-                                  ignore_default_svc_conf_file);
-
+  return 0;
 } /* parse_args_i () */
 
 
@@ -286,48 +270,52 @@ ACE_Service_Config::open_i (const ACE_TCHAR program_name[],
   const ACE_TCHAR *key = logger_key;
 
   if (key == 0 || ACE_OS::strcmp (key, ACE_DEFAULT_LOGGER_KEY) == 0)
-    // Only use the static <logger_key_> if the caller doesn't
-    // override it in the parameter list or if the key supplied is
-    // equal to the default static logger key.
-    key = ACE_Service_Config::current()->logger_key_;
+    {
+      // Only use the static <logger_key_> if the caller doesn't
+      // override it in the parameter list or if the key supplied is
+      // equal to the default static logger key.
+      key = ACE_Service_Config::current()->logger_key_;
+    }
   else
-    ACE_SET_BITS (flags, ACE_Log_Msg::LOGGER);
+    {
+      ACE_SET_BITS (flags, ACE_Log_Msg::LOGGER);
+    }
 
   if (log_msg->open (program_name,
                      flags,
                      key) == -1)
     return -1;
 
-    if (ACE::debug ())
-      ACE_DEBUG ((LM_STARTUP,
-                  ACE_TEXT ("starting up daemon %n\n")));
+  if (ACE::debug ())
+    ACE_DEBUG ((LM_STARTUP,
+                ACE_TEXT ("starting up daemon %n\n")));
 
-    // Initialize the Service Repository (this will still work if
-    // user forgets to define an object of type ACE_Service_Config).
-    ACE_Service_Repository::instance (ACE_Service_Gestalt::MAX_SERVICES);
+  // Initialize the Service Repository (this will still work if
+  // user forgets to define an object of type ACE_Service_Config).
+  ACE_Service_Repository::instance (ACE_Service_Gestalt::MAX_SERVICES);
 
-    // Initialize the ACE_Reactor (the ACE_Reactor should be the
-    // same size as the ACE_Service_Repository).
-    ACE_Reactor::instance ();
+  // Initialize the ACE_Reactor (the ACE_Reactor should be the
+  // same size as the ACE_Service_Repository).
+  ACE_Reactor::instance ();
 
-    // There's no point in dealing with this on NT since it doesn't
-    // really support signals very well...
+  // There's no point in dealing with this on NT since it doesn't
+  // really support signals very well...
 #if !defined (ACE_LACKS_UNIX_SIGNALS)
-    // Only attempt to register a signal handler for positive
-    // signal numbers.
-    if (ACE_Service_Config::signum_ > 0)
-      {
-        ACE_Sig_Set ss;
-        ss.sig_add (ACE_Service_Config::signum_);
-        if ((ACE_Reactor::instance () != 0) &&
-            (ACE_Reactor::instance ()->register_handler
-             (ss, ACE_Service_Config::signal_handler_) == -1))
-          ACE_ERROR ((LM_ERROR,
-                      ACE_TEXT ("can't register signal handler\n")));
-      }
+  // Only attempt to register a signal handler for positive
+  // signal numbers.
+  if (ACE_Service_Config::signum_ > 0)
+    {
+      ACE_Sig_Set ss;
+      ss.sig_add (ACE_Service_Config::signum_);
+      if ((ACE_Reactor::instance () != 0) &&
+          (ACE_Reactor::instance ()->register_handler
+           (ss, ACE_Service_Config::signal_handler_) == -1))
+        ACE_ERROR ((LM_ERROR,
+                    ACE_TEXT ("can't register signal handler\n")));
+    }
 #endif /* ACE_LACKS_UNIX_SIGNALS */
 
-    return 0;
+  return 0;
 }
 
 /// Return the global configuration instance. Always returns the same

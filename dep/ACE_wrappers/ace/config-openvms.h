@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-openvms.h 81935 2008-06-12 22:01:53Z jtc $
+// $Id: config-openvms.h 91285 2010-08-05 08:29:30Z johnnyw $
 
 // The following configuration file is designed to work for OpenVMS 7.3-2
 
@@ -35,7 +35,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#undef clearerr
 #undef memset
 #undef memcpy
 #undef memmove
@@ -107,7 +106,6 @@
 #define ACE_HAS_2_PARAM_ASCTIME_R_AND_CTIME_R 1
 #define ACE_HAS_3_PARAM_WCSTOK 1
 #define ACE_HAS_SIGSUSPEND 1
-#define ACE_HAS_SIG_MACROS 1
 #define ACE_HAS_SIGWAIT 1
 #define ACE_HAS_SIGTIMEDWAIT 1
 
@@ -115,7 +113,6 @@
 #define ACE_HAS_SIGISMEMBER_BUG
 #define ACE_HAS_STRNLEN 1
 #define ACE_HAS_STREAMS 1
-#define ACE_HAS_STRERROR 1
 #define ACE_HAS_UALARM 1
 #define ACE_HAS_VOIDPTR_MMAP 1
 #define ACE_HAS_VOIDPTR_SOCKOPT 1
@@ -129,6 +126,7 @@
 #define ACE_LACKS_SETSCHED
 #define ACE_LACKS_SYSCALL 1
 #define ACE_LACKS_WCSTOULL 1
+#define ACE_LACKS_WCSTOLL
 
 /* (missing) standard data types */
 #define ACE_LACKS_CONST_TIMESPEC_PTR 1
@@ -172,7 +170,6 @@
 
 #define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES 1
 #define ACE_HAS_CPLUSPLUS_HEADERS 1
-#define ACE_HAS_EXCEPTIONS 1
 #define ACE_LACKS_LINEBUFFERED_STREAMBUF 1
 
 #define ACE_HAS_GPERF 1
@@ -191,5 +188,10 @@
 #define ACE_LACKS_UNIX_DOMAIN_SOCKETS 1
 #define ACE_LACKS_UNIX_SYSLOG 1
 #define ACE_LACKS_ALPHASORT 1
+#define ACE_LACKS_ISCTYPE
+#define ACE_LACKS_ISBLANK
+
+#define ACE_LACKS_SETENV
+#define ACE_LACKS_UNSETENV
 
 #endif

@@ -1,4 +1,4 @@
-// $Id: SOCK_Connector.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: SOCK_Connector.cpp 91287 2010-08-05 10:30:49Z johnnyw $
 
 #include "ace/SOCK_Connector.h"
 #include "ace/INET_Addr.h"
@@ -14,8 +14,6 @@
 #if !defined (__ACE_INLINE__)
 #include "ace/SOCK_Connector.inl"
 #endif /* __ACE_INLINE__ */
-
-ACE_RCSID(ace, SOCK_Connector, "$Id: SOCK_Connector.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -97,8 +95,7 @@ ACE_SOCK_Connector::shared_connect_start (ACE_SOCK_Stream &new_stream,
     }
 
   // Enable non-blocking, if required.
-  if (timeout != 0
-      && new_stream.enable (ACE_NONBLOCK) == -1)
+  if (timeout != 0 && new_stream.enable (ACE_NONBLOCK) == -1)
     return -1;
   else
     return 0;
@@ -119,8 +116,7 @@ ACE_SOCK_Connector::shared_connect_finish (ACE_SOCK_Stream &new_stream,
       if (error == EINPROGRESS || error == EWOULDBLOCK)
         {
           // This expression checks if we were polling.
-          if (timeout->sec () == 0
-              && timeout->usec () == 0)
+          if (*timeout == ACE_Time_Value::zero)
             {
 #if defined(ACE_WIN32)
               // In order to detect when the socket that has been
@@ -164,10 +160,18 @@ ACE_SOCK_Connector::shared_connect_finish (ACE_SOCK_Stream &new_stream,
   // EISCONN is treated specially since this routine may be used to
   // check if we are already connected.
   if (result != -1 || error == EISCONN)
-    // Start out with non-blocking disabled on the <new_stream>.
-    new_stream.disable (ACE_NONBLOCK);
+    {
+      // Start out with non-blocking disabled on the new_stream.
+      result = new_stream.disable (ACE_NONBLOCK);
+      if (result == -1)
+        {
+          new_stream.close ();
+        }
+    }
   else if (!(error == EWOULDBLOCK || error == ETIMEDOUT))
-    new_stream.close ();
+    {
+      new_stream.close ();
+    }
 
   return result;
 }

@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Reactor.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Reactor.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 #include "ace/Reactor_Impl.h"
 
@@ -143,7 +143,7 @@ ACE_Reactor::current_info (ACE_HANDLE handle, size_t &size)
 
 ACE_INLINE int
 ACE_Reactor::open (size_t size,
-                   int restart,
+                   bool restart,
                    ACE_Sig_Handler *signal_handler,
                    ACE_Timer_Queue *timer_queue)
 {
@@ -410,14 +410,14 @@ ACE_Reactor::owner (ACE_thread_t *owner)
   return this->implementation ()->owner (owner);
 }
 
-ACE_INLINE int
+ACE_INLINE bool
 ACE_Reactor::restart (void)
 {
   return this->implementation ()->restart ();
 }
 
-ACE_INLINE int
-ACE_Reactor::restart (int r)
+ACE_INLINE bool
+ACE_Reactor::restart (bool r)
 {
   return this->implementation ()->restart (r);
 }
@@ -479,7 +479,7 @@ ACE_Reactor::size (void) const
   return this->implementation ()->size ();
 }
 
-ACE_INLINE int
+ACE_INLINE bool
 ACE_Reactor::uses_event_associations (void)
 {
   return this->implementation ()->uses_event_associations ();

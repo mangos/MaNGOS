@@ -1,4 +1,4 @@
-// $Id: Svc_Handler.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Svc_Handler.cpp 89432 2010-03-10 10:34:51Z vzykov $
 
 #ifndef ACE_SVC_HANDLER_CPP
 #define ACE_SVC_HANDLER_CPP
@@ -302,7 +302,11 @@ ACE_Svc_Handler<PR_ST_2, ACE_SYNCH_USE>::handle_close (ACE_HANDLE,
 {
   ACE_TRACE ("ACE_Svc_Handler<PR_ST_2, ACE_SYNCH_USE>::handle_close");
 
-  this->destroy ();
+  if (this->reference_counting_policy ().value () ==
+      ACE_Event_Handler::Reference_Counting_Policy::DISABLED)
+    {
+      this->destroy ();
+    }
 
   return 0;
 }

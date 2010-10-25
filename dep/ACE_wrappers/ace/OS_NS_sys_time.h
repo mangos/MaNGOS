@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_sys_time.h
  *
- *  $Id: OS_NS_sys_time.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_sys_time.h 87823 2009-11-30 12:38:34Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -37,22 +37,8 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE_OS
 {
-#if defined (ACE_WIN32) && defined (_WIN32_WCE)
-// Something is a bit brain-damaged here and I'm not sure what... this code
-// compiled before the OS reorg for ACE 5.4. Since then it hasn't - eVC
-// complains that the operators that return ACE_Time_Value are C-linkage
-// functions that can't return a C++ class. The only way I've found to
-// defeat this is to wrap the whole class in extern "C++".
-//    - Steve Huston, 23-Aug-2004
-extern "C++" {
-#endif
-
   ACE_NAMESPACE_INLINE_FUNCTION
   ACE_Time_Value gettimeofday (void);
-
-#if defined (ACE_WIN32) && defined (_WIN32_WCE)
-}
-#endif
 } /* namespace ACE_OS */
 
 ACE_END_VERSIONED_NAMESPACE_DECL

@@ -3,7 +3,7 @@
 /**
  * @file Condition_Recursive_Thread_Mutex.cpp
  *
- * $Id: Condition_Recursive_Thread_Mutex.cpp 80826 2008-03-04 14:51:23Z wotte $
+ * $Id: Condition_Recursive_Thread_Mutex.cpp 89127 2010-02-22 19:58:18Z schmidt $
  *
  * Originally in Synch.cpp
  *
@@ -63,7 +63,7 @@ ACE_Condition<ACE_Recursive_Thread_Mutex>::wait (ACE_Recursive_Thread_Mutex &mut
                                                  const ACE_Time_Value *abstime)
 {
   ACE_recursive_mutex_state mutex_state_holder;
-  ACE_recursive_thread_mutex_t &recursive_mutex = mutex.mutex ();
+  ACE_recursive_thread_mutex_t &recursive_mutex = mutex.lock ();
 
   if (ACE_OS::recursive_mutex_cond_unlock (&recursive_mutex,
                                            mutex_state_holder) == -1)
@@ -78,7 +78,7 @@ ACE_Condition<ACE_Recursive_Thread_Mutex>::wait (ACE_Recursive_Thread_Mutex &mut
   // returned with the lock held, but waiters primed and waiting to be
   // released. At cond_wait below, the mutex will be released.
   // On return, it will be reacquired.
-  const int result = abstime == 0
+  int const result = abstime == 0
     ? ACE_OS::cond_wait (&this->cond_,
                          &mutex.get_nesting_mutex ())
     : ACE_OS::cond_timedwait (&this->cond_,

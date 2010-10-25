@@ -8,7 +8,7 @@
  * Integrity RTOS with SCA from Green Hills Software
  * http://www.ghs.com/products/rtos/integrity.html
  *
- * $Id: config-integritySCA.h 81935 2008-06-12 22:01:53Z jtc $
+ * $Id: config-integritySCA.h 91285 2010-08-05 08:29:30Z johnnyw $
  */
 
 #define ghs
@@ -26,9 +26,6 @@
 #define ACE_LACKS_GETEGID
 #define ACE_LACKS_GETGID
 
-#ifndef ACE_HAS_EXCEPTIONS
-  #define ACE_HAS_EXCEPTIONS
-#endif
 #define ACE_NEW_THROWS_EXCEPTIONS
 #define ACE_HAS_STANDARD_CPP_LIBRARY 1
 #define ACE_TEMPLATES_REQUIRE_SOURCE 1
@@ -47,8 +44,7 @@
 
 /***** ANSI defines *****/
 #define ACE_LACKS_TEMPNAM /* believe it or not, this is ANSI C */
-#define ACE_HAS_STRERROR
-
+#define ACE_LACKS_PUTENV_PROTOTYPE
 
 #define ACE_LACKS_SENDMSG
 
@@ -104,12 +100,9 @@
 #define ACE_LACKS_RWLOCK_T
 #define ACE_LACKS_SEMBUF_T
 #define ACE_LACKS_UNIX_DOMAIN_SOCKETS
-#define ACE_LACKS_USER
-#define ACE_LACKS_FILE_FCNTL
 #define ACE_LACKS_FCNTL
 #define ACE_LACKS_UMASK
 #define ACE_LACKS_SEEK
-#define ACE_LACKS_SHARED_MEMORY
 #define ACE_LACKS_MSYNC
 #define ACE_LACKS_PID_STUFF
 #define ACE_LACKS_NETDB_REENTRANT_FUNCTIONS

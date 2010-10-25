@@ -4,7 +4,7 @@
 /**
  * @file Monitor_Admin.h
  *
- * $Id: Monitor_Admin.h 81753 2008-05-21 19:02:47Z parsons $
+ * $Id: Monitor_Admin.h 85297 2009-05-07 01:40:41Z parsons $
  *
  * @author Jeff Parsons <j.parsons@vanderbilt.edu>
  */
@@ -50,10 +50,10 @@ namespace ACE
      */
     class Monitor_Point_Auto_Updater : public ACE_Event_Handler
     {
-      public:
-        /// Override of ACE base class method.
-        virtual int handle_timeout (const ACE_Time_Value& interval,
-                                    const void* monitor_point);
+    public:
+      /// Override of ACE base class method.
+      virtual int handle_timeout (const ACE_Time_Value& interval,
+                                  const void* monitor_point);
     };
 
     /**

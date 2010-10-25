@@ -4,7 +4,7 @@
 /**
  *  @file    Pipe.h
  *
- *  $Id: Pipe.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Pipe.h 87240 2009-10-27 15:54:10Z schmidt $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -122,7 +122,7 @@ public:
    * This is an interface to ::readv, that doesn't use the struct
    * iovec explicitly.  The ... can be passed as an arbitrary number
    * of (char *ptr, int len) tuples.  However, the count N is the
-   * *total* number of trailing arguments, *not* a couple of the
+   * *total* number of trailing arguments, *not* a count of the
    * number of tuple pairs!
    */
   ssize_t recv (size_t n, ...) const;

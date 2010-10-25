@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Guard_T.inl 82508 2008-08-05 13:52:48Z johnnyw $
+// $Id: Guard_T.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 #include "ace/RW_Thread_Mutex.h"
 
@@ -65,7 +65,7 @@ ACE_Guard<ACE_LOCK>::~ACE_Guard (void)
   this->release ();
 }
 
-template <class ACE_LOCK> ACE_INLINE int
+template <class ACE_LOCK> ACE_INLINE bool
 ACE_Guard<ACE_LOCK>::locked (void) const
 {
   return this->owner_ != -1;

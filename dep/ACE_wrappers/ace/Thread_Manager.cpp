@@ -1,4 +1,4 @@
-// $Id: Thread_Manager.cpp 82600 2008-08-12 08:04:24Z johnnyw $
+// $Id: Thread_Manager.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/TSS_T.h"
 #include "ace/Thread_Manager.h"
@@ -14,10 +14,6 @@
 #if !defined (__ACE_INLINE__)
 #include "ace/Thread_Manager.inl"
 #endif /* __ACE_INLINE__ */
-
-ACE_RCSID (ace,
-           Thread_Manager,
-           "$Id: Thread_Manager.cpp 82600 2008-08-12 08:04:24Z johnnyw $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -252,7 +248,6 @@ ACE_Thread_Descriptor::dump (void) const
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nthr_handle_ = %d"), this->thr_handle_));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\ngrp_id_ = %d"), this->grp_id_));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nthr_state_ = %d"), this->thr_state_));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\ncleanup_info_.cleanup_hook_ = %x"), this->cleanup_info_.cleanup_hook_));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nflags_ = %x\n"), this->flags_));
 
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
@@ -628,9 +623,9 @@ ACE_Thread_Manager::spawn_i (ACE_THR_FUNC func,
   // @@ How are thread handles implemented on AIX?  Do they
   // also need to be duplicated?
   if (t_handle != 0)
-# if defined (ACE_HAS_WINCE)
+# if defined (ACE_LACKS_DUPLICATEHANDLE)
     *t_handle = thr_handle;
-# else  /* ! ACE_HAS_WINCE */
+# else  /* ! ACE_LACKS_DUP */
   (void) ::DuplicateHandle (::GetCurrentProcess (),
                             thr_handle,
                             ::GetCurrentProcess (),
@@ -638,7 +633,7 @@ ACE_Thread_Manager::spawn_i (ACE_THR_FUNC func,
                             0,
                             TRUE,
                             DUPLICATE_SAME_ACCESS);
-# endif /* ! ACE_HAS_WINCE */
+# endif /* ! ACE_LACKS_DUP */
 #else  /* ! ACE_HAS_WTHREADS */
   if (t_handle != 0)
     *t_handle = thr_handle;
@@ -898,14 +893,17 @@ ACE_Thread_Manager::run_thread_exit_hooks (int i)
   // generalized to support an arbitrary number of hooks.
 
   ACE_Thread_Descriptor *td = this->thread_desc_self ();
-  if (td != 0 && td->cleanup_info.cleanup_hook_ != 0)
+  for (ACE_Cleanup_Info_Node *iter = td->cleanup_info_->pop_front ();
+       iter != 0;
+       iter = cleanup_info_->pop_front ())
     {
-      (*td->cleanup_info_.cleanup_hook_)
-        (td->cleanup_info_.object_,
-         td->cleanup_info_.param_);
-
-      td->cleanup_info_.cleanup_hook_ = 0;
+      if (iter->cleanup_hook () != 0)
+        {
+          (*iter->cleanup_hook ()) (iter->object (), iter->param ());
+        }
+      delete iter;
     }
+
   ACE_UNUSED_ARG (i);
 #else
   ACE_UNUSED_ARG (i);
@@ -1066,7 +1064,7 @@ ACE_Thread_Manager::kill_thr (ACE_Thread_Descriptor *td, int signum)
       errno = ENOENT; \
       return -1; \
     } \
-  int result = OP (ptr, ARG); \
+  int const result = OP (ptr, ARG); \
   ACE_Errno_Guard error (errno); \
   while (! this->thr_to_be_removed_.is_empty ()) { \
     ACE_Thread_Descriptor * td = 0; \
@@ -1410,7 +1408,7 @@ ACE_Thread_Manager::join (ACE_thread_t tid, ACE_THR_FUNC_RETURN *status)
   ACE_TRACE ("ACE_Thread_Manager::join");
 
   bool found = false;
-  ACE_Thread_Descriptor tdb;
+  ACE_Thread_Descriptor_Base tdb;
 
   {
     ACE_MT (ACE_GUARD_RETURN (ACE_Thread_Mutex, ace_mon, this->lock_, -1));
@@ -1717,7 +1715,7 @@ ACE_Thread_Manager::apply_task (ACE_Task_Base *task,
       // Save/restore errno.
       ACE_Errno_Guard error (errno);
 
-      for (ACE_Thread_Descriptor *td;
+      for (ACE_Thread_Descriptor *td = 0;
            this->thr_to_be_removed_.dequeue_head (td) != -1;
            )
         this->remove_thr (td, 1);

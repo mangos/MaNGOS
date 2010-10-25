@@ -6,7 +6,7 @@
  *
  *  implementation-defined constants
  *
- *  $Id: os_limits.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_limits.h 84972 2009-03-25 19:09:06Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -102,7 +102,7 @@ extern "C"
 #  define ACE_IOV_MAX IOV_MAX
 #endif /* ACE_IOV_MAX */
 
-#if defined (ACE_VXWORKS) && ((ACE_VXWORKS >= 0x620) && (ACE_VXWORKS <= 0x660)) && !defined (__RTP__)
+#if defined (ACE_VXWORKS) && ((ACE_VXWORKS >= 0x620) && (ACE_VXWORKS <= 0x670)) && !defined (__RTP__)
 #  if defined (PIPE_BUF) && (PIPE_BUF == -1)
 #    undef PIPE_BUF
 #  endif

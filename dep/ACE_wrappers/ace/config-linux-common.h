@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-linux-common.h 82516 2008-08-05 19:22:59Z shuston $
+// $Id: config-linux-common.h 88663 2010-01-22 10:49:22Z mcorino $
 
 // Do not use this configuration file directly since it's designed to
 // be included by another, specific configuration file, such as
@@ -73,6 +73,7 @@
 # if (__GLIBC__  < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 3)
 #   define ACE_HAS_RUSAGE_WHO_ENUM enum __rusage_who
 #   define ACE_HAS_RLIMIT_RESOURCE_ENUM enum __rlimit_resource
+#   define ACE_LACKS_ISCTYPE
 # endif
 # define ACE_HAS_SOCKLEN_T
 # define ACE_HAS_4_4BSD_SENDMSG_RECVMSG
@@ -174,13 +175,7 @@
 #elif defined (__DECCXX)
 # define ACE_CONFIG_INCLUDE_CXX_COMMON
 # include "ace/config-cxx-common.h"
-#elif defined (__BORLANDC__)
-# undef ACE_HAS_LLSEEK
-# undef ACE_HAS_LSEEK64
-# undef ACE_LACKS_LLSEEK_PROTOTYPE
-# undef ACE_LACKS_LSEEK64_PROTOTYPE
-# include "ace/config-borland-common.h"
-#elif defined (__SUNCC_PRO)
+#elif defined (__SUNCC_PRO) || defined (__SUNPRO_CC)
 # include "ace/config-suncc-common.h"
 #elif defined (__PGI)
 // Portable group compiler
@@ -199,7 +194,7 @@
  * (TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.{h,c}) that may indirectly
  * include this
  */
-#else  /* ! __GNUG__ && !__DECCXX && !__INTEL_COMPILER && !__BORLANDC__ && !__PGI */
+#else  /* ! __GNUG__ && !__DECCXX && !__INTEL_COMPILER && && !__PGI */
 #  ifdef __cplusplus  /* Let it slide for C compilers. */
 #    error unsupported compiler in ace/config-linux-common.h
 #  endif  /* __cplusplus */
@@ -208,11 +203,13 @@
 // Completely common part :-)
 
 // Platform/compiler has the sigwait(2) prototype
-# define ACE_HAS_SIGWAIT
+#define ACE_HAS_SIGWAIT
 
-# define ACE_HAS_SIGSUSPEND
+#define ACE_HAS_SIGSUSPEND
 
-# define ACE_HAS_UALARM
+#define ACE_HAS_UALARM
+
+#define ACE_HAS_STRSIGNAL
 
 #if __GLIBC__ >= 2
 #ifndef ACE_HAS_POSIX_REALTIME_SIGNALS
@@ -239,6 +236,7 @@
 #define ACE_LACKS_ITOW
 #define ACE_LACKS_WCSICMP
 #define ACE_LACKS_WCSNICMP
+#define ACE_LACKS_ISWASCII
 
 #if __GLIBC__ >= 2
 # define ACE_HAS_3_PARAM_WCSTOK
@@ -323,8 +321,11 @@
 
 // Platform supplies scandir()
 #define ACE_HAS_SCANDIR
+#if (__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 10)
 // Although the scandir man page says otherwise, this setting is correct.
+// The setting was fixed in 2.10, so do not use the hack after that.
 #define ACE_SCANDIR_CMP_USES_CONST_VOIDPTR
+#endif
 
 // A conflict appears when including both <ucontext.h> and
 // <sys/procfs.h> with recent glibc headers.
@@ -340,9 +341,6 @@
 #define ACE_HAS_TIMEZONE
 
 #define ACE_HAS_TIMEZONE_GETTIMEOFDAY
-
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
 
 // Don't define _XOPEN_SOURCE in ACE to make strptime() prototype
 // visible.  ACE shouldn't depend on feature test macros to make
@@ -378,12 +376,17 @@
 #if defined (__ia64) || defined(__alpha) || defined (__x86_64__)
 // On 64 bit platforms, the "long" type is 64-bits.  Override the
 // default 32-bit platform-specific format specifiers appropriately.
-# define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT ("%lu")
-# define ACE_SSIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%ld")
-# define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%lu")
+# define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%lu"
+# define ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII "%ld"
+# define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%lu"
 #endif /* __ia64 */
 
 #define ACE_SIZEOF_WCHAR 4
+
+#if defined (__powerpc__) && !defined (ACE_SIZEOF_LONG_DOUBLE)
+// 32bit PowerPC Linux uses 128bit long double
+# define ACE_SIZEOF_LONG_DOUBLE 16
+#endif
 
 #define ACE_LACKS_GETIPNODEBYADDR
 #define ACE_LACKS_GETIPNODEBYNAME
@@ -392,15 +395,28 @@
 #define ACE_HAS_TERMIOS
 
 // Linux implements sendfile().
-#define ACE_HAS_SENDFILE
+#define ACE_HAS_SENDFILE 1
 
 #define ACE_HAS_VOIDPTR_MMAP
+
+#define ACE_HAS_ICMP_SUPPORT 1
+
+#define ACE_HAS_VASPRINTF
+
+// According to man pages Linux uses different (compared to UNIX systems) types
+// for setting IP_MULTICAST_TTL and IPV6_MULTICAST_LOOP / IP_MULTICAST_LOOP
+// in setsockopt/getsockopt.
+#define ACE_HAS_IP_MULTICAST_TTL_AS_INT 1
+#define ACE_HAS_IPV6_MULTICAST_LOOP_AS_BOOL 1
+#define ACE_HAS_IP_MULTICAST_LOOP_AS_INT 1
 
 #if defined (ACE_LACKS_NETWORKING)
 # include "ace/config-posix-nonetworking.h"
 #else
 # define ACE_HAS_NETLINK
-# define ACE_HAS_GETIFADDRS
+# if (__GLIBC__  > 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ > 2)
+#   define ACE_HAS_GETIFADDRS
+# endif
 #endif
 
 #if !defined (ACE_GETNAME_RETURNS_RANDOM_SIN_ZERO)

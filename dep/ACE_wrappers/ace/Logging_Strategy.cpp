@@ -1,8 +1,9 @@
-// $Id: Logging_Strategy.cpp 81696 2008-05-14 18:15:31Z johnnyw $
+// $Id: Logging_Strategy.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/Logging_Strategy.h"
 #include "ace/Service_Config.h"
 #include "ace/ACE.h"
+#include "ace/ACE_export.h"
 #include "ace/Get_Opt.h"
 
 // FUZZ: disable check_for_streams_include
@@ -14,10 +15,6 @@
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"
 #include "ace/OS_NS_unistd.h"
-
-ACE_RCSID (ace,
-           Logging_Strategy,
-           "$Id: Logging_Strategy.cpp 81696 2008-05-14 18:15:31Z johnnyw $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -386,11 +383,6 @@ ACE_Logging_Strategy::init (int argc, ACE_TCHAR *argv[])
               if (this->reactor () == 0)
                 // Use singleton.
                 this->reactor (ACE_Reactor::instance ());
-
-              this->reactor ()->schedule_timer
-                (this, 0,
-                 ACE_Time_Value (this->interval_),
-                 ACE_Time_Value (this->interval_));
             }
         }
       // Now set the flags for Log_Msg
@@ -551,6 +543,43 @@ ACE_Logging_Strategy::handle_timeout (const ACE_Time_Value &,
   return 0;
 }
 
+int
+ACE_Logging_Strategy::handle_close (ACE_HANDLE,
+                                    ACE_Reactor_Mask)
+{
+  // This will reset reactor member and cancel timer events.
+  this->reactor (0);
+  return 0;
+}
+
+void
+ACE_Logging_Strategy::reactor (ACE_Reactor *r)
+{
+  if (this->reactor () != r)
+    {
+      if (this->reactor () && this->interval_ > 0 && this->max_size_ > 0)
+        {
+          this->reactor ()->cancel_timer (this);
+        }
+
+      ACE_Service_Object::reactor (r);
+
+      if (this->reactor ())
+        {
+          this->reactor ()->schedule_timer
+            (this, 0,
+             ACE_Time_Value (this->interval_),
+             ACE_Time_Value (this->interval_));
+        }
+    }
+}
+
+ACE_Reactor *
+ACE_Logging_Strategy::reactor (void) const
+{
+  return ACE_Service_Object::reactor ();
+}
+
 void
 ACE_Logging_Strategy::log_msg (ACE_Log_Msg *log_msg)
 {
@@ -563,4 +592,19 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 // svc.conf file to dynamically initialize the state of the
 // Logging_Strategy.
 
+ACE_STATIC_SVC_DEFINE (ACE_Logging_Strategy,
+                       ACE_TEXT ("Logging_Strategy"),
+                       ACE_Service_Type::SERVICE_OBJECT,
+                       &ACE_SVC_NAME (ACE_Logging_Strategy),
+                       ACE_Service_Type::DELETE_THIS | ACE_Service_Type::DELETE_OBJ,
+                       0)
+
 ACE_FACTORY_DEFINE (ACE, ACE_Logging_Strategy)
+
+// _get_dll_unload_policy() prevents ACE from being unloaded and having its
+// framework components run down if/when the Logging Strategy is unloaded.
+extern "C" ACE_Export int
+_get_dll_unload_policy()
+{
+  return ACE_DLL_UNLOAD_POLICY_LAZY;
+}

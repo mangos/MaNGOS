@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_sys_stat.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_sys_stat.inl 84373 2009-02-10 18:21:50Z johnnyw $
 
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_fcntl.h"
@@ -214,10 +214,11 @@ namespace ACE_OS
       }
     else
       {
-        stp->st_mode = static_cast<unsigned short>(fdata.dwFileAttributes);
+        stp->st_mode = static_cast<mode_t>(fdata.dwFileAttributes);
         stp->st_size = fdata.nFileSizeLow;
-        stp->st_atime = ACE_Time_Value (fdata.ftLastAccessTime);
-        stp->st_mtime = ACE_Time_Value (fdata.ftLastWriteTime);
+        stp->st_atime = ACE_Time_Value (fdata.ftLastAccessTime).sec ();
+        stp->st_mtime = ACE_Time_Value (fdata.ftLastWriteTime).sec ();
+        stp->st_ctime = ACE_Time_Value (fdata.ftCreationTime).sec ();
       }
     return 0;
 #elif defined (ACE_HAS_X86_STAT_MACROS)
@@ -252,14 +253,15 @@ namespace ACE_OS
       }
     else
       {
-        stp->st_mode = static_cast<unsigned short>(fdata.dwFileAttributes);
+        stp->st_mode = static_cast<mode_t>(fdata.dwFileAttributes);
         stp->st_size = fdata.nFileSizeLow;
-        stp->st_atime = ACE_Time_Value (fdata.ftLastAccessTime);
-        stp->st_mtime = ACE_Time_Value (fdata.ftLastWriteTime);
+        stp->st_atime = ACE_Time_Value (fdata.ftLastAccessTime).sec ();
+        stp->st_mtime = ACE_Time_Value (fdata.ftLastWriteTime).sec ();
+        stp->st_ctime = ACE_Time_Value (fdata.ftCreationTime).sec ();
       }
     return 0;
 #elif defined (__BORLANDC__) \
-      || (defined (_MSC_VER) && _MSC_VER >= 1300) \
+      || defined (_MSC_VER) \
       || defined (__MINGW32__)
     ACE_OSCALL_RETURN (ACE_WSTAT_FUNC_NAME (file, stp), int, -1);
 #else /* ACE_HAS_WINCE */
@@ -277,9 +279,10 @@ namespace ACE_OS
     ACE_UNUSED_ARG (cmask);
     ACE_NOTSUP_RETURN ((mode_t)-1);
 # elif defined (ACE_HAS_TR24731_2005_CRT)
-    mode_t old_mode;
-    ACE_SECURECRTCALL (_umask_s (cmask, &old_mode), mode_t, -1, old_mode);
-    return old_mode;
+    int old_mode;
+    int new_mode = static_cast<int> (cmask);
+    ACE_SECURECRTCALL (_umask_s (new_mode, &old_mode), mode_t, -1, old_mode);
+    return static_cast<mode_t> (old_mode);
 # elif defined (ACE_WIN32) && !defined (__BORLANDC__)
     ACE_OSCALL_RETURN (::_umask (cmask), mode_t, -1);
 # else

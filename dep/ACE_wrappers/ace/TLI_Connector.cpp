@@ -1,8 +1,8 @@
-// $Id: TLI_Connector.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: TLI_Connector.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/TLI_Connector.h"
 
-ACE_RCSID(ace, TLI_Connector, "$Id: TLI_Connector.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if defined (ACE_HAS_TLI)
 
@@ -159,7 +159,7 @@ ACE_TLI_Connector::connect (ACE_TLI_Stream &new_stream,
           // non-blocking handle or whether there's really an error.
           if (t_errno == TNODATA)
             {
-              if (timeout->sec () == 0 && timeout->usec () == 0)
+              if (*timeout == ACE_Time_Value::zero)
                 errno = EWOULDBLOCK;
               else
                 result = this->complete (new_stream, 0, timeout);

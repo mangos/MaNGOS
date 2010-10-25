@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Select_Reactor_T.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Select_Reactor_T.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 #include "ace/Reactor.h"
 #include "ace/Signal.h"
@@ -116,12 +116,12 @@ ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::remove_handler (int signum,
 }
 
 template <class ACE_SELECT_REACTOR_TOKEN>
-ACE_INLINE int
+ACE_INLINE bool
 ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::uses_event_associations (void)
 {
   // Since the Select_Reactor does not do any event associations, this
-  // function always return 0.
-  return 0;
+  // function always return false.
+  return false;
 }
 
 // = The remaining methods in this file must be called with locks

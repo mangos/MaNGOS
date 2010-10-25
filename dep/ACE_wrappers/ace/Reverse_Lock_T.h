@@ -4,7 +4,7 @@
 /**
  *  @file    Reverse_Lock_T.h
  *
- *  $Id: Reverse_Lock_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Reverse_Lock_T.h 84481 2009-02-17 10:58:31Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -77,7 +77,7 @@ public:
 
   // = Initialization/Finalization methods.
 
-  /// Constructor. All locking requests will be forwarded to <lock>.
+  /// Constructor. All locking requests will be forwarded to @a lock.
   ACE_Reverse_Lock (ACE_LOCKING_MECHANISM &lock,
                     ACE_Acquire_Method::METHOD_TYPE acquire_method = ACE_Acquire_Method::ACE_REGULAR);
 

@@ -1,5 +1,5 @@
 // Handle_Set.cpp
-// $Id: Handle_Set.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Handle_Set.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Handle_Set.h"
 
@@ -9,7 +9,7 @@
 
 #include "ace/OS_NS_string.h"
 
-ACE_RCSID(ace, Handle_Set, "$Id: Handle_Set.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -23,11 +23,6 @@ ACE_ALLOC_HOOK_DEFINE(ACE_Handle_Set)
 #else  /* ! ACE_WIN32 */
 #  define ACE_MSB_MASK (~((fd_mask) 1 << (NFDBITS - 1)))
 #endif /* ! ACE_WIN32 */
-
-#if defined (__BORLANDC__) && !defined (ACE_WIN32)
-// The Borland C++ compiler on Linux also doesn't have fds_bits, but has __fds_bits.
-#define fds_bits __fds_bits
-#endif
 
 #if defined (linux) && __GLIBC__ > 1 && __GLIBC_MINOR__ >= 1 && !defined (_XOPEN_SOURCE)
   // XPG4.2 requires the fds_bits member name, so it is not enabled by

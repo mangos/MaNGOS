@@ -4,7 +4,7 @@
 /**
  *  @file    TLI_Connector.h
  *
- *  $Id: TLI_Connector.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: TLI_Connector.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Doug Schmidt
  */
@@ -106,7 +106,7 @@ public:
                 ACE_Time_Value *tv);
 
   /// Resets any event associations on this handle
-  int reset_new_handle (ACE_HANDLE handle);
+  bool reset_new_handle (ACE_HANDLE handle);
 
   // = Meta-type info
   typedef ACE_INET_Addr PEER_ADDR;

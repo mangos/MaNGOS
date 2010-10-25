@@ -1,4 +1,4 @@
- // $Id: Future.cpp 80826 2008-03-04 14:51:23Z wotte $
+ // $Id: Future.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #ifndef ACE_FUTURE_CPP
 #define ACE_FUTURE_CPP
@@ -8,8 +8,6 @@
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
-
-ACE_RCSID (ace, Future, "$Id: Future.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #if defined (ACE_HAS_THREADS)
 
@@ -54,7 +52,7 @@ ACE_Future_Rep<T>::dump (void) const
   ACE_DEBUG ((LM_DEBUG,
               "ref_count_ = %d\n",
  (int) this->ref_count_));
-  ACE_DEBUG ((LM_INFO,"value_: \n"));
+  ACE_DEBUG ((LM_INFO,"value_:\n"));
   if (this->value_)
     ACE_DEBUG ((LM_DEBUG, ACE_TEXT (" (NON-NULL)\n")));
   else
@@ -62,9 +60,9 @@ ACE_Future_Rep<T>::dump (void) const
     ACE_DEBUG ((LM_DEBUG, ACE_TEXT (" (NULL)\n")));
     //FUZZ: enable check_for_NULL
 
-  ACE_DEBUG ((LM_INFO,"value_ready_: \n"));
+  ACE_DEBUG ((LM_INFO,"value_ready_:\n"));
   this->value_ready_.dump ();
-  ACE_DEBUG ((LM_INFO,"value_ready_mutex_: \n"));
+  ACE_DEBUG ((LM_INFO,"value_ready_mutex_:\n"));
   this->value_ready_mutex_.dump ();
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
@@ -328,8 +326,7 @@ template <class T> int
 ACE_Future<T>::cancel (const T &r)
 {
   this->cancel ();
-  return this->future_rep_->set (r,
-                                 *this);
+  return this->future_rep_->set (r, *this);
 }
 
 template <class T> int
@@ -346,8 +343,7 @@ template <class T> int
 ACE_Future<T>::set (const T &r)
 {
   // Give the pointer to the result to the ACE_Future_Rep.
-  return this->future_rep_->set (r,
-                                 *this);
+  return this->future_rep_->set (r, *this);
 }
 
 template <class T> int

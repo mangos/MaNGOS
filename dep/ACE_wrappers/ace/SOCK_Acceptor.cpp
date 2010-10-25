@@ -1,4 +1,4 @@
-// $Id: SOCK_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: SOCK_Acceptor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/SOCK_Acceptor.h"
 
@@ -16,7 +16,7 @@
 #include "ace/OS_QoS.h"
 #endif  // ACE_HAS_WINCE
 
-ACE_RCSID(ace, SOCK_Acceptor, "$Id: SOCK_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -33,7 +33,7 @@ ACE_SOCK_Acceptor::ACE_SOCK_Acceptor (void)
 
 int
 ACE_SOCK_Acceptor::shared_accept_start (ACE_Time_Value *timeout,
-                                        int restart,
+                                        bool restart,
                                         int &in_blocking_mode) const
 {
   ACE_TRACE ("ACE_SOCK_Acceptor::shared_accept_start");
@@ -66,7 +66,7 @@ ACE_SOCK_Acceptor::shared_accept_start (ACE_Time_Value *timeout,
 int
 ACE_SOCK_Acceptor::shared_accept_finish (ACE_SOCK_Stream new_stream,
                                          int in_blocking_mode,
-                                         int reset_new_handle) const
+                                         bool reset_new_handle) const
 {
   ACE_TRACE ("ACE_SOCK_Acceptor::shared_accept_finish ()");
 
@@ -105,8 +105,8 @@ int
 ACE_SOCK_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                            ACE_Addr *remote_addr,
                            ACE_Time_Value *timeout,
-                           int restart,
-                           int reset_new_handle) const
+                           bool restart,
+                           bool reset_new_handle) const
 {
   ACE_TRACE ("ACE_SOCK_Acceptor::accept");
 
@@ -135,7 +135,7 @@ ACE_SOCK_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                                                addr,
                                                len_ptr));
       while (new_stream.get_handle () == ACE_INVALID_HANDLE
-             && restart != 0
+             && restart
              && errno == EINTR
              && timeout == 0);
 
@@ -161,8 +161,8 @@ ACE_SOCK_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                            ACE_Accept_QoS_Params qos_params,
                            ACE_Addr *remote_addr,
                            ACE_Time_Value *timeout,
-                           int restart,
-                           int reset_new_handle) const
+                           bool restart,
+                           bool reset_new_handle) const
 {
   ACE_TRACE ("ACE_SOCK_Acceptor::accept");
 
@@ -192,7 +192,7 @@ ACE_SOCK_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                                                len_ptr,
                                                qos_params));
       while (new_stream.get_handle () == ACE_INVALID_HANDLE
-             && restart != 0
+             && restart
              && errno == EINTR
              && timeout == 0);
 

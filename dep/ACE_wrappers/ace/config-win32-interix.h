@@ -1,75 +1,108 @@
 // -*- C++ -*-
-// $Id: config-win32-interix.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-win32-interix.h 91285 2010-08-05 08:29:30Z johnnyw $
 
 // The following configuration file is designed to work for Interix
 // platforms using GNU g++ (Interix == Microsoft's Services for Unix)
 
 #ifndef ACE_CONFIG_WIN32_INTERIX_H
 #define ACE_CONFIG_WIN32_INTERIX_H
-#include /**/ "ace/pre.h"
-#include <arpa/inet.h>
 
-# define ACE_LACKS_SENDMSG
-# define ACE_LACKS_RECVMSG
-# define ACE_LACKS_STDINT_H
-# define ACE_LACKS_INTTYPES_H
-# define ACE_LACKS_PRAGMA_ONCE
-# define ACE_LACKS_RWLOCK_T
-# define ACE_LACKS_GETPGID                      // Don't have getpgid(), have setpgid() though...
-# define ACE_LACKS_UCONTEXT_H
-# define ACE_HAS_REENTRANT_FUNCTIONS
-# define ACE_LACKS_NETDB_REENTRANT_FUNCTIONS    // Don't have gethostbyaddr_r and friends.
-# define ACE_HAS_DIRENT
-# define ACE_HAS_STDCPP_STL_INCLUDES
-# define ACE_HAS_STANDARD_CPP_LIBRARY 1
-# define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
-# define ACE_HAS_NONCONST_SELECT_TIMEVAL
-# define ACE_HAS_SIGWAIT
-# define ACE_HAS_SIGINFO_T
+#include /**/ "ace/pre.h"
 
 #include "ace/config-g++-common.h"
 
-#define ACE_HAS_NEW_NOTHROW // Need to know 'new's failure semantics.
+#define ACE_HAS_2_PARAM_ASCTIME_R_AND_CTIME_R
+#define ACE_HAS_3_PARAM_READDIR_R
+#define ACE_HAS_4_4BSD_SENDMSG_RECVMSG
+#define ACE_HAS_AUTOMATIC_INIT_FINI
+#define ACE_HAS_BROKEN_T_ERROR
+#define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES
+#define ACE_HAS_DIRENT
+#define ACE_HAS_GETPAGESIZE
+#define ACE_HAS_GETRUSAGE
+#define ACE_HAS_GETRUSAGE_PROTOTYPE
+#define ACE_HAS_GPERF
+#define ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT
+#define ACE_HAS_ICMP_SUPPORT 1
+#define ACE_HAS_IP_MULTICAST
+#define ACE_HAS_MEMCHR
+#define ACE_HAS_MKDIR
+#define ACE_HAS_MSG
+#define ACE_HAS_NEW_NOTHROW
+#define ACE_HAS_NEW_NO_H
+#define ACE_HAS_NONCONST_SELECT_TIMEVAL
+#define ACE_HAS_POLL
+#define ACE_HAS_POSITION_INDEPENDENT_POINTERS 1
+#define ACE_HAS_POSIX_GETPWNAM_R
+#define ACE_HAS_POSIX_NONBLOCK
+#define ACE_HAS_POSIX_TIME
+#define ACE_HAS_PTHREADS_STD
+#define ACE_HAS_PTHREADS_UNIX98_EXT
+#define ACE_HAS_PTHREAD_GETCONCURRENCY
+#define ACE_HAS_PTHREAD_SETCONCURRENCY
+#define ACE_HAS_PTHREAD_SIGMASK_PROTOTYPE
+#define ACE_HAS_P_READ_WRITE
+#define ACE_HAS_RECURSIVE_THR_EXIT_SEMANTICS
+#define ACE_HAS_REENTRANT_FUNCTIONS
+#define ACE_HAS_RTLD_LAZY_V
+#define ACE_HAS_SEMUN
+#define ACE_HAS_SIGINFO_T
+#define ACE_HAS_SIGSUSPEND
+#define ACE_HAS_SIGWAIT
+#define ACE_HAS_SIG_ATOMIC_T
+#define ACE_HAS_SIG_C_FUNC
+#define ACE_HAS_SOCKADDR_MSG_NAME
+#define ACE_HAS_SOCKLEN_T
+#define ACE_HAS_SSIZE_T
+#define ACE_HAS_STANDARD_CPP_LIBRARY 1
+#define ACE_HAS_STDCPP_STL_INCLUDES
+#define ACE_HAS_STREAMS
+#define ACE_HAS_STRING_CLASS
+#define ACE_HAS_STRSIGNAL
+#define ACE_HAS_SVR4_DYNAMIC_LINKING
+#define ACE_HAS_SVR4_GETTIMEOFDAY
+#define ACE_HAS_SVR4_SIGNAL_T
+#define ACE_HAS_SYSV_IPC
+#define ACE_HAS_SYS_SYSCALL_H
+#define ACE_HAS_TERMIOS
+#define ACE_HAS_UALARM
+#define ACE_HAS_UCONTEXT_T
+#define ACE_HAS_VOIDPTR_GETTIMEOFDAY
+#define ACE_HAS_NONSTATIC_OBJECT_MANAGER
+
+#define ACE_LACKS_GETPGID
+#define ACE_LACKS_ISCTYPE
+#define ACE_LACKS_LOG2
+#define ACE_LACKS_NETDB_REENTRANT_FUNCTIONS
+#define ACE_LACKS_NET_IF_H
+#define ACE_LACKS_PRAGMA_ONCE
+#define ACE_LACKS_SETSCHED
+#define ACE_LACKS_STRRECVFD
+#define ACE_LACKS_SYS_SYSCTL_H
+#define ACE_LACKS_TIMESPEC_T
+#define ACE_LACKS_WCSTOK
+#define ACE_LACKS_WCSTOLL
+#define ACE_LACKS_WCSTOULL
+
+// These are probably not needed with gcc 4.x
+#define ACE_LACKS_UNSETENV
+#define ACE_LACKS_STRTOLL
+#define ACE_LACKS_STRTOULL
+#define ACE_LACKS_SETEGID
+#define ACE_LACKS_SETEUID
+
+
+#define ACE_PAGE_SIZE 4096
+#define ACE_SIZEOF_LONG_LONG 8
+#define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
 
 #if defined (ACE_HAS_THREADS)
-#define ACE_HAS_THREADS
-#define ACE_HAS_PTHREADS
-#define _THREAD_SAFE
-#define ACE_MTSAFE 1
-#define ACE_MT_SAFE 1
-#define ACE_LACKS_PTHREAD_YIELD
-#define ACE_HAS_MUTEX_TIMEOUTS
+# define ACE_HAS_MUTEX_TIMEOUTS
+# define ACE_HAS_PTHREADS
+# define ACE_MT_SAFE 1
 #else
-  error "You need to enable threads for this Interix port."
+# error "You need to enable threads for this Interix port."
 #endif /* ACE_HAS_THREADS */
-
-// INTERIX has the following, just an issue with porting for the moment
-#define ACE_LACKS_ACCESS
-// END INTERIX has the following....
-
-#define ACE_SIZEOF_LONG_DOUBLE 12
-#define ACE_PAGE_SIZE 4096
-
-#define ACE_HAS_SYSV_IPC
-#define ACE_HAS_SVR4_SIGNAL_T
-#define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES
-#define ACE_HAS_SVR4_DYNAMIC_LINKING
-#define ACE_HAS_POSIX_TIME                  // Supports POSIX timers via struct timespec.
-#define ACE_LACKS_TIMESPEC_T                // Defines struct timespec but not timespec_t.
-#define ACE_LACKS_STRRECVFD
-#define ACE_LACKS_SETSCHED
-#define ACE_HAS_SOCKADDR_IN_SIN_LEN
-#define ACE_HAS_RTLD_LAZY_V
-#define ACE_HAS_POSIX_NONBLOCK
-#define ACE_HAS_GETRUSAGE
-#define ACE_HAS_SIG_ATOMIC_T
-#define ACE_HAS_SEMUN
-#define ACE_HAS_SSIZE_T
-#define ACE_HAS_STRERROR
-#define ACE_HAS_SVR4_GETTIMEOFDAY
-#define ACE_HAS_UALARM
-#define ACE_HAS_TERMIOS
-#define ACE_HAS_SIGWAIT
 
 // Turns off the tracing feature.
 #if !defined (ACE_NTRACE)
@@ -87,14 +120,7 @@
 #define ACE_HAS_THREAD_SPECIFIC_STORAGE    // We need thread specific storage even though...
 #define ACE_HAS_TSS_EMULATION              // It would appear to be broken in Interix!
 
+
 #include /**/ "ace/post.h"
+
 #endif /* ACE_CONFIG_WIN32_INTERIX_H */
-
-/*
-The following tests do not run.
-Dynamic_Priority_Test.log ACE_HAS_TIMED_MESSAGE_BLOCKS
-Enum_Interfaces_Test.log
-IOStream_Test.log ACE_IOSTREAM not supported on this platform
-*/
-
-

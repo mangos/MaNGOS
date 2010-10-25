@@ -1,4 +1,4 @@
-// $Id: WFMO_Reactor.cpp 81138 2008-03-28 09:18:15Z johnnyw $
+// $Id: WFMO_Reactor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/WFMO_Reactor.h"
 
@@ -14,7 +14,7 @@
 #include "ace/WFMO_Reactor.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, WFMO_Reactor, "$Id: WFMO_Reactor.cpp 81138 2008-03-28 09:18:15Z johnnyw $")
+
 
 #include "ace/Auto_Ptr.h"
 
@@ -1137,15 +1137,12 @@ ACE_WFMO_Reactor::current_info (ACE_HANDLE, size_t &)
 
 int
 ACE_WFMO_Reactor::open (size_t size,
-                        int unused,
+                        bool,
                         ACE_Sig_Handler *sh,
                         ACE_Timer_Queue *tq,
-                        int disable_notify_pipe,
+                        int,
                         ACE_Reactor_Notify *notify)
 {
-  ACE_UNUSED_ARG (unused);
-  ACE_UNUSED_ARG (disable_notify_pipe);
-
   // This GUARD is necessary since we are updating shared state.
   ACE_GUARD_RETURN (ACE_Process_Mutex, ace_mon, this->lock_, -1);
 
@@ -1759,9 +1756,13 @@ ACE_WFMO_Reactor::ok_to_wait (ACE_Time_Value *max_wait_time,
   // grab the lock and recheck the ok_to_wait_ event. When we can get them
   // both, or there's an error/timeout, return.
 #if defined (ACE_HAS_WINCE)
-  ACE_Time_Value timeout = ACE_OS::gettimeofday ();
+  ACE_UNUSED_ARG (alertable);
+  ACE_Time_Value timeout;
   if (max_wait_time != 0)
-    timeout += *max_wait_time;
+    {
+      timeout = ACE_OS::gettimeofday ();
+      timeout += *max_wait_time;
+    }
   while (1)
     {
       int status;
@@ -1776,14 +1777,15 @@ ACE_WFMO_Reactor::ok_to_wait (ACE_Time_Value *max_wait_time,
       if (max_wait_time == 0)
         status = this->lock_.acquire ();
       else
-        status = this->lock_.acquire (timeout);
+        {
+          status = this->lock_.acquire (timeout);
+        }
       if (status == -1)
         return -1;
 
       // Have the lock_, now re-check the event. If it's not signaled,
       // another thread changed something so go back and wait again.
-      ACE_Time_Value poll_it = ACE_OS::gettimeofday ();
-      if (this->ok_to_wait_.wait (&poll_it) == 0)
+      if (this->ok_to_wait_.wait (&ACE_Time_Value::zero, 0) == 0)
         break;
       this->lock_.release ();
     }
@@ -1902,10 +1904,8 @@ ACE_WFMO_Reactor::expire_timers (void)
 int
 ACE_WFMO_Reactor::dispatch (DWORD wait_status)
 {
-  int handlers_dispatched = 0;
-
   // Expire timers
-  handlers_dispatched += this->expire_timers ();
+  int handlers_dispatched = this->expire_timers ();
 
   switch (wait_status)
     {
@@ -1940,7 +1940,7 @@ ACE_WFMO_Reactor::dispatch_handles (DWORD wait_status)
   DWORD dispatch_slot = 0;
 
   // Cache this value, this is the absolute value.
-  DWORD max_handlep1 = this->handler_rep_.max_handlep1 ();
+  DWORD const max_handlep1 = this->handler_rep_.max_handlep1 ();
 
   // nCount starts off at <max_handlep1>, this is a transient count of
   // handles last waited on.
@@ -1954,9 +1954,9 @@ ACE_WFMO_Reactor::dispatch_handles (DWORD wait_status)
 #if ! defined(__BORLANDC__) \
     && !defined (ghs) \
     && !defined (__MINGW32__) \
-    && !(defined (_MSC_VER) && _MSC_VER >= 1300)
+    && !defined (_MSC_VER)
                  // wait_status is unsigned in Borland, Green Hills,
-                 // mingw32 and MSVC++ >= 7.1.
+                 // mingw32 and MSVC++
                  // This >= is always true, with a warning.
                  wait_status >= WAIT_OBJECT_0 &&
 #endif
@@ -2218,7 +2218,7 @@ ACE_WFMO_Reactor::upcall (ACE_Event_Handler *event_handler,
         }
     }
 
-          if (ACE_BIT_ENABLED (actual_events, FD_ACCEPT))
+  if (ACE_BIT_ENABLED (actual_events, FD_ACCEPT))
     {
       action = event_handler->handle_input (io_handle);
       if (action <= 0)

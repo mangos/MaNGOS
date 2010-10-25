@@ -1,0 +1,18 @@
+//  -*- MPC -*-
+//
+// $Id: ace.mwc 82426 2008-07-26 06:35:20Z johnnyw $
+
+workspace {
+  ace.mpc
+  ace_for_tao.mpc
+  ace_flreactor.mpc
+  ace_foxreactor.mpc
+  ace_qt3reactor.mpc
+  ace_qt4reactor.mpc
+  ace_tkreactor.mpc
+  ace_xtreactor.mpc
+  ETCL
+  Monitor_Control
+  QoS
+  SSL
+}

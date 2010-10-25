@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_signal.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_signal.inl 87480 2009-11-11 11:38:15Z olli $
 
 #include "ace/OS_NS_macros.h"
 #include "ace/OS_NS_errno.h"
@@ -78,7 +78,7 @@ ACE_INLINE int
 sigaddset (sigset_t *s, int signum)
 {
   ACE_OS_TRACE ("ACE_OS::sigaddset");
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   if (s == 0)
     {
       errno = EFAULT;
@@ -92,14 +92,14 @@ sigaddset (sigset_t *s, int signum)
   *s |= (1 << (signum - 1)) ;
   return 0 ;
 #else
-  ACE_OSCALL_RETURN (::sigaddset (s, signum), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+  return ace_sigaddset_helper (s, signum);
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE int
 sigdelset (sigset_t *s, int signum)
 {
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   if (s == 0)
     {
       errno = EFAULT;
@@ -113,14 +113,14 @@ sigdelset (sigset_t *s, int signum)
   *s &= ~(1 << (signum - 1)) ;
   return 0;
 #else
-  ACE_OSCALL_RETURN (::sigdelset (s, signum), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+  return ace_sigdelset_helper (s, signum);
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE int
 sigemptyset (sigset_t *s)
 {
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   if (s == 0)
     {
       errno = EFAULT;
@@ -129,14 +129,14 @@ sigemptyset (sigset_t *s)
   *s = 0 ;
   return 0;
 #else
-  ACE_OSCALL_RETURN (::sigemptyset (s), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+  return ace_sigemptyset_helper (s);
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE int
 sigfillset (sigset_t *s)
 {
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   if (s == 0)
     {
       errno = EFAULT;
@@ -145,14 +145,14 @@ sigfillset (sigset_t *s)
   *s = ~(sigset_t) 0;
   return 0 ;
 #else
-  ACE_OSCALL_RETURN (::sigfillset (s), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+  return ace_sigfillset_helper (s);
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE int
 sigismember (sigset_t *s, int signum)
 {
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   if (s == 0)
     {
       errno = EFAULT;
@@ -172,8 +172,8 @@ sigismember (sigset_t *s, int signum)
       return -1;                 // Invalid signum, return error
     }
 #  endif /* ACE_HAS_SIGISMEMBER_BUG */
-  ACE_OSCALL_RETURN (::sigismember (s, signum), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+  return ace_sigismember_helper (s, signum);
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE ACE_SignalHandler
@@ -183,11 +183,11 @@ signal (int signum, ACE_SignalHandler func)
     return 0;
   else
 # if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE) || !defined (ACE_LACKS_UNIX_SIGNALS)
-#  if !defined (ACE_HAS_TANDEM_SIGNALS) && !defined (ACE_HAS_LYNXOS_SIGNALS)
+#  if !defined (ACE_HAS_TANDEM_SIGNALS) && !defined (ACE_HAS_LYNXOS4_SIGNALS)
     return ::signal (signum, func);
 #  else
     return (ACE_SignalHandler) ::signal (signum, (void (*)(int)) func);
-#  endif /* !ACE_HAS_TANDEM_SIGNALS */
+#  endif /* !ACE_HAS_TANDEM_SIGNALS && !ACE_HAS_LYNXOS4_SIGNALS */
 #else
     // @@ WINCE: Don't know how to implement signal on WinCE (yet.)
     ACE_UNUSED_ARG (signum);
@@ -199,32 +199,43 @@ signal (int signum, ACE_SignalHandler func)
 ACE_INLINE int
 sigprocmask (int how, const sigset_t *nsp, sigset_t *osp)
 {
-#if defined (ACE_LACKS_SIGSET) || defined (ACE_LACKS_SIGSET_DEFINITIONS)
+#if defined (ACE_LACKS_SIGSET)
   ACE_UNUSED_ARG (how);
   ACE_UNUSED_ARG (nsp);
   ACE_UNUSED_ARG (osp);
   ACE_NOTSUP_RETURN (-1);
 #else
   ACE_OSCALL_RETURN (::sigprocmask (how, nsp, osp), int, -1);
-#endif /* ACE_LACKS_SIGSET || ACE_LACKS_SIGSET_DEFINITIONS */
+#endif /* ACE_LACKS_SIGSET */
 }
 
 ACE_INLINE int
-sigsuspend (const sigset_t *sigset)
+sigsuspend (const sigset_t *s)
 {
 #if defined (ACE_HAS_SIGSUSPEND)
-  sigset_t s;
+  sigset_t sigset;
 
-  if (sigset == 0)
+  if (s == 0)
     {
-      sigset = &s;
-      ACE_OS::sigemptyset (&s);
+      ACE_OS::sigemptyset (&sigset);
+      s = &sigset;
     }
-  ACE_OSCALL_RETURN (::sigsuspend (sigset), int, -1);
+  return ace_sigsuspend_helper (s);
 #else
-  ACE_UNUSED_ARG (sigset);
+  ACE_UNUSED_ARG (s);
   ACE_NOTSUP_RETURN (-1);
 #endif /* ACE_HAS_SIGSUSPEND */
+}
+
+ACE_INLINE int
+raise (const int signum)
+{
+#if defined (ACE_LACKS_RAISE)
+  ACE_UNUSED_ARG (signum);
+  ACE_NOTSUP_RETURN (-1);
+#else
+  ACE_OSCALL_RETURN (::raise (signum), int, -1);
+#endif /* ACE_LACKS_RAISE */
 }
 
 }  /* end namespace ACE_OS */

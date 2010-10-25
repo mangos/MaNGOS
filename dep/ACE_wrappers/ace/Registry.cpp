@@ -1,10 +1,6 @@
-// $Id: Registry.cpp 82435 2008-07-28 11:53:42Z johnnyw $
+// $Id: Registry.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Registry.h"
-
-ACE_RCSID (ace,
-           Registry,
-           "$Id: Registry.cpp 82435 2008-07-28 11:53:42Z johnnyw $")
 
 #if defined (ACE_WIN32) && !defined (ACE_LACKS_WIN32_REGISTRY)
 
@@ -842,11 +838,14 @@ ACE_Registry::Binding_Iterator::Iteration_State::iterator (Binding_Iterator *ite
 }
 
 
-ACE_Registry::Binding_Iterator::Iteration_State::Iteration_State ()
+ACE_Registry::Binding_Iterator::Iteration_State::Iteration_State (void)
   : index_ (0)
 {
 }
 
+ACE_Registry::Binding_Iterator::Iteration_State::~Iteration_State (void)
+{
+}
 
 // Next entry
 int
@@ -1075,6 +1074,9 @@ ACE_Predefined_Naming_Contexts::connect (ACE_Registry::Naming_Context &naming_co
                                          const ACE_TCHAR *machine_name)
 {
 #if defined (ACE_HAS_WINCE)
+  ACE_UNUSED_ARG(naming_context);
+  ACE_UNUSED_ARG(predefined);
+  ACE_UNUSED_ARG(machine_name);
   return -1;
 #else
   long result = -1;
@@ -1088,6 +1090,7 @@ ACE_Predefined_Naming_Contexts::connect (ACE_Registry::Naming_Context &naming_co
                                    predefined,
                                    &naming_context.key_);
   if (predefined == HKEY_CURRENT_USER || predefined == HKEY_CLASSES_ROOT)
+    {
     // Make sure that for these types, the machine is local
     if (machine_name == 0 ||
         ACE_Predefined_Naming_Contexts::is_local_host (machine_name))
@@ -1097,6 +1100,7 @@ ACE_Predefined_Naming_Contexts::connect (ACE_Registry::Naming_Context &naming_co
       }
     else
       result = -1;
+    }
 
   ACE_REGISTRY_CALL_RETURN (result);
 #endif  // ACE_HAS_WINCE

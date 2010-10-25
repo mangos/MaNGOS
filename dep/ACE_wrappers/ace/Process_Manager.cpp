@@ -1,4 +1,4 @@
-// $Id: Process_Manager.cpp 82559 2008-08-07 20:23:07Z parsons $
+// $Id: Process_Manager.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 // Process_Manager.cpp
 #include "ace/Process_Manager.h"
@@ -19,11 +19,8 @@
 #include "ace/OS_NS_signal.h"
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_sys_time.h"
+#include "ace/os_include/os_typeinfo.h"
 #include "ace/Truncate.h"
-
-ACE_RCSID (ace,
-           Process_Manager,
-           "$Id: Process_Manager.cpp 82559 2008-08-07 20:23:07Z parsons $")
 
 #if defined (ACE_HAS_SIG_C_FUNC)
 extern "C" void
@@ -131,11 +128,13 @@ ACE_Process_Manager::instance (void)
 #if defined ACE_HAS_SIG_C_FUNC
           ACE_Object_Manager::at_exit (ACE_Process_Manager::instance_,
                                        ACE_Process_Manager_cleanup,
-                                       0);
+                                       0,
+                                       typeid (*ACE_Process_Manager::instance_).name ());
 #else
           ACE_Object_Manager::at_exit (ACE_Process_Manager::instance_,
                                        ACE_Process_Manager::cleanup,
-                                       0);
+                                       0,
+                                       typeid (*ACE_Process_Manager::instance_).name ());
 #endif /* ACE_HAS_SIG_C_FUNC */
 
         }
@@ -162,11 +161,13 @@ ACE_Process_Manager::instance (ACE_Process_Manager *tm)
 #if defined ACE_HAS_SIG_C_FUNC
   ACE_Object_Manager::at_exit (ACE_Process_Manager::instance_,
                                 ACE_Process_Manager_cleanup,
-                                0);
+                                0,
+                                typeid (*ACE_Process_Manager::instance_).name ());
 #else
   ACE_Object_Manager::at_exit (ACE_Process_Manager::instance_,
                                 ACE_Process_Manager::cleanup,
-                                0);
+                                0,
+                                typeid (*ACE_Process_Manager::instance_).name ());
 #endif /* ACE_HAS_SIG_C_FUNC */
 
   ACE_Process_Manager::instance_ = tm;
@@ -256,11 +257,12 @@ ACE_Process_Manager::ACE_Process_Manager (size_t size,
 {
   ACE_TRACE ("ACE_Process_Manager::ACE_Process_Manager");
 
-  if (this->open (size,
-                  r) == -1)
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("%p\n"),
-                ACE_TEXT ("ACE_Process_Manager")));
+  if (this->open (size, r) == -1)
+    {
+      ACE_ERROR ((LM_ERROR,
+                  ACE_TEXT ("%p\n"),
+                  ACE_TEXT ("ACE_Process_Manager")));
+    }
 }
 
 // Close up and release all resources.
@@ -427,7 +429,7 @@ ACE_Process_Manager::spawn (ACE_Process_Options &options,
                   ACE_Managed_Process,
                   ACE_INVALID_PID);
 
-  pid_t const pid = spawn (process, options, event_handler);
+  pid_t const pid = this->spawn (process, options, event_handler);
   if (pid == ACE_INVALID_PID || pid == 0)
     delete process;
 
@@ -686,7 +688,7 @@ ACE_Process_Manager::find_proc (pid_t pid)
 {
   ACE_TRACE ("ACE_Process_Manager::find_proc");
 
-  for (size_t i = 0; i < this->current_count_; ++i) 
+  for (size_t i = 0; i < this->current_count_; ++i)
     {
       if (pid == this->process_table_[i].process_->getpid ())
         {
@@ -841,7 +843,7 @@ ACE_Process_Manager::wait (pid_t pid,
           // WAIT_OBJECT_0 is a pointless comparison because
           // WAIT_OBJECT_0 is zero and DWORD is unsigned long, so this
           // test is skipped for Green Hills.  Same for mingw.
-# if defined (ghs) || defined (__MINGW32__) || (defined (_MSC_VER) && _MSC_VER >= 1300)
+# if defined (ghs) || defined (__MINGW32__) || defined (_MSC_VER)
           ACE_ASSERT (result < WAIT_OBJECT_0 + this->current_count_);
 # else
           ACE_ASSERT (result >= WAIT_OBJECT_0

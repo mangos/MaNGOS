@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK_SEQPACK_Connector.h
  *
- *  $Id: SOCK_SEQPACK_Connector.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SOCK_SEQPACK_Connector.h 84816 2009-03-13 08:16:32Z johnnyw $
  *
  *  @author  Patrick J. Lardieri <plardier@atl.lmco.com>
  *  @author  Gaurav Naik, Lockheed Martin ATL
@@ -79,7 +79,7 @@ public:
    *                    amount of time passes before the connection is made,
    *                    this method returns -1 and errno == ETIME. Note
    *                    the difference between this case and when a blocking
-   *                    connect is attmpted that TCP times out - in the latter
+   *                    connect is attempted that TCP times out - in the latter
    *                    case, errno will be ETIMEDOUT.
    * @param local_sap   (optional) The local address to bind to.  If it's
    *                    the default value of @c ACE_Addr::sap_any then the
@@ -129,7 +129,7 @@ public:
    *                    amount of time passes before the connection is made,
    *                    this method returns -1 and errno == ETIME. Note
    *                    the difference between this case and when a blocking
-   *                    connect is attmpted that TCP times out - in the latter
+   *                    connect is attempted that TCP times out - in the latter
    *                    case, errno will be ETIMEDOUT.
    * @param local_sap   (optional) The set of local addresses for SCTP to
    *                    bind to.
@@ -178,7 +178,7 @@ public:
    *                    amount of time passes before the connection is made,
    *                    this method returns -1 and errno == ETIME. Note
    *                    the difference between this case and when a blocking
-   *                    connect is attmpted that TCP times out - in the latter
+   *                    connect is attempted that TCP times out - in the latter
    *                    case, errno will be ETIMEDOUT.
    * @param local_sap   (optional) The local address to bind to.  If it's
    *                    the default value of @c ACE_Addr::sap_any then the
@@ -228,7 +228,7 @@ public:
    *                    amount of time passes before the connection is made,
    *                    this method returns -1 and errno == ETIME. Note
    *                    the difference between this case and when a blocking
-   *                    connect is attmpted that TCP times out - in the latter
+   *                    connect is attempted that TCP times out - in the latter
    *                    case, errno will be ETIMEDOUT.
    * @param local_sap   (optional) The set of local addresses for SCTP to
    *                    bind to.
@@ -275,7 +275,7 @@ public:
                 const ACE_Time_Value *timeout = 0);
 
   /// Resets any event associations on this handle
-  int reset_new_handle (ACE_HANDLE handle);
+  bool reset_new_handle (ACE_HANDLE handle);
 
   // = Meta-type info
   typedef ACE_Multihomed_INET_Addr PEER_ADDR;

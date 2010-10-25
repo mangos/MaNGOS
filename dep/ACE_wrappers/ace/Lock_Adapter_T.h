@@ -4,7 +4,7 @@
 /**
  *  @file    Lock_Adapter_T.h
  *
- *  $Id: Lock_Adapter_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Lock_Adapter_T.h 84481 2009-02-17 10:58:31Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -43,7 +43,7 @@ public:
 
   // = Initialization/Finalization methods.
 
-  /// Constructor. All locking requests will be forwarded to <lock>.
+  /// Constructor. All locking requests will be forwarded to @a lock.
   ACE_Lock_Adapter (ACE_LOCKING_MECHANISM &lock);
 
   /// Constructor. Since no lock is provided by the user, one will be

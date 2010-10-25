@@ -1,0 +1,32 @@
+//  -*- MPC -*- now wouldn't this be cool...
+// $Id: ace_xtreactor.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+
+project(ACE_XtReactor) : acedefaults, install, acelib, ace_output, ace_xt {
+
+  sharedname   = ACE_XtReactor
+  dynamicflags += ACE_XTREACTOR_BUILD_DLL
+
+  Source_Files {
+    XtReactor
+  }
+
+  Header_Files {
+    XtReactor
+  }
+
+  Inline_Files {
+    XtReactor
+  }
+
+  Template_Files {
+    XtReactor
+  }
+
+  Resource_Files {
+    XtReactor
+  }
+
+  Pkgconfig_Files {
+    XtReactor/ACE_XtReactor.pc.in
+  }
+}

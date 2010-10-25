@@ -1,9 +1,9 @@
-// $Id: Priority_Reactor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Priority_Reactor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Priority_Reactor.h"
 #include "ace/Malloc_T.h"
 
-ACE_RCSID(ace, Priority_Reactor, "$Id: Priority_Reactor.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -51,10 +51,10 @@ ACE_Priority_Reactor::ACE_Priority_Reactor (ACE_Sig_Handler *sh,
 }
 
 ACE_Priority_Reactor::ACE_Priority_Reactor (size_t size,
-                                            int rs,
+                                            bool restart,
                                             ACE_Sig_Handler *sh,
                                             ACE_Timer_Queue *tq)
-  : ACE_Select_Reactor (size, rs, sh, tq),
+  : ACE_Select_Reactor (size, restart, sh, tq),
     bucket_ (0),
     tuple_allocator_ (0)
 {
@@ -84,7 +84,7 @@ ACE_Priority_Reactor::build_bucket (ACE_Handle_Set &dispatch_mask,
        (handle = handle_iter ()) != ACE_INVALID_HANDLE;
        )
     {
-      ACE_Event_Handler *event_handler = 
+      ACE_Event_Handler *event_handler =
         this->handler_rep_.find (handle);
       if (event_handler == 0)
         return -1;

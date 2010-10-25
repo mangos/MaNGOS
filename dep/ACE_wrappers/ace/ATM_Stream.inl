@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: ATM_Stream.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: ATM_Stream.inl 84262 2009-01-29 10:34:33Z johnnyw $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -103,7 +103,7 @@ ACE_ATM_Stream::recv (void *buf,
   ACE_UNUSED_ARG(buf);
   ACE_UNUSED_ARG(n);
   ACE_UNUSED_ARG(flags);
-  return (0);
+  return 0;
 #endif /* ACE_HAS_FORE_ATM_XTI */
 }
 
@@ -126,7 +126,7 @@ ACE_ATM_Stream::send_n (const void *buf,
   ACE_UNUSED_ARG(buf);
   ACE_UNUSED_ARG(n);
   ACE_UNUSED_ARG(flags);
-  return (0);
+  return 0;
 #endif /* ACE_HAS_FORE_ATM_XTI */
 }
 

@@ -1,4 +1,4 @@
-// $Id: Timer_Queue_Adapters.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Timer_Queue_Adapters.cpp 89482 2010-03-15 07:58:50Z johnnyw $
 
 #ifndef ACE_TIMER_QUEUE_ADAPTERS_CPP
 #define ACE_TIMER_QUEUE_ADAPTERS_CPP
@@ -23,14 +23,14 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-template <class TQ> TQ &
-ACE_Async_Timer_Queue_Adapter<TQ>::timer_queue (void)
+template <class TQ, class TYPE> TQ &
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::timer_queue (void)
 {
   return this->timer_queue_;
 }
 
-template <class TQ> int
-ACE_Async_Timer_Queue_Adapter<TQ>::cancel (long timer_id,
+template <class TQ, class TYPE> int
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::cancel (long timer_id,
                                            const void **act)
 {
   // Block designated signals.
@@ -40,8 +40,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::cancel (long timer_id,
   return this->timer_queue_.cancel (timer_id, act);
 }
 
-template <class TQ> int
-ACE_Async_Timer_Queue_Adapter<TQ>::expire (void)
+template <class TQ, class TYPE> int
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::expire (void)
 {
   // Block designated signals.
   ACE_Sig_Guard sg (&this->mask_);
@@ -50,8 +50,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::expire (void)
   return this->timer_queue_.expire ();
 }
 
-template <class TQ> int
-ACE_Async_Timer_Queue_Adapter<TQ>::schedule_ualarm (void)
+template <class TQ, class TYPE> int
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::schedule_ualarm (void)
 {
   ACE_Time_Value tv = this->timer_queue_.earliest_time ()
     - this->timer_queue_.gettimeofday ();
@@ -68,8 +68,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::schedule_ualarm (void)
   return 0;
 }
 
-template <class TQ> long
-ACE_Async_Timer_Queue_Adapter<TQ>::schedule (ACE_Event_Handler *eh,
+template <class TQ, class TYPE> long
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::schedule (TYPE eh,
                                              const void *act,
                                              const ACE_Time_Value &future_time,
                                              const ACE_Time_Value &interval)
@@ -96,8 +96,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::schedule (ACE_Event_Handler *eh,
   return tid;
 }
 
-template <class TQ>
-ACE_Async_Timer_Queue_Adapter<TQ>::ACE_Async_Timer_Queue_Adapter (ACE_Sig_Set *mask)
+template <class TQ, class TYPE>
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::ACE_Async_Timer_Queue_Adapter (ACE_Sig_Set *mask)
   // If <mask> == 0, block *all* signals when the SIGARLM handler is
   // running, else just block those in the mask.
   : mask_ (mask)
@@ -120,8 +120,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::ACE_Async_Timer_Queue_Adapter (ACE_Sig_Set *m
 // list.  It gets invoked asynchronously when the SIGALRM signal
 // occurs.
 
-template <class TQ> int
-ACE_Async_Timer_Queue_Adapter<TQ>::handle_signal (int signum,
+template <class TQ, class TYPE> int
+ACE_Async_Timer_Queue_Adapter<TQ, TYPE>::handle_signal (int signum,
                                                   siginfo_t *,
                                                   ucontext_t *)
 {
@@ -154,8 +154,8 @@ ACE_Async_Timer_Queue_Adapter<TQ>::handle_signal (int signum,
     }
 }
 
-template<class TQ>
-ACE_Thread_Timer_Queue_Adapter<TQ>::ACE_Thread_Timer_Queue_Adapter (ACE_Thread_Manager *tm,
+template<class TQ, class TYPE>
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::ACE_Thread_Timer_Queue_Adapter (ACE_Thread_Manager *tm,
                                                                     TQ* timer_queue)
   : ACE_Task_Base (tm),
     timer_queue_(timer_queue),
@@ -172,8 +172,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::ACE_Thread_Timer_Queue_Adapter (ACE_Thread_M
     }
 }
 
-template<class TQ>
-ACE_Thread_Timer_Queue_Adapter<TQ>::~ACE_Thread_Timer_Queue_Adapter (void)
+template<class TQ, class TYPE>
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::~ACE_Thread_Timer_Queue_Adapter (void)
 {
   if (this->delete_timer_queue_)
     {
@@ -183,15 +183,15 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::~ACE_Thread_Timer_Queue_Adapter (void)
     }
 }
 
-template<class TQ> ACE_SYNCH_RECURSIVE_MUTEX &
-ACE_Thread_Timer_Queue_Adapter<TQ>::mutex (void)
+template<class TQ, class TYPE> ACE_SYNCH_RECURSIVE_MUTEX &
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::mutex (void)
 {
   return this->mutex_;
 }
 
-template<class TQ> long
-ACE_Thread_Timer_Queue_Adapter<TQ>::schedule
-    (ACE_Event_Handler* handler,
+template<class TQ, class TYPE> long
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::schedule
+    (TYPE handler,
      const void *act,
      const ACE_Time_Value &future_time,
      const ACE_Time_Value &interval)
@@ -203,8 +203,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::schedule
   return result;
 }
 
-template<class TQ> int
-ACE_Thread_Timer_Queue_Adapter<TQ>::cancel (long timer_id,
+template<class TQ, class TYPE> int
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::cancel (long timer_id,
                                             const void **act)
 {
   ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, guard, this->mutex_, -1);
@@ -214,8 +214,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::cancel (long timer_id,
   return result;
 }
 
-template<class TQ> void
-ACE_Thread_Timer_Queue_Adapter<TQ>::deactivate (void)
+template<class TQ, class TYPE> void
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::deactivate (void)
 {
   ACE_GUARD (ACE_SYNCH_RECURSIVE_MUTEX, guard, this->mutex_);
 
@@ -223,8 +223,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::deactivate (void)
   this->condition_.signal ();
 }
 
-template<class TQ> int
-ACE_Thread_Timer_Queue_Adapter<TQ>::svc (void)
+template<class TQ, class TYPE> int
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::svc (void)
 {
   ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, guard, this->mutex_, -1);
 
@@ -290,8 +290,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::svc (void)
   return 0;
 }
 
-template<class TQ> int
-ACE_Thread_Timer_Queue_Adapter<TQ>::activate (long flags,
+template<class TQ, class TYPE> int
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::activate (long flags,
                                               int ,
                                               int ,
                                               long priority,
@@ -320,14 +320,14 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::activate (long flags,
 // or cancelling timers on platforms where the timer queue mutex is not
 // recursive.
 
-template<class TQ> int
-ACE_Thread_Timer_Queue_Adapter<TQ>::enqueue_command (ACE_Command_Base *cmd,
+template<class TQ, class TYPE> int
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::enqueue_command (ACE_Command_Base *cmd,
                                                      COMMAND_ENQUEUE_POSITION pos)
 {
   // Serialize access to the command queue.
   ACE_GUARD_RETURN (ACE_SYNCH_MUTEX, guard, this->command_mutex_, -1);
 
-  if (pos == ACE_Thread_Timer_Queue_Adapter<TQ>::TAIL)
+  if (pos == ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::TAIL)
     return command_queue_.enqueue_tail (cmd);
   else
     return command_queue_.enqueue_head (cmd);
@@ -336,8 +336,8 @@ ACE_Thread_Timer_Queue_Adapter<TQ>::enqueue_command (ACE_Command_Base *cmd,
 // Dispatches all command objects enqueued in the most recent event
 // handler context.
 
-template<class TQ> int
-ACE_Thread_Timer_Queue_Adapter<TQ>::dispatch_commands (void)
+template<class TQ, class TYPE> int
+ACE_Thread_Timer_Queue_Adapter<TQ, TYPE>::dispatch_commands (void)
 {
   // Serialize access to the command queue.
   ACE_GUARD_RETURN (ACE_SYNCH_MUTEX, guard, this->command_mutex_, -1);

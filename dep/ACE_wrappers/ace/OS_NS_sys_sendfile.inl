@@ -1,10 +1,10 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_sys_sendfile.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_sys_sendfile.inl 84216 2009-01-22 18:34:40Z johnnyw $
 
-#ifdef ACE_HAS_SENDFILE
+#if defined ACE_HAS_SENDFILE && ACE_HAS_SENDFILE == 1
 # include <sys/sendfile.h>
-#endif  /* ACE_HAS_SENDFILE */
+#endif  /* ACE_HAS_SENDFILE==1 */
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -14,11 +14,11 @@ ACE_OS::sendfile (ACE_HANDLE out_fd,
                   off_t * offset,
                   size_t count)
 {
-#ifdef ACE_HAS_SENDFILE
+#if defined ACE_HAS_SENDFILE && ACE_HAS_SENDFILE == 1
   return ::sendfile (out_fd, in_fd, offset, count);
 #else
   return ACE_OS::sendfile_emulation (out_fd, in_fd, offset, count);
-#endif  /* ACE_HAS_SENDFILE */
+#endif  /* ACE_HAS_SENDFILE==1 */
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

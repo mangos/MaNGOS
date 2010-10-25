@@ -1,8 +1,8 @@
-// $Id: UPIPE_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: UPIPE_Acceptor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/UPIPE_Acceptor.h"
 
-ACE_RCSID(ace, UPIPE_Acceptor, "$Id: UPIPE_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if defined (ACE_HAS_THREADS)
 
@@ -72,8 +72,8 @@ int
 ACE_UPIPE_Acceptor::accept (ACE_UPIPE_Stream &new_stream,
                             ACE_UPIPE_Addr *remote_addr,
                             ACE_Time_Value *timeout,
-                            int restart,
-                            int reset_new_handle)
+                            bool restart,
+                            bool reset_new_handle)
 {
   ACE_TRACE ("ACE_UPIPE_Acceptor::accept");
   ACE_UNUSED_ARG (reset_new_handle);

@@ -4,7 +4,7 @@
 /**
  *  @file    Connector.h
  *
- *  $Id: Connector.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Connector.h 91527 2010-08-27 15:03:31Z shuston $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -67,6 +67,9 @@ public:
                                    SVC_HANDLER *,
                                    long timer_id);
 
+  /// Destructor.
+  ~ACE_NonBlocking_Connect_Handler (void);
+
   /// Close up and return underlying SVC_HANDLER through @c sh.
   /**
    * If the return value is true the close was performed succesfully,
@@ -99,6 +102,9 @@ public:
   /// Called by ACE_Reactor when asynchronous connections fail.
   virtual int handle_input (ACE_HANDLE);
 
+  /// Called by ACE_Dev_Poll_Reactor when asynchronous connections fail.
+  virtual int handle_close (ACE_HANDLE, ACE_Reactor_Mask);
+
   /// Called by ACE_Reactor when asynchronous connections succeed.
   virtual int handle_output (ACE_HANDLE);
 
@@ -126,6 +132,9 @@ private:
 
   /// Associated SVC_HANDLER.
   SVC_HANDLER *svc_handler_;
+
+  /// Same as svc_handler_ if svc_handler_ is reference counted.
+  SVC_HANDLER *cleanup_svc_handler_;
 
   /// Associated timer id.
   long timer_id_;
@@ -190,7 +199,7 @@ public:
    * 1). @a flags and @a perms can be used to pass any flags that are
    * needed to perform specific operations such as opening a file
    * within connect with certain permissions.  If the connection fails
-   * the <close> hook on the <svc_handler> will be called
+   * the <close> hook on the @a svc_handler will be called
    * automatically to prevent resource leaks.
    */
   virtual int connect (SVC_HANDLER *&svc_handler,
@@ -209,7 +218,7 @@ public:
    * context of the internal cache its use is thread-safe.  But the
    * actual svc_handler for the current connection is returned in the
    * second parameter @a svc_handler.  If the connection fails the
-   * <close> hook on the <svc_handler> will be called automatically to
+   * <close> hook on the @a svc_handler will be called automatically to
    * prevent resource leaks.
    */
   virtual int connect (SVC_HANDLER *&svc_handler_hint,
@@ -418,7 +427,7 @@ public:
   SUPER;
 
   /**
-   * Initialize a connector.  @a flags indicates how <SVC_HANDLER>'s
+   * Initialize a connector.  @a flags indicates how SVC_HANDLER's
    * should be initialized prior to being activated.  Right now, the
    * only flag that is processed is ACE_NONBLOCK, which enabled
    * non-blocking I/O on the SVC_HANDLER when it is opened.
@@ -529,21 +538,21 @@ protected:
   /// Creation strategy for an Connector.
   CREATION_STRATEGY *creation_strategy_;
 
-  /// true if Connector created the creation strategy and thus should
+  /// True if Connector created the creation strategy and thus should
   /// delete it, else false.
   bool delete_creation_strategy_;
 
   /// Connect strategy for a Connector.
   CONNECT_STRATEGY *connect_strategy_;
 
-  /// true if Connector created the connect strategy and thus should
+  /// True if Connector created the connect strategy and thus should
   /// delete it, else false.
   bool delete_connect_strategy_;
 
-  /// Concurrency strategy for an <Connector>.
+  /// Concurrency strategy for a Connector.
   CONCURRENCY_STRATEGY *concurrency_strategy_;
 
-  /// true if Connector created the concurrency strategy and thus should
+  /// True if Connector created the concurrency strategy and thus should
   /// delete it, else false.
   bool delete_concurrency_strategy_;
 };

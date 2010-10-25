@@ -1,4 +1,4 @@
-// $Id: Log_Record.cpp 81826 2008-06-02 15:29:53Z schmidt $
+// $Id: Log_Record.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Log_Record.h"
 
@@ -21,7 +21,7 @@
 
 #include "ace/OS_Memory.h"
 
-ACE_RCSID(ace, Log_Record, "$Id: Log_Record.cpp 81826 2008-06-02 15:29:53Z schmidt $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

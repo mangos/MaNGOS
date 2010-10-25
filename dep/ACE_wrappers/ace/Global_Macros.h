@@ -4,7 +4,7 @@
 /**
  *  @file   Global_Macros.h
  *
- *  $Id: Global_Macros.h 82442 2008-07-28 13:11:29Z johnnyw $
+ *  $Id: Global_Macros.h 91459 2010-08-25 09:51:01Z mcorino $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -104,68 +104,20 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 #   define ACE_UNIMPLEMENTED_FUNC(f) f;
 # endif /* ACE_NEEDS_FUNC_DEFINITIONS */
 
-#if !defined (ACE_LACKS_DEPRECATED_MACROS)
-  // Easy way to designate that a class is used as a pseudo-namespace.
-  // Insures that g++ "friendship" anamolies are properly handled.
-  # define ACE_CLASS_IS_NAMESPACE(CLASSNAME) \
-  private: \
-  CLASSNAME (void); \
-  CLASSNAME (const CLASSNAME&); \
-  friend class ace_dewarn_gplusplus
-#endif /* ACE_LACKS_DEPRECATED_MACROS */
-
-// ----------------------------------------------------------------
-
-//FUZZ: disable check_for_exception_sepc
-#if !defined (ACE_LACKS_DEPRECATED_MACROS)
-  #if defined (ACE_HAS_NO_THROW_SPEC)
-  #  define ACE_THROW_SPEC(X)
-  #else
-  #  if defined (ACE_HAS_EXCEPTIONS)
-  #    if defined (ACE_WIN32) && defined (_MSC_VER) && \
-          (_MSC_VER >= 1400) && (_MSC_VER <= 1500)
-  #      define ACE_THROW_SPEC(X) throw(...)
-  #    else
-  #      define ACE_THROW_SPEC(X) throw X
-  #    endif /* ACE_WIN32 && VC8 */
-  #  else  /* ! ACE_HAS_EXCEPTIONS */
-  #    define ACE_THROW_SPEC(X)
-  #  endif /* ! ACE_HAS_EXCEPTIONS */
-  #endif /*ACE_HAS_NO_THROW_SPEC*/
-#endif /* ACE_LACKS_DEPRECATED_MACROS */
-//FUZZ: enable check_for_exception_sepc
-
-// ----------------------------------------------------------------
-
-#if !defined (ACE_LACKS_DEPRECATED_MACROS)
-  /**
-   * This macro is deprecated
-   */
-  #define ACE_NESTED_CLASS(TYPE, NAME) TYPE::NAME
-#endif /* ACE_LACKS_DEPRECATED_MACROS */
-
-#if !defined (ACE_LACKS_DEPRECATED_MACROS)
-  /**
-   * @name CORBA namespace macros.
-   *
-   * CORBA namespace macros.
-   *
-   * @deprecated These macros were formerly used by TAO but are now
-   *             deprecated, and only remain to retain some backward
-   *             compatibility.  They will be removed in a future ACE
-   *             release.
-   */
-  //@{
-  #define ACE_CORBA_1(NAME) CORBA::NAME
-  #define ACE_CORBA_2(TYPE, NAME) CORBA::TYPE::NAME
-  #define ACE_CORBA_3(TYPE, NAME) CORBA::TYPE::NAME
-  //@}
-#endif /* ACE_LACKS_DEPRECATED_MACROS */
-
 // ----------------------------------------------------------------
 
 // Convenient macro for testing for deadlock, as well as for detecting
 // when mutexes fail.
+/* WARNING:
+ *   Use of ACE_GUARD() is rarely correct.  ACE_GUARD() causes the current
+ *   function to return if the lock is not acquired.  Since merely returning
+ *   (no value) almost certainly fails to handle the acquisition failure
+ *   and almost certainly fails to communicate the failure to the caller
+ *   for the caller to handle, ACE_GUARD() is almost always the wrong
+ *   thing to do.  The same goes for ACE_WRITE_GUARD() and ACE_READ_GUARD() .
+ *   ACE_GUARD_REACTION() is better because it lets you specify error
+ *   handling code.
+ */
 #define ACE_GUARD_ACTION(MUTEX, OBJ, LOCK, ACTION, REACTION) \
    ACE_Guard< MUTEX > OBJ (LOCK); \
    if (OBJ.locked () != 0) { ACTION; } \
@@ -188,6 +140,37 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 # define ACE_READ_GUARD_RETURN(MUTEX,OBJ,LOCK,RETURN) \
   ACE_Read_Guard< MUTEX > OBJ (LOCK); \
     if (OBJ.locked () == 0) return RETURN;
+
+// ----------------------------------------------------------------
+
+#if defined(ACE_UNEXPECTED_RETURNS)
+
+/* Using ACE_UNEXPECTED_RETURNS is ill-advised because, in many cases,
+ *   it fails to inform callers of the error condition.
+ * It exists mainly to provide back-compatibility with old, dangerous,
+ *   incorrect behavior.
+ * Code that previously used ACE_GUARD() or ACE_GUARD_RETURN() to return
+ *   upon failure to acquire a lock can now use:
+ *     ACE_GUARD_REACTION(..., ACE_UNEXPECTED(...))
+ *   The behavior of this depends on whether or not ACE_UNEXPECTED_RETURNS
+ *     is defined.  If so, it just returns upon failure (as in the original),
+ *     which is usually dangerous because it usually fails to handle the
+ *     error.  If not, it calls std::unexpected(), which does whatever the
+ *     std::unexpected handler does (which is to abort, by default).
+ */
+#  define ACE_UNEXPECTED(RETVAL) \
+  do { \
+    return RETVAL; \
+  } while (0)
+
+#else
+
+#  define ACE_UNEXPECTED(RETVAL) \
+  do { \
+    std::unexpected(); \
+  } while (0)
+
+#endif
 
 // ----------------------------------------------------------------
 

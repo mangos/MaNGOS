@@ -4,7 +4,7 @@
 /**
  *  @file     Pagefile_Memory_Pool.h
  *
- *  $Id: Pagefile_Memory_Pool.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Pagefile_Memory_Pool.h 85318 2009-05-11 18:17:14Z johnnyw $
  *
  *  @author Dougls C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Prashant Jain <pjain@cs.wustl.edu>
@@ -66,6 +66,9 @@ public:
   /// Initialize the pool.
   ACE_Pagefile_Memory_Pool (const ACE_TCHAR *backing_store_name = 0,
                             const OPTIONS *options = 0);
+
+  /// Destructor
+  virtual ~ACE_Pagefile_Memory_Pool (void);
 
   /// Ask system for initial chunk of shared memory.
   void *init_acquire (size_t nbytes,

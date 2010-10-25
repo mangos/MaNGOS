@@ -1,4 +1,4 @@
-// $Id: Service_Object.cpp 81826 2008-06-02 15:29:53Z schmidt $
+// $Id: Service_Object.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/config-all.h"
 
@@ -17,16 +17,12 @@
 # include "ace/Lib_Find.h"
 #endif
 
-ACE_RCSID (ace,
-           Service_Object,
-           "$Id: Service_Object.cpp 81826 2008-06-02 15:29:53Z schmidt $")
-
-  ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_ALLOC_HOOK_DEFINE(ACE_Service_Object)
-  ACE_ALLOC_HOOK_DEFINE(ACE_Service_Type)
+ACE_ALLOC_HOOK_DEFINE(ACE_Service_Type)
 
-  void
+void
 ACE_Service_Type::dump (void) const
 {
 #if defined (ACE_HAS_DUMP)
@@ -110,6 +106,9 @@ ACE_Service_Type::fini (void)
     }
 
   int ret = this->type_->fini ();
+
+  // Ensure type is 0 to prevent invalid access after call to fini.
+  this->type_ = 0;
 
   // Ensure that closing the DLL is done after type_->fini() as it may
   // require access to the code for the service object destructor,

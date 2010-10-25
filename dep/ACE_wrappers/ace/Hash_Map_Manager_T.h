@@ -4,7 +4,7 @@
 /**
  *  @file    Hash_Map_Manager_T.h
  *
- *  $Id: Hash_Map_Manager_T.h 81735 2008-05-19 19:14:10Z johnnyw $
+ *  $Id: Hash_Map_Manager_T.h 84477 2009-02-16 13:30:38Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -53,8 +53,14 @@ public:
   /// Key accessor.
   EXT_ID& key (void);
 
+  /// Read-only key accessor.
+  const EXT_ID& key (void) const;
+
   /// Item accessor.
   INT_ID& item (void);
+
+  /// Read-only item accessor.
+  const INT_ID& item (void) const;
 
   /// Key used to look up an entry.
   /// @deprecated Use key()
@@ -552,9 +558,6 @@ protected:
 
   /// Accessor of the underlying table
   ACE_Hash_Map_Entry<EXT_ID, INT_ID> *table (void);
-
-  /// Accessor of the current size attribute
-  size_t cur_size (void) const;
 
 private:
   /**

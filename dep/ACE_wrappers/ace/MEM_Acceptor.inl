@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: MEM_Acceptor.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: MEM_Acceptor.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -23,8 +23,8 @@ ACE_INLINE int
 ACE_MEM_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                           ACE_Addr *remote_addr,
                           ACE_Time_Value *timeout,
-                          int restart,
-                          int reset_new_handle) const
+                          bool restart,
+                          bool reset_new_handle) const
 {
   return this->ACE_SOCK_Acceptor::accept
     (new_stream, remote_addr, timeout, restart, reset_new_handle);
@@ -36,8 +36,8 @@ ACE_MEM_Acceptor::accept (ACE_SOCK_Stream &new_stream,
                           ACE_Accept_QoS_Params qos_params,
                           ACE_Addr *remote_addr,
                           ACE_Time_Value *timeout,
-                          int restart,
-                          int reset_new_handle) const
+                          bool restart,
+                          bool reset_new_handle) const
 {
   return this->ACE_SOCK_Acceptor::accept
     (new_stream, qos_params, remote_addr, timeout, restart, reset_new_handle);

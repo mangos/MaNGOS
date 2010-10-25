@@ -1,87 +1,134 @@
 // -*- C++ -*-
 //
-//$Id: UUID.inl 80826 2008-03-04 14:51:23Z wotte $
+//$Id: UUID.inl 85331 2009-05-14 00:04:12Z hillj $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE_Utils
 {
+  ACE_INLINE
+  const UUID_Node::Node_ID & UUID_Node::node_ID (void) const
+  {
+    return this->node_ID_;
+  }
 
-  /// Data Members for Class Attributes
+  ACE_INLINE
+  UUID_Node::Node_ID & UUID_Node::node_ID (void)
+  {
+    return this->node_ID_;
+  }
+
+  ACE_INLINE
+  UUID::UUID (void)
+  {
+    this->init ();
+  }
+
+  ACE_INLINE
+  UUID::UUID (const UUID &right)
+    : thr_id_ (right.thr_id_),
+      pid_ (right.pid_)
+  {
+    ACE_OS::memcpy (&this->uuid_, &right.uuid_, BINARY_SIZE);
+  }
+
+  ACE_INLINE
+  UUID::~UUID (void)
+  {
+
+  }
+
+  ACE_INLINE void
+  UUID::init (void)
+  {
+    ACE_OS::memset (&this->uuid_, 0, BINARY_SIZE);
+  }
+
+  ACE_INLINE unsigned long
+  UUID::hash (void) const
+  {
+    return ACE::hash_pjw (reinterpret_cast <const char *> (&this->uuid_),
+                          UUID::BINARY_SIZE);
+  }
+
   ACE_INLINE ACE_UINT32
   UUID::time_low (void) const
   {
-    return this->time_low_;
+    return this->uuid_.time_low_;
   }
 
   ACE_INLINE void
   UUID::time_low (ACE_UINT32 timelow)
   {
-    this->time_low_ = timelow;
+    this->uuid_.time_low_ = timelow;
   }
 
   ACE_INLINE ACE_UINT16
   UUID::time_mid (void) const
   {
-    return this->time_mid_;
+    return this->uuid_.time_mid_;
   }
 
   ACE_INLINE void
   UUID::time_mid (ACE_UINT16 time_mid)
   {
-    this->time_mid_ = time_mid;
+    this->uuid_.time_mid_ = time_mid;
   }
 
   ACE_INLINE ACE_UINT16
   UUID::time_hi_and_version (void) const
   {
-    return this->time_hi_and_version_;
+    return this->uuid_.time_hi_and_version_;
   }
 
   ACE_INLINE void
   UUID::time_hi_and_version (ACE_UINT16 time_hi_and_version)
   {
-    this->time_hi_and_version_ = time_hi_and_version;
+    this->uuid_.time_hi_and_version_ = time_hi_and_version;
   }
 
   ACE_INLINE u_char
   UUID::clock_seq_hi_and_reserved (void) const
   {
-    return this->clock_seq_hi_and_reserved_;
+    return this->uuid_.clock_seq_hi_and_reserved_;
   }
 
   ACE_INLINE void
   UUID::clock_seq_hi_and_reserved (u_char clock_seq_hi_and_reserved)
   {
-    this->clock_seq_hi_and_reserved_ = clock_seq_hi_and_reserved;
+    this->uuid_.clock_seq_hi_and_reserved_ = clock_seq_hi_and_reserved;
   }
 
   ACE_INLINE u_char
   UUID::clock_seq_low (void) const
   {
-    return this->clock_seq_low_;
+    return this->uuid_.clock_seq_low_;
   }
 
   ACE_INLINE void
   UUID::clock_seq_low (u_char clock_seq_low)
   {
-    this->clock_seq_low_ = clock_seq_low;
+    this->uuid_.clock_seq_low_ = clock_seq_low;
   }
 
-  ACE_INLINE UUID_Node*
+  ACE_INLINE const UUID_Node &
   UUID::node (void) const
   {
-    return this->node_;
+    return this->uuid_.node_;
+  }
+
+  ACE_INLINE UUID_Node &
+  UUID::node (void)
+  {
+    return this->uuid_.node_;
   }
 
   ACE_INLINE void
-  UUID::node (UUID_Node* node)
+  UUID::node (const UUID_Node & node)
   {
-    if (node_release_)
-      delete node_;
-
-    this->node_ = node;
-    node_release_ = false;
+    ACE_OS::memcpy (&this->uuid_.node_,
+                    node.node_ID (),
+                    UUID_Node::NODE_ID_SIZE);
   }
 
   ACE_INLINE ACE_CString*
@@ -117,58 +164,15 @@ namespace ACE_Utils
   ACE_INLINE bool
   UUID::operator == (const UUID &right) const
   {
-    if ((this->time_low_ != right.time_low ()) ||
-        (this->time_mid_ != right.time_mid ()) ||
-        (this->time_hi_and_version_ != right.time_hi_and_version ()) ||
-        (this->clock_seq_hi_and_reserved_ != right.clock_seq_hi_and_reserved ()) ||
-        (this->clock_seq_low_ != right.clock_seq_low ()) ||
-        (*this->node_ != *right.node ()))
-      return false;
-
-      return true;
+    return 0 == ACE_OS::memcmp (&this->uuid_, &right.uuid_, BINARY_SIZE);
   }
 
   ACE_INLINE bool
   UUID::operator != (const UUID &right) const
   {
-    return !(*this == right);
+    return 0 != ACE_OS::memcmp (&this->uuid_, &right.uuid_, BINARY_SIZE);
   }
 
-//  ACE_INLINE bool
-//UUID::operator < (const UUID &rt) const
-//  {
-//    UUID right (rt);
-//    if ((timeLow_ < right.timeLow ()) ||
-//        (timeMid_ < right.timeMid ()) ||
-//        (timeHiAndVersion_ < right.timeHiAndVersion ()) ||
-//        (clockSeqHiAndReserved_ < right.clockSeqHiAndReserved ()) ||
-//        (clockSeqLow_ < right.clockSeqLow ()) ||
-//        (node_ < right.node ()))
-//      {
-//        return true;
-//      }
-//
-//    return false;
-//  }
-//
-//  ACE_INLINE bool
-//  UUID::operator > (const UUID &right) const
-//  {
-//    return right < *this;
-//  }
-//
-//  ACE_INLINE bool
-//  UUID::operator <= (const UUID &right) const
-//  {
-//    return !(*this > right);
-//  }
-//
-//  ACE_INLINE bool
-//  UUID::operator >= (const UUID &right) const
-//  {
-//    return !(*this < right);
-//  }
-//
   ACE_INLINE bool
   UUID_Node::operator == (const UUID_Node& rt) const
   {

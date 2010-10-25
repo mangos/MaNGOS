@@ -1,4 +1,4 @@
-// $Id: SUN_Proactor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: SUN_Proactor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/SUN_Proactor.h"
 
@@ -7,12 +7,6 @@
 #include "ace/Task_T.h"
 #include "ace/Log_Msg.h"
 #include "ace/Object_Manager.h"
-
-
-ACE_RCSID (ace,
-           POSIX_CB_Proactor,
-           "$Id: SUN_Proactor.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -112,8 +106,8 @@ ACE_SUN_Proactor::handle_events_i (ACE_Time_Value *delta)
 
        default:         // EFAULT
          ACE_ERROR_RETURN ((LM_ERROR,
-                       "%N:%l:(%P | %t)::%p \nNumAIO=%d\n",
-                       "ACE_SUN_Proactor::handle_events: aiowait failed",
+                       ACE_TEXT("%N:%l:(%P | %t)::%p \nNumAIO=%d\n"),
+                       ACE_TEXT("ACE_SUN_Proactor::handle_events: aiowait failed"),
                         num_started_aio_),
                       -1);
        }
@@ -202,9 +196,9 @@ ACE_SUN_Proactor::find_completed_aio (aio_result_t *result,
                                transfer_count) == 0)
     { // should never be
       ACE_ERROR ((LM_ERROR,
-                  "%N:%l:(%P | %t)::%p\n",
-                  "ACE_SUN_Proactor::find_completed_aio:"
-                  "should never be !!!\n"));
+                  ACE_TEXT("%N:%l:(%P | %t)::%p\n"),
+                  ACE_TEXT("ACE_SUN_Proactor::find_completed_aio:")
+                  ACE_TEXT("should never be !!!\n")));
       return 0;
     }
 

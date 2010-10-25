@@ -1,4 +1,4 @@
-// $Id: Intrusive_List.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Intrusive_List.cpp 84273 2009-01-30 12:55:25Z johnnyw $
 
 #ifndef ACE_INTRUSIVE_LIST_CPP
 #define ACE_INTRUSIVE_LIST_CPP
@@ -36,13 +36,14 @@ ACE_Intrusive_List<T>::push_back (T *node)
       this->head_ = node;
       node->next (0);
       node->prev (0);
-      return;
     }
-
-  this->tail_->next (node);
-  node->prev (this->tail_);
-  node->next (0);
-  this->tail_ = node;
+  else
+    {
+      this->tail_->next (node);
+      node->prev (this->tail_);
+      node->next (0);
+      this->tail_ = node;
+    }
 }
 
 template<class T> void
@@ -54,22 +55,24 @@ ACE_Intrusive_List<T>::push_front (T *node)
       this->head_ = node;
       node->next (0);
       node->prev (0);
-      return;
     }
-
-  this->head_->prev (node);
-  node->next (this->head_);
-  node->prev (0);
-  this->head_ = node;
+  else
+    {
+      this->head_->prev (node);
+      node->next (this->head_);
+      node->prev (0);
+      this->head_ = node;
+    }
 }
 
 template<class T> T *
 ACE_Intrusive_List<T>::pop_front (void)
 {
   T *node = this->head_;
-  if (node == 0)
-    return 0;
-  this->unsafe_remove (node);
+  if (node != 0)
+    {
+      this->unsafe_remove (node);
+    }
   return node;
 }
 
@@ -77,9 +80,10 @@ template<class T> T *
 ACE_Intrusive_List<T>::pop_back (void)
 {
   T *node = this->tail_;
-  if (node == 0)
-    return 0;
-  this->unsafe_remove (node);
+  if (node != 0)
+    {
+      this->unsafe_remove (node);
+    }
   return node;
 }
 

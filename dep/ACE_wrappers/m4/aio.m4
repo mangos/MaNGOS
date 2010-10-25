@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------------------
-dnl       $Id: aio.m4 80826 2008-03-04 14:51:23Z wotte $
+dnl       $Id: aio.m4 85317 2009-05-11 15:21:04Z schmidt $
 dnl
 dnl       aio.m4
 dnl
@@ -64,6 +64,7 @@ if test "$ace_has_aio_funcs" = yes; then
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <iostream>
 
 #include <aio.h>
 
@@ -137,7 +138,6 @@ Test_Aio::init (void)
   // Init the buffers.
   this->buffer_write_ = new char [sizeof (message) + 1];
   strcpy (this->buffer_write_, message);
-  // cout << "The buffer : " << this->buffer_write_ << endl;
   this->buffer_read_ = new char [sizeof (message) + 1];
 
   return 0;
@@ -219,8 +219,6 @@ Test_Aio::do_aio (void)
               list_aiocb [0] = 0;
             }
         }
-//      else
-//        cout << "AIO in progress" << endl;
 
       if (list_aiocb [1] != 0 && aio_error (list_aiocb [1]) != EINPROGRESS)
         {
@@ -237,16 +235,11 @@ Test_Aio::do_aio (void)
               list_aiocb [1] = 0;
             }
         }
-//      else
-//        cout << "AIO in progress" << endl;
 
       // Is it done?
       if ((list_aiocb [0] == 0) && (list_aiocb [1] == 0))
         done = 1;
     }
-
-  //cout << "Both the AIO operations done." << endl;
-  //cout << "The buffer is :" << this->buffer_read_ << endl;
 
   return 0;
 }

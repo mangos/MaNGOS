@@ -1,9 +1,9 @@
 // -*- C++ -*-
-// $Id: OS_NS_netdb.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_netdb.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/OS_NS_netdb.h"
 
-ACE_RCSID(ace, OS_NS_netdb, "$Id: OS_NS_netdb.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_netdb.inl"
@@ -276,7 +276,7 @@ ACE_OS::getmacaddress (struct macaddr_node_t *node)
 # else
 #   if defined (ACE_HAS_PHARLAP_RT)
       DEVHANDLE ip_dev = (DEVHANDLE)0;
-      EK_TCPIPCFG *devp;
+      EK_TCPIPCFG *devp = 0;
       size_t i;
       ACE_TCHAR dev_name[16];
 
@@ -382,6 +382,60 @@ ACE_OS::getmacaddress (struct macaddr_node_t *node)
   ACE_OS::memcpy (node->node,
                   sa->sa_data,
                   6);
+
+  return 0;
+
+#elif defined (ACE_HAS_IPHONE) || defined (ACE_HAS_MAC_OSX)
+
+  const long BUFFERSIZE = 4000;
+  char buffer[BUFFERSIZE];
+
+  struct ifconf ifc;
+  struct ifreq* ifr = 0;
+
+  ACE_HANDLE handle =
+    ACE_OS::socket (AF_INET, SOCK_DGRAM, 0);
+
+  if (handle == ACE_INVALID_HANDLE)
+    {
+      return -1;
+    }
+
+  ifc.ifc_len = BUFFERSIZE;
+  ifc.ifc_buf = buffer;
+
+  if (ACE_OS::ioctl (handle, SIOCGIFCONF, &ifc) < 0)
+    {
+      ACE_OS::close (handle);
+      return -1;
+    }
+
+  for(char* ptr=buffer; ptr < buffer + ifc.ifc_len; )
+    {
+      ifr = (struct ifreq *) ptr;
+
+      if (ifr->ifr_addr.sa_family == AF_LINK)
+        {
+          if(ACE_OS::strcmp (ifr->ifr_name, "en0") == 0)
+            {
+              struct sockaddr_dl* sdl =
+                (struct sockaddr_dl *) &ifr->ifr_addr;
+
+              ACE_OS::memcpy (node->node,
+                              LLADDR(sdl),
+                              6);
+            }
+        }
+
+      ptr += sizeof(ifr->ifr_name);
+
+      if(sizeof(ifr->ifr_addr) > ifr->ifr_addr.sa_len)
+        ptr += sizeof(ifr->ifr_addr);
+      else
+        ptr += ifr->ifr_addr.sa_len;
+    }
+
+  ACE_OS::close (handle);
 
   return 0;
 

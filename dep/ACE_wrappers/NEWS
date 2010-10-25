@@ -1,9 +1,300 @@
-PLANNED MAJOR CHANGES "SOMETIME IN THE FUTURE" (i.e., exact beta not known)
-===========================================================================
+USER VISIBLE CHANGES BETWEEN ACE-5.8.1 and ACE-5.8.2
+====================================================
 
-. RPM packaging as part of the release process by the doc_group (Remedy and user community)
+. Added support for the Microsoft Visual Studio 2010 IDE (vc10)
 
-. Remove BCB6, BCB2006, and the borland MPC template after the release of x.6.6
+. Removed complete support for emulated C++ exceptions
+
+USER VISIBLE CHANGES BETWEEN ACE-5.8.0 and ACE-5.8.1
+====================================================
+
+. Added support for Microsoft Visual Studio 2010 using nmake 
+
+. Reduced the amount of doxygen pages generated, the original settings caused
+  a doxygen generated html package of 1.4GB which was way too large
+
+. Extended ACE INet addon library with:
+  * HTTP Basic Authentication
+  * SSL/HTTPS support.
+  * Proxy CONNECT tunneling.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.9 and ACE-5.8.0
+====================================================
+
+. There are two new ACE_Time_Value methods for getting and setting millisecond
+  values to/from ACE_UINT64 values:
+
+      ACE_UINT64 ACE_Time_Value::get_msec () const
+      void ACE_Time_Value::set_msec (const ACE_UINT64 &ms)
+
+  The former is a replacement for the existing msec(ACE_UINT64&) methods that
+  are "getter" methods whose signatures look confusingly like "setters". See
+  Bugzilla #3336 for the history behind this change.
+
+  The latter is for consistency and clarity.
+
+. Added ACE INet addon library for Inet protocol clients (and possibly
+  servers at some point) like http://, ftp:// etc.
+  The library implements standard C++ iostream wrapper classes for
+  ACE Svc_Handler and Reactor based input/output handling, URL classes
+  and protocol handler classes.
+  NOTE: This is work in progress! There is no guarentee that the API
+  won't change in the next few releases.
+  Protocol handling is currently restricted to client side download
+  requests for HTTP and FTP.
+  Handling for upload requests should be added in the near future as well
+  as HTTP Basic Authentication.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.8 and ACE-5.7.9
+====================================================
+
+. ACE's default makefiles (traditional ACE/GNU, not autoconf/automake)
+  now support installation with "make install".
+  Please see the ACE-INSTALL.html file for instructions.
+
+. Support for the ARCH make variable has been enhanced to apply to executables
+  (in addition to libraries and object files), and the ARCH feature has been
+  integrated into the MPC-generated makefiles (to work with MPC's requires
+  and avoids features).
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.7 and ACE-5.7.8
+====================================================
+
+. ACE now uses GCC builtin Atomic instructions for short,
+  unsigned short, long, unsigned long, int, unsigned int,
+  and bool. This makes our Atomic_Op around 7 times faster
+
+. ACE Service Configuration Framework now process first service
+  configuration files and then command-line directives. Thus if
+  application uses both service configuration files and command-line
+  directives then the command-line directives may override results of
+  directives in the configuration files. At the same time if the
+  application uses only the default svc.conf file and command-line
+  directives then the directives from svc.conf can not override
+  results of the user provided command-line directives.
+
+. ACE_Dev_Poll_Reactor now dispatches notifications in only one thread at
+  a time. This brings notification handling more in line with behavior in
+  other Reactor implementations.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.6 and ACE-5.7.7
+====================================================
+
+. Integrated fix for bug 3104 and regression test for
+  interval timers.
+
+. Added support for GCC builtin Atomic instructions which
+  are enabled with GCC >= 4.1 for PPC32/PPC64/IA64
+
+. Improved autoconf support for debian
+
+. Added support for -mcpu and -mtune. Add TCPU=.. to your
+  environment/platform_macros.GNU to specify you cpu and
+  than add cpumodelflag=1 and/or tunemodelflag=1. Using
+  this with IBM Cell increased the performance significantly
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.5 and ACE-5.7.6
+====================================================
+
+. Added support for iPhone/iPod Touch/iPad. The following
+  environment variables are needed:
+
+  IPHONE_TARGET, should be set to either SIMULATOR or
+  HARDWARE. Set to HARDWARE if you want to deploy
+  on the iPhone/iPod Touch/iPad device.
+
+  IPHONE_VERSION, should be set to 3.1.2 or 3.2. One can
+  set the version to any future or past versions, but
+  only 3.1.2 and 3.2 have been tried.
+
+  Note that one has to compile ACE/TAO statically as
+  it is believed that the iPhone OS does not support
+  dynamic loading of external libraries. The usual
+  procedure of cross compiling ACE/TAO applies
+  (such as setting HOST_ROOT environment variable).
+
+. Added support for Embarcadero C++ Builder 2010
+
+. Added option to print a given ACE_Time_Value in the log
+  message instead of system supplied timestamp as in %T
+  and %D.
+  The option is implemented as a variant of the %D/%T
+  options by using the '#' flag character like '%#D' or
+  '%#T'. When using this flag an ACE_Time_Value pointer is
+  expected in the argument list supplied with the log message.
+  This fixed Bugzilla #3221.
+
+. Fixed problems with ACE_INET_Addr::is_multicast() on
+  little endian platforms. This fixed bugzilla #3729.
+
+. Added compilation support for VxWorks 6.8, no runtime
+  testing has been performed
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.4 and ACE-5.7.5
+====================================================
+
+. Added MacOSX Snow Leopard support
+
+. Added strsignal() wrapper
+
+. Improved LynxOS support
+
+. Updated Interix port
+
+. Fixed MinGW compilation problems
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.3 and ACE-5.7.4
+====================================================
+
+. ACE_CDR::consolidate now returns an int, 0 is ok, -1 is failure
+
+. Fixed a bug in the realclean feature of the GNU makefiles
+
+. Improved Sun Studio for Linux support
+
+. Improved OpenBSD support
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.2 and ACE-5.7.3
+====================================================
+
+. C++ Builder 2009 Update 3 is the only C++Builder that is supported, older
+  and newer compilers are not supported anymore
+
+. Made final changes for the CEGCC port
+
+. Added a set of tests to validate C++ compiler and the stl implementation
+  they ship.
+
+. HP-UX PARISC aCC < 3.80 are deprecated and can't be used anymore. Upgrade
+  to aCC 3.80 or newer
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.1 and ACE-5.7.2
+====================================================
+
+. Borland C++ makefiles aren't shipped anymore as part of the release
+  but have to be generated by the user
+
+. Refactored gperf to have its own shared library so that we can reuse
+  that in TAO
+
+. Added support for SuSE Enterprise 10
+
+. ACE_Configuration_Heap::open() now returns -1 with errno EBUSY if it is
+  called multiple times. Previous versions would allow multiple calls to
+  open() but leak resources.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.7.0 and ACE-5.7.1
+====================================================
+
+. Added support for Sun Studio 12 Update Pack 1
+
+. Fixed compile problems when using Windows CE x86 release mode
+
+. Fixed compile problems for FreeBSD
+
+USER VISIBLE CHANGES BETWEEN ACE-5.6.9 and ACE-5.7.0
+====================================================
+
+. Added support for the VxWorks vxAtomicLib which is available with VxWorks 6.6
+  and newer. If you don't want to use this library undef ACE_HAS_VXATOMICLIB
+  in your config.h file
+
+. Added support for C++ Builder 2009 Update 3
+
+. Added support for ACE/TAO using the CEGCC project
+
+. Added support for upcoming Fedora 11 and OpenSuSE Factory
+
+USER VISIBLE CHANGES BETWEEN ACE-5.6.8 and ACE-5.6.9
+====================================================
+
+. Removed Borland/CodeGear C++ Builder 2007 support.  If you'd like to
+  fund this support please let us know.
+
+. Removed VxWorks 5.5.x, 6.2, and 6.3 support.  If you'd like to fund
+  this support please let us know.
+
+. Improved Unicode support.
+
+. Added support for the native Windows Vista and Windows Server 2008
+  condition variables. These has to be enabled at compile time, and when
+  enabled the application can only run on Vista or Server 2008.  Add
+  ACE_HAS_WTHREADS_CONDITION_VARIABLE to your config.h file to enable
+  these
+
+. Fixed a bug when trying to read a file of 1 byte when unicode is
+  enabled
+
+. Improved the Windows CE port
+
+. Fixed several Klocwork reported issues
+
+. Added support for MinGW 3.15
+
+. Added support for Incredibuild, which is an MSVC++ feature that
+  optimizes compiles via distributing builds.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.6.7 and ACE-5.6.8
+====================================================
+
+. Added a new function ACE::isdotdir() which determines if a specified
+  pathname is "dot dir" (ie. "." or ".."). ACE::isdotdir() is significantly
+  faster than pair of strcmp() calls.
+
+. Last micro release that is maintained for Borland/CodeGear C++
+  Builder 2007 and Intel C++ on Windows.
+
+. Fixed crash when ACE thread tries to inherit the logging attributes
+  from non ACE threads.
+
+. Fixed many small compile and test errors that occur on some platforms.
+
+. Fixed log output formatting on some platforms.
+
+. Bugs fixed:  2748, 3164, 3480, 3494, 3502, 3541, 3542, 3544, 3557.
+
+USER VISIBLE CHANGES BETWEEN ACE-5.6.6 and ACE-5.6.7
+====================================================
+
+. Changed the automake build's feature test for a "usable" config
+  to warn on failure instead of exiting with an error.  This should
+  make it easier to diagnose configure failures, as the script will
+  now generate a config.h file even when the test fails.
+
+. Removed borland MPC template, use the bmake template from now
+
+. Added Windows Mobile 6 support and improved the WinCE port
+
+. Removed BCB6 and BCB2006 support
+
+. Added BCB2009 MPC template
+
+. Updated stat struct on Windows CE to match the stat struct on other
+  platforms so that application code can be written portable
+
+. Added new ACE_OS wrappers: raise, atof, atol, isblank, isascii,
+  isctype, and iswctype
+
+. Added ACE_OS wrapper for narrow-char version of strtoll.
+
+. ACE_OS wrappers for wide-char versions of strtol, strtoul,
+  strtoll, and strtoll.
+
+. Added Visual Studio 2010 (vc10) support
+
+. Added a new feature for the "Traditional Make" build facility to allow
+  building for multiple architectures out of a single source directory.
+  To use this facility, set the ARCH make variable. The ARCH value will be
+  used to add a subdirectory layer below the source directory where the
+  traditional .shobj, .obj, etc. directories will be placed.
+
+. Added support for HP-UX 11iv3 on Integrity using aC++
+
+. ACE (and TAO) can now be built using GNU make and the Microsoft Visual C++
+  compiler and linker.  See include/makeinclude/platform_win32_msvc.GNU for
+  more details.
+
+. Added support for FC10
 
 USER VISIBLE CHANGES BETWEEN ACE-5.6.5 and ACE-5.6.6
 ====================================================

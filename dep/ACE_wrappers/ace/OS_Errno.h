@@ -4,7 +4,7 @@
 /**
  *  @file   OS_Errno.h
  *
- *  $Id: OS_Errno.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_Errno.h 83891 2008-11-28 11:01:50Z johnnyw $
  *
  *  @author (Originally in OS.h)Doug Schmidt <schmidt@cs.wustl.edu>
  */
@@ -46,20 +46,19 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Errno_Guard
 {
 public:
-  ///  Stash the value of <error> into <error_> and initialize the
-  ///  <errno_ptr_> to the address of <errno_ref>.
+  ///  Stash the value of @a error into @c error_ and initialize the
+  ///  @c errno_ptr_ to the address of @a errno_ref.
   ACE_Errno_Guard (ACE_ERRNO_TYPE &errno_ref,
                    int error);
 
-  ///  Stash the value of @c errno into <error_> and initialize the
-  ///  <errno_ptr_> to the address of <errno_ref>.
+  ///  Initialize the @c errno_ptr_ to the address of @a errno_ref.
   ACE_Errno_Guard (ACE_ERRNO_TYPE &errno_ref);
 
   /// Reset the value of @c errno to <error>.
   ~ACE_Errno_Guard (void);
 
 #if defined (ACE_HAS_WINCE_BROKEN_ERRNO)
-  /// Assign <errno_ref> to <error_>.
+  /// Assign @a errno_ref to <error_>.
   int operator= (const ACE_ERRNO_TYPE &errno_ref);
 #endif /* ACE_HAS_WINCE_BROKEN_ERRNO */
 
