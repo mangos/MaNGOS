@@ -4,7 +4,7 @@
 /**
  *  @file    Bound_Ptr.h
  *
- *  $Id: Bound_Ptr.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Bound_Ptr.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Christopher Kohlhoff <chris@kohlhoff.com>
  *  @author Boris Kolpackov <boris@codesynthesis.com>
@@ -223,7 +223,7 @@ public:
 
   /// Allows us to check for NULL on all ACE_Strong_Bound_Ptr
   /// objects.
-  int null (void) const;
+  bool null (void) const;
 
   /// Declare the dynamic allocation hooks.
   ACE_ALLOC_HOOK_DECLARE;
@@ -359,7 +359,7 @@ public:
   long remove_ref (void);
 
   /// Allows us to check for NULL on all ACE_Weak_Bound_Ptr objects.
-  int null (void) const;
+  bool null (void) const;
 
   /// Declare the dynamic allocation hooks.
   ACE_ALLOC_HOOK_DECLARE;

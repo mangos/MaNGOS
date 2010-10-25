@@ -4,7 +4,7 @@
 /**
  * @file CORBA_macros.h
  *
- * $Id: CORBA_macros.h 80826 2008-03-04 14:51:23Z wotte $
+ * $Id: CORBA_macros.h 91285 2010-08-05 08:29:30Z johnnyw $
  *
  *   Writing code that is portable between platforms with or without
  *   native C++ exceptions is hard.  The following macros offer some
@@ -29,10 +29,6 @@
 # if !defined (ACE_LACKS_PRAGMA_ONCE)
 #   pragma once
 # endif /* ACE_LACKS_PRAGMA_ONCE */
-
-#define ACE_ENV_POLLUTE_NAMES
-
-#include "ace/Exception_Macros.h"
 
 // The Windows MFC exception mechanism requires that a caught CException
 // (including the CMemoryException in use here) be freed using its Delete()
@@ -449,126 +445,6 @@
 # define ACE_WRITE_GUARD_THROW_EX(MUTEX,OBJ,LOCK,EXCEPTION) \
   ACE_Write_Guard< MUTEX > OBJ (LOCK); \
     if (OBJ.locked () == 0) throw EXCEPTION;
-
-#if !defined (ACE_LACKS_DEPRECATED_MACROS)
-
-//@{
-/**
- * @name Native C++ exceptions portability macros.
- *
- * The following macros are used to write code portable between platforms
- * with and without native C++ exception support. Their main goal is to
- * hide the presence of the ACE_ENV_TYPE argument, but they collaborate
- * with the ACE_TRY_* macros to emulate the try/catch blocks.
- */
-
-/// Define a macro to emit code only when ACE_ENV_TYPE is used
-#if !defined (ACE_USES_NATIVE_EXCEPTIONS) || defined (ACE_ENV_BKWD_COMPAT)
-#  define ACE_ENV_EMIT_CODE(X) X
-#else
-#  define ACE_ENV_EMIT_CODE(X)
-#endif /* ACE_USES_NATIVE_EXCEPTIONS && ! ACE_ENV_BKWD_COMPAT */
-
-/// Another macro to emit code only when ACE_ENV_TYPE is used
-#if !defined (ACE_USES_NATIVE_EXCEPTIONS) || defined (ACE_ENV_BKWD_COMPAT)
-#  define ACE_ENV_EMIT_CODE2(X,Y) X,Y
-#else
-#  define ACE_ENV_EMIT_CODE2(X,Y)
-#endif /* ACE_USES_NATIVE_EXCEPTIONS && ! ACE_ENV_BKWD_COMPAT */
-
-/// Helper macro
-#define ACE_ENV_EMIT_DUMMY
-
-/// Declare a ACE_ENV_TYPE argument as the last argument of a
-/// function
-/**
- * Normally this macro is used as follows:
- *
- * <CODE>void my_funct (int x, int y ACE_ENV_ARG_DECL);</CODE>
- *
- * Its purpose is to provide developers (and users) with a mechanism to
- * write code that is portable to platforms with and without native C++
- * exceptions.
- */
-#define ACE_ENV_ARG_DECL \
-    ACE_ENV_EMIT_CODE2(ACE_ENV_EMIT_DUMMY, \
-                       ACE_ENV_TYPE &ACE_TRY_ENV)
-
-/// Declare a ACE_ENV_TYPE argument with the default value obtained from
-/// the ORB/application.
-/**
- * It is similar to ACE_ENV_ARG_DECL. The name of the default environment
- * getter method needs to be changed when switching ORBs or when used with
- * another application.
- */
-#define ACE_ENV_ARG_DECL_WITH_DEFAULTS \
-    ACE_ENV_EMIT_CODE2(ACE_ENV_EMIT_DUMMY, \
-                       ACE_ENV_TYPE &ACE_TRY_ENV = \
-                           ACE_DEFAULT_GET_ENV_METHOD ())
-
-/// Declare a ACE_ENV_TYPE argument that is not used by the
-/// function definition.
-/**
- * Similar to ACE_ENV_ARG_DECL, but the formal parameter name is dropped to
- * avoid warnings about unused parameters
- */
-#define ACE_ENV_ARG_DECL_NOT_USED \
-    ACE_ENV_EMIT_CODE2(ACE_ENV_EMIT_DUMMY, \
-                       ACE_ENV_TYPE &)
-
-/// Declare a ACE_ENV_TYPE argument for methods that do not take any other
-/// parameters
-#define ACE_ENV_SINGLE_ARG_DECL \
-    ACE_ENV_EMIT_CODE(ACE_ENV_TYPE &ACE_TRY_ENV)
-
-/// Declare a ACE_ENV_TYPE argument with a default value for methods that
-/// do not take any other parameters. The name of the default environment
-/// getter method needs to be changed when switching ORBs or when used in
-/// another application.
-#define ACE_ENV_SINGLE_ARG_DECL_WITH_DEFAULTS \
-    ACE_ENV_EMIT_CODE(ACE_ENV_TYPE &ACE_TRY_ENV = \
-                          ACE_DEFAULT_GET_ENV_METHOD ())
-
-/// Declare a ACE_ENV_TYPE argument for methods which don't use it.
-#define ACE_ENV_SINGLE_ARG_DECL_NOT_USED \
-    ACE_ENV_EMIT_CODE(ACE_ENV_TYPE &)
-
-/// Use the ACE_ENV_TYPE argument in a nested call
-#define ACE_ENV_ARG_PARAMETER \
-    ACE_ENV_EMIT_CODE2(ACE_ENV_EMIT_DUMMY, \
-                       ACE_TRY_ENV)
-
-/// Use the ACE_ENV_TYPE argument in a nested call, assuming that the
-/// called function takes only the ACE_TRY_ENV argument.
-#define ACE_ENV_SINGLE_ARG_PARAMETER \
-    ACE_ENV_EMIT_CODE(ACE_TRY_ENV)
-
-/// Eliminate unused argument warnings about ACE_TRY_ENV
-#define ACE_ENV_ARG_NOT_USED \
-    ACE_ENV_EMIT_CODE(ACE_UNUSED_ARG(ACE_TRY_ENV))
-//@}
-
-#if !defined (ACE_USES_NATIVE_EXCEPTIONS)
-// This thing can be moved above when we drop ACE_ENV_BKWD_COMPAT.
-#  define ACE_ENV_RAISE(ex) ACE_TRY_ENV.exception (ex)
-#else
-#  define ACE_ENV_RAISE(ex) (ex)->_raise ()
-#endif /* ACE_USES_NATIVE_EXCEPTIONS */
-
-// ============================================================
-
-// Print out a TAO exception.  This is not CORBA compliant.
-# define ACE_PRINT_TAO_EXCEPTION(EX,INFO) \
-  EX._tao_print_exception (INFO)
-
-// Print out a CORBA exception.  There is not portable way to
-// dump a CORBA exception.  If you are using other ORB implementation,
-// redefine the macro to get what you want.
-# if !defined ACE_PRINT_EXCEPTION
-#   define ACE_PRINT_EXCEPTION(EX,INFO) ACE_PRINT_TAO_EXCEPTION(EX,INFO)
-# endif /* ACE_PRINT_EXCEPTION */
-
-#endif /* !ACE_LACKS_DEPRECATED_MACROS */
 
 #include /**/ "ace/post.h"
 

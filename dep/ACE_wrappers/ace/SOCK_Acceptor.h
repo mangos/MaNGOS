@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK_Acceptor.h
  *
- *  $Id: SOCK_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SOCK_Acceptor.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -99,8 +99,8 @@ public:
   // = Passive connection <accept> methods.
   /**
    * Accept a new ACE_SOCK_Stream connection.  A @a timeout of 0
-   * means block forever, a @a timeout of {0, 0} means poll.  <restart>
-   * == 1 means "restart if interrupted," i.e., if errno == EINTR.
+   * means block forever, a @a timeout of {0, 0} means poll.  @a restart
+   * == true means "restart if interrupted," i.e., if errno == EINTR.
    * Note that @a new_stream inherits the "blocking mode" of @c this
    * ACE_SOCK_Acceptor, i.e., if @c this acceptor factory is in
    * non-blocking mode, the @a new_stream will be in non-blocking mode
@@ -109,14 +109,14 @@ public:
   int accept (ACE_SOCK_Stream &new_stream,
               ACE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0) const;
+              bool restart = true,
+              bool reset_new_handle = false) const;
 
 #if !defined (ACE_HAS_WINCE)
   /**
    * Accept a new ACE_SOCK_Stream connection using the QoS
    * information in @a qos_params.  A @a timeout of 0 means block
-   * forever, a @a timeout of {0, 0} means poll.  @a restart == 1 means
+   * forever, a @a timeout of {0, 0} means poll.  @a restart == true means
    * "restart if interrupted," i.e., if errno == EINTR.  Note that
    * @a new_stream inherits the "blocking mode" of @c this
    * ACE_SOCK_Acceptor, i.e., if @c this acceptor factory is in
@@ -127,8 +127,8 @@ public:
               ACE_Accept_QoS_Params qos_params,
               ACE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0) const;
+              bool restart = true,
+              bool reset_new_handle = false) const;
 #endif  // ACE_HAS_WINCE
 
   // = Meta-type info
@@ -145,14 +145,14 @@ protected:
   /// Perform operations that must occur before <ACE_OS::accept> is
   /// called.
   int shared_accept_start (ACE_Time_Value *timeout,
-                           int restart,
+                           bool restart,
                            int &in_blocking_mode) const;
 
   /// Perform operations that must occur after <ACE_OS::accept> is
   /// called.
   int shared_accept_finish (ACE_SOCK_Stream new_stream,
                             int in_blocking_mode,
-                            int reset_new_handle) const;
+                            bool reset_new_handle) const;
 
   /**
    * This method factors out the common <open> code and is called by

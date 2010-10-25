@@ -4,7 +4,7 @@
 /**
  *  @file    Auto_IncDec_T.h
  *
- *  $Id: Auto_IncDec_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Auto_IncDec_T.h 84675 2009-03-02 11:44:35Z johnnyw $
  *
  *  @author Edan Ayal <EdanA@cti2.com>
  */
@@ -60,8 +60,8 @@ private:
   // = Prevent assignment and initialization.
   ACE_UNIMPLEMENTED_FUNC (void operator= (const
                                           ACE_Auto_IncDec<ACE_SAFELY_INCREMENTABLE_DECREMENTABLE> &))
-    ACE_UNIMPLEMENTED_FUNC (ACE_Auto_IncDec (const
-                                             ACE_Auto_IncDec<ACE_SAFELY_INCREMENTABLE_DECREMENTABLE> &))
+  ACE_UNIMPLEMENTED_FUNC (ACE_Auto_IncDec (const
+                                           ACE_Auto_IncDec<ACE_SAFELY_INCREMENTABLE_DECREMENTABLE> &))
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-sco-5.0.0.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-sco-5.0.0.h 87167 2009-10-19 19:33:53Z olli $
 
 #ifndef ACE_CONFIG_SCO_5_0_0_H
 #define ACE_CONFIG_SCO_5_0_0_H
@@ -15,7 +15,6 @@
 #endif /* SCO */
 
 #define ACE_HAS_NONCONST_SELECT_TIMEVAL
-#define ACE_HAS_SIG_MACROS
 #define ACE_LACKS_CONST_TIMESPEC_PTR
 #define ACE_LACKS_SYSCALL
 #define ACE_LACKS_STRRECVFD
@@ -48,9 +47,6 @@
 // Compiler/platform has correctly prototyped header files.
 #define ACE_HAS_CPLUSPLUS_HEADERS
 
-// Header files lack t_errno for ACE_TLI.
-//#define ACE_LACKS_T_ERRNO
-
 // Compiler/platform supports poll().
 // #define ACE_HAS_POLL
 
@@ -65,9 +61,6 @@
 
 // Defines the page size of the system.
 #define ACE_PAGE_SIZE 4096
-
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
 
 #define ACE_HAS_TIMEZONE_GETTIMEOFDAY
 

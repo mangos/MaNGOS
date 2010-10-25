@@ -3,7 +3,7 @@
 /**
  *  @file    Hash_Map_Manager_T.cpp
  *
- *  $Id: Hash_Map_Manager_T.cpp 81735 2008-05-19 19:14:10Z johnnyw $
+ *  $Id: Hash_Map_Manager_T.cpp 84477 2009-02-16 13:30:38Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cse.wustl.edu>
  */
@@ -58,8 +58,20 @@ ACE_Hash_Map_Entry<EXT_ID, INT_ID>::key ()
   return ext_id_;
 }
 
+template <class EXT_ID, class INT_ID> const EXT_ID &
+ACE_Hash_Map_Entry<EXT_ID, INT_ID>::key () const
+{
+  return ext_id_;
+}
+
 template <class EXT_ID, class INT_ID> INT_ID &
 ACE_Hash_Map_Entry<EXT_ID, INT_ID>::item ()
+{
+  return int_id_;
+}
+
+template <class EXT_ID, class INT_ID> const INT_ID &
+ACE_Hash_Map_Entry<EXT_ID, INT_ID>::item () const
 {
   return int_id_;
 }
@@ -80,8 +92,8 @@ ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::dump 
 {
 #if defined (ACE_HAS_DUMP)
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
-  ACE_DEBUG ((LM_DEBUG,  ACE_TEXT ("total_size_ = %d"), this->total_size_));
-  ACE_DEBUG ((LM_DEBUG,  ACE_TEXT ("\ncur_size_ = %d"), this->cur_size_));
+  ACE_DEBUG ((LM_DEBUG,  ACE_TEXT ("total_size_ = %d\n"), this->total_size_));
+  ACE_DEBUG ((LM_DEBUG,  ACE_TEXT ("cur_size_ = %d\n"), this->cur_size_));
   this->table_allocator_->dump ();
   this->entry_allocator_->dump ();
   this->lock_.dump ();
@@ -227,7 +239,7 @@ ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::bind_
                                                             &this->table_[loc]);
       this->table_[loc].next_ = entry;
       entry->next_->prev_ = entry;
-      this->cur_size_++;
+      ++this->cur_size_;
       return 0;
     }
   else
@@ -254,7 +266,7 @@ ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::trybi
                                                             &this->table_[loc]);
       this->table_[loc].next_ = entry;
       entry->next_->prev_ = entry;
-      this->cur_size_++;
+      ++this->cur_size_;
       return 0;
     }
   else

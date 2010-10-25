@@ -4,7 +4,7 @@
 /**
  *  @file    Functor_String.h
  *
- *  $Id: Functor_String.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Functor_String.h 86698 2009-09-13 15:58:17Z johnnyw $
  *
  *   Class template specializations for ACE_*String types implementing
  *   function objects that are used in  various places in ATC. They
@@ -40,8 +40,6 @@ template <class TYPE> class ACE_Equal_To;
 template <class TYPE> class ACE_Less_Than;
 
 /**
- * @class ACE_Equal_To<ACE_CString>
- *
  * @brief Function object for determining whether two ACE_CStrings are
  * equal.
  */
@@ -55,8 +53,6 @@ public:
 
 
 /**
- * @class ACE_Hash<ACE_CString>
- *
  * @brief Function object for hashing a ACE_CString
  */
 template<>
@@ -69,8 +65,6 @@ public:
 
 
 /**
- * @class ACE_Less_Than<ACE_CString>
- *
  * @brief Function object for determining whether the first const string
  * is less than the second const string.
  */
@@ -87,9 +81,7 @@ public:
 #if defined (ACE_USES_WCHAR)
 
 /**
- * @class ACE_Equal_To<ACE_WString>
- *
- * @brief Function object for determining whether two ACE_CStrings are
+ * @brief Function object for determining whether two ACE_WStrings are
  * equal.
  */
 template<>
@@ -102,8 +94,6 @@ public:
 
 
 /**
- * @class ACE_Hash<ACE_WString>
- *
  * @brief Function object for hashing a ACE_WString
  */
 template<>
@@ -115,10 +105,8 @@ public:
 };
 
 /**
- * @class ACE_Less_Than<ACE_WString>
- *
- * @brief Function object for determining whether the first const string
- * is less than the second const string.
+ * @brief Function object for determining whether the first const wstring
+ * is less than the second const wstring.
  */
 template<>
 class ACE_Export ACE_Less_Than<ACE_WString>

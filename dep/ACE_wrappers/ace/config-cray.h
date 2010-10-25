@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-cray.h 81935 2008-06-12 22:01:53Z jtc $
+// $Id: config-cray.h 87169 2009-10-19 20:26:55Z olli $
 
 #ifndef ACE_CONFIG_CRAY_H
 #define ACE_CONFIG_CRAY_H
@@ -81,11 +81,10 @@
 #define ACE_HAS_CHARPTR_SOCKOPT
 
 #define ACE_HAS_NONCONST_GETBY
+#define ACE_HAS_NONCONST_INET_ADDR
 
 // has man pages, but links with missing symbols and I can't find lib yet
 /* #define ACE_HAS_REGEX */
-
-#define ACE_HAS_SIG_MACROS
 
 #define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES
 
@@ -98,8 +97,6 @@
 #define ACE_HAS_SIGISMEMBER_BUG
 
 #define ACE_HAS_MSG
-
-#define ACE_HAS_STRERROR
 
 #define ACE_HAS_GPERF
 
@@ -190,8 +187,6 @@
 
 // Ones to check out at some point
 
-/* #define ACE_HAS_SYS_SIGLIST */
-
 // C++ Compiler stuff to verify
 /* #define ACE_NEW_THROWS_EXCEPTIONS */
 /* #define ACE_HAS_TEMPLATE_TYPEDEFS */
@@ -203,11 +198,8 @@
 /* #define ACE_HAS_TLI */
 /* #define ACE_HAS_TIUSER_H */
 /* #define ACE_HAS_TLI_PROTOTYPES */
-/* #define ACE_LACKS_T_ERRNO */
 
 /* #define ACE_LACKS_NAMED_POSIX_SEM */
-
-/* #define ACE_HAS_SYS_ERRLIST */
 
 #include /**/ "ace/post.h"
 #endif /* ACE_CONFIG_CRAY_H */

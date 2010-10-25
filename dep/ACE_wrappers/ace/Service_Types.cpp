@@ -1,4 +1,4 @@
-// $Id: Service_Types.cpp 81826 2008-06-02 15:29:53Z schmidt $
+// $Id: Service_Types.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Service_Types.h"
 
@@ -10,11 +10,6 @@
 #include "ace/Stream.h"
 #include "ace/OS_NS_stdio.h"
 #include "ace/OS_NS_string.h"
-
-
-ACE_RCSID (ace,
-           Service_Types,
-           "$Id: Service_Types.cpp 81826 2008-06-02 15:29:53Z schmidt $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -35,11 +30,13 @@ ACE_Service_Type_Impl::dump (void) const
 ACE_Service_Type_Impl::ACE_Service_Type_Impl (void *so,
                                               const ACE_TCHAR *s_name,
                                               u_int f,
-                                              ACE_Service_Object_Exterminator gobbler)
+                                              ACE_Service_Object_Exterminator gobbler,
+                                              int stype)
   : name_ (0),
     obj_ (so),
     gobbler_ (gobbler),
-    flags_ (f)
+    flags_ (f),
+  service_type_ (stype)
 {
   ACE_TRACE ("ACE_Service_Type_Impl::ACE_Service_Type_Impl");
   this->name (s_name);
@@ -82,8 +79,9 @@ ACE_Service_Type_Impl::fini (void) const
 ACE_Service_Object_Type::ACE_Service_Object_Type (void *so,
                                                   const ACE_TCHAR *s_name,
                                                   u_int f,
-                                                  ACE_Service_Object_Exterminator gobbler)
-  : ACE_Service_Type_Impl (so, s_name, f, gobbler)
+                                                  ACE_Service_Object_Exterminator gobbler,
+                                                  int stype)
+  : ACE_Service_Type_Impl (so, s_name, f, gobbler, stype)
   , initialized_ (-1)
 {
   ACE_TRACE ("ACE_Service_Object_Type::ACE_Service_Object_Type");
@@ -164,8 +162,9 @@ ACE_Module_Type::dump (void) const
 
 ACE_Module_Type::ACE_Module_Type (void *m,
                                   const ACE_TCHAR *m_name,
-                                  u_int f)
-  : ACE_Service_Type_Impl (m, m_name, f)
+                                  u_int f,
+                                  int stype)
+  : ACE_Service_Type_Impl (m, m_name, f, 0, stype)
 {
   ACE_TRACE ("ACE_Module_Type::ACE_Module_Type");
 }
@@ -181,6 +180,15 @@ ACE_Module_Type::init (int argc, ACE_TCHAR *argv[]) const
   ACE_TRACE ("ACE_Module_Type::init");
   void *obj = this->object ();
   MT_Module *mod = (MT_Module *) obj;
+  //
+  // Change the Module's name to what's in the svc.conf file.
+  // We must do this so the names match up so everything shuts
+  // down properly during the call to ACE_Stream_Type::fini
+  // which calls MT_Stream::remove([name]) for all the modules.
+  // If the calls to remove fail, we end up with a double delete
+  // during shutdown. Bugzilla #3847
+  //
+  mod->name (this->name_);
   MT_Task *reader = mod->reader ();
   MT_Task *writer = mod->writer ();
 
@@ -230,7 +238,6 @@ int
 ACE_Module_Type::fini (void) const
 {
   ACE_TRACE ("ACE_Module_Type::fini");
-
   void *obj = this->object ();
   MT_Module *mod = (MT_Module *) obj;
   MT_Task *reader = mod->reader ();
@@ -324,8 +331,9 @@ ACE_Stream_Type::resume (void) const
 
 ACE_Stream_Type::ACE_Stream_Type (void *s,
                                   const ACE_TCHAR *s_name,
-                                  u_int f)
-  : ACE_Service_Type_Impl (s, s_name, f),
+                                  u_int f,
+                                  int stype)
+  : ACE_Service_Type_Impl (s, s_name, f, 0, stype),
     head_ (0)
 {
   ACE_TRACE ("ACE_Stream_Type::ACE_Stream_Type");
@@ -361,17 +369,13 @@ ACE_Stream_Type::fini (void) const
   void *obj = this->object ();
   MT_Stream *str = (MT_Stream *) obj;
 
-  for (ACE_Module_Type *m = this->head_; m != 0; )
-    {
-      ACE_Module_Type *t = m->link ();
+  for (ACE_Module_Type *m = this->head_; m != 0;)
+  {
+    ACE_Module_Type *t = m->link ();
 
       // Final arg is an indication to *not* delete the Module.
       str->remove (m->name (),
-                   MT_Module::M_DELETE_NONE);
-
-      // Finalize the Module (this may delete it, but we don't really
-      // care since we don't access it again).
-      m->fini ();
+                   MT_Module::M_DELETE_NONE);      
       m = t;
     }
   str->close ();
@@ -408,9 +412,8 @@ ACE_Stream_Type::remove (ACE_Module_Type *mod)
                            MT_Module::M_DELETE_NONE) == -1)
             result = -1;
 
-          // This call may end up deleting m, which is ok since we
-          // don't access it again!
-          m->fini ();
+          // Do not call m->fini (); as this will result in a double delete
+          // of the ACE_Module_type when ACE_Service_Repository::fini is called
         }
       else
         prev = m;
@@ -435,14 +438,14 @@ ACE_Stream_Type::push (ACE_Module_Type *new_module)
 }
 
 ACE_Module_Type *
-ACE_Stream_Type::find (const ACE_TCHAR *mod_name) const
+ACE_Stream_Type::find (const ACE_TCHAR *module_name) const
 {
   ACE_TRACE ("ACE_Stream_Type::find");
 
   for (ACE_Module_Type *m = this->head_;
        m != 0;
        m = m->link ())
-    if (ACE_OS::strcmp (m->name (), mod_name) == 0)
+    if (ACE_OS::strcmp (m->name (), module_name) == 0)
       return m;
 
   return 0;

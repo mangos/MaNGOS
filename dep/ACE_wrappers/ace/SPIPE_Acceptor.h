@@ -4,7 +4,7 @@
 /**
  *  @file    SPIPE_Acceptor.h
  *
- *  $Id: SPIPE_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SPIPE_Acceptor.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Prashant Jain <pjain@cs.wustl.edu>
@@ -121,8 +121,8 @@ public:
   int accept (ACE_SPIPE_Stream &ipc_sap_spipe,
               ACE_SPIPE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0);
+              bool restart = true,
+              bool reset_new_handle = false);
 
   // = Meta-type info
   typedef ACE_SPIPE_Addr PEER_ADDR;

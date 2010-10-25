@@ -1,4 +1,4 @@
-// $Id: Configuration_Import_Export.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Configuration_Import_Export.cpp 84565 2009-02-23 08:20:39Z johnnyw $
 
 #include "ace/Configuration_Import_Export.h"
 #include "ace/OS_Errno.h"
@@ -254,7 +254,7 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
       ACE_TString header = ACE_TEXT ("[");
       header += path;
       header += ACE_TEXT ("]");
-      header += ACE_TEXT (" \n");
+      header += ACE_TEXT ("\n");
       if (ACE_OS::fputs (header.fast_rep (), out) < 0)
         return -1;
       // Write out each value

@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Queue_NT.h
  *
- *  $Id: Message_Queue_NT.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Message_Queue_NT.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -69,7 +69,7 @@ public:
   // = Enqueue and dequeue methods.
 
   /**
-   * Enqueue an <ACE_Message_Block *> at the end of the queue.
+   * Enqueue an ACE_Message_Block * at the end of the queue.
    * Returns -1 on failure, else the number of items still on the
    * queue.
    */
@@ -79,7 +79,7 @@ public:
                        ACE_Time_Value *timeout = 0);
 
   /**
-   * Dequeue and return the <ACE_Message_Block *> at the head of the
+   * Dequeue and return the ACE_Message_Block * at the head of the
    * queue.  Returns -1 on failure, else the number of items still on
    * the queue.
    */

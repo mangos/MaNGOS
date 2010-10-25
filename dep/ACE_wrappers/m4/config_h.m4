@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------------------
-dnl       $Id: config_h.m4 82833 2008-09-25 18:28:53Z jtc $
+dnl       $Id: config_h.m4 87480 2009-11-11 11:38:15Z olli $
 dnl
 dnl       config_h.m4
 dnl
@@ -74,7 +74,7 @@ AH_TEMPLATE([ACE_HAS_STDEXCEPT_NO_H],[Platform provides C++ <stdexcept> header])
 dnl Deprecated! (or soon to be?)
 AH_TEMPLATE([ACE_HAS_OSF1_GETTIMEOFDAY],
 [timezone* 2nd parameter & no prototype])
-AH_TEMPLATE([ACE_HAS_LYNXOS_SIGNALS],[])
+AH_TEMPLATE([ACE_HAS_LYNXOS4_SIGNALS],[])
 AH_TEMPLATE([ACE_HAS_TANDEM_SIGNALS],[])
 
 AH_TEMPLATE([PTHREAD_STACK_MIN],[])
@@ -237,14 +237,6 @@ AH_TEMPLATE([ACE_HAS_STDARG_THR_DEST],
 [Platform has void (*)(...) prototype for pthread_key_create()
 destructor (e.g., LynxOS).])
 
-AH_TEMPLATE([ACE_HAS_STL_MAP_CONFLICT],
-[Used when users want to compile ACE with STL and STL map class
-conflicts with <net/if.h> map struct.])
-
-AH_TEMPLATE([ACE_HAS_STL_QUEUE_CONFLICT],
-[Used when users want to compile ACE with STL and STL queue class
-conflicts with <netinet/in.h> queue struct.])
-
 AH_TEMPLATE([ACE_HAS_4_4BSD_SENDMSG_RECVMSG],
 [Platform has BSD 4.4 sendmsg()/recvmsg() APIs.])
 
@@ -270,9 +262,6 @@ AH_TEMPLATE([ACE_EXPLICIT_TEMPLATE_DESTRUCTOR_TAKES_ARGS],
 AH_TEMPLATE([ACE_HAS_BROKEN_MAP_FAILED],
 [Platform doesn't cast MAP_FAILED to a (void *).])
 
-AH_TEMPLATE([ACE_HAS_BROKEN_CTIME],
-[Compiler/platform uses macro for ctime (e.g., MVS)])
-
 AH_TEMPLATE([ACE_HAS_BROKEN_DGRAM_SENDV],
 [Platform sendv() does not work properly with datagrams, i.e. it
 fails when the iovec size is IOV_MAX.])
@@ -285,9 +274,6 @@ AH_TEMPLATE([ACE_HAS_BROKEN_MMAP_H],
 
 AH_TEMPLATE([ACE_HAS_BROKEN_POSIX_TIME],
 [Platform defines struct timespec in <sys/timers.h>])
-
-AH_TEMPLATE([ACE_HAS_BROKEN_R_ROUTINES],
-[Platform defines ctime_r, asctime_r, rand_r and getpwnam_r as macros])
 
 AH_TEMPLATE([ACE_HAS_BROKEN_RANDR],
 [OS/compiler's header files are inconsistent with libC definition of
@@ -329,9 +315,6 @@ AH_TEMPLATE([ACE_HAS_FL],[Platform has Fast-Light (FL) toolkit installed.])
 AH_TEMPLATE([ACE_HAS_GETPAGESIZE],
 [Platform supports getpagesize() call (otherwise, ACE_PAGE_SIZE must
 be defined, except on Win32).])
-
-AH_TEMPLATE([ACE_HAS_GNU_CSTRING_H],
-[Denotes that GNU has cstring.h as standard which redefines memchr()])
 
 AH_TEMPLATE([ACE_HAS_INTRINSIC_INTERLOCKED],
 [Platform supports the intrinsic interlocked optimizations.])
@@ -539,10 +522,6 @@ AH_TEMPLATE([ACE_SHM_OPEN_REQUIRES_ONE_SLASH],[shm_open() requires a leading sla
 AH_TEMPLATE([ACE_HAS_SIGISMEMBER_BUG],
 [Platform has bug with sigismember() (HP/UX 11).])
 
-AH_TEMPLATE([ACE_HAS_SIG_MACROS],
-[Platform/compiler has macros for sig{empty,fill,add,del}set (e.g.,
-   SCO and FreeBSD)])
-
 AH_TEMPLATE([ACE_HAS_SIGNAL_OBJECT_AND_WAIT],
 [Platform supports the Win32 SignalObjectAndWait() function (WinNT
    4.0 and beyond).])
@@ -592,9 +571,6 @@ AH_TEMPLATE([ACE_HAS_SVR4_TLI],
 
 AH_TEMPLATE([ACE_HAS_SYSV_IPC],
 [Platform supports System V IPC (most versions of UNIX, but not Win32)])
-
-AH_TEMPLATE([ACE_HAS_SYS_ERRLIST],
-[Platform/compiler supports _sys_errlist symbol])
 
 AH_TEMPLATE([ACE_HAS_SYS_SIGLIST],
 [Compiler/platform supports _sys_siglist array])

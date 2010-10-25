@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Block.h
  *
- *  $Id: Message_Block.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Message_Block.h 91066 2010-07-12 11:05:04Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -138,7 +138,7 @@ public:
    * responsibility to take care of the memory allocated for the
    * data_block
    */
-  ACE_Message_Block (ACE_Data_Block *,
+  ACE_Message_Block (ACE_Data_Block *data_block,
                      Message_Flags flags = 0,
                      ACE_Allocator *message_block_allocator = 0);
 
@@ -214,14 +214,14 @@ public:
   /**
    * Create an initialized message of type @a type containing @a size
    * bytes.  The @a cont argument initializes the continuation field in
-   * the <Message_Block>.  If @a data == 0 then we create and own the
+   * the Message_Block.  If @a data == 0 then we create and own the
    * @a data, using @a allocator_strategy to get the data if it's non-0.  If
    * @a data != 0 we assume that we have ownership of the @a data till
    * this object ceases to exist  (and don't delete it during
    * destruction).  If @a locking_strategy is non-0 then this is used
    * to protect regions of code that access shared state (e.g.,
    * reference counting) from race conditions.  Note that the @a size
-   * of the <Message_Block> will be @a size, but the @a length will be 0
+   * of the Message_Block will be @a size, but the @a length will be 0
    * until <wr_ptr> is set. The @a data_block_allocator is use to
    * allocate the data blocks while the @a allocator_strategy is used
    * to allocate the buffers contained by those.
@@ -241,8 +241,8 @@ public:
   /**
    * Delete all the resources held in the message.
    *
-   * Note that <release()> is designed to release the continuation
-   * chain; the destructor is not. See <release()> for details.
+   * @note Note that release() is designed to release the continuation
+   * chain; the destructor is not. See release() for details.
    */
   virtual ~ACE_Message_Block (void);
 
@@ -393,7 +393,7 @@ public:
    */
   int copy (const char *buf);
 
-  /// Normalizes data in the top-level <Message_Block> to align with the base,
+  /// Normalizes data in the top-level Message_Block to align with the base,
   /// i.e., it "shifts" the data pointed to by <rd_ptr> down to the <base> and
   /// then readjusts <rd_ptr> to point to <base> and <wr_ptr> to point
   /// to <base> + the length of the moved data.  Returns -1 and does
@@ -405,7 +405,7 @@ public:
   void reset (void);
 
   /// Access all the allocators in the message block.
-  /// @@todo: Not sure whether we would need finer control while
+  /// @todo Not sure whether we would need finer control while
   /// trying to access allocators ie. a method for every allocator.
   /**
    * This method returns the allocators only from the first message
@@ -486,40 +486,40 @@ public:
   /// Set the length of the message
   void length (size_t n);
 
-  /// Get the length of the <Message_Block>s, including chained
-  /// <Message_Block>s.
+  /// Get the length of the Message_Blocks, including chained
+  /// Message_Blocks.
   size_t total_length (void) const;
 
-  /// Get the total number of bytes in all <Message_Block>s, including
-  /// chained <Message_Block>s.
+  /// Get the total number of bytes in all Message_Blocks, including
+  /// chained Message_Blocks.
   size_t total_size (void) const;
 
   /// Get the total number of bytes and total length in all
-  /// <Message_Block>s, including chained <Message_Block>s.
+  /// Message_Blocks, including chained Message_Blocks.
   void total_size_and_length (size_t &mb_size,
                               size_t &mb_length) const;
 
-  /// Get the number of bytes in the top-level <Message_Block> (i.e.,
-  /// does not consider the bytes in chained <Message_Block>s).
+  /// Get the number of bytes in the top-level Message_Block (i.e.,
+  /// does not consider the bytes in chained Message_Blocks).
   size_t size (void) const;
 
   /**
-   * Set the number of bytes in the top-level <Message_Block>,
-   * reallocating space if necessary.  However, the <rd_ptr_> and
-   * <wr_ptr_> remain at the original offsets into the buffer, even if
+   * Set the number of bytes in the top-level Message_Block,
+   * reallocating space if necessary.  However, the @c rd_ptr_ and
+   * @c wr_ptr_ remain at the original offsets into the buffer, even if
    * it is reallocated.  Returns 0 if successful, else -1.
    */
   int size (size_t length);
 
-  /// Get the number of allocated bytes in all <Message_Block>, including
-  /// chained <Message_Block>s.
+  /// Get the number of allocated bytes in all Message_Block, including
+  /// chained Message_Blocks.
   size_t total_capacity (void) const;
 
-  /// Get the number of allocated bytes in the top-level <Message_Block>.
+  /// Get the number of allocated bytes in the top-level Message_Block.
   size_t capacity (void) const;
 
   /// Get the number of bytes available after the <wr_ptr_> in the
-  /// top-level <Message_Block>.
+  /// top-level Message_Block.
   size_t space (void) const;
   //@}
 
@@ -552,14 +552,14 @@ public:
   /// Set the continuation field.
   void cont (ACE_Message_Block *);
 
-  // = Pointer to the <Message_Block> directly ahead in the ACE_Message_Queue.
+  // = Pointer to the Message_Block directly ahead in the ACE_Message_Queue.
   /// Get link to next message.
   ACE_Message_Block *next (void) const;
 
   /// Set link to next message.
   void next (ACE_Message_Block *);
 
-  // = Pointer to the <Message_Block> directly behind in the ACE_Message_Queue.
+  // = Pointer to the Message_Block directly behind in the ACE_Message_Queue.
   /// Get link to prev message.
   ACE_Message_Block *prev (void) const;
 
@@ -802,7 +802,7 @@ protected:
   /**
    * Decrease the reference count, but don't delete the object.
    * Returns 0 if the object should be removed.
-   * If <lock> is equal to the locking strategy then we assume that
+   * If @a lock is equal to the locking strategy then we assume that
    * the lock is beign held by the current thread; this is used to
    * release all the data blocks in a chain while holding a single
    * lock.

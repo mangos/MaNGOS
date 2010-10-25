@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: INET_Addr.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: INET_Addr.inl 88218 2009-12-17 12:32:14Z mcorino $
 
 
 #include "ace/OS_NS_string.h"
@@ -88,15 +88,13 @@ ACE_INLINE u_short
 ACE_INET_Addr::get_port_number (void) const
 {
   ACE_TRACE ("ACE_INET_Addr::get_port_number");
-#if defined (ACE_LACKS_NTOHS)
-  ACE_NOTSUP_RETURN (0);
-#elif defined (ACE_HAS_IPV6)
+#if defined (ACE_HAS_IPV6)
   if (this->get_type () == PF_INET)
-    return ntohs (this->inet_addr_.in4_.sin_port);
+    return ACE_NTOHS (this->inet_addr_.in4_.sin_port);
   else
-    return ntohs (this->inet_addr_.in6_.sin6_port);
+    return ACE_NTOHS (this->inet_addr_.in6_.sin6_port);
 #else
-  return ntohs (this->inet_addr_.in4_.sin_port);
+  return ACE_NTOHS (this->inet_addr_.in4_.sin_port);
 #endif /* ACE_HAS_IPV6 */
 }
 
@@ -218,8 +216,8 @@ ACE_INET_Addr::is_multicast (void) const
     return this->inet_addr_.in6_.sin6_addr.s6_addr[0] == 0xFF;
 #endif /* ACE_HAS_IPV6 */
   return
-    this->inet_addr_.in4_.sin_addr.s_addr >= 0xE0000000 &&  // 224.0.0.0
-    this->inet_addr_.in4_.sin_addr.s_addr <= 0xEFFFFFFF; // 239.255.255.255
+    (*static_cast<const unsigned char*> (
+        static_cast<const void*> (&this->inet_addr_.in4_.sin_addr.s_addr)) & 0xf0) == 0xe0;
 }
 
 #if defined (ACE_HAS_IPV6)

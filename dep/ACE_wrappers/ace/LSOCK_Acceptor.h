@@ -4,7 +4,7 @@
 /**
  *  @file    LSOCK_Acceptor.h
  *
- *  $Id: LSOCK_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: LSOCK_Acceptor.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Doug Schmidt
  */
@@ -63,8 +63,8 @@ public:
   int accept (ACE_LSOCK_Stream &new_ipc_sap,
               ACE_Addr * = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0) const;
+              bool restart = true,
+              bool reset_new_handle = false) const;
 
   /// Close down the ACE_LSOCK and remove the rendezvous point from the
   /// file system.

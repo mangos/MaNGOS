@@ -4,7 +4,7 @@
 /**
  *  @file    Free_List.h
  *
- *  $Id: Free_List.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Free_List.h 84619 2009-02-26 12:26:16Z johnnyw $
  *
  *  @author Darrell Brunsch (brunsch@cs.wustl.edu)
  */
@@ -73,8 +73,8 @@ public:
   /**
    * Constructor takes a @a mode (i.e., ACE_FREE_LIST_WITH_POOL or
    * ACE_PURE_FREE_LIST), a count of the number of nodes to
-   * <prealloc>, a low and high water mark (<lwm> and <hwm>) that
-   * indicate when to allocate more nodes, an increment value (<inc>)
+   * @a prealloc, a low and high water mark (@a lwm and @a hwm) that
+   * indicate when to allocate more nodes, an increment value (@a inc)
    * that indicates how many nodes to allocate when the list must
    * grow.
    */

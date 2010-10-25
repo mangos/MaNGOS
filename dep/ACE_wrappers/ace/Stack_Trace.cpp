@@ -2,13 +2,27 @@
 /**
  *  @file   Stack_Trace.cpp
  *
- *  $Id: Stack_Trace.cpp 82575 2008-08-08 20:36:10Z mitza $
+ *  $Id: Stack_Trace.cpp 91286 2010-08-05 09:04:31Z johnnyw $
  *
  *  @brief  Encapsulate string representation of stack trace.
  *
- *  Portions of the platform-specific code have been based on
- *  code found in various places on the internet e.g., google groups,
- *  VxWorks FAQ, etc., and adapted for use here.
+ *  Some platform-specific areas of this code have been adapted from
+ *  examples found elsewhere.  Specifically,
+ *  - the GLIBC stack generation uses the documented "backtrace" API
+ *    and is adapted from examples shown in relevant documentation
+ *    and repeated elsewhere, e.g.,
+ *    http://www.linuxselfhelp.com/gnu/glibc/html_chapter/libc_33.html
+ *  - the Solaris stack generation is adapted from a 1995 post on
+ *    comp.unix.solaris by Bart Smaalders,
+ *    http://groups.google.com/group/comp.unix.solaris/browse_thread/thread/8b9f3de8be288f1c/31550f93a48231d5?lnk=gst&q=how+to+get+stack+trace+on+solaris+group:comp.unix.solaris#31550f93a48231d5
+ *  - VxWorks kernel-mode stack tracing is adapted from a code example
+ *    in the VxWorks FAQ at http://www.xs4all.nl/~borkhuis/vxworks/vxw_pt5.html
+ *    although the undocumented functions it uses are also mentioned in
+ *    various documents available on the WindRiver support website.
+ *
+ *  If you add support for a new platform, please add a bullet to the
+ *  above list with durable references to the origins of your code.
+ *
  */
 //=============================================================================
 
@@ -16,8 +30,6 @@
 #include "ace/Min_Max.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"
-
-ACE_RCSID (ace, Stack_Trace, "$Id: Stack_Trace.cpp 82575 2008-08-08 20:36:10Z mitza $")
 
 /*
   This is ugly, simply because it's very platform-specific.
@@ -77,13 +89,13 @@ ACE_Stack_Trace::generate_trace (ssize_t starting_frame_offset, size_t num_frame
         {
           // this could be more efficient by remembering where we left off in buf_
           char *symp = &stack_syms[i][0];
-          while (this->buflen_ < SYMBUFSIZ && *symp != '\0')
+          while (this->buflen_ < SYMBUFSIZ - 2 && *symp != '\0')
             {
               this->buf_[this->buflen_++] = *symp++;
             }
           this->buf_[this->buflen_++] = '\n'; // put a newline at the end
         }
-      this->buf_[this->buflen_+1] = '\0'; // zero terminate the string
+      this->buf_[this->buflen_] = '\0'; // zero terminate the string
 
       ::free (stack_syms);
     }
@@ -108,7 +120,7 @@ struct ACE_Stack_Trace_stackstate
   size_t starting_frame;
 };
 
-//@TODO: Replace with a TSS-based pointer to avoid problems in multithreaded environs, 
+//@TODO: Replace with a TSS-based pointer to avoid problems in multithreaded environs,
 //       or use a mutex to serialize access to this.
 static ACE_Stack_Trace_stackstate* ACE_Stack_Trace_stateptr = 0;
 
@@ -495,7 +507,7 @@ typedef struct _dbghelp_functions
 
 
 #  pragma warning (push)
-#  pragma warning (disable:4706)  
+#  pragma warning (disable:4706)
 static bool load_dbghelp_library_if_needed (dbghelp_functions *pDbg)
 {
   //@TODO: See codeproject's StackWalker.cpp for the list of locations to
@@ -570,6 +582,14 @@ add_frame_to_buf (struct frame_state const *fs, void *usrarg)
 
 static void emptyStack () { }
 
+#if defined (_MSC_VER)
+#  pragma warning(push)
+// Suppress warning 4748 "/GS can not protect parameters and local
+// variables from local buffer overrun because optimizations are
+// disabled in function"
+#  pragma warning(disable: 4748)
+#endif /* _MSC_VER */
+
 static int
 cs_operate(int (*func)(struct frame_state const *, void *), void *usrarg,
            size_t starting_frame, size_t num_frames)
@@ -587,7 +607,7 @@ cs_operate(int (*func)(struct frame_state const *, void *), void *usrarg,
   ZeroMemory (&fs.sf, sizeof (fs.sf));
   fs.pDbg = &dbg;
   emptyStack ();   //Not sure what this should do, Chad?
-  
+
   CONTEXT c;
   ZeroMemory (&c, sizeof (CONTEXT));
   c.ContextFlags = CONTEXT_FULL;
@@ -664,6 +684,11 @@ cs_operate(int (*func)(struct frame_state const *, void *), void *usrarg,
   return 0;
 }
 
+#if defined (_MSC_VER)
+// Restore the warning state to what it was before entry.
+#  pragma warning(pop)
+#endif /* _MSC_VER */
+
 void
 ACE_Stack_Trace::generate_trace (ssize_t starting_frame_offset,
                                  size_t num_frames)
@@ -684,7 +709,7 @@ ACE_Stack_Trace::generate_trace (ssize_t starting_frame_offset,
 void
 ACE_Stack_Trace::generate_trace (ssize_t, size_t)
 {
-// Call determine_starting_frame() on HP aCC build to resolve declared 
+// Call determine_starting_frame() on HP aCC build to resolve declared
 // method never referenced warning.
 #if defined (__HP_aCC)
   size_t starting_frame = determine_starting_frame (0, 0);

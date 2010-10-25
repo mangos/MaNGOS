@@ -4,7 +4,7 @@
 /**
  *  @file    SV_Semaphore_Simple.h
  *
- *  $Id: SV_Semaphore_Simple.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SV_Semaphore_Simple.h 86494 2009-08-13 19:09:03Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -29,7 +29,7 @@
 #if defined (ACE_WIN32)
    // Default semaphore key and mutex name
 #  if !defined (ACE_DEFAULT_SEM_KEY)
-#    define ACE_DEFAULT_SEM_KEY "ACE_SEM_KEY"
+#    define ACE_DEFAULT_SEM_KEY const_cast <char*>("ACE_SEM_KEY")
 #  endif /* ACE_DEFAULT_SEM_KEY */
 #else /* !defined (ACE_WIN32) */
    // Default semaphore key

@@ -4,7 +4,7 @@
 /**
  *  @file    Configuration.h
  *
- *  $Id: Configuration.h 82294 2008-07-12 13:03:37Z johnnyw $
+ *  $Id: Configuration.h 86348 2009-08-04 14:45:29Z shuston $
  *
  *  @author Chris Hafey <chafey@stentor.com>
  *
@@ -177,7 +177,7 @@ public:
   /**
    * @param key          Section key to remove the named section from.
    * @param sub_section  Name of the section to remove.
-   * @param recursive    If non zero, any subkeys below @a sub_section are
+   * @param recursive    If true, any subkeys below @a sub_section are
    *                     removed as well.
    *
    * @retval   0 for success.
@@ -185,7 +185,7 @@ public:
    */
   virtual int remove_section (const ACE_Configuration_Section_Key &key,
                               const ACE_TCHAR *sub_section,
-                              int recursive) = 0;
+                              bool recursive) = 0;
 
   /**
    * Enumerates through the values in a section.
@@ -483,7 +483,7 @@ public:
 
   virtual int remove_section (const ACE_Configuration_Section_Key& key,
                               const ACE_TCHAR* sub_section,
-                              int recursive);
+                              bool recursive);
 
   virtual int enumerate_values (const ACE_Configuration_Section_Key& key,
                                 int index,
@@ -598,7 +598,7 @@ public:
   /// allocator name_ was created in
   void free (ACE_Allocator *alloc);
 
-  /// <hash> function is required in order for this class to be usable by
+  /// hash function is required in order for this class to be usable by
   /// ACE_Hash_Map_Manager.
   u_long hash  (void) const;
 
@@ -791,12 +791,37 @@ public:
   /// Destructor
   virtual ~ACE_Configuration_Heap (void);
 
-  /// Opens a configuration based on a file name
+  /**
+   * Opens a configuration that allocates its memory from a memory-mapped file.
+   * This makes it possible to persist a configuration to permanent storage.
+   * This is not the same as exporting the configuration to a file; the
+   * memory-mapped file is not likely to be very readable by humans.
+   *
+   * @param file_name    Name of the file to map into memory.
+   *
+   * @param base_address Address to map the base of @a file_name to.
+   *
+   * @param default_map_size Starting size for the internal hash tables that
+   *                     contain configuration information.
+   *
+   * @retval 0 for success.
+   * @retval -1 for error, with errno set to indicate the cause. If open()
+   *            is called multiple times, errno will be @c EBUSY.
+   */
   int open (const ACE_TCHAR* file_name,
             void* base_address = ACE_DEFAULT_BASE_ADDR,
             size_t default_map_size = ACE_DEFAULT_CONFIG_SECTION_SIZE);
 
-  /// Opens a heap based configuration
+  /**
+   * Opens a configuration that allocates memory from the heap.
+   *
+   * @param default_map_size Starting size for the internal hash tables that
+   *                     contain configuration information.
+   *
+   * @retval 0 for success.
+   * @retval -1 for error, with errno set to indicate the cause. If open()
+   *            is called multiple times, errno will be @c EBUSY.
+   */
   int open (size_t default_map_size = ACE_DEFAULT_CONFIG_SECTION_SIZE);
 
   virtual int open_section (const ACE_Configuration_Section_Key& base,
@@ -805,7 +830,7 @@ public:
 
   virtual int remove_section (const ACE_Configuration_Section_Key& key,
                               const ACE_TCHAR* sub_section,
-                              int recursive);
+                              bool recursive);
 
   virtual int enumerate_values (const ACE_Configuration_Section_Key& key,
                                 int index,

@@ -1,0 +1,32 @@
+//  -*- MPC -*- now wouldn't this be cool...
+// $Id: ace_flreactor.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+
+project(ACE_FlReactor) : acedefaults, install, acelib, ace_output, ace_fl{
+
+  sharedname   = ACE_FlReactor
+  dynamicflags += ACE_FLREACTOR_BUILD_DLL
+
+  Source_Files {
+    FlReactor
+  }
+
+  Header_Files {
+    FlReactor
+  }
+
+  Inline_Files {
+    FlReactor
+  }
+
+  Template_Files {
+    FlReactor
+  }
+
+  Resource_Files {
+    FlReactor
+  }
+
+  Pkgconfig_Files {
+    FlReactor/ACE_FlReactor.pc.in
+  }
+}

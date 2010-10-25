@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// $Id: config-qnx-neutrino.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-qnx-neutrino.h 87167 2009-10-19 19:33:53Z olli $
 // The following configuration file is designed to work for Neutrino
 // 2.0 (Beta) with GNU C++ and the POSIX (pthread) threads package.
 
@@ -75,10 +75,8 @@
 #define ACE_HAS_SIGISMEMBER_BUG
 #define ACE_HAS_SIGWAIT
 #define ACE_HAS_SIG_ATOMIC_T
-#define ACE_HAS_SIG_MACROS
 #define ACE_HAS_SOCKADDR_IN_SIN_LEN
 #define ACE_HAS_SSIZE_T
-#define ACE_HAS_STRERROR
 #define ACE_HAS_STRINGS
 #define ACE_HAS_SVR4_GETTIMEOFDAY
 #define ACE_HAS_TERMIOS
@@ -106,7 +104,8 @@
 #define ACE_LACKS_RWLOCK_T
 #define ACE_LACKS_SBRK
 #define ACE_LACKS_SEEKDIR
-#define ACE_LACKS_SOCKET_BUFSIZ
+#define ACE_LACKS_SO_SNDBUF
+#define ACE_LACKS_SO_RCVBUF
 #define ACE_LACKS_SOCKETPAIR
 #define ACE_LACKS_STROPTS_H
 #define ACE_LACKS_STREAM_MODULES

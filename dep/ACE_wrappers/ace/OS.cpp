@@ -1,4 +1,4 @@
-// $Id: OS.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 // FUZZ: disable check_for_OS_h_include
 #include "ace/OS.h"
@@ -13,7 +13,7 @@
 # include "ace/OS.inl"
 #endif /* ACE_HAS_INLINED_OSCALLS */
 
-ACE_RCSID(ace, OS, "$Id: OS.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 // include new cpps
 #include "ace/Cleanup.cpp"

@@ -4,7 +4,7 @@
 /**
  *  @file    Based_Pointer_Repository.h
  *
- *  $Id: Based_Pointer_Repository.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Based_Pointer_Repository.h 84837 2009-03-16 13:01:15Z johnnyw $
  *
  *  @author Dietrich Quehl <Dietrich.Quehl@med.siemens.de>
  *  @author Douglas C. Schmidt <schmidt@.cs.wustl.edu>
@@ -71,6 +71,9 @@ private:
   /// order to avoid circular #include dependencies.
   ACE_Based_Pointer_Repository_Rep *rep_;
 
+private:
+  ACE_UNIMPLEMENTED_FUNC (void operator= (const ACE_Based_Pointer_Repository &))
+  ACE_UNIMPLEMENTED_FUNC (ACE_Based_Pointer_Repository (const ACE_Based_Pointer_Repository &))
 };
 
 // ----------------------------------

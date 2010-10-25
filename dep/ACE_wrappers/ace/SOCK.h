@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK.h
  *
- *  $Id: SOCK.h 81014 2008-03-19 11:41:31Z johnnyw $
+ *  $Id: SOCK.h 84834 2009-03-16 12:28:51Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -125,7 +125,6 @@ protected:
    * pointer/reference.
    */
   ~ACE_SOCK (void);
-
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

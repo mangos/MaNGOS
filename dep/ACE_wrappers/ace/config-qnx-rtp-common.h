@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// $Id: config-qnx-rtp-common.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-qnx-rtp-common.h 85074 2009-04-10 03:17:24Z mesnier_p $
 // several macros common to various qnx neutrino version.
 
 #ifndef ACE_CONFIG_QNX_RTP_COMMON_H
@@ -41,6 +41,10 @@
 //  These macros are:
 #define ACE_SIZEOF_DOUBLE   8
 #define ACE_SIZEOF_FLOAT    4
+
+// At least qnx 6.3.2 uses a void return for unsetenv
+// This assumes that older versions do too.
+#define ACE_HAS_VOID_UNSETENV
 
 #include /**/ "ace/post.h"
 #endif /* ACE_CONFIG_QNX_RTP_COMMON_H */

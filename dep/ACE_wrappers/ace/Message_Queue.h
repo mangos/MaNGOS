@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Queue.h
  *
- *  $Id: Message_Queue.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Message_Queue.h 88560 2010-01-15 05:02:05Z schmidt $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -21,10 +21,6 @@
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include "ace/IO_Cntl_Msg.h"
-#if defined (ACE_HAS_WIN32_OVERLAPPED_IO)
-# include "ace/Synch_Traits.h"   /* Needed in ACE_Message_Queue_NT */
-# include "ace/Thread_Mutex.h"   /* Needed in ACE_Message_Queue_NT */
-#endif
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

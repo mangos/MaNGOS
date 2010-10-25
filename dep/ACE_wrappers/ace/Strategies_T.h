@@ -4,7 +4,7 @@
 /**
  *  @file   Strategies_T.h
  *
- *  $Id: Strategies_T.h 81954 2008-06-15 13:24:16Z johnnyw $
+ *  $Id: Strategies_T.h 84316 2009-02-03 19:46:05Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -107,7 +107,7 @@ public:
   /**
    * Create a SVC_HANDLER with the appropriate creation strategy.  The
    * default behavior of this method is to make a new SVC_HANDLER if
-   * @a sh == 0 (passing in the <Thread_Manager>), else @a sh is
+   * @a sh == 0 (passing in the Thread_Manager), else @a sh is
    * unchanged.  Returns -1 on failure, else 0.
    */
   virtual int make_svc_handler (SVC_HANDLER *&sh);
@@ -262,7 +262,7 @@ public:
 
   // = Factory method.
   /**
-   * Activate the <svc_handler> with an appropriate concurrency
+   * Activate the @a svc_handler with an appropriate concurrency
    * strategy.  The default behavior of this method is to activate the
    * SVC_HANDLER by calling its <open> method (which allows the
    * SVC_HANDLER to define its own concurrency strategy).
@@ -321,7 +321,7 @@ public:
   virtual ~ACE_Reactive_Strategy (void);
 
   // = Factory method.
-  /// Activate the <svc_handler> by registering it with the <Reactor>
+  /// Activate the @a svc_handler by registering it with the <Reactor>
   /// and then calling it's <open> hook.
   virtual int activate_svc_handler (SVC_HANDLER *svc_handler,
                                     void *arg = 0);
@@ -511,13 +511,13 @@ public:
 
   /// Initialize the @c peer_acceptor_ with @a local_addr.
   ACE_Accept_Strategy (const ACE_PEER_ACCEPTOR_ADDR &local_addr,
-                       int restart = 0,
+                       bool restart = false,
                        ACE_Reactor *reactor = ACE_Reactor::instance ());
 
   /// Initialize the <peer_acceptor_> with @a local_addr, indicating
   /// whether to @a reuse_addr if it's already in use.
   virtual int open (const ACE_PEER_ACCEPTOR_ADDR &local_addr,
-                    int reuse_addr = 0);
+                    bool reuse_addr = false);
 
   /// Return the underlying ACE_HANDLE of the <peer_acceptor_>.
   virtual ACE_HANDLE get_handle (void) const;
@@ -546,7 +546,7 @@ protected:
   ACE_Reactor *reactor_;
 
   /// Needed to reopen the socket if <accept> fails.
-  int reuse_addr_;
+  bool reuse_addr_;
 
   /// Needed to reopen the socket if <accept> fails.
   ACE_PEER_ACCEPTOR_ADDR peer_acceptor_addr_;
@@ -588,7 +588,7 @@ public:
                                    const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                    ACE_Time_Value *timeout,
                                    const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                   int reuse_addr,
+                                   bool reuse_addr,
                                    int flags,
                                    int perms);
 
@@ -602,7 +602,7 @@ public:
                                    const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                    ACE_Time_Value *timeout,
                                    const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                   int reuse_addr,
+                                   bool reuse_addr,
                                    int flags,
                                    int perms);
 
@@ -875,7 +875,7 @@ public:
   /// Template method for making a new <svc_handler>
   virtual int make_svc_handler (SVC_HANDLER *&sh);
 
-  /// Template method for activating a new <svc_handler>
+  /// Template method for activating a new @a svc_handler
   virtual int activate_svc_handler (SVC_HANDLER *svc_handler);
 
   /// Template method for setting the recycler information of the
@@ -905,7 +905,7 @@ public:
                                    const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                    ACE_Time_Value *timeout,
                                    const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                   int reuse_addr,
+                                   bool reuse_addr,
                                    int flags,
                                    int perms);
   virtual int connect_svc_handler (SVC_HANDLER *&sh,
@@ -913,7 +913,7 @@ public:
                                    const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                    ACE_Time_Value *timeout,
                                    const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                   int reuse_addr,
+                                   bool reuse_addr,
                                    int flags,
                                    int perms);
 
@@ -965,7 +965,7 @@ protected:
                               const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                               ACE_Time_Value *timeout,
                               const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                              int reuse_addr,
+                              bool reuse_addr,
                               int flags,
                               int perms);
 
@@ -995,7 +995,7 @@ protected:
                     const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                     ACE_Time_Value *timeout,
                     const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                    int reuse_addr,
+                    bool reuse_addr,
                     int flags,
                     int perms,
                     CONNECTION_MAP_ENTRY *&entry,
@@ -1005,7 +1005,7 @@ protected:
                                     const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                     ACE_Time_Value *timeout,
                                     const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                    int reuse_addr,
+                                    bool reuse_addr,
                                     int flags,
                                     int perms,
                                     CONNECTION_MAP_ENTRY *&entry,
@@ -1016,7 +1016,7 @@ protected:
     const ACE_PEER_CONNECTOR_ADDR &remote_addr,
     ACE_Time_Value *timeout,
     const ACE_PEER_CONNECTOR_ADDR &local_addr,
-    int reuse_addr,
+    bool reuse_addr,
     int flags,
     int perms,
     int &found);

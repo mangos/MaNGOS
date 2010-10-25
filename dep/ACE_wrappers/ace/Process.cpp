@@ -1,4 +1,4 @@
-// $Id: Process.cpp 82499 2008-08-04 20:01:17Z shuston $
+// $Id: Process.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Process.h"
 
@@ -17,17 +17,19 @@
 #include "ace/OS_NS_errno.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_unistd.h"
+#include "ace/OS_NS_fcntl.h"
 #include "ace/OS_Memory.h"
 #include "ace/Countdown_Time.h"
 #include "ace/Truncate.h"
 #include "ace/Vector_T.h"
+#include "ace/Tokenizer_T.h"
 
 #if defined (ACE_VXWORKS) && (ACE_VXWORKS > 0x600) && defined (__RTP__)
 # include <rtpLib.h>
 # include <taskLib.h>
 #endif
 
-ACE_RCSID (ace, Process, "$Id: Process.cpp 82499 2008-08-04 20:01:17Z shuston $")
+
 
 // This function acts as a signal handler for SIGCHLD. We don't really want
 // to do anything with the signal - it's just needed to interrupt a sleep.
@@ -137,13 +139,12 @@ ACE_Process::spawn (ACE_Process_Options &options)
   // like other OS environment.  Therefore, it is user's whole responsibility to call
   // 'ACE_Process_Options::process_name(const ACE_TCHAR *name)' to set the proper
   // process name (the execution file name with path if needed).
-
   BOOL fork_result =
     ACE_TEXT_CreateProcess (options.process_name(),
                             options.command_line_buf(),
                             options.get_process_attributes(),  // must be NULL in CE
                             options.get_thread_attributes(),   // must be NULL in CE
-                            options.handle_inheritence(),      // must be false in CE
+                            options.handle_inheritance(),      // must be false in CE
                             options.creation_flags(),          // must be NULL in CE
                             options.env_buf(),                 // environment variables, must be NULL in CE
                             options.working_directory(),       // must be NULL in CE
@@ -175,7 +176,7 @@ ACE_Process::spawn (ACE_Process_Options &options)
                             options.command_line_buf (),
                             options.get_process_attributes (),
                             options.get_thread_attributes (),
-                            options.handle_inheritence (),
+                            options.handle_inheritance (),
                             flags,
                             env_buf, // environment variables
                             options.working_directory (),
@@ -454,6 +455,16 @@ ACE_Process::spawn (ACE_Process_Options &options)
         ACE_OS::close (options.get_stdin ());
         ACE_OS::close (options.get_stdout ());
         ACE_OS::close (options.get_stderr ());
+        if (!options.handle_inheritance ())
+          {
+            // Set close-on-exec for all FDs except standard handles
+            for (int i = ACE::max_handles () - 1; i >= 0; i--)
+              {
+                if (i == ACE_STDIN || i == ACE_STDOUT || i == ACE_STDERR)
+                  continue;
+                ACE_OS::fcntl (i, F_SETFD, FD_CLOEXEC);
+              }
+          }
 
         // If we must, set the working directory for the child
         // process.
@@ -783,9 +794,9 @@ ACE_Process::convert_env_buffer (const char* env) const
 #endif
 
 ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
-                                          int command_line_buf_len,
-                                          int env_buf_len,
-                                          int max_env_args)
+                                          size_t command_line_buf_len,
+                                          size_t env_buf_len,
+                                          size_t max_env_args)
   :
 #if !defined (ACE_HAS_WINCE)
     inherit_environment_ (inherit_environment),
@@ -795,7 +806,6 @@ ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
 #if !defined (ACE_HAS_WINCE)
 #if defined (ACE_WIN32)
     environment_inherited_ (0),
-    handle_inheritence_ (TRUE),
     process_attributes_ (0),
     thread_attributes_ (0),
 #else /* ACE_WIN32 */
@@ -807,6 +817,7 @@ ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
     rgid_ ((uid_t) -1),
     egid_ ((uid_t) -1),
 #endif /* ACE_WIN32 */
+    handle_inheritance_ (true),
     set_handles_called_ (0),
     environment_buf_index_ (0),
     environment_argv_index_ (0),
@@ -815,7 +826,7 @@ ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
     max_environment_args_ (max_env_args),
     max_environ_argv_index_ (max_env_args - 1),
 #endif /* !ACE_HAS_WINCE */
-    command_line_argv_calculated_ (0),
+    command_line_argv_calculated_ (false),
     command_line_buf_ (0),
     command_line_copy_ (0),
     command_line_buf_len_ (command_line_buf_len),
@@ -825,6 +836,13 @@ ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
   ACE_NEW (command_line_buf_,
            ACE_TCHAR[command_line_buf_len]);
   command_line_buf_[0] = '\0';
+  process_name_[0] = '\0';
+
+#if defined (ACE_HAS_WINCE)
+  ACE_UNUSED_ARG(inherit_environment);
+  ACE_UNUSED_ARG(env_buf_len);
+  ACE_UNUSED_ARG(max_env_args);
+#endif
 
 #if !defined (ACE_HAS_WINCE)
   working_directory_[0] = '\0';
@@ -834,7 +852,6 @@ ACE_Process_Options::ACE_Process_Options (bool inherit_environment,
            ACE_TCHAR *[max_env_args]);
   environment_buf_[0] = '\0';
   environment_argv_[0] = 0;
-  process_name_[0] = '\0';
 #if defined (ACE_WIN32)
   ACE_OS::memset ((void *) &this->startup_info_,
                   0,
@@ -915,24 +932,6 @@ ACE_Process_Options::env_argv (void)
 
 #endif /* ACE_WIN32 */
 
-void
-ACE_Process_Options::enable_unicode_environment (void)
-{
-  this->use_unicode_environment_ = true;
-}
-
-void
-ACE_Process_Options::disable_unicode_environment (void)
-{
-  this->use_unicode_environment_ = false;
-}
-
-bool
-ACE_Process_Options::use_unicode_environment (void) const
-{
-  return this->use_unicode_environment_;
-}
-
 int
 ACE_Process_Options::setenv (ACE_TCHAR *envp[])
 {
@@ -1004,8 +1003,11 @@ ACE_Process_Options::setenv (const ACE_TCHAR *variable_name,
   va_start (argp, format);
 
   // Add the rest of the varargs.
-  size_t tmp_buflen = DEFAULT_COMMAND_LINE_BUF_LEN > buflen
-                      ? static_cast<size_t> (DEFAULT_COMMAND_LINE_BUF_LEN) : buflen;
+  size_t tmp_buflen = buflen;
+  if (DEFAULT_COMMAND_LINE_BUF_LEN > buflen)
+    {
+      tmp_buflen = DEFAULT_COMMAND_LINE_BUF_LEN;
+    }
   int retval = 0;
 
   ACE_TCHAR *stack_buf = 0;
@@ -1181,22 +1183,37 @@ ACE_Process_Options::~ACE_Process_Options (void)
 int
 ACE_Process_Options::command_line (const ACE_TCHAR *const argv[])
 {
-  // @@ Factor out the code between this
   int i = 0;
 
   if (argv[i])
     {
       ACE_OS::strcat (command_line_buf_, argv[i]);
+
       while (argv[++i])
         {
-          ACE_OS::strcat (command_line_buf_,
-                          ACE_TEXT (" "));
-          ACE_OS::strcat (command_line_buf_,
-                          argv[i]);
+          // Check to see if the next argument will overflow the
+          // command_line buffer.
+          size_t const cur_len =
+            ACE_OS::strlen (command_line_buf_)
+              + ACE_OS::strlen (argv[i])
+              + 2;
+
+          if (cur_len > command_line_buf_len_)
+            {
+              ACE_ERROR_RETURN ((LM_ERROR,
+                                 ACE_TEXT ("ACE_Process:command_line: ")
+                                 ACE_TEXT ("command line is ")
+                                 ACE_TEXT ("longer than %d\n"),
+                                 command_line_buf_len_),
+                                1);
+            }
+
+          ACE_OS::strcat (command_line_buf_, ACE_TEXT (" "));
+          ACE_OS::strcat (command_line_buf_, argv[i]);
         }
     }
 
-  command_line_argv_calculated_ = 0;
+  command_line_argv_calculated_ = false;
   return 0; // Success.
 }
 
@@ -1226,7 +1243,7 @@ ACE_Process_Options::command_line (const ACE_TCHAR *format, ...)
   // Useless macro.
   va_end (argp);
 
-  command_line_argv_calculated_ = 0;
+  command_line_argv_calculated_ = false;
   return 0;
 }
 
@@ -1238,7 +1255,7 @@ ACE_Process_Options::command_line (const ACE_TCHAR *format, ...)
 int
 ACE_Process_Options::command_line (const ACE_ANTI_TCHAR *format, ...)
 {
-  ACE_ANTI_TCHAR *anti_clb;
+  ACE_ANTI_TCHAR *anti_clb = 0;
   ACE_NEW_RETURN (anti_clb,
                   ACE_ANTI_TCHAR[this->command_line_buf_len_],
                   -1);
@@ -1260,7 +1277,7 @@ ACE_Process_Options::command_line (const ACE_ANTI_TCHAR *format, ...)
 
   delete [] anti_clb;
 
-  command_line_argv_calculated_ = 0;
+  command_line_argv_calculated_ = false;
   return 0;
 }
 #endif /* ACE_HAS_WCHAR && !ACE_HAS_WINCE */
@@ -1281,9 +1298,9 @@ ACE_Process_Options::env_buf (void)
 ACE_TCHAR * const *
 ACE_Process_Options::command_line_argv (void)
 {
-  if (command_line_argv_calculated_ == 0)
+  if (!command_line_argv_calculated_)
     {
-      command_line_argv_calculated_ = 1;
+      command_line_argv_calculated_ = true;
 
       // We need to free up any previous allocated memory first.
       ACE::strdelete (command_line_copy_);

@@ -1,7 +1,7 @@
 /**
  * @file Recursive_Thread_Mutex.cpp
  *
- * $Id: Recursive_Thread_Mutex.cpp 82253 2008-07-04 20:18:14Z shuston $
+ * $Id: Recursive_Thread_Mutex.cpp 91286 2010-08-05 09:04:31Z johnnyw $
  *
  * Originally in Synch.cpp
  *
@@ -18,7 +18,7 @@
 
 #include "ace/Log_Msg.h"
 
-ACE_RCSID(ace, Recursive_Thread_Mutex, "$Id: Recursive_Thread_Mutex.cpp 82253 2008-07-04 20:18:14Z shuston $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -82,7 +82,7 @@ int
 ACE_Recursive_Thread_Mutex::get_nesting_level (void)
 {
   // ACE_TRACE ("ACE_Recursive_Thread_Mutex::get_nesting_level");
-#if defined (ACE_HAS_WINCE) || defined (ACE_HAS_VXTHREADS) || defined (ACE_HAS_PHARLAP)
+#if defined (ACE_HAS_VXTHREADS) || defined (ACE_HAS_PHARLAP) || defined (ACE_HAS_WINCE)
   ACE_NOTSUP_RETURN (-1);
 #elif defined (ACE_HAS_RECURSIVE_MUTEXES)
 # if defined (ACE_WIN32)

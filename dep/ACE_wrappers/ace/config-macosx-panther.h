@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-macosx-panther.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-macosx-panther.h 87167 2009-10-19 19:33:53Z olli $
 
 // This configuration file is designed to work with the MacOS X operating system.
 
@@ -15,7 +15,7 @@
 #endif /* __GNUG__ */
 
 #define ACE_LACKS_SUSECONDS_T
-#define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%lu")
+#define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%lu"
 
 #if defined (ACE_HAS_PENTIUM)
 # undef ACE_HAS_PENTIUM
@@ -46,9 +46,6 @@
 //Platform supports sigsuspend()
 #define ACE_HAS_SIGSUSPEND
 
-//Platform/compiler has macros for sig{empty,fill,add,del}set (e.g., SCO and FreeBSD)
-#define ACE_HAS_SIG_MACROS
-
 //#define ACE_HAS_RECURSIVE_THR_EXIT_SEMANTICS
 #define ACE_LACKS_GETPGID
 #define ACE_LACKS_RWLOCK_T
@@ -57,9 +54,6 @@
 #define ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT
 
 #define ACE_HAS_NONCONST_SELECT_TIMEVAL
-
-//?
-#define ACE_LACKS_SIGSET
 
 #define ACE_NEEDS_SCHED_H
 
@@ -112,9 +106,6 @@
 
 // Compiler supports the ssize_t typedef.
 #define ACE_HAS_SSIZE_T
-
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
 
 // Compiler/platform provides the sockio.h file.
 #define ACE_HAS_SYS_SOCKIO_H

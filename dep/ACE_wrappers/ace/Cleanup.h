@@ -4,7 +4,7 @@
 /**
  *  @file   Cleanup.h
  *
- *  $Id: Cleanup.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Cleanup.h 84163 2009-01-15 07:57:27Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -26,6 +26,9 @@
 # endif /* ACE_LACKS_PRAGMA_ONCE */
 
 #include /**/ "ace/ACE_export.h"
+
+# include "ace/Intrusive_List.h"
+# include "ace/Intrusive_List_Node.h"
 
 #if (defined (ACE_HAS_VERSIONED_NAMESPACE) && ACE_HAS_VERSIONED_NAMESPACE == 1)
 # include "ace/Global_Macros.h"
@@ -54,27 +57,39 @@ public:
   virtual void cleanup (void *param = 0);
 };
 
-// Adapter for cleanup, used by ACE_Object_Manager.
+/// Adapter for cleanup, used by ACE_Object_Manager.
 extern "C" ACE_Export
 void ACE_CLEANUP_DESTROYER_NAME (ACE_Cleanup *, void *param = 0);
 
 /**
- * @class ACE_Cleanup_Info
+ * @class ACE_Cleanup_Info_Node
  *
- * @brief Hold cleanup information for thread/process
+ * @brief For maintaining a list of ACE_Cleanup_Info items.
+ *
+ * For internal use by ACE_Object_Manager.
  */
-class ACE_Export ACE_Cleanup_Info
+class ACE_Cleanup_Info_Node : public ACE_Intrusive_List_Node<ACE_Cleanup_Info_Node>
 {
 public:
-  /// Default constructor.
-  ACE_Cleanup_Info (void);
+  ACE_Cleanup_Info_Node (void);
+  ACE_Cleanup_Info_Node (void *object,
+                         ACE_CLEANUP_FUNC cleanup_hook,
+                         void *param,
+                         const char *name);
+  ~ACE_Cleanup_Info_Node (void);
 
   /// Equality operator.
-  bool operator== (const ACE_Cleanup_Info &o) const;
+  bool operator== (const ACE_Cleanup_Info_Node &o) const;
 
   /// Inequality operator.
-  bool operator!= (const ACE_Cleanup_Info &o) const;
+  bool operator!= (const ACE_Cleanup_Info_Node &o) const;
 
+  void* object(void);
+
+  ACE_CLEANUP_FUNC cleanup_hook (void);
+
+  void *param (void);
+private:
   /// Point to object that gets passed into the <cleanup_hook_>.
   void *object_;
 
@@ -83,14 +98,19 @@ public:
 
   /// Parameter passed to the <cleanup_hook_>.
   void *param_;
+
+  /// Name of the cleanup object
+  const char *name_;
 };
 
-class ACE_Cleanup_Info_Node;
+typedef ACE_Intrusive_List<ACE_Cleanup_Info_Node> ACE_Cleanup_Info_Node_List;
 
 /**
  * @class ACE_OS_Exit_Info
  *
  * @brief Hold Object Manager cleanup (exit) information.
+ *
+ * @internal
  *
  * For internal use by the ACE library, only.
  */
@@ -104,11 +124,15 @@ public:
   ~ACE_OS_Exit_Info (void);
 
   /// Use to register a cleanup hook.
-  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param);
+  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param, const char* name = 0);
 
-  /// Look for a registered cleanup hook object.  Returns 1 if already
-  /// registered, 0 if not.
-  int find (void *object);
+  /// Look for a registered cleanup hook object.  Returns true if already
+  /// registered, false if not.
+  bool find (void *object);
+
+  /// Remove a registered cleanup hook object.  Returns true if removed
+  /// false if not.
+  bool remove (void *object);
 
   /// Call all registered cleanup hooks, in reverse order of
   /// registration.
@@ -116,12 +140,11 @@ public:
 
 private:
   /**
-   * Keeps track of all registered objects.  The last node is only
-   * used to terminate the list (it doesn't contain a valid
-   * ACE_Cleanup_Info).
+   * Keeps track of all registered objects.
    */
-  ACE_Cleanup_Info_Node *registered_objects_;
+  ACE_Cleanup_Info_Node_List registered_objects_;
 };
+
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

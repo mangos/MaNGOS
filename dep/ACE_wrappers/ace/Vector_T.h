@@ -4,7 +4,7 @@
 /**
  *  @file    Vector_T.h
  *
- *  $Id: Vector_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Vector_T.h 91285 2010-08-05 08:29:30Z johnnyw $
  *
  *  @author Craig L. Ching <cching@mqsoftware.com>
  *  @author Gonzalo Diethelm <gonzalo.diethelm@aditiva.com>
@@ -16,7 +16,7 @@
 
 #include /**/ "ace/pre.h"
 
-#include "ace/Array.h"
+#include "ace/Containers_T.h"
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
@@ -170,14 +170,14 @@ public:
 
   // = Compare operators
 
-  ///Equality comparison operator.
+  /// Equality comparison operator.
   /**
    * Compare this vector with @arg s for equality.  Two vectors are equal
    * if their sizes are equal and all the elements are equal.
    */
   bool operator== (const ACE_Vector<T, DEFAULT_SIZE> &s) const;
 
-  ///Inequality comparison operator.
+  /// Inequality comparison operator.
   /**
    * Compare this vector with @arg s for inequality such that @c *this !=
    * @arg s is always the complement of the boolean return value of
@@ -272,7 +272,7 @@ public:
 
   // = Iteration methods.
 
-  /// Pass back the <next_item> that hasn't been seen in the vector.
+  /// Pass back the @a next_item that hasn't been seen in the vector.
   /// Returns 0 when all items have been seen, else 1.
   int next (T *&next_item);
 

@@ -6,7 +6,7 @@
  *
  *  STREAMS interface (STREAMS)
  *
- *  $Id: os_stropts.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_stropts.h 84660 2009-03-01 20:22:37Z olli $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -27,13 +27,7 @@
 #include "ace/os_include/os_unistd.h"
 
 #if defined (ACE_HAS_TIMOD_H)
-#  if defined (ACE_HAS_STL_QUEUE_CONFLICT)
-#    define queue _Queue_
-#  endif /* ACE_HAS_STL_QUEUE_CONFLICT */
 #  include /**/ <sys/timod.h>
-#  if defined (ACE_HAS_STL_QUEUE_CONFLICT)
-#    undef queue
-#  endif /* ACE_HAS_STL_QUEUE_CONFLICT */
 #elif defined (ACE_HAS_OSF_TIMOD_H)
 #  include /**/ <tli/timod.h>
 #endif /* ACE_HAS_TIMOD_H */

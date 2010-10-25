@@ -1,4 +1,4 @@
-// $Id: Filecache.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Filecache.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/Filecache.h"
 #include "ace/Object_Manager.h"
@@ -10,10 +10,6 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_fcntl.h"
 #include "ace/Truncate.h"
-
-ACE_RCSID (ace,
-           Filecache,
-           "$Id: Filecache.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #if defined (ACE_WIN32)
 // Specifies no sharing flags.
@@ -738,15 +734,7 @@ ACE_Filecache_Object::update (void) const
   if (ACE_OS::stat (this->filename_, &statbuf) == -1)
     result = 1;
   else
-    // non-portable code may follow
-#if defined (ACE_HAS_WINCE)
-    // Yup, non-portable... there's probably a way to safely implement
-    // difftime() on WinCE, but for now, this will have to do. It flags
-    // every file as having changed since cached.
-    result = 1;
-#else
     result = ACE_OS::difftime (this->stat_.st_mtime, statbuf.st_mtime) < 0;
-#endif /* ACE_HAS_WINCE */
 
   return result;
 }

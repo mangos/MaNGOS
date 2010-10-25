@@ -4,7 +4,7 @@
 /**
  *  @file    Get_Opt.h
  *
- *  $Id: Get_Opt.h 81840 2008-06-05 13:46:45Z sma $
+ *  $Id: Get_Opt.h 86367 2009-08-05 09:41:11Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Don Hinton <dhinton@gmx.net> (added long option support)
@@ -182,14 +182,14 @@ public:
 private:
   void ACE_Get_Opt_Init (const ACE_TCHAR *optstring);
 public:
-  ACE_INLINE ACE_Get_Opt (int argc,
+  ACE_Get_Opt (int argc,
                ACE_TCHAR **argv,
                const ACE_TCHAR *optstring = ACE_TEXT (""),
                int skip_args = 1,
                int report_errors = 0,
                int ordering = PERMUTE_ARGS,
                int long_only = 0);
-  ACE_INLINE ACE_Get_Opt (int argc,
+  ACE_Get_Opt (int argc,
                ACE_TCHAR **argv,
                const char *optstring,
                int skip_args = 1,

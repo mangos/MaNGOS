@@ -3,9 +3,10 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="ACE_Wrappers"
-	ProjectGUID="{AD537C9A-FECA-1BAD-6757-8A6348EA12C8}"
+	ProjectGUID="{AD537C9A-FECA-1BAD-6757-8A6300006755}"
 	RootNamespace="ACE"
 	Keyword="Win32Proj"
+	SignManifests="true"
 	>
 	<Platforms>
 		<Platform
@@ -583,7 +584,7 @@
 	<Files>
 		<Filter
 			Name="Source Files"
-			Filter="cpp;cxx;cc;C;c"
+			Filter="cpp;cxx;cc;c;C"
 			>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\ACE.cpp"
@@ -1314,6 +1315,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\OS_QoS.cpp"
 				>
 			</File>
@@ -1923,6 +1928,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Atomic_Op_Sparc.h"
 				>
 			</File>
@@ -2059,10 +2068,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-borland-common.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-cray.h"
 				>
 			</File>
@@ -2119,6 +2124,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-kfreebsd.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-linux-common.h"
 				>
 			</File>
@@ -2135,11 +2144,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-hardware.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-simulator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-macosx-leopard.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-macosx-panther.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-macosx-snowleopard.h"
 				>
 			</File>
 			<File
@@ -2291,18 +2312,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks5.x.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks6.2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks6.3.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks6.4.h"
 				>
 			</File>
@@ -2315,7 +2324,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks6.7.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-vxworks6.8.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-borland.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-cegcc.h"
 				>
 			</File>
 			<File
@@ -2336,6 +2357,10 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-mingw.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-msvc-10.h"
 				>
 			</File>
 			<File
@@ -2496,10 +2521,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Event_Handler_T.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Exception_Macros.h"
 				>
 			</File>
 			<File
@@ -3019,6 +3040,30 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Dirent.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Errno.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\arpa\os_inet.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\net\os_if.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_in.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_tcp.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_aio.h"
 				>
 			</File>
@@ -3043,19 +3088,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Dirent.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_dirent.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_dlfcn.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Errno.h"
 				>
 			</File>
 			<File
@@ -3099,27 +3136,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\net\os_if.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_in.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\arpa\os_inet.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_intrin.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_inttypes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_ipc.h"
 				>
 			</File>
 			<File
@@ -3143,31 +3164,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_loadavg.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_local.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_main.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_math.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_mman.h"
 				>
 			</File>
 			<File
@@ -3176,10 +3177,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_mqueue.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_msg.h"
 				>
 			</File>
 			<File
@@ -3192,6 +3189,250 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_nl_types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pdh.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pdhmsg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_poll.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pthread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pwd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_regex.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_sched.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_search.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_semaphore.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_setjmp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_signal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_spawn.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdarg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdbool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stddef.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdint.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdlib.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_strings.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stropts.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_syslog.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_tar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_termios.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_tgmath.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_time.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_trace.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_typeinfo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_ucontext.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_ulimit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_unistd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_utime.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_utmpx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wchar.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wctype.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wordexp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_ipc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_loadavg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_mman.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_msg.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_pstat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_resource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_select.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sem.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_shm.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_socket.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_stat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_statvfs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysctl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysinfo.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_time.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_timeb.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_times.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_uio.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_un.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_utsname.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_wait.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Memory.h"
 				>
 			</File>
 			<File
@@ -3331,27 +3572,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pdh.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pdhmsg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_poll.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_pstat.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pthread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_pwd.h"
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.h"
 				>
 			</File>
 			<File
@@ -3359,127 +3580,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_regex.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_resource.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_sched.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_search.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_select.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sem.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_semaphore.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_setjmp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_shm.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_signal.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_socket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_spawn.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_stat.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_statvfs.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdarg.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdbool.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stddef.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdint.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stdlib.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\OS_String.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_strings.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_stropts.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysctl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysinfo.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_syslog.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_tar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_tcp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_termios.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_tgmath.h"
 				>
 			</File>
 			<File
@@ -3487,79 +3588,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_timeb.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_times.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\OS_TLI.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_trace.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_ucontext.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_uio.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_ulimit.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_un.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_unistd.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_utime.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_utmpx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_utsname.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\sys\os_wait.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wchar.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wctype.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\os_include\os_wordexp.h"
 				>
 			</File>
 			<File
@@ -4159,6 +4188,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\Tokenizer_T.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\TP_Reactor.h"
 				>
 			</File>
@@ -4277,7 +4310,7 @@
 		</Filter>
 		<Filter
 			Name="Inline Files"
-			Filter="i;inl"
+			Filter="i;ipp;inl"
 			>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\ACE.inl"
@@ -4349,6 +4382,10 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Atomic_Op.inl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.inl"
 				>
 			</File>
 			<File
@@ -4445,6 +4482,10 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Containers_T.inl"
+				>
+			</File>
+			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\Countdown_Time.inl"
 				>
 			</File>
 			<File
@@ -4956,6 +4997,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.inl"
+				>
+			</File>
+			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\OS_TLI.inl"
 				>
 			</File>
@@ -5378,109 +5423,59 @@
 		</Filter>
 		<Filter
 			Name="Documentation"
-			>
+			Filter="">
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\README"
-				>
+				RelativePath="..\..\dep\ACE_wrappers\ace\..\VERSION">
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\VERSION"
-				>
+				RelativePath="..\..\dep\ACE_wrappers\ace\README">
 				<FileConfiguration
 					Name="Debug|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|Win32"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug_NoPCH|x64"
-					ExcludedFromBuild="true"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|Win32"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="Release|x64"
-					ExcludedFromBuild="true"
-					>
+					ExcludedFromBuild="TRUE">
 					<Tool
-						Name="VCCustomBuildTool"
-					/>
+						Name="VCCustomBuildTool"/>
 				</FileConfiguration>
 			</File>
 		</Filter>

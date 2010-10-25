@@ -4,7 +4,7 @@
 /**
  *  @file    ace_wchar.h
  *
- *  $Id: ace_wchar.h 82441 2008-07-28 13:04:13Z johnnyw $
+ *  $Id: ace_wchar.h 91285 2010-08-05 08:29:30Z johnnyw $
  *
  *  @author Darrell Brunsch <brunsch@uci.edu>
  */
@@ -123,9 +123,6 @@ using std::size_t;
 typedef wchar_t ACE_TCHAR;
 typedef char ACE_ANTI_TCHAR;
 # define ACE_TEXT(STRING) ACE_TEXT_WIDE (STRING)
-# if !defined (ACE_LACKS_DEPRECATED_MACROS)
-#  define ACE_LIB_TEXT(STRING) ACE_TEXT_WIDE (STRING)
-# endif
 # define ACE_TEXT_ALWAYS_CHAR(STRING) ACE_Wide_To_Ascii (STRING).char_rep ()
 # define ACE_TEXT_ALWAYS_WCHAR(STRING) STRING
 # define ACE_TEXT_CHAR_TO_TCHAR(STRING) ACE_Ascii_To_Wide (STRING).wchar_rep ()
@@ -135,9 +132,6 @@ typedef char ACE_ANTI_TCHAR;
 typedef char ACE_TCHAR;
 typedef wchar_t ACE_ANTI_TCHAR;
 # define ACE_TEXT(STRING) STRING
-# if !defined (ACE_LACKS_DEPRECATED_MACROS)
-#  define ACE_LIB_TEXT(STRING) STRING
-# endif
 # define ACE_TEXT_ALWAYS_CHAR(STRING) STRING
 # define ACE_TEXT_ALWAYS_WCHAR(STRING) ACE_Ascii_To_Wide (STRING).wchar_rep ()
 # define ACE_TEXT_CHAR_TO_TCHAR(STRING) STRING

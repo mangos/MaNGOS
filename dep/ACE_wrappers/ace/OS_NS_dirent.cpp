@@ -1,8 +1,8 @@
-// $Id: OS_NS_dirent.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_dirent.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/OS_NS_dirent.h"
 
-ACE_RCSID(ace, OS_NS_dirent, "$Id: OS_NS_dirent.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_dirent.inl"
@@ -21,9 +21,11 @@ ACE_OS::closedir_emulation (ACE_DIR *d)
 {
 #if defined (ACE_WIN32)
   if (d->current_handle_ != INVALID_HANDLE_VALUE)
-    ::FindClose (d->current_handle_);
+    {
+      ::FindClose (d->current_handle_);
+      d->current_handle_ = INVALID_HANDLE_VALUE;
+    }
 
-  d->current_handle_ = INVALID_HANDLE_VALUE;
   d->started_reading_ = 0;
   if (d->dirent_ != 0)
     {
@@ -41,11 +43,11 @@ ACE_DIR *
 ACE_OS::opendir_emulation (const ACE_TCHAR *filename)
 {
 #if defined (ACE_WIN32)
-#  if defined (ACE_HAS_WINCE) && !defined (INVALID_FILE_ATTRIBUTES)
+#  if !defined (INVALID_FILE_ATTRIBUTES)
 #    define INVALID_FILE_ATTRIBUTES 0xFFFFFFFF
 #  endif
 
-  ACE_DIR *dir;
+  ACE_DIR *dir = 0;
   ACE_TCHAR extra[3] = {0,0,0};
 
    // Check if filename is a directory.
@@ -72,7 +74,7 @@ ACE_OS::opendir_emulation (const ACE_TCHAR *filename)
   Phil Mesnier
 */
 
-  size_t lastchar = ACE_OS::strlen (filename);
+  size_t const lastchar = ACE_OS::strlen (filename);
   if (lastchar > 0)
     {
       if (filename[lastchar-1] != '*')
@@ -122,8 +124,7 @@ ACE_OS::readdir_emulation (ACE_DIR *d)
     }
   else
     {
-      int retval = ACE_TEXT_FindNextFile (d->current_handle_,
-                                          &d->fdata_);
+      int const retval = ACE_TEXT_FindNextFile (d->current_handle_, &d->fdata_);
       if (retval == 0)
         {
           // Make sure to close the handle explicitly to avoid a leak!
@@ -175,7 +176,6 @@ ACE_OS::scandir_emulation (const ACE_TCHAR *dirname,
   ACE_DIRENT **vector = 0;
   ACE_DIRENT *dp = 0;
   int arena_size = 0;
-
   int nfiles = 0;
   int fail = 0;
 

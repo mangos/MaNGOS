@@ -4,7 +4,7 @@
 /**
  * @file    Numeric_Limits.h
  *
- * $Id: Numeric_Limits.h 80826 2008-03-04 14:51:23Z wotte $
+ * $Id: Numeric_Limits.h 85057 2009-04-08 10:59:58Z msmit $
  *
  * Traits containing basic integer limits.  Useful for template-based
  * code on platforms that lack @c std::numeric_limits<>.
@@ -37,7 +37,7 @@
 # include "ace/Basic_Types.h"
 #else
 
-# ifdef __MINGW32__
+# if defined __MINGW32__
 // Windows defines min/max macros that interfere with the
 // numeric_limits::min/max() traits.  Undefine those macros before
 // including <limits>.

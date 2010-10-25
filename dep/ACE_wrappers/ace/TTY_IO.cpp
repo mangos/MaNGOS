@@ -1,4 +1,4 @@
-// $Id: TTY_IO.cpp 82271 2008-07-09 09:23:03Z olli $
+// $Id: TTY_IO.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/TTY_IO.h"
 #include "ace/OS_NS_errno.h"
@@ -10,10 +10,6 @@
 #elif  defined (ACE_HAS_TERMIO)
 # include <termio.h>
 #endif
-
-ACE_RCSID (ace,
-           TTY_IO,
-           "$Id: TTY_IO.cpp 82271 2008-07-09 09:23:03Z olli $")
 
 namespace
 {
@@ -399,17 +395,24 @@ int ACE_TTY_IO::control (Control_Mode cmd, Serial_Params *arg) const
       return -1; // Wrong cmd.
     }
 #elif defined (ACE_WIN32)
+  DCB dcb;
+  dcb.DCBlength = sizeof dcb;
+  if (!::GetCommState (this->get_handle (), &dcb))
+  {
+    ACE_OS::set_errno_to_last_error ();
+    return -1;
+  }
+
+  COMMTIMEOUTS timeouts;
+  if (!::GetCommTimeouts (this->get_handle(), &timeouts))
+  {
+    ACE_OS::set_errno_to_last_error ();
+    return -1;
+  }
+
   switch (cmd)
     {
     case SETPARAMS:
-      DCB dcb;
-      dcb.DCBlength = sizeof dcb;
-      if (!::GetCommState (this->get_handle (), &dcb))
-        {
-          ACE_OS::set_errno_to_last_error ();
-          return -1;
-        }
-
       dcb.BaudRate = arg->baudrate;
 
       switch (arg->databits)
@@ -522,13 +525,6 @@ int ACE_TTY_IO::control (Control_Mode cmd, Serial_Params *arg) const
           return -1;
         }
 
-      COMMTIMEOUTS timeouts;
-      if (!::GetCommTimeouts (this->get_handle(), &timeouts))
-        {
-          ACE_OS::set_errno_to_last_error ();
-          return -1;
-        }
-
       if (arg->readtimeoutmsec < 0)
         {
           // Settings for infinite timeout.
@@ -560,7 +556,130 @@ int ACE_TTY_IO::control (Control_Mode cmd, Serial_Params *arg) const
        return 0;
 
     case GETPARAMS:
-      ACE_NOTSUP_RETURN (-1); // Not yet implemented.
+      arg->baudrate = dcb.BaudRate;
+
+      switch (dcb.ByteSize)
+        {
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+          arg->databits = dcb.ByteSize;
+          break;
+        default:
+          return -1;
+        }
+
+      switch (dcb.StopBits)
+        {
+        case ONESTOPBIT:
+          arg->stopbits = 1;
+          break;
+        case TWOSTOPBITS:
+          arg->stopbits = 2;
+          break;
+        default:
+          return -1;
+        }
+
+      if (!dcb.fParity)
+        {
+          arg->paritymode = ACE_TTY_IO_NONE;
+        }
+      else
+        {
+          switch (dcb.Parity)
+            {
+            case ODDPARITY:
+              arg->paritymode = ACE_TTY_IO_ODD;
+              break;
+            case EVENPARITY:
+              arg->paritymode = ACE_TTY_IO_EVEN;
+              break;
+            case NOPARITY:
+              arg->paritymode = ACE_TTY_IO_NONE;
+              break;
+            case MARKPARITY:
+              arg->paritymode = ACE_TTY_IO_MARK;
+              break;
+            case SPACEPARITY:
+              arg->paritymode = ACE_TTY_IO_SPACE;
+              break;
+            default:
+              return -1;
+            }
+        }
+
+      // Enable/disable RTS protocol.
+      switch (dcb.fRtsControl)
+        {
+        case RTS_CONTROL_ENABLE:
+          arg->rtsenb = 1;
+          break;
+        case RTS_CONTROL_HANDSHAKE:
+          arg->rtsenb = 2;
+          break;
+        case RTS_CONTROL_TOGGLE:
+          arg->rtsenb = 3;
+          break;
+        case RTS_CONTROL_DISABLE:
+          arg->rtsenb = 0;
+          break;
+        default:
+          return -1;
+        }
+
+      // Enable/disable CTS protocol.
+      if (dcb.fOutxCtsFlow)
+        arg->ctsenb = true;
+      else
+        arg->ctsenb = false;
+
+      // Enable/disable DSR protocol.
+      if (dcb.fOutxDsrFlow)
+        arg->dsrenb = true;
+      else
+        arg->dsrenb = false;
+
+      // Disable/enable DTR protocol
+      // Attention: DTR_CONTROL_HANDSHAKE is not supported.
+      switch (dcb.fDtrControl)
+        {
+        case DTR_CONTROL_DISABLE:
+          arg->dtrdisable = true;
+          break;
+        case DTR_CONTROL_ENABLE:
+          arg->dtrdisable = false;
+          break;
+        default:
+          return -1;
+        }
+
+      // Enable/disable software flow control on input
+      if (dcb.fInX)
+        arg->xinenb = true;
+      else
+        arg->xinenb = false;
+
+      // Enable/disable software flow control on output
+      if (dcb.fOutX)
+        arg->xoutenb = true;
+      else
+        arg->xoutenb = false;
+
+      arg->xonlim = static_cast<int>(dcb.XonLim);
+      arg->xofflim = static_cast<int>(dcb.XoffLim);
+
+      if (timeouts.ReadIntervalTimeout == 0 &&
+        timeouts.ReadTotalTimeoutMultiplier == 0 &&
+        timeouts.ReadTotalTimeoutConstant == 0)
+          arg->readtimeoutmsec = -1;
+      else
+        arg->readtimeoutmsec = timeouts.ReadTotalTimeoutConstant;
+
+      return 0;
+
     default:
       return -1; // Wrong cmd.
 

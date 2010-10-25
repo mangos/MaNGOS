@@ -4,7 +4,7 @@
 /**
  *  @file   OS_Memory.h
  *
- *  $Id: OS_Memory.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_Memory.h 86400 2009-08-06 13:52:28Z schmidt $
  *
  *  @author Doug Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -231,9 +231,15 @@ ACE_END_VERSIONED_NAMESPACE_DECL
      if (POINTER == 0) { errno = ENOMEM; } \
    } while (0)
 
-# define ACE_throw_bad_alloc \
-  void* gcc_will_complain_if_literal_0_is_returned = 0; \
-  return gcc_will_complain_if_literal_0_is_returned
+# if !defined (ACE_bad_alloc)
+    class ACE_bad_alloc_class {};
+#   define ACE_bad_alloc  ACE_bad_alloc_class
+# endif
+# if defined (ACE_HAS_MFC) && (ACE_HAS_MFC == 1)
+#   define ACE_throw_bad_alloc  AfxThrowMemoryException ()
+# else
+#   define ACE_throw_bad_alloc  return 0
+# endif
 
 #endif /* ACE_NEW_THROWS_EXCEPTIONS */
 
@@ -260,7 +266,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  *
  * ~(alignment - 1) = 1...110...0 = T2
  *
- * Notice that there is a multiple of <alignment> in the range
+ * Notice that there is a multiple of @a alignment in the range
  * [<value>,<value> + T1], also notice that if
  *
  * X = ( <value> + T1 ) & T2
@@ -270,7 +276,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * <value> <= X <= <value> + T1
  *
  * because the & operator only changes the last bits, and since X is a
- * multiple of <alignment> (its last bits are zero) we have found the
+ * multiple of @a alignment (its last bits are zero) we have found the
  * multiple we wanted.
  */
 /// Return the next integer aligned to a required boundary

@@ -1,4 +1,4 @@
-// $Id: README 82276 2008-07-09 17:35:49Z jtc $
+// $Id: README 91581 2010-08-31 13:18:11Z shuston $
 
 ACE Portability Macros
 ----------------------
@@ -208,10 +208,6 @@ ACE_HAS_STDARG_THR_DEST                 Platform has void (*)(...)
                                         prototype for
                                         pthread_key_create()
                                         destructor (e.g., LynxOS).
-ACE_HAS_STL_MAP_CONFLICT                Used when users want to
-                                        compile ACE with STL and STL
-                                        map class conflicts with
-                                        <net/if.h> map struct.
 ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS     Platform/compiler supports
                                         Win32 structural exceptions
 ACE_HAS_READ_TIMEDWAIT
@@ -249,10 +245,6 @@ ACE_HAS_WORKING_EXPLICIT_TEMPLATE_DESTRUCTOR
 ACE_HAS_BROKEN_ACCEPT_ADDR              Platform can't correctly deal
                                         with a NULL addr to accept()
                                         (e.g, VxWorks).
-ACE_HAS_BROKEN_CONDITIONAL_STRING_CASTS Compiler can't handle const char *
-                                        as rvalue in conditional operator.
-ACE_HAS_BROKEN_CTIME                    Compiler/platform uses macro
-                                        for ctime (e.g., MVS)
 ACE_HAS_BROKEN_DGRAM_SENDV              Platform sendv() does not work
                                         properly with datagrams,
                                         i.e. it fails when the iovec
@@ -313,13 +305,6 @@ ACE_HAS_EBCDIC                          Compile in the ACE code set classes
                                         that support EBCDIC.
 ACE_HAS_EXCEPTIONS                      Compiler supports C++
                                         exception handling
-ACE_HAS_BROKEN_UNEXPECTED_EXCEPTIONS    Compiler does not call
-                                        unexpected exception handler
-                                        if exception not listed in
-                                        exception specification is
-                                        thrown.  In particular, the
-                                        exception specification is not
-                                        respected.
 ACE_HAS_EXPLICIT_TEMPLATE_INSTANTIATION_EXPORT  When a base-class is a
                                         specialization of a class template
                                         then this class template must be
@@ -339,9 +324,6 @@ ACE_HAS_GETRUSAGE_PROTOTYPE             Platform has a getrusage ()
                                         prototype in sys/resource.h
                                         that differs from the one in
                                         ace/OS.i.
-ACE_HAS_GNU_CSTRING_H                   Denotes that GNU has cstring.h
-                                        as standard which redefines
-                                        memchr()
 ACE_HAS_GPERF                           The GPERF utility is compiled
                                         for this platform
 ACE_HAS_GETIFADDRS                      This platform has ifaddrs.h and
@@ -384,8 +366,6 @@ ACE_HAS_THR_MINSTACK                    Platform calls thr_minstack()
                                         (e.g., Tandem).
 ACE_HAS_LIMITED_RUSAGE_T                The rusage_t structure has
                                         only two fields.
-ACE_HAS_LIMITED_SELECT                  The select is unable to deal with
-                                        large file descriptors.
 ACE_HAS_LINUX_NPTL                      Linux platform (with kernel >= 2.6.x)
                                         with GLibc including new NPTL (Native
                                         POSIX Thread Library).
@@ -562,9 +542,6 @@ ACE_HAS_SIGINFO_T                       Platform supports SVR4
 ACE_HAS_SIGSUSPEND                      Platform supports sigsuspend()
 ACE_HAS_SIGISMEMBER_BUG                 Platform has bug with
                                         sigismember() (HP/UX 11).
-ACE_HAS_SIG_MACROS                      Platform/compiler has macros
-                                        for sig{empty,fill,add,del}set
-                                        (e.g., SCO and FreeBSD)
 ACE_HAS_SIGNAL_OBJECT_AND_WAIT          Platform supports the Win32
                                         SignalObjectAndWait() function
                                         (WinNT 4.0 and beyond).
@@ -614,7 +591,6 @@ ACE_HAS_WCSDUP_EMULATION                Use ACE's wcsdup() emulation (even
 ACE_HAS_STRNLEN                         Platform supports strnlen(3).
 ACE_HAS_STREAMS                         Platform supports STREAMS
 ACE_HAS_STREAM_PIPES                    Platform supports STREAM pipes
-ACE_HAS_STRERROR                        Compiler/platform supports strerror ()
 ACE_HAS_STRICT                          Use the STRICT compilation mode on Win32.
 ACE_HAS_STRING_CLASS                    Platform/Compiler supports a
                                         String class (e.g., GNU or
@@ -640,21 +616,17 @@ ACE_HAS_SYSCALL_GETRUSAGE               HP/UX has an undefined syscall
                                         for GETRUSAGE...
 ACE_HAS_SYSENT_H                        Platform provides <sysent.h>
                                         header
-ACE_HAS_SYSINFO                         Platform supports system
+ACE_HAS_SYSV_SYSINFO                    Platform supports system
                                         configuration information
 ACE_HAS_SYSV_IPC                        Platform supports System V IPC
                                         (most versions of UNIX, but
                                         not Win32)
-ACE_HAS_SYS_ERRLIST                     Platform/compiler supports
-                                        _sys_errlist symbol
 ACE_HAS_SYS_FILIO_H                     Platform provides
                                         <sys/filio.h> header
 ACE_HAS_SYS_LOADAVG_H                   Compiler/platform contains the
                                         <sys/loadavg.h> file.
 ACE_HAS_SYS_PSTAT_H                     Compiler/platform contains the
                                         <sys/pstat.h> file.
-ACE_HAS_SYS_SIGLIST                     Compiler/platform supports
-                                        _sys_siglist array
 ACE_HAS_SYS_SOCKIO_H                    Compiler/platform provides the
                                         sockio.h file
 ACE_HAS_SYS_SYSCALL_H                   Compiler/platform contains the
@@ -869,17 +841,6 @@ ACE_LACKS_OPENDIR                       Platform lacks opendir and the opendir
                                         emulation must be used
 ACE_LACKS_READDIR                       Platform lacks readdir and the readdir
                                         emulation must be used
-ACE_LACKS_CMSG_DATA_MACRO               Platform has
-                                        ACE_HAS_4_4BSD_SENDMSG_RECVMSG but does
-                                        not define CMSG_DATA (cmsg) macro.
-ACE_LACKS_CMSG_DATA_MEMBER              Platform has
-                                        ACE_HAS_4_4BSD_SENDMSG_RECVMSG but its
-                                        cmsghdr structure does not contain
-                                        an 'unsigned char cmsg_data[0]'
-                                        member.  (This may be
-                                        'unsigned char __cmsg_data[0]' on some
-                                        platforms, in which case we need
-                                        another macro.)
 ACE_LACKS_COND_TIMEDWAIT_RESET          pthread_cond_timedwait does
                                         *not* reset the time argument
                                         when the lock is acquired.
@@ -1009,7 +970,6 @@ ACE_LACKS_PUTENV_PROTOTYPE              Platform/compiler lacks the
                                         LynxOS)
 ACE_LACKS_PWD_REENTRANT_FUNCTIONS       Platform lacks getpwnam_r()
                                         methods (e.g., SGI 6.2).
-ACE_LACKS_SID                           Platform lacks setsid()
 ACE_LACKS_QSORT                         Compiler/platform lacks the
                                         standard C library qsort()
                                         function
@@ -1062,7 +1022,6 @@ ACE_LACKS_SIGSET                        Platform lacks signal sets
                                         (e.g., Chorus and Win32)
 ACE_LACKS_STRPTIME                      Platform/compiler lacks the strptime()
                                         function.
-ACE_LACKS_STRCHR			Platform/compiler lacks strchr()
 ACE_LACKS_WCSCHR			Platform/compiler lacks wcschr()
 ACE_LACKS_STRDUP			Platform/compiler lacks strdup()
 ACE_LACKS_WCSDUP			Platform/compiler lacks wcsdup()
@@ -1566,25 +1525,6 @@ ACE_HAS_STREAM_PIPES:
      No sysV.4 streams.
 
 
-ACE_HAS_STRERROR:
------------------
-
-  Used in:
-     ace/OS.h
-
-  Notes:
-     if not defined, does a:
-     #define strerror(err) sys_errlist[err]
-
-  Solaris:
-     /usr/include/string.h
-
-  HPUX:
-     set it.
-     in /usr/include/sys/errno.h and string.h
-     extern char *strerror (int);
-
-
 ACE_HAS_SVR4_DYNAMIC_LINKING:
 -----------------------------
 
@@ -1713,27 +1653,6 @@ ACE_HAS_SYS_FILIO_H:
      <sgtty.h> defines some like FIOCLEX.
      some are never defined.
      use #ifdef HP-UX to modify sysincludes.h
-
-
-ACE_HAS_SYS_SIGLIST:
---------------------
-
-  Used in:
-     ace/OS.h
-     libsrc/Log_Msg/Log_Msg.C
-
-  Notes:
-     if not defined, does a:
-     extern const char **_sys_siglist;
-
-  Solaris:
-     This is an array holding signal descriptions.
-
-  HPUX:
-     don't set.
-     Some additional work is required.  In libsrc/Log_Msg/Log_Msg.C,
-     sys_siglist is used regardless of ACE_HAS_SYS_SIGLIST.
-     have to add #ifdefs to remove them.
 
 
 ACE_HAS_TEMPLATE_TYPEDEFS:

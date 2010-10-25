@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_ctype.h
  *
- *  $Id: OS_NS_ctype.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_ctype.h 83891 2008-11-28 11:01:50Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -32,6 +32,11 @@
 #endif
 #define ACE_EXPORT_MACRO ACE_Export
 
+#include "ace/os_include/os_ctype.h"
+#if defined ACE_HAS_WCHAR
+# include "ace/os_include/os_wctype.h"
+#endif /* ACE_HAS_WCHAR */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE_OS {
@@ -55,6 +60,14 @@ namespace ACE_OS {
   /// Returns true if the character is an alphabetic character.
   ACE_NAMESPACE_INLINE_FUNCTION
   int ace_isalpha (ACE_TCHAR c);
+
+  /// Returns true if the character is a control character.
+  ACE_NAMESPACE_INLINE_FUNCTION
+  int ace_isblank (ACE_TCHAR c);
+
+  /// Returns true if the character is a control character.
+  ACE_NAMESPACE_INLINE_FUNCTION
+  int ace_isascii (ACE_TCHAR c);
 
   /// Returns true if the character is a control character.
   ACE_NAMESPACE_INLINE_FUNCTION
@@ -112,6 +125,9 @@ namespace ACE_OS {
   wint_t ace_towupper (wint_t c);
 #endif /* ACE_HAS_WCHAR && !ACE_LACKS_TOWUPPER */
 
+  /// Tests @a c for the property specified by the @a desc argument
+  ACE_NAMESPACE_INLINE_FUNCTION
+  int ace_isctype (int c, ctype_t desc);
   //@}
 
 } /* namespace ACE_OS */

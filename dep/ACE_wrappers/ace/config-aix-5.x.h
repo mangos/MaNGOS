@@ -1,4 +1,4 @@
-// $Id: config-aix-5.x.h 80826 2008-03-04 14:51:23Z wotte $
+// $Id: config-aix-5.x.h 87268 2009-10-29 21:06:06Z olli $
 //
 // Config file for AIX 5.1 and higher.
 
@@ -40,61 +40,52 @@
 #  endif /* _THREAD_SAFE */
 #endif /* !ACE_MT_SAFE || (ACE_MT_SAFE != 0) */
 
-#if defined (__xlC__) || defined (__IBMCPP__)
-   // AIX xlC, IBM C/C++, and Visual Age C++ compilers
+#if defined (__IBMCPP__)
+   // AIX xlC, IBM C/C++ compiler
    //********************************************************************
    //
 
-// Compiler does this with a builtin - it's not in libc.
-// Although ACE does have alloca() on this compiler/platform combination, it is
-// disabled by default since it can be dangerous.  Uncomment the following line
-// if you ACE to use it.
-//#  define ACE_HAS_ALLOCA
+   // Compiler does this with a builtin - it's not in libc.
+   // Although ACE does have alloca() on this compiler/platform combination,
+   // it is disabled by default since it can be dangerous.  Uncomment the
+   // following line if you ACE to use it.
+   //#  define ACE_HAS_ALLOCA
 
-// Compiler supports the ssize_t typedef.
+   // Compiler supports the ssize_t typedef.
 #  define ACE_HAS_SSIZE_T
 
    // Keep an eye on this as the compiler and standards converge...
 #  define ACE_LACKS_LINEBUFFERED_STREAMBUF
 #  define ACE_LACKS_PRAGMA_ONCE
 
-   // C Set++ 3.1, IBM C/C++ 3.6, and Visual Age C++ 5 batch (__xlC__)
-#  if defined (__xlC__)
-#    if (__xlC__ < 0x0500)
-#      define ACE_LACKS_PLACEMENT_OPERATOR_DELETE
-#    endif /* __xlC__ < 0x0500 */
-#  endif
+#  define ACE_EXPLICIT_TEMPLATE_DESTRUCTOR_TAKES_ARGS
+   // When using -qtempinc, we don't need to see template implementation
+   // source (though we do need a pragma to find the correct source file).
+   // However, without -qtempinc (either -qnotempinc or -qtemplateregistry)
+   // we do need to see the source.
+#  if defined (__TEMPINC__)
+#    if !defined ACE_TEMPLATES_REQUIRE_PRAGMA
+#      define ACE_TEMPLATES_REQUIRE_PRAGMA
+#    endif
+#  else
+#    if !defined (ACE_TEMPLATES_REQUIRE_SOURCE)
+#      define ACE_TEMPLATES_REQUIRE_SOURCE
+#    endif
+#  endif /* __TEMPINC__ */
 
-   // These are for Visual Age C++ only
-#  if defined (__IBMCPP__) && (__IBMCPP__ >= 600)
-#    define ACE_EXPLICIT_TEMPLATE_DESTRUCTOR_TAKES_ARGS
-     // When using -qtempinc, we don't need to see template implementation
-     // source (though we do need a pragma to find the correct source file).
-     // However, without -qtempinc (either -qnotempinc or -qtemplateregistry)
-     // we do need to see the source.
-#    if defined (__TEMPINC__)
-#      if !defined ACE_TEMPLATES_REQUIRE_PRAGMA
-#        define ACE_TEMPLATES_REQUIRE_PRAGMA
-#      endif
-#    else
-#      if !defined (ACE_TEMPLATES_REQUIRE_SOURCE)
-#        define ACE_TEMPLATES_REQUIRE_SOURCE
-#      endif
-#    endif /* __TEMPINC__ */
+#  undef WIFEXITED
+#  undef WEXITSTATUS
+#  define ACE_HAS_STANDARD_CPP_LIBRARY 1
+#  define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
 
-#    undef WIFEXITED
-#    undef WEXITSTATUS
-#    define ACE_HAS_STANDARD_CPP_LIBRARY 1
-#    define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
-
-#    if (__IBMCPP__ >= 600) /* Visual Age 6 and XL C/C++ 7 and up */
-#      define ACE_HAS_TEMPLATE_TYPEDEFS
-#      define ACE_HAS_CUSTOM_EXPORT_MACROS
-#      define ACE_Proper_Export_Flag
-#      define ACE_Proper_Import_Flag
-#      define ACE_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) extern template class SINGLETON_TYPE < CLASS, LOCK >;
-#    endif /* __IBMCPP__ >= 600 */
-#  endif /* __IBMCPP__ */
+#  define ACE_HAS_TEMPLATE_TYPEDEFS
+#  define ACE_HAS_CUSTOM_EXPORT_MACROS
+#  define ACE_Proper_Export_Flag
+#  define ACE_Proper_Import_Flag
+   // There's no explicit import/export per-se, but to be sure that declared
+   // template code is exported, explicitly instantiate the class.
+#  define ACE_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) template class SINGLETON_TYPE < CLASS, LOCK >;
+#  define ACE_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) extern template class SINGLETON_TYPE < CLASS, LOCK >;
 
 #elif defined (__GNUG__)
   // config-g++-common.h undef's ACE_HAS_STRING_CLASS with -frepo, so
@@ -102,8 +93,7 @@
 # define ACE_HAS_STRING_CLASS
 
 # include "ace/config-g++-common.h"
-  // Denotes that GNU has cstring.h as standard, to redefine memchr().
-# define ACE_HAS_GNU_CSTRING_H
+
 # define ACE_HAS_SSIZE_T
 
 # if (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ == 0))
@@ -118,7 +108,7 @@
 #   endif /* _REENTRANT */
 # endif /* !ACE_MT_SAFE */
 
-#else  /* ! __xlC__ && ! __GNUG__ */
+#else  /* ! __IBMCPP__ && ! __GNUG__ */
 #  ifdef __cplusplus  /* Let it slide for C compilers. */
 #    error unsupported compiler in ace/config-aix-5.x.h
 #  endif  /* __cplusplus */
@@ -142,7 +132,7 @@
 #if defined (ACE_DLL_SUFFIX)
 #  undef ACE_DLL_SUFFIX
 #endif
-#define ACE_DLL_SUFFIX ".so"
+#define ACE_DLL_SUFFIX ACE_TEXT (".so")
 
 #define ACE_DEFAULT_BASE_ADDR ((char *) 0x80000000)
 
@@ -179,6 +169,7 @@
 
 #define ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT
 #define ACE_HAS_NONCONST_SELECT_TIMEVAL
+#define ACE_HAS_ICMP_SUPPORT 1
 #define ACE_HAS_IP_MULTICAST
 
 // Lacks perfect filtering, must bind group address.
@@ -217,9 +208,6 @@
 #define ACE_HAS_STREAMS
 // #define ACE_HAS_STREAM_PIPES
 
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
-
 // AIX bzero()
 #define ACE_HAS_STRINGS
 
@@ -246,6 +234,8 @@
 
 #define ACE_HAS_UTIME
 
+#define ACE_HAS_CTYPE_T
+
 // Platform has XPG4 wide character type and functions. However, the size
 // of wchar_t changes for 32- vs. 64-bit builds (unsigned short vs. unsigned
 // int, respectively).
@@ -259,7 +249,7 @@
 #define ACE_LACKS_NETINET_TCP_H
 
 // AIX uses LIBPATH to search for libraries
-#define ACE_LD_SEARCH_PATH "LIBPATH"
+#define ACE_LD_SEARCH_PATH ACE_TEXT ("LIBPATH")
 
 // Defines the page size of the system.
 #define ACE_PAGE_SIZE 4096
@@ -329,5 +319,8 @@
 #define ACE_SCANDIR_SEL_LACKS_CONST
 #define ACE_HAS_SIGSUSPEND
 #define ACE_HAS_TIMEZONE  /* Call tzset() to set timezone */
+#define ACE_LACKS_ISCTYPE
+#define ACE_HAS_STRSIGNAL
+#define ACE_NEEDS_STRSIGNAL_RANGE_CHECK
 
 #endif /* ACE_CONFIG_AIX_5_X_H */

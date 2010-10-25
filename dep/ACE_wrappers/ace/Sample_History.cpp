@@ -1,4 +1,4 @@
-// $Id: Sample_History.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Sample_History.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Sample_History.h"
 
@@ -10,7 +10,7 @@
 #include "ace/Log_Msg.h"
 #include "ace/OS_Memory.h"
 
-ACE_RCSID(ace, Sample_History, "$Id: Sample_History.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -46,7 +46,7 @@ ACE_Sample_History::dump_samples (const ACE_TCHAR *msg,
 #ifndef ACE_NLOGGING
   for (size_t i = 0; i != this->sample_count_; ++i)
     {
-      const ACE_UINT64 val = this->samples_[i] / scale_factor;
+      ACE_UINT64 const val = this->samples_[i] / scale_factor;
       ACE_DEBUG ((LM_DEBUG,
                   ACE_TEXT ("%s: ")
                   ACE_SIZE_T_FORMAT_SPECIFIER

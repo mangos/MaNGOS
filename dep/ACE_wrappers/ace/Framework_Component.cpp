@@ -1,5 +1,5 @@
 // Framework_Component.cpp
-// $Id: Framework_Component.cpp 82238 2008-07-02 12:05:46Z sma $
+// $Id: Framework_Component.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Framework_Component.h"
 
@@ -13,7 +13,7 @@
 #include "ace/Recursive_Thread_Mutex.h"
 #include "ace/OS_NS_string.h"
 
-ACE_RCSID(ace, Framework_Component, "$Id: Framework_Component.cpp 82238 2008-07-02 12:05:46Z sma $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -144,7 +144,7 @@ ACE_Framework_Repository::register_component (ACE_Framework_Component *fc)
   if (i < this->total_size_)
     {
       this->component_vector_[i] = fc;
-      this->current_size_++;
+      ++this->current_size_;
       return 0;
     }
 

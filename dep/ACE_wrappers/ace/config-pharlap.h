@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-pharlap.h 81837 2008-06-04 22:48:08Z shuston $
+// $Id: config-pharlap.h 84373 2009-02-10 18:21:50Z johnnyw $
 
 // This configuration file is for use with the PharLap Realtime ETS Kernel.
 // It has been tested with PharLap TNT Embedded ToolSuite version 9.1.
@@ -23,6 +23,7 @@
 // Fortunately, PharLap ETS offers much of the Win32 API. But it's still on
 // Winsock 1.1
 #define ACE_HAS_WINSOCK2 0
+#define ACE_HAS_WINSOCK1 1
 
 // The TSS implementation doesn't pass muster on the TSS_Test, but it works
 // well with ACE's TSS emulation.

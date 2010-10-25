@@ -4,7 +4,7 @@
 /**
  *  @file    Stream.h
  *
- *  $Id: Stream.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Stream.h 91058 2010-07-12 08:20:09Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@uci.edu>
  */
@@ -37,8 +37,8 @@ class ACE_Time_Value;
  * @brief This class is the primary abstraction for the ASX framework.
  * It is moduled after System V Stream.
  *
- * A Stream consists of a stack of <ACE_Modules>, each of which
- * contains two <ACE_Tasks>.  Even though the methods in this
+ * A Stream consists of a stack of @c ACE_Modules, each of which
+ * contains two @c ACE_Tasks.  Even though the methods in this
  * class are virtual, this class isn't really intended for
  * subclassing unless you know what you are doing.  In
  * particular, the ACE_Stream destructor calls <close>, which
@@ -53,27 +53,27 @@ public:
 
   enum
   {
-    /// Indicates that <close> deletes the Tasks.  Don't change this
+    /// Indicates that @c close() deletes the Tasks.  Don't change this
     /// value without updating the same enum in class ACE_Module...
     M_DELETE = 3
   };
 
   // = Initializatation and termination methods.
   /**
-   * Create a Stream consisting of <head> and <tail> as the Stream
+   * Create a Stream consisting of @a head and @a tail as the Stream
    * head and Stream tail, respectively.  If these are 0 then the
-   * <ACE_Stream_Head> and <ACE_Stream_Tail> are used, respectively.
-   * <arg> is the value past in to the <open> methods of the tasks.
+   * ACE_Stream_Head and ACE_Stream_Tail are used, respectively.
+   * @a arg is the value past in to the <open> methods of the tasks.
    */
   ACE_Stream (void *arg = 0,
               ACE_Module<ACE_SYNCH_USE> *head = 0,
               ACE_Module<ACE_SYNCH_USE> *tail = 0);
 
   /**
-   * Create a Stream consisting of <head> and <tail> as the Stream
+   * Create a Stream consisting of @a head and @a tail as the Stream
    * head and Stream tail, respectively.  If these are 0 then the
-   * <ACE_Stream_Head> and <ACE_Stream_Tail> are used, respectively.
-   * <arg> is the value past in to the <open> methods of the tasks.
+   * ACE_Stream_Head and ACE_Stream_Tail are used, respectively.
+   * @a arg is the value past in to the @c open() methods of the tasks.
    */
   virtual int open (void *arg,
                     ACE_Module<ACE_SYNCH_USE> *head = 0,
@@ -87,12 +87,12 @@ public:
 
   // = ACE_Stream plumbing operations
 
-  /// Add a new module <mod> right below the Stream head.  The
-  /// <open()> hook methods of the <ACE_Tasks> in this ACE_Module
+  /// Add a new module @a mod right below the Stream head.  The
+  /// @c open() hook methods of the @c ACE_Tasks in this ACE_Module
   /// are invoked to initialize the tasks.
   virtual int push (ACE_Module<ACE_SYNCH_USE> *mod);
 
-  /// Remove the <mod> right below the Stream head and close it down.
+  /// Remove the @a mod right below the Stream head and close it down.
   //  The <close()> hook methods of the <ACE_Tasks> in this ACE_Module
   /// are invoked to cleanup the tasks.
   virtual int pop (int flags = M_DELETE);
@@ -101,17 +101,17 @@ public:
   /// head).
   virtual int top (ACE_Module<ACE_SYNCH_USE> *&mod);
 
-  /// Insert a new module <mod> below the named module <prev_name>.
+  /// Insert a new module @a mod below the named module @a prev_name.
   virtual int insert (const ACE_TCHAR *prev_name,
                       ACE_Module<ACE_SYNCH_USE> *mod);
 
-  /// Replace the named module <replace_name> with a new module <mod>.
+  /// Replace the named module @a replace_name with a new module @a mod.
   virtual int replace (const ACE_TCHAR *replace_name,
                        ACE_Module<ACE_SYNCH_USE> *mod,
                        int flags = M_DELETE);
 
-  /// Remove the named module <mod> from the stream.  This bypasses the
-  /// strict LIFO ordering of <push> and <pop>.
+  /// Remove the named module @a mod from the stream.  This bypasses the
+  /// strict LIFO ordering of @c push and @c pop.
   virtual int remove (const ACE_TCHAR *mod,
                       int flags = M_DELETE);
 
@@ -206,7 +206,7 @@ public:
 
   // = Iteration methods.
 
-  /// Pass back the <next_item> that hasn't been seen in the set.
+  /// Pass back the @a next_item that hasn't been seen in the set.
   /// Returns 0 when all items have been seen, else 1.
   int next (const ACE_Module<ACE_SYNCH_USE> *&next_item);
 
@@ -218,7 +218,7 @@ public:
   int advance (void);
 
 private:
-  /// Next <Module> that we haven't yet seen.
+  /// Next ACE_Module that we haven't yet seen.
   ACE_Module<ACE_SYNCH_USE> *next_;
 };
 

@@ -4,7 +4,7 @@
 /**
  *  @file    Token.h
  *
- *  $Id: Token.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Token.h 85367 2009-05-18 10:11:54Z johnnyw $
  *
  *  @author Original author
  *  @author Karl-Heinz Dorn (kdorn@erlh.siemens.de)
@@ -29,10 +29,10 @@
 
 #include "ace/Thread_Mutex.h"
 
-#if (defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)) || defined (ACE_HAS_VXTHREADS)
+#if (defined (ACE_WIN32) && !defined (ACE_USES_WINCE_SEMA_SIMULATION)) || defined (ACE_HAS_VXTHREADS)
 // If platforms support semaphores with timed wait, then we use semaphores instead of c.v.
 # define ACE_TOKEN_USES_SEMAPHORE
-#endif /* (ACE_WIN32 && !ACE_HAS_WINCE) || VXWORKS */
+#endif /* ACE_WIN32 || ACE_HAS_VXTHREADS */
 
 #if defined (ACE_TOKEN_USES_SEMAPHORE)
 #  include "ace/Semaphore.h"

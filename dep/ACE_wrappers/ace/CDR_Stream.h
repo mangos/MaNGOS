@@ -4,7 +4,7 @@
 /**
  *  @file   CDR_Stream.h
  *
- *  $Id: CDR_Stream.h 82350 2008-07-22 07:36:47Z johnnyw $
+ *  $Id: CDR_Stream.h 84527 2009-02-19 14:01:42Z johnnyw $
  *
  * ACE Common Data Representation (CDR) marshaling and demarshaling
  * classes.
@@ -120,8 +120,8 @@ public:
                  ACE_CDR::Octet minor_version = ACE_CDR_GIOP_MINOR_VERSION);
 
   /// Build a CDR stream with an initial buffer, it will *not* remove
-  /// <data>, since it did not allocated it.  It's important to be careful
-  /// with the alignment of <data>.
+  /// @a data, since it did not allocated it.  It's important to be careful
+  /// with the alignment of @a data.
   /**
    * Create an output stream from an arbitrary buffer, care must be
    * exercised with alignment, because this contructor will align if
@@ -254,8 +254,8 @@ public:
                                   const ACE_CDR::WChar *x);
   //@}
 
-  /// @note the portion written starts at <x> and ends
-  ///    at <x + length>.
+  /// @note the portion written starts at @a x and ends
+  ///    at @a x + @a length.
   /// The length is *NOT* stored into the CDR stream.
   //@{ @name Array write operations
   ACE_CDR::Boolean write_boolean_array (const ACE_CDR::Boolean *x,
@@ -663,7 +663,7 @@ public:
                 ACE_Lock* lock = 0);
 
   /// Create an input stream from an ACE_Data_Block. The <flag>
-  /// indicates whether the <data> can be deleted by the CDR stream
+  /// indicates whether the @a data can be deleted by the CDR stream
   /// or not
   ACE_InputCDR (ACE_Data_Block *data,
                 ACE_Message_Block::Message_Flags flag = 0,
@@ -919,7 +919,7 @@ public:
    */
   void exchange_data_blocks (ACE_InputCDR &cdr);
 
-  /// Copy the data portion from the @c cdr to this cdr and return the
+  /// Copy the data portion from the @a cdr to this cdr and return the
   /// data content (ie. the ACE_Data_Block) from this CDR to the
   /// caller.
   /**

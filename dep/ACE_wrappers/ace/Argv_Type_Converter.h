@@ -4,7 +4,7 @@
 /**
  *  @file    Argv_Type_Converter.h
  *
- *  $Id: Argv_Type_Converter.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Argv_Type_Converter.h 83891 2008-11-28 11:01:50Z johnnyw $
  *
  *  @author Si Mong Park <spark@ociweb.com>
  */
@@ -29,7 +29,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  *
  * @brief To convert 'char' input/command line parameter to 'wchar_t'.
  *
- * This class is to convert 'char' type command line paramter to
+ * This class is to convert 'char' type command line parameter to
  * wide-character (wchar_t) format and stores the copy of it.
  * This is useful for all classes that use 'char**' argv but cannot
  * be converted into 'ACE_TCHAR**' version.
@@ -54,7 +54,7 @@ public:
   /// Returns the pointer of ASCII (char) command line.
   char** get_ASCII_argv (void);
 
-  /// Returns the number of sub paramters (argc).
+  /// Returns the number of sub parameters (argc).
   int& get_argc (void);
 
 private:
@@ -83,7 +83,7 @@ private:
 #endif  // ACE_USES_WCHAR
 
 private:
-  /// Original number of input paramter, same as 'argc'.
+  /// Original number of input parameter, same as 'argc'.
   int &saved_argc_;
 
   /// Data member pointer that contains converted argv in ACE_ANTI_TCHAR.

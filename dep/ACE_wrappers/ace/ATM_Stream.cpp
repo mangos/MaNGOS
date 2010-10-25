@@ -1,8 +1,6 @@
-// $Id: ATM_Stream.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: ATM_Stream.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/ATM_Stream.h"
-
-ACE_RCSID (ace, ATM_Stream, "$Id: ATM_Stream.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #if defined (ACE_HAS_ATM)
 
@@ -216,7 +214,7 @@ ACE_ATM_Stream::get_vpi_vci (ACE_UINT16 &vpi,
 
   vpi = conn_prop.vpi;
   vci = conn_prop.vci;
-  return (0);
+  return 0;
 #elif defined (ACE_HAS_FORE_ATM_WS2)
   ATM_CONNECTION_ID connID;
   DWORD bytes = 0;
@@ -278,10 +276,10 @@ ACE_ATM_Stream::get_vpi_vci (ACE_UINT16 &vpi,
   ACE_UNUSED_ARG (vci);
   ACE_UNUSED_ARG (vpi);
 
-  return (-1);
+  return -1;
 #endif /* SO_ATMPVC || SO_VCID */
 #else
-  return (-1);
+  return -1;
 #endif /* ACE_HAS_FORE_ATM_XTI || ACE_HAS_FORE_ATM_WS2 || ACE_HAS_LINUX_ATM */
 }
 

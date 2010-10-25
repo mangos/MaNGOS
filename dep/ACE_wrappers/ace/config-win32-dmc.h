@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// $Id: config-win32-dmc.h 81992 2008-06-16 19:09:50Z wotte $
+// $Id: config-win32-dmc.h 91285 2010-08-05 08:29:30Z johnnyw $
 
 // The following configuration file contains defines for Digital Mars compilers.
 
@@ -48,13 +48,10 @@
 
 # define ACE_EXPORT_NESTED_CLASSES 1
 # define ACE_HAS_CPLUSPLUS_HEADERS 1
-//# define ACE_HAS_EXCEPTIONS 1
-# define ACE_HAS_GNU_CSTRING_H 1
 # define ACE_HAS_NONCONST_SELECT_TIMEVAL 1
 # define ACE_HAS_SIG_ATOMIC_T 1
 # define ACE_HAS_STANDARD_CPP_LIBRARY 0
 # define ACE_HAS_STDCPP_STL_INCLUDES 1
-# define ACE_HAS_STRERROR 1
 # define ACE_HAS_STRING_CLASS 1
 # define ACE_HAS_TEMPLATE_TYPEDEFS 1
 # define ACE_HAS_USER_MODE_MASKS 1

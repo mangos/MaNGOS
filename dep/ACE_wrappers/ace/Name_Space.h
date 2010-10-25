@@ -4,7 +4,7 @@
 /**
  *  @file    Name_Space.h
  *
- *  $Id: Name_Space.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Name_Space.h 84834 2009-03-16 12:28:51Z johnnyw $
  *
  *  @author Prashant Jain <pjain@cse.wustl.edu>
  */
@@ -49,7 +49,7 @@ public:
   ACE_Name_Binding (const ACE_Name_Binding &);
 
   /// Assignment operator.
-  void operator= (const ACE_Name_Binding &);
+  const ACE_Name_Binding& operator= (const ACE_Name_Binding &);
 
   /// Destructor.
   ~ACE_Name_Binding (void);

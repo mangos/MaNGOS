@@ -1,11 +1,9 @@
+// $Id: Codecs.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+
 #include "ace/Codecs.h"
 #include "ace/Log_Msg.h"
 #include "ace/OS_Memory.h"
 #include "ace/OS_NS_ctype.h"
-
-ACE_RCSID (ace,
-           Codecs,
-           "$Id: Codecs.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 namespace
 {

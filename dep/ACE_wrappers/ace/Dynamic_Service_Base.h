@@ -4,7 +4,7 @@
 /**
  *  @file Dynamic_Service_Base.h
  *
- *  $Id: Dynamic_Service_Base.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Dynamic_Service_Base.h 89454 2010-03-11 09:35:25Z johnnyw $
  *
  *  @author Prashant Jain <pjain@cs.wustl.edu>
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
@@ -37,7 +37,6 @@ class ACE_Service_Type;
  */
 class ACE_Export ACE_Dynamic_Service_Base
 {
-
 public:
   /// Dump the current static of the object
   void dump (void) const;

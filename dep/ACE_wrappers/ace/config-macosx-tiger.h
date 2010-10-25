@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-macosx-tiger.h 82344 2008-07-19 20:04:18Z johnnyw $
+// $Id: config-macosx-tiger.h 87167 2009-10-19 19:33:53Z olli $
 
 // This configuration file is designed to work with the MacOS X operating system.
 
@@ -26,7 +26,7 @@
 
 #define ACE_HAS_WORKING_EXPLICIT_TEMPLATE_DESTRUCTOR
 
-#define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%lu")
+#define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%lu"
 
 #if !defined (__i386__)
 # if defined (ACE_HAS_PENTIUM)
@@ -76,9 +76,6 @@
 //Platform supports sigsuspend()
 #define ACE_HAS_SIGSUSPEND
 
-//Platform/compiler has macros for sig{empty,fill,add,del}set (e.g., SCO and FreeBSD)
-#define ACE_HAS_SIG_MACROS
-
 #define ACE_LACKS_GETPGID
 #define ACE_LACKS_RWLOCK_T
 
@@ -86,9 +83,6 @@
 #define ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT
 
 #define ACE_HAS_NONCONST_SELECT_TIMEVAL
-
-//?
-#define ACE_LACKS_SIGSET
 
 #define ACE_NEEDS_SCHED_H
 
@@ -137,9 +131,6 @@
 
 // Compiler supports the ssize_t typedef.
 #define ACE_HAS_SSIZE_T
-
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
 
 // Compiler/platform provides the sockio.h file.
 #define ACE_HAS_SYS_SOCKIO_H
@@ -211,6 +202,9 @@
 
 // gperf seems to need this
 //#define ACE_HAS_NONSTATIC_OBJECT_MANAGER
+
+#define ACE_LACKS_UNSETENV
+#define ACE_LACKS_ISCTYPE
 
 #if defined(__APPLE_CC__) && (__APPLE_CC__ < 1173)
 #error "Compiler must be upgraded, see http://developer.apple.com"

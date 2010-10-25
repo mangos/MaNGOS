@@ -1,4 +1,4 @@
-// $Id: Reactor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Reactor.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/Reactor.h"
 
@@ -50,10 +50,6 @@
 #if !defined (__ACE_INLINE__)
   #include "ace/Reactor.inl"
 #endif /* __ACE_INLINE__ */
-
-ACE_RCSID (ace,
-           Reactor,
-           "$Id: Reactor.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -477,7 +473,9 @@ ACE_Reactor::notify (ACE_Event_Handler *event_handler,
   // First, try to remember this reactor in the event handler, in case
   // the event handler goes away before the notification is delivered.
   if (event_handler != 0 && event_handler->reactor () == 0)
-    event_handler->reactor (this);
+    {
+      event_handler->reactor (this);
+    }
   return this->implementation ()->notify (event_handler, mask, tv);
 }
 

@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Queue_T.h
  *
- *  $Id: Timer_Queue_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Timer_Queue_T.h 89254 2010-02-25 22:10:39Z cleeland $
  *
  *  @author Doug Schmidt <schmidt@cs.wustl.edu>
  *  @author Irfan Pyarali <irfan@cs.wustl.edu> and
@@ -430,6 +430,10 @@ protected:
   /// Non-locking version of dispatch_info ()
   virtual int dispatch_info_i (const ACE_Time_Value &current_time,
                                ACE_Timer_Node_Dispatch_Info_T<TYPE> &info);
+
+  /// Recompute when the next time is that this interval timer should fire.
+  void recompute_next_abs_interval_time (ACE_Timer_Node_T<TYPE>* expired,
+                                         const ACE_Time_Value &cur_time);
 
   /// Synchronization variable for ACE_Timer_Queue.
   /// @note The right name would be lock_, but HP/C++ will choke on that!

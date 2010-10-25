@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: ATM_Connector.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: ATM_Connector.inl 84565 2009-02-23 08:20:39Z johnnyw $
 
 // Open versioned namespace, if enabled by the user.
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -96,7 +96,7 @@ ACE_ATM_Connector::add_leaf (ACE_ATM_Stream &current_stream,
 
   return (result != ACE_INVALID_HANDLE);
 #elif defined (ACE_HAS_LINUX_ATM)
-  ACE_OS::printf("ATM_Connector(add_leaf): not yet implemented in Linux \n");
+  ACE_OS::printf("ATM_Connector(add_leaf): not yet implemented in Linux\n");
 
   ACE_UNUSED_ARG(current_stream);
   ACE_UNUSED_ARG(remote_sap);
@@ -114,7 +114,7 @@ ACE_ATM_Connector::add_leaf (ACE_ATM_Stream &current_stream,
 }
 
 ACE_INLINE
-int
+bool
 ACE_ATM_Connector::reset_new_handle (ACE_HANDLE handle)
 {
 #if defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0)
@@ -124,7 +124,7 @@ ACE_ATM_Connector::reset_new_handle (ACE_HANDLE handle)
                            0);
 #else /* !defined ACE_HAS_WINSOCK2 */
   ACE_UNUSED_ARG (handle);
-  return 0;
+  return false;
 #endif /* ACE_WIN32 */
 }
 

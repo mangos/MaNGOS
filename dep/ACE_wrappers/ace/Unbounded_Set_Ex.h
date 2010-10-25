@@ -4,7 +4,7 @@
 /**
  *  @file Unbounded_Set_Ex.h
  *
- *  $Id: Unbounded_Set_Ex.h 81624 2008-05-06 17:14:57Z wotte $
+ *  $Id: Unbounded_Set_Ex.h 88978 2010-02-13 16:03:31Z hillj $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -16,6 +16,7 @@
 
 #include "ace/Node.h"
 #include "ace/os_include/os_stddef.h"
+#include <iterator>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
@@ -43,12 +44,22 @@ template <class T, class C>
 class ACE_Unbounded_Set_Ex_Iterator
 {
 public:
+  /// Type definition of the container type.
+  typedef ACE_Unbounded_Set_Ex<T, C> container_type;
+
+  // = std::iterator_traits typedefs/traits.
+  typedef std::forward_iterator_tag                iterator_category;
+  typedef typename container_type::value_type      value_type;
+  typedef typename container_type::reference       reference;
+  typedef typename container_type::pointer         pointer;
+  typedef typename container_type::difference_type difference_type;
+
   // = Initialization method.
   ACE_Unbounded_Set_Ex_Iterator (ACE_Unbounded_Set_Ex<T, C> &s, bool end = false);
 
   // = Iteration methods.
 
-  /// Pass back the <next_item> that hasn't been seen in the Set.
+  /// Pass back the @a next_item that hasn't been seen in the Set.
   /// Returns 0 when all items have been seen, else 1.
   int next (T *&next_item);
 
@@ -102,6 +113,15 @@ template <class T, class C>
 class ACE_Unbounded_Set_Ex_Const_Iterator
 {
 public:
+  typedef ACE_Unbounded_Set_Ex<T, C> container_type;
+
+  // = std::iterator_traits typedefs/traits.
+  typedef std::forward_iterator_tag                 iterator_category;
+  typedef typename container_type::const_value_type value_type;
+  typedef typename container_type::const_reference  reference;
+  typedef typename container_type::const_pointer    pointer;
+  typedef typename container_type::difference_type  difference_type;
+
   // = Initialization method.
   ACE_Unbounded_Set_Ex_Const_Iterator (const ACE_Unbounded_Set_Ex<T, C> &s,
                                        bool end = false);
@@ -163,7 +183,7 @@ private:
  * allow duplicates, but it maintains FIFO ordering of insertions.
  *
  * This implementation may also be parameterized with a comparator
- * functor, which must implement bool operator () (const T&, const T&) const, 
+ * functor, which must implement bool operator () (const T&, const T&) const,
  * returning true if the given items are equivalent.  The default comparator
  * is sufficient for objects reliably compared with operator==.
  *
@@ -205,7 +225,16 @@ public:
   typedef ACE_Unbounded_Set_Ex_Const_Iterator<T, C> const_iterator;
   typedef C COMP;
   typedef ACE_Node<T, C> NODE;
-  
+
+  // = STL typedefs/traits.
+  typedef T                   value_type;
+  typedef T const             const_value_type;
+  typedef value_type &        reference;
+  typedef const_value_type &  const_reference;
+  typedef value_type *        pointer;
+  typedef const_value_type *  const_pointer;
+  typedef ptrdiff_t           difference_type;
+
   // = Initialization and termination methods.
   /// Constructor.  Use user specified allocation strategy
   /// if specified.
@@ -324,7 +353,7 @@ private:
 
   /// Allocation strategy of the set.
   ACE_Allocator *allocator_;
-  
+
   /// Comparator to be used
   COMP comp_;
 };

@@ -1,14 +1,14 @@
 
      _________________________________________________________________
-   
+
   Copyright and Licensing Information for ACE(TM), TAO(TM), CIAO(TM), and
   CoSMIC(TM)
-  
+
    [1]ACE(TM), [2]TAO(TM), [3]CIAO(TM), and [4]CoSMIC(TM) (henceforth
    referred to as "DOC software") are copyrighted by [5]Douglas C.
    Schmidt and his [6]research group at [7]Washington University,
    [8]University of California, Irvine, and [9]Vanderbilt University,
-   Copyright (c) 1993-2008, all rights reserved. Since DOC software is
+   Copyright (c) 1993-2010, all rights reserved. Since DOC software is
    open-source, freely available software, you are free to use, modify,
    copy, and distribute--perpetually and irrevocably--the DOC software
    source code and object code produced from the source, as well as copy
@@ -16,7 +16,7 @@
    include this copyright statement along with any code built using DOC
    software that you release. No copyright statement needs to be provided
    if you just ship binary executables of your software products.
-   
+
    You can use DOC software in commercial and/or binary software releases
    and are under no obligation to redistribute any of your source code
    that is built using DOC software. Note, however, that you may not do
@@ -27,7 +27,7 @@
    software in your software, though we encourage you to let [10]us know
    so we can promote your project in the [11]DOC software success
    stories.
-   
+
    The [12]ACE, [13]TAO, [14]CIAO, and [15]CoSMIC web sites are
    maintained by the [16]DOC Group at the [17]Institute for Software
    Integrated Systems (ISIS) and the [18]Center for Distributed Object
@@ -50,13 +50,13 @@
    University, UC Irvine, or Vanderbilt University, their employees, or
    students be liable for any lost revenue or profits or other special,
    indirect and consequential damages.
-   
+
    DOC software is provided with no support and without any obligation on
    the part of Washington University, UC Irvine, Vanderbilt University,
    their employees, or students to assist in its use, correction,
    modification, or enhancement. A [19]number of companies around the
    world provide commercial support for DOC software, however.
-   
+
    DOC software is Y2K-compliant, as long as the underlying OS platform
    is Y2K-compliant. Likewise, DOC software is compliant with the new US
    daylight savings rule passed by Congress as "The Energy Policy Act of
@@ -65,7 +65,7 @@
    obtains time/date and calendaring information from operating systems
    users will not be affected by the new DST rules as long as they
    upgrade their operating systems accordingly.
-   
+
    The names ACE(TM), TAO(TM), CIAO(TM), CoSMIC(TM), Washington
    University, UC Irvine, and Vanderbilt University, may not be used to
    endorse or promote products or services derived from this source
@@ -75,13 +75,13 @@
    CIAO(TM), or CoSMIC(TM), nor does it grant permission for the name
    Washington University, UC Irvine, or Vanderbilt University to appear
    in their names.
-   
+
    If you have any suggestions, additions, comments, or questions, please
    let [20]me know.
-   
+
    [21]Douglas C. Schmidt
      _________________________________________________________________
-   
+
    Back to the [22]ACE home page.
 
 References
@@ -104,7 +104,7 @@ References
   16. http://www.dre.vanderbilt.edu/
   17. http://www.isis.vanderbilt.edu/
   18. http://www.cs.wustl.edu/~schmidt/doc-center.html
-  19. http://www.cs.wustl.edu/~schmidt/commercial-support.html
+  19. http://www.cs.wustl.edu/~schmidt/commercial-support.html
   20. mailto:d.schmidt@vanderbilt.edu
   21. http://www.dre.vanderbilt.edu/~schmidt/
   22. http://www.cs.wustl.edu/ACE.html

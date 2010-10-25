@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Log_Record.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Log_Record.inl 84183 2009-01-19 08:50:16Z johnnyw $
 
 #include "ace/Global_Macros.h"
 #include "ace/os_include/arpa/os_inet.h"
@@ -20,17 +20,15 @@ ACE_INLINE void
 ACE_Log_Record::encode (void)
 {
   ACE_TRACE ("ACE_Log_Record::encode");
-#if !defined (ACE_LACKS_HTONL)
-  this->length_ = htonl (this->length_);
-  this->type_ = htonl (this->type_);
+  this->length_ = ACE_HTONL (this->length_);
+  this->type_ = ACE_HTONL (this->type_);
   // Make sure we don't enclose the sec() and usec() fields until
   // they've been normalized.
   // secs_ is commented out because it can be 64 bits. This method is
   // deprecated; use the CDR operations instead.
-  //  this->secs_ = htonl (this->secs_);
-  this->usecs_ = htonl (this->usecs_);
-  this->pid_ = htonl (this->pid_);
-#endif /* ACE_LACKS_HTONL */
+  //  this->secs_ = ACE_HTONL (this->secs_);
+  this->usecs_ = ACE_HTONL (this->usecs_);
+  this->pid_ = ACE_HTONL (this->pid_);
 }
 
 ACE_INLINE void

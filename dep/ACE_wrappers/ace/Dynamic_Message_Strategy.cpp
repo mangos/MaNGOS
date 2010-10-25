@@ -1,3 +1,5 @@
+// $Id: Dynamic_Message_Strategy.cpp 91287 2010-08-05 10:30:49Z johnnyw $
+
 #include "ace/Dynamic_Message_Strategy.h"
 
 #if !defined (__ACE_INLINE__)
@@ -8,10 +10,6 @@
 #include "ace/Log_Msg.h"
 #include "ace/Malloc_Base.h"
 #include "ace/OS_NS_string.h"
-
-ACE_RCSID (ace,
-           Dynamic_Message_Strategy,
-           "$Id: Dynamic_Message_Strategy.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -149,7 +147,7 @@ ACE_Deadline_Message_Strategy::dump (void) const
 
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
 
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Dynamic_Message_Strategy base class: \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Dynamic_Message_Strategy base class:\n")));
   this->ACE_Dynamic_Message_Strategy::dump ();
 
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nderived class: ACE_Deadline_Message_Strategy\n")));
@@ -192,7 +190,7 @@ ACE_Laxity_Message_Strategy::dump (void) const
 
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
 
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Dynamic_Message_Strategy base class: \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Dynamic_Message_Strategy base class:\n")));
   this->ACE_Dynamic_Message_Strategy::dump ();
 
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nderived class: ACE_Laxity_Message_Strategy\n")));

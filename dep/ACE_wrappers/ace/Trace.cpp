@@ -1,11 +1,6 @@
-// $Id: Trace.cpp 80826 2008-03-04 14:51:23Z wotte $
-
+// $Id: Trace.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Trace.h"
-
-ACE_RCSID (ace,
-           Trace,
-           "$Id: Trace.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 // Turn off tracing for the duration of this file.
 #if defined (ACE_NTRACE)
@@ -24,7 +19,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 int ACE_Trace::nesting_indent_ = ACE_Trace::DEFAULT_INDENT;
 
 // Is tracing enabled?
-int ACE_Trace::enable_tracing_ = ACE_Trace::DEFAULT_TRACING;
+bool ACE_Trace::enable_tracing_ = ACE_Trace::DEFAULT_TRACING;
 
 ACE_ALLOC_HOOK_DEFINE(ACE_Trace)
 
@@ -37,7 +32,7 @@ ACE_Trace::dump (void) const
 
 // Determine whether or not tracing is enabled
 
-int
+bool
 ACE_Trace::is_tracing (void)
 {
   return ACE_Trace::enable_tracing_;
@@ -48,7 +43,7 @@ ACE_Trace::is_tracing (void)
 void
 ACE_Trace::start_tracing (void)
 {
-  ACE_Trace::enable_tracing_ = 1;
+  ACE_Trace::enable_tracing_ = true;
 }
 
 // Disable the tracing facility.
@@ -56,7 +51,7 @@ ACE_Trace::start_tracing (void)
 void
 ACE_Trace::stop_tracing (void)
 {
-  ACE_Trace::enable_tracing_ = 0;
+  ACE_Trace::enable_tracing_ = false;
 }
 
 // Change the nesting indentation level.

@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK_Dgram_Mcast.h
  *
- *  $Id: SOCK_Dgram_Mcast.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SOCK_Dgram_Mcast.h 83891 2008-11-28 11:01:50Z johnnyw $
  *
  *  @author Irfan Pyrali <irfan@cs.wustl.edu>
  *  @author Tim Harrison <harrison@cs.wustl.edu>
@@ -201,7 +201,7 @@ public:
   /**
    * This method is optional; if not explicitly invoked, it is invoked by
    * the first <subscribe>, using the subscribed address/port# and network
-   * interface paramters.
+   * interface parameters.
    * The <mcast_addr> parameter defines the default send address/port# and
    * also the port# and, if the OPT_BINDADDR_YES option is used,
    * the multicast address that is bound to this socket.

@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-cygwin32.h 81809 2008-05-30 13:40:21Z vzykov $
+// $Id: config-cygwin32.h 87169 2009-10-19 20:26:55Z olli $
 
 // The following configuration file is designed to work for CygWin
 // platforms using GNU C++.
@@ -25,13 +25,15 @@
 #endif /* ACE_IOV_MAX */
 
 // Define custom export macros for export/import of symbols from/of dll's
-#define ACE_HAS_CUSTOM_EXPORT_MACROS
-#define ACE_Proper_Export_Flag __declspec (dllexport)
-#define ACE_Proper_Import_Flag __declspec (dllimport)
-#define ACE_EXPORT_SINGLETON_DECLARATION(T) template class __declspec (dllexport) T
-#define ACE_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) template class __declspec (dllexport) SINGLETON_TYPE<CLASS, LOCK>;
-#define ACE_IMPORT_SINGLETON_DECLARATION(T) extern template class T
-#define ACE_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) extern template class SINGLETON_TYPE <CLASS, LOCK>;
+#if !defined (ACE_HAS_CUSTOM_EXPORT_MACROS)
+# define ACE_HAS_CUSTOM_EXPORT_MACROS 1
+# define ACE_Proper_Export_Flag __declspec (dllexport)
+# define ACE_Proper_Import_Flag __declspec (dllimport)
+# define ACE_EXPORT_SINGLETON_DECLARATION(T) template class __declspec (dllexport) T
+# define ACE_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) template class __declspec (dllexport) SINGLETON_TYPE<CLASS, LOCK>;
+# define ACE_IMPORT_SINGLETON_DECLARATION(T) extern template class T
+# define ACE_IMPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) extern template class SINGLETON_TYPE <CLASS, LOCK>;
+#endif
 
 #define ACE_HAS_SELECT_H
 
@@ -61,7 +63,6 @@
 
 #define ACE_HAS_VOIDPTR_SOCKOPT 1
 #define ACE_HAS_UALARM 1
-#define ACE_HAS_SYS_ERRLIST 1
 #define ACE_HAS_STRNLEN 1
 #define ACE_HAS_POSIX_GETPWNAM_R 1
 #define ACE_HAS_POSIX_NONBLOCK 1
@@ -110,8 +111,7 @@
 
 #define ACE_HAS_VOIDPTR_GETTIMEOFDAY
 
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
+#define ACE_HAS_STRSIGNAL
 
 // Compiler supports the ssize_t typedef.
 #define ACE_HAS_SSIZE_T
@@ -145,6 +145,7 @@
 #define ACE_LACKS_FPUTWS 1
 
 #define ACE_LACKS_WCSTOULL 1
+#define ACE_LACKS_ISCTYPE
 
 #define ACE_HAS_AUTOMATIC_INIT_FINI
 
@@ -195,11 +196,20 @@
 #  define ACE_LACKS_PTHREAD_YIELD 1
 #  define ACE_LACKS_PTHREAD_ATTR_SETSTACK
 
+#if CYGWIN_VERSION_API_MINOR < 207
 // In the 1.5.9 release of Cygwin the pthread_kill gives an access violation
 // so for the time being we say Cygwin doesn't support pthread_kill.
 #  define ACE_LACKS_PTHREAD_KILL
+#endif
 
 #endif  /* ACE_MT_SAFE */
+
+#if CYGWIN_VERSION_API_MINOR >= 207
+// > Cygwin 1.7
+#define ACE_HAS_VWPRINTF
+#define ACE_HAS_VFWPRINTF
+#define ACE_HAS_VSWPRINTF
+#endif
 
 #include /**/ "ace/post.h"
 

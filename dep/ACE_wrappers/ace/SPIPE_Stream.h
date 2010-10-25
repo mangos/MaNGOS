@@ -4,7 +4,7 @@
 /**
  *  @file    SPIPE_Stream.h
  *
- *  $Id: SPIPE_Stream.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SPIPE_Stream.h 84480 2009-02-16 18:58:16Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -84,12 +84,12 @@ public:
   /// Recv bytes via STREAM pipes using "band" mode.
   ssize_t recv (void *buf, size_t len) const;
 
-  /// Send <cntl> and <data> via STREAM pipes.
+  /// Send @a cntl and @a data via STREAM pipes.
   ssize_t send (const ACE_Str_Buf *cntl,
                 const ACE_Str_Buf *data,
                 int flags = 0) const;
 
-  /// Recv <cntl> and <data> via STREAM pipes.
+  /// Recv @a cntl and @a data via STREAM pipes.
   ssize_t recv (ACE_Str_Buf *cntl,
                 ACE_Str_Buf *data,
                 int *flags) const;
@@ -144,7 +144,7 @@ public:
   ssize_t sendv_n (const iovec iov[],
                    int len) const;
 
-  /// Receive an <iovec> of size @a len to the stream.
+  /// Receive an <iovec> of size @a len from the stream.
   ssize_t recvv_n (iovec iov[],
                    int len) const;
 

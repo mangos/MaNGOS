@@ -4,7 +4,7 @@
 /**
  *  @file    Object_Manager.h
  *
- *  $Id: Object_Manager.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Object_Manager.h 91066 2010-07-12 11:05:04Z johnnyw $
  *
  *  @author David L. Levine <levine@cs.wustl.edu>
  *  @author Matthias Kerkhoff
@@ -237,13 +237,13 @@ public:
    * Register an ACE_Cleanup object for cleanup at process
    * termination.  The object is deleted via the
    * <ace_cleanup_destroyer>.  If you need more flexiblity, see the
-   * <other at_exit> method below.  For OS's that do not have
+   * @c other at_exit method below.  For OS's that do not have
    * processes, cleanup takes place at the end of <main>.  Returns 0
    * on success.  On failure, returns -1 and sets errno to: EAGAIN if
    * shutting down, ENOMEM if insufficient virtual memory, or EEXIST
    * if the object (or array) had already been registered.
    */
-  static int at_exit (ACE_Cleanup *object, void *param = 0);
+  static int at_exit (ACE_Cleanup *object, void *param = 0, const char* name = 0);
 
 #if defined (ACE_HAS_TSS_EMULATION)
   static int init_tss (void);
@@ -256,8 +256,8 @@ public:
    * that is called for the object or array when it to be destroyed.
    * It may perform any necessary cleanup specific for that object or
    * its class.  "param" is passed as the second parameter to the
-   * "cleanup_hook" function; the first parameter is the object (or
-   * array) to be destroyed.  "cleanup_hook", for example, may delete
+   * @a cleanup_hook function; the first parameter is the object (or
+   * array) to be destroyed.  @a cleanup_hook, for example, may delete
    * the object (or array).  For OS's that do not have processes, this
    * function is the same as <at_thread_exit>.  Returns 0 on success.
    * On failure, returns -1 and sets errno to: EAGAIN if shutting
@@ -266,14 +266,18 @@ public:
    */
   static int at_exit (void *object,
                       ACE_CLEANUP_FUNC cleanup_hook,
-                      void *param);
+                      void *param,
+                      const char* name = 0);
+
+  static int remove_at_exit (void *object);
 
 #if 0 /* not implemented yet */
-  /// Similar to <at_exit>, except that the cleanup_hook is called
+  /// Similar to at_exit(), except that the cleanup_hook is called
   /// when the current thread exits instead of when the program terminates.
   static int at_thread_exit (void *object,
                              ACE_CLEANUP_FUNC cleanup_hook,
-                             void *param);
+                             void *param,
+                             const char* name);
 #endif /* 0 */
 
   /// Unique identifiers for preallocated objects.  Please see
@@ -323,7 +327,8 @@ public:
     };
 
   /**
-   * @deprecated Accesses a default signal set used, for example,
+   * @deprecated
+   * Accesses a default signal set used, for example,
    * in ACE_Sig_Guard methods.
    * Deprecated: use ACE_Object_Manager::default_mask () instead.
    */
@@ -343,7 +348,11 @@ private:
 
   /// Register an object or array for deletion at program termination.
   /// See description of static version above for return values.
-  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param);
+  int at_exit_i (void *object, ACE_CLEANUP_FUNC cleanup_hook, void *param, const char* name);
+
+  /// Remove an object for deletion at program termination.
+  /// See description of static version above for return values.
+  int remove_at_exit_i (void *object);
 
 #if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0)
 public:
@@ -403,10 +412,10 @@ public:
   static void *preallocated_array[ACE_PREALLOCATED_ARRAYS];
 
 public:
-  // Application code should not use these explicitly, so they're
-  // hidden here.  They're public so that the ACE_Object_Manager can
-  // be constructed/destructed in <main> with
-  // ACE_HAS_NONSTATIC_OBJECT_MANAGER.
+  /// Application code should not use these explicitly, so they're
+  /// hidden here.  They're public so that the ACE_Object_Manager can
+  /// be constructed/destructed in <main> with
+  /// ACE_HAS_NONSTATIC_OBJECT_MANAGER.
   ACE_Object_Manager (void);
   ~ACE_Object_Manager (void);
 
@@ -427,7 +436,7 @@ private:
 #endif /* ACE_MT_SAFE */
 
 #if defined (ACE_HAS_TSS_EMULATION)
-  // Main thread's thread-specific storage array.
+  /// Main thread's thread-specific storage array.
   void *ts_storage_[ACE_TSS_Emulation::ACE_TSS_THREAD_KEYS_MAX];
   bool ts_storage_initialized_;
 #endif /* ACE_HAS_TSS_EMULATION */
@@ -436,7 +445,7 @@ private:
   friend class ACE_Object_Manager_Manager;
 #endif /* ACE_HAS_NONSTATIC_OBJECT_MANAGER */
 
-  // Disallow copying by not implementing the following . . .
+  /// Disallow copying by not implementing the following . . .
   ACE_Object_Manager (const ACE_Object_Manager &);
   ACE_Object_Manager &operator= (const ACE_Object_Manager &);
 };

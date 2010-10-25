@@ -6,7 +6,7 @@
  *
  *  definitions for UNIX domain sockets
  *
- *  $Id: os_un.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_un.h 85015 2009-04-03 12:27:59Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -36,12 +36,12 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-#if defined (ACE_VXWORKS) && (ACE_VXWORKS <= 0x600)
+#if defined (ACE_LACKS_SOCKADDR_UN)
 struct sockaddr_un {
   short sun_family;    // AF_UNIX.
   char  sun_path[108]; // path name.
 };
-#endif /* ACE_VXWORKS */
+#endif /* ACE_LACKS_SOCKADDR_UN */
 
 
 #ifdef __cplusplus

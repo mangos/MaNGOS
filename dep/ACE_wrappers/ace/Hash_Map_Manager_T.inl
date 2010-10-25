@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Hash_Map_Manager_T.inl 81082 2008-03-25 09:09:11Z johnnyw $
+// $Id: Hash_Map_Manager_T.inl 84477 2009-02-16 13:30:38Z johnnyw $
 
 #include "ace/Guard_T.h"
 
@@ -434,13 +434,6 @@ ACE_Hash_Map_Entry<EXT_ID, INT_ID> *
 ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::table (void)
 {
   return this->table_;
-}
-
-template <class EXT_ID, class INT_ID, class HASH_KEY, class COMPARE_KEYS, class ACE_LOCK> ACE_INLINE
-size_t
-ACE_Hash_Map_Manager_Ex<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::cur_size (void) const
-{
-  return this->cur_size_;
 }
 
 template <class EXT_ID,

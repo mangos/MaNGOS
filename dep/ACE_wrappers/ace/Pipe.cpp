@@ -1,4 +1,4 @@
-// $Id: Pipe.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Pipe.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Pipe.h"
 #include "ace/SOCK_Acceptor.h"
@@ -18,7 +18,7 @@
 #include "ace/Pipe.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, Pipe, "$Id: Pipe.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -29,8 +29,7 @@ ACE_Pipe::dump (void) const
   ACE_TRACE ("ACE_Pipe::dump");
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("handles_[0] = %d"), this->handles_[0]));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nhandles_[1] = %d"), this->handles_[1]));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nhandles_[1] = %d\n"), this->handles_[1]));
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
 }
@@ -40,7 +39,7 @@ ACE_Pipe::open (int buffer_size)
 {
   ACE_TRACE ("ACE_Pipe::open");
 
-#if defined (ACE_LACKS_SOCKETPAIR) || defined (__Lynx__)
+#if defined (ACE_LACKS_SOCKETPAIR)
   ACE_INET_Addr my_addr;
   ACE_SOCK_Acceptor acceptor;
   ACE_SOCK_Connector connector;
@@ -97,9 +96,10 @@ ACE_Pipe::open (int buffer_size)
     }
 # endif /* ! ACE_LACKS_TCP_NODELAY */
 
-# if defined (ACE_LACKS_SOCKET_BUFSIZ)
+# if defined (ACE_LACKS_SO_RCVBUF) && defined (ACE_LACKS_SO_SNDBUF)
     ACE_UNUSED_ARG (buffer_size);
-# else  /* ! ACE_LACKS_SOCKET_BUFSIZ */
+# endif
+# if !defined (ACE_LACKS_SO_RCVBUF)
   if (reader.set_option (SOL_SOCKET,
                          SO_RCVBUF,
                          reinterpret_cast <void *> (&buffer_size),
@@ -109,16 +109,18 @@ ACE_Pipe::open (int buffer_size)
       this->close ();
       return -1;
     }
-  else if (writer.set_option (SOL_SOCKET,
-                              SO_SNDBUF,
-                              reinterpret_cast <void *> (&buffer_size),
-                              sizeof (buffer_size)) == -1
+# endif /* !ACE_LACKS_SO_RCVBUF */
+# if !defined (ACE_LACKS_SO_SNDBUF)
+  if (writer.set_option (SOL_SOCKET,
+                         SO_SNDBUF,
+                         reinterpret_cast <void *> (&buffer_size),
+                         sizeof (buffer_size)) == -1
            && errno != ENOTSUP)
     {
       this->close ();
       return -1;
     }
-# endif /* ! ACE_LACKS_SOCKET_BUFSIZ */
+# endif /* !ACE_LACKS_SO_SNDBUF */
 
 #elif defined (ACE_HAS_STREAM_PIPES) || defined (__QNX__)
   ACE_UNUSED_ARG (buffer_size);
@@ -156,9 +158,10 @@ ACE_Pipe::open (int buffer_size)
                        ACE_TEXT ("%p\n"),
                        ACE_TEXT ("socketpair")),
                       -1);
-# if defined (ACE_LACKS_SOCKET_BUFSIZ)
+# if defined (ACE_LACKS_SO_SNDBUF) && defined (ACE_LACKS_SO_RCVBUF)
   ACE_UNUSED_ARG (buffer_size);
-# else  /* ! ACE_LACKS_SOCKET_BUFSIZ */
+# endif
+# if !defined (ACE_LACKS_SO_RCVBUF)
   if (ACE_OS::setsockopt (this->handles_[0],
                           SOL_SOCKET,
                           SO_RCVBUF,
@@ -169,6 +172,8 @@ ACE_Pipe::open (int buffer_size)
       this->close ();
       return -1;
     }
+# endif
+# if !defined (ACE_LACKS_SO_SNDBUF)
   if (ACE_OS::setsockopt (this->handles_[1],
                           SOL_SOCKET,
                           SO_SNDBUF,
@@ -179,7 +184,7 @@ ACE_Pipe::open (int buffer_size)
       this->close ();
       return -1;
     }
-# endif /* ! ACE_LACKS_SOCKET_BUFSIZ */
+# endif /* ! ACE_LACKS_SO_SNDBUF */
 # if defined (ACE_OPENVMS) && !defined (ACE_LACKS_TCP_NODELAY)
   int one = 1;
   // OpenVMS implements socketpair(AF_UNIX...) by returning AF_INET sockets.

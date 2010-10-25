@@ -1,5 +1,5 @@
 //* -*- C++ -*- */
-// $Id: config-vxworks6.4.h 81850 2008-06-06 08:39:54Z vzykov $
+// $Id: config-vxworks6.4.h 89494 2010-03-15 20:11:18Z olli $
 
 // The following configuration file is designed to work for VxWorks
 // 6.4 platforms using one of these compilers:
@@ -72,7 +72,7 @@
 
 #if !defined __RTP__
 # if defined (TOOL) && (TOOL == gnu)
-#  if defined (CPU) && (CPU == PPC85XX || CPU == PPC604 || CPU == PPC603)
+#  if defined (CPU) && (CPU == PPC85XX || CPU == PPC604 || CPU == PPC603 || CPU == PPC32)
 // These PPC's do lack log2 in kernel mode
 #   define ACE_LACKS_LOG2
 #  endif
@@ -83,7 +83,10 @@
 #define ACE_HAS_4_4BSD_SENDMSG_RECVMSG
 #define ACE_HAS_3_PARAM_READDIR_R
 #define ACE_HAS_NONCONST_GETBY
+#define ACE_HAS_NONCONST_INET_ADDR
 #define ACE_HAS_NONCONST_SWAB
+#define ACE_USES_INETLIB_H
+#define ACE_USES_SELECTLIB_H
 #define ACE_LACKS_UNIX_SYSLOG
 #define ACE_DEFAULT_MAX_SOCKET_BUFSIZ 32768
 #define ACE_DEFAULT_THREAD_KEYS 16
@@ -96,7 +99,6 @@
 #define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES
 #define ACE_HAS_CPLUSPLUS_HEADERS
 #define ACE_HAS_DIRENT
-#define ACE_HAS_DLL 0
 #define ACE_HAS_HANDLE_SET_OPTIMIZED_FOR_SELECT
 #define ACE_HAS_MSG
 #define ACE_HAS_NONCONST_READV
@@ -111,7 +113,6 @@
 #define ACE_HAS_SIG_ATOMIC_T
 #define ACE_HAS_SOCKADDR_IN_SIN_LEN
 #define ACE_HAS_SOCKADDR_IN6_SIN6_LEN
-#define ACE_HAS_STRERROR
 #define ACE_HAS_THREADS
 #define ACE_HAS_SYSCTL
 #define ACE_LACKS_ALPHASORT
@@ -192,11 +193,14 @@
 #define ACE_LACKS_WCSDUP
 #define ACE_LACKS_WCSICMP
 #define ACE_LACKS_WCSNICMP
+#define ACE_LACKS_STRTOLL
+#define ACE_LACKS_WCSTOLL
 #define ACE_LACKS_STRTOULL
 #define ACE_LACKS_WCSTOULL
 
 #define ACE_HAS_CHARPTR_SOCKOPT
 #define ACE_LACKS_SYMLINKS
+#define ACE_LACKS_ISCTYPE
 
 #if defined __RTP__
   // We are building for RTP mode
@@ -223,8 +227,11 @@
   #if !defined (IOV_MAX) || (IOV_MAX == 0)
     #define ACE_IOV_MAX 16
   #endif
+  #define ACE_LACKS_ISASCII
 #else
   // We are building for kernel mode
+  #define ACE_LACKS_SETENV
+  #define ACE_LACKS_UNSETENV
   #define ACE_LACKS_SUSECONDS_T
   #define ACE_LACKS_INTPTR_T
   #define ACE_LACKS_INTTYPES_H
@@ -273,6 +280,9 @@
   #if !defined (ACE_MAIN)
   #  define ACE_MAIN ace_main
   #endif /* ! ACE_MAIN */
+  #define ACE_LACKS_TZSET
+  #define ACE_LACKS_ISWCTYPE
+  #define ACE_LACKS_ISBLANK
 #endif
 
 // It is possible to enable pthread support with VxWorks, when the user decides

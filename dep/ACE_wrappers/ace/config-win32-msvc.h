@@ -2,7 +2,7 @@
 /**
  *  @file   config-win32-msvc.h
  *
- *  $Id: config-win32-msvc.h 82643 2008-08-19 14:02:12Z johnnyw $
+ *  $Id: config-win32-msvc.h 85785 2009-06-24 18:20:42Z mitza $
  *
  *  @brief  Microsoft Visual C++ configuration file.
  *
@@ -31,12 +31,6 @@
 #define ACE_CC_MINOR_VERSION (_MSC_VER % 100)
 #define ACE_CC_BETA_VERSION (0)
 
-#if !defined (ACE_LD_DECORATOR_STR)
-# if defined (_DEBUG)
-#  define ACE_LD_DECORATOR_STR ACE_TEXT ("d")
-# endif  /* _DEBUG */
-#endif  /* ACE_LD_DECORATOR_STR */
-
 #if !defined(_NATIVE_WCHAR_T_DEFINED)
   #define ACE_LACKS_NATIVE_WCHAR_T
 #endif
@@ -48,7 +42,10 @@
 #  define ACE_ENDTHREADEX(STATUS) ::_endthreadex ((DWORD) STATUS)
 #endif /* _WIN32_WCE */
 
-#if (_MSC_VER >= 1500)
+//FUZZ: disable check_for_msc_ver
+#if (_MSC_VER >= 1600)
+# include "ace/config-win32-msvc-10.h"
+#elif (_MSC_VER >= 1500)
 # include "ace/config-win32-msvc-9.h"
 #elif (_MSC_VER >= 1400)
 # include "ace/config-win32-msvc-8.h"
@@ -57,6 +54,7 @@
 #else
 # error This version of Microsoft Visual C++ is not supported.
 #endif
+//FUZZ: enable check_for_msc_ver
 
 // MFC changes the behavior of operator new at all MSVC versions from 6 up
 // by throwing a static CMemoryException* instead of std::bad_alloc
@@ -124,11 +122,19 @@
 #define ACE_LACKS_TERMIOS_H
 #define ACE_LACKS_REGEX_H
 
-#define ACE_INT64_FORMAT_SPECIFIER ACE_TEXT ("%I64d")
-#define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT ("%I64u")
+#define ACE_INT64_FORMAT_SPECIFIER_ASCII "%I64d"
+#define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%I64u"
 
+#define ACE_STRTOLL_EQUIVALENT ::_strtoi64
+#define ACE_WCSTOLL_EQUIVALENT ::_wcstoi64
 #define ACE_STRTOULL_EQUIVALENT ::_strtoui64
-#define ACE_WCSTOOULL_EQUIVALENT ::_wcstoui64
+#define ACE_WCSTOULL_EQUIVALENT ::_wcstoui64
+#define ACE_WTOF_EQUIVALENT ::_wtof
+
+#define ACE_LACKS_ISBLANK
+#define ACE_LACKS_ISWBLANK
+#define ACE_LACKS_CORRECT_ISWPRINT_TAB
+#define ACE_ISCTYPE_EQUIVALENT ::_isctype
 
 // Turn off warnings for /W4
 // To resume any of these warning: #pragma warning(default: 4xxx)

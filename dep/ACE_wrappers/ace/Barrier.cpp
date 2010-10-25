@@ -1,4 +1,4 @@
-// $Id: Barrier.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Barrier.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Barrier.h"
 
@@ -15,10 +15,6 @@
 #  include "ace/Log_Msg.h"
 #endif /* ACE_HAS_DUMP */
 
-ACE_RCSID (ace,
-           Barrier,
-           "$Id: Barrier.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_ALLOC_HOOK_DEFINE(ACE_Sub_Barrier)
@@ -31,8 +27,7 @@ ACE_Sub_Barrier::dump (void) const
 
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   this->barrier_finished_.dump ();
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("running_threads_ = %d"), this->running_threads_));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("running_threads_ = %d\n"), this->running_threads_));
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
 }

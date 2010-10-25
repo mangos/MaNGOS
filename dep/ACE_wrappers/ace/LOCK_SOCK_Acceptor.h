@@ -4,7 +4,7 @@
 /**
  *  @file    LOCK_SOCK_Acceptor.h
  *
- *  $Id: LOCK_SOCK_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: LOCK_SOCK_Acceptor.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author James Hu and Irfan Pyarali
  */
@@ -42,8 +42,8 @@ public:
   int accept (ACE_SOCK_Stream &new_stream,
               ACE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0) const;
+              bool restart = true,
+              bool reset_new_handle = false) const;
 
   /// Return a reference to the lock.
   ACE_LOCK &lock (void);

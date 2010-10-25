@@ -1,4 +1,4 @@
-//$Id: Cached_Connect_Strategy_T.cpp 80826 2008-03-04 14:51:23Z wotte $
+//$Id: Cached_Connect_Strategy_T.cpp 82771 2008-09-17 18:47:48Z johnnyw $
 
 #ifndef ACE_CACHED_CONNECT_STRATEGY_T_CPP
 #define ACE_CACHED_CONNECT_STRATEGY_T_CPP
@@ -51,7 +51,7 @@ ACE_Cached_Connect_Strategy_Ex<ACE_T2>::check_hint_i
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  ACE_Hash_Map_Entry<ACE_Refcounted_Hash_Recyclable<ACE_PEER_CONNECTOR_ADDR>, ACE_Pair<SVC_HANDLER *, ATTRIBUTES> > *&entry,
@@ -141,7 +141,7 @@ ACE_Cached_Connect_Strategy_Ex<ACE_T2>::find_or_create_svc_handler_i
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  ACE_Hash_Map_Entry<ACE_Refcounted_Hash_Recyclable<ACE_PEER_CONNECTOR_ADDR>, ACE_Pair<SVC_HANDLER *, ATTRIBUTES> > *&entry,
@@ -256,7 +256,7 @@ ACE_Cached_Connect_Strategy_Ex<ACE_T2>::cached_connect (SVC_HANDLER *&sh,
                                                         const ACE_PEER_CONNECTOR_ADDR &remote_addr,
                                                         ACE_Time_Value *timeout,
                                                         const ACE_PEER_CONNECTOR_ADDR &local_addr,
-                                                        int reuse_addr,
+                                                        bool reuse_addr,
                                                         int flags,
                                                         int perms)
 {
@@ -319,7 +319,7 @@ ACE_Cached_Connect_Strategy_Ex<ACE_T2>::connect_svc_handler_i
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  int& found)
@@ -587,7 +587,7 @@ ACE_Bounded_Cached_Connect_Strategy<ACE_T2>::find_or_create_svc_handler_i
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  ACE_Hash_Map_Entry<ACE_Refcounted_Hash_Recyclable<ACE_PEER_CONNECTOR_ADDR>,

@@ -4,7 +4,7 @@
 /**
  *  @file    Null_Mutex.h
  *
- *  $Id: Null_Mutex.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Null_Mutex.h 86731 2009-09-17 12:23:48Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -124,8 +124,6 @@ template <class ACE_LOCK>
 class ACE_Guard;
 
 /**
- * @class ACE_Guard<ACE_Null_Mutex>
- *
  * @brief Template specialization of ACE_Guard for the
  * ACE_Null_Mutex.
  *
@@ -164,8 +162,8 @@ template <class ACE_LOCK>
 class ACE_Write_Guard;
 
 /**
- * @class ACE_Write_Guard<ACE_Null_Mutex>
- *
+ * @brief Template specialization of ACE_Write_Guard for the
+ * ACE_Null_Mutex.
  */
 template<>
 class ACE_Export ACE_Write_Guard<ACE_Null_Mutex>
@@ -188,8 +186,8 @@ template <class ACE_LOCK>
 class ACE_Read_Guard;
 
 /**
- * @class ACE_Read_Guard<ACE_Null_Mutex>
- *
+ * @brief Template specialization of ACE_Read)Guard for the
+ * ACE_Null_Mutex.
  */
 template<>
 class ACE_Export ACE_Read_Guard<ACE_Null_Mutex>
@@ -211,8 +209,8 @@ public:
 template <class T> class ACE_Malloc_Lock_Adapter_T;
 
 /**
- * @class ACE_Malloc_Lock_Adapter_T<ACE_Null_Mutex>
- *
+ * @brief Template specialization of ACE_Malloc_Lock_Adapter_T for the
+ * ACE_Null_Mutex.
  */
 template<>
 class ACE_Export ACE_Malloc_Lock_Adapter_T<ACE_Null_Mutex>

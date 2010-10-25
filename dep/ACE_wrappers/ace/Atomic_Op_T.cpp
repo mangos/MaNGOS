@@ -1,3 +1,5 @@
+// $Id: Atomic_Op_T.cpp 91287 2010-08-05 10:30:49Z johnnyw $
+
 #ifndef ACE_ATOMIC_OP_T_CPP
 #define ACE_ATOMIC_OP_T_CPP
 
@@ -20,8 +22,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 ACE_ALLOC_HOOK_DEFINE(ACE_Atomic_Op_Ex)
 ACE_ALLOC_HOOK_DEFINE(ACE_Atomic_Op)
 
-ACE_RCSID(ace, Atomic_Op_T, "$Id: Atomic_Op_T.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
 // *************************************************
 template <class ACE_LOCK, class TYPE> ACE_LOCK &
 ACE_Atomic_Op_Ex<ACE_LOCK, TYPE>::mutex (void)
@@ -38,7 +38,7 @@ ACE_Atomic_Op_Ex<ACE_LOCK, TYPE>::dump (void) const
   // ACE_TRACE ("ACE_Atomic_Op_Ex<ACE_LOCK, TYPE>::dump");
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   this->mutex_.dump ();
-  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
+  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP, this));
 #endif /* ACE_HAS_DUMP */
 }
 

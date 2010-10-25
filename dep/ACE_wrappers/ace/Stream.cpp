@@ -1,8 +1,9 @@
 // Stream.cpp
-// $Id: Stream.cpp 82513 2008-08-05 18:52:53Z parsons $
+// $Id: Stream.cpp 90072 2010-05-04 21:34:39Z cbeaulac $
 
 #ifndef ACE_STREAM_CPP
 #define ACE_STREAM_CPP
+
 
 //#include "ace/Module.h"
 #include "ace/Stream.h"
@@ -241,6 +242,17 @@ ACE_Stream<ACE_SYNCH_USE>::remove (const ACE_TCHAR *name,
   for (ACE_Module<ACE_SYNCH_USE> *mod = this->stream_head_;
        mod != 0;
        mod = mod->next ())
+  {
+#ifndef ACE_NLOGGING
+    if (ACE::debug ())
+    {
+      ACE_DEBUG ((LM_DEBUG,
+        ACE_TEXT ("ACE_Stream::remove comparing existing module :%s: with :%s:\n"),
+        mod->name (),
+        name));
+    }
+#endif
+
     if (ACE_OS::strcmp (mod->name (), name) == 0)
       {
         if (prev == 0) // Deleting ACE_Stream Head
@@ -260,7 +272,9 @@ ACE_Stream<ACE_SYNCH_USE>::remove (const ACE_TCHAR *name,
       }
     else
       prev = mod;
+  }
 
+  ACE_DEBUG ((LM_WARNING,  ACE_TEXT ("ACE_Stream::remove failed to find module with name %s to remove\n"),name));
   return -1;
 }
 

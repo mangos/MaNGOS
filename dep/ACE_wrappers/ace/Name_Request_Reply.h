@@ -4,7 +4,7 @@
 /**
  *  @file    Name_Request_Reply.h
  *
- *  $Id: Name_Request_Reply.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Name_Request_Reply.h 84316 2009-02-03 19:46:05Z johnnyw $
  *
  *   Define the format used to exchange messages between the
  *   ACE_Name Server and its clients.
@@ -205,7 +205,7 @@ public:
   /// Default constructor.
   ACE_Name_Reply (void);
 
-  /// Create a <ACE_Name_Reply> message.
+  /// Create a ACE_Name_Reply message.
   ACE_Name_Reply (ACE_UINT32 type, ACE_UINT32 err); // Type of reply.
 
   /// Initialize length_ in order to ensure correct byte ordering

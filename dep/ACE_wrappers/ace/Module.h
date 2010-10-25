@@ -4,7 +4,7 @@
 /**
  *  @file    Module.h
  *
- *  $Id: Module.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Module.h 85417 2009-05-22 08:31:42Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -94,8 +94,8 @@ public:
               int flags = M_DELETE);
 
   /**
-   * Initialize the module with <module_name> as its identity
-   * and <reader> and <writer> as its tasks.  Previously register
+   * Initialize the module with @a module_name as its identity
+   * and @a reader> and @a writer as its tasks.  Previously register
    * reader or writers or closed down and deleted according to the
    * value of flags_.  Should not be called from within
    * <ACE_Task::module_closed>.
@@ -174,7 +174,7 @@ public:
 
 private:
   /// Implements the close operation for either the reader or the
-  /// writer task (depending on <which>).
+  /// writer task (depending on @a which).
   int close_i (int which, int flags);
 
   /// Pair of Tasks that form the "read-side" and "write-side" of the

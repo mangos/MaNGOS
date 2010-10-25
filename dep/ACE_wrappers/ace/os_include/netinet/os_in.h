@@ -1,3 +1,4 @@
+
 // -*- C++ -*-
 
 //=============================================================================
@@ -6,7 +7,7 @@
  *
  *  Internet address family
  *
- *  $Id: os_in.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_in.h 85438 2009-05-26 06:56:46Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -31,23 +32,16 @@
 #  include /**/ <ws2tcpip.h>
 #endif /* ACE_HAS_WINSOCK2 */
 
-#if !defined (ACE_LACKS_NETINET_IN_H)
-#  if defined (ACE_HAS_STL_QUEUE_CONFLICT)
-#    define queue _Queue_
-#  endif /* ACE_HAS_STL_QUEUE_CONFLICT */
-   extern "C" {
-#  include /**/ <netinet/in.h>
-   }
-#  if defined (ACE_HAS_STL_QUEUE_CONFLICT)
-#    undef queue
-#  endif /* ACE_HAS_STL_QUEUE_CONFLICT */
-#endif /* !ACE_LACKS_NETINET_IN_H */
-
 // Place all additions (especially function declarations) within extern "C" {}
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
+
+#if !defined (ACE_LACKS_NETINET_IN_H)
+#  include /**/ <netinet/in.h>
+#endif /* !ACE_LACKS_NETINET_IN_H */
+
 
 # if defined (ACE_HAS_PHARLAP_RT)
 #   define ACE_IPPROTO_TCP SOL_SOCKET
@@ -55,7 +49,7 @@ extern "C"
 #   define ACE_IPPROTO_TCP IPPROTO_TCP
 # endif /* ACE_HAS_PHARLAP_RT */
 
-# if !defined (ACE_HAS_IP_MULTICAST)  &&  defined (ACE_LACKS_IP_ADD_MEMBERSHIP)
+# if !defined (ACE_HAS_IP_MULTICAST) && defined (ACE_LACKS_IP_ADD_MEMBERSHIP)
   // Even if ACE_HAS_IP_MULTICAST is not defined, if IP_ADD_MEMBERSHIP
   // is defined, assume that the ip_mreq struct is also defined
   // (presumably in netinet/in.h).

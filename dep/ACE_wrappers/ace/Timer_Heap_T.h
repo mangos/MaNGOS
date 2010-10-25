@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Heap_T.h
  *
- *  $Id: Timer_Heap_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Timer_Heap_T.h 84619 2009-02-26 12:26:16Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -143,7 +143,7 @@ public:
 
   /**
    * Cancel all timers associated with @a type.  If @a dont_call_handle_close
-   * is 0then the <functor> will be invoked.  Returns number of timers
+   * is 0 then the <functor> will be invoked.  Returns number of timers
    * cancelled.
    */
   virtual int cancel (const TYPE &type,
