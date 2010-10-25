@@ -487,6 +487,13 @@ bool Spell::FillCustomTargetMap(SpellEffectIndex i, UnitList &targetUnitMap)
             }
         break;
 
+        case 65045: // Flame of demolisher
+        {
+                FillAreaTargets(targetUnitMap,m_targets.m_destX, m_targets.m_destY,radius,PUSH_DEST_CENTER,SPELL_TARGETS_AOE_DAMAGE);
+                break;
+        }
+        break;
+
         default:
             return false;
         break;
@@ -671,6 +678,8 @@ void Spell::FillTargetMap()
                         break;
                 }
                 break;
+            case TARGET_AREAEFFECT_CUSTOM:
+                if (FillCustomTargetMap(SpellEffectIndex(i),tmpUnitMap)) break;
             default:
                 switch(m_spellInfo->EffectImplicitTargetB[i])
                 {
@@ -1677,9 +1686,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         case TARGET_TOTEM_FIRE:
         case TARGET_SELF:
         case TARGET_SELF2:
-        case TARGET_AREAEFFECT_CUSTOM_2:
             targetUnitMap.push_back(m_caster);
             break;
+        case TARGET_AREAEFFECT_CUSTOM_2:
+        {
+            // Only "Hated" gameobjects TYPE 33 can be here. Not implemented yet...
+            break;
+        }
         case TARGET_RANDOM_ENEMY_CHAIN_IN_AREA:
         {
             m_targets.m_targetMask = 0;
@@ -5576,13 +5589,15 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             }
             else
             {
-                bool duelvsplayertar = false;
+                bool dualEffect = false;
                 for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
                 {
                                                             //TARGET_DUELVSPLAYER is positive AND negative
-                    duelvsplayertar |= (m_spellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER);
+                    dualEffect |= (m_spellInfo->EffectImplicitTargetA[j] == TARGET_DUELVSPLAYER
+                                   || m_spellInfo->EffectImplicitTargetA[j] == TARGET_IN_FRONT_OF_CASTER_30);
                 }
-                if(m_caster->IsFriendlyTo(target) && !duelvsplayertar && !IsDispelSpell(m_spellInfo))
+
+                if (m_caster->IsFriendlyTo(target) && !dualEffect && !IsDispelSpell(m_spellInfo))
                 {
                     return SPELL_FAILED_BAD_TARGETS;
                 }
