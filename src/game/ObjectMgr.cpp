@@ -1913,23 +1913,23 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->Quality = ITEM_QUALITY_NORMAL;
         }
 
-        if (proto->Flags2 & ITEM_FLAGS2_HORDE_ONLY)
+        if (proto->Flags2 & ITEM_FLAG2_HORDE_ONLY)
         {
             if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
                 if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) == 0)
-                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAGS2_HORDE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
-                        i, proto->AllowableRace, ITEM_FLAGS2_HORDE_ONLY);
+                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAG2_HORDE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
+                        i, proto->AllowableRace, ITEM_FLAG2_HORDE_ONLY);
 
-            if (proto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY)
-                sLog.outErrorDb("Item (Entry: %u) have in `Flags2` flags ITEM_FLAGS2_ALLIANCE_ONLY (%u) and ITEM_FLAGS2_HORDE_ONLY (%u) in Flags field, this is wrong combination.",
-                    i, ITEM_FLAGS2_ALLIANCE_ONLY, ITEM_FLAGS2_HORDE_ONLY);
+            if (proto->Flags2 & ITEM_FLAG2_ALLIANCE_ONLY)
+                sLog.outErrorDb("Item (Entry: %u) have in `Flags2` flags ITEM_FLAG2_ALLIANCE_ONLY (%u) and ITEM_FLAG2_HORDE_ONLY (%u) in Flags field, this is wrong combination.",
+                    i, ITEM_FLAG2_ALLIANCE_ONLY, ITEM_FLAG2_HORDE_ONLY);
         }
-        else if (proto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY)
+        else if (proto->Flags2 & ITEM_FLAG2_ALLIANCE_ONLY)
         {
             if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
                 if ((proto->AllowableRace & faction->BaseRepRaceMask[0]) == 0)
-                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAGS2_ALLIANCE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
-                        i, proto->AllowableRace, ITEM_FLAGS2_ALLIANCE_ONLY);
+                    sLog.outErrorDb("Item (Entry: %u) have in `AllowableRace` races (%u) only not compatible with ITEM_FLAG2_ALLIANCE_ONLY (%u) in Flags field, item any way will can't be equipped or use by this races.",
+                        i, proto->AllowableRace, ITEM_FLAG2_ALLIANCE_ONLY);
         }
 
         if(proto->BuyCount <= 0)
@@ -2020,10 +2020,19 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->Stackable = 1000;
         }
 
-        if(proto->ContainerSlots > MAX_BAG_SIZE)
+        if (proto->ContainerSlots)
         {
-            sLog.outErrorDb("Item (Entry: %u) has too large value in ContainerSlots (%u), replace by hardcoded limit (%u).",i,proto->ContainerSlots,MAX_BAG_SIZE);
-            const_cast<ItemPrototype*>(proto)->ContainerSlots = MAX_BAG_SIZE;
+            if(proto->ContainerSlots > MAX_BAG_SIZE)
+            {
+                sLog.outErrorDb("Item (Entry: %u) has too large value in ContainerSlots (%u), replace by hardcoded limit (%u).",i,proto->ContainerSlots,MAX_BAG_SIZE);
+                const_cast<ItemPrototype*>(proto)->ContainerSlots = MAX_BAG_SIZE;
+            }
+            
+            if(proto->Flags & ITEM_FLAG_LOOTABLE)
+            {
+                sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
+                const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
+            }
         }
 
         if(proto->StatsCount > MAX_ITEM_PROTO_STATS)
@@ -2106,6 +2115,12 @@ void ObjectMgr::LoadItemPrototypes()
                     const_cast<ItemPrototype*>(proto)->Spells[1].SpellId = 0;
                     const_cast<ItemPrototype*>(proto)->Spells[1].SpellTrigger = ITEM_SPELLTRIGGER_ON_USE;
                 }
+                // ok case for spell_1 (and other)
+                else if(proto->Flags & ITEM_FLAG_LOOTABLE)
+                {
+                    sLog.outErrorDb("Item container (Entry: %u) has not allowed for spell learning items flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
+                    const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
+                }
             }
 
             // spell_3*,spell_4*,spell_5* is empty
@@ -2156,6 +2171,13 @@ void ObjectMgr::LoadItemPrototypes()
                         sLog.outErrorDb("Item (Entry: %u) has broken spell in spellid_%d (%u)",i,j+1,proto->Spells[j].SpellId);
                         const_cast<ItemPrototype*>(proto)->Spells[j].SpellId = 0;
                     }
+                    // ok cast at use case 
+                    else if((proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE) &&
+                        proto->Flags & ITEM_FLAG_LOOTABLE)
+                    {
+                        sLog.outErrorDb("Item container (Entry: %u) has not allowed for spell casting at use items flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
+                        const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
+                    }
                 }
             }
         }
@@ -2163,8 +2185,11 @@ void ObjectMgr::LoadItemPrototypes()
         if(proto->Bonding >= MAX_BIND_TYPE)
             sLog.outErrorDb("Item (Entry: %u) has wrong Bonding value (%u)",i,proto->Bonding);
 
-        if(proto->PageText && !sPageTextStore.LookupEntry<PageText>(proto->PageText))
-            sLog.outErrorDb("Item (Entry: %u) has non existing first page (Id:%u)", i,proto->PageText);
+        if(proto->PageText)
+        {
+            if(!sPageTextStore.LookupEntry<PageText>(proto->PageText))
+                sLog.outErrorDb("Item (Entry: %u) has non existing first page (Id:%u)", i,proto->PageText);
+        }
 
         if(proto->LockID && !sLockStore.LookupEntry(proto->LockID))
             sLog.outErrorDb("Item (Entry: %u) has wrong LockID (%u)",i,proto->LockID);

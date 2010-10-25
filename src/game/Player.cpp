@@ -11024,10 +11024,10 @@ uint8 Player::CanUseItem( ItemPrototype const *pProto ) const
     {
         if(!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
         {
-        if ((pProto->Flags2 & ITEM_FLAGS2_HORDE_ONLY) && GetTeam() != HORDE)
+        if ((pProto->Flags2 & ITEM_FLAG2_HORDE_ONLY) && GetTeam() != HORDE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
-        if ((pProto->Flags2 & ITEM_FLAGS2_ALLIANCE_ONLY) && GetTeam() != ALLIANCE)
+        if ((pProto->Flags2 & ITEM_FLAG2_ALLIANCE_ONLY) && GetTeam() != ALLIANCE)
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
@@ -11583,7 +11583,7 @@ void Player::DestroyItem( uint8 bag, uint8 slot, bool update )
                 DestroyItem(slot, i, update);
         }
 
-        if(pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED))
+        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
             CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
 
         RemoveEnchantmentDurations(pItem);
@@ -16228,7 +16228,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             }
 
             // "Conjured items disappear if you are logged out for more than 15 minutes"
-            if (timediff > 15*MINUTE && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_CONJURED))
+            if (timediff > 15*MINUTE && (item->GetProto()->Flags & ITEM_FLAG_CONJURED))
             {
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_guid);
                 item->FSetState(ITEM_REMOVED);
@@ -19023,7 +19023,7 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         }
     }
 
-    uint32 price  = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAGS2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
+    uint32 price  = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
 
     // reputation discount
     if (price)
@@ -20029,7 +20029,7 @@ void Player::SendInstanceResetWarning( uint32 mapid, Difficulty difficulty, uint
 
 void Player::ApplyEquipCooldown( Item * pItem )
 {
-    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_NO_EQUIP_COOLDOWN))
+    if (pItem->GetProto()->Flags & ITEM_FLAG_NO_EQUIP_COOLDOWN)
         return;
 
     for(int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -21580,7 +21580,7 @@ uint8 Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limit_count) c
 uint8 Player::CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_slot, uint32 limit_count) const
 {
     // check unique-equipped on item
-    if (itemProto->Flags & ITEM_FLAGS_UNIQUE_EQUIPPED)
+    if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPED)
     {
         // there is an equip limit on this item
         if(HasItemOrGemWithIdEquipped(itemProto->ItemId,1,except_slot))

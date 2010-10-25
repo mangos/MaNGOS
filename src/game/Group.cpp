@@ -53,7 +53,7 @@ void Roll::CalculateCommonVoteMask(uint32 max_enchanting_skill)
 
     ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(itemid);
 
-    if (itemProto->Flags2 & ITEM_FLAGS2_NEED_ROLL_DISABLED)
+    if (itemProto->Flags2 & ITEM_FLAG2_NEED_ROLL_DISABLED)
         m_commonVoteMask = RollVoteMask(m_commonVoteMask & ~ROLL_VOTE_MASK_NEED);
 
     if (!itemProto->DisenchantID || uint32(itemProto->RequiredDisenchantSkill) > max_enchanting_skill)
