@@ -9405,6 +9405,22 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
             }
             break;
         }
+        case SPELLFAMILY_PET:
+        {
+            switch (GetId())
+            {
+                case 34455:
+                    spellId1 = 75593;
+                    break;
+                case 34459:
+                    spellId1 = 75446;
+                    break;
+                case 34460:
+                    spellId1 = 75447;
+                    break;
+            }
+            break;
+        }
         default:
             return;
     }
