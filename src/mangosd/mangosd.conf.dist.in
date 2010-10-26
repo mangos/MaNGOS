@@ -972,7 +972,7 @@ ListenRange.Yell = 300
 #    ChatFlood.MessageCount
 #        Chat anti-flood protection, haste message count to activate protection
 #        Default: 10
-#                 0 (disible anti-flood protection)
+#                 0 (disable anti-flood protection)
 #
 #    ChatFlood.MessageDelay
 #        Chat anti-flood protection, minimum message delay to count message
