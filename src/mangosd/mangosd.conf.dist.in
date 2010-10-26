@@ -953,8 +953,8 @@ ListenRange.Yell = 300
 #        Chat protection from creating fake messages using a lot spaces (other invisible symbols),
 #        not applied to addon language messages, but can prevent working old addons
 #        that use normal languages for sending data to another clients.
-#        Default: 0 (disible fake messages preventing)
-#                 1 (enabled fake messages preventing)
+#        Default: 0 (disable fake messages preventing)
+#                 1 (enable fake messages preventing)
 #
 #    ChatStrictLinkChecking.Severity
 #        Check chat messages for ingame links to spells, items, quests, achievements etc.
