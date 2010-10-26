@@ -513,6 +513,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         GetPlayer()->GetSession()->GetSecurity() <= sWorld.GetMvAnticheatGmLevel() &&
         GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()!=FLIGHT_MOTION_TYPE &&
         !GetPlayer()->IsTaxiFlying() &&
+        !GetPlayer()->HasMovementFlag(MOVEFLAG_ONTRANSPORT) &&
         Anti_TeleTimeDiff>Anti_TeleTimeIgnoreDiff)
     {
         const uint32 CurTime=getMSTime();
@@ -563,7 +564,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             GetPlayer()->m_anti_MovedLen = 0.0f;
             static const float MaxDeltaXYT = sWorld.GetMvAnticheatMaxXYT();
 
-            if (delta_xyt > MaxDeltaXYT && delta<=100.0f && GetPlayer()->GetZoneId() != 2257)
+            if (delta_xyt > MaxDeltaXYT && delta<=100.0f)
             {
                 if (sWorld.GetMvAnticheatSpeedCheck())
                     Anti__CheatOccurred(CurTime,"Speed hack",delta_xyt,LookupOpcodeName(opcode),
@@ -599,6 +600,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
         float Anti__MapZ = ((Anti__FloorZ <= (INVALID_HEIGHT+5.0f)) ? Anti__GroundZ : Anti__FloorZ) + DIFF_OVERGROUND;
          
         if (!GetPlayer()->CanFly() &&
+            !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !GetPlayer()->GetBaseMap()->IsUnderWater(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z-7.0f) &&
             Anti__MapZ < GetPlayer()->GetPositionZ() && Anti__MapZ > (INVALID_HEIGHT+DIFF_OVERGROUND + 5.0f))
         {
@@ -608,7 +610,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             if ((movementInfo.GetMovementFlags() & (MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_ROOT)) != 0) // Fly Hack
             {
                 // Fix Aura 55164
-                if (!GetPlayer()->HasAura(55164) || !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL))
+                if (!GetPlayer()->HasAura(55164))
                     if (sWorld.GetMvAnticheatFlyCheck())
                         Anti__CheatOccurred(CurTime,"Fly hack",
                             ((uint8)(GetPlayer()->HasAuraType(SPELL_AURA_FLY))) +
@@ -619,8 +621,7 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
             // Need a better way to do that - currently a lot of fake alarms
             else if ((Anti__MapZ+DIFF_AIRJUMP < GetPlayer()->GetPositionZ() &&
                     (movementInfo.GetMovementFlags() & (MOVEFLAG_FALLINGFAR | MOVEFLAG_PENDINGSTOP))==0) ||
-                    (Anti__MapZ < GetPlayer()->GetPositionZ() && opcode==MSG_MOVE_JUMP) &&
-                    !GetPlayer()->HasAuraType(SPELL_AURA_FEATHER_FALL))
+                    (Anti__MapZ < GetPlayer()->GetPositionZ() && opcode==MSG_MOVE_JUMP))
             {
                 if (sWorld.GetMvAnticheatJumpCheck())
                     Anti__CheatOccurred(CurTime,"Possible Air Jump Hack",0.0f,LookupOpcodeName(opcode),0.0f,movementInfo.GetMovementFlags());
