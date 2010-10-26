@@ -2031,7 +2031,7 @@ void ObjectMgr::LoadItemPrototypes()
             if(proto->Flags & ITEM_FLAG_LOOTABLE)
             {
                 sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
-                const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
+                const_cast<ItemPrototype*>(proto)->Flags &= ~ITEM_FLAG_LOOTABLE;
             }
         }
 
@@ -2115,12 +2115,6 @@ void ObjectMgr::LoadItemPrototypes()
                     const_cast<ItemPrototype*>(proto)->Spells[1].SpellId = 0;
                     const_cast<ItemPrototype*>(proto)->Spells[1].SpellTrigger = ITEM_SPELLTRIGGER_ON_USE;
                 }
-                // ok case for spell_1 (and other)
-                else if(proto->Flags & ITEM_FLAG_LOOTABLE)
-                {
-                    sLog.outErrorDb("Item container (Entry: %u) has not allowed for spell learning items flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
-                    const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
-                }
             }
 
             // spell_3*,spell_4*,spell_5* is empty
@@ -2170,13 +2164,6 @@ void ObjectMgr::LoadItemPrototypes()
                     {
                         sLog.outErrorDb("Item (Entry: %u) has broken spell in spellid_%d (%u)",i,j+1,proto->Spells[j].SpellId);
                         const_cast<ItemPrototype*>(proto)->Spells[j].SpellId = 0;
-                    }
-                    // ok cast at use case 
-                    else if((proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || proto->Spells[j].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE) &&
-                        proto->Flags & ITEM_FLAG_LOOTABLE)
-                    {
-                        sLog.outErrorDb("Item container (Entry: %u) has not allowed for spell casting at use items flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
-                        const_cast<ItemPrototype*>(proto)->Flags |= ITEM_FLAG_LOOTABLE;
                     }
                 }
             }

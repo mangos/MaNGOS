@@ -717,7 +717,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
         bodyItem->SetText(m->body);
 
     bodyItem->SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid(HIGHGUID_PLAYER, m->sender));
-    bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_READBLE | ITEM_DYNFLAG_UNK15 | ITEM_DYNFLAG_UNK16);
+    bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_READABLE | ITEM_DYNFLAG_UNK15 | ITEM_DYNFLAG_UNK16);
 
 
     DETAIL_LOG("HandleMailCreateTextItem mailid=%u", mailId);
