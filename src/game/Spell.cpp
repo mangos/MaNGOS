@@ -6034,28 +6034,31 @@ SpellCastResult Spell::CheckItems()
         }
     }
 
-    // check target item
+    // check target item (for triggered case not report error)
     if(m_targets.getItemTargetGUID())
     {
         if(m_caster->GetTypeId() != TYPEID_PLAYER)
-            return SPELL_FAILED_BAD_TARGETS;
+            return m_IsTriggeredSpell && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+                ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_BAD_TARGETS;
 
         if(!m_targets.getItemTarget())
-            return SPELL_FAILED_ITEM_GONE;
+            return m_IsTriggeredSpell  && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+                ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ITEM_GONE;
 
         isVellumTarget = m_targets.getItemTarget()->GetProto()->IsVellum();
         if(!m_targets.getItemTarget()->IsFitToSpellRequirements(m_spellInfo))
-            return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+            return m_IsTriggeredSpell  && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+                ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_EQUIPPED_ITEM_CLASS;
 
             // Do not enchant vellum with scroll
         if(isVellumTarget && isScrollItem)
             return SPELL_FAILED_BAD_TARGETS;
     }
-    // if not item target then required item must be equipped
+    // if not item target then required item must be equipped (for triggered case not report error)
     else
     {
         if(m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->HasItemFitToSpellReqirements(m_spellInfo))
-            return SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_EQUIPPED_ITEM_CLASS;
     }
 
     // check spell focus object
