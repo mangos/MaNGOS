@@ -4238,10 +4238,10 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
                 case SUMMON_PROP_TYPE_PHASING:
                 case SUMMON_PROP_TYPE_LIGHTWELL:
                 case SUMMON_PROP_TYPE_REPAIR_BOT:
+                case SUMMON_PROP_TYPE_DRAKE_VEH:
                     DoSummonWild(eff_idx, summon_prop->FactionId);
                     break;
                 case SUMMON_PROP_TYPE_SIEGE_VEH:
-                case SUMMON_PROP_TYPE_DRAKE_VEH:
                     // TODO
                     // EffectSummonVehicle(i);
                     break;
