@@ -40,7 +40,8 @@ bool Player::UpdateStats(Stats stat)
 
     SetStat(stat, int32(value));
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_STAT, stat, false),false,false,false);
+    if (IsInWorld())
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_STAT, stat, false),false,false,false);
 
     switch(stat)
     {
@@ -96,8 +97,11 @@ void Player::ApplySpellPowerBonus(int32 amount, bool apply)
     for(int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
         ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS+i, amount, apply);;
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
+    if (IsInWorld())
+    {
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
+    }
 }
 
 void Player::UpdateSpellDamageAndHealingBonus()
@@ -384,9 +388,13 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
             UpdateDamagePhysical(OFF_ATTACK);
     }
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_DAMAGE, 0, false),false,false,false);
+
+    if (IsInWorld())
+    {
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_ATTACKPOWER, 0, false),false,false,false);
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLDAMAGE, 0, false),false,false,false);
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_DAMAGE, 0, false),false,false,false);
+    }
 }
 
 void Player::UpdateShieldBlockValue()
@@ -623,7 +631,8 @@ void Player::UpdateSpellHitChances()
     m_modSpellHitChance = GetTotalAuraModifier(SPELL_AURA_MOD_SPELL_HIT_CHANCE);
     m_modSpellHitChance+= GetRatingBonusValue(CR_HIT_SPELL);
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLHIT, 0, false),false,false,false);
+    if (IsInWorld())
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_SPELLHIT, 0, false),false,false,false);
 }
 
 void Player::UpdateAllSpellCritChances()
@@ -662,7 +671,8 @@ void Player::UpdateExpertise(WeaponAttackType attack)
         default: break;
     }
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_EXPERTIZE, 0, false),false,false,false);
+    if (IsInWorld())
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_EXPERTIZE, 0, false),false,false,false);
 }
 
 void Player::UpdateArmorPenetration()
@@ -725,7 +735,8 @@ void Player::UpdateManaRegen()
 
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, power_regen_mp5 + power_regen);
 
-    CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_POWERREGEN, 0, false),false,false,false);
+    if (IsInWorld())
+        CallForAllControlledUnits(ApplyScalingBonusWithHelper(SCALING_TARGET_POWERREGEN, 0, false),false,false,false);
 }
 
 void Player::_ApplyAllStatBonuses()
