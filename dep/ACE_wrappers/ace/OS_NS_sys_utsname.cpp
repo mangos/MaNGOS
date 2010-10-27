@@ -1,8 +1,8 @@
-// $Id: OS_NS_sys_utsname.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_sys_utsname.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/OS_NS_sys_utsname.h"
 
-ACE_RCSID(ace, OS_NS_sys_utsname, "$Id: OS_NS_sys_utsname.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdio.h"
@@ -58,7 +58,7 @@ ACE_OS::uname (ACE_utsname *name)
       )
     {
       // Get information from the two structures
-      const char *os;
+      const char *os = 0;
       if (vinfo.dwPlatformId == VER_PLATFORM_WIN32_NT)
         os = "Windows NT %d.%d";
       else
@@ -77,7 +77,7 @@ ACE_OS::uname (ACE_utsname *name)
       // half the space to the processor and half the space to
       // subtype.  The -1 is necessary for because of the space
       // between processor and subtype in the machine name.
-      const int bufsize = (sizeof (name->machine) / 2) - 1;
+      int const bufsize = (sizeof (name->machine) / 2) - 1;
       char processor[bufsize] = "Unknown";
       char subtype[bufsize] = "Unknown";
 
@@ -101,10 +101,17 @@ ACE_OS::uname (ACE_utsname *name)
             ACE_OS::strcpy (subtype, "Pentium Pro");
           else if (sinfo.wProcessorLevel == 7)  // I'm guessing here
             ACE_OS::strcpy (subtype, "Pentium II");
+          else
+            ACE_OS::sprintf (subtype, "%d", sinfo.wProcessorLevel);
           break;
         case PROCESSOR_ARCHITECTURE_MIPS:
           ACE_OS::strcpy (processor, "MIPS");
-          ACE_OS::strcpy (subtype, "R4000");
+          if (sinfo.wProcessorLevel == 3)
+            ACE_OS::strcpy (subtype, "R3000");
+          else if (sinfo.wProcessorLevel == 4)
+            ACE_OS::strcpy (subtype, "R4000");
+          else
+            ACE_OS::sprintf (subtype, "%d", sinfo.wProcessorLevel);
           break;
         case PROCESSOR_ARCHITECTURE_ALPHA:
           ACE_OS::strcpy (processor, "Alpha");
@@ -213,7 +220,7 @@ ACE_OS::uname (ACE_utsname *name)
 # endif /* ACE_LACKS_HOSTNAME */
 
 #elif defined (ACE_VXWORKS)
-  size_t maxnamelen = sizeof name->nodename;
+  size_t const maxnamelen = sizeof name->nodename;
   ACE_OS::strcpy (name->sysname, "VxWorks");
   ACE_OS::strcpy (name->release, kernelVersion());
   ACE_OS::strcpy (name->version, sysBspRev ());

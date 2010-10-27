@@ -1,4 +1,4 @@
-// $Id: Timer_Wheel_T.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Timer_Wheel_T.cpp 89254 2010-02-25 22:10:39Z cleeland $
 
 #ifndef ACE_TIMER_WHEEL_T_CPP
 #define ACE_TIMER_WHEEL_T_CPP
@@ -148,7 +148,7 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK>::open_i
 
   this->free_list_->resize (prealloc + this->spoke_count_);
 
-  this->wheel_time_.msec (1 << (this->res_bits_ + this->spoke_bits_));
+  this->wheel_time_.msec (1 << (this->res_bits_));
 
   ACE_NEW (this->spokes_, ACE_Timer_Node_T<TYPE>* [this->spoke_count_]);
 
@@ -699,7 +699,7 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK>::dump (void) const
   ACE_DEBUG ((LM_DEBUG,
     ACE_TEXT ("\nresolution_ = %d"), 1 << this->res_bits_));
   ACE_DEBUG ((LM_DEBUG,
-    ACE_TEXT ("\nwheel_ = \n")));
+    ACE_TEXT ("\nwheel_ =\n")));
 
   for (u_int i = 0; i < this->spoke_count_; ++i)
     {
@@ -834,10 +834,7 @@ ACE_Timer_Wheel_T<TYPE, FUNCTOR, ACE_LOCK>::expire (const ACE_Time_Value& cur_ti
         {
           // Make sure that we skip past values that have already
           // "expired".
-          do
-            n->set_timer_value (n->get_timer_value () +
-                                n->get_interval ());
-          while (n->get_timer_value () <= cur_time);
+          this->recompute_next_abs_interval_time (n, cur_time);
 
           this->reschedule (n);
         }

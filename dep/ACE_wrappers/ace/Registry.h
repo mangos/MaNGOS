@@ -4,7 +4,7 @@
 /**
  *  @file    Registry.h
  *
- *  $Id: Registry.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Registry.h 85110 2009-04-20 09:18:43Z msmit $
  *
  *  @author Irfan Pyarali (irfan@cs.wustl.edu)
  */
@@ -460,7 +460,10 @@ public:
       {
       public:
         /// Constructor
-        Iteration_State ();
+        Iteration_State (void);
+
+        /// Destructor
+        virtual ~Iteration_State (void);
 
         /// Set the iterator reference.
         void iterator (Binding_Iterator *iterator);

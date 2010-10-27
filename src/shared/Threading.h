@@ -26,7 +26,6 @@
 
 namespace ACE_Based
 {
-
     class Runnable
     {
         public:
@@ -40,7 +39,7 @@ namespace ACE_Based
                     delete this;
             }
         private:
-            ACE_Atomic_Op<ACE_Thread_Mutex, int> m_refs;
+            ACE_Atomic_Op<ACE_Thread_Mutex, long> m_refs;
     };
 
     enum Priority
@@ -103,6 +102,5 @@ namespace ACE_Based
             //use this object to determine current OS thread priority values mapped to enum Priority{}
             static ThreadPriority m_TpEnum;
     };
-
 }
 #endif

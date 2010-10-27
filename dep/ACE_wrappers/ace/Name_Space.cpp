@@ -1,11 +1,11 @@
 // Name_Space.cpp
-// $Id: Name_Space.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Name_Space.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Name_Space.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_stdlib.h"
 
-ACE_RCSID(ace, Name_Space, "$Id: Name_Space.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -42,7 +42,7 @@ ACE_Name_Binding::ACE_Name_Binding (const ACE_Name_Binding &s)
   ACE_TRACE ("ACE_Name_Binding::ACE_Name_Binding");
 }
 
-void
+const ACE_Name_Binding&
 ACE_Name_Binding::operator = (const ACE_Name_Binding &s)
 {
   ACE_TRACE ("ACE_Name_Binding::operator =");
@@ -54,6 +54,8 @@ ACE_Name_Binding::operator = (const ACE_Name_Binding &s)
       this->value_ = s.value_;
       this->type_ = ACE_OS::strdup (s.type_);
     }
+
+  return *this;
 }
 
 bool

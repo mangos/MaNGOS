@@ -4,7 +4,7 @@
 /**
  *  @file    Condition_Recursive_Thread_Mutex.h
  *
- *  $Id: Condition_Recursive_Thread_Mutex.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Condition_Recursive_Thread_Mutex.h 86731 2009-09-17 12:23:48Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -32,8 +32,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 template <class ACE_LOCK> class ACE_Condition;
 
 /**
- * @class ACE_Condition<ACE_Recursive_Thread_Mutex>
- *
  * @brief ACE_Condition template specialization written using
  *  @a ACE_Recursive_Thread_Mutex.  This allows threads to block until
  *  shared data changes state using recursive mutexes.
@@ -57,7 +55,7 @@ public:
 
   /**
    * Block on condition, or until absolute time-of-day has passed.  If
-   * abstime == 0 use "blocking" <wait> semantics.  Else, if <abstime>
+   * abstime == 0 use "blocking" <wait> semantics.  Else, if @a abstime
    * != 0 and the call times out before the condition is signaled
    * <wait> returns -1 and sets errno to ETIME.
    */

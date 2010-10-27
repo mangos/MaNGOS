@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_string.h
  *
- *  $Id: OS_NS_string.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_string.h 87481 2009-11-11 11:46:10Z olli $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -183,11 +183,9 @@ namespace ACE_OS {
   wchar_t *strecpy (wchar_t *s, const wchar_t *t);
 #endif /* ACE_HAS_WCHAR */
 
-  /*
-  ** Returns a system error message. If the supplied errnum is out of range,
-  ** a string of the form "Unknown error %d" is used to format the string
-  ** whose pointer is returned and errno is set to EINVAL.
-  */
+  /// Returns a system error message. If the supplied errnum is out of range,
+  /// a string of the form "Unknown error %d" is used to format the string
+  /// whose pointer is returned and errno is set to EINVAL.
   extern ACE_Export
   char *strerror (int errnum);
 
@@ -196,6 +194,14 @@ namespace ACE_OS {
   extern ACE_Export
   char *strerror_emulation (int errnum);
 #endif /* ACE_LACKS_STRERROR */
+
+
+  /// Returns a string describing the signal number passed in the
+  /// argument signum. If the supplied signal number is out of range,
+  /// a string of the form "Unknown signal %d" is used to format the string
+  /// whose pointer is returned.
+  extern ACE_Export
+  char *strsignal (int signum);
 
   /// Finds the length of a string (char version).
   ACE_NAMESPACE_INLINE_FUNCTION

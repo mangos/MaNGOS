@@ -1,4 +1,4 @@
-// $Id: LSOCK_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: LSOCK_Acceptor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/LSOCK_Acceptor.h"
 
@@ -8,7 +8,7 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_sys_socket.h"
 
-ACE_RCSID(ace, LSOCK_Acceptor, "$Id: LSOCK_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -84,8 +84,8 @@ int
 ACE_LSOCK_Acceptor::accept (ACE_LSOCK_Stream &new_stream,
                             ACE_Addr *remote_addr,
                             ACE_Time_Value *timeout,
-                            int restart,
-                            int reset_new_handle) const
+                            bool restart,
+                            bool reset_new_handle) const
 {
   ACE_TRACE ("ACE_LSOCK_Acceptor::accept");
 

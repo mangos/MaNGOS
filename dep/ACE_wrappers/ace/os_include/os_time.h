@@ -6,7 +6,7 @@
  *
  *  time types
  *
- *  $Id: os_time.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_time.h 87270 2009-10-29 21:47:47Z olli $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -80,10 +80,6 @@ typedef struct timespec timespec_t;
 extern "C"
 {
 #endif /* __cplusplus */
-
-#if defined (ACE_HAS_BROKEN_CTIME)
-#  undef ctime
-#endif /* ACE_HAS_BROKEN_CTIME */
 
 // There are a lot of threads-related macro definitions in the config files.
 // They came in at different times and from different places and platform

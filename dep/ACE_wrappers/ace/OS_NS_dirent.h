@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_dirent.h
  *
- *  $Id: OS_NS_dirent.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_dirent.h 85435 2009-05-25 18:52:50Z coryan $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>

@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_stdio.inl 82444 2008-07-28 13:33:07Z johnnyw $
+// $Id: OS_NS_stdio.inl 87232 2009-10-26 13:25:55Z johnnyw $
 
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_stdlib.h"
@@ -135,11 +135,11 @@ ACE_OS::flock_unlock (ACE_OS::ace_flock_t *lock,
   DWORD low_len = ACE_LOW_PART (len);
   DWORD high_len = ACE_HIGH_PART (len);
   ACE_WIN32CALL_RETURN (
-    ACE_ADAPT_RETVAL (::UnlockFile (lock->handle_,
-                                    lock->overlapped_.Offset,
-                                    lock->overlapped_.OffsetHigh,
-                                    low_len,
-                                    high_len),
+    ACE_ADAPT_RETVAL (::UnlockFileEx (lock->handle_,
+                                      0,
+                                      low_len,
+                                      high_len,
+                                      &lock->overlapped_),
                       ace_result_), int, -1);
 #else
   lock->lock_.l_whence = whence;
@@ -365,12 +365,12 @@ ACE_OS::cuserid (char *user, size_t maxlen)
       ::remCurIdGet (user, 0);
       return user;
     }
-#elif defined (__QNXNTO__) || defined (ACE_HAS_PHARLAP) || defined (ACE_HAS_WINCE)
+#elif defined (ACE_HAS_PHARLAP) || defined (ACE_HAS_WINCE)
   ACE_UNUSED_ARG (user);
   ACE_UNUSED_ARG (maxlen);
   ACE_NOTSUP_RETURN (0);
 #elif defined (ACE_WIN32)
-  BOOL result = GetUserNameA (user, (u_long *) &maxlen);
+  BOOL const result = GetUserNameA (user, (u_long *) &maxlen);
   if (result == FALSE)
     ACE_FAIL_RETURN (0);
   else
@@ -461,7 +461,7 @@ ACE_OS::cuserid (wchar_t *user, size_t maxlen)
   ACE_UNUSED_ARG (maxlen);
   ACE_NOTSUP_RETURN (0);
 # elif defined (ACE_WIN32)
-  BOOL result = GetUserNameW (user, (u_long *) &maxlen);
+  BOOL const result = GetUserNameW (user, (u_long *) &maxlen);
   if (result == FALSE)
     ACE_FAIL_RETURN (0);
   else
@@ -498,9 +498,15 @@ ACE_OS::fdopen (ACE_HANDLE handle, const ACE_TCHAR *mode)
 {
   ACE_OS_TRACE ("ACE_OS::fdopen");
 #if defined (ACE_HAS_WINCE)
+# if defined (ACE_HAS_NONCONST_WFDOPEN)
+  ACE_OSCALL_RETURN (::_wfdopen ((int)handle, const_cast <ACE_TCHAR*> (ACE_TEXT_ALWAYS_WCHAR (mode))),
+                     FILE*,
+                     0);
+# else
   ACE_OSCALL_RETURN (::_wfdopen (handle, ACE_TEXT_ALWAYS_WCHAR (mode)),
                      FILE*,
                      0);
+# endif
 #elif defined (ACE_WIN32)
   // kernel file handle -> FILE* conversion...
   // Options: _O_APPEND, _O_RDONLY and _O_TEXT are lost
@@ -511,15 +517,11 @@ ACE_OS::fdopen (ACE_HANDLE handle, const ACE_TCHAR *mode)
 
   if (crt_handle != -1)
     {
-#   if defined(ACE_HAS_NONCONST_FDOPEN) && !defined (ACE_USES_WCHAR)
-      file = ::_fdopen (crt_handle, const_cast<ACE_TCHAR *> (mode));
-#   elif defined (ACE_HAS_NONCONST_FDOPEN) && defined (ACE_USES_WCHAR)
-      file = ::_wfdopen (crt_handle, const_cast<ACE_TCHAR *> (mode));
-#   elif defined (ACE_USES_WCHAR)
+#   if defined (ACE_USES_WCHAR)
       file = ::_wfdopen (crt_handle, mode);
 #   else
       file = ::_fdopen (crt_handle, mode);
-#   endif /* ACE_HAS_NONCONST_FDOPEN */
+#   endif /* ACE_USES_WCHAR */
 
       if (!file)
         {
@@ -542,14 +544,6 @@ ACE_INLINE int
 ACE_OS::fflush (FILE *fp)
 {
   ACE_OS_TRACE ("ACE_OS::fflush");
-#if defined (ACE_VXWORKS)
-  if (fp == 0)
-    {
-      // Do not allow fflush(0) on VxWorks
-      return 0;
-    }
-#endif /* ACE_VXWORKS */
-
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::fflush (fp), int, -1);
 }
 
@@ -587,14 +581,23 @@ ACE_OS::fgets (wchar_t *buf, int size, FILE *fp)
 }
 #endif /* ACE_HAS_WCHAR && !ACE_LACKS_FGETWS */
 
+ACE_INLINE ACE_HANDLE
+ACE_OS::fileno (FILE *stream)
+{
+#if defined ACE_FILENO_EQUIVALENT
+  return (ACE_HANDLE)ACE_FILENO_EQUIVALENT (stream);
+#else
+  return ace_fileno_helper (stream);
+#endif
+}
+
 #if !(defined (ACE_WIN32) && !defined (ACE_HAS_WINCE))
 // Win32 PC implementation of fopen () is in OS_NS_stdio.cpp.
 ACE_INLINE FILE *
 ACE_OS::fopen (const char *filename, const char *mode)
 {
   ACE_OS_TRACE ("ACE_OS::fopen");
-  ACE_OSCALL_RETURN
-    (::fopen (filename, mode), FILE *, 0);
+  ACE_OSCALL_RETURN (::fopen (filename, mode), FILE *, 0);
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -604,17 +607,16 @@ ACE_OS::fopen (const char *filename, const wchar_t *mode)
 {
   ACE_OS_TRACE ("ACE_OS::fopen");
   ACE_Wide_To_Ascii n_mode (mode);
-  ACE_OSCALL_RETURN
-    (::fopen (filename, n_mode.char_rep ()), FILE *, 0);
+  ACE_OSCALL_RETURN (::fopen (filename, n_mode.char_rep ()), FILE *, 0);
 }
+
 // Win32 PC implementation of fopen () is in OS_NS_stdio.cpp.
 ACE_INLINE FILE *
 ACE_OS::fopen (const wchar_t *filename, const wchar_t *mode)
 {
   ACE_OS_TRACE ("ACE_OS::fopen");
 #if defined (ACE_HAS_WINCE)
-  ACE_OSCALL_RETURN
-    (::_wfopen (filename, mode), FILE *, 0);
+  ACE_OSCALL_RETURN (::_wfopen (filename, mode), FILE *, 0);
 #else
   // Non-Windows doesn't use wchar_t file systems.
   ACE_Wide_To_Ascii n_filename (filename);
@@ -690,7 +692,7 @@ ACE_INLINE FILE *
 ACE_OS::freopen (const ACE_TCHAR *filename, const ACE_TCHAR *mode, FILE* stream)
 {
   ACE_OS_TRACE ("ACE_OS::freopen");
-#if defined (ACE_WIN32) && (defined(ACE_USES_WCHAR) || defined(ACE_HAS_WINCE))
+#if defined (ACE_WIN32) && defined(ACE_USES_WCHAR)
   ACE_OSCALL_RETURN (::_wfreopen (ACE_TEXT_ALWAYS_WCHAR (filename),
                                   ACE_TEXT_ALWAYS_WCHAR (mode),
                                   stream),
@@ -774,7 +776,7 @@ ACE_OS::perror (const wchar_t *s)
 #else
   ACE_Wide_To_Ascii n_s (s);
   ::perror (n_s.char_rep ());
-#endif /* ACE_HAS_WINCE */
+#endif /* ACE_LACKS_PERROR */
 }
 #endif /* ACE_HAS_WCHAR */
 
@@ -813,8 +815,8 @@ ACE_OS::rename (const char *old_name,
 # elif defined (ACE_HAS_WINCE)
   // Win CE is always wide-char.
   ACE_UNUSED_ARG (flags);
-  if (0 != MoveFile (ACE_TEXT_CHAR_TO_TCHAR (old_name),
-                     ACE_TEXT_CHAR_TO_TCHAR (new_name)))
+  if (0 == ::MoveFile (ACE_TEXT_CHAR_TO_TCHAR (old_name),
+                       ACE_TEXT_CHAR_TO_TCHAR (new_name)))
     ACE_FAIL_RETURN (-1);
   return 0;
 # elif defined (ACE_WIN32) && !defined (ACE_LACKS_WIN32_MOVEFILEEX)
@@ -846,7 +848,7 @@ ACE_OS::rename (const wchar_t *old_name,
   ACE_NOTSUP_RETURN (-1);
 # elif defined (ACE_HAS_WINCE)
   ACE_UNUSED_ARG (flags);
-  if (MoveFileW (old_name, new_name) != 0)
+  if (::MoveFileW (old_name, new_name) == 0)
     ACE_FAIL_RETURN (-1);
   return 0;
 # elif defined (ACE_WIN32) && !defined (ACE_LACKS_WIN32_MOVEFILEEX)
@@ -879,7 +881,7 @@ ACE_OS::rewind (FILE *fp)
 #else
   // This isn't perfect since it doesn't reset EOF, but it's probably
   // the closest we can get on WINCE.
-  (void) fseek (fp, 0L, SEEK_SET);
+  (void) ::fseek (fp, 0L, SEEK_SET);
 #endif /* ACE_HAS_WINCE */
 }
 
@@ -912,7 +914,7 @@ ACE_OS::tempnam (const wchar_t *dir, const wchar_t *pfx)
   ACE_OSCALL_RETURN (::_wtempnam (const_cast <wchar_t*> (dir), const_cast <wchar_t*> (pfx)), wchar_t *, 0);
 #  else
   ACE_OSCALL_RETURN (::_wtempnam (dir, pfx), wchar_t *, 0);
-#  endif /* __BORLANDC__ */
+#  endif /* ACE_HAS_NONCONST_TEMPNAM */
 #else /* ACE_LACKS_TEMPNAM */
   // No native wide-char support; convert to narrow and call the char* variant.
   char *ndir = ACE_Wide_To_Ascii (dir).char_rep ();
@@ -1011,8 +1013,10 @@ ACE_OS::vsprintf (wchar_t *buffer, const wchar_t *format, va_list argptr)
 # if (defined _XOPEN_SOURCE && (_XOPEN_SOURCE - 0) >= 500) || \
      (defined (sun) && !(defined(_XOPEN_SOURCE) && (_XOPEN_VERSION-0==4))) || \
       defined (ACE_HAS_DINKUM_STL) || defined (__DMC__) || \
-      defined (ACE_HAS_VSWPRINTF) || defined (ACE_WIN32_VC9) || \
-     (defined (ACE_WIN32_VC8) && !defined (ACE_HAS_WINCE) && \
+      defined (ACE_HAS_VSWPRINTF) || \
+      (defined (ACE_WIN32_VC10) && !defined (ACE_HAS_WINCE)) || \
+      (defined (ACE_WIN32_VC9) && !defined (ACE_HAS_WINCE)) || \
+      (defined (ACE_WIN32_VC8) && !defined (ACE_HAS_WINCE) && \
       _MSC_FULL_VER > 140050000)
 
   // The XPG4/UNIX98/C99 signature of the wide-char sprintf has a
@@ -1054,11 +1058,11 @@ ACE_OS::vsnprintf (char *buffer, size_t maxlen, const char *format, va_list ap)
   result = ::_vsnprintf (buffer, maxlen, format, ap);
 
   // Win32 doesn't regard a full buffer with no 0-terminate as an overrun.
-  if (result == static_cast<int> (maxlen))
+  if (result == static_cast<int> (maxlen) && maxlen > 0)
     buffer[maxlen-1] = '\0';
 
   // Win32 doesn't 0-terminate the string if it overruns maxlen.
-  if (result == -1)
+  if (result == -1 && maxlen > 0)
     buffer[maxlen-1] = '\0';
 # endif
   // In out-of-range conditions, C99 defines vsnprintf() to return the number
@@ -1102,25 +1106,23 @@ ACE_OS::vsnprintf (wchar_t *buffer, size_t maxlen, const wchar_t *format, va_lis
   result = ::_vsnwprintf (buffer, maxlen, format, ap);
 
   // Win32 doesn't regard a full buffer with no 0-terminate as an overrun.
-  if (result == static_cast<int> (maxlen))
+  if (result == static_cast<int> (maxlen) && maxlen > 0)
     buffer[maxlen-1] = '\0';
 
   // Win32 doesn't 0-terminate the string if it overruns maxlen.
-  if (result == -1)
+  if (result == -1 && maxlen > 0)
     buffer[maxlen-1] = '\0';
 # else
   result = vswprintf (buffer, maxlen, format, ap);
 #endif
 
-  // In out-of-range conditions, C99 defines vsnprintf() to return the number
-  // of characters that would have been written if enough space was available.
-  // Earlier variants of the vsnprintf() (e.g. UNIX98) defined it to return
-  // -1. This method follows the C99 standard, but needs to guess at the
-  // value; uses maxlen + 1.
+  // In out-of-range conditions, C99 defines vsnprintf() to return the
+  // number of characters that would have been written if enough space
+  // was available.  Earlier variants of the vsnprintf() (e.g. UNIX98)
+  // defined it to return -1. This method follows the C99 standard,
+  // but needs to guess at the value; uses maxlen + 1.
   if (result == -1)
-    {
-      result = static_cast <int> (maxlen + 1);
-    }
+    result = static_cast <int> (maxlen + 1);
 
   return result;
 

@@ -1,4 +1,4 @@
-// $Id: Unbounded_Queue.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Unbounded_Queue.cpp 82723 2008-09-16 09:35:44Z johnnyw $
 
 #ifndef ACE_UNBOUNDED_QUEUE_CPP
 #define ACE_UNBOUNDED_QUEUE_CPP
@@ -154,7 +154,6 @@ ACE_Unbounded_Queue<T>::~ACE_Unbounded_Queue (void)
                          this->allocator_->free,
                          ACE_Node,
                          <T>);
-  this->head_ = 0;
 }
 
 template <class T> int

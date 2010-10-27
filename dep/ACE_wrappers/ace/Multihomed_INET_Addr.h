@@ -4,7 +4,7 @@
 /**
  *  @file    Multihomed_INET_Addr.h
  *
- *  $Id: Multihomed_INET_Addr.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Multihomed_INET_Addr.h 84325 2009-02-04 22:46:30Z shuston $
  *
  *  @author Edward R. Mulholland <emulholl@atl.lmco.com>
  */
@@ -61,11 +61,11 @@ public:
    * AF_INET6. To specify IPv4, use AF_INET.
    */
     ACE_Multihomed_INET_Addr(u_short port_number,
-                           const char primary_host_name[],
-                           int encode = 1,
-                           int address_family = AF_UNSPEC,
-                           const char *(secondary_host_names[]) = 0,
-                           size_t size = 0);
+                             const char primary_host_name[],
+                             int encode = 1,
+                             int address_family = AF_UNSPEC,
+                             const char *(secondary_host_names[]) = 0,
+                             size_t size = 0);
 
   /**
    * Constructs an ACE_Multihomed_INET_Addr from a @a port_number,
@@ -91,6 +91,7 @@ public:
                            int address_family = AF_UNSPEC,
                            const wchar_t *(secondary_host_names[]) = 0,
                            size_t size = 0);
+
   int set (u_short port_number,
            const wchar_t primary_host_name[],
            int encode = 1,

@@ -1,4 +1,4 @@
-// $Id: Message_Queue_T.cpp 82574 2008-08-08 19:35:06Z parsons $
+// $Id: Message_Queue_T.cpp 91016 2010-07-06 11:29:50Z johnnyw $
 
 #ifndef ACE_MESSAGE_QUEUE_T_CPP
 #define ACE_MESSAGE_QUEUE_T_CPP
@@ -8,6 +8,10 @@
 #include "ace/Message_Queue.h"
 #include "ace/Log_Msg.h"
 #include "ace/OS_NS_sys_time.h"
+
+#if defined (ACE_HAS_WIN32_OVERLAPPED_IO)
+#include "ace/Message_Queue_NT.h"
+#endif /* ACE_HAS_WIN32_OVERLAPPED_IO */
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
@@ -56,13 +60,13 @@ ACE_Message_Queue_Ex<ACE_MESSAGE_TYPE, ACE_SYNCH_USE>::message_length (size_t ne
 }
 
 template <class ACE_MESSAGE_TYPE, ACE_SYNCH_DECL>
-ACE_Message_Queue_Ex<ACE_MESSAGE_TYPE, ACE_SYNCH_USE>::ACE_Message_Queue_Ex (size_t hwm,
-                                                                             size_t lwm,
+ACE_Message_Queue_Ex<ACE_MESSAGE_TYPE, ACE_SYNCH_USE>::ACE_Message_Queue_Ex (size_t high_water_mark,
+                                                                             size_t low_water_mark,
                                                                              ACE_Notification_Strategy *ns)
 {
   ACE_TRACE ("ACE_Message_Queue_Ex<ACE_MESSAGE_TYPE, ACE_SYNCH_USE>::ACE_Message_Queue_Ex");
 
-  if (this->queue_.open (hwm, lwm, ns) == -1)
+  if (this->queue_.open (high_water_mark, low_water_mark, ns) == -1)
     ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("ACE_Message_Queue_Ex")));
 }
@@ -981,9 +985,9 @@ ACE_Message_Queue<ACE_SYNCH_USE>::dump (void) const
               this->cur_count_,
               this->head_,
               this->tail_));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("not_full_cond: \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("not_full_cond:\n")));
   not_full_cond_.dump ();
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("not_empty_cond: \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("not_empty_cond:\n")));
   not_empty_cond_.dump ();
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
@@ -1028,12 +1032,12 @@ ACE_Message_Queue<ACE_SYNCH_USE>::ACE_Message_Queue (size_t hwm,
   char pid_buf[sizeof (int) + 1];
   ACE_OS::sprintf (pid_buf, "%d", ACE_OS::getpid ());
   pid_buf[sizeof (int)] = '\0';
-  
+
   const int addr_nibbles = 2 * sizeof (ptrdiff_t);
   char addr_buf[addr_nibbles + 1];
   ACE_OS::sprintf (addr_buf, "%p", this);
   addr_buf[addr_nibbles] = '\0';
-  
+
   ACE_CString name_str ("Message_Queue_");
   name_str += pid_buf;
   name_str += '_';
@@ -1138,6 +1142,7 @@ ACE_Message_Queue<ACE_SYNCH_USE>::deactivate_i (int pulse)
       else
         this->state_ = ACE_Message_Queue_Base::DEACTIVATED;
     }
+
   return previous_state;
 }
 
@@ -1168,12 +1173,12 @@ ACE_Message_Queue<ACE_SYNCH_USE>::close (void)
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::close");
   ACE_GUARD_RETURN (ACE_SYNCH_MUTEX_T, ace_mon, this->lock_, -1);
 
-  int const result = this->deactivate_i ();
+  // There's no need to check the return value of deactivate_i() since
+  // it never fails!
+  this->deactivate_i ();
 
   // Free up the remaining messages on the queue.
-  this->flush_i ();
-
-  return result;
+  return this->flush_i ();
 }
 
 template <ACE_SYNCH_DECL> int
@@ -1764,6 +1769,7 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_head (ACE_Message_Block *new_item,
 {
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_head");
   int queue_count = 0;
+  ACE_Notification_Strategy *notifier = 0;
   {
     ACE_GUARD_RETURN (ACE_SYNCH_MUTEX_T, ace_mon, this->lock_, -1);
 
@@ -1777,12 +1783,17 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_head (ACE_Message_Block *new_item,
       return -1;
 
     queue_count = this->enqueue_head_i (new_item);
-
     if (queue_count == -1)
       return -1;
 
-    this->notify ();
+#if defined (ACE_HAS_MONITOR_POINTS) && (ACE_HAS_MONITOR_POINTS == 1)
+    this->monitor_->receive (this->cur_length_);
+#endif
+    notifier = this->notification_strategy_;
   }
+
+  if (0 != notifier)
+    notifier->notify();
   return queue_count;
 }
 
@@ -1796,6 +1807,7 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_prio (ACE_Message_Block *new_item,
 {
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_prio");
   int queue_count = 0;
+  ACE_Notification_Strategy *notifier = 0;
   {
     ACE_GUARD_RETURN (ACE_SYNCH_MUTEX_T, ace_mon, this->lock_, -1);
 
@@ -1813,8 +1825,13 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_prio (ACE_Message_Block *new_item,
     if (queue_count == -1)
       return -1;
 
-    this->notify ();
+#if defined (ACE_HAS_MONITOR_POINTS) && (ACE_HAS_MONITOR_POINTS == 1)
+    this->monitor_->receive (this->cur_length_);
+#endif
+    notifier = this->notification_strategy_;
   }
+  if (0 != notifier)
+    notifier->notify ();
   return queue_count;
 }
 
@@ -1828,6 +1845,7 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_deadline (ACE_Message_Block *new_item,
 {
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_deadline");
   int queue_count = 0;
+  ACE_Notification_Strategy *notifier = 0;
   {
     ACE_GUARD_RETURN (ACE_SYNCH_MUTEX_T, ace_mon, this->lock_, -1);
 
@@ -1845,8 +1863,13 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_deadline (ACE_Message_Block *new_item,
     if (queue_count == -1)
       return -1;
 
-    this->notify ();
+#if defined (ACE_HAS_MONITOR_POINTS) && (ACE_HAS_MONITOR_POINTS == 1)
+    this->monitor_->receive (this->cur_length_);
+#endif
+    notifier = this->notification_strategy_;
   }
+  if (0 != notifier)
+    notifier->notify ();
   return queue_count;
 }
 
@@ -1867,6 +1890,7 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_tail (ACE_Message_Block *new_item,
 {
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_tail");
   int queue_count = 0;
+  ACE_Notification_Strategy *notifier = 0;
   {
     ACE_GUARD_RETURN (ACE_SYNCH_MUTEX_T, ace_mon, this->lock_, -1);
 
@@ -1884,8 +1908,13 @@ ACE_Message_Queue<ACE_SYNCH_USE>::enqueue_tail (ACE_Message_Block *new_item,
     if (queue_count == -1)
       return -1;
 
-    this->notify ();
+#if defined (ACE_HAS_MONITOR_POINTS) && (ACE_HAS_MONITOR_POINTS == 1)
+    this->monitor_->receive (this->cur_length_);
+#endif
+    notifier = this->notification_strategy_;
   }
+  if (0 != notifier)
+    notifier->notify ();
   return queue_count;
 }
 
@@ -1985,10 +2014,6 @@ template <ACE_SYNCH_DECL> int
 ACE_Message_Queue<ACE_SYNCH_USE>::notify (void)
 {
   ACE_TRACE ("ACE_Message_Queue<ACE_SYNCH_USE>::notify");
-
-#if defined (ACE_HAS_MONITOR_POINTS) && (ACE_HAS_MONITOR_POINTS == 1)
-  this->monitor_->receive (this->cur_length_);
-#endif
 
   // By default, don't do anything.
   if (this->notification_strategy_ == 0)
@@ -2212,7 +2237,7 @@ ACE_Dynamic_Message_Queue<ACE_SYNCH_USE>::dump (void) const
   ACE_TRACE ("ACE_Dynamic_Message_Queue<ACE_SYNCH_USE>::dump");
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
 
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Message_Queue<ACE_SYNCH_USE> (base class): \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("ACE_Message_Queue<ACE_SYNCH_USE> (base class):\n")));
   this->ACE_Message_Queue<ACE_SYNCH_USE>::dump ();
 
   ACE_DEBUG ((LM_DEBUG,
@@ -2229,7 +2254,7 @@ ACE_Dynamic_Message_Queue<ACE_SYNCH_USE>::dump (void) const
               this->beyond_late_head_,
               this->beyond_late_tail_));
 
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("message_strategy_ : \n")));
+  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("message_strategy_ :\n")));
   message_strategy_.dump ();
 
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
@@ -2255,7 +2280,7 @@ ACE_Dynamic_Message_Queue<ACE_SYNCH_USE>::enqueue_i (ACE_Message_Block *new_item
   // Refresh priority status boundaries in the queue.
 
   result = this->refresh_queue (current_time);
-  
+
   if (result < 0)
     {
       return result;
@@ -2928,6 +2953,7 @@ ACE_Message_Queue_Factory<ACE_SYNCH_USE>::create_laxity_message_queue (size_t hw
 // <ACE_Dynamic_Message_Queue>.
 
 #if defined (ACE_VXWORKS)
+  // factory method for a wrapped VxWorks message queue
 
 template <ACE_SYNCH_DECL>
 ACE_Message_Queue_Vx *
@@ -2942,7 +2968,7 @@ ACE_Message_Queue_Factory<ACE_SYNCH_USE>::create_Vx_message_queue (size_t max_me
                   0);
   return tmp;
 }
-  // factory method for a wrapped VxWorks message queue
+#endif /* defined (ACE_VXWORKS) */
 
 #if defined (ACE_HAS_WIN32_OVERLAPPED_IO)
 
@@ -2953,13 +2979,12 @@ ACE_Message_Queue_Factory<ACE_SYNCH_USE>::create_NT_message_queue (size_t max_th
   ACE_Message_Queue_NT *tmp = 0;
 
   ACE_NEW_RETURN (tmp,
-                  ACE_Message_Queue_NT (max_threads);
+                  ACE_Message_Queue_NT (max_threads),
                   0);
   return tmp;
 }
 
 #endif /* ACE_HAS_WIN32_OVERLAPPED_IO */
-#endif /* defined (ACE_VXWORKS) */
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

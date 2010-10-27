@@ -4,7 +4,7 @@
 /**
  *  @file    Process_Mutex.h
  *
- *  $Id: Process_Mutex.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Process_Mutex.h 87179 2009-10-20 16:27:01Z shuston $
  *
  *   A wrapper for mutexes that can be used across processes on the
  *   same host machine, as well as within a process, of course.
@@ -46,36 +46,48 @@ class ACE_Time_Value;
  * @class ACE_Process_Mutex
  *
  * @brief A wrapper for mutexes that can be used across processes on
- * the same host machine, as well as within a process, of
- * course.
+ * the same host machine, as well as within a process, of course.
  *
  * @attention The mechanism upon which @c ACE_Process_Mutex is based
  * can be configured at build time to be either @c ACE_SV_Semaphore_Complex
- * (on platforms that support it) or @c ACE_Mutex. On platforms that
- * require interprocess mutexes be allocated from shared memory (Pthreads
- * and UI Threads are examples), @c ACE_SV_Semaphore_Complex provides a
- * more reliable mechanism for implementing inter-process mutex than
- * @c ACE_Mutex. However, at least on some platforms,
- * @c ACE_SV_Semaphore_Complex is limited to a small number of
- * objects by the underlying System V IPC kernel parameters. If you
- * want to force use of @c ACE_Mutex as the underlying mechanism, set
- * @c ACE_USES_MUTEX_FOR_PROCESS_MUTEX in your @c config.h file.
- * Also, if you require the ability to do a timed @c acquire(), you must
- * set @c ACE_USES_MUTEX_FOR_PROCESS_MUTEX, as timed acquire does not
- * work with System V semaphores.
- * @attention Currently there is also the operational difference between
- * pthreads and semaphores based @c. For semaphore base @c the semaphore
- * is destroyed after the last instance of @c in OS. In contrary, pthread based
- * @c is destroyed when the owner, namely the process which created the
- * first instance of @c destroys the mutex. For protable applications it is better
- * to always ensure that the owner of the mutex destroys it after the
- * other processes.
+ * (on platforms that support it) or @c ACE_Mutex. On platforms that offer
+ * System V IPC (the @c ACE_HAS_SYSV_IPC config macro is defined)
+ * @c ACE_SV_Semaphore_Complex is the default because it is more convenient
+ * and easy to use. @c ACE_Mutex is the default on all other platforms.
+ * On platforms where ACE_SV_Semaphore_Complex is used by default, the
+ * mechanism can be changed to ACE_Mutex when ACE is built by adding
+ * @code
+ *   #define ACE_USES_MUTEX_FOR_PROCESS_MUTEX
+ * @endcode
+ * to your @c config.h file.
+ * @par
+ * Consider these tradeoffs when evaluating whether or not to change
+ * the default:
+ *   - Some platforms (e.g., Pthreads and UI Threads) require interprocess
+ *     mutexes to be allocated from shared memory. On these platforms, using
+ *     ACE_Mutex as the underlying mechanism requires that ACE_Process_Mutex
+ *     objects be allocated in shared memory. Using ACE_SV_Semaphore_Complex
+ *     avoids this restriction.
+ *   - System V IPC kernel parameters have a low default limit on some
+ *     platforms. This would restrict the number of ACE_Process_Mutex objects
+ *     that can be in use simultaneously when using ACE_SV_Semaphore_Complex.
+ *   - If you require the ability to do a timed @c acquire(), you must
+ *     use ACE_Mutex as the underlying mechanism because timed acquire does not
+ *     work with System V semaphores.
+ *   - When using ACE_Mutex on a Pthreads-based platform, an ACE_Process_Mutex
+ *     object is deleted when the process which created the object destroys
+ *     it, regardless of whether or not there are other processes still
+ *     accessing the ACE_Process_Mutex. Using ACE_SV_Semaphore_Complex avoids
+ *     this problem; the semaphore is destroyed when the last use of the
+ *     object ends. For portable applications it is better to always ensure
+ *     that the owner of the mutex destroys it after all other processes have
+ *     stopped using it.
  */
 class ACE_Export ACE_Process_Mutex
 {
 public:
   /**
-   * Create a Process_Mutex, passing in the optional @c name.
+   * Create an ACE_Process_Mutex.
    *
    * @param name optional, null-terminated string containing the name of
    * the object. Multiple users of the same @c ACE_Process_Mutex must use
@@ -93,8 +105,7 @@ public:
 
 #if defined (ACE_HAS_WCHAR)
   /**
-   * Create a Process_Mutex, passing in the optional @c name. (@c wchar_t
-   * version)
+   * Create an ACE_Process_Mutex (@c wchar_t version)
    *
    * @param name optional, null-terminated string containing the name of
    * the object. Multiple users of the same @c ACE_Process_Mutex must use
@@ -111,6 +122,12 @@ public:
                      mode_t mode = ACE_DEFAULT_FILE_PERMS);
 #endif /* ACE_HAS_WCHAR */
 
+  /**
+   * Destructor.
+   *
+   * @note The destructor will not release an acquired mutex except
+   * on Windows.
+   */
   ~ACE_Process_Mutex (void);
 
   /**

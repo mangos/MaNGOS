@@ -6,7 +6,7 @@
  *
  *  standard library definitions
  *
- *  $Id: os_stdlib.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_stdlib.h 83948 2008-12-02 13:55:34Z jtc $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -66,8 +66,16 @@ extern "C"
 #endif /* ACE_LACKS_MKTEMP_PROTOTYPE */
 
 #if defined (ACE_LACKS_MKSTEMP_PROTOTYPE)
-  int mkstemp(char *);
+  int mkstemp (char *);
 #endif /* ACE_LACKS_MKSTEMP_PROTOTYPE */
+
+#if defined (ACE_LACKS_STRTOLL_PROTOTYPE)
+  long long strtoll (const char *, char **, int);
+#endif /* ACE_LACKS_STRTOLL_PROTOTYPE */
+
+#if defined (ACE_LACKS_STRTOULL_PROTOTYPE)
+  unsigned long long strtoull (const char *, char **, int);
+#endif /* ACE_LACKS_STRTOULL_PROTOTYPE */
 
 #ifdef __cplusplus
 }

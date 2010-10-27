@@ -264,11 +264,11 @@ void WorldSession::HandleLootOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: CMSG_LOOT");
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     // Check possible cheat
-    if(!_player->isAlive())
+    if (!_player->isAlive())
         return;
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
@@ -406,8 +406,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             ItemPrototype const* proto = pItem->GetProto();
 
             // destroy only 5 items from stack in case prospecting and milling
-            if( (proto->BagFamily & (BAG_FAMILY_MASK_MINING_SUPP|BAG_FAMILY_MASK_HERBS)) &&
-                proto->Class == ITEM_CLASS_TRADE_GOODS)
+            if ((proto->Flags & (ITEM_FLAG_PROSPECTABLE | ITEM_FLAG_MILLABLE)))
             {
                 pItem->m_lootGenerated = false;
                 pItem->loot.clear();

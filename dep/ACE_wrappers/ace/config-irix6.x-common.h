@@ -1,6 +1,6 @@
 /* -*- C++ -*- */
 //
-// $Id: config-irix6.x-common.h 81697 2008-05-14 18:33:11Z johnnyw $
+// $Id: config-irix6.x-common.h 87167 2009-10-19 19:33:53Z olli $
 //
 // This file contains the common configuration options for both
 // SGI/MIPSPro C++ and g++ under IRIX 6.X
@@ -119,9 +119,6 @@
 // Platform supports STREAMS.
 #define ACE_HAS_STREAMS
 
-// Compiler/platform supports strerror ().
-#define ACE_HAS_STRERROR
-
 // Compiler/platform supports struct strbuf.
 #define ACE_HAS_STRBUF_T
 
@@ -181,7 +178,7 @@
 #define ACE_LACKS_LINEBUFFERED_STREAMBUF
 #define ACE_LACKS_STDINT_H
 #define ACE_HAS_SYSENT_H
-#define ACE_HAS_SYSINFO
+#define ACE_HAS_SYSV_SYSINFO
 #define ACE_HAS_SYS_SYSTEMINFO_H
 
 // Platform has support for multi-byte character support compliant

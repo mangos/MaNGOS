@@ -6,7 +6,7 @@
  *
  *  standard type definitions
  *
- *  $Id: os_stddef.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_stddef.h 89759 2010-04-06 06:07:24Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -36,28 +36,6 @@ extern "C"
 {
 #endif /* __cplusplus */
 
-//FUZZ: disable check_for_NULL
-// NULL pointer constant
-#if defined (ACE_LACKS_NULL)
-#  undef NULL
-#  if defined(__cplusplus)
-#    define NULL 0
-#  else
-#    define NULL ((void *)0)
-#  endif
-#endif /* ACE_LACKS_NULL */
-//FUZZ: enable check_for_NULL
-
-/*
-  Integer constant expression of type size_t, the value of which is the offset
-  in bytes to the structure member (member-designator), from the beginning of
-  its structure (type).
-*/
-#if defined (ACE_LACKS_OFFSETOF)
-#  undef offsetof
-#  define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
-#endif /* ACE_LACKS_OFFSETOF */
-
 //  Signed integer type of the result of subtracting two pointers.
 #if defined (ACE_LACKS_PTRDIFF_T)
 #  if !defined (ACE_PTRDIFF_T_TYPE)
@@ -76,7 +54,7 @@ extern "C"
 */
 #if defined (ACE_LACKS_WCHAR_T)
 #  if !defined (ACE_WCHAR_T_TYPE)
-#    define ACE_WCHAR_T_TYPE long;
+#    define ACE_WCHAR_T_TYPE long
 #  endif /* !ACE_WCHAR_T_TYPE */
    typedef ACE_WCHAR_T_TYPE wchar_t;
 #endif /* ACE_LACKS_WCHAR_T */
@@ -84,7 +62,7 @@ extern "C"
 //  Unsigned integer type of the result of the sizeof operator.
 #if defined (ACE_LACKS_SIZE_T)
 #  if !defined (ACE_SIZE_T_TYPE)
-#    define ACE_SIZE_T_TYPE unsigned int;
+#    define ACE_SIZE_T_TYPE unsigned int
 #  endif /* !ACE_SIZE_T_TYPE */
    typedef ACE_SIZE_T_TYPE size_t;
 #endif /* ACE_LACKS_SIZE_T */

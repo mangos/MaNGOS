@@ -4,7 +4,7 @@
 /**
  *  @file    Thread_Mutex.h
  *
- *  $Id: Thread_Mutex.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Thread_Mutex.h 89127 2010-02-22 19:58:18Z schmidt $
  *
  *   Moved from Synch.h.
  *
@@ -130,15 +130,16 @@ public:
   int tryacquire_write (void);
 
   /**
-   * This is only here to make the ACE_Thread_Mutex
-   * interface consistent with the other synchronization APIs.
-   * Assumes the caller has already acquired the mutex using one of
-   * the above calls, and returns 0 (success) always.
+   * This is only here to make the ACE_Thread_Mutex interface
+   * consistent with the other synchronization APIs.  Assumes the
+   * caller has already acquired the mutex using one of the above
+   * calls, and returns 0 (success) always.
    */
   int tryacquire_write_upgrade (void);
 
   /// Return the underlying mutex.
   const ACE_thread_mutex_t &lock (void) const;
+  ACE_thread_mutex_t &lock (void);
 
   /// Dump the state of an object.
   void dump (void) const;
@@ -146,7 +147,7 @@ public:
   /// Declare the dynamic allocation hooks.
   ACE_ALLOC_HOOK_DECLARE;
 
-  // protected:
+protected:
   /// Mutex type that supports single-process locking efficiently.
   ACE_thread_mutex_t lock_;
 

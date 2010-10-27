@@ -4,7 +4,7 @@
 /**
  *  @file    Service_Object.h
  *
- *  $Id: Service_Object.h 81388 2008-04-23 14:02:05Z johnnyw $
+ *  $Id: Service_Object.h 84170 2009-01-15 13:31:50Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -53,10 +53,10 @@ public:
   /// Destructor.
   virtual ~ACE_Service_Object (void);
 
-    /// Temporarily disable a service without removing it completely.
+  /// Temporarily disable a service without removing it completely.
   virtual int suspend (void);
 
-    /// Re-enable a previously suspended service.
+  /// Re-enable a previously suspended service.
   virtual int resume (void);
 };
 
@@ -116,7 +116,7 @@ public:
   bool active (void) const;
   void active (bool turnon);
 
-  /// Calls <fini> on <type_>
+  /// Calls @c fini on @c type_
   int fini (void);
 
   /// Check if the service has been fini'ed.
@@ -148,7 +148,7 @@ private:
   /// true if svc is currently active, otherwise false.
   bool active_;
 
-  /// true if <fini> on <type_> has already been called, otherwise false.
+  /// true if @c fini on @c type_ has already been called, otherwise false.
   bool fini_already_called_;
 };
 
@@ -157,13 +157,12 @@ private:
  *
  * @brief This is a smart pointer that holds onto the associated
  * ACE_Service_Object * until the current scope is left, at
- * which point the object's <fini> hook is called and the
+ * which point the object's fini() hook is called and the
  * service_object_ gets deleted.
  *
  * This class is similar to the Standard C++ Library class
- * <auto_ptr>.  It is used in conjunction with statically linked
- * <ACE_Service_Objects>, as shown in the
- * ./netsvcs/server/main.cpp example.
+ * auto_ptr. It is used in conjunction with statically linked
+ * ACE_Service_Objects, as shown in the ./netsvcs/server/main.cpp example.
  */
 class ACE_Export ACE_Service_Object_Ptr
 {
@@ -172,7 +171,7 @@ public:
   /// Acquire ownership of the @a so.
   ACE_Service_Object_Ptr (ACE_Service_Object *so);
 
-  /// Release the held ACE_Service_Object by calling its <fini> hook.
+  /// Release the held ACE_Service_Object by calling its fini() hook.
   ~ACE_Service_Object_Ptr (void);
 
   /// Smart pointer to access the underlying ACE_Service_Object.

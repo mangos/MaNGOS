@@ -1,7 +1,7 @@
 /**
  * @file RW_Mutex.cpp
  *
- * $Id: RW_Mutex.cpp 80826 2008-03-04 14:51:23Z wotte $
+ * $Id: RW_Mutex.cpp 91286 2010-08-05 09:04:31Z johnnyw $
  *
  * Originally in Synch.cpp
  *
@@ -18,7 +18,7 @@
 
 #include "ace/Log_Msg.h"
 
-ACE_RCSID(ace, RW_Mutex, "$Id: RW_Mutex.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -35,7 +35,7 @@ ACE_RW_Mutex::dump (void) const
 }
 
 ACE_RW_Mutex::ACE_RW_Mutex (int type, const ACE_TCHAR *name, void *arg)
-  : removed_ (0)
+  : removed_ (false)
 {
 // ACE_TRACE ("ACE_RW_Mutex::ACE_RW_Mutex");
   if (ACE_OS::rwlock_init (&this->lock_, type, name, arg) != 0)

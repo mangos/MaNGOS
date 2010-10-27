@@ -1,3 +1,4 @@
+// $Id: Parse_Node.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 #include "ace/Parse_Node.h"
 
 #if (ACE_USES_CLASSIC_SVC_CONF == 1)
@@ -11,19 +12,16 @@
 #include "ace/OS_NS_string.h"
 #include "ace/ARGV.h"
 
-ACE_RCSID (ace,
-           Parse_Node,
-           "$Id: Parse_Node.cpp 81245 2008-04-05 13:37:47Z johnnyw $")
+#include <list>
 
-
-  ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_ALLOC_HOOK_DEFINE (ACE_Stream_Node)
 
 // Provide the class hierarchy that defines the parse tree of Service
 // Nodes.
 
-  void
+void
 ACE_Stream_Node::dump (void) const
 {
 #if defined (ACE_HAS_DUMP)
@@ -46,10 +44,21 @@ ACE_Stream_Node::apply (ACE_Service_Gestalt *config, int &yyerrno)
   ACE_Stream_Type *st =
       dynamic_cast<ACE_Stream_Type *> (const_cast<ACE_Service_Type_Impl *> (sst->type ()));
 
-  for (const ACE_Static_Node *module = dynamic_cast<const ACE_Static_Node*> (this->mods_);
+  // The modules were linked as popped off the yacc stack, so they're in
+  // reverse order from the way they should be pushed onto the stream.
+  // So traverse mods_ and and reverse the list, then iterate over it to push
+  // the modules in the stream in the correct order.
+  std::list<const ACE_Static_Node *> mod_list;
+  const ACE_Static_Node *module;
+  for (module = dynamic_cast<const ACE_Static_Node*> (this->mods_);
        module != 0;
        module = dynamic_cast<ACE_Static_Node*> (module->link()))
+    mod_list.push_front (module);
+
+  std::list<const ACE_Static_Node *>::const_iterator iter;
+  for (iter = mod_list.begin (); iter != mod_list.end (); ++iter)
     {
+      module = *iter;
       ACE_ARGV args (module->parameters ());
 
       const ACE_Service_Type *mst = module->record (config);
@@ -58,10 +67,14 @@ ACE_Stream_Node::apply (ACE_Service_Gestalt *config, int &yyerrno)
 
       if (yyerrno != 0)
         {
-          ACE_ERROR ((LM_ERROR,
-                      ACE_TEXT ("dynamic initialization failed for Module %s\n"),
-                      module->name ()));
+          if (ACE::debug ())
+            {
+              ACE_ERROR ((LM_ERROR,
+                          ACE_TEXT ("dynamic initialization failed for Module %s\n"),
+                          module->name ()));
+            }
           ++yyerrno;
+          continue;     // Don't try anything else with this one
         }
 
       ACE_Module_Type const * const mt1 =
@@ -71,9 +84,12 @@ ACE_Stream_Node::apply (ACE_Service_Gestalt *config, int &yyerrno)
 
       if (st->push (mt) == -1)
         {
-          ACE_ERROR ((LM_ERROR,
-                      ACE_TEXT ("dynamic initialization failed for Stream %s\n"),
-                      this->node_->name ()));
+          if (ACE::debug ())
+            {
+              ACE_ERROR ((LM_ERROR,
+                          ACE_TEXT ("dynamic initialization failed for Stream %s\n"),
+                          this->node_->name ()));
+            }
           ++yyerrno;
         }
 
@@ -465,11 +481,14 @@ ACE_Location_Node::open_dll (int & yyerrno)
       ++yyerrno;
 
 #ifndef ACE_NLOGGING
-      ACE_TCHAR *errmsg = this->dll_.error ();
-      ACE_ERROR ((LM_ERROR,
-                  ACE_TEXT ("ACE (%P|%t) LN::open_dll - Failed to open %s: %s\n"),
-                  this->pathname (),
-                  errmsg ? errmsg : ACE_TEXT ("no error reported")));
+      if (ACE::debug ())
+        {
+          ACE_TCHAR *errmsg = this->dll_.error ();
+          ACE_ERROR ((LM_ERROR,
+                      ACE_TEXT ("ACE (%P|%t) LN::open_dll - Failed to open %s: %s\n"),
+                      this->pathname (),
+                      errmsg ? errmsg : ACE_TEXT ("no error reported")));
+        }
 #endif /* ACE_NLOGGING */
 
       return -1;
@@ -521,12 +540,15 @@ ACE_Object_Node::symbol (ACE_Service_Gestalt *,
           ++yyerrno;
 
 #ifndef ACE_NLOGGING
-          ACE_TCHAR *errmsg = this->dll_.error ();
-          ACE_ERROR ((LM_ERROR,
-                      ACE_TEXT ("ACE (%P|%t) DLL::symbol -")
-                      ACE_TEXT (" Failed for object %s: %s\n"),
-                      object_name,
-                      errmsg ? errmsg : ACE_TEXT ("no error reported")));
+          if (ACE::debug ())
+            {
+              ACE_TCHAR *errmsg = this->dll_.error ();
+              ACE_ERROR ((LM_ERROR,
+                          ACE_TEXT ("ACE (%P|%t) DLL::symbol -")
+                          ACE_TEXT (" Failed for object %s: %s\n"),
+                          object_name,
+                          errmsg ? errmsg : ACE_TEXT ("no error reported")));
+            }
 #endif /* ACE_NLOGGING */
 
           return 0;
@@ -647,12 +669,15 @@ ACE_Function_Node::symbol (ACE_Service_Gestalt *,
           ++yyerrno;
 
 #ifndef ACE_NLOGGING
-          ACE_TCHAR * const errmsg = this->dll_.error ();
-          ACE_ERROR ((LM_ERROR,
-                      ACE_TEXT ("DLL::symbol failed for function %s: ")
-                      ACE_TEXT ("%s\n"),
-                      function_name,
-                      errmsg ? errmsg : ACE_TEXT ("no error reported")));
+          if (ACE::debug ())
+            {
+              ACE_TCHAR * const errmsg = this->dll_.error ();
+              ACE_ERROR ((LM_ERROR,
+                          ACE_TEXT ("DLL::symbol failed for function %s: ")
+                          ACE_TEXT ("%s\n"),
+                          function_name,
+                          errmsg ? errmsg : ACE_TEXT ("no error reported")));
+            }
 #endif /* ACE_NLOGGING */
 
           return 0;
@@ -673,10 +698,13 @@ ACE_Function_Node::symbol (ACE_Service_Gestalt *,
       if (this->symbol_ == 0)
         {
           ++yyerrno;
-          ACE_ERROR_RETURN ((LM_ERROR,
-                             ACE_TEXT ("%p\n"),
-                             this->function_name_),
-                            0);
+          if (ACE::debug ())
+            {
+              ACE_ERROR ((LM_ERROR,
+                         ACE_TEXT ("%p\n"),
+                         this->function_name_));
+            }
+          return 0;
         }
     }
   return this->symbol_;
@@ -766,11 +794,14 @@ ACE_Static_Function_Node::symbol (ACE_Service_Gestalt *config,
   if (config->find_static_svc_descriptor (this->function_name_, &ssd) == -1)
     {
       ++yyerrno;
-      ACE_ERROR_RETURN ((LM_ERROR,
-       ACE_TEXT ("(%P|%t) No static service ")
-       ACE_TEXT ("registered for function %s\n"),
-       this->function_name_),
-      0);
+      if (ACE::debug ())
+        {
+          ACE_ERROR ((LM_ERROR,
+                     ACE_TEXT ("(%P|%t) No static service ")
+                     ACE_TEXT ("registered for function %s\n"),
+                     this->function_name_));
+        }
+      return 0;
     }
 
   if (ssd->alloc_ == 0)
@@ -781,11 +812,14 @@ ACE_Static_Function_Node::symbol (ACE_Service_Gestalt *config,
         {
           ++yyerrno;
 
-          ACE_ERROR_RETURN ((LM_ERROR,
-                             ACE_TEXT ("(%P|%t) No static service factory ")
-                             ACE_TEXT ("function registered for function %s\n"),
-                             this->function_name_),
-          0);
+          if (ACE::debug ())
+            {
+              ACE_ERROR ((LM_ERROR,
+                          ACE_TEXT ("(%P|%t) No static service factory ")
+                          ACE_TEXT ("function registered for function %s\n"),
+                          this->function_name_));
+            }
+          return 0;
         }
     }
 
@@ -795,10 +829,13 @@ ACE_Static_Function_Node::symbol (ACE_Service_Gestalt *config,
   if (this->symbol_ == 0)
     {
       ++yyerrno;
-      ACE_ERROR_RETURN ((LM_ERROR,
-                         ACE_TEXT ("%p\n"),
-                         this->function_name_),
-                        0);
+      if (ACE::debug ())
+        {
+          ACE_ERROR ((LM_ERROR,
+                      ACE_TEXT ("%p\n"),
+                      this->function_name_));
+        }
+      return 0;
     }
 
   return this->symbol_;
@@ -834,7 +871,7 @@ ACE_Service_Type_Factory::make_service_type (ACE_Service_Gestalt *cfg) const
 {
   ACE_TRACE ("ACE_Service_Type_Factory::make_service_type");
 
-  u_int flags = ACE_Service_Type::DELETE_THIS
+  u_int const flags = ACE_Service_Type::DELETE_THIS
     | (this->location_->dispose () == 0 ? 0 : ACE_Service_Type::DELETE_OBJ);
 
   int yyerrno = 0;
@@ -864,10 +901,13 @@ ACE_Service_Type_Factory::make_service_type (ACE_Service_Gestalt *cfg) const
     }
 
 #ifndef ACE_NLOGGING
-  ACE_ERROR ((LM_ERROR,
-              ACE_TEXT ("ACE (%P|%t) Unable to create ")
-              ACE_TEXT ("service object for %s\n"),
-              this->name ()));
+  if (ACE::debug ())
+    {
+      ACE_ERROR ((LM_ERROR,
+                  ACE_TEXT ("ACE (%P|%t) Unable to create ")
+                  ACE_TEXT ("service object for %s\n"),
+                  this->name ()));
+    }
 #endif
   ++yyerrno;
   return 0;

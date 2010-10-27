@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Process.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Process.inl 83405 2008-10-23 06:30:06Z johnnyw $
 
 #include "ace/ACE.h"
 #include "ace/OS_NS_sys_wait.h"
@@ -9,6 +9,24 @@
 #include "ace/OS_NS_string.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
+ACE_INLINE void
+ACE_Process_Options::enable_unicode_environment (void)
+{
+  this->use_unicode_environment_ = true;
+}
+
+ACE_INLINE void
+ACE_Process_Options::disable_unicode_environment (void)
+{
+  this->use_unicode_environment_ = false;
+}
+
+ACE_INLINE bool
+ACE_Process_Options::use_unicode_environment (void) const
+{
+  return this->use_unicode_environment_;
+}
 
 #if defined (ACE_WIN32)
 
@@ -129,24 +147,15 @@ ACE_Process_Options::setgroup (pid_t pgrp)
 }
 
 ACE_INLINE int
-ACE_Process_Options::handle_inheritence (void)
+ACE_Process_Options::handle_inheritance (void)
 {
-#if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)
-  return handle_inheritence_;
-#else
-  ACE_NOTSUP_RETURN (0);  // This is a benign error.
-#endif /* ACE_WIN32 && ! ACE_HAS_WINCE */
+  return handle_inheritance_;
 }
 
 ACE_INLINE void
-ACE_Process_Options::handle_inheritence (int hi)
+ACE_Process_Options::handle_inheritance (int hi)
 {
-#if defined (ACE_WIN32) &&  !defined (ACE_HAS_WINCE)
-  handle_inheritence_ = hi;
-#else
-  ACE_UNUSED_ARG (hi);
-  ACE_NOTSUP;
-#endif /* !ACE_HAS_WINCE */
+  handle_inheritance_ = hi;
 }
 
 ACE_INLINE int

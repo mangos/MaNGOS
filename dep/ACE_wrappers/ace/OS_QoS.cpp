@@ -2,7 +2,7 @@
 ///**
 // *  @file   OS_QoS.cpp
 // *
-// *  $Id: OS_QoS.cpp 80826 2008-03-04 14:51:23Z wotte $
+// *  $Id: OS_QoS.cpp 86508 2009-08-14 13:32:40Z johnnyw $
 // *
 // *  @brief  Contains OS specific data structures for QoS networking.
 // *
@@ -363,7 +363,7 @@ void
 ACE_QoS::provider_specific (const iovec &ps)
 {
 #if defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0)
-  this->ProviderSpecific = (WSABUF) ((iovec &) ps);
+  this->ProviderSpecific = (WSABUF) (const_cast <iovec &> (ps));
 #else
   ACE_UNUSED_ARG (ps);
 #endif /* ACE_HAS_WINSOCK2 */

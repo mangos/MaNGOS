@@ -4,7 +4,7 @@
 /**
  *  @file    Local_Tokens.h
  *
- *  $Id: Local_Tokens.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Local_Tokens.h 84477 2009-02-16 13:30:38Z johnnyw $
  *
  *  @author Karl-Heinz Dorn <kdorn@erlh.siemens.de>
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
@@ -223,7 +223,7 @@ public:
   /// Allows us to pass args to the construction of the TSS object.
   virtual ACE_TPQ_Entry *make_TSS_TYPE (void) const;
 
-  /// Operator overloading and inheritence don't mix.
+  /// Operator overloading and inheritance don't mix.
   operator ACE_TPQ_Entry *(void);
 
   /// Dump the state of the class.
@@ -270,7 +270,7 @@ public:
   /// Destructor.
   ~ACE_TPQ_Iterator (void);
 
-  /// Pass back the <next_item>.
+  /// Pass back the @a next_item.
   int next (ACE_TPQ_Entry *&next_item);
 
   /// Returns 1 when all items have been seen, else 0.

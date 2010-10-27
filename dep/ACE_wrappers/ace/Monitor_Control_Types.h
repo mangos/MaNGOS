@@ -4,7 +4,7 @@
 /**
  * @file Monitor_Control_Types.h
  *
- * $Id: Monitor_Control_Types.h 82332 2008-07-16 01:00:55Z johnnyw $
+ * $Id: Monitor_Control_Types.h 83306 2008-10-17 12:19:53Z johnnyw $
  *
  * @author Jeff Parsons <j.parsons@vanderbilt.edu>
  */
@@ -88,13 +88,6 @@ namespace ACE
         Control_Action* control_action;
       };
 
-#if defined (__BORLANDC__) && (__BORLANDC__ <= 0x570)
-      // Borland C++ Builder 6 and earlier don't handle the second template
-      // argument correctly. We have to pass it explicitly
-      typedef ACE_Vector<Data, ACE_VECTOR_DEFAULT_SIZE> DataList;
-      typedef ACE_Vector<ACE_CString, ACE_VECTOR_DEFAULT_SIZE> NameList;
-      typedef ACE_Array_Map<long, Constraint, std::equal_to<long> > ConstraintList;
-#else
       /**
        * @brief Used by the admin class as a container for the data from
        *        a group of monitor points.
@@ -110,7 +103,6 @@ namespace ACE
        * @brief Holder for a monitor point's constraints.
        */
       typedef ACE_Array_Map<long, Constraint> ConstraintList;
-#endif
     };
   }
 }

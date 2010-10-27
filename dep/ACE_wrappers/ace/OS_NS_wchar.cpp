@@ -1,8 +1,8 @@
-// $Id: OS_NS_wchar.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_wchar.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/OS_NS_wchar.h"
 
-ACE_RCSID(ace, OS_NS_wchar, "$Id: OS_NS_wchar.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_wchar.inl"
@@ -84,7 +84,7 @@ ACE_OS::wcscmp_emulation (const ACE_WCHAR_T *string1,
 {
   while (*string1 == *string2++)
     if (*string1++ == 0)
-      return (0);
+      return 0;
   return (*string1 - *--string2);
 }
 #endif /* !ACE_HAS_WCHAR || ACE_LACKS_WCSCMP */
@@ -157,7 +157,7 @@ ACE_OS::wcsicmp_emulation (const wchar_t *s, const wchar_t *t)
 size_t
 ACE_OS::wcslen_emulation (const ACE_WCHAR_T *string)
 {
-  const ACE_WCHAR_T *s;
+  const ACE_WCHAR_T *s = 0;
 
   for (s = string; *s; ++s)
     continue;
@@ -178,14 +178,14 @@ ACE_OS::wcsncat_emulation (ACE_WCHAR_T *destination,
       const ACE_WCHAR_T *s = source;
 
       while (*d != 0)
-        d++;
+        ++d;
 
       do
         {
           if ((*d = *s++) == 0)
             break;
 
-          d++;
+          ++d;
         } while (--count != 0);
 
       *d = 0;
@@ -285,7 +285,7 @@ wchar_t *
 ACE_OS::wcspbrk_emulation (const wchar_t *string,
                            const wchar_t *charset)
 {
-  const wchar_t *scanp;
+  const wchar_t *scanp = 0;
   int c, sc;
 
   while ((c = *string++) != 0)
@@ -335,7 +335,7 @@ ACE_OS::wcsspn_emulation (const wchar_t *string,
                           const wchar_t *charset)
 {
   const wchar_t *p = string;
-  const wchar_t *spanp;
+  const wchar_t *spanp = 0;
   wchar_t c, sc;
 
   // Skip any characters in charset, excluding the terminating \0.

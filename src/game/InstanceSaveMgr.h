@@ -63,6 +63,7 @@ class InstanceSave
         InstanceSave objects may be created on player logon but the maps are
         created and loaded only when a player actually enters the instance. */
         uint32 GetInstanceId() const { return m_instanceid; }
+        ObjectGuid GetInstanceGuid() const { return ObjectGuid(HIGHGUID_INSTANCE, GetInstanceId()); }
         uint32 GetMapId() const { return m_mapid; }
 
         /* Saved when the instance is generated for the first time */

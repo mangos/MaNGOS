@@ -1,10 +1,6 @@
-// $Id: Thread.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Thread.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Thread.h"
-
-ACE_RCSID(ace,
-          Thread,
-          "$Id: Thread.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Thread.inl"
@@ -26,22 +22,24 @@ ACE_Thread::spawn_n (size_t n,
                      const char* thr_name[])
 {
   ACE_TRACE ("ACE_Thread::spawn_n");
-  ACE_thread_t t_id;
   size_t i;
 
   for (i = 0; i < n; i++)
-    // Bail out if error occurs.
-    if (ACE_OS::thr_create (func,
-                            arg,
-                            flags,
-                            &t_id,
-                            0,
-                            priority,
-                            stack == 0 ? 0 : stack[i],
-                            stack_size == 0 ? ACE_DEFAULT_THREAD_STACKSIZE : stack_size[i],
-                            thread_adapter,
-                            thr_name == 0 ? 0 : &thr_name[i]) != 0)
-      break;
+   {
+      ACE_thread_t t_id;
+      // Bail out if error occurs.
+      if (ACE_OS::thr_create (func,
+                              arg,
+                              flags,
+                              &t_id,
+                              0,
+                              priority,
+                              stack == 0 ? 0 : stack[i],
+                              stack_size == 0 ? ACE_DEFAULT_THREAD_STACKSIZE : stack_size[i],
+                              thread_adapter,
+                              thr_name == 0 ? 0 : &thr_name[i]) != 0)
+        break;
+   }
 
   return i;
 }

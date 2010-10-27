@@ -93,7 +93,7 @@ inline float Traveller<Creature>::GetMoveDestinationTo(float x, float y, float z
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
 
-    if (i_traveller.canFly())
+    if (i_traveller.CanFly())
     {
         float dz = z - GetPositionZ();
         return sqrt((dx*dx) + (dy*dy) + (dz*dz));
@@ -141,7 +141,7 @@ inline float Traveller<Player>::GetMoveDestinationTo(float x, float y, float z)
 template<>
 inline void Traveller<Player>::Relocation(float x, float y, float z, float orientation)
 {
-    i_traveller.GetMap()->PlayerRelocation(&i_traveller, x, y, z, orientation);
+    i_traveller.SetPosition(x, y, z, orientation);
 }
 
 template<>

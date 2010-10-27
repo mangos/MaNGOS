@@ -4,7 +4,7 @@
 /**
  *  @file    File_Lock.h
  *
- *  $Id: File_Lock.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: File_Lock.h 91064 2010-07-12 10:11:24Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -44,15 +44,15 @@ public:
    * zero value for <unlink_in_destructor>.
    */
   ACE_File_Lock (ACE_HANDLE handle = ACE_INVALID_HANDLE,
-                 int unlink_in_destructor = 1);
+                 bool unlink_in_destructor = true);
 
   /// Open the @a filename with @a flags and @a mode and set the result
   /// to <handle_>.  If you don't want the file unlinked in the
-  /// destructor pass a zero value for <unlink_in_destructor>.
+  /// destructor pass a false value for @a unlink_in_destructor.
   ACE_File_Lock (const ACE_TCHAR *filename,
                  int flags,
                  mode_t mode = 0,
-                 int unlink_in_destructor = 1);
+                 bool unlink_in_destructor = true);
 
   /// Open the @a filename with @a flags and @a mode and set the result to
   /// <handle_>.
@@ -64,12 +64,12 @@ public:
   ~ACE_File_Lock (void);
 
   /// Remove a File lock by releasing it and closing down the
-  /// <handle_>.  If <unlink_file> is non-0 then we unlink the file.
-  int remove (int unlink_file = 1);
+  /// <handle_>.  If @a unlink_file is true then we unlink the file.
+  int remove (bool unlink_file = true);
 
   /**
    * Note, for interface uniformity with other synchronization
-   * wrappers we include the <acquire> method.  This is implemented as
+   * wrappers we include the acquire() method. This is implemented as
    * a write-lock to be on the safe-side...
    */
   int acquire (short whence = 0, ACE_OFF_T start = 0, ACE_OFF_T len = 1);
@@ -125,10 +125,10 @@ public:
 
   /**
    * Set underlying ACE_HANDLE.  Note that this method assumes
-   * ownership of the <handle> and will close it down in <remove>.  If
-   * you want the <handle> to stay open when <remove> is called make
-   * sure to call <dup> on the <handle> before closing it. You are
-   * responsible for the closing the existing <handle> before
+   * ownership of the @a handle and will close it down in <remove>.  If
+   * you want the @a handle to stay open when <remove> is called make
+   * sure to call <dup> on the @a handle before closing it. You are
+   * responsible for the closing the existing @a handle before
    * overwriting it.
    */
   void set_handle (ACE_HANDLE);
@@ -148,11 +148,11 @@ protected:
   /// destructor.  This flag isn't protected by a lock, so make sure
   /// that you don't have multiple threads simultaneously calling
   /// <remove> on the same object, which is a bad idea anyway...
-  int removed_;
+  bool removed_;
 
   /// Keeps track of whether to unlink the underlying file in the
   /// destructor.
-  int unlink_in_destructor_;
+  bool const unlink_in_destructor_;
 
 private:
   // = Prevent assignment and initialization.

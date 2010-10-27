@@ -4,7 +4,7 @@
 /**
  *  @file    Thread_Semaphore.h
  *
- *  $Id: Thread_Semaphore.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Thread_Semaphore.h 86731 2009-09-17 12:23:48Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -62,8 +62,6 @@ public:
 template <class T> class ACE_Malloc_Lock_Adapter_T;
 
 /**
- * @class ACE_Malloc_Lock_Adapter_T<ACE_Thread_Semaphore>
- *
  * @brief Template specialization of ACE_Malloc_Lock_Adapter_T for
  * ACE_Thread_Semaphore.
  *

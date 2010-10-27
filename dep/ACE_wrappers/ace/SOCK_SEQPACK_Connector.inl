@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: SOCK_SEQPACK_Connector.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: SOCK_SEQPACK_Connector.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -21,7 +21,7 @@ ACE_SOCK_SEQPACK_Connector::ACE_SOCK_SEQPACK_Connector (void)
   ACE_TRACE ("ACE_SOCK_SEQPACK_Connector::ACE_SOCK_SEQPACK_Connector");
 }
 
-ACE_INLINE int
+ACE_INLINE bool
 ACE_SOCK_SEQPACK_Connector::reset_new_handle (ACE_HANDLE handle)
 {
 #if defined (ACE_HAS_WINSOCK2) && (ACE_HAS_WINSOCK2 != 0)
@@ -31,7 +31,7 @@ ACE_SOCK_SEQPACK_Connector::reset_new_handle (ACE_HANDLE handle)
                            0);
 #else /* !defined ACE_HAS_WINSOCK2 */
   ACE_UNUSED_ARG (handle);
-  return 0;
+  return false;
 #endif /* ACE_WIN32 */
 }
 

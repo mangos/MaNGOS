@@ -1,11 +1,11 @@
-// $Id: Shared_Memory_Pool.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Shared_Memory_Pool.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 // Shared_Memory_Pool.cpp
 #include "ace/Shared_Memory_Pool.h"
 #include "ace/OS_NS_sys_shm.h"
 #include "ace/Log_Msg.h"
 
-ACE_RCSID(ace, Shared_Memory_Pool, "$Id: Shared_Memory_Pool.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #if !defined (ACE_LACKS_SYSV_SHMEM)
 
@@ -135,8 +135,8 @@ ACE_Shared_Memory_Pool::commit_backing_store_name (size_t rounded_bytes,
 
       if (shmem != address)
         ACE_ERROR_RETURN ((LM_ERROR,
-                           "(%P|%t) %p, shmem = %u, address = %u\n",
-                           "shmat",
+                           ACE_TEXT("(%P|%t) %p, shmem = %u, address = %u\n"),
+                           ACE_TEXT("shmat"),
                            shmem,
                            address),
                           -1);
@@ -211,8 +211,8 @@ ACE_Shared_Memory_Pool::handle_signal (int , siginfo_t *siginfo, ucontext_t *)
 
   if (shmem != address)
       ACE_ERROR_RETURN ((LM_ERROR,
-                         "(%P|%t) %p, shmem = %u, address = %u\n",
-                         "shmat",
+                         ACE_TEXT("(%P|%t) %p, shmem = %u, address = %u\n"),
+                         ACE_TEXT("shmat"),
                          shmem,
                          address),
                         -1);
@@ -349,8 +349,8 @@ ACE_Shared_Memory_Pool::init_acquire (size_t nbytes,
                        0);
       if (this->base_addr_ == reinterpret_cast<void *> (-1))
         ACE_ERROR_RETURN ((LM_ERROR,
-                           "(%P|%t) %p, base_addr = %u\n",
-                           "shmat",
+                           ACE_TEXT("(%P|%t) %p, base_addr = %u\n"),
+                           ACE_TEXT("shmat"),
                            this->base_addr_),
                           0);
     }
@@ -366,8 +366,8 @@ ACE_Shared_Memory_Pool::init_acquire (size_t nbytes,
                        0);
       if (this->base_addr_ == reinterpret_cast<char *> (-1))
         ACE_ERROR_RETURN ((LM_ERROR,
-                           "(%P|%t) %p, base_addr = %u\n",
-                           "shmat",
+                           ACE_TEXT("(%P|%t) %p, base_addr = %u\n"),
+                           ACE_TEXT("shmat"),
                            this->base_addr_), 0);
 
       SHM_TABLE *st = reinterpret_cast<SHM_TABLE *> (this->base_addr_);

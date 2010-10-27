@@ -1,4 +1,4 @@
-// $Id: LOCK_SOCK_Acceptor.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: LOCK_SOCK_Acceptor.cpp 82723 2008-09-16 09:35:44Z johnnyw $
 
 #ifndef ACE_LOCK_SOCK_ACCEPTOR_CPP
 #define ACE_LOCK_SOCK_ACCEPTOR_CPP
@@ -12,8 +12,8 @@ template <class ACE_LOCK> int
 ACE_LOCK_SOCK_Acceptor<ACE_LOCK>::accept (ACE_SOCK_Stream &stream,
                                           ACE_Addr *remote_address,
                                           ACE_Time_Value *timeout,
-                                          int restart,
-                                          int reset_new_handle) const
+                                          bool restart,
+                                          bool reset_new_handle) const
 {
   ACE_GUARD_RETURN (ACE_LOCK, ace_mon, (ACE_LOCK &) this->lock_, -1);
 

@@ -1,14 +1,10 @@
-// $Id: Argv_Type_Converter.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Argv_Type_Converter.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Argv_Type_Converter.h"
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Argv_Type_Converter.inl"
 #endif  /* __ACE_INLINE__ */
-
-ACE_RCSID (ace,
-           Argv_Type_Converter,
-           "$Id: Argv_Type_Converter.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 #include "ace/OS_NS_string.h"
 #include "ace/OS_Errno.h"
@@ -108,11 +104,10 @@ ACE_Argv_Type_Converter::initialize (void)
 void
 ACE_Argv_Type_Converter::align_char_with_wchar (void)
 {
-  int wchar_argv_index = 0;
-  wchar_t* match_argv = this->wchar_argv_[0];  // pick the initial entry
-
-  while (wchar_argv_index < this->saved_argc_)
+  for (int wchar_argv_index = 0; wchar_argv_index < this->saved_argc_;
+       ++wchar_argv_index)
     {
+      wchar_t *match_argv = this->wchar_argv_[wchar_argv_index];
       // if n'th entries of both argv lists are different
       if (ACE_OS::strcmp (this->char_argv_[wchar_argv_index],
                           ACE_TEXT_ALWAYS_CHAR (match_argv)) != 0)
@@ -132,9 +127,6 @@ ACE_Argv_Type_Converter::align_char_with_wchar (void)
                 }
             }
         }
-
-        // move to the next wchar argv list entry
-        match_argv = this->wchar_argv_[++wchar_argv_index];
     }
 
   this->cleanup ();
@@ -143,11 +135,10 @@ ACE_Argv_Type_Converter::align_char_with_wchar (void)
 void
 ACE_Argv_Type_Converter::align_wchar_with_char (void)
 {
-  int char_argv_index = 0;
-  char* match_argv = this->char_argv_[0];  // pick the initial entry
-
-  while (char_argv_index < saved_argc_)
+  for (int char_argv_index = 0; char_argv_index < saved_argc_;
+       ++char_argv_index)
     {
+      char* match_argv = this->char_argv_[char_argv_index];
       // if n'th entries of both argv lists are different
       if (ACE_OS::strcmp (
             ACE_TEXT_ALWAYS_CHAR (this->wchar_argv_[char_argv_index]),
@@ -168,9 +159,6 @@ ACE_Argv_Type_Converter::align_wchar_with_char (void)
               }
             }
         }
-
-      // move to the next wchar argv list entry
-      match_argv = this->char_argv_[++char_argv_index];
     }
 
   this->cleanup();

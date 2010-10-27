@@ -1,4 +1,4 @@
-// $Id: Lib_Find.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Lib_Find.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Lib_Find.h"
 #include "ace/Log_Msg.h"
@@ -26,29 +26,30 @@
 
 extern "C" int LIB$FIND_IMAGE_SYMBOL(...);
 
+/**
+ * @internal
+ *
+ * Implements a class to register symbols and addresses for use with DLL
+ * symbol retrieval.
+ *
+ * OpenVMS restricts symbol length to 31 characters encoding any symbols
+ * longer than that. In these cases dlsym() only works with the encoded
+ * names.
+ * This creates serious problems for the service configurator framework
+ * where the factory method names often exceed 31 chars and where loading
+ * is based on retrieval of method pointers using the *full* name.
+ * For OpenVMS we therefor added this singleton class and the
+ * ACE_Dynamic_Svc_Registrar class which registers full names and function
+ * pointers with this singleton at the time the static ACE_Dynamic_Svc_Registrar
+ * object is created in a (service) DLL.
+ * By forcing the DLL to load using a common symbol ("NULL") we trigger static
+ * object creation *before* the full names are referenced.
+ * Symbol references will be resolved as follows on OpenVMS:
+ * - first try directly from DLL using the RTL dlsym() function and if that fails;
+ * - try to find symbol in singleton registry.
+ */
 class ACE_LD_Symbol_Registry
 {
-  // @internal
-  // = TITLE
-  //   Implements a class to register symbols and addresses for use with DLL
-  //   symbol retrieval.
-  //
-  // = DESCRIPTION
-  //   OpenVMS restricts symbol length to 31 characters encoding any symbols
-  //   longer than that. In these cases dlsym() only works with the encoded
-  //   names.
-  //   This creates serious problems for the service configurator framework
-  //   where the factory method names often exceed 31 chars and where loading
-  //   is based on retrieval of method pointers using the *full* name.
-  //   For OpenVMS we therefor added this singleton class and the
-  //   ACE_Dynamic_Svc_Registrar class which registers full names and function
-  //   pointers with this singleton at the time the static ACE_Dynamic_Svc_Registrar
-  //   object is created in a (service) DLL.
-  //   By forcing the DLL to load using a common symbol ("NULL") we trigger static
-  //   object creation *before* the full names are referenced.
-  //   Symbol references will be resolved as follows on OpenVMS:
-  //   - first try directly from DLL using the RTL dlsym() function and if that fails;
-  //   - try to find symbol in singleton registry.
 public:
 
   typedef ACE_RB_Tree<const ACE_TCHAR*,
@@ -109,7 +110,7 @@ template ACE_Singleton<ACE_LD_Symbol_Registry, ACE_Thread_Mutex> *
 #endif /* ACE_HAS_EXPLICIT_STATIC_TEMPLATE_MEMBER_INSTANTIATION */
 #endif
 
-ACE_RCSID(ace, Lib_Find, "$Id: Lib_Find.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -202,12 +203,12 @@ ACE::ldfind (const ACE_TCHAR* filename,
 
   ACE_TCHAR tempcopy[MAXPATHLEN + 1];
   ACE_TCHAR searchpathname[MAXPATHLEN + 1];
-#if defined (ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
   ACE_TCHAR decorator[] = ACE_LD_DECORATOR_STR;
   ACE_TCHAR searchfilename[MAXPATHLEN + sizeof(decorator) / sizeof (ACE_TCHAR)];
 #else
   ACE_TCHAR searchfilename[MAXPATHLEN + 1];
-#endif /* ACE_WIN32 && ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
+#endif /* ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
 
   // Create a copy of filename to work with.
   if (ACE_OS::strlen (filename) + 1
@@ -284,18 +285,17 @@ ACE::ldfind (const ACE_TCHAR* filename,
       return -1;
     }
 
-#if defined (ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
-  size_t len_searchfilename = ACE_OS::strlen (searchfilename);
-  if (! has_suffix)
-    ACE_OS::strcpy (searchfilename + len_searchfilename,
-                           decorator);
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+  size_t const len_searchfilename = ACE_OS::strlen (searchfilename);
+  if (!has_suffix)
+    ACE_OS::strcpy (searchfilename + len_searchfilename, decorator);
 
   for (int tag = 1; tag >= 0; tag --)
     {
       if (tag == 0)
         searchfilename [len_searchfilename] = 0;
 
-#endif /* ACE_WIN32 && ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
+#endif /* ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
       // Use absolute pathname if there is one.
       if (ACE_OS::strlen (searchpathname) > 0)
         {
@@ -375,9 +375,9 @@ ACE::ldfind (const ACE_TCHAR* filename,
           else if (pathlen > 0)
               return 0;
 #else
-          ACE_TCHAR *ld_path;
+          ACE_TCHAR *ld_path = 0;
 #  if defined ACE_DEFAULT_LD_SEARCH_PATH
-          ld_path = ACE_DEFAULT_LD_SEARCH_PATH;
+          ld_path = const_cast <ACE_TCHAR*> (ACE_DEFAULT_LD_SEARCH_PATH);
 #  else
 #    if defined (ACE_WIN32) || !defined (ACE_USES_WCHAR)
           ld_path = ACE_OS::getenv (ACE_LD_SEARCH_PATH);
@@ -498,17 +498,16 @@ ACE::ldfind (const ACE_TCHAR* filename,
                 ACE_OS::free (ld_path_temp);
 #endif /* ACE_HAS_WINCE */
               ACE_OS::free ((void *) ld_path);
-#if defined (ACE_HAS_WINCE) && defined (ACE_LD_DECORATOR_STR) && \
-            !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
                if (result == 0 || tag == 0)
-#endif /* ACE_HAS_WINCE && ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
+#endif /* ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
               return result;
             }
 #endif /* ACE_WIN32 && !ACE_HAS_WINCE */
         }
-#if defined (ACE_WIN32) && defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
+#if defined (ACE_LD_DECORATOR_STR) && !defined (ACE_DISABLE_DEBUG_DLL_CHECK)
     }
-#endif /* ACE_WIN32 && ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
+#endif /* ACE_LD_DECORATOR_STR && !ACE_DISABLE_DEBUG_DLL_CHECK */
 
   errno = ENOENT;
   return -1;
@@ -594,8 +593,8 @@ ACE::get_temp_dir (ACE_TCHAR *buffer, size_t buffer_len)
                                  buffer);
 
   // Make sure to return -1 if there is an error
-  if (result == 0 && ::GetLastError () != ERROR_SUCCESS
-      || result > static_cast<int> (buffer_len))
+  if ((result == 0 && ::GetLastError () != ERROR_SUCCESS)
+      || (result > static_cast<int> (buffer_len)))
     result = -1;
 
 #else /* ACE_WIN32 */

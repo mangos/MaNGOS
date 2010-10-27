@@ -31,51 +31,52 @@
 
 void WorldSession::HandleTaxiNodeStatusQueryOpcode( WorldPacket & recv_data )
 {
-    DEBUG_LOG( "WORLD: Received CMSG_TAXINODE_STATUS_QUERY" );
+    DEBUG_LOG("WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recv_data >> guid;
     SendTaxiStatus( guid );
 }
 
-void WorldSession::SendTaxiStatus( uint64 guid )
+void WorldSession::SendTaxiStatus(ObjectGuid guid)
 {
     // cheating checks
     Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
     {
-        DEBUG_LOG( "WorldSession::SendTaxiStatus - Unit (GUID: %u) not found.", uint32(GUID_LOPART(guid)) );
+        DEBUG_LOG("WorldSession::SendTaxiStatus - %s not found or you can't interact with it.", guid.GetString().c_str());
         return;
     }
 
     uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(),unit->GetPositionY(),unit->GetPositionZ(),unit->GetMapId(),GetPlayer( )->GetTeam());
 
     // not found nearest
-    if(curloc == 0)
+    if (curloc == 0)
         return;
 
-    DEBUG_LOG( "WORLD: current location %u ",curloc);
+    DEBUG_LOG("WORLD: current location %u ",curloc);
 
-    WorldPacket data( SMSG_TAXINODE_STATUS, 9 );
-    data << guid;
-    data << uint8( GetPlayer( )->m_taxi.IsTaximaskNodeKnown(curloc) ? 1 : 0 );
-    SendPacket( &data );
-    DEBUG_LOG( "WORLD: Sent SMSG_TAXINODE_STATUS" );
+    WorldPacket data(SMSG_TAXINODE_STATUS, 9);
+    data << ObjectGuid(guid);
+    data << uint8(GetPlayer()->m_taxi.IsTaximaskNodeKnown(curloc) ? 1 : 0);
+    SendPacket(&data);
+
+    DEBUG_LOG("WORLD: Sent SMSG_TAXINODE_STATUS");
 }
 
 void WorldSession::HandleTaxiQueryAvailableNodes( WorldPacket & recv_data )
 {
     DEBUG_LOG( "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES" );
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     // cheating checks
     Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
     {
-        DEBUG_LOG( "WORLD: HandleTaxiQueryAvailableNodes - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)) );
+        DEBUG_LOG("WORLD: HandleTaxiQueryAvailableNodes - %s not found or you can't interact with him.", guid.GetString().c_str());
         return;
     }
 
@@ -154,7 +155,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
 {
     DEBUG_LOG( "WORLD: Received CMSG_ACTIVATETAXIEXPRESS" );
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 node_count;
 
     recv_data >> guid >> node_count;
@@ -162,7 +163,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode ( WorldPacket & recv_data )
     Creature *npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-        DEBUG_LOG( "WORLD: HandleActivateTaxiExpressOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)) );
+        DEBUG_LOG( "WORLD: HandleActivateTaxiExpressOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
         return;
     }
     std::vector<uint32> nodes;
@@ -257,18 +258,18 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleActivateTaxiOpcode( WorldPacket & recv_data )
 {
-    DEBUG_LOG( "WORLD: Received CMSG_ACTIVATETAXI" );
+    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXI");
 
-    uint64 guid;
+    ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
 
     recv_data >> guid >> nodes[0] >> nodes[1];
-    DEBUG_LOG( "WORLD: Received CMSG_ACTIVATETAXI from %d to %d" ,nodes[0],nodes[1]);
+    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXI from %d to %d" ,nodes[0],nodes[1]);
     Creature *npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {
-        DEBUG_LOG( "WORLD: HandleActivateTaxiOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)) );
+        DEBUG_LOG("WORLD: HandleActivateTaxiOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
         return;
     }
 

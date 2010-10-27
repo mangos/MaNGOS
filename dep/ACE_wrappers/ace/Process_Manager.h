@@ -4,7 +4,7 @@
 /**
  *  @file    Process_Manager.h
  *
- *  $Id: Process_Manager.h 81014 2008-03-19 11:41:31Z johnnyw $
+ *  $Id: Process_Manager.h 84619 2009-02-26 12:26:16Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -337,9 +337,9 @@ public:
   //@}
 
 protected:
-  // = These methods allow a <Process_Manager> to be an <Event_Handler>.
+  // = These methods allow a <Process_Manager> to be an Event_Handler.
 
-  // As an <Event_Handler>, the <Process_Manager> automagically
+  // As an Event_Handler, the <Process_Manager> automagically
   // detects child Processes exiting and calls notify_proc_handler()
   // and remove().  This means that you don't have to (shouldn't!)
   // call the wait(...)  methods yourself.

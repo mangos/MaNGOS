@@ -35,9 +35,9 @@ RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
     Map const* map = creature.GetBaseMap();
 
     // For 2D/3D system selection
-    //bool is_land_ok  = creature.canWalk();                // not used?
-    //bool is_water_ok = creature.canSwim();                // not used?
-    bool is_air_ok = creature.canFly();
+    //bool is_land_ok  = creature.CanWalk();                // not used?
+    //bool is_water_ok = creature.CanSwim();                // not used?
+    bool is_air_ok = creature.CanFly();
 
     const float angle = rand_norm_f() * (M_PI_F*2.0f);
     const float range = rand_norm_f() * wander_distance;
@@ -116,7 +116,7 @@ void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
     if (!creature.isAlive())
         return;
 
-    if (creature.canFly())
+    if (creature.CanFly())
         creature.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
     else
         creature.AddSplineFlag(SPLINEFLAG_WALKMODE);
@@ -155,7 +155,7 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
 
     i_nextMoveTime.Update(diff);
 
-    if (i_destinationHolder.HasArrived() && !creature.IsStopped() && !creature.canFly())
+    if (i_destinationHolder.HasArrived() && !creature.IsStopped() && !creature.CanFly())
         creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
 
     if (!i_destinationHolder.HasArrived() && creature.IsStopped())
@@ -170,14 +170,14 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
 
         if (i_nextMoveTime.Passed())
         {
-            if (creature.canFly())
+            if (creature.CanFly())
                 creature.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
             else
                 creature.AddSplineFlag(SPLINEFLAG_WALKMODE);
 
             _setRandomLocation(creature);
         }
-        else if (creature.isPet() && creature.GetOwner() && !creature.IsWithinDist(creature.GetOwner(), PET_FOLLOW_DIST+2.5f))
+        else if (creature.IsPet() && creature.GetOwner() && !creature.IsWithinDist(creature.GetOwner(), PET_FOLLOW_DIST+2.5f))
         {
             creature.AddSplineFlag(SPLINEFLAG_WALKMODE);
             _setRandomLocation(creature);

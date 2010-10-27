@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Wheel_T.h
  *
- *  $Id: Timer_Wheel_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Timer_Wheel_T.h 84619 2009-02-26 12:26:16Z johnnyw $
  *
  *  @author Darrell Brunsch <brunsch@cs.wustl.edu>
  */
@@ -126,8 +126,8 @@ public:
   virtual int reset_interval (long timer_id,
                               const ACE_Time_Value& interval);
 
-  /// Cancel all timer associated with @a type.  If <dont_call> is 0
-  /// then the <functor> will be invoked.  Returns number of timers
+  /// Cancel all timer associated with @a type.  If @a dont_call_handle_close is
+  /// 0 then the <functor> will be invoked.  Returns number of timers
   /// cancelled.
   virtual int cancel (const TYPE& type,
                       int dont_call_handle_close = 1);

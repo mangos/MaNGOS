@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_pwd.h
  *
- *  $Id: OS_NS_pwd.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_pwd.h 87270 2009-10-29 21:47:47Z olli $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -32,10 +32,6 @@
 #  undef ACE_EXPORT_MACRO
 #endif
 #define ACE_EXPORT_MACRO ACE_Export
-
-# if defined (ACE_HAS_BROKEN_R_ROUTINES)
-#   undef getpwnam_r
-# endif /* ACE_HAS_BROKEN_R_ROUTINES */
 
 struct passwd;
 

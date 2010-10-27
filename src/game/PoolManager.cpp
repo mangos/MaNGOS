@@ -385,7 +385,7 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj, bool instantly)
                 if(!instantly)
                 {
                     pCreature->SetRespawnTime( pCreature->GetRespawnDelay() );
-                    if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY) || pCreature->isWorldBoss())
+                    if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY) || pCreature->IsWorldBoss())
                         pCreature->SaveRespawnTime();
                 }
                 map->Add(pCreature);

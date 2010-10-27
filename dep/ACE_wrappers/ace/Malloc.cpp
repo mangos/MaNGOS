@@ -1,4 +1,4 @@
-// $Id: Malloc.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Malloc.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 #include "ace/Malloc.h"
 
@@ -9,11 +9,6 @@
 #include "ace/Object_Manager.h"
 #include "ace/Malloc_Base.h"
 #include "ace/OS_NS_string.h"
-
-
-ACE_RCSID (ace,
-           Malloc,
-           "$Id: Malloc.cpp 80826 2008-03-04 14:51:23Z wotte $")
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -145,10 +140,9 @@ ACE_Control_Block::ACE_Name_Node::dump (void) const
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("pointer = %@"), (const char *) this->pointer_));
   ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\nnext_ = %@"), (ACE_Name_Node *) this->next_));
   ACE_DEBUG ((LM_DEBUG,
-              ACE_TEXT ("\nname_ = (%@, %s)"),
+              ACE_TEXT ("\nname_ = (%@, %C)\n"),
               (const char *) this->name_,
               (const char *) this->name_));
-  ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\n")));
   ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
 }

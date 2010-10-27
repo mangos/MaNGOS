@@ -4,7 +4,7 @@
 /**
  *  @file    Guard_T.h
  *
- *  $Id: Guard_T.h 82508 2008-08-05 13:52:48Z johnnyw $
+ *  $Id: Guard_T.h 91459 2010-08-25 09:51:01Z mcorino $
  *
  *   Moved from Synch.h.
  *
@@ -31,12 +31,35 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * @class ACE_Guard
  *
  * @brief This data structure is meant to be used within a method or
- * function...  It performs automatic aquisition and release of
- * a parameterized synchronization object <ACE_LOCK>.
+ * function...  It performs automatic acquisition and release of
+ * a parameterized synchronization object ACE_LOCK.
  *
- * The <ACE_LOCK> class given as an actual parameter must provide at
+ * The <ACE_LOCK> class given as an actual parameter must provide, at
  * the very least the <acquire>, <tryacquire>, <release>, and
  * <remove> methods.
+ *
+ * WARNING: A successfully constructed ACE_Guard does NOT mean that the
+ * lock was acquired!  It is the caller's responsibility, after
+ * constructing an ACE_Guard, to check whether the lock was successfully
+ * acquired.  Code like this is dangerous:
+ *   {
+ *     ACE_Guard<ACE_Lock> g(lock);
+ *     ... perform critical operation requiring lock to be held ...
+ *   }
+ * Instead, one must do something like this:
+ *   {
+ *     ACE_Guard<ACE_Lock> g(lock);
+ *     if (! g.locked())
+ *       {
+ *         ... handle error ...
+ *       }
+ *     else
+ *       {
+ *         ... perform critical operation requiring lock to be held ...
+ *       }
+ *   }
+ * The ACE_GUARD_RETURN() and ACE_GUARD_REACTION() macros are designed to
+ * to help with this.
  */
 template <class ACE_LOCK>
 class ACE_Guard
@@ -52,8 +75,8 @@ public:
   ACE_Guard (ACE_LOCK &l, bool block);
 
   /// Initialise the guard without implicitly acquiring the lock. The
-  /// <become_owner> parameter indicates whether the guard should release
-  /// the lock implicitly on destruction. The <block> parameter is
+  /// @a become_owner parameter indicates whether the guard should release
+  /// the lock implicitly on destruction. The @a block parameter is
   /// ignored and is used here to disambiguate with the preceding
   /// constructor.
   ACE_Guard (ACE_LOCK &l, bool block, int become_owner);
@@ -77,9 +100,9 @@ public:
   void disown (void);
 
   // = Utility methods.
-  /// 1 if locked, 0 if couldn't acquire the lock
+  /// true if locked, false if couldn't acquire the lock
   /// (errno will contain the reason for this).
-  int locked (void) const;
+  bool locked (void) const;
 
   /// Explicitly remove the lock.
   int remove (void);
@@ -114,6 +137,8 @@ private:
  * acquires/releases a write lock automatically (naturally, the
  * <ACE_LOCK> it is instantiated with must support the appropriate
  * API).
+ *
+ * WARNING: See important "WARNING" in comments at top of ACE_Guard.
  */
 template <class ACE_LOCK>
 class ACE_Write_Guard : public ACE_Guard<ACE_LOCK>
@@ -158,6 +183,8 @@ public:
  * acquires/releases a read lock automatically (naturally, the
  * <ACE_LOCK> it is instantiated with must support the appropriate
  * API).
+ *
+ * WARNING: See important "WARNING" in comments at top of ACE_Guard.
  */
 template <class ACE_LOCK>
 class ACE_Read_Guard : public ACE_Guard<ACE_LOCK>

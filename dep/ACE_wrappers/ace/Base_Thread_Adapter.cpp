@@ -1,10 +1,6 @@
-// $Id: Base_Thread_Adapter.cpp 81239 2008-04-04 22:28:48Z iliyan $
+// $Id: Base_Thread_Adapter.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Base_Thread_Adapter.h"
-
-ACE_RCSID (ace,
-           Base_Thread_Adapter,
-           "$Id: Base_Thread_Adapter.cpp 81239 2008-04-04 22:28:48Z iliyan $")
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/Base_Thread_Adapter.inl"

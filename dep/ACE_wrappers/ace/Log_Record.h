@@ -4,7 +4,7 @@
 /**
  *  @file    Log_Record.h
  *
- *  $Id: Log_Record.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Log_Record.h 91064 2010-07-12 10:11:24Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -56,7 +56,7 @@ public:
 
   // = Initialization
   /**
-   * Create a <Log_Record> and set its priority, time stamp, and
+   * Create a Log_Record and set its priority, time stamp, and
    * process id.
    */
   ACE_Log_Record (void);
@@ -72,7 +72,7 @@ public:
 
 
   /// Write the contents of the logging record to the appropriate
-  /// <FILE> iff the corresponding type is enabled.
+  /// FILE if the corresponding type is enabled.
   int print (const ACE_TCHAR host_name[],
              u_long verbose_flag,
 #if !defined (ACE_HAS_WINCE)
@@ -83,7 +83,7 @@ public:
 
 #if !defined (ACE_LACKS_IOSTREAM_TOTALLY)
   /// Write the contents of the logging record to the appropriate
-  /// <ostream> iff the corresponding type is enabled.
+  /// @a stream if the corresponding type is enabled.
   int print (const ACE_TCHAR host_name[],
              u_long verbose_flag,
              ACE_OSTREAM_TYPE &stream);
@@ -95,68 +95,73 @@ public:
 
   /**
    * Returns a character array with the string form of the
-   * <ACE_Log_Priority> parameter.  This is used for the verbose
+   * ACE_Log_Priority parameter.  This is used for the verbose
    * printing format.
    */
   static const ACE_TCHAR *priority_name (ACE_Log_Priority p);
 
-  // IMPORTANT: @a name must be a statically allocated const ACE_TCHAR*
-  static void priority_name (ACE_Log_Priority p,
-                             const ACE_TCHAR *name);
+  /// IMPORTANT: @a name must be a statically allocated const ACE_TCHAR*
+  static void priority_name (ACE_Log_Priority p, const ACE_TCHAR *name);
 
   // = Marshall/demarshall
-  /// Encode the <Log_Record> for transmission on the network.
-  /// @deprecated The encode() and decode() metods are deprecated; please use
-  /// the CDR insertion and extraction operators to properly encode and decode
-  /// ACE_Log_Record objects.
+  /**
+   * Encode the @c Log_Record for transmission on the network.
+   * @deprecated
+   * The encode() and decode() metods are deprecated; please use
+   * the CDR insertion and extraction operators to properly encode and decode
+   * ACE_Log_Record objects.
+   */
   void encode (void);
 
-  /// Decode the <Log_Record> received from the network.
-  /// @deprecated The encode() and decode() metods are deprecated; please use
-  /// the CDR insertion and extraction operators to properly encode and decode
-  /// ACE_Log_Record objects.
+  /**
+   * Decode the @c Log_Record received from the network.
+   * @deprecated
+   * The encode() and decode() metods are deprecated; please use
+   * the CDR insertion and extraction operators to properly encode and decode
+   * ACE_Log_Record objects.
+   */
   void decode (void);
 
   // = Set/get methods
 
-  /// Get the type of the <Log_Record>.
+  /// Get the type of the Log_Record.
   ACE_UINT32 type (void) const;
 
-  /// Set the type of the <Log_Record>.
+  /// Set the type of the Log_Record.
   void type (ACE_UINT32);
 
   /**
-   * Get the priority of the <Log_Record> <type_>.  This is computed
+   * Get the priority of the Log_Record <type_>.  This is computed
    * as the base 2 logarithm of <type_> (which must be a power of 2,
-   * as defined by the enums in <ACE_Log_Priority>).
+   * as defined by the enums in ACE_Log_Priority).
    */
   u_long priority (void) const;
 
-  /// Set the priority of the <Log_Record> <type_> (which must be a
-  /// power of 2, as defined by the enums in <ACE_Log_Priority>).
+  /// Set the priority of the Log_Record <type_> (which must be a
+  /// power of 2, as defined by the enums in ACE_Log_Priority).
   void priority (u_long num);
 
-  /// Get the total length of the <Log_Record>, which includes the
+  /// Get the total length of the Log_Record, which includes the
   /// size of the various data member fields.
   long length (void) const;
 
-  /// Set the total length of the <Log_Record>, which needs to account for
+  /// Set the total length of the Log_Record, which needs to account for
   /// the size of the various data member fields.
   void length (long);
 
-  /// Get the time stamp of the <Log_Record>.
+  /// Get the time stamp of the Log_Record.
   ACE_Time_Value time_stamp (void) const;
 
-  /// Set the time stamp of the <Log_Record>.
+  /// Set the time stamp of the Log_Record.
   void time_stamp (const ACE_Time_Value &ts);
 
-  /// Get the process id of the <Log_Record>.
+  /// Get the process id of the Log_Record.
   long pid (void) const;
 
-  /// Set the process id of the <Log_Record>.
+  /// Set the process id of the Log_Record.
   void pid (long);
 
-  /// Get the message data of the <Log_Record>.
+  /// Get the message data of the Log_Record.
   const ACE_TCHAR *msg_data (void) const;
 
   /// Set the message data of the record. If @a data is longer than the
@@ -164,7 +169,7 @@ public:
   /// fit. If such a reallocation faisl, this method returns -1, else 0.
   int msg_data (const ACE_TCHAR *data);
 
-  /// Get the size of the message data of the <Log_Record>, including
+  /// Get the size of the message data of the Log_Record, including
   /// a byte for the NUL.
   size_t msg_data_len (void) const;
 
@@ -198,7 +203,9 @@ private:
 
   /// Logging record data
   ACE_TCHAR *msg_data_;   // Heap-allocated text message area
-  size_t msg_data_size_;  // Allocated size of msg_data_ in ACE_TCHARs
+
+  /// Allocated size of msg_data_ in ACE_TCHARs
+  size_t msg_data_size_;
 
   /// disallow copying...
   ACE_Log_Record (const ACE_Log_Record& rhs);

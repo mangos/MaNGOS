@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_netdb.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_netdb.inl 86295 2009-07-30 10:41:49Z shuston $
 
 #include "ace/OS_NS_macros.h"
 #include "ace/OS_NS_string.h"
@@ -125,7 +125,7 @@ ACE_OS::gethostbyaddr_r (const char *addr,
       *h_errnop = h_errno;
       return (struct hostent *) 0;
     }
-#   elif defined (__GLIBC__) || defined (__FreeBSD__)
+#   elif defined (__GLIBC__)
   // GNU C library has a different signature
   ACE_OS::memset (buffer, 0, sizeof (ACE_HOSTENT_DATA));
 
@@ -318,7 +318,7 @@ ACE_OS::gethostbyname_r (const char *name,
       *h_errnop = h_errno;
       return (struct hostent *) 0;
     }
-#   elif defined (__GLIBC__) || defined (__FreeBSD__)
+#   elif defined (__GLIBC__)
   // GNU C library has a different signature
   ACE_OS::memset (buffer, 0, sizeof (ACE_HOSTENT_DATA));
 
@@ -410,12 +410,16 @@ ACE_OS::gethostbyname_r (const char *name,
 # else
   ACE_UNUSED_ARG (result);
   ACE_UNUSED_ARG (buffer);
-  ACE_UNUSED_ARG (h_errnop);
 
-  //FUZZ: disable check_for_lack_ACE_OS
-  ACE_SOCKCALL_RETURN (::gethostbyname (name),
-                       struct hostent *,
-                       0);
+  // FUZZ: disable check_for_lack_ACE_OS
+  struct hostent *result2 = 0;
+  ACE_SOCKCALL (::gethostbyname (name),
+                struct hostent *,
+                0,
+                result2);
+  if (result2 == 0 && h_errnop)
+    *h_errnop = errno;
+  return result2;
   //FUZZ: enable check_for_lack_ACE_OS
 # endif /* defined (ACE_HAS_REENTRANT_FUNCTIONS) && !defined (UNIXWARE) */
 }
@@ -528,7 +532,7 @@ ACE_OS::getprotobyname_r (const char *name,
   else
     return 0;
   //FUZZ: enable check_for_lack_ACE_OS
-# elif defined (__GLIBC__) || defined (__FreeBSD__)
+# elif defined (__GLIBC__)
   // GNU C library has a different signature
   //FUZZ: disable check_for_lack_ACE_OS
   if (::getprotobyname_r (name,
@@ -609,7 +613,7 @@ ACE_OS::getprotobynumber_r (int proto,
   //FUZZ: enable check_for_lack_ACE_OS
   else
     return 0;
-# elif defined (__GLIBC__) || defined (__FreeBSD__)
+# elif defined (__GLIBC__)
   // GNU C library has a different signature
   //FUZZ: disable check_for_lack_ACE_OS
   if (::getprotobynumber_r (proto,
@@ -695,7 +699,7 @@ ACE_OS::getservbyname_r (const char *svc,
   //FUZZ: enable check_for_lack_ACE_OS
   else
     return (struct servent *) 0;
-# elif defined (__GLIBC__) || defined (__FreeBSD__)
+# elif defined (__GLIBC__)
   // GNU C library has a different signature
   ACE_OS::memset (buf, 0, sizeof (ACE_SERVENT_DATA));
 

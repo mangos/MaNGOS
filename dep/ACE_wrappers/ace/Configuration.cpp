@@ -1,9 +1,10 @@
-// $Id: Configuration.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Configuration.cpp 86348 2009-08-04 14:45:29Z shuston $
 #include "ace/Configuration.h"
 #include "ace/Auto_Ptr.h"
 #include "ace/SString.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_strings.h"
+#include "ace/Tokenizer_T.h"
 
 // Can remove this when import_config and export_config are removed from
 // ACE_Configuration. They're deprecated at ACE 5.2.
@@ -518,11 +519,7 @@ ACE_Configuration_Win32Registry::open_section (const ACE_Configuration_Section_K
                                              KEY_ALL_ACCESS,
                                              0,
                                              &result_key,
-#if defined (__MINGW32__)
                                              (PDWORD) 0
-#else
-                                             0
-#endif /* __MINGW32__ */
                                              )) != ERROR_SUCCESS)
         {
           errno = errnum;
@@ -540,7 +537,7 @@ ACE_Configuration_Win32Registry::open_section (const ACE_Configuration_Section_K
 int
 ACE_Configuration_Win32Registry::remove_section (const ACE_Configuration_Section_Key& key,
                                                  const ACE_TCHAR* sub_section,
-                                                 int recursive)
+                                                 bool recursive)
 {
   if (validate_name (sub_section))
     return -1;
@@ -574,13 +571,12 @@ ACE_Configuration_Win32Registry::remove_section (const ACE_Configuration_Section
                                     0,
                                     0) == ERROR_SUCCESS)
         {
-          remove_section (section, name_buffer, 1);
+          remove_section (section, name_buffer, true);
           buffer_size = ACE_DEFAULT_BUFSIZE;
         }
     }
 
-  int errnum;
-  errnum = ACE_TEXT_RegDeleteKey (base_key, sub_section);
+  int const errnum = ACE_TEXT_RegDeleteKey (base_key, sub_section);
   if (errnum != ERROR_SUCCESS)
     {
       errno = errnum;
@@ -1049,11 +1045,7 @@ ACE_Configuration_Win32Registry::resolve_key (HKEY hKey,
                                                             KEY_ALL_ACCESS,
                                                             0,
                                                             &subkey,
-#if defined (__MINGW32__)
                                                             (PDWORD) 0
-#else
-                                                            0
-#endif /* __MINGW32__ */
                                                             )) !=ERROR_SUCCESS)
             {
               errno = errnum;
@@ -1267,6 +1259,12 @@ ACE_Configuration_Heap::~ACE_Configuration_Heap (void)
 int
 ACE_Configuration_Heap::open (size_t default_map_size)
 {
+  if (this->allocator_ != 0)
+    {
+      errno = EBUSY;
+      return -1;
+    }
+
   default_map_size_ = default_map_size;
   // Create the allocator with the appropriate options.
   // The name used for  the lock is the same as one used
@@ -1283,6 +1281,12 @@ ACE_Configuration_Heap::open (const ACE_TCHAR* file_name,
                               void* base_address,
                               size_t default_map_size)
 {
+  if (this->allocator_ != 0)
+    {
+      errno = EBUSY;
+      return -1;
+    }
+
   default_map_size_ = default_map_size;
 
   // Make sure that the file name is of the legal length.
@@ -1595,7 +1599,7 @@ ACE_Configuration_Heap::open_simple_section (const ACE_Configuration_Section_Key
 int
 ACE_Configuration_Heap::remove_section (const ACE_Configuration_Section_Key& key,
                                         const ACE_TCHAR* sub_section,
-                                        int recursive)
+                                        bool recursive)
 {
   ACE_ASSERT (this->allocator_);
   if (validate_name (sub_section))
@@ -1617,7 +1621,7 @@ ACE_Configuration_Heap::remove_section (const ACE_Configuration_Section_Key& key
 
   section += sub_section;
   ACE_Configuration_ExtId SectionExtId (section.fast_rep ());
-  SECTION_HASH::ENTRY* section_entry;
+  SECTION_HASH::ENTRY* section_entry = 0;
   SECTION_HASH* hashmap = index_;
   if (hashmap->find (SectionExtId, section_entry))
     return -1;
@@ -1632,7 +1636,7 @@ ACE_Configuration_Heap::remove_section (const ACE_Configuration_Section_Key& key
       ACE_TString name;
       while (!enumerate_sections (section, index, name))
         {
-          if (remove_section (section, name.fast_rep (), 1))
+          if (remove_section (section, name.fast_rep (), true))
             return -1;
 
           ++index;
@@ -1801,7 +1805,7 @@ ACE_Configuration_Heap::set_string_value (const ACE_Configuration_Section_Key& k
     return -1;
 
   // Get the entry for this item (if it exists)
-  VALUE_HASH::ENTRY* entry;
+  VALUE_HASH::ENTRY* entry = 0;
   ACE_Configuration_ExtId item_name (t_name);
   if (section_int.value_hash_map_->VALUE_HASH::find (item_name, entry) == 0)
     {
@@ -1860,7 +1864,7 @@ ACE_Configuration_Heap::set_integer_value (const ACE_Configuration_Section_Key& 
     return -1;  // section does not exist
 
   // Get the entry for this item (if it exists)
-  VALUE_HASH::ENTRY* entry;
+  VALUE_HASH::ENTRY* entry = 0;
   ACE_Configuration_ExtId item_name (t_name);
   if (section_int.value_hash_map_->VALUE_HASH::find (item_name, entry) == 0)
     {
@@ -1910,7 +1914,7 @@ ACE_Configuration_Heap::set_binary_value (const ACE_Configuration_Section_Key& k
     return -1;    // section does not exist
 
   // Get the entry for this item (if it exists)
-  VALUE_HASH::ENTRY* entry;
+  VALUE_HASH::ENTRY* entry = 0;
   ACE_Configuration_ExtId item_name (t_name);
   if (section_int.value_hash_map_->VALUE_HASH::find (item_name, entry) == 0)
     {
@@ -2100,7 +2104,7 @@ ACE_Configuration_Heap::find_value (const ACE_Configuration_Section_Key& key,
 
   // Find it
   ACE_Configuration_ExtId ValueExtId (t_name);
-  VALUE_HASH::ENTRY* value_entry;
+  VALUE_HASH::ENTRY* value_entry = 0;
   if (((VALUE_HASH *) IntId.value_hash_map_)->find (ValueExtId, value_entry))
     return -1;  // value does not exist
 
@@ -2130,7 +2134,7 @@ ACE_Configuration_Heap::remove_value (const ACE_Configuration_Section_Key& key,
 
   // Find it
   ACE_Configuration_ExtId ValueExtId (t_name);
-  VALUE_HASH::ENTRY* value_entry;
+  VALUE_HASH::ENTRY* value_entry = 0;
   if (((VALUE_HASH *) IntId.value_hash_map_)->find (ValueExtId, value_entry))
     return -1;
 

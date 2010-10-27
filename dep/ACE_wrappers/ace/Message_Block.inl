@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: Message_Block.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Message_Block.inl 84527 2009-02-19 14:01:42Z johnnyw $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -397,7 +397,7 @@ ACE_Message_Block::replace_data_block (ACE_Data_Block *db)
   if (db != 0)
     {
       // Set the read and write pointers in the <Message_Block> to point
-      // to the buffer in the <ACE_Data_Block>.
+      // to the buffer in the ACE_Data_Block.
       this->rd_ptr (this->data_block ()->base ());
       this->wr_ptr (this->data_block ()->base ());
     }

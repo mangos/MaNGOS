@@ -4,7 +4,7 @@
 /**
  *  @file    Acceptor.h
  *
- *  $Id: Acceptor.h 81460 2008-04-28 11:34:23Z elliott_c $
+ *  $Id: Acceptor.h 88800 2010-02-01 23:18:34Z shuston $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -89,7 +89,7 @@ public:
    * @param use_select Affects behavior when called back by the reactor
    *                   when a connection can be accepted.  If non-zero,
    *                   this object will accept all pending connections,
-   *                   intead of just the one that triggered the reactor
+   *                   instead of just the one that triggered the reactor
    *                   callback.  Uses ACE_OS::select() internally to
    *                   detect any remaining acceptable connections.
    *                   The default is 1.
@@ -128,7 +128,7 @@ public:
    * @param use_select Affects behavior when called back by the reactor
    *                   when a connection can be accepted.  If non-zero,
    *                   this object will accept all pending connections,
-   *                   intead of just the one that triggered the reactor
+   *                   instead of just the one that triggered the reactor
    *                   callback.  Uses ACE_OS::select() internally to
    *                   detect any remaining acceptable connections.
    *                   The default is 1.
@@ -187,7 +187,7 @@ protected:
 
   /**
    * Bridge method for accepting the new connection into the
-   * <svc_handler>.  The default behavior delegates to the
+   * @a svc_handler.  The default behavior delegates to the
    * PEER_ACCEPTOR::accept.
    */
   virtual int accept_svc_handler (SVC_HANDLER *svc_handler);
@@ -293,8 +293,6 @@ public:
   typedef ACE_Concurrency_Strategy<SVC_HANDLER> CONCURRENCY_STRATEGY;
   typedef ACE_Scheduling_Strategy<SVC_HANDLER> SCHEDULING_STRATEGY;
 
-
-
   /// Default constructor.
   ACE_Strategy_Acceptor (const ACE_TCHAR service_name[] = 0,
                          const ACE_TCHAR service_description[] = 0,
@@ -341,7 +339,7 @@ public:
    * @param use_select   Affects behavior when called back by the reactor
    *                     when a connection can be accepted.  If non-zero,
    *                     this object will accept all pending connections,
-   *                     intead of just the one that triggered the reactor
+   *                     instead of just the one that triggered the reactor
    *                     callback.  Uses ACE_OS::select() internally to
    *                     detect any remaining acceptable connections.
    *                     The default is 1.
@@ -505,21 +503,30 @@ protected:
  * @class ACE_Oneshot_Acceptor
  *
  * @brief Generic factory for passively connecting clients and creating
- * exactly one service handler (SVC_HANDLER).
+ * exactly one service handler of the type SVC_HANDLER specified in the
+ * template.
  *
- * This class works similarly to the regular {ACE_Acceptor},
+ * This class works similarly to the regular ACE_Acceptor, but
  * with the following differences:
- * 1. This class doesn't automagically register {this} with the
- * {ACE_Reactor} since it expects to have its {accept} method
- * called directly.  However, it stashes the {ACE_Reactor}
- * pointer away in case it's needed later to finish accepting
- * a connection asynchronously.
- * 2. The class doesn't need an {ACE_Creation_Strategy} (since
- * the user supplies the SVC_HANDLER) or an
- * {ACE_Accept_Strategy} (since this class only accepts one
- * connection and then removes all traces of itself from the
- * {ACE_Reactor} if it was registered for asynchronous
- * accepts).
+ *  -# ACE_Oneshot_Acceptor doesn't automatically register itself with the
+ *     ACE_Reactor; the caller is expected to call the accept() method
+ *     directly. Since a later call to accept() may require a reactor,
+ *     the constructor and open() methods both accept an ACE_Reactor pointer
+ *     which is saved in case it's needed in accept().
+ *  -# ACE_Oneshot_Acceptor doesn't need an ACE_Creation_Strategy (because
+ *     the user supplies the SVC_HANDLER) or an ACE_Accept_Strategy (because
+ *     this class only accepts one connection and then removes all traces of
+ *     itself from the ACE_Reactor if it was registered for asynchronous
+ *     accepts).
+ *
+ * The usage model for ACE_Oneshot_Acceptor is:
+ *  - Instantiate an object and establish its local address to listen at.
+ *    This can be accomplished using either the address-accepting constructor
+ *    (but there's no error indication) or the default constructor followed
+ *    by a call to open().
+ *  - Call the accept() method. This will attempt to accept a connection
+ *    immediately. If there is no immediately available connection to accept,
+ *    behavior is governed by the ACE_Synch_Options argument passed to open().
  */
 template <class SVC_HANDLER, ACE_PEER_ACCEPTOR_1>
 class ACE_Oneshot_Acceptor : public ACE_Service_Object
@@ -537,10 +544,10 @@ public:
 
   /**
    * Initialize the appropriate strategies for concurrency and then
-   * open the {peer_acceptor} at the designated {local_addr}.  Note
-   * that unlike the {ACE_Acceptor} and {ACE_Strategy_Acceptor}, this
-   * method does NOT register {this} acceptor with the {reactor} at
-   * this point -- it just stashes the {reactor} away in case it's
+   * open the acceptor at the designated @a local_addr.  Note
+   * that unlike ACE_Acceptor and ACE_Strategy_Acceptor, this
+   * method does NOT register this acceptor with the @a reactor at
+   * this point -- the @a reactor parameter is saved in case it's
    * needed later.
    */
   ACE_Oneshot_Acceptor (const ACE_PEER_ACCEPTOR_ADDR &local_addr,
@@ -549,10 +556,10 @@ public:
 
   /**
    * Initialize the appropriate strategies for concurrency and then
-   * open the {peer_acceptor} at the designated {local_addr}.  Note
-   * that unlike the {ACE_Acceptor} and {ACE_Strategy_Acceptor}, this
-   * method does NOT register {this} acceptor with the {reactor} at
-   * this point -- it just stashes the {reactor} away in case it's
+   * open the acceptor at the designated @a local_addr.  Note
+   * that unlike ACE_Acceptor and ACE_Strategy_Acceptor, this
+   * method does NOT register this acceptor with the @a reactor at
+   * this point -- the @a reactor parameter is saved in case it's
    * needed later.
    */
   int open (const ACE_PEER_ACCEPTOR_ADDR &,
@@ -568,8 +575,8 @@ public:
   virtual int accept (SVC_HANDLER * = 0,
                       ACE_PEER_ACCEPTOR_ADDR *remote_addr = 0,
                       const ACE_Synch_Options &synch_options = ACE_Synch_Options::defaults,
-                      int restart = 1,
-                      int reset_new_handle = 0);
+                      bool restart = true,
+                      bool reset_new_handle = false);
 
   /// Cancel a oneshot acceptor that was started asynchronously.
   virtual int cancel (void);
@@ -605,8 +612,8 @@ protected:
   int shared_accept (SVC_HANDLER *svc_handler,
                      ACE_PEER_ACCEPTOR_ADDR *remote_addr,
                      ACE_Time_Value *timeout,
-                     int restart,
-                     int reset_new_handle);
+                     bool restart,
+                     bool reset_new_handle);
 
   // = Demultiplexing hooks.
   /// Returns the listening acceptor's {ACE_HANDLE}.
@@ -654,13 +661,13 @@ private:
    */
   int register_handler (SVC_HANDLER *svc_handler,
                         const ACE_Synch_Options &options,
-                        int restart);
+                        bool restart);
 
   /// Hold the svc_handler_ across asynchrony boundaries.
   SVC_HANDLER *svc_handler_;
 
   /// Hold the restart flag across asynchrony boundaries.
-  int restart_;
+  bool restart_;
 
   /// Factory that establishes connections passively.
   ACE_PEER_ACCEPTOR peer_acceptor_;

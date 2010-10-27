@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: UPIPE_Connector.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: UPIPE_Connector.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -24,11 +24,11 @@ ACE_UPIPE_Connector::ACE_UPIPE_Connector (ACE_UPIPE_Stream &new_stream,
                 ACE_TEXT ("ACE_UPIPE_Connector")));
 }
 
-ACE_INLINE int
+ACE_INLINE bool
 ACE_UPIPE_Connector::reset_new_handle (ACE_HANDLE /* handle */)
 {
   // Nothing to do here since the handle is not a socket
-  return 0;
+  return false;
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

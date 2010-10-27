@@ -1,4 +1,4 @@
-// $Id: Notification_Queue.cpp 81315 2008-04-10 07:14:15Z johnnyw $
+// $Id: Notification_Queue.cpp 85236 2009-05-01 11:43:56Z johnnyw $
 
 #include "ace/Notification_Queue.h"
 
@@ -26,8 +26,7 @@ ACE_Notification_Queue::
 }
 
 int
-ACE_Notification_Queue::
-open()
+ACE_Notification_Queue::open()
 {
   ACE_TRACE ("ACE_Notification_Queue::open");
 
@@ -40,8 +39,7 @@ open()
 }
 
 void
-ACE_Notification_Queue::
-reset()
+ACE_Notification_Queue::reset()
 {
   ACE_TRACE ("ACE_Notification_Queue::reset");
 
@@ -75,8 +73,8 @@ reset()
   Buffer_List().swap(free_queue_);
 }
 
-int ACE_Notification_Queue::
-allocate_more_buffers()
+int
+ACE_Notification_Queue::allocate_more_buffers()
 {
   ACE_TRACE ("ACE_Notification_Queue::allocate_more_buffers");
 
@@ -101,9 +99,9 @@ allocate_more_buffers()
 }
 
 int
-ACE_Notification_Queue::
-purge_pending_notifications(ACE_Event_Handler * eh,
-                            ACE_Reactor_Mask mask)
+ACE_Notification_Queue::purge_pending_notifications(
+  ACE_Event_Handler * eh,
+  ACE_Reactor_Mask mask)
 {
   ACE_TRACE ("ACE_Notification_Queue::purge_pending_notifications");
 
@@ -155,8 +153,8 @@ purge_pending_notifications(ACE_Event_Handler * eh,
   return number_purged;
 }
 
-int ACE_Notification_Queue::
-push_new_notification(
+int
+ACE_Notification_Queue::push_new_notification(
   ACE_Notification_Buffer const & buffer)
 {
   ACE_TRACE ("ACE_Notification_Queue::push_new_notification");
@@ -210,8 +208,7 @@ ACE_Notification_Queue::pop_next_notification(
       return 0;
     }
 
-  ACE_Notification_Queue_Node * node =
-    notify_queue_.pop_front();
+  ACE_Notification_Queue_Node * node = notify_queue_.pop_front();
 
   current = node->get();
   free_queue_.push_front(node);

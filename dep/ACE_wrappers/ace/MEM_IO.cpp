@@ -1,5 +1,5 @@
 // MEM_IO.cpp
-// $Id: MEM_IO.cpp 82559 2008-08-07 20:23:07Z parsons $
+// $Id: MEM_IO.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/MEM_IO.h"
 #include "ace/Handle_Set.h"
@@ -10,7 +10,7 @@
 #include "ace/MEM_IO.inl"
 #endif /* __ACE_INLINE__ */
 
-ACE_RCSID(ace, MEM_IO, "$Id: MEM_IO.cpp 82559 2008-08-07 20:23:07Z parsons $")
+
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -54,7 +54,7 @@ ACE_Reactive_MEM_IO::recv_buf (ACE_MEM_SAP_Node *&buf,
       buf = 0;
       return 0;
     }
-  else if (retv != sizeof (ACE_OFF_T))
+  else if (retv != static_cast <ssize_t> (sizeof (ACE_OFF_T)))
     {
       //  Nothing available or we are really screwed.
       buf = 0;
@@ -75,26 +75,26 @@ ACE_Reactive_MEM_IO::send_buf (ACE_MEM_SAP_Node *buf,
     {
       return -1;
     }
-    
+
   // The offset.
   ACE_OFF_T offset =
     ACE_Utils::truncate_cast<ACE_OFF_T> (
       reinterpret_cast<char *> (buf)
       - static_cast<char *> (this->shm_malloc_->base_addr ()));
-      
+
   // Send the offset value over the socket.
   if (ACE::send (this->handle_,
                  (const char *) &offset,
                  sizeof (offset),
                  flags,
-                 timeout) != sizeof (offset))
+                 timeout) != static_cast <ssize_t> (sizeof (offset)))
     {
       // unsucessful send, release the memory in the shared-memory.
       this->release_buffer (buf);
 
       return -1;
     }
-    
+
   return ACE_Utils::truncate_cast<ssize_t> (buf->size ());
 }
 
@@ -280,12 +280,12 @@ ACE_MT_MEM_IO::recv_buf (ACE_MEM_SAP_Node *&buf,
     ACE_GUARD_RETURN (ACE_SYNCH_PROCESS_MUTEX, ace_mon, *this->recv_channel_.lock_, -1);
 
     buf = this->recv_channel_.queue_.read ();
-    
+
     if (buf != 0)
       {
         return ACE_Utils::truncate_cast<ssize_t> (buf->size ());
       }
-      
+
     return -1;
   }
 }
@@ -403,9 +403,9 @@ ACE_MEM_IO::send (const ACE_Message_Block *message_block,
         reinterpret_cast<ACE_MEM_SAP_Node *> (
           this->deliver_strategy_->acquire_buffer (
             ACE_Utils::truncate_cast<ssize_t> (len)));
-          
+
       size_t n = 0;
-      
+
       while (message_block != 0)
         {
           ACE_OS::memcpy (static_cast<char *> (buf->data ()) + n,
@@ -429,7 +429,7 @@ ACE_MEM_IO::send (const ACE_Message_Block *message_block,
                                                 0,
                                                 timeout);
     }
-    
+
   return 0;
 }
 

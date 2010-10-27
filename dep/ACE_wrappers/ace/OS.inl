@@ -1,5 +1,5 @@
 // -*- C++ -*-
-// $Id: OS.inl 81697 2008-05-14 18:33:11Z johnnyw $
+// $Id: OS.inl 87244 2009-10-27 20:15:48Z olli $
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # undef ACE_INLINE
@@ -41,18 +41,6 @@ using std::strftime;
 
 #if !defined (ACE_WIN32)
 
-// Matthew Stevens 7-10-95 Fix GNU GCC 2.7 for memchr() problem.
-# if defined (ACE_HAS_GNU_CSTRING_H)
-// Define this file to keep /usr/include/memory.h from being included.
-#   include /**/ <cstring>
-# else
-#   if defined (ACE_LACKS_MEMORY_H)
-#     include "ace/os_include/os_string.h"
-#   else
-#     include /**/ <memory.h>
-#   endif /* ACE_LACKS_MEMORY_H */
-# endif /* ACE_HAS_GNU_CSTRING_H */
-
 // The following are #defines and #includes that must be visible for
 // ACE to compile it's OS wrapper class implementation correctly.  We
 // put them inside of here to reduce compiler overhead if we're not
@@ -90,4 +78,3 @@ using std::strftime;
 #endif
 
 // ****************************************************************
-

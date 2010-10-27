@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_math.h
  *
- *  $Id: OS_NS_math.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_math.h 89470 2010-03-12 12:12:12Z olli $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -88,12 +88,18 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 namespace ACE_OS
 {
   /// This method computes the largest integral value not greater than x.
-  ACE_NAMESPACE_INLINE_FUNCTION
-  double floor (double x);
+  template <typename T>
+  T floor (T x)
+  {
+    return ACE_STD_NAMESPACE::floor (x);
+  }
 
   /// This method computes the smallest integral value not less than x.
-  ACE_NAMESPACE_INLINE_FUNCTION
-  double ceil (double x);
+  template <typename T>
+  T ceil (T x)
+  {
+    return ACE_STD_NAMESPACE::ceil (x);
+  }
 
   /// This method computes the base-2 logarithm of x.
   ACE_NAMESPACE_INLINE_FUNCTION

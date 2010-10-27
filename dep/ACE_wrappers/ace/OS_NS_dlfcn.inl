@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_dlfcn.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: OS_NS_dlfcn.inl 85341 2009-05-14 11:07:37Z johnnyw $
 
 #include "ace/OS_NS_macros.h"
 #include "ace/OS_NS_errno.h"
@@ -78,7 +78,7 @@ ACE_OS::dlerror (void)
 {
   ACE_OS_TRACE ("ACE_OS::dlerror");
 # if defined (ACE_HAS_SVR4_DYNAMIC_LINKING)
-  const char *err;
+  const char *err = 0;
 #   if defined(_M_UNIX)
   ACE_OSCALL (::_dlerror (), const char *, 0, err);
 #   else /* _M_UNIX */

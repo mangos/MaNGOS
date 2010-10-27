@@ -1,4 +1,4 @@
-// $Id: Pagefile_Memory_Pool.cpp 82559 2008-08-07 20:23:07Z parsons $
+// $Id: Pagefile_Memory_Pool.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 // Pagefile_Memory_Pool.cpp
 #include "ace/Pagefile_Memory_Pool.h"
@@ -21,7 +21,7 @@
 #include "ace/Based_Pointer_Repository.h"
 #endif /* ACE_HAS_POSITION_INDEPENDENT_POINTERS == 1  */
 
-ACE_RCSID(ace, Pagefile_Memory_Pool, "$Id: Pagefile_Memory_Pool.cpp 82559 2008-08-07 20:23:07Z parsons $")
+
 
 #if defined (ACE_WIN32) && !defined (ACE_HAS_PHARLAP)
 #if !defined (ACE_HAS_WINCE)
@@ -93,6 +93,10 @@ ACE_Pagefile_Memory_Pool::ACE_Pagefile_Memory_Pool (const ACE_TCHAR *backing_sto
       && ACE_OS::strlen (this->backing_store_name_) < sizeof this->backing_store_name_)
       ACE_OS::strcat (this->backing_store_name_,
                       ACE_TEXT ("_"));
+}
+
+ACE_Pagefile_Memory_Pool::~ACE_Pagefile_Memory_Pool (void)
+{
 }
 
 void *

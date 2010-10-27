@@ -54,7 +54,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
                 data << uint32(save->GetMapId());
                 data << uint32(save->GetDifficulty());
                 data << uint32(save->GetResetTime() - cur_time);
-                data << uint64(save->GetInstanceId());      // instance save id as unique instance copy id
+                data << ObjectGuid(save->GetInstanceGuid());
                 ++counter;
             }
         }
@@ -117,10 +117,10 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket &recv_data)
     //    if (count)
     //    {
     //        uint8 unk12,unk13;
-    //        uint64 guid;
+    //        ObjectGuid guid;
     //        for (int i=0;i<count;i++)
     //        {
-    //            recv_data.readPackGUID(guid);
+    //            recv_data >> guid.ReadAsPacked();
     //            recv_data >> (uint8)unk12;
     //            recv_data >> (uint8)unk13;
     //        }

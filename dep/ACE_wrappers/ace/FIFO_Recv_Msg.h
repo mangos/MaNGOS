@@ -4,7 +4,7 @@
 /**
  *  @file    FIFO_Recv_Msg.h
  *
- *  $Id: FIFO_Recv_Msg.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: FIFO_Recv_Msg.h 84480 2009-02-16 18:58:16Z johnnyw $
  *
  *  @author Doug Schmidt
  */
@@ -109,12 +109,12 @@ public:
   ssize_t recv (void *buf, size_t len);
 
 #if defined (ACE_HAS_STREAM_PIPES)
-  /// Recv <data> and <cntl> message via Stream pipes.
+  /// Recv @a data and @a cntl message via Stream pipes.
   ssize_t recv (ACE_Str_Buf *data,
                 ACE_Str_Buf *cntl,
                 int *flags);
 
-  /// Recv <data> and <cntl> message via Stream pipes in "band" mode.
+  /// Recv @a data and @a cntl message via Stream pipes in "band" mode.
   ssize_t recv (int *band,
                 ACE_Str_Buf *data,
                 ACE_Str_Buf *cntl,

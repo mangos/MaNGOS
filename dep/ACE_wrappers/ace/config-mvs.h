@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-mvs.h 81992 2008-06-16 19:09:50Z wotte $
+// $Id: config-mvs.h 88495 2010-01-12 19:23:11Z olli $
 
 // Config file for MVS with OpenEdition
 
@@ -13,7 +13,6 @@
 #define NSIG 44                 /* missing from Signal.h */
 #define MAXHOSTNAMELEN 256      /* missing form netdb.h */
 #define howmany __howmany       /* MVS uses different names than most others */
-#define fd_mask __fd_mask
 #define MAXNAMLEN  __DIR_NAME_MAX
 #if defined (log)               /* log is a macro in math.h */
 # undef log                     /* conflicts with log function in ACE */
@@ -43,7 +42,6 @@
 #define ERRMAX __sys_nerr
 
 #define ACE_HAS_3_PARAM_WCSTOK
-#define ACE_HAS_BROKEN_CTIME
 #define ACE_HAS_CONSISTENT_SIGNAL_PROTOTYPES
 #define ACE_HAS_CPLUSPLUS_HEADERS
 #define ACE_HAS_DIRENT
@@ -67,7 +65,6 @@
 #define ACE_HAS_SOCKADDR_IN_SIN_LEN
 #define ACE_HAS_SIZET_SOCKET_LEN
 #define ACE_HAS_SSIZE_T
-#define ACE_HAS_STRERROR
 #define ACE_HAS_STRBUF_T
 #define ACE_HAS_STRINGS
 #define ACE_HAS_SYSV_IPC
@@ -85,7 +82,6 @@
 
 #define ACE_LACKS_CONDATTR_PSHARED
 #define ACE_LACKS_INET_ATON
-#define ACE_LACKS_MSGBUF_T
 #define ACE_LACKS_MUTEXATTR_PSHARED
 #define ACE_LACKS_IOSTREAM_FX
 #define ACE_LACKS_LINEBUFFERED_STREAMBUF
@@ -102,7 +98,6 @@
 #define ACE_LACKS_SEMAPHORE_H
 #define ACE_LACKS_SIGINFO_H
 #define ACE_LACKS_STDINT_H
-#define ACE_LACKS_SYS_NERR
 #define ACE_LACKS_SYS_SELECT_H
 #define ACE_LACKS_SYS_SYSCTL_H
 #define ACE_LACKS_SYSTIME_H
@@ -111,6 +106,7 @@
 #define ACE_LACKS_THREAD_PROCESS_SCOPING
 #define ACE_LACKS_PTHREAD_ATTR_SETSTACKADDR
 #define ACE_LACKS_TIMESPEC_T
+#define ACE_LACKS_FD_MASK
 
 #if !defined (ACE_MT_SAFE)
 # define ACE_MT_SAFE 1

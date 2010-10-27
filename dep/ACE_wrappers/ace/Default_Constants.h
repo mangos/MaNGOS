@@ -4,7 +4,7 @@
 /**
  *  @file   Default_Constants.h
  *
- *  $Id: Default_Constants.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Default_Constants.h 87487 2009-11-12 07:54:39Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -18,13 +18,16 @@
 #define ACE_DEFAULT_CONSTANTS_H
 #include /**/ "ace/pre.h"
 
-// Included just keep compilers that see #pragma dierctive first
+// Included just keep compilers that see #pragma directive first
 // happy.
 #include /**/ "ace/config-all.h"
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
+
+// For _POSIX_TIMER_MAX
+#include "ace/os_include/os_limits.h"
 
 // Define the default constants for ACE.  Many of these are used for
 // the ACE tests and applications.  You can change these values by
@@ -61,6 +64,10 @@
 #if !defined (ACE_DEFAULT_SERVICE_REPOSITORY_SIZE)
 #define ACE_DEFAULT_SERVICE_REPOSITORY_SIZE 1024
 #endif /* ACE_DEFAULT_SERVICE_REPOSITORY_SIZE */
+
+#if !defined (ACE_DEFAULT_SERVICE_GESTALT_SIZE)
+#define ACE_DEFAULT_SERVICE_GESTALT_SIZE 1024
+#endif /* ACE_DEFAULT_SERVICE_GESTALT_SIZE */
 
 #if !defined (ACE_REACTOR_NOTIFICATION_ARRAY_SIZE)
 #define ACE_REACTOR_NOTIFICATION_ARRAY_SIZE 1024
@@ -196,7 +203,7 @@
 #   define ACE_DEFAULT_TIME_SERVER_STR "ACE_TS_TIME"
 # endif /* ACE_DEFAULT_TIME_SERVER_STR */
 
-// Used by the FIFO tests and the Client_Logging_Handler netsvc.
+// Used by the FIFO tests
 # if !defined (ACE_DEFAULT_RENDEZVOUS)
 #   if defined (ACE_HAS_STREAM_PIPES)
 #     define ACE_DEFAULT_RENDEZVOUS ACE_TEXT("/tmp/fifo.ace")
@@ -210,13 +217,20 @@
 # define ACE_DEFAULT_SYSLOG_FACILITY LOG_USER
 # endif /* ACE_DEFAULT_SYSLOG_FACILITY */
 
-# if !defined (ACE_DEFAULT_LOGGER_KEY)
+# if !defined (ACE_HAS_STREAM_LOG_MSG_IPC)
+#   if defined (ACE_HAS_STREAM_PIPES)
+#     define ACE_HAS_STREAM_LOG_MSG_IPC 1
+#   else
+#     define ACE_HAS_STREAM_LOG_MSG_IPC 0
+#   endif /* ACE_HAS_STREAM_PIPES */
+# endif /* !ACE_HAS_STREAM_LOG_MSG_IPC */
 
-#     if defined (ACE_HAS_STREAM_PIPES)
-#       define ACE_DEFAULT_LOGGER_KEY ACE_TEXT ("/tmp/server_daemon")
-#     else
-#       define ACE_DEFAULT_LOGGER_KEY ACE_TEXT ("localhost:20012")
-#     endif /* ACE_HAS_STREAM_PIPES */
+# if !defined (ACE_DEFAULT_LOGGER_KEY)
+#   if (ACE_HAS_STREAM_LOG_MSG_IPC == 1)
+#     define ACE_DEFAULT_LOGGER_KEY ACE_TEXT ("/tmp/server_daemon")
+#   else
+#     define ACE_DEFAULT_LOGGER_KEY ACE_TEXT ("localhost:20012")
+#   endif /* ACE_HAS_STREAM_LOG_MSG_IPC==1 */
 # endif /* ACE_DEFAULT_LOGGER_KEY */
 
 // The way to specify the local host for loopback IP. This is usually
@@ -297,6 +311,10 @@
 // Default size of the ACE Map_Manager.
 # if !defined (ACE_DEFAULT_MAP_SIZE)
 #   define ACE_DEFAULT_MAP_SIZE 1024
+# endif /* ACE_DEFAULT_MAP_SIZE */
+
+# if defined (ACE_DEFAULT_MAP_SIZE) && (ACE_DEFAULT_MAP_SIZE == 0)
+#  error ACE_DEFAULT_MAP_SIZE should not be zero
 # endif /* ACE_DEFAULT_MAP_SIZE */
 
 // Defaults for ACE Timer Wheel
@@ -450,9 +468,13 @@
 
 // Default number of ACE_Event_Handlers supported by
 // ACE_Timer_Heap.
-# if !defined (ACE_DEFAULT_TIMERS)
-#   define ACE_DEFAULT_TIMERS _POSIX_TIMER_MAX
-# endif /* ACE_DEFAULT_TIMERS */
+#if !defined (ACE_DEFAULT_TIMERS) && defined (_POSIX_TIMER_MAX)
+#  define ACE_DEFAULT_TIMERS _POSIX_TIMER_MAX
+#endif /* ACE_DEFAULT_TIMERS */
+
+#if !defined (ACE_DEFAULT_TIMERS) || (defined (ACE_DEFAULT_TIMERS) && (ACE_DEFAULT_TIMERS == 0))
+#error ACE_DEFAULT_TIMERS should be defined and not be zero
+#endif /* ACE_DEFAULT_TIMERS */
 
 #if defined (ACE_WIN32)
 #  define ACE_PLATFORM_A "Win32"
@@ -482,11 +504,9 @@
 #  define ACE_LD_SEARCH_PATH ACE_TEXT ("PATH")
 #  define ACE_LD_SEARCH_PATH_SEPARATOR_STR ACE_TEXT (";")
 #  define ACE_DLL_SUFFIX ACE_TEXT (".dll")
-#  if defined (__MINGW32__)
-#    define ACE_DLL_PREFIX ACE_TEXT ("lib")
-#  else /* __MINGW32__ */
+#  if !defined (ACE_DLL_PREFIX)
 #    define ACE_DLL_PREFIX ACE_TEXT ("")
-#  endif /* __MINGW32__ */
+#  endif /* !ACE_DLL_PREFIX */
 #else /* !ACE_WIN32 */
 #  if !defined (ACE_LD_SEARCH_PATH)
 #    define ACE_LD_SEARCH_PATH ACE_TEXT ("LD_LIBRARY_PATH")
@@ -558,6 +578,18 @@
 
 #define ACE_DEFAULT_LOCALNAME ACE_TEXT (ACE_DEFAULT_LOCALNAME_A)
 #define ACE_DEFAULT_GLOBALNAME ACE_TEXT (ACE_DEFAULT_GLOBALNAME_A)
+
+#if !defined (ACE_DEFAULT_OPEN_PERMS)
+#  define ACE_DEFAULT_OPEN_PERMS ACE_DEFAULT_FILE_PERMS
+#endif  /* ACE_DEFAULT_OPEN_PERMS */
+
+#if !defined (ACE_DEFAULT_RW_PROCESS_MUTEX_PERMS)
+# if defined (ACE_WIN32)
+#  define ACE_DEFAULT_RW_PROCESS_MUTEX_PERMS ACE_DEFAULT_OPEN_PERMS
+# else
+#  define ACE_DEFAULT_RW_PROCESS_MUTEX_PERMS (S_IRUSR | S_IWUSR)
+# endif /* ACE_WIN32 */
+#endif /* ACE_DEFAULT_RW_PROCESS_MUTEX_PERMS */
 
 # if defined (ACE_WIN32)
     // The "null" device on Win32.

@@ -4,7 +4,7 @@
 /**
  *  @file    UPIPE_Acceptor.h
  *
- *  $Id: UPIPE_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: UPIPE_Acceptor.h 82723 2008-09-16 09:35:44Z johnnyw $
  *
  *  @author Gerhard Lenzer
  *  @author Douglas C. Schmidt
@@ -69,8 +69,8 @@ public:
   int accept (ACE_UPIPE_Stream &server_stream,
               ACE_UPIPE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0);
+              bool restart = true,
+              bool reset_new_handle = false);
 
   /// Dump the state of an object.
   void dump (void) const;

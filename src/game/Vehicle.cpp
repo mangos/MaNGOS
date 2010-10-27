@@ -51,9 +51,9 @@ void Vehicle::RemoveFromWorld()
     Unit::RemoveFromWorld();
 }
 
-void Vehicle::setDeathState(DeathState s)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
+void Vehicle::SetDeathState(DeathState s)                       // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
 {
-    Creature::setDeathState(s);
+    Creature::SetDeathState(s);
 }
 
 void Vehicle::Update(uint32 diff)

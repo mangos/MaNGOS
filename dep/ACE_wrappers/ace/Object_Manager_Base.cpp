@@ -1,8 +1,8 @@
-// $Id: Object_Manager_Base.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Object_Manager_Base.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/Object_Manager_Base.h"
 
-ACE_RCSID(ace, Object_Manager_Base, "$Id: Object_Manager_Base.cpp 80826 2008-03-04 14:51:23Z wotte $")
+
 
 #include "ace/OS_Memory.h"
 #include "ace/OS_NS_Thread.h"
@@ -83,8 +83,8 @@ void *ACE_OS_Object_Manager::preallocated_object[
   ACE_OS_Object_Manager::ACE_OS_PREALLOCATED_OBJECTS] = { 0 };
 
 ACE_OS_Object_Manager::ACE_OS_Object_Manager (void)
-  // default_mask_ isn't initialized, because it's defined by <init>.
-  : thread_hook_ (0)
+  : default_mask_ (0)
+  , thread_hook_ (0)
   , exit_info_ ()
 #if defined (ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS)
   , seh_except_selector_ (ACE_SEH_Default_Exception_Selector)
@@ -394,11 +394,12 @@ ACE_OS_Object_Manager::fini (void)
 int ace_exit_hook_marker = 0;
 
 int
-ACE_OS_Object_Manager::at_exit (ACE_EXIT_HOOK func)
+ACE_OS_Object_Manager::at_exit (ACE_EXIT_HOOK func, const char* name)
 {
   return exit_info_.at_exit_i (&ace_exit_hook_marker,
                                reinterpret_cast <ACE_CLEANUP_FUNC> (func),
-                               0);
+                               0,
+                               name);
 }
 
 void

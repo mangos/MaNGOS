@@ -6,7 +6,7 @@
  *
  *  main sockets header
  *
- *  $Id: os_socket.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_socket.h 85015 2009-04-03 12:27:59Z johnnyw $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -30,9 +30,9 @@
 #  include /**/ <sys/socket.h>
 #endif /* !ACE_LACKS_SYS_SOCKET_H */
 
-#if defined (ACE_VXWORKS) && (ACE_VXWORKS < 0x620)
+#if defined (ACE_USES_SOCKLIB_H)
 #  include /**/ <sockLib.h>
-#endif /* ACE_VXWORKS */
+#endif /* ACE_USES_SOCKLIB_H */
 
 // Place all additions (especially function declarations) within extern "C" {}
 #ifdef __cplusplus

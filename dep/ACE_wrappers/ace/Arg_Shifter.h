@@ -4,7 +4,7 @@
 /**
  *  @file     Arg_Shifter.h
  *
- *  $Id: Arg_Shifter.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Arg_Shifter.h 91459 2010-08-25 09:51:01Z mcorino $
  *
  *  @author Seth Widoff
  */
@@ -33,13 +33,23 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * @a argv vector, so deeper levels of argument parsing can locate the yet
  * unprocessed arguments at the beginning of the vector.
  *
+ * Nomenclature:
+ *   argument - a member of the argv array
+ *   option - an argument starting with '-'
+ *   flag - synonym for "option"
+ *   parameter value - an argument not starting with '-'
+ *   parameter - synonym for "parameter value"
+ *
  * The @c ACE_Arg_Shifter copies the pointers of the @a argv vector
- * into a temporary array. As the @c ACE_Arg_Shifter iterates over
- * the copied vector, it places known arguments in the rear of the
- * vector, leaving the unknown ones in the beginning. So, after having
- * visited all the arguments in the temporary vector, @c ACE_Arg_Shifter
- * has placed all the unknown arguments in their original order at
- * the front of original @a argv.
+ * into a temporary array, emptying the original.  As the @c ACE_Arg_Shifter
+ * iterates over the temporary array, it places known arguments in the rear
+ * of the original array and places the unknown ones in the beginning of the
+ * original array.  It modifies argc to be the number of unknown arguments,
+ * so it looks to the caller as if the original array contains only unknown
+ * arguments.  So, after @c ACE_Arg_Shifter has visited all the arguments
+ * in the temporary array, the original @a argv array appears to contain
+ * only the unknown arguments in their original order (but it actually has
+ * all the known arguments, too, beyond argc).
  */
 template <typename CHAR_TYPE>
 class ACE_Arg_Shifter_T
@@ -106,7 +116,7 @@ public:
    *     If the current argument does not match flag
    *     If there is no parameter found after a 'matched' flag
    *
-   * If the flag is matched and the flag and paramter DO NOT RUN
+   * If the flag is matched and the flag and parameter DO NOT RUN
    * together, the flag is consumed, the parameter is returned,
    * and the new current argument is the parameter value.
    * ie '-foobarflag  VALUE' leaves the new cur arg == "VALUE"
@@ -118,7 +128,7 @@ public:
   const CHAR_TYPE *get_the_parameter (const CHAR_TYPE* flag);
 
   /**
-   * Check if the current argument matches (case insensitive) <flag>
+   * Check if the current argument matches (case insensitive) @a flag
    *
    * ------------------------------------------------------------
    *
@@ -202,6 +212,9 @@ private:
   /// The index of <argv_> in which we'll stick the next known
   /// argument.
   int front_;
+  /* This is not really the "front" at all.  It's the point after
+   * which the unknown arguments end and at which the known arguments begin.
+   */
 };
 
 typedef ACE_Arg_Shifter_T<ACE_TCHAR> ACE_Arg_Shifter;

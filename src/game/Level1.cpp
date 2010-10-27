@@ -101,8 +101,8 @@ bool ChatHandler::HandleNpcWhisperCommand(char* args)
     if (!ExtractPlayerTarget(&args, &target))
         return false;
 
-    uint64 guid = m_session->GetPlayer()->GetSelection();
-    if (!guid)
+    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
+    if (guid.IsEmpty())
         return false;
 
     Creature* pCreature = m_session->GetPlayer()->GetMap()->GetCreature(guid);
@@ -907,7 +907,7 @@ bool ChatHandler::HandleModifyTalentCommand (char* args)
         ((Player*)target)->SendTalentsInfoData(false);
         return true;
     }
-    else if(((Creature*)target)->isPet())
+    else if(((Creature*)target)->IsPet())
     {
         Unit *owner = target->GetOwner();
         if(owner && owner->GetTypeId() == TYPEID_PLAYER && ((Pet *)target)->IsPermanentPetFor((Player*)owner))

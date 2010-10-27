@@ -4,7 +4,7 @@
 /**
  *  @file   CDR_Base.h
  *
- *  $Id: CDR_Base.h 82088 2008-06-19 16:22:16Z shuston $
+ *  $Id: CDR_Base.h 88488 2010-01-12 14:20:13Z olli $
  *
  * ACE Common Data Representation (CDR) basic types.
  *
@@ -124,7 +124,7 @@ public:
     /// Use whichever byte order is native to this machine.
     BYTE_ORDER_NATIVE = ACE_CDR_BYTE_ORDER
   };
-    
+
   /**
    * Do byte swapping for each basic IDL type size.  There exist only
    * routines to put byte, halfword (2 bytes), word (4 bytes),
@@ -177,10 +177,14 @@ public:
    */
   static int grow (ACE_Message_Block *mb, size_t minsize);
 
-  /// Copy a message block chain into a single message block,
-  /// preserving the alignment of the first message block of the
-  /// original stream, not the following message blocks.
-  static void consolidate (ACE_Message_Block *dst,
+  /**
+   * Copy a message block chain into a single message block,
+   * preserving the alignment of the first message block of the
+   * original stream, not the following message blocks.
+   * @retval -1 Failure
+   * @retval 0 Success.
+   */
+  static int consolidate (ACE_Message_Block *dst,
                           const ACE_Message_Block *src);
 
   static size_t total_length (const ACE_Message_Block *begin,
@@ -216,7 +220,6 @@ public:
               // complain about no ANSI C++ long long.
               typedef   longlong_t LongLong;
 #     else
-              // LynxOS 2.5.0   and Linux don't have u_longlong_t.
               typedef   long long LongLong;
 #     endif /* sun */
 #   else  /* no native 64 bit integer type */

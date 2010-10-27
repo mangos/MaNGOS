@@ -1,3 +1,5 @@
+﻿// $Id: Arg_Shifter.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+
 #ifndef ACE_ARG_SHIFTER_T_CPP
 #define ACE_ARG_SHIFTER_T_CPP
 
@@ -6,11 +8,6 @@
 #include "ace/OS_NS_strings.h"
 #include "ace/OS_Errno.h"
 #include "ace/OS_Memory.h"
-
-ACE_RCSID (ace,
-           Arg_Shifter,
-           "$Id: Arg_Shifter.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -133,8 +130,7 @@ ACE_Arg_Shifter_T<CHAR_TYPE>::cur_arg_strncasecmp (const CHAR_TYPE *flag)
                               flag,
                               flag_length) == 0)
         {
-          if (ACE_OS::strlen(temp_[current_index_]) ==
-              flag_length)
+          if (ACE_OS::strlen(temp_[current_index_]) == flag_length)
             {
               // match and lengths are equal
               return 0;

@@ -4,7 +4,7 @@
 /**
  *  @file    Basic_Types.h
  *
- *  $Id: Basic_Types.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Basic_Types.h 91161 2010-07-21 18:25:12Z schmidt $
  *
  *  @author David L. Levine
  *
@@ -349,13 +349,6 @@ typedef unsigned char ACE_Byte;
 #   define ACE_SIZEOF_VOID_P ACE_SIZEOF_LONG
 # endif /* ACE_SIZEOF_VOID_P */
 
-// Type for doing arithmetic on pointers ... as elsewhere, we assume
-// that unsigned versions of a type are the same size as the signed
-// version of the same type.
-# if defined (ACE_HAS_WINCE) && (_WIN32_WCE < 400)
-typedef unsigned long ptrdiff_t;    // evc3, PocketPC don't defined ptrdiff_t
-# endif
-
 ACE_END_VERSIONED_NAMESPACE_DECL
 
 // Byte-order (endian-ness) determination.
@@ -391,10 +384,13 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 #   endif /* __BYTE_ORDER */
 # else /* ! BYTE_ORDER && ! __BYTE_ORDER */
   // We weren't explicitly told, so we have to figure it out . . .
+  // Note that Itanium hardware (IA64) can run in either byte order. It's
+  // selected by the OS when loading; Windows runs little, HP-UX runs big.
 #   if defined (i386) || defined (__i386__) || defined (_M_IX86) || \
      defined (vax) || defined (__alpha) || defined (__LITTLE_ENDIAN__) || \
-     defined (ARM) || defined (_M_IA64) || defined (__ia64__) || \
-     defined (_M_AMD64) || defined (__amd64)
+     defined (ARM) || defined (_M_IA64) || defined (_M_AMD64) || \
+     defined (__amd64) || \
+     ((defined (__ia64__) || defined (__ia64)) && !defined (__hpux))
     // We know these are little endian.
 #     define ACE_LITTLE_ENDIAN 0x0123
 #     define ACE_BYTE_ORDER ACE_LITTLE_ENDIAN
@@ -704,92 +700,164 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 #   define ACE_INT64_LITERAL(n) n ## ll
 # endif /* ! ACE_WIN32  &&  ! ACE_LACKS_LONGLONG_T */
 
+#if !defined (ACE_INT8_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRId8)
+#    define ACE_INT8_FORMAT_SPECIFIER_ASCII "%" PRId8
+#  else
+#    define ACE_INT8_FORMAT_SPECIFIER_ASCII "%d"
+#  endif /* defined (PRId8) */
+#endif /* ACE_INT8_FORMAT_SPECIFIER_ASCII */
+
 #if !defined (ACE_INT8_FORMAT_SPECIFIER)
 #  if defined (PRId8)
 #    define ACE_INT8_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRId8)
 #  else
-#    define ACE_INT8_FORMAT_SPECIFIER ACE_TEXT ("%d")
+#    define ACE_INT8_FORMAT_SPECIFIER ACE_TEXT (ACE_INT8_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRId8) */
 #endif /* ACE_INT8_FORMAT_SPECIFIER */
+
+#if !defined (ACE_UINT8_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRIu8)
+#    define ACE_UINT8_FORMAT_SPECIFIER_ASCII "%" PRIu8
+#  else
+#    define ACE_UINT8_FORMAT_SPECIFIER_ASCII "%u"
+#  endif /* defined (PRIu8) */
+#endif /* ACE_UINT8_FORMAT_SPECIFIER */
 
 #if !defined (ACE_UINT8_FORMAT_SPECIFIER)
 #  if defined (PRIu8)
 #    define ACE_UINT8_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRIu8)
 #  else
-#    define ACE_UINT8_FORMAT_SPECIFIER ACE_TEXT ("%u")
+#    define ACE_UINT8_FORMAT_SPECIFIER ACE_TEXT (ACE_UINT8_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRIu8) */
 #endif /* ACE_UINT8_FORMAT_SPECIFIER */
+
+#if !defined (ACE_INT16_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRId16)
+#    define ACE_INT16_FORMAT_SPECIFIER_ASCII "%" PRId16
+#  else
+#    define ACE_INT16_FORMAT_SPECIFIER_ASCII "%d"
+#  endif /* defined (PRId16) */
+#endif /* ACE_INT16_FORMAT_SPECIFIER */
 
 #if !defined (ACE_INT16_FORMAT_SPECIFIER)
 #  if defined (PRId16)
 #    define ACE_INT16_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRId16)
 #  else
-#    define ACE_INT16_FORMAT_SPECIFIER ACE_TEXT ("%d")
+#    define ACE_INT16_FORMAT_SPECIFIER ACE_TEXT (ACE_INT16_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRId16) */
 #endif /* ACE_INT16_FORMAT_SPECIFIER */
+
+#if !defined (ACE_UINT16_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRIu16)
+#    define ACE_UINT16_FORMAT_SPECIFIER_ASCII "%" PRIu16
+#  else
+#    define ACE_UINT16_FORMAT_SPECIFIER_ASCII "%u"
+#  endif /* defined (PRIu16) */
+#endif /* ACE_UINT16_FORMAT_SPECIFIER */
 
 #if !defined (ACE_UINT16_FORMAT_SPECIFIER)
 #  if defined (PRIu16)
 #    define ACE_UINT16_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRIu16)
 #  else
-#    define ACE_UINT16_FORMAT_SPECIFIER ACE_TEXT ("%u")
+#    define ACE_UINT16_FORMAT_SPECIFIER ACE_TEXT (ACE_UINT16_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRIu16) */
 #endif /* ACE_UINT16_FORMAT_SPECIFIER */
+
+#if !defined (ACE_INT32_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRId32)
+#    define ACE_INT32_FORMAT_SPECIFIER_ASCII "%" PRId32
+#  elif ACE_SIZEOF_INT == 4
+#    define ACE_INT32_FORMAT_SPECIFIER_ASCII "%d"
+#  else
+#    define ACE_INT32_FORMAT_SPECIFIER_ASCII "%ld"
+#  endif /* defined (PRId32) */
+#endif /* ACE_INT32_FORMAT_SPECIFIER */
 
 #if !defined (ACE_INT32_FORMAT_SPECIFIER)
 #  if defined (PRId32)
 #    define ACE_INT32_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRId32)
-#  elif ACE_SIZEOF_INT == 4
-#    define ACE_INT32_FORMAT_SPECIFIER ACE_TEXT ("%d")
 #  else
-#    define ACE_INT32_FORMAT_SPECIFIER ACE_TEXT ("%ld")
+#    define ACE_INT32_FORMAT_SPECIFIER ACE_TEXT (ACE_INT32_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRId32) */
 #endif /* ACE_INT32_FORMAT_SPECIFIER */
+
+#if !defined (ACE_UINT32_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRIu32)
+#    define ACE_UINT32_FORMAT_SPECIFIER_ASCII "%" PRIu32
+#  elif ACE_SIZEOF_INT == 4
+#    define ACE_UINT32_FORMAT_SPECIFIER_ASCII "%u"
+#  else
+#    define ACE_UINT32_FORMAT_SPECIFIER_ASCII "%lu"
+#  endif /* defined (PRIu32) */
+#endif /* ACE_UINT32_FORMAT_SPECIFIER */
 
 #if !defined (ACE_UINT32_FORMAT_SPECIFIER)
 #  if defined (PRIu32)
 #    define ACE_UINT32_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRIu32)
-#  elif ACE_SIZEOF_INT == 4
-#    define ACE_UINT32_FORMAT_SPECIFIER ACE_TEXT ("%u")
 #  else
-#    define ACE_UINT32_FORMAT_SPECIFIER ACE_TEXT ("%lu")
+#    define ACE_UINT32_FORMAT_SPECIFIER ACE_TEXT (ACE_UINT32_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRIu32) */
 #endif /* ACE_UINT32_FORMAT_SPECIFIER */
+
+#if !defined (ACE_INT64_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRId64)
+#    define ACE_INT64_FORMAT_SPECIFIER_ASCII "%" PRId64
+#  elif ACE_SIZEOF_LONG == 8
+#    define ACE_INT64_FORMAT_SPECIFIER_ASCII "%ld"
+#  else
+#    define ACE_INT64_FORMAT_SPECIFIER_ASCII "%lld"
+#  endif /* defined (PRId64) */
+#endif /* ACE_INT64_FORMAT_SPECIFIER */
 
 #if !defined (ACE_INT64_FORMAT_SPECIFIER)
 #  if defined (PRId64)
 #    define ACE_INT64_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRId64)
-#  elif ACE_SIZEOF_LONG == 8
-#    define ACE_INT64_FORMAT_SPECIFIER ACE_TEXT ("%ld")
 #  else
-#    define ACE_INT64_FORMAT_SPECIFIER ACE_TEXT ("%lld")
+#    define ACE_INT64_FORMAT_SPECIFIER ACE_TEXT (ACE_INT64_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRId64) */
 #endif /* ACE_INT64_FORMAT_SPECIFIER */
+
+#if !defined (ACE_UINT64_FORMAT_SPECIFIER_ASCII)
+#  if defined (PRIu64)
+#    define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%" PRIu64
+#  elif ACE_SIZEOF_LONG == 8
+#    define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%lu"
+#  else
+#    define ACE_UINT64_FORMAT_SPECIFIER_ASCII "%llu"
+#  endif /* defined (PRIu64) */
+#endif /* ACE_UINT64_FORMAT_SPECIFIER_ASCII */
 
 #if !defined (ACE_UINT64_FORMAT_SPECIFIER)
 #  if defined (PRIu64)
 #    define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT ("%") ACE_TEXT (PRIu64)
-#  elif ACE_SIZEOF_LONG == 8
-#    define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT ("%lu")
 #  else
-#    define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT ("%llu")
+#    define ACE_UINT64_FORMAT_SPECIFIER ACE_TEXT (ACE_UINT64_FORMAT_SPECIFIER_ASCII)
 #  endif /* defined (PRIu64) */
 #endif /* ACE_UINT64_FORMAT_SPECIFIER */
 
-#if !defined (ACE_SSIZE_T_FORMAT_SPECIFIER)
+#if !defined (ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII)
 # if defined (ACE_WIN64)
-#  define ACE_SSIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%I64d")
+#  define ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII "%I64d"
 # else
-#  define ACE_SSIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%d")
+#  define ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII "%d"
 # endif /* ACE_WIN64 */
 #endif /* ACE_SSIZE_T_FORMAT_SPECIFIER */
 
-#if !defined (ACE_SIZE_T_FORMAT_SPECIFIER)
+#if !defined (ACE_SSIZE_T_FORMAT_SPECIFIER)
+#define ACE_SSIZE_T_FORMAT_SPECIFIER ACE_TEXT (ACE_SSIZE_T_FORMAT_SPECIFIER_ASCII)
+#endif /* ACE_SSIZE_T_FORMAT_SPECIFIER */
+
+#if !defined (ACE_SIZE_T_FORMAT_SPECIFIER_ASCII)
 # if defined (ACE_WIN64)
-#  define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%I64u")
+#  define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%I64u"
 # else
-#  define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT ("%u")
+#  define ACE_SIZE_T_FORMAT_SPECIFIER_ASCII "%u"
 # endif /* ACE_WIN64 */
+#endif /* ACE_SIZE_T_FORMAT_SPECIFIER */
+
+#if !defined (ACE_SIZE_T_FORMAT_SPECIFIER)
+#define ACE_SIZE_T_FORMAT_SPECIFIER ACE_TEXT (ACE_SIZE_T_FORMAT_SPECIFIER_ASCII)
 #endif /* ACE_SIZE_T_FORMAT_SPECIFIER */
 
 // Cast from UINT64 to a double requires an intermediate cast to INT64
@@ -833,13 +901,17 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 #   if LDBL_MAX_EXP == 128
 #     define ACE_SIZEOF_LONG_DOUBLE 4
 #   elif LDBL_MAX_EXP == 1024
-#     define ACE_SIZEOF_LONG_DOUBLE 8
+#     if defined (__powerpc64__)
+#       define ACE_SIZEOF_LONG_DOUBLE 16
+#     else
+#       define ACE_SIZEOF_LONG_DOUBLE 8
+#     endif
 #   elif LDBL_MAX_EXP == 16384
 #     if defined (LDBL_DIG)  &&  LDBL_DIG == 18
 #       if defined (__ia64) || defined (__x86_64)
 #         define ACE_SIZEOF_LONG_DOUBLE 16
-#       else /* ! __ia64 */
-#       define ACE_SIZEOF_LONG_DOUBLE 12
+#       else /* ! __ia64 || __x86_64 */
+#         define ACE_SIZEOF_LONG_DOUBLE 12
 #       endif /* __ia64 */
 #     else  /* ! LDBL_DIG  ||  LDBL_DIG != 18 */
 #       define ACE_SIZEOF_LONG_DOUBLE 16

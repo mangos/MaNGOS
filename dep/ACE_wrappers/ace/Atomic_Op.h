@@ -4,7 +4,7 @@
 /**
  *  @file    Atomic_Op.h
  *
- *  $Id: Atomic_Op.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Atomic_Op.h 91523 2010-08-27 14:18:02Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@uci.edu>
  */
@@ -43,16 +43,26 @@
 #  endif /* ACE_HAS_INTERLOCKED_EXCHANGEADD */
 # elif defined (ACE_HAS_INTEL_ASSEMBLY)
 #  define ACE_HAS_BUILTIN_ATOMIC_OP
+# elif defined (ACE_HAS_VXATOMICLIB)
+#  define ACE_HAS_BUILTIN_ATOMIC_OP
+# elif defined (ACE_HAS_SOLARIS_ATOMIC_LIB) && !defined (ACE_HAS_BUILTIN_ATOMIC_OP)
+#  define ACE_HAS_BUILTIN_ATOMIC_OP
 # endif /* WIN32 */
 #endif /* ACE_HAS_THREADS */
 
-#if defined (ACE_HAS_BUILTIN_ATOMIC_OP)
+// If we have the GCC Atomic builtin support, use it
+#if defined (ACE_HAS_GCC_ATOMIC_BUILTINS) && (ACE_HAS_GCC_ATOMIC_BUILTINS == 1)
+# undef ACE_HAS_BUILTIN_ATOMIC_OP
+#endif
+
+// Include the templates here.
+#include "ace/Atomic_Op_GCC_T.h"
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+#if defined (ACE_HAS_BUILTIN_ATOMIC_OP)
+
 /**
- * @class ACE_Atomic_Op<ACE_Thread_Mutex, long>
- *
  * @brief Specialization of ACE_Atomic_Op for platforms that
  *        support atomic integer operations.
  *
@@ -63,64 +73,64 @@ template<>
 class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, long>
 {
 public:
-  /// Initialize <value_> to 0.
+  /// Initialize @c value_ to 0.
   ACE_Atomic_Op (void);
 
-  /// Initialize <value_> to c.
+  /// Initialize @c value_ to c.
   ACE_Atomic_Op (long c);
 
   /// Manage copying...
   ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, long> &c);
 
-  /// Atomically pre-increment <value_>.
+  /// Atomically pre-increment @c value_.
   long operator++ (void);
 
-  /// Atomically post-increment <value_>.
+  /// Atomically post-increment @c value_.
   long operator++ (int);
 
-  /// Atomically increment <value_> by rhs.
+  /// Atomically increment @c value_ by rhs.
   long operator+= (long rhs);
 
-  /// Atomically pre-decrement <value_>.
+  /// Atomically pre-decrement @c value_.
   long operator-- (void);
 
-  /// Atomically post-decrement <value_>.
+  /// Atomically post-decrement @c value_.
   long operator-- (int);
 
-  /// Atomically decrement <value_> by rhs.
+  /// Atomically decrement @c value_ by rhs.
   long operator-= (long rhs);
 
-  /// Atomically compare <value_> with rhs.
+  /// Atomically compare @c value_ with rhs.
   bool operator== (long rhs) const;
 
-  /// Atomically compare <value_> with rhs.
+  /// Atomically compare @c value_ with rhs.
   bool operator!= (long rhs) const;
 
-  /// Atomically check if <value_> greater than or equal to rhs.
+  /// Atomically check if @c value_ greater than or equal to rhs.
   bool operator>= (long rhs) const;
 
-  /// Atomically check if <value_> greater than rhs.
+  /// Atomically check if @c value_ greater than rhs.
   bool operator> (long rhs) const;
 
-  /// Atomically check if <value_> less than or equal to rhs.
+  /// Atomically check if @c value_ less than or equal to rhs.
   bool operator<= (long rhs) const;
 
-  /// Atomically check if <value_> less than rhs.
+  /// Atomically check if @c value_ less than rhs.
   bool operator< (long rhs) const;
 
-  /// Atomically assign rhs to <value_>.
+  /// Atomically assign rhs to @c value_.
   ACE_Atomic_Op<ACE_Thread_Mutex, long> &operator= (long rhs);
 
-  /// Atomically assign <rhs> to <value_>.
+  /// Atomically assign <rhs> to @c value_.
   ACE_Atomic_Op<ACE_Thread_Mutex, long> &operator= (const ACE_Atomic_Op<ACE_Thread_Mutex, long> &rhs);
 
-  /// Explicitly return <value_>.
+  /// Explicitly return @c value_.
   long value (void) const;
 
   /// Dump the state of an object.
   void dump (void) const;
 
-  /// Explicitly return <value_> (by reference).
+  /// Explicitly return @c value_ (by reference).
   volatile long &value_i (void);
 
   // ACE_ALLOC_HOOK_DECLARE;
@@ -132,9 +142,9 @@ public:
 
 private:
 
-  // This function cannot be supported by this template specialization.
-  // If you need access to an underlying lock, use the ACE_Atomic_Op_Ex
-  // template instead.
+  /// This function cannot be supported by this template specialization.
+  /// If you need access to an underlying lock, use the ACE_Atomic_Op_Ex
+  /// template instead.
   ACE_Thread_Mutex &mutex (void);
 
 private:
@@ -142,7 +152,7 @@ private:
   /// Current object decorated by the atomic op.
   volatile long value_;
 
-  // Pointers to selected atomic op implementations.
+  /// Pointers to selected atomic op implementations.
   static long (*increment_fn_) (volatile long *);
   static long (*decrement_fn_) (volatile long *);
   static long (*exchange_fn_) (volatile long *, long);
@@ -150,8 +160,6 @@ private:
 };
 
 /**
- * @class ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long>
- *
  * @brief Specialization of ACE_Atomic_Op for platforms that
  *        support atomic integer operations.
  *
@@ -162,64 +170,64 @@ template<>
 class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long>
 {
 public:
-  /// Initialize <value_> to 0.
+  /// Initialize @c value_ to 0.
   ACE_Atomic_Op (void);
 
-  /// Initialize <value_> to c.
+  /// Initialize @c value_ to c.
   ACE_Atomic_Op (unsigned long c);
 
   /// Manage copying...
   ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &c);
 
-  /// Atomically pre-increment <value_>.
+  /// Atomically pre-increment @c value_.
   unsigned long operator++ (void);
 
-  /// Atomically post-increment <value_>.
+  /// Atomically post-increment @c value_.
   unsigned long operator++ (int);
 
-  /// Atomically increment <value_> by rhs.
+  /// Atomically increment @c value_ by rhs.
   unsigned long operator+= (unsigned long rhs);
 
-  /// Atomically pre-decrement <value_>.
+  /// Atomically pre-decrement @c value_.
   unsigned long operator-- (void);
 
-  /// Atomically post-decrement <value_>.
+  /// Atomically post-decrement @c value_.
   unsigned long operator-- (int);
 
-  /// Atomically decrement <value_> by rhs.
+  /// Atomically decrement @c value_ by rhs.
   unsigned long operator-= (unsigned long rhs);
 
-  /// Atomically compare <value_> with rhs.
+  /// Atomically compare @c value_ with rhs.
   bool operator== (unsigned long rhs) const;
 
-  /// Atomically compare <value_> with rhs.
+  /// Atomically compare @c value_ with rhs.
   bool operator!= (unsigned long rhs) const;
 
-  /// Atomically check if <value_> greater than or equal to rhs.
+  /// Atomically check if @c value_ greater than or equal to rhs.
   bool operator>= (unsigned long rhs) const;
 
-  /// Atomically check if <value_> greater than rhs.
+  /// Atomically check if @c value_ greater than rhs.
   bool operator> (unsigned long rhs) const;
 
-  /// Atomically check if <value_> less than or equal to rhs.
+  /// Atomically check if @c value_ less than or equal to rhs.
   bool operator<= (unsigned long rhs) const;
 
-  /// Atomically check if <value_> less than rhs.
+  /// Atomically check if @c value_ less than rhs.
   bool operator< (unsigned long rhs) const;
 
-  /// Atomically assign rhs to <value_>.
+  /// Atomically assign rhs to @c value_.
   ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &operator= (unsigned long rhs);
 
-  /// Atomically assign <rhs> to <value_>.
+  /// Atomically assign <rhs> to @c value_.
   ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &operator= (const ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &rhs);
 
-  /// Explicitly return <value_>.
+  /// Explicitly return @c value_.
   unsigned long value (void) const;
 
   /// Dump the state of an object.
   void dump (void) const;
 
-  /// Explicitly return <value_> (by reference).
+  /// Explicitly return @c value_ (by reference).
   volatile unsigned long &value_i (void);
 
   // ACE_ALLOC_HOOK_DECLARE;
@@ -231,9 +239,9 @@ public:
 
 private:
 
-  // This function cannot be supported by this template specialization.
-  // If you need access to an underlying lock, use the ACE_Atomic_Op_Ex
-  // template instead.
+  /// This function cannot be supported by this template specialization.
+  /// If you need access to an underlying lock, use the ACE_Atomic_Op_Ex
+  /// template instead.
   ACE_Thread_Mutex &mutex (void);
 
 private:
@@ -248,9 +256,96 @@ private:
   static long (*exchange_add_fn_) (volatile long *, long);
 };
 
-ACE_END_VERSIONED_NAMESPACE_DECL
+#endif /* !ACE_HAS_BUILTIN_ATOMIC_OP */
+
+#if defined (ACE_HAS_GCC_ATOMIC_BUILTINS) && (ACE_HAS_GCC_ATOMIC_BUILTINS == 1)
+
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, int>
+: public ACE_Atomic_Op_GCC<int>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (int c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, int> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, int> &operator= (int rhs);
+};
+
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, unsigned int>
+: public ACE_Atomic_Op_GCC<unsigned int>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (unsigned int c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, unsigned> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, unsigned int> &operator= (unsigned int rhs);
+};
+
+// If we have built in atomic op, use that, the assignment operator
+// is faster for a long/unsinged long
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, long>
+: public ACE_Atomic_Op_GCC<long>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (long c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, long> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, long> &operator= (long rhs);
+};
+
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long>
+: public ACE_Atomic_Op_GCC<unsigned long>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (unsigned long c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, unsigned long> &operator= (unsigned long rhs);
+};
+
+#if !defined (ACE_LACKS_GCC_ATOMIC_BUILTINS_2)
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, short>
+: public ACE_Atomic_Op_GCC<short>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (short c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, short> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, short> &operator= (short rhs);
+};
+
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, unsigned short>
+: public ACE_Atomic_Op_GCC<unsigned short>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (unsigned short c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, unsigned short> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, unsigned short> &operator= (unsigned short rhs);
+};
+#endif
+
+#if !defined (ACE_LACKS_GCC_ATOMIC_BUILTINS_1)
+template<>
+class ACE_Export ACE_Atomic_Op<ACE_Thread_Mutex, bool>
+: public ACE_Atomic_Op_GCC<bool>
+{
+public:
+  ACE_Atomic_Op (void);
+  ACE_Atomic_Op (bool c);
+  ACE_Atomic_Op (const ACE_Atomic_Op<ACE_Thread_Mutex, bool> &c);
+  ACE_Atomic_Op<ACE_Thread_Mutex, bool> &operator= (bool rhs);
+};
+#endif
 
 #endif /* ACE_HAS_BUILTIN_ATOMIC_OP */
+
+ACE_END_VERSIONED_NAMESPACE_DECL
 
 #if defined (__ACE_INLINE__)
 #include "ace/Atomic_Op.inl"

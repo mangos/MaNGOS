@@ -1,5 +1,5 @@
 //* -*- C++ -*- */
-// $Id: config-vxworks.h 81046 2008-03-21 10:11:12Z johnnyw $
+// $Id: config-vxworks.h 87036 2009-10-10 18:21:39Z johnnyw $
 
 // The following configuration file is designed to work for VxWorks
 // Based on ACE_VXWORKS it will select the correct config file
@@ -29,25 +29,27 @@
 #    define ACE_VXWORKS 0x650
 #   elif (_WRS_VXWORKS_MINOR == 6)
 #    define ACE_VXWORKS 0x660
+#   elif (_WRS_VXWORKS_MINOR == 7)
+#    define ACE_VXWORKS 0x670
+#   elif (_WRS_VXWORKS_MINOR == 8)
+#    define ACE_VXWORKS 0x680
 #   endif
 #  endif
 # endif
 #endif /* ! ACE_VXWORKS */
 
-#if (ACE_VXWORKS == 0x551)
-# include "ace/config-vxworks5.x.h"
-#elif (ACE_VXWORKS == 0x620)
-# include "ace/config-vxworks6.2.h"
-#elif (ACE_VXWORKS == 0x630)
-# include "ace/config-vxworks6.3.h"
-#elif (ACE_VXWORKS == 0x640)
+#if (ACE_VXWORKS == 0x640)
 # include "ace/config-vxworks6.4.h"
 #elif (ACE_VXWORKS == 0x650)
 # include "ace/config-vxworks6.5.h"
 #elif (ACE_VXWORKS == 0x660)
 # include "ace/config-vxworks6.6.h"
+#elif (ACE_VXWORKS == 0x670)
+# include "ace/config-vxworks6.7.h"
+#elif (ACE_VXWORKS == 0x680)
+# include "ace/config-vxworks6.8.h"
 #else
-#error Unknown VxWorks version
+#error Unknown or unsupported VxWorks version
 #endif
 
 #include /**/ "ace/post.h"

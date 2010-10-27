@@ -1,3 +1,5 @@
+// $Id: Dynamic_Service_Base.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+
 #include "ace/Dynamic_Service_Base.h"
 #include "ace/ACE.h"
 #include "ace/Service_Config.h"
@@ -6,11 +8,7 @@
 #include "ace/Log_Msg.h"
 
 
-ACE_RCSID (ace,
-           Dynamic_Service_Base,
-           "$Id: Dynamic_Service_Base.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
-  ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 
 void
@@ -82,17 +80,22 @@ ACE_Dynamic_Service_Base::instance (const ACE_Service_Gestalt* repo,
     {
       ACE_Guard <ACE_Log_Msg> log_guard (*ACE_Log_Msg::instance ());
 
-      ACE_DEBUG ((LM_DEBUG,
-                  ACE_TEXT ("ACE (%P|%t) DSB::instance, repo=%@, name=%s")
-                  ACE_TEXT (" type=%@ => %@"),
-                  repo->repo_, name, type, obj));
-
       if (repo->repo_ != repo_found->repo_)
-        ACE_DEBUG ((LM_DEBUG,
+        {
+          ACE_DEBUG ((LM_DEBUG,
+                    ACE_TEXT ("ACE (%P|%t) DSB::instance, repo=%@, name=%s")
+                    ACE_TEXT (" type=%@ => %@")
                     ACE_TEXT (" [in repo=%@]\n"),
+                    repo->repo_, name, type, obj, 
                     repo_found->repo_));
+        }
       else
-        ACE_DEBUG ((LM_DEBUG, ACE_TEXT ("\n")));
+        {
+          ACE_DEBUG ((LM_DEBUG,
+                    ACE_TEXT ("ACE (%P|%t) DSB::instance, repo=%@, name=%s")
+                    ACE_TEXT (" type=%@ => %@\n"),
+                    repo->repo_, name, type, obj));
+        }
     }
 
   return obj;

@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_stropts.h
  *
- *  $Id: OS_NS_stropts.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_stropts.h 85110 2009-04-20 09:18:43Z msmit $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -108,13 +108,13 @@ namespace ACE_OS {
   ACE_NAMESPACE_INLINE_FUNCTION
   int fdetach (const char *file);
 
-  /// UNIX-style <ioctl>.
+  /// UNIX-style @c ioctl
   ACE_NAMESPACE_INLINE_FUNCTION
   int ioctl (ACE_HANDLE handle,
              ACE_IOCTL_TYPE_ARG2 cmd,
              void * = 0);
 
-  /// QoS-enabled <ioctl>.
+  /// QoS-enabled @c ioctl
   extern ACE_Export
   int ioctl (ACE_HANDLE socket,
              unsigned long io_control_code,
@@ -126,8 +126,7 @@ namespace ACE_OS {
              ACE_OVERLAPPED *overlapped,
              ACE_OVERLAPPED_COMPLETION_FUNC func);
 
-#if !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500))
-  /// QoS-enabled <ioctl> when the I/O control code is either
+  /// QoS-enabled @c ioctl when the I/O control code is either
   /// SIO_SET_QOS or SIO_GET_QOS.
   extern ACE_Export
   int ioctl (ACE_HANDLE socket,
@@ -138,7 +137,6 @@ namespace ACE_OS {
              unsigned long buffer = 0,
              ACE_OVERLAPPED *overlapped = 0,
              ACE_OVERLAPPED_COMPLETION_FUNC func = 0);
-#endif  /* !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500)) */
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int isastream (ACE_HANDLE handle);

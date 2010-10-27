@@ -1,3 +1,5 @@
+// $Id: Activation_Queue.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+
 #include "ace/Activation_Queue.h"
 
 #if !defined (__ACE_INLINE__)
@@ -9,10 +11,6 @@
 #include "ace/Malloc_Base.h"
 #include "ace/Time_Value.h"
 
-ACE_RCSID (ace,
-           Activation_Queue,
-           "$Id: Activation_Queue.cpp 80826 2008-03-04 14:51:23Z wotte $")
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 void
@@ -23,7 +21,7 @@ ACE_Activation_Queue::dump (void) const
   ACE_DEBUG ((LM_DEBUG,
               ACE_TEXT ("delete_queue_ = %d\n"),
               this->delete_queue_));
-  ACE_DEBUG ((LM_INFO, ACE_TEXT ("queue_: \n")));
+  ACE_DEBUG ((LM_INFO, ACE_TEXT ("queue_:\n")));
   if (this->queue_)
     this->queue_->dump();
   else

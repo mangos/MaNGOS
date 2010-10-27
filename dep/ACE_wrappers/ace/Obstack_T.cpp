@@ -1,4 +1,4 @@
-// $Id: Obstack_T.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Obstack_T.cpp 88793 2010-02-01 17:50:34Z cleeland $
 
 #ifndef ACE_OBSTACK_T_CPP
 #define ACE_OBSTACK_T_CPP
@@ -19,11 +19,11 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_ALLOC_HOOK_DEFINE(ACE_Obstack_T)
 
-template <class CHAR> void
-ACE_Obstack_T<CHAR>::dump (void) const
+template <class ACE_CHAR_T> void
+ACE_Obstack_T<ACE_CHAR_T>::dump (void) const
 {
 #if defined (ACE_HAS_DUMP)
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::dump");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::dump");
 
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   ACE_DEBUG ((LM_DEBUG,  ACE_TEXT ("size_ = %d\n"), this->size_));
@@ -33,13 +33,13 @@ ACE_Obstack_T<CHAR>::dump (void) const
 #endif /* ACE_HAS_DUMP */
 }
 
-template <class CHAR> int
-ACE_Obstack_T<CHAR>::request (size_t len)
+template <class ACE_CHAR_T> int
+ACE_Obstack_T<ACE_CHAR_T>::request (size_t len)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::request");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::request");
 
   // normalize the length.
-  len *= sizeof (CHAR);
+  len *= sizeof (ACE_CHAR_T);
 
   // Check to see if there's room for the requested length, including
   // any part of an existing string, if any.
@@ -89,15 +89,15 @@ ACE_Obstack_T<CHAR>::request (size_t len)
   return 0;
 }
 
-template <class CHAR> CHAR *
-ACE_Obstack_T<CHAR>::grow (CHAR c)
+template <class ACE_CHAR_T> ACE_CHAR_T *
+ACE_Obstack_T<ACE_CHAR_T>::grow (ACE_CHAR_T c)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::grow");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::grow");
 
   if (this->request (1) == 0)
     {
-      CHAR *retv = reinterpret_cast<CHAR *> (this->curr_->cur_);
-      this->curr_->cur_ += sizeof (CHAR);
+      ACE_CHAR_T *retv = reinterpret_cast<ACE_CHAR_T *> (this->curr_->cur_);
+      this->curr_->cur_ += sizeof (ACE_CHAR_T);
       *retv = c;
       return retv;
     }
@@ -105,10 +105,10 @@ ACE_Obstack_T<CHAR>::grow (CHAR c)
     return 0;
 }
 
-template <class CHAR> ACE_Obchunk *
-ACE_Obstack_T<CHAR>::new_chunk (void)
+template <class ACE_CHAR_T> ACE_Obchunk *
+ACE_Obstack_T<ACE_CHAR_T>::new_chunk (void)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::new_chunk");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::new_chunk");
 
   ACE_Obchunk *temp = 0;
 
@@ -120,15 +120,15 @@ ACE_Obstack_T<CHAR>::new_chunk (void)
   return temp;
 }
 
-template <class CHAR>
-ACE_Obstack_T<CHAR>::ACE_Obstack_T (size_t size,
+template <class ACE_CHAR_T>
+ACE_Obstack_T<ACE_CHAR_T>::ACE_Obstack_T (size_t size,
                                     ACE_Allocator *allocator_strategy)
   : allocator_strategy_ (allocator_strategy),
     size_ (size),
     head_ (0),
     curr_ (0)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::ACE_Obstack");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::ACE_Obstack");
 
   if (this->allocator_strategy_ == 0)
     ACE_ALLOCATOR (this->allocator_strategy_,
@@ -138,10 +138,10 @@ ACE_Obstack_T<CHAR>::ACE_Obstack_T (size_t size,
   this->curr_ = this->head_;
 }
 
-template <class CHAR>
-ACE_Obstack_T<CHAR>::~ACE_Obstack_T (void)
+template <class ACE_CHAR_T>
+ACE_Obstack_T<ACE_CHAR_T>::~ACE_Obstack_T (void)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::~ACE_Obstack_T");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::~ACE_Obstack_T");
 
   ACE_Obchunk *temp = this->head_;
 
@@ -154,23 +154,23 @@ ACE_Obstack_T<CHAR>::~ACE_Obstack_T (void)
     }
 }
 
-template <class CHAR> CHAR *
-ACE_Obstack_T<CHAR>::copy (const CHAR *s,
+template <class ACE_CHAR_T> ACE_CHAR_T *
+ACE_Obstack_T<ACE_CHAR_T>::copy (const ACE_CHAR_T *s,
                            size_t len)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::copy");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::copy");
 
   if (this->request (len) != 0)
     return 0;
 
-  size_t tsize = len * sizeof (CHAR);
+  size_t tsize = len * sizeof (ACE_CHAR_T);
   ACE_OS::memcpy (this->curr_->cur_, s, tsize);
   this->curr_->cur_ += tsize ;
   return this->freeze ();
 }
 
-template <class CHAR> void
-ACE_Obstack_T<CHAR>::unwind (void* obj)
+template <class ACE_CHAR_T> void
+ACE_Obstack_T<ACE_CHAR_T>::unwind (void* obj)
 {
   if (obj >= this->curr_->contents_ && obj < this->curr_->end_)
     this->curr_->block_ = this->curr_->cur_ = reinterpret_cast<char*> (obj);
@@ -178,8 +178,8 @@ ACE_Obstack_T<CHAR>::unwind (void* obj)
     this->unwind_i (obj);
 }
 
-template <class CHAR> void
-ACE_Obstack_T<CHAR>::unwind_i (void* obj)
+template <class ACE_CHAR_T> void
+ACE_Obstack_T<ACE_CHAR_T>::unwind_i (void* obj)
 {
   ACE_Obchunk* curr = this->head_;
   while (curr != 0 && (curr->contents_ > obj || curr->end_ < obj))
@@ -194,29 +194,29 @@ ACE_Obstack_T<CHAR>::unwind_i (void* obj)
                 ACE_TEXT ("Deletion of non-existent object.\n%a")));
 }
 
-template <class CHAR> void
-ACE_Obstack_T<CHAR>::release (void)
+template <class ACE_CHAR_T> void
+ACE_Obstack_T<ACE_CHAR_T>::release (void)
 {
-  ACE_TRACE ("ACE_Obstack_T<CHAR>::release");
+  ACE_TRACE ("ACE_Obstack_T<ACE_CHAR_T>::release");
 
   this->curr_ = this->head_;
   this->curr_->block_ = this->curr_->cur_ = this->curr_->contents_;
 }
 
-template <class CHAR> void
-ACE_Obstack_T<CHAR>::grow_fast (CHAR c)
+template <class ACE_CHAR_T> void
+ACE_Obstack_T<ACE_CHAR_T>::grow_fast (ACE_CHAR_T c)
 {
-  * (reinterpret_cast<CHAR *> (this->curr_->cur_)) = c;
-  this->curr_->cur_ += sizeof (CHAR);
+  * (reinterpret_cast<ACE_CHAR_T *> (this->curr_->cur_)) = c;
+  this->curr_->cur_ += sizeof (ACE_CHAR_T);
 }
 
-template <class CHAR> CHAR *
-ACE_Obstack_T<CHAR>::freeze (void)
+template <class ACE_CHAR_T> ACE_CHAR_T *
+ACE_Obstack_T<ACE_CHAR_T>::freeze (void)
 {
-  CHAR *retv = reinterpret_cast<CHAR *> (this->curr_->block_);
-  * (reinterpret_cast<CHAR *> (this->curr_->cur_)) = 0;
+  ACE_CHAR_T *retv = reinterpret_cast<ACE_CHAR_T *> (this->curr_->block_);
+  * (reinterpret_cast<ACE_CHAR_T *> (this->curr_->cur_)) = 0;
 
-  this->curr_->cur_ += sizeof (CHAR);
+  this->curr_->cur_ += sizeof (ACE_CHAR_T);
   this->curr_->block_ = this->curr_->cur_;
   return retv;
 }

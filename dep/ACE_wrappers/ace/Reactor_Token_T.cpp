@@ -1,4 +1,4 @@
-// $Id: Reactor_Token_T.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Reactor_Token_T.cpp 82917 2008-10-03 19:10:56Z dai_y $
 
 #include "ace/Log_Msg.h"
 #include "ace/Reactor_Token_T.h"
@@ -61,10 +61,20 @@ template <class ACE_TOKEN_TYPE> void
 ACE_Reactor_Token_T<ACE_TOKEN_TYPE>::sleep_hook (void)
 {
   ACE_TRACE ("ACE_Reactor_Token_T::sleep_hook");
-  if (this->reactor_->notify () == -1)
-    ACE_ERROR ((LM_ERROR,
-                ACE_TEXT ("%p\n"),
-                ACE_TEXT ("sleep_hook failed")));
+  ACE_Time_Value ping = ACE_Time_Value::zero;
+  if (this->reactor_->notify (0, ACE_Event_Handler::EXCEPT_MASK, &ping) == -1)
+    {
+      if (errno == ETIME)
+        {
+          errno = 0;
+        }
+      else
+        {
+          ACE_ERROR ((LM_ERROR,
+                      ACE_TEXT ("%p\n"),
+                      ACE_TEXT ("sleep_hook failed")));
+        }
+    }
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

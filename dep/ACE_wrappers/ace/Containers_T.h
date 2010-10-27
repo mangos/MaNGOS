@@ -4,7 +4,7 @@
 /**
  *  @file    Containers_T.h
  *
- *  $Id: Containers_T.h 82588 2008-08-11 13:37:41Z johnnyw $
+ *  $Id: Containers_T.h 88975 2010-02-12 19:19:38Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -1993,13 +1993,8 @@ class ACE_Array : public ACE_Array_Base<T>
 public:
   // Define a "trait"
   typedef T TYPE;
-
   typedef ACE_Array_Iterator<T> ITERATOR;
-
-  // = Exceptions.
-
-  // = Initialization and termination methods.
-
+  
   /// Dynamically create an uninitialized array.
   /**
    * Initialize an empty array of the specified size using the provided

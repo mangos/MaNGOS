@@ -4,7 +4,7 @@
 /**
  *  @file    Log_Msg_IPC.h
  *
- *  $Id: Log_Msg_IPC.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Log_Msg_IPC.h 84536 2009-02-20 09:28:48Z johnnyw $
  *
  *  @author Carlos O'Ryan <coryan@uci.edu>
  */
@@ -20,10 +20,12 @@
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
 
+#include "ace/Default_Constants.h"
+
 // IPC conduit between sender and client daemon.  This should be
 // included in the ACE_Log_Msg class, but due to "order of include"
 // problems it can't be...
-#if defined (ACE_HAS_STREAM_PIPES)
+#if (ACE_HAS_STREAM_LOG_MSG_IPC == 1)
 # include "ace/SPIPE_Connector.h"
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 typedef ACE_SPIPE_Stream ACE_LOG_MSG_IPC_STREAM;

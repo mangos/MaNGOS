@@ -4,10 +4,13 @@
 /**
  *  @file   Init_ACE.h
  *
- *  $Id: Init_ACE.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Init_ACE.h 88794 2010-02-01 19:15:36Z schmidt $
  *
- *  Initialize ACE library services.  Can be called only once per
- *  program invocation.
+ *  Initialize and finalize the ACE library services.  You can
+ *  generally execute the @a ACE::init() and @a ACE::fini() sequence
+ *  multiple times, but be aware that nothing that ACE controls (e.g.,
+ *  singletons, thread-specific services, loaded services, etc.)  will
+ *  survive the @a ACE::fini().
  */
 //=============================================================================
 
@@ -28,17 +31,22 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 namespace ACE
 {
   /**
-   * This class implements the functions for the initialization and
-   * shutting down ACE.  These functions are called only once per ACE
-   * invokation.
-   * @return Returns 0 on success, -1 on failure, and 1 if it had already been
-   * called.
+   * This method initializes the ACE library services and initializes
+   * ACE's internal resources.  Applications should not instantiate
+   * ACE classes or call methods on objects of these classes until @a
+   * ACE::init() returns successfully.
+
+   * @return Returns 0 on success, -1 on failure, and 1 if it had
+   * already been called.
    */
   extern ACE_Export int init (void);
 
   /**
-   * Shut down ACE library services.  Can be called only once per
-   * program invocation.
+   * Finalize the ACE library services and releases ACE's internal
+   * resources.  In general, do not instantiate ACE classes or call
+   * methods on objects of these classes after @a ACE::fini() has been
+   * called.
+   *
    * @return Returns 0 on success, -1 on failure, and 1 if it had already been
    * called.
    */

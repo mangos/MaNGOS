@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------------------
-dnl       $Id: ace.m4 82523 2008-08-06 08:36:01Z johnnyw $
+dnl       $Id: ace.m4 88997 2010-02-15 09:38:01Z johnnyw $
 dnl
 dnl       ace.m4
 dnl
@@ -1250,8 +1250,8 @@ AC_DEFUN([ACE_PATH_FL],
    fi
  fi
  if test X"${FLTKCONFIG}" != X; then
-   ACE_FLTK_CPPFLAGS=`$FLTKCONFIG --use-gl --cxxflags 2>/dev/null`
-   ACE_FLTK_LIBS=`$FLTKCONFIG --use-gl --ldflags 2>/dev/null`
+   ACE_FLTK_CPPFLAGS=`$FLTKCONFIG --cxxflags 2>/dev/null`
+   ACE_FLTK_LIBS=`$FLTKCONFIG --ldflags 2>/dev/null`
 
    AC_SUBST(ACE_FLTK_CPPFLAGS)
    AC_SUBST(ACE_FLTK_LIBS)
@@ -1393,6 +1393,7 @@ if test "$no_x" != yes; then
    AC_SUBST(ACE_XT_LIBS)
 fi
 AM_CONDITIONAL([BUILD_ATHENA], true)
+AM_CONDITIONAL([BUILD_ATHENA3D], true)
 AM_CONDITIONAL([BUILD_MOTIF], false)
 ])
 

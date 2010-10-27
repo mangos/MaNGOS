@@ -1,4 +1,4 @@
-// $Id: Strategies_T.cpp 82294 2008-07-12 13:03:37Z johnnyw $
+// $Id: Strategies_T.cpp 89510 2010-03-17 12:21:14Z vzykov $
 
 #ifndef ACE_STRATEGIES_T_CPP
 #define ACE_STRATEGIES_T_CPP
@@ -301,7 +301,7 @@ ACE_Thread_Strategy<SVC_HANDLER>::activate_svc_handler (SVC_HANDLER *svc_handler
 
 template <class SVC_HANDLER, ACE_PEER_ACCEPTOR_1> int
 ACE_Accept_Strategy<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::open
-  (const ACE_PEER_ACCEPTOR_ADDR &local_addr, int reuse_addr)
+  (const ACE_PEER_ACCEPTOR_ADDR &local_addr, bool reuse_addr)
 {
   this->reuse_addr_ = reuse_addr;
   this->peer_acceptor_addr_ = local_addr;
@@ -321,7 +321,7 @@ ACE_Accept_Strategy<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::open
 template <class SVC_HANDLER, ACE_PEER_ACCEPTOR_1>
 ACE_Accept_Strategy<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::ACE_Accept_Strategy
   (const ACE_PEER_ACCEPTOR_ADDR &local_addr,
-   int reuse_addr,
+   bool reuse_addr,
    ACE_Reactor *reactor)
     : reactor_ (reactor)
 {
@@ -344,7 +344,7 @@ ACE_Accept_Strategy<SVC_HANDLER, ACE_PEER_ACCEPTOR_2>::accept_svc_handler
   // created handle. This is because the newly created handle will
   // inherit the properties of the listen handle, including its event
   // associations.
-  int reset_new_handle = this->reactor_->uses_event_associations ();
+  bool reset_new_handle = this->reactor_->uses_event_associations ();
 
   if (this->peer_acceptor_.accept (svc_handler->peer (), // stream
                                    0, // remote address
@@ -372,7 +372,7 @@ ACE_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2>::connect_svc_handler
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms)
 {
@@ -394,7 +394,7 @@ ACE_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2>::connect_svc_handler
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms)
 {
@@ -439,7 +439,7 @@ ACE_Process_Strategy<SVC_HANDLER>::activate_svc_handler (SVC_HANDLER *svc_handle
     case -1:
       {
         ACE_Errno_Guard error (errno);
-        svc_handler->destroy ();
+        svc_handler->close ();
       }
       ACE_ERROR_RETURN ((LM_ERROR,
                          ACE_TEXT ("%p\n"),
@@ -462,7 +462,7 @@ ACE_Process_Strategy<SVC_HANDLER>::activate_svc_handler (SVC_HANDLER *svc_handle
     default: // In parent process.
       // We need to close down the <SVC_HANDLER> here because it's
       // running in the child.
-      svc_handler->destroy ();
+      svc_handler->close ();
       return 0;
     }
 }
@@ -646,7 +646,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::check_hin
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  CONNECTION_MAP_ENTRY *&entry,
@@ -721,7 +721,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::find_or_c
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  CONNECTION_MAP_ENTRY *&entry,
@@ -816,7 +816,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::new_conne
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms)
 {
@@ -840,7 +840,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::connect_s
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms)
 {
@@ -905,7 +905,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::connect_s
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms)
 {
@@ -972,7 +972,7 @@ ACE_Cached_Connect_Strategy<SVC_HANDLER, ACE_PEER_CONNECTOR_2, MUTEX>::connect_s
  const ACE_PEER_CONNECTOR_ADDR &remote_addr,
  ACE_Time_Value *timeout,
  const ACE_PEER_CONNECTOR_ADDR &local_addr,
- int reuse_addr,
+ bool reuse_addr,
  int flags,
  int perms,
  int& found)

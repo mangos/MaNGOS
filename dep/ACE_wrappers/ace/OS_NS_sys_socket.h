@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_sys_socket.h
  *
- *  $Id: OS_NS_sys_socket.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: OS_NS_sys_socket.h 85110 2009-04-20 09:18:43Z msmit $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -74,24 +74,22 @@ namespace ACE_OS
 # endif /* ACE_WIN32 */
 
   //@{ @name A set of wrappers for sockets.
-  /// BSD-style <accept> (no QoS).
+  /// BSD-style @c accept (no QoS).
   ACE_NAMESPACE_INLINE_FUNCTION
   ACE_HANDLE accept (ACE_HANDLE handle,
                      struct sockaddr *addr,
                      int *addrlen);
 
-#if !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500))
   /**
-   * QoS-enabled <accept>, which passes @a qos_params to <accept>.  If
-   * the OS platform doesn't support QoS-enabled <accept> then the
-   * @a qos_params are ignored and the BSD-style <accept> is called.
+   * QoS-enabled @c accept, which passes @a qos_params to @c accept.  If
+   * the OS platform doesn't support QoS-enabled @c accept then the
+   * @a qos_params are ignored and the BSD-style @c accept is called.
    */
   extern ACE_Export
   ACE_HANDLE accept (ACE_HANDLE handle,
                      struct sockaddr *addr,
                      int *addrlen,
                      const ACE_Accept_QoS_Params &qos_params);
-#endif  /* !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500)) */
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int bind (ACE_HANDLE s,
@@ -102,24 +100,22 @@ namespace ACE_OS
   ACE_NAMESPACE_INLINE_FUNCTION
   int closesocket (ACE_HANDLE s);
 
-  /// BSD-style <connect> (no QoS).
+  /// BSD-style @c connect (no QoS).
   ACE_NAMESPACE_INLINE_FUNCTION
   int connect (ACE_HANDLE handle,
                struct sockaddr *addr,
                int addrlen);
 
-#if !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500))
   /**
-   * QoS-enabled <connect>, which passes @a qos_params to <connect>.
-   * If the OS platform doesn't support QoS-enabled <connect> then the
-   * @a qos_params are ignored and the BSD-style <connect> is called.
+   * QoS-enabled @c connect, which passes @a qos_params to @c connect.
+   * If the OS platform doesn't support QoS-enabled @c connect then the
+   * @a qos_params are ignored and the BSD-style @c connect is called.
    */
   extern ACE_Export
   int connect (ACE_HANDLE handle,
                const sockaddr *addr,
                int addrlen,
                const ACE_QoS_Params &qos_params);
-#endif  /* !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500)) */
 
   /// Retrieve information about available transport protocols
   /// installed on the local machine. Windows specific...
@@ -144,14 +140,12 @@ namespace ACE_OS
                   char *optval,
                   int *optlen);
 
-#if !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500))
   /// Joins a leaf node into a QoS-enabled multi-point session.
   extern ACE_Export
   ACE_HANDLE join_leaf (ACE_HANDLE socket,
                         const sockaddr *name,
                         int namelen,
                         const ACE_QoS_Params &qos_params);
-#endif  /* !(defined (ACE_HAS_WINCE) && (UNDER_CE < 500)) */
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int listen (ACE_HANDLE handle,

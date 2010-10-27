@@ -4,7 +4,7 @@
 /**
  *  @file    RW_Mutex.h
  *
- *  $Id: RW_Mutex.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: RW_Mutex.h 83934 2008-12-01 13:47:06Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -120,7 +120,7 @@ protected:
   /// destructor.  This flag isn't protected by a lock, so make sure
   /// that you don't have multiple threads simultaneously calling
   /// <remove> on the same object, which is a bad idea anyway...
-  int removed_;
+  bool removed_;
 
 private:
   // = Prevent assignment and initialization.

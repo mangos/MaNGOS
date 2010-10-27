@@ -4,7 +4,7 @@
 /**
  *  @file    Event_Handler_T.h
  *
- *  $Id: Event_Handler_T.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Event_Handler_T.h 83891 2008-11-28 11:01:50Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  */
@@ -37,7 +37,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * inheritance hierarchy but also would like to integrate with
  * the ACE_Reactor.  Rather than adopt a "mixin" approach, it is
  * often cleaner to define a template as a subclass of
- * ACE_Event_Handler and paramterize it with an operation
+ * ACE_Event_Handler and parameterize it with an operation
  * dispatcher type.
  * When constructing an instantiation of the ACE_Event_Handler_T
  * object, a set of pointers to member functions must be

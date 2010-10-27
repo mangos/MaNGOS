@@ -6,7 +6,7 @@
  *
  *  definitions for the Internet Transmission Control Protocol (TCP)
  *
- *  $Id: os_tcp.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: os_tcp.h 88499 2010-01-12 19:34:34Z olli $
  *
  *  @author Don Hinton <dhinton@dresystems.com>
  *  @author This code was originally in various places including ace/OS.h.
@@ -26,7 +26,7 @@
 
 #if !defined (ACE_LACKS_NETINET_TCP_H)
 # include /**/ <netinet/tcp.h>
-#endif /* !ACE_LACKS_NETIINET_TCP_H */
+#endif /* !ACE_LACKS_NETINET_TCP_H */
 
 // Place all additions (especially function declarations) within extern "C" {}
 #ifdef __cplusplus

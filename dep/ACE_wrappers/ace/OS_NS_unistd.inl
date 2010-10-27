@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: OS_NS_unistd.inl 81696 2008-05-14 18:15:31Z johnnyw $
+// $Id: OS_NS_unistd.inl 88515 2010-01-13 08:47:38Z johnnyw $
 
 #include "ace/OS_NS_sys_utsname.h"
 #include "ace/OS_NS_string.h"
@@ -19,16 +19,17 @@
 #  include "ace/OS_NS_stdio.h"
 #endif /* ACE_LACKS_ACCESS */
 
-#if defined (ACE_VXWORKS) || defined (ACE_HAS_WINCE)
+#if defined (ACE_HAS_ACCESS_EMULATION)
 #  include "ace/os_include/os_unistd.h"
-#  if defined (ACE_VXWORKS) && (((ACE_VXWORKS >= 0x620) && (ACE_VXWORKS <= 0x660)) || defined (ACE_HAS_VXWORKS551_MEDUSA))
-#    if defined (__RTP__)
-#      include "ace/os_include/os_strings.h"
-#    else
-#      include "ace/os_include/os_string.h"
-#    endif
+#endif /* ACE_HAS_ACCESS_EMULATION */
+
+#if defined (ACE_VXWORKS) && (((ACE_VXWORKS >= 0x620) && (ACE_VXWORKS <= 0x680)) || defined (ACE_HAS_VXWORKS551_MEDUSA))
+#  if defined (__RTP__)
+#    include "ace/os_include/os_strings.h"
+#  else
+#    include "ace/os_include/os_string.h"
 #  endif
-#endif /* VXWORKS || ACE_HAS_WINCE */
+#endif
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -37,7 +38,7 @@ ACE_OS::access (const char *path, int amode)
 {
   ACE_OS_TRACE ("ACE_OS::access");
 #if defined (ACE_LACKS_ACCESS)
-#  if defined (ACE_HAS_WINCE) || defined (ACE_VXWORKS)
+#  if defined (ACE_HAS_ACCESS_EMULATION)
   // @@ WINCE: There should be a Win32 API that can do this.
   // Hard coded read access here.
   ACE_UNUSED_ARG (amode);
@@ -48,12 +49,12 @@ ACE_OS::access (const char *path, int amode)
       ACE_OS::fclose (handle);
       return 0;
     }
-  return (-1);
+  return -1;
 #  else
     ACE_UNUSED_ARG (path);
     ACE_UNUSED_ARG (amode);
     ACE_NOTSUP_RETURN (-1);
-#  endif  // ACE_HAS_WINCE
+#  endif  /* ACE_HAS_ACCESS_EMULATION */
 #elif defined(ACE_WIN32)
   // Windows doesn't support checking X_OK(6)
   ACE_OSCALL_RETURN (::access (path, amode & 6), int, -1);
@@ -67,11 +68,11 @@ ACE_OS::access (const char *path, int amode)
 ACE_INLINE int
 ACE_OS::access (const wchar_t *path, int amode)
 {
-#if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)
+#if defined (ACE_WIN32) && !defined (ACE_LACKS__WACCESS)
   ACE_OSCALL_RETURN (::_waccess (path, amode), int, -1);
 #else /* ACE_WIN32 && !ACE_HAS_WINCE */
   return ACE_OS::access (ACE_Wide_To_Ascii (path).char_rep (), amode);
-#endif /* ACE_WIN32 && !ACE_HAS_WINCE */
+#endif /* ACE_WIN32 && !ACE_LACKS__WACCESS */
 }
 #endif /* ACE_HAS_WCHAR */
 
@@ -117,16 +118,15 @@ ACE_OS::allocation_granularity (void)
 #endif /* ACE_WIN32 */
 }
 
-#if !defined (ACE_LACKS_CHDIR)
 ACE_INLINE int
 ACE_OS::chdir (const char *path)
 {
   ACE_OS_TRACE ("ACE_OS::chdir");
-#if defined (ACE_HAS_NONCONST_CHDIR)
-  ACE_OSCALL_RETURN (::chdir (const_cast<char *> (path)), int, -1);
-#elif defined (ACE_HAS_WINCE)
+#if defined (ACE_LACKS_CHDIR)
   ACE_UNUSED_ARG (path);
   ACE_NOTSUP_RETURN (-1);
+#elif defined (ACE_HAS_NONCONST_CHDIR)
+  ACE_OSCALL_RETURN (::chdir (const_cast<char *> (path)), int, -1);
 #else
   ACE_OSCALL_RETURN (::chdir (path), int, -1);
 #endif /* ACE_HAS_NONCONST_CHDIR */
@@ -136,20 +136,22 @@ ACE_OS::chdir (const char *path)
 ACE_INLINE int
 ACE_OS::chdir (const wchar_t *path)
 {
-#if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)
+#if defined (ACE_LACKS_CHDIR)
+  ACE_UNUSED_ARG (path);
+  ACE_NOTSUP_RETURN (-1);
+#elif defined (ACE_WIN32)
   ACE_OSCALL_RETURN (::_wchdir (path), int, -1);
 #else /* ACE_WIN32 */
   return ACE_OS::chdir (ACE_Wide_To_Ascii (path).char_rep ());
 #endif /* ACE_WIN32 */
 }
 #endif /* ACE_HAS_WCHAR */
-#endif /* ACE_LACKS_CHDIR */
 
 ACE_INLINE int
 ACE_OS::rmdir (const char *path)
 {
 #if defined (ACE_HAS_WINCE)
-  ACE_WIN32CALL_RETURN (ACE_ADAPT_RETVAL (::RemoveDirectory (ACE_TEXT_CHAR_TO_TCHAR (path)),
+  ACE_WIN32CALL_RETURN (ACE_ADAPT_RETVAL (::RemoveDirectory (ACE_TEXT_CHAR_TO_TCHAR(path)),
                                           ace_result_),
                         int, -1);
 #else
@@ -193,7 +195,10 @@ ACE_INLINE ACE_HANDLE
 ACE_OS::dup (ACE_HANDLE handle)
 {
   ACE_OS_TRACE ("ACE_OS::dup");
-#if defined (ACE_WIN32) && !defined (ACE_HAS_WINCE)
+#if defined (ACE_LACKS_DUP)
+  ACE_UNUSED_ARG (handle);
+  ACE_NOTSUP_RETURN (ACE_INVALID_HANDLE);
+#elif defined (ACE_WIN32)
   ACE_HANDLE new_fd;
   if (::DuplicateHandle(::GetCurrentProcess (),
                         handle,
@@ -206,15 +211,42 @@ ACE_OS::dup (ACE_HANDLE handle)
   else
     ACE_FAIL_RETURN (ACE_INVALID_HANDLE);
   /* NOTREACHED */
-#elif defined (ACE_LACKS_DUP)
-  ACE_UNUSED_ARG (handle);
-  ACE_NOTSUP_RETURN (-1);
-#elif defined (ACE_HAS_WINCE)
-  ACE_UNUSED_ARG (handle);
-  ACE_NOTSUP_RETURN (0);
 #else
   ACE_OSCALL_RETURN (::dup (handle), ACE_HANDLE, ACE_INVALID_HANDLE);
-#endif /* ACE_WIN32 && !ACE_HAS_WINCE */
+#endif /* ACE_LACKS_DUP */
+}
+
+ACE_INLINE ACE_HANDLE
+ACE_OS::dup(ACE_HANDLE handle, pid_t pid)
+{
+  ACE_OS_TRACE("ACE_OS::dup");
+#if defined (ACE_LACKS_DUP)
+  ACE_UNUSED_ARG (handle);
+  ACE_UNUSED_ARG (pid);
+  ACE_NOTSUP_RETURN (ACE_INVALID_HANDLE);
+#elif defined (ACE_WIN32)
+  ACE_HANDLE new_fd;
+  ACE_HANDLE hTargetProcess = ::OpenProcess (PROCESS_DUP_HANDLE,
+                                             FALSE,
+                                             pid);
+  if(::DuplicateHandle(::GetCurrentProcess (),
+                       handle,
+                       hTargetProcess,
+                       &new_fd,
+                       0,
+                       TRUE,
+                       DUPLICATE_SAME_ACCESS))
+    {
+      ::CloseHandle (hTargetProcess);
+      return new_fd;
+    }
+  else
+    ACE_FAIL_RETURN (ACE_INVALID_HANDLE);
+  /*NOTREACHED*/
+#else
+  ACE_UNUSED_ARG (pid);
+  ACE_OSCALL_RETURN(::dup(handle), ACE_HANDLE, ACE_INVALID_HANDLE);
+#endif /*ACE_WIN32 &&  !ACE_HAS_WINCE*/
 }
 
 ACE_INLINE int
@@ -556,11 +588,10 @@ ACE_OS::hostname (wchar_t name[], size_t maxnamelen)
 #else /* ACE_WIN32 && !ACE_HAS_WINCE */
   // Emulate using the char version
   char *char_name = 0;
-  int result = 0;
 
   ACE_NEW_RETURN (char_name, char[maxnamelen], -1);
 
-  result = ACE_OS::hostname(char_name, maxnamelen);
+  int result = ACE_OS::hostname(char_name, maxnamelen);
   ACE_OS::strcpy (name, ACE_Ascii_To_Wide (char_name).wchar_rep ());
 
   delete [] char_name;
@@ -591,9 +622,13 @@ ACE_OS::isatty (ACE_HANDLE handle)
   ACE_UNUSED_ARG (handle);
   return 0;
 #else
-  int fd = ::_open_osfhandle (intptr_t (handle), 0);
-  int status = ::_isatty (fd);
-  ::_close (fd);
+  int const fd = ::_open_osfhandle (intptr_t (handle), 0);
+  int status = 0;
+  if (fd != -1)
+    {
+      status = ::_isatty (fd);
+      ::_close (fd);
+    }
   return status;
 #endif /* ACE_LACKS_ISATTY */
 }
@@ -750,13 +785,11 @@ ACE_OS::readlink (const char *path, char *buf, size_t bufsiz)
   ACE_UNUSED_ARG (buf);
   ACE_UNUSED_ARG (bufsiz);
   ACE_NOTSUP_RETURN (-1);
+# elif defined(ACE_HAS_NONCONST_READLINK)
+  ACE_OSCALL_RETURN (
+    ::readlink (const_cast <char *>(path), buf, bufsiz), ssize_t, -1);
 # else
-#   if !defined(ACE_HAS_NONCONST_READLINK)
-      ACE_OSCALL_RETURN (::readlink (path, buf, bufsiz), ssize_t, -1);
-#   else
-      ACE_OSCALL_RETURN (
-        ::readlink (const_cast <char *>(path), buf, bufsiz), ssize_t, -1);
-#   endif
+  ACE_OSCALL_RETURN (::readlink (path, buf, bufsiz), ssize_t, -1);
 # endif /* ACE_LACKS_READLINK */
 }
 
@@ -1007,7 +1040,7 @@ ACE_INLINE long
 ACE_OS::sysinfo (int cmd, char *buf, long count)
 {
   ACE_OS_TRACE ("ACE_OS::sysinfo");
-#if defined (ACE_HAS_SYSINFO)
+#if defined (ACE_HAS_SYSV_SYSINFO)
   ACE_OSCALL_RETURN (::sysinfo (cmd, buf, count), long, -1);
 #else
   ACE_UNUSED_ARG (cmd);
@@ -1015,7 +1048,7 @@ ACE_OS::sysinfo (int cmd, char *buf, long count)
   ACE_UNUSED_ARG (count);
 
   ACE_NOTSUP_RETURN (0);
-#endif /* ACE_HAS_SYSINFO */
+#endif /* ACE_HAS_SYSV_SYSINFO */
 }
 
 ACE_INLINE int

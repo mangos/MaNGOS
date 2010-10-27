@@ -1,4 +1,4 @@
-// $Id: TP_Reactor.cpp 82393 2008-07-23 10:52:34Z johnnyw $
+// $Id: TP_Reactor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
 
 #include "ace/TP_Reactor.h"
 #include "ace/Thread.h"
@@ -10,10 +10,6 @@
 #if !defined (__ACE_INLINE__)
 #include "ace/TP_Reactor.inl"
 #endif /* __ACE_INLINE__ */
-
-ACE_RCSID (ace,
-           TP_Reactor,
-           "$Id: TP_Reactor.cpp 82393 2008-07-23 10:52:34Z johnnyw $")
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -54,7 +50,7 @@ ACE_TP_Token_Guard::acquire_read_token (ACE_Time_Value *max_wait_time)
     }
 
   // We got the token and so let us mark ourselves as owner
-  this->owner_ = 1;
+  this->owner_ = true;
 
   return result;
 }
@@ -92,7 +88,7 @@ ACE_TP_Token_Guard::acquire_token (ACE_Time_Value *max_wait_time)
     }
 
   // We got the token and so let us mark ourselves as owner
-  this->owner_ = 1;
+  this->owner_ = true;
 
   return result;
 }
@@ -109,7 +105,7 @@ ACE_TP_Reactor::ACE_TP_Reactor (ACE_Sig_Handler *sh,
 }
 
 ACE_TP_Reactor::ACE_TP_Reactor (size_t max_number_of_handles,
-                                int restart,
+                                bool restart,
                                 ACE_Sig_Handler *sh,
                                 ACE_Timer_Queue *tq,
                                 bool mask_signals,
@@ -657,7 +653,7 @@ ACE_TP_Reactor::notify_handle (ACE_HANDLE,
 {
   ACE_ERROR ((LM_ERROR,
               ACE_TEXT ("ACE_TP_Reactor::notify_handle: ")
-              ACE_TEXT ("Wrong version of notify_handle() got called \n")));
+              ACE_TEXT ("Wrong version of notify_handle() got called\n")));
 
   ACE_ASSERT (eh == 0);
   ACE_UNUSED_ARG (eh);

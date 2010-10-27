@@ -1,4 +1,4 @@
-// $Id: INET_Addr.cpp 82434 2008-07-28 11:40:36Z johnnyw $
+// $Id: INET_Addr.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
 
 // Defines the Internet domain address family address format.
 
@@ -18,10 +18,6 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/OS_NS_sys_socket.h"
 
-ACE_RCSID (ace,
-           INET_Addr,
-           "$Id: INET_Addr.cpp 82434 2008-07-28 11:40:36Z johnnyw $")
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 ACE_ALLOC_HOOK_DEFINE(ACE_INET_Addr)
@@ -36,7 +32,7 @@ ACE_INET_Addr::addr_to_string (ACE_TCHAR s[],
   ACE_TRACE ("ACE_INET_Addr::addr_to_string");
 
   // XXX Can we (should we) include the scope id for IPv6 addresses?
-  char  hoststr[MAXHOSTNAMELEN+1];
+  char hoststr[MAXHOSTNAMELEN+1];
 
   bool result = false;
   if (ipaddr_format == 0)
@@ -489,7 +485,7 @@ ACE_INET_Addr::set (const char port_name[],
 
   int address_family = PF_UNSPEC;
 #  if defined (ACE_HAS_IPV6)
-  if (ACE_OS::strcmp (ACE_TEXT_CHAR_TO_TCHAR(protocol), ACE_TEXT ("tcp6")) == 0)
+  if (ACE_OS::strcmp (protocol, "tcp6") == 0)
     address_family = AF_INET6;
 #  endif /* ACE_HAS_IPV6 */
 
@@ -702,18 +698,12 @@ ACE_INET_Addr::ACE_INET_Addr (const char port_name[],
   : ACE_Addr (determine_type (), sizeof (inet_addr_))
 {
   ACE_TRACE ("ACE_INET_Addr::ACE_INET_Addr");
-#if !defined (ACE_LACKS_HTONL)
   this->reset ();
   if (this->set (port_name,
-                 htonl (inet_address),
+                 ACE_HTONL (inet_address),
                  protocol) == -1)
     ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("ACE_INET_Addr::ACE_INET_Addr")));
-#else
-  ACE_UNUSED_ARG (port_name);
-  ACE_UNUSED_ARG (inet_address);
-  ACE_UNUSED_ARG (protocol);
-#endif
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -723,18 +713,12 @@ ACE_INET_Addr::ACE_INET_Addr (const wchar_t port_name[],
   : ACE_Addr (determine_type (), sizeof (inet_addr_))
 {
   ACE_TRACE ("ACE_INET_Addr::ACE_INET_Addr");
-#if !defined (ACE_LACKS_HTONL)
   this->reset ();
   if (this->set (port_name,
-                 htonl (inet_address),
+                 ACE_HTONL (inet_address),
                  protocol) == -1)
     ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("ACE_INET_Addr::ACE_INET_Addr")));
-#else
-  ACE_UNUSED_ARG (port_name);
-  ACE_UNUSED_ARG (inet_address);
-  ACE_UNUSED_ARG (protocol);
-#endif
 }
 #endif /* ACE_HAS_WCHAR */
 

@@ -4,7 +4,7 @@
 /**
  *  @file   config-all.h
  *
- *  $Id: config-all.h 81661 2008-05-09 12:05:34Z johnnyw $
+ *  $Id: config-all.h 84216 2009-01-22 18:34:40Z johnnyw $
  *
  *  @author (Originally in OS.h)Doug Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -74,6 +74,10 @@
 
 #if !defined (ACE_HAS_MONITOR_FRAMEWORK)
 # define ACE_HAS_MONITOR_FRAMEWORK 1
+#endif
+
+#if !defined (ACE_HAS_SENDFILE)
+# define ACE_HAS_SENDFILE 0
 #endif
 
 #if !defined (ACE_HAS_MONITOR_POINTS)

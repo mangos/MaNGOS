@@ -1,4 +1,4 @@
-// $Id: Module.cpp 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Module.cpp 84068 2008-12-24 18:32:05Z shuston $
 
 #ifndef ACE_MODULE_CPP
 #define ACE_MODULE_CPP
@@ -83,14 +83,14 @@ ACE_Module<ACE_SYNCH_USE>::link (ACE_Module<ACE_SYNCH_USE> *m)
 }
 
 template <ACE_SYNCH_DECL> int
-ACE_Module<ACE_SYNCH_USE>::open (const ACE_TCHAR *mod_name,
+ACE_Module<ACE_SYNCH_USE>::open (const ACE_TCHAR *module_name,
                                  ACE_Task<ACE_SYNCH_USE> *writer_q,
                                  ACE_Task<ACE_SYNCH_USE> *reader_q,
                                  void *arg,
                                  int flags /* = M_DELETE */)
 {
   ACE_TRACE ("ACE_Module<ACE_SYNCH_USE>::open");
-  this->name (mod_name);
+  this->name (module_name);
   this->arg_ = arg;
 
   // We may already have readers and/or writers.
@@ -178,7 +178,7 @@ ACE_Module<ACE_SYNCH_USE>::~ACE_Module (void)
 }
 
 template <ACE_SYNCH_DECL>
-ACE_Module<ACE_SYNCH_USE>::ACE_Module (const ACE_TCHAR *mod_name,
+ACE_Module<ACE_SYNCH_USE>::ACE_Module (const ACE_TCHAR *module_name,
                                        ACE_Task<ACE_SYNCH_USE> *writer_q,
                                        ACE_Task<ACE_SYNCH_USE> *reader_q,
                                        void *args,
@@ -190,7 +190,7 @@ ACE_Module<ACE_SYNCH_USE>::ACE_Module (const ACE_TCHAR *mod_name,
   this->q_pair_[0] = 0;
   this->q_pair_[1] = 0;
 
-  if (this->open (mod_name, writer_q, reader_q, args, flags) == -1)
+  if (this->open (module_name, writer_q, reader_q, args, flags) == -1)
     ACE_ERROR ((LM_ERROR,
                 ACE_TEXT ("%p\n"),
                 ACE_TEXT ("ACE_Module")));

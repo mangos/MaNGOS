@@ -4,7 +4,7 @@
 /**
  *  @file    SOCK_SEQPACK_Acceptor.h
  *
- *  $Id: SOCK_SEQPACK_Acceptor.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: SOCK_SEQPACK_Acceptor.h 84325 2009-02-04 22:46:30Z shuston $
  *  @author  Patrick J. Lardieri <plardier@atl.lmco.com>
  *  @author  Gaurav Naik, Lockheed Martin ATL
  *  @author  based on SOCK_STREAM_Acceptor
@@ -56,30 +56,29 @@ public:
    * @c SO_REUSEADDR to reuse this address.
    */
   ACE_SOCK_SEQPACK_Acceptor (const ACE_Addr &local_sap,
-                     int reuse_addr = 0,
-                     int protocol_family = PF_UNSPEC,
-                     int backlog = ACE_DEFAULT_BACKLOG,
-                     int protocol = 132);
+                             int reuse_addr = 0,
+                             int protocol_family = PF_UNSPEC,
+                             int backlog = ACE_DEFAULT_BACKLOG,
+                             int protocol = 132);
 
   /// Multihomed version of same
 
   ACE_SOCK_SEQPACK_Acceptor (const ACE_Multihomed_INET_Addr &local_sap,
-                     int reuse_addr = 0,
-                     int protocol_family = PF_UNSPEC,
-                     int backlog = ACE_DEFAULT_BACKLOG,
-                     int protocol = 132);
+                             int reuse_addr = 0,
+                             int protocol_family = PF_UNSPEC,
+                             int backlog = ACE_DEFAULT_BACKLOG,
+                             int protocol = 132);
 
   /// Initialize a passive-mode QoS-enabled acceptor socket.  Returns 0
   /// on success and -1 on failure.
   ACE_SOCK_SEQPACK_Acceptor (const ACE_Addr &local_sap,
-                     ACE_Protocol_Info *protocolinfo,
-                     ACE_SOCK_GROUP g,
-                     u_long flags,
-                     int reuse_addr,
-                     int protocol_family = PF_UNSPEC,
-                     int backlog = ACE_DEFAULT_BACKLOG,
-                     int protocol = 132);
-
+                             ACE_Protocol_Info *protocolinfo,
+                             ACE_SOCK_GROUP g,
+                             u_long flags,
+                             int reuse_addr,
+                             int protocol_family = PF_UNSPEC,
+                             int backlog = ACE_DEFAULT_BACKLOG,
+                             int protocol = 132);
 
   /**
    * Initialize a passive-mode BSD-style acceptor socket (no QoS).
@@ -133,8 +132,8 @@ public:
   int accept (ACE_SOCK_SEQPACK_Association &new_association,
               ACE_Addr *remote_addr = 0,
               ACE_Time_Value *timeout = 0,
-              int restart = 1,
-              int reset_new_handle = 0) const;
+              bool restart = true,
+              bool reset_new_handle = false) const;
 
   // = Meta-type info
   typedef ACE_Multihomed_INET_Addr PEER_ADDR;
@@ -150,14 +149,14 @@ protected:
   /// Perform operations that must occur before <ACE_OS::accept> is
   /// called.
   int shared_accept_start (ACE_Time_Value *timeout,
-                           int restart,
+                           bool restart,
                            int &in_blocking_mode) const;
 
   /// Perform operations that must occur after <ACE_OS::accept> is
   /// called.
   int shared_accept_finish (ACE_SOCK_SEQPACK_Association new_association,
                             int in_blocking_mode,
-                            int reset_new_handle) const;
+                            bool reset_new_handle) const;
 
   /**
    * This method factors out the common <open> code and is called by

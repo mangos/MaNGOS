@@ -4,7 +4,7 @@
 /**
  *  @file   OS_NS_unistd.h
  *
- *  $Id: OS_NS_unistd.h 81156 2008-03-30 20:56:47Z iliyan $
+ *  $Id: OS_NS_unistd.h 91066 2010-07-12 11:05:04Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
@@ -62,7 +62,7 @@ namespace ACE_OS
   ACE_NAMESPACE_INLINE_FUNCTION
   long allocation_granularity (void);
 
-  // used by ARGV::argv_to_string() and ACE_OS::fork_exec()
+  /// used by ARGV::argv_to_string() and ACE_OS::fork_exec()
   extern ACE_Export
   int argv_to_string (int argc,
                       ACE_TCHAR **argv,
@@ -76,7 +76,6 @@ namespace ACE_OS
                       bool substitute_env_args = true,
                       bool quote_args = false);
 
-#if !defined (ACE_LACKS_CHDIR)
   ACE_NAMESPACE_INLINE_FUNCTION
   int chdir (const char *path);
 
@@ -84,7 +83,6 @@ namespace ACE_OS
   ACE_NAMESPACE_INLINE_FUNCTION
   int chdir (const wchar_t *path);
 #endif /* ACE_HAS_WCHAR */
-#endif /* ACE_LACKS_CHDIR */
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int rmdir (const char *path);
@@ -99,6 +97,9 @@ namespace ACE_OS
 
   ACE_NAMESPACE_INLINE_FUNCTION
   ACE_HANDLE dup (ACE_HANDLE handle);
+
+  ACE_NAMESPACE_INLINE_FUNCTION
+  ACE_HANDLE dup (ACE_HANDLE handle, pid_t pid);
 
   ACE_NAMESPACE_INLINE_FUNCTION
   int dup2 (ACE_HANDLE oldfd,
@@ -141,7 +142,6 @@ namespace ACE_OS
 
   extern ACE_Export
   pid_t fork_exec (ACE_TCHAR *argv[]);
-
   //@}
 
   ACE_NAMESPACE_INLINE_FUNCTION
@@ -189,12 +189,12 @@ namespace ACE_OS
 
   // should call gethostname()
   ACE_NAMESPACE_INLINE_FUNCTION
-  int hostname (char *name,
+  int hostname (char name[],
                 size_t maxnamelen);
 
 #if defined (ACE_HAS_WCHAR)
   ACE_NAMESPACE_INLINE_FUNCTION
-  int hostname (wchar_t *name,
+  int hostname (wchar_t name[],
                 size_t maxnamelen);
 #endif /* ACE_HAS_WCHAR */
 
@@ -253,11 +253,11 @@ namespace ACE_OS
                 ACE_OVERLAPPED *);
 
   /**
-   * Receive @a len bytes into @a buf from <handle> (uses the
+   * Receive @a len bytes into @a buf from @a handle (uses the
    * <ACE_OS::read> call, which uses the <read> system call on UNIX
    * and the <ReadFile> call on Win32). If errors occur, -1 is
    * returned.  If EOF occurs, 0 is returned.  Whatever data has been
-   * read will be returned to the caller through<bytes_transferred>.
+   * read will be returned to the caller through @a bytes_transferred.
    *
    */
   extern ACE_Export
@@ -358,7 +358,7 @@ namespace ACE_OS
    * calls, which is uses the <write> system call on UNIX and the
    * <WriteFile> call on Win32).  If errors occur, -1 is returned.  If
    * EOF occurs, 0 is returned.  Whatever data has been transmitted
-   * will be returned to the caller through <bytes_transferred>.
+   * will be returned to the caller through @a bytes_transferred.
    */
   extern ACE_Export
   ssize_t write_n (ACE_HANDLE handle,

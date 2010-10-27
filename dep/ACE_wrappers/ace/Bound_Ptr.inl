@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: Bound_Ptr.inl 80826 2008-03-04 14:51:23Z wotte $
+// $Id: Bound_Ptr.inl 82723 2008-09-16 09:35:44Z johnnyw $
 
 // Bound_Ptr.i
 
@@ -288,7 +288,7 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::get (void) const
   return this->ptr_;
 }
 
-template <class X, class ACE_LOCK> inline int
+template <class X, class ACE_LOCK> inline bool
 ACE_Strong_Bound_Ptr<X, ACE_LOCK>::null (void) const
 {
   return this->ptr_ == 0;
@@ -453,13 +453,13 @@ ACE_Weak_Bound_Ptr<X, ACE_LOCK>::unsafe_get (void) const
   return this->ptr_;
 }
 
-template <class X, class ACE_LOCK> inline int
+template <class X, class ACE_LOCK> inline bool
 ACE_Weak_Bound_Ptr<X, ACE_LOCK>::null (void) const
 {
   // A weak pointer must behave as though it is automatically set to null
   // if the underlying object has been deleted.
   if (COUNTER::object_was_deleted (this->counter_))
-    return 1;
+    return true;
 
   return this->ptr_ == 0;
 }

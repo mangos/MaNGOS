@@ -4,7 +4,7 @@
 /**
  *  @file    Timer_Queue_Adapters.h
  *
- *  $Id: Timer_Queue_Adapters.h 80826 2008-03-04 14:51:23Z wotte $
+ *  $Id: Timer_Queue_Adapters.h 89482 2010-03-15 07:58:50Z johnnyw $
  *
  *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu> and
  *          Carlos O'Ryan <coryan@uci.edu>
@@ -49,7 +49,7 @@ class ACE_Sig_Set;
  *
  * @todo This adapter does not automatically reschedule repeating timers.
  */
-template <class TQ>
+template <class TQ, class TYPE = ACE_Event_Handler*>
 class ACE_Async_Timer_Queue_Adapter : public ACE_Event_Handler
 {
 public:
@@ -70,7 +70,7 @@ public:
    * calling expire().  Note that interval timers are not implemented
    * yet.
    */
-  long schedule (ACE_Event_Handler *type,
+  long schedule (TYPE type,
                  const void *act,
                  const ACE_Time_Value &future_time,
                  const ACE_Time_Value &interval = ACE_Time_Value::zero);
@@ -119,7 +119,7 @@ private:
  * use.
  *
  */
-template <class TQ>
+template <class TQ, class TYPE = ACE_Event_Handler*>
 class ACE_Thread_Timer_Queue_Adapter : public ACE_Task_Base
 {
 public:
@@ -145,7 +145,7 @@ public:
 
   /// Schedule the timer according to the semantics of the <TQ>; wakes
   /// up the dispatching thread.
-  long schedule (ACE_Event_Handler *handler,
+  long schedule (TYPE handler,
                  const void *act,
                  const ACE_Time_Value &future_time,
                  const ACE_Time_Value &interval = ACE_Time_Value::zero);
