@@ -1576,22 +1576,16 @@ struct SpellReagentsEntry
 // SpellScaling.dbc
 struct SpellScalingEntry
 {
-    //uint32    Id;                                           // 0        m_ID
-    uint32    unk1;                                         // 1
-    uint32    unk2;                                         // 2
-    uint32    unk3;                                         // 3
-    uint32    unk4;                                         // 4        class?
-    float     unk5;                                         // 5
-    float     unk6;                                         // 6
-    float     unk7;                                         // 7
-    float     unk8;                                         // 8
-    float     unk9;                                         // 9
-    float     unk10;                                        // 10       all zeros
-    float     unk11;                                        // 11
-    float     unk12;                                        // 12       all zeros
-    float     unk13;                                        // 13       all zeros
-    float     unk14;                                        // 14
-    uint32    unk15;                                        // 15
+    uint32    Id;                                           // 0        m_ID
+    uint32    castTimeMin;                                  // 1
+    uint32    castTimeMax;                                  // 2
+    uint32    castScalingMaxLevel;                          // 3
+    uint32    playerClass;                                  // 4        (index * 100) + charLevel => gtSpellScaling.dbc
+    float     coeff1[3];                                    // 5-7
+    float     coeff2[3];                                    // 8-10
+    float     coeff3[3];                                    // 11-13
+    float     unkMult;                                      // 14        some coefficient, mostly 1.0f
+    uint32    unkLevel;                                     // 15        some level
 };
 
 // SpellShapeshift.dbc
