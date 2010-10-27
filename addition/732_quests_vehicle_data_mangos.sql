@@ -22,25 +22,6 @@ INSERT INTO npc_spellclick_spells VALUES
 INSERT IGNORE INTO spell_script_target VALUES (52264, 1, 28653);
 
 -- From jahangames
--- Into the realm of Shadows quest
-UPDATE creature_template SET
-spell1 = 52362,
-spell2 = 0,
-spell3 = 0,
-spell4 = 0,
-spell5 = 0,
-spell6 = 0,
-VehicleId = 135
-WHERE entry IN (28782);
-
-DELETE FROM npc_spellclick_spells WHERE npc_entry in (28782);
-INSERT INTO npc_spellclick_spells VALUES (28782, 52349, 12687, 1, 12687, 1);
-INSERT IGNORE INTO spell_script_target VALUES (52349, 1, 28782);
-DELETE FROM creature_involvedrelation WHERE quest in (12687);
-INSERT INTO creature_involvedrelation (id, quest) VALUES (28788, 12687);
-UPDATE creature_template SET npcflag=npcflag|2 WHERE entry=28788;
-UPDATE quest_template SET SpecialFlags = 0 , SuggestedPlayers = 1 , Method = 2 WHERE entry IN (12687);
-
 -- Massacre at Light's point quest
 UPDATE creature_template SET
 spell1 = 52435,
@@ -202,3 +183,45 @@ UPDATE creature_template SET
 WHERE entry IN (28670);
 
 UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, InhabitType = 3 WHERE entry = 28670;
+
+-- from me
+-- into realm of shadows
+#UPDATE `creature_template` SET `unit_flags` = '16777224' WHERE `entry` =28782;
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor',
+`unit_flags` = 0,
+`spell1` = 52362
+WHERE `entry` =28782;
+
+UPDATE `quest_template` SET 
+`SrcSpell` = 52359,
+`SpecialFlags` = 2,
+`ReqCreatureOrGOId1` = 28768,
+`ReqCreatureOrGOCount1` = 1,
+`ReqSpellCast1` = 0,
+`RewItemId1` = 0,
+`RewItemCount1` = 0 WHERE `entry` = 12687;
+
+DELETE FROM `creature_involvedrelation` WHERE `quest` in (12687);
+INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES (28788, 12687);
+
+DELETE FROM `spell_script_target` WHERE `entry` = 52349;
+
+UPDATE `creature_ai_scripts` SET 
+`action1_type`   = '11',
+`action1_param1` = '52361',
+`action1_param2` = '6',
+`action1_param3` = '16',
+`action2_type`   = '11',
+`action2_param1` = '52357',
+`action2_param2` = '6',
+`action2_param3` = '16',
+`action3_type`   = '0'
+WHERE `id` = 2876806;
+
+DELETE FROM `creature` WHERE `id` = 28782;
+
+DELETE FROM `creature_template_addon` WHERE `entry` = 28782;
+
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (28782);
+INSERT INTO `npc_spellclick_spells` VALUES
+(28782, 46598, 0, 0, 0, 1);

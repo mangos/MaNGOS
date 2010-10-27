@@ -58,7 +58,6 @@ UPDATE `creature_template` SET `VehicleId` = 200 WHERE `entry` = 28607;
 UPDATE `creature_template` SET `VehicleId` = 124 WHERE `entry` = 28614;
 UPDATE `creature_template` SET `VehicleId` = 156 WHERE `entry` = 28670;
 UPDATE `creature_template` SET `VehicleId` = 158 WHERE `entry` = 28781;
-UPDATE `creature_template` SET `VehicleId` = 135 WHERE `entry` = 28782;
 UPDATE `creature_template` SET `VehicleId` = 79 WHERE `entry` = 28833;
 UPDATE `creature_template` SET `VehicleId` = 145 WHERE `entry` = 28851;
 UPDATE `creature_template` SET `VehicleId` = 143 WHERE `entry` = 28864;
