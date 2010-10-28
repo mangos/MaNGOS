@@ -312,7 +312,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleNULL,                                      //259 corrupt healing over time spell
     &Aura::HandleNoImmediateEffect,                         //260 SPELL_AURA_SCREEN_EFFECT (miscvalue = id in ScreenEffect.dbc) not required any code
     &Aura::HandlePhase,                                     //261 SPELL_AURA_PHASE undetectable invisibility?     implemented in Unit::isVisibleForOrDetect
-    &Aura::HandleNULL,                                      //262 ignore combat/aura state?
+    &Aura::HandleIgnoreUnitState,                           //262 SPELL_AURA_IGNORE_UNIT_STATE                    implemented in Unit::isIgnoreUnitState & Spell::CheckCast
     &Aura::HandleNoImmediateEffect,                         //263 SPELL_AURA_ALLOW_ONLY_ABILITY                   implemented in Spell::CheckCasterAuras
     &Aura::HandleUnused,                                    //264 unused (3.0.8a-3.2.2a)
     &Aura::HandleUnused,                                    //265 unused (3.0.8a-3.2.2a)
@@ -2203,6 +2203,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 break;
             }
+            case SPELLFAMILY_MAGE:
+            {
+                // hack for Fingers of Frost stacks
+                if (GetId() == 74396)
+                {
+                    if (Aura *aur = target->GetAura(74396, EFFECT_INDEX_0))
+                        aur->GetHolder()->SetAuraCharges(2);
+                }
+                break;
+            }
             case SPELLFAMILY_SHAMAN:
             {
                 switch(GetId())
@@ -2411,6 +2421,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             case 68839:                                     // Corrupt Soul
                 target->CastSpell(target, 68846, true, NULL, this);
                 return;
+            case 74396:                                     // Fingers of Frost effect remove
+            {
+                target->RemoveAurasDueToSpell(44544);
+                return;
+            }
         }
 
         // Living Bomb
@@ -8200,6 +8215,16 @@ void Aura::HandlePhase(bool apply, bool Real)
         target->SetVisibility(target->GetVisibility());
 }
 
+void Aura::HandleIgnoreUnitState(bool apply, bool Real)
+{
+    if(GetTarget()->GetTypeId() != TYPEID_PLAYER || !Real)
+        return;
+
+    // for alowing charge/intercept/intervene in different stances
+    if (GetId() == 57499 && apply)
+        GetHolder()->SetAuraFlags(19);
+}
+
 void Aura::HandleAuraSafeFall( bool Apply, bool Real )
 {
     // implemented in WorldSession::HandleMovementOpcodes
@@ -8735,7 +8760,7 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
         return true;
     else if (IsSpellHaveAura(m_spellProto, SPELL_AURA_MOD_IGNORE_SHAPESHIFT))
         return true;
-    else if (IsSpellHaveAura(m_spellProto, SPELL_AURA_262))
+    else if (IsSpellHaveAura(m_spellProto, SPELL_AURA_IGNORE_UNIT_STATE))
         return true;
 
     // passive auras (except totem auras) do not get placed in the slots
