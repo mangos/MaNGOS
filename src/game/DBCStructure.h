@@ -601,6 +601,7 @@ struct BattlemasterListEntry
     uint32 maxLevel;                                        // 15, max level (sync with PvPDifficulty.dbc content)
     //uint32 maxGroupSizeRated;                             // 16 4.0.1
     //uint32 maxPlayers;                                    // 17 4.0.1
+    //uint32 unk1;                                          // 18 4.0.3, value 2 for Rated Battlegrounds
 };
 
 /*struct Cfg_CategoriesEntry
@@ -1576,7 +1577,7 @@ struct SpellReagentsEntry
 // SpellScaling.dbc
 struct SpellScalingEntry
 {
-    uint32    Id;                                           // 0        m_ID
+    //uint32    Id;                                           // 0        m_ID
     uint32    castTimeMin;                                  // 1
     uint32    castTimeMax;                                  // 2
     uint32    castScalingMaxLevel;                          // 3
@@ -1732,7 +1733,7 @@ struct MANGOS_DLL_SPEC SpellEntry
 
 private:
     // prevent creating custom entries (copy data from original in fact)
-    SpellEntry(SpellEntry const&);                      // DON'T must have implementation
+    SpellEntry(SpellEntry const&);                          // DON'T must have implementation
 };
 
 struct SpellCastTimesEntry

@@ -19,7 +19,7 @@
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
-// Auto generated for version 4, 0, 3, 13202
+// Auto generated for version 4, 0, 3, 13221
 
 enum EObjectFields
 {
@@ -486,7 +486,7 @@ enum EUnitFields
     PLAYER_FIELD_BUYBACK_TIMESTAMP_1          = UNIT_END + 0x0476, // Size: 12, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_KILLS                        = UNIT_END + 0x0482, // Size: 1, Type: TWO_SHORT, Flags: PRIVATE
     PLAYER_FIELD_LIFETIME_HONORBALE_KILLS     = UNIT_END + 0x0483, // Size: 1, Type: INT, Flags: PRIVATE
-    PLAYER_FIELD_BYTES2                       = UNIT_END + 0x0484, // Size: 1, Type: 6, Flags: PRIVATE
+    PLAYER_FIELD_BYTES2                       = UNIT_END + 0x0484, // Size: 1, Type: TWO_BYTES_SHORT, Flags: PRIVATE
     PLAYER_FIELD_WATCHED_FACTION_INDEX        = UNIT_END + 0x0485, // Size: 1, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_COMBAT_RATING_1              = UNIT_END + 0x0486, // Size: 26, Type: INT, Flags: PRIVATE
     PLAYER_FIELD_ARENA_TEAM_INFO_1_1          = UNIT_END + 0x04A0, // Size: 21, Type: INT, Flags: PRIVATE

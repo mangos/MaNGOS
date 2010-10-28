@@ -4040,7 +4040,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
                 case SUMMON_PROP_TYPE_SUMMON:
                 case SUMMON_PROP_TYPE_ARMY:
                 case SUMMON_PROP_TYPE_DK:
-                    DoSummonGuardian(eff_idx, summon_prop->FactionId);
+                    DoSummonGuardian(effect, summon_prop->FactionId);
                     break;
                 case SUMMON_PROP_TYPE_GUARDIAN:
                 {
@@ -4057,7 +4057,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
                             if (!cInfo)
                                 return;
 
-                            // FIXME: not all totems and similar cases seelcted by this check...
+                            // FIXME: not all totems and similar cases selected by this check...
                             if (cInfo->type == CREATURE_TYPE_TOTEM)
                                 DoSummonTotem(effect);
                             else
@@ -4071,6 +4071,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
                 case SUMMON_PROP_TYPE_CONSTRUCT:
                 {
                     if (prop_id == 2913)                    // Scrapbot
+                        DoSummonWild(effect, summon_prop->FactionId);
                     else
                         DoSummonGuardian(effect, summon_prop->FactionId);
                     break;
@@ -4102,7 +4103,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
             // FIXME : multiple summons -  not yet supported as pet
             //1562 - force of nature  - sid 33831
             //1161 - feral spirit - sid 51533
-            if(prop_id == 1562) // 3 uncontrolable instead of one controllable :/
+            if(prop_id == 1562) // 3 uncontrollable instead of one controllable :/
                 DoSummonGuardian(effect, summon_prop->FactionId);
             else
                 DoSummon(effect);
