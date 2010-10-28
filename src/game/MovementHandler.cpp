@@ -493,23 +493,27 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
 
     if (plMover)
     {
-        if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT) && !plMover->m_transport)
+        if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
         {
             // elevators also cause the client to send MOVEFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
             for (MapManager::TransportSet::const_iterator iter = sMapMgr.m_Transports.begin(); iter != sMapMgr.m_Transports.end(); ++iter)
             {
                 if ((*iter)->GetObjectGuid() == movementInfo.GetTransportGuid())
                 {
-                    plMover->m_transport = (*iter);
+                    plMover->SetTransport(*iter);
                     (*iter)->AddPassenger(plMover);
+
+                    if (plMover->GetVehicleKit())
+                        plMover->GetVehicleKit()->RemoveAllPassengers();
+
                     break;
                 }
             }
         }
-        else if (plMover->m_transport)               // if we were on a transport, leave
+        else if (plMover->GetTransport())               // if we were on a transport, leave
         {
-            plMover->m_transport->RemovePassenger(plMover);
-            plMover->m_transport = NULL;
+            plMover->GetTransport()->RemovePassenger(plMover);
+            plMover->SetTransport(NULL);
             movementInfo.ClearTransportData();
         }
 
@@ -556,6 +560,9 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
     else                                                    // creature charmed
     {
         if (mover->IsInWorld())
-            mover->GetMap()->CreatureRelocation((Creature*)mover, movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
+        {
+            mover->m_movementInfo = movementInfo;
+            mover->SetPosition(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);
+        }
     }
 }
