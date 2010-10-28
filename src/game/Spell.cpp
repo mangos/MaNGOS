@@ -5161,7 +5161,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_EFFECT_CHARGE:
             {
-                if (m_caster->hasUnitState(UNIT_STAT_ROOT) && !m_caster->HasAura(57499))
+                if (m_caster->hasUnitState(UNIT_STAT_ROOT))
                     return SPELL_FAILED_ROOTED;
 
                 break;
