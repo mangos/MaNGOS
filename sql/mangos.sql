@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10629_01_mangos_mangos_string` bit(1) default NULL
+  `required_10654_01_mangos_game_event_creature_quest` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1654,7 +1654,7 @@ CREATE TABLE `game_event_creature_quest` (
   `id` mediumint(8) unsigned NOT NULL default '0',
   `quest` mediumint(8) unsigned NOT NULL default '0',
   `event` smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`id`,`quest`)
+  PRIMARY KEY  (`id`,`quest`,`event`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
