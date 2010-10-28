@@ -6176,6 +6176,8 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
+    target->GetAntiCheat()->SetCanFly(value ? true : false);
+
     WorldPacket data(12);
     data.SetOpcode(value ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
     data << target->GetPackGUID();

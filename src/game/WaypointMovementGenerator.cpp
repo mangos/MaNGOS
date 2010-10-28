@@ -333,6 +333,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
 {
     // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
     player.clearUnitState(UNIT_STAT_TAXI_FLIGHT);
+    player.GetAntiCheat()->Anti__SetLastTeleTime(time(NULL));
 
     float x, y, z;
     i_destinationHolder.GetLocationNow(player.GetBaseMap(), x, y, z);
@@ -357,6 +358,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
 void FlightPathMovementGenerator::Interrupt(Player & player)
 {
     player.clearUnitState(UNIT_STAT_TAXI_FLIGHT);
+    player.GetAntiCheat()->Anti__SetLastTeleTime(time(NULL));
 }
 
 void FlightPathMovementGenerator::Reset(Player & player)
