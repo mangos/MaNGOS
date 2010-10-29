@@ -212,6 +212,10 @@ void VehicleKit::RemovePassenger(Unit *passenger)
     seat->second.passenger = NULL;
     passenger->clearUnitState(UNIT_STAT_ON_VEHICLE);
 
+    float px, py, pz, po;
+    m_pBase->GetClosePoint(px, py, pz, m_pBase->GetObjectBoundingRadius(), 2.0f, M_PI_F);
+    po = m_pBase->GetOrientation();
+
     passenger->m_movementInfo.ClearTransportData();
     passenger->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
 
@@ -245,7 +249,8 @@ void VehicleKit::RemovePassenger(Unit *passenger)
         data << uint32(0);
         passenger->SendMessageToSet(&data, true);
     }
-
+    passenger->UpdateAllowedPositionZ(px, py, pz);
+    passenger->SetPosition(px, py, pz + 0.5f, po);
     UpdateFreeSeatCount();
 }
 
@@ -283,6 +288,7 @@ void VehicleKit::RelocatePassengers(float x, float y, float z, float ang)
             float pz = z + passenger->m_movementInfo.GetTransportPos()->z;
             float po = ang + passenger->m_movementInfo.GetTransportPos()->o;
 
+            passenger->UpdateAllowedPositionZ(px, py, pz);
             passenger->SetPosition(px, py, pz, po);
         }
     }
