@@ -161,6 +161,15 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
 
         passenger->SetCharm(m_pBase);
 
+        if(m_pBase->HasAuraType(SPELL_AURA_FLY) || m_pBase->HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED))
+        {
+            WorldPacket data;
+            data.Initialize(SMSG_MOVE_SET_CAN_FLY, 12);
+            data << m_pBase->GetPackGUID();
+            data << (uint32)(0);
+            m_pBase->SendMessageToSet(&data,false);
+        }
+
         if (passenger->GetTypeId() == TYPEID_PLAYER)
         {
             m_pBase->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
@@ -208,6 +217,7 @@ void VehicleKit::RemovePassenger(Unit *passenger)
 
     if (seat->second.seatInfo->m_flags & SEAT_FLAG_CAN_CONTROL)
     {
+
         passenger->SetCharm(NULL);
         passenger->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
 
