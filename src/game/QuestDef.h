@@ -197,7 +197,7 @@ class Quest
         Quest(Field * questRecord);
         uint32 XPValue( Player *pPlayer ) const;
 
-        bool HasFlag( uint32 flag ) const { return ( QuestFlags & flag ) != 0; }
+        bool HasQuestFlag(uint32 flag) const { return (QuestFlags & flag) != 0; }
         void SetFlag( uint32 flag ) { QuestFlags |= flag; }
 
         // table data accessors:
