@@ -110,6 +110,7 @@ pkgdata_DATA = \
 	10628_01_mangos_mangos_string.sql \
 	10629_01_mangos_mangos_string.sql \
 	10654_01_mangos_game_event_creature_quest.sql \
+	10655_01_characters_character_queststatus_monthly.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -200,4 +201,5 @@ EXTRA_DIST = \
 	10628_01_mangos_mangos_string.sql \
 	10629_01_mangos_mangos_string.sql \
 	10654_01_mangos_game_event_creature_quest.sql \
+	10655_01_characters_character_queststatus_monthly.sql \
 	README

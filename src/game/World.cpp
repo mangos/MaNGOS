@@ -1347,6 +1347,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Calculate next weekly quest reset time..." );
     InitWeeklyQuestResetTime();
 
+    sLog.outString("Calculate next monthly quest reset time..." );
+    SetMonthlyQuestResetTime();
+
     sLog.outString("Calculate random battleground reset time..." );
     InitRandomBGResetTime();
 
@@ -1438,6 +1441,10 @@ void World::Update(uint32 diff)
     /// Handle weekly quests reset time
     if (m_gameTime > m_NextWeeklyQuestReset)
         ResetWeeklyQuests();
+
+    /// Handle monthly quests reset time
+    if (m_gameTime > m_NextMonthlyQuestReset)
+        ResetMonthlyQuests();
 
     if (m_gameTime > m_NextRandomBGReset)
         ResetRandomBG();
@@ -2134,6 +2141,52 @@ void World::InitRandomBGResetTime()
         delete result;
 }
 
+void World::SetMonthlyQuestResetTime(bool initialize)
+{
+    if (initialize)
+    {
+        QueryResult * result = CharacterDatabase.Query("SELECT NextMonthlyQuestResetTime FROM saved_variables");
+
+        if (!result)
+            m_NextMonthlyQuestReset = time_t(time(NULL));
+        else
+            m_NextMonthlyQuestReset = time_t((*result)[0].GetUInt64());
+
+        delete result;
+    }
+
+    // generate time
+    time_t currentTime = time(NULL);
+    tm localTm = *localtime(&currentTime);
+
+    int month = localTm.tm_mon;
+    int year = localTm.tm_year;
+
+    ++month;
+
+    // month 11 is december, next is january (0)
+    if (month > 11)
+    {
+        month = 0;
+        year += 1;
+    }
+
+    // reset time for next month
+    localTm.tm_year = year;
+    localTm.tm_mon = month;
+    localTm.tm_mday = 1;                                    // don't know if we really need config option for day/hour
+    localTm.tm_hour = 0;
+    localTm.tm_min  = 0;
+    localTm.tm_sec  = 0;
+
+    time_t nextMonthResetTime = mktime(&localTm);
+
+    m_NextMonthlyQuestReset = (initialize && m_NextMonthlyQuestReset < nextMonthResetTime) ? m_NextMonthlyQuestReset : nextMonthResetTime;
+
+    // Row must exist for this to work. Currently row is added by InitDailyQuestResetTime(), called before this function
+    CharacterDatabase.PExecute("UPDATE saved_variables SET NextMonthlyQuestResetTime = '"UI64FMTD"'", uint64(m_NextMonthlyQuestReset));
+}
+
 void World::ResetDailyQuests()
 {
     DETAIL_LOG("Daily quests reset for all characters.");
@@ -2168,6 +2221,18 @@ void World::ResetRandomBG()
 
     m_NextRandomBGReset = time_t(m_NextRandomBGReset + DAY);
     CharacterDatabase.PExecute("UPDATE saved_variables SET NextRandomBGResetTime = '"UI64FMTD"'", uint64(m_NextRandomBGReset));
+}
+
+void World::ResetMonthlyQuests()
+{
+    DETAIL_LOG("Monthly quests reset for all characters.");
+    CharacterDatabase.Execute("TRUNCATE character_queststatus_monthly");
+
+    for(SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+        if (itr->second->GetPlayer())
+            itr->second->GetPlayer()->ResetMonthlyQuestStatus();
+
+    SetMonthlyQuestResetTime(false);
 }
 
 void World::SetPlayerLimit( int32 limit, bool needUpdate )

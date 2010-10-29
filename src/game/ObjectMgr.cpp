@@ -3839,6 +3839,15 @@ void ObjectMgr::LoadQuests()
             }
         }
 
+        if (qinfo->QuestFlags & QUEST_MANGOS_FLAGS_MONTHLY)
+        {
+            if (!(qinfo->QuestFlags & QUEST_MANGOS_FLAGS_REPEATABLE))
+            {
+                sLog.outErrorDb("Monthly quest %u not marked as repeatable in `SpecialFlags`, added.", qinfo->GetQuestId());
+                qinfo->QuestFlags |= QUEST_MANGOS_FLAGS_REPEATABLE;
+            }
+        }
+
         if (qinfo->QuestFlags & QUEST_FLAGS_AUTO_REWARDED)
         {
             // at auto-reward can be rewarded only RewChoiceItemId[0]
@@ -4107,7 +4116,7 @@ void ObjectMgr::LoadQuests()
 
                     if (found)
                     {
-                        if (!qinfo->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
+                        if (!qinfo->HasQuestFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
                         {
                             sLog.outErrorDb("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE or SPELL_EFFECT_SEND_EVENT for quest %u and ReqCreatureOrGOId%d = 0, but quest not have flag QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT. Quest flags or ReqCreatureOrGOId%d must be fixed, quest modified to enable objective.",spellInfo->Id,qinfo->QuestId,j+1,j+1);
 
@@ -4373,7 +4382,7 @@ void ObjectMgr::LoadQuests()
             if (!quest)
                 continue;
 
-            if (!quest->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
+            if (!quest->HasQuestFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
             {
                 sLog.outErrorDb("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE for quest %u , but quest does not have SpecialFlags QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT (2) set. Quest SpecialFlags should be corrected to enable this objective.", spellInfo->Id, quest_id);
 
@@ -4662,7 +4671,7 @@ void ObjectMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     continue;
                 }
 
-                if (!quest->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
+                if (!quest->HasQuestFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
                 {
                     sLog.outErrorDb("Table `%s` has quest (ID: %u) in SCRIPT_COMMAND_QUEST_EXPLORED in `datalong` for script id %u, but quest not have flag QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT in quest flags. Script command or quest flags wrong. Quest modified to require objective.", tablename, tmp.questExplored.questId, tmp.id);
 
@@ -5569,7 +5578,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
             continue;
         }
 
-        if (!quest->HasFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
+        if (!quest->HasQuestFlag(QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT))
         {
             sLog.outErrorDb("Table `areatrigger_involvedrelation` has record (id: %u) for not quest %u, but quest not have flag QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT. Trigger or quest flags must be fixed, quest modified to require objective.",trigger_ID,quest_ID);
 

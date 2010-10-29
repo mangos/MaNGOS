@@ -479,7 +479,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
     data << uint32(pQuest->GetSuggestedPlayers());
     data << uint8(0);                                       // IsFinished? value is sent back to server in quest accept packet
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
         data << uint32(0);                                  // Rewarded chosen items hidden
         data << uint32(0);                                  // Rewarded items hidden
@@ -625,7 +625,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
     data << uint32(pQuest->GetRewXPId());                   // column index in QuestXP.dbc (row based on quest level)
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
         data << uint32(0);                                  // Hide money rewarded
     else
         data << uint32(pQuest->GetRewOrReqMoney());         // reward money (below max lvl)
@@ -648,7 +648,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
 
     int iI;
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
         for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
             data << uint32(0) << uint32(0);
