@@ -6531,6 +6531,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, m_spellInfo->EffectBasePoints[eff_idx]+1, true);
                     break;
                 }
+                case 52479:                                 // The Gift That Keeps On Giving - trigger Scarlet Miner Ghoul Transform
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER || unitTarget->GetTypeId() == TYPEID_PLAYER)
+                        return;
+
+                    m_caster->CastSpell(m_caster, m_spellInfo->EffectBasePoints[eff_idx]+1, true);
+                    break;
+                }
                 case 52694:                                 // Recall Eye of Acherus
                 {
                     if (!m_caster || m_caster->GetTypeId() != TYPEID_UNIT)
