@@ -160,15 +160,17 @@ enum __QuestFlags
     QUEST_FLAGS_AUTO_ACCEPT    = 0x00080000,                // quests in starting areas
 
     // Mangos flags for set SpecialFlags in DB if required but used only at server
-    QUEST_MANGOS_FLAGS_REPEATABLE           = 0x01000000,   // Set by 1 in SpecialFlags from DB
-    QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x02000000,   // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
-    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
+    QUEST_MANGOS_FLAGS_REPEATABLE           = 0x001000000,  // Set by 1 in SpecialFlags from DB
+    QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x002000000,  // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
+    QUEST_MANGOS_FLAGS_MONTHLY              = 0x004000000,  // 4 in SpecialFlags. Quest reset for player at beginning of month.
+    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFFFF |
+        QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT | QUEST_MANGOS_FLAGS_MONTHLY,
 
     // Mangos flags for internal use only
-    QUEST_MANGOS_FLAGS_DELIVER              = 0x04000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_SPEAKTO              = 0x08000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_KILL_OR_CAST         = 0x10000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_TIMED                = 0x20000000,   // Internal flag computed only
+    QUEST_MANGOS_FLAGS_DELIVER              = 0x008000000,  // Internal flag computed only
+    QUEST_MANGOS_FLAGS_SPEAKTO              = 0x010000000,  // Internal flag computed only
+    QUEST_MANGOS_FLAGS_KILL_OR_CAST         = 0x020000000,  // Internal flag computed only
+    QUEST_MANGOS_FLAGS_TIMED                = 0x040000000,  // Internal flag computed only
 };
 
 struct QuestLocale
@@ -257,6 +259,7 @@ class Quest
         uint32 GetFlags() const { return QuestFlags; }
         bool   IsDaily() const { return QuestFlags & QUEST_FLAGS_DAILY; }
         bool   IsWeekly() const { return QuestFlags & QUEST_FLAGS_WEEKLY; }
+        bool   IsMonthly() const { return QuestFlags & QUEST_MANGOS_FLAGS_MONTHLY; }
         bool   IsDailyOrWeekly() const { return QuestFlags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
         bool   IsAutoAccept() const { return QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
         bool   IsAllowedInRaid() const;

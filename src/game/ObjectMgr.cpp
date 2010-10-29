@@ -3685,6 +3685,15 @@ void ObjectMgr::LoadQuests()
             }
         }
 
+        if (qinfo->QuestFlags & QUEST_MANGOS_FLAGS_MONTHLY)
+        {
+            if (!(qinfo->QuestFlags & QUEST_MANGOS_FLAGS_REPEATABLE))
+            {
+                sLog.outErrorDb("Monthly quest %u not marked as repeatable in `SpecialFlags`, added.", qinfo->GetQuestId());
+                qinfo->QuestFlags |= QUEST_MANGOS_FLAGS_REPEATABLE;
+            }
+        }
+
         if (qinfo->QuestFlags & QUEST_FLAGS_AUTO_REWARDED)
         {
             // at auto-reward can be rewarded only RewChoiceItemId[0]

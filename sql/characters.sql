@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10568_01_characters_character_tutorial` bit(1) default NULL
+  `required_10655_01_characters_character_queststatus_monthly` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -723,6 +723,27 @@ CREATE TABLE `character_queststatus_daily` (
 LOCK TABLES `character_queststatus_daily` WRITE;
 /*!40000 ALTER TABLE `character_queststatus_daily` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_queststatus_daily` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_queststatus_monthly`
+--
+
+DROP TABLE IF EXISTS `character_queststatus_monthly`;
+CREATE TABLE `character_queststatus_monthly` (
+  `guid` int(11) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
+  `quest` int(11) unsigned NOT NULL default '0' COMMENT 'Quest Identifier',
+  PRIMARY KEY  (`guid`,`quest`),
+  KEY `idx_guid` (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+
+--
+-- Dumping data for table `character_queststatus_monthly`
+--
+
+LOCK TABLES `character_queststatus_monthly` WRITE;
+/*!40000 ALTER TABLE `character_queststatus_monthly` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_queststatus_monthly` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1624,6 +1645,7 @@ CREATE TABLE `saved_variables` (
     `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0',
     `NextDailyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
     `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
+    `NextMonthlyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
     `cleaning_flags` int(11) unsigned NOT NULL default '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Variable Saves';
 
