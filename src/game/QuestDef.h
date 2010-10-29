@@ -200,10 +200,10 @@ class Quest
         Quest(Field * questRecord);
         uint32 XPValue( Player *pPlayer ) const;
 
-        uint32 GetQuestFlags() const { return QuestFlags; }
-        bool HasQuestFlag(uint32 flag) const { return (QuestFlags & flag) != 0; }
-        bool HasSpecialFlag(uint32 flag) const { return (SpecialFlags & flag) != 0; }
-        void SetSpecialFlag(uint32 flag) { SpecialFlags |= flag; }
+        uint32 GetQuestFlags() const { return m_QuestFlags; }
+        bool HasQuestFlag(QuestFlags flag) const { return (m_QuestFlags & flag) != 0; }
+        bool HasSpecialFlag(QuestSpecialFlags flag) const { return (m_SpecialFlags & flag) != 0; }
+        void SetSpecialFlag(QuestSpecialFlags flag) { m_SpecialFlags |= flag; }
 
         // table data accessors:
         uint32 GetQuestId() const { return QuestId; }
@@ -260,13 +260,13 @@ class Quest
         uint32 GetQuestStartScript() const { return QuestStartScript; }
         uint32 GetQuestCompleteScript() const { return QuestCompleteScript; }
 
-        bool   IsRepeatable() const { return SpecialFlags & QUEST_SPECIAL_FLAG_REPEATABLE; }
+        bool   IsRepeatable() const { return m_SpecialFlags & QUEST_SPECIAL_FLAG_REPEATABLE; }
         bool   IsAutoComplete() const { return QuestMethod ? false : true; }
-        bool   IsDaily() const { return QuestFlags & QUEST_FLAGS_DAILY; }
-        bool   IsWeekly() const { return QuestFlags & QUEST_FLAGS_WEEKLY; }
-        bool   IsMonthly() const { return SpecialFlags & QUEST_SPECIAL_FLAG_MONTHLY; }
-        bool   IsDailyOrWeekly() const { return QuestFlags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
-        bool   IsAutoAccept() const { return QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
+        bool   IsDaily() const { return m_QuestFlags & QUEST_FLAGS_DAILY; }
+        bool   IsWeekly() const { return m_QuestFlags & QUEST_FLAGS_WEEKLY; }
+        bool   IsMonthly() const { return m_SpecialFlags & QUEST_SPECIAL_FLAG_MONTHLY; }
+        bool   IsDailyOrWeekly() const { return m_QuestFlags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
+        bool   IsAutoAccept() const { return m_QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
         bool   IsAllowedInRaid() const;
 
         // multiple values
@@ -327,8 +327,8 @@ class Quest
         int32  RequiredMaxRepValue;
         uint32 SuggestedPlayers;
         uint32 LimitTime;
-        uint32 QuestFlags;
-        uint32 SpecialFlags;
+        uint32 m_QuestFlags;
+        uint32 m_SpecialFlags;
         uint32 CharTitleId;
         uint32 PlayersSlain;
         uint32 BonusTalents;
