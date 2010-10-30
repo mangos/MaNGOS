@@ -382,7 +382,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
 
             if (const Quest *pQuest = sObjectMgr.GetQuestTemplate(quest))
             {
-                if (pQuest->HasQuestFlag(QUEST_MANGOS_FLAGS_TIMED))
+                if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
                     _player->RemoveTimedQuest(quest);
             }
 
