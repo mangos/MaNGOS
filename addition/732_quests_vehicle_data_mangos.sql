@@ -182,7 +182,7 @@ UPDATE creature_template SET
     VehicleId = 156
 WHERE entry IN (28670);
 
-UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, InhabitType = 4 WHERE entry = 28670;
+UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, InhabitType = 3 WHERE entry = 28670;
 
 -- from me
 -- into realm of shadows
