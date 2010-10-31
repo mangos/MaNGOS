@@ -2068,7 +2068,7 @@ void Pet::ApplyStatScalingBonus(Stats stat, bool apply)
 
     UnitMods unitMod = UnitMods(stat);
 
-    int32 newStat  = owner->GetTotalStatValue(stat);
+    int32 newStat = owner->GetTotalStatValue(stat);
 
     if (m_baseBonusData->statScale[stat] == newStat && !apply)
         return;
@@ -2199,6 +2199,14 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
     switch(getPetType())
     {
         case GUARDIAN_PET:
+        {
+            if (owner->getClass() == CLASS_SHAMAN)
+            {
+                newAPBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
+                break;
+            }
+                             // No break another case!
+        }
         case SUMMON_PET:
         {
             switch(owner->getClass())
@@ -2380,8 +2388,6 @@ void Pet::ApplyDamageScalingBonus(bool apply)
 
 void Pet::ApplySpellDamageScalingBonus(bool apply)
 {
-    // SpellPower for pets exactly same DamageBonus.
-    //    m_baseBonusData->damageScale
     Unit* owner = GetOwner();
 
     // Don't apply scaling bonuses if no owner or owner is not player
@@ -2392,8 +2398,16 @@ void Pet::ApplySpellDamageScalingBonus(bool apply)
 
     switch(getPetType())
     {
-        case SUMMON_PET:
         case GUARDIAN_PET:
+        {
+            if (owner->getClass() == CLASS_SHAMAN)
+            {
+                newDamageBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_NATURE);
+                break;
+            }
+                             // No break another case!
+        }
+        case SUMMON_PET:
         {
             switch(owner->getClass())
             {
@@ -2727,7 +2741,7 @@ bool Pet::Summon()
     if (GetCreateSpellID())
         SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
 
-    if ( isTemporarySummoned() || (owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->IsTotem()))
+    if (isTemporarySummoned())
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
@@ -2871,13 +2885,19 @@ bool Pet::Summon()
 
 Unit* Pet::GetOwner() const
 {
-    Unit* pOwner = Unit::GetOwner();
+    Unit* owner = Unit::GetOwner();
 
-    if (pOwner) return pOwner;
-
-    else if (uint64 ownerguid = GetOwnerGUID())
+    if (!owner)
+        if (uint64 ownerguid = GetOwnerGUID())
             if (Map* pMap = GetMap())
-                return pMap->GetAnyTypeCreature(ownerguid);
+                owner = pMap->GetAnyTypeCreature(ownerguid);
+
+    if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->IsTotem())
+        if (Unit* ownerOfOwner = owner->GetOwner())
+            return ownerOfOwner;
+
+    if (owner)
+        return owner;
 
     return NULL;
 }

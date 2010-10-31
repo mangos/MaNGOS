@@ -88,3 +88,32 @@ INSERT INTO `spell_pet_auras` VALUES
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 27829;
 INSERT INTO `spell_pet_auras` VALUES
 (0,0,27829,54566);
+
+-- Greater Earth Elemetal
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 15352;
+INSERT INTO `spell_pet_auras` VALUES
+(0,0,15352, 7941),
+(0,0,15352,34947);
+
+-- Greater Fire Elemetal
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 15438;
+INSERT INTO `spell_pet_auras` VALUES
+(0,0,15438, 7942),
+(0,0,15438,34956),
+(0,0,15438,34947);
+
+-- Need correct spellcasting for this!
+-- UPDATE `creature_template` SET `spell1` = 12470, `spell2` = 57984 WHERE `entry` = 15438;
+-- UPDATE `creature_template` SET `spell1` = 36213 WHERE `entry` = 15352;
+
+UPDATE `creature_template` SET `spell1` = 0, `spell2` = 0 WHERE `entry` = 15438;
+UPDATE `creature_template` SET `spell1` = 0, `spell2` = 0 WHERE `entry` = 15352;
+
+
+UPDATE `creature_template` SET `spell1` = 40133 WHERE `entry` = 15439;
+UPDATE `creature_template` SET `spell1` = 40132 WHERE `entry` = 15430;
+
+DELETE FROM `event_scripts` WHERE `id` IN (14859,14858);
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
+(14858, 1, 15, 33663, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summon greater Earth elemental'),
+(14859, 1, 15, 32982, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Summon greater Fire  elemental');
