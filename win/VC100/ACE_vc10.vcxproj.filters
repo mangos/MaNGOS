@@ -568,6 +568,9 @@
     <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_QoS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1023,6 +1026,9 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_Sparc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1125,9 +1131,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-all.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-borland-common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1182,10 +1185,19 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-lynxos.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-hardware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-simulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-leopard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-panther.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-snowleopard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-tiger.h">
@@ -1299,15 +1311,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks5.x.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1317,7 +1320,16 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.6.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-borland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-cegcc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-common.h">
@@ -1342,6 +1354,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-10.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc.h">
@@ -2079,6 +2094,9 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_pdh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2161,6 +2179,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_typeinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_String.h">
@@ -2700,6 +2721,9 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token_Request_Reply.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Tokenizer_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\TP_Reactor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2843,6 +2867,9 @@
     <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op.inl">
       <Filter>Inline Files</Filter>
     </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
     <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_T.inl">
       <Filter>Inline Files</Filter>
     </None>
@@ -2913,6 +2940,9 @@
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\Containers_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Countdown_Time.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\Date_Time.inl">
@@ -3294,6 +3324,9 @@
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\OS_TLI.inl">
