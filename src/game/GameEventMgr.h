@@ -87,10 +87,11 @@ class GameEventMgr
         typedef std::pair<uint32, ModelEquip> ModelEquipPair;
         typedef std::list<ModelEquipPair> ModelEquipList;
         typedef std::vector<ModelEquipList> GameEventModelEquipMap;
-        typedef std::pair<uint32, uint32> QuestRelation;
-        typedef std::list<QuestRelation> QuestRelList;
-        typedef std::vector<QuestRelList> GameEventQuestMap;
+
+        typedef std::list<uint32> QuestList;
+        typedef std::vector<QuestList> GameEventQuestMap;
         GameEventQuestMap mGameEventQuests;                 // events*2-1
+
         GameEventModelEquipMap mGameEventModelEquip;        // events*2-1
         GameEventGuidMap  mGameEventCreatureGuids;          // events*2-1
         GameEventGuidMap  mGameEventGameobjectGuids;        // events*2-1
