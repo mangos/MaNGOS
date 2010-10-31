@@ -264,12 +264,13 @@ INSERT INTO `npc_spellclick_spells` VALUES
 -- from me
 -- chopper
 UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3,
-`spell1` = 62974, `spell2` = 62286, `spell3` = 62299, `spell4` = 64460
+`spell1` = 62974, `spell2` = 62286, `spell3` = 62299, `spell4` = 64660, `AIName` = 'NullAI'
 WHERE `entry` IN (33062);
 -- Siege engine
-UPDATE `creature_template` SET `IconName` = 'vehichleCursor',  `PowerType` = 3,
-`spell1` = 62345, `spell2` = 62522, `spell3` = 62346
+UPDATE `creature_template` SET `IconName` = 'Gunner',  `PowerType` = 3,
+`spell1` = 62345, `spell2` = 62522, `spell3` = 62346, `AIName` = 'NullAI'
 WHERE `entry` IN (33060);
 -- demolisher
-UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3
+UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3,
+`spell1` = 62306, `spell2` = 62490, `spell3` = 62308, `spell4` =  62324, `AIName` = 'NullAI'
 WHERE `entry` IN (33109);
