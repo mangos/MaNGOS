@@ -404,8 +404,8 @@ void GameEventMgr::LoadFromDB()
     }
 
     mGameEventQuests.resize(mGameEvent.size());
-    //                                   0   1      2
-    result = WorldDatabase.Query("SELECT id, quest, event FROM game_event_creature_quest");
+
+    result = WorldDatabase.Query("SELECT quest, event FROM game_event_quest");
 
     count = 0;
     if( !result )
@@ -425,25 +425,36 @@ void GameEventMgr::LoadFromDB()
             Field *fields = result->Fetch();
 
             bar.step();
-            uint32 id       = fields[0].GetUInt32();
-            uint32 quest    = fields[1].GetUInt32();
-            uint16 event_id = fields[2].GetUInt16();
+            uint32 quest    = fields[0].GetUInt32();
+            uint16 event_id = fields[1].GetUInt16();
 
             if(event_id >= mGameEventQuests.size())
             {
-                sLog.outErrorDb("`game_event_creature_quest` game event id (%u) is out of range compared to max event id in `game_event`",event_id);
+                sLog.outErrorDb("`game_event_quest` game event id (%u) is out of range compared to max event id in `game_event`",event_id);
                 continue;
             }
 
+            const Quest* pQuest = sObjectMgr.GetQuestTemplate(quest);
+
+            if (!pQuest)
+            {
+                sLog.outErrorDb("Table `game_event_quest` contain entry for quest %u (event %u) but this quest does not exist. Skipping.", quest, event_id);
+                continue;
+            }
+
+            // disable any event specific quest (for cases where creature is spawned, but event not active).
+            const_cast<Quest*>(pQuest)->SetQuestActiveState(false);
+
             ++count;
-            QuestRelList& questlist = mGameEventQuests[event_id];
-            questlist.push_back(QuestRelation(id, quest));
+
+            QuestList& questlist = mGameEventQuests[event_id];
+            questlist.push_back(quest);
 
         } while( result->NextRow() );
         delete result;
 
         sLog.outString();
-        sLog.outString( ">> Loaded %u quests additions in game events", count );
+        sLog.outString( ">> Loaded %u quest additions in game events", count );
     }
 }
 
@@ -481,9 +492,6 @@ uint32 GameEventMgr::Update()                               // return the next e
                     int16 event_nid = (-1) * (itr);
                     // spawn all negative ones for this event
                     GameEventSpawn(event_nid);
-
-                    // disable any event specific quest (for cases where creature is spawned, but event not active).
-                    UpdateEventQuests(itr, false);
                     UpdateWorldStates(itr, false);
                 }
             }
@@ -792,26 +800,17 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
 
 void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 {
-    QuestRelList::iterator itr;
-    for (itr = mGameEventQuests[event_id].begin();itr != mGameEventQuests[event_id].end();++itr)
+    QuestList::iterator itr;
+    for (itr = mGameEventQuests[event_id].begin(); itr != mGameEventQuests[event_id].end(); ++itr)
     {
-        QuestRelationsMap &CreatureQuestMap = sObjectMgr.GetCreatureQuestRelationsMap();
+        const Quest *pQuest = sObjectMgr.GetQuestTemplate(*itr);
 
-        if (Activate)                                       // Add the pair(id,quest) to the multimap
-            CreatureQuestMap.insert(QuestRelationsMap::value_type(itr->first, itr->second));
-        else
-        {                                                   // Remove the pair(id,quest) from the multimap
-            std::pair<QuestRelationsMap::iterator, QuestRelationsMap::iterator> bounds = CreatureQuestMap.equal_range(itr->first);
+        //if (Activate)
+        //{
+            // TODO: implement way to reset quests when event begin.
+        //}
 
-            for(QuestRelationsMap::iterator qitr = bounds.first; qitr != bounds.second; ++qitr)
-            {
-                if (qitr->second == itr->second)
-                {
-                    CreatureQuestMap.erase(qitr);           // iterator is now no more valid
-                    break;                                  // but we can exit loop since the element is found
-                }
-            }
-        }
+        const_cast<Quest*>(pQuest)->SetQuestActiveState(Activate);
     }
 }
 

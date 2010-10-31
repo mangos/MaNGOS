@@ -1055,12 +1055,6 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();
 
-    sLog.outString( "Loading Game Event Data...");          // must be after sPoolMgr.LoadFromDB for proper load pool events
-    sLog.outString();
-    sGameEventMgr.LoadFromDB();
-    sLog.outString( ">>> Game Event Data loaded" );
-    sLog.outString();
-
     sLog.outString( "Loading Weather Data..." );
     sObjectMgr.LoadWeatherZoneChances();
 
@@ -1074,6 +1068,12 @@ void World::SetInitialWorldSettings()
     sLog.outString();
     sObjectMgr.LoadQuestRelations();                            // must be after quest load
     sLog.outString( ">>> Quests Relations loaded" );
+    sLog.outString();
+
+    sLog.outString( "Loading Game Event Data...");          // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events
+    sLog.outString();
+    sGameEventMgr.LoadFromDB();
+    sLog.outString( ">>> Game Event Data loaded" );
     sLog.outString();
 
     sLog.outString( "Loading UNIT_NPC_FLAG_SPELLCLICK Data..." );
