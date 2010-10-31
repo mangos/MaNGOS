@@ -241,8 +241,8 @@ Item::Item( )
     uState = ITEM_NEW;
     uQueuePos = -1;
     m_container = NULL;
-    m_lootGenerated = false;
     mb_in_trade = false;
+    m_lootState = ITEM_LOOT_NONE;
 }
 
 bool Item::Create( uint32 guidlow, uint32 itemid, Player const* owner)
@@ -326,40 +326,66 @@ void Item::SaveToDB()
             CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", guid);
             if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
                 CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
+
+            if (HasSavedLoot())
+                CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", GetGUIDLow());
+
             delete this;
             return;
         }
         case ITEM_UNCHANGED:
-            break;
+            return;
     }
+
+    if (m_lootState == ITEM_LOOT_CHANGED || m_lootState == ITEM_LOOT_REMOVED)
+        CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", GetGUIDLow());
+
+    if (m_lootState == ITEM_LOOT_NEW || m_lootState == ITEM_LOOT_CHANGED)
+    {
+        if(Player* owner = GetOwner())
+        {
+            // save money as 0 itemid data
+            if (loot.gold)
+                CharacterDatabase.PExecute("INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) "
+                    "VALUES (%u, %u, 0, %u, 0, 0)",
+                    GetGUIDLow(), owner->GetGUIDLow(), loot.gold);
+
+            // save items and quest items (at load its all will added as normal, but this not important for item loot case)
+            for (size_t i = 0; i < loot.GetMaxSlotInLootFor(owner); ++i)
+            {
+                QuestItem *qitem = NULL;
+
+                LootItem *item = loot.LootItemInSlot(i,owner,&qitem);
+                if(!item)
+                    continue;
+
+                // questitems use the blocked field for other purposes
+                if (!qitem && item->is_blocked)
+                    continue;
+
+                CharacterDatabase.PExecute("INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) "
+                    "VALUES (%u, %u, %u, %u, %u, %i)",
+                    GetGUIDLow(), owner->GetGUIDLow(), item->itemid, item->count, item->randomSuffix, item->randomPropertyId);
+            }
+        }
+
+    }
+
+    if (m_lootState != ITEM_LOOT_NONE && m_lootState != ITEM_LOOT_TEMPORARY)
+        SetLootState(ITEM_LOOT_UNCHANGED);
+
     SetState(ITEM_UNCHANGED);
 }
 
-bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
+bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, Field *fields)
 {
     // create item before any checks for store correct guid
     // and allow use "FSetState(ITEM_REMOVED); SaveToDB();" for deleting item from DB
     Object::_Create(guidLow, 0, HIGHGUID_ITEM);
 
-    bool delete_result = false;
-    if(!result)
-    {
-        result = CharacterDatabase.PQuery("SELECT data FROM item_instance WHERE guid = '%u'", guidLow);
-        delete_result = true;
-    }
-
-    if (!result)
-    {
-        sLog.outError("Item (GUID: %u owner: %u) not found in table `item_instance`, can't load. ", guidLow, GUID_LOPART(owner_guid));
-        return false;
-    }
-
-    Field *fields = result->Fetch();
-
     if (!LoadValues(fields[0].GetString()))
     {
         sLog.outError("Item #%d have broken data in `data` field. Can't be loaded.", guidLow);
-        if (delete_result) delete result;
         return false;
     }
 
@@ -372,9 +398,6 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
         SetGuidValue(OBJECT_FIELD_GUID, new_item_guid);
         need_save = true;
     }
-
-    if (delete_result)
-        delete result;
 
     ItemPrototype const* proto = GetProto();
     if(!proto)
@@ -444,6 +467,37 @@ bool Item::LoadFromDB(uint32 guidLow, uint64 owner_guid, QueryResult *result)
     }
 
     return true;
+}
+
+void Item::LoadLootFromDB(Field *fields)
+{
+    uint32 item_id     = fields[1].GetUInt32();
+    uint32 item_amount = fields[2].GetUInt32();
+    uint32 item_suffix = fields[3].GetUInt32();
+    int32  item_propid = fields[4].GetInt32();
+
+    // money value special case
+    if (item_id == 0)
+    {
+        loot.gold = item_amount;
+        SetLootState(ITEM_LOOT_UNCHANGED);
+        return;
+    }
+
+    // normal item case
+    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
+
+    if(!proto)
+    {
+        CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u' AND itemid = '%u'", GetGUIDLow(), item_id);
+        sLog.outError("Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", ObjectGuid(GetOwnerGUID()).GetString().c_str(), item_id);
+        return;
+    }
+
+    loot.items.push_back(LootItem(item_id, item_amount, item_suffix, item_propid));
+    ++loot.unlootedCount;
+
+    SetLootState(ITEM_LOOT_UNCHANGED);
 }
 
 void Item::DeleteFromDB()
@@ -725,9 +779,6 @@ bool Item::IsEquipped() const
 
 bool Item::CanBeTraded(bool mail) const
 {
-    if (m_lootGenerated)
-        return false;
-
     if ((!mail || !IsBoundAccountWide()) && IsSoulBound())
         return false;
 
@@ -741,6 +792,9 @@ bool Item::CanBeTraded(bool mail) const
         if (owner->GetLootGUID()==GetGUID())
             return false;
     }
+
+    if (HasGeneratedLoot())
+        return false;
 
     if (IsBoundByEnchant())
         return false;
@@ -1003,6 +1057,10 @@ bool Item::IsBindedNotWith( Player const* player ) const
     if(GetOwnerGUID()== player->GetGUID())
         return false;
 
+    // has loot with diff owner
+    if (HasGeneratedLoot())
+        return true;
+
     // not BOA item case
     if(!IsBoundAccountWide())
         return true;
@@ -1050,7 +1108,7 @@ uint8 Item::CanBeMergedPartlyWith( ItemPrototype const* proto ) const
         return EQUIP_ERR_ITEM_CANT_STACK;
 
     // not allow merge looting currently items
-    if (m_lootGenerated)
+    if (HasGeneratedLoot())
         return EQUIP_ERR_ALREADY_LOOTED;
 
     return EQUIP_ERR_OK;
@@ -1098,4 +1156,48 @@ void Item::RestoreCharges()
             SetState(ITEM_CHANGED);
         }
     }
+}
+
+void Item::SetLootState( ItemLootUpdateState state )
+{
+    // ITEM_LOOT_NONE -> ITEM_LOOT_TEMPORARY -> ITEM_LOOT_NONE
+    // ITEM_LOOT_NONE -> ITEM_LOOT_NEW -> ITEM_LOOT_NONE
+    // ITEM_LOOT_NONE -> ITEM_LOOT_NEW -> ITEM_LOOT_UNCHANGED [<-> ITEM_LOOT_CHANGED] -> ITEM_LOOT_REMOVED -> ITEM_LOOT_NONE
+    switch(state)
+    {
+        case ITEM_LOOT_NONE:
+        case ITEM_LOOT_NEW:
+             assert(false);                                 // not used in state change calls
+             return;
+        case ITEM_LOOT_TEMPORARY:
+            assert(m_lootState == ITEM_LOOT_NONE);          // called only for not generated yet loot case
+            m_lootState = ITEM_LOOT_TEMPORARY;
+            break;
+        case ITEM_LOOT_CHANGED:
+            // new loot must stay in new state until saved, temporary must stay until remove
+            if (m_lootState != ITEM_LOOT_NEW && m_lootState != ITEM_LOOT_TEMPORARY)
+                m_lootState = m_lootState == ITEM_LOOT_NONE ? ITEM_LOOT_NEW : state;
+            break;
+        case ITEM_LOOT_UNCHANGED:
+            // expected that called after DB update or load
+            if (m_lootState == ITEM_LOOT_REMOVED)
+                m_lootState = ITEM_LOOT_NONE;
+            // temporary must stay until remove (ignore any changes)
+            else if (m_lootState != ITEM_LOOT_TEMPORARY)
+                m_lootState = ITEM_LOOT_UNCHANGED;
+            break;
+        case ITEM_LOOT_REMOVED:
+            // if loot not saved then it existence in past can be just ignored
+            if (m_lootState == ITEM_LOOT_NEW || m_lootState == ITEM_LOOT_TEMPORARY)
+            {
+                m_lootState = ITEM_LOOT_NONE;
+                return;
+            }
+
+            m_lootState = ITEM_LOOT_REMOVED;
+            break;
+    }
+
+    if (m_lootState != ITEM_LOOT_NONE && m_lootState != ITEM_LOOT_UNCHANGED && m_lootState != ITEM_LOOT_TEMPORARY)
+        SetState(ITEM_CHANGED);
 }

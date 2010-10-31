@@ -112,6 +112,7 @@ pkgdata_DATA = \
 	10654_01_mangos_game_event_creature_quest.sql \
 	10655_01_characters_character_queststatus_monthly.sql \
 	10660_01_mangos_game_event_quest.sql \
+	10662_01_characters_item_loot.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -204,4 +205,5 @@ EXTRA_DIST = \
 	10654_01_mangos_game_event_creature_quest.sql \
 	10655_01_characters_character_queststatus_monthly.sql \
 	10660_01_mangos_game_event_quest.sql \
+	10662_01_characters_item_loot.sql \
 	README

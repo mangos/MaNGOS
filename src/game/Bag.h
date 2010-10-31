@@ -57,7 +57,7 @@ class Bag : public Item
         // overwrite virtual Item::SaveToDB
         void SaveToDB();
         // overwrite virtual Item::LoadFromDB
-        bool LoadFromDB(uint32 guid, uint64 owner_guid, QueryResult *result);
+        bool LoadFromDB(uint32 guid, uint64 owner_guid, Field *fields);
         // overwrite virtual Item::DeleteFromDB
         void DeleteFromDB();
 
@@ -71,6 +71,10 @@ class Bag : public Item
 
 inline Item* NewItemOrBag(ItemPrototype const * proto)
 {
-    return (proto->InventoryType == INVTYPE_BAG) ? new Bag : new Item;
+    if (proto->InventoryType == INVTYPE_BAG)
+        return new Bag;
+
+    return new Item;
 }
+
 #endif
