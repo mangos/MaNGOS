@@ -595,7 +595,13 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             {
                 // Shadow Word: Death - deals damage equal to damage done to caster
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000200000000))
+                {
+                    // Glyph of Shadow Word: Death
+                    if (Aura* pAura = m_caster->GetAura(55682, EFFECT_INDEX_0))
+                        if (unitTarget->GetHealth() < unitTarget->GetMaxHealth()*0.35)
+                            damage += int32(damage / 100 * pAura->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_1));
                     m_caster->CastCustomSpell(m_caster, 32409, &damage, 0, 0, true);
+                }
                 // Improved Mind Blast (Mind Blast in shadow form bonus)
                 else if (m_caster->m_form == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00002000)))
                 {
