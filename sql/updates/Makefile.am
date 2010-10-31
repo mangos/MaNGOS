@@ -113,6 +113,7 @@ pkgdata_DATA = \
 	10655_01_characters_character_queststatus_monthly.sql \
 	10660_01_mangos_game_event_quest.sql \
 	10662_01_characters_item_loot.sql \
+	10664_01_characters_arena_team_stats.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -206,4 +207,5 @@ EXTRA_DIST = \
 	10655_01_characters_character_queststatus_monthly.sql \
 	10660_01_mangos_game_event_quest.sql \
 	10662_01_characters_item_loot.sql \
+	10664_01_characters_arena_team_stats.sql \
 	README

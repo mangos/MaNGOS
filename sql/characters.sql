@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10662_01_characters_item_loot` bit(1) default NULL
+  `required_10664_01_characters_arena_team_stats` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -117,10 +117,10 @@ DROP TABLE IF EXISTS `arena_team_stats`;
 CREATE TABLE `arena_team_stats` (
   `arenateamid` int(10) unsigned NOT NULL default '0',
   `rating` int(10) unsigned NOT NULL default '0',
-  `games` int(10) unsigned NOT NULL default '0',
-  `wins` int(10) unsigned NOT NULL default '0',
-  `played` int(10) unsigned NOT NULL default '0',
-  `wins2` int(10) unsigned NOT NULL default '0',
+  `games_week` int(10) unsigned NOT NULL default '0',
+  `wins_week` int(10) unsigned NOT NULL default '0',
+  `games_season` int(10) unsigned NOT NULL default '0',
+  `wins_season` int(10) unsigned NOT NULL default '0',
   `rank` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`arenateamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
