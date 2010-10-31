@@ -134,12 +134,13 @@ void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
         // If spell have cast time -> so its active totem
         if (GetSpellCastTime(totemSpell))
             m_type = TOTEM_ACTIVE;
+
+        if(totemSpell->Id == 40132 || totemSpell->Id == 40133)
+            m_type = TOTEM_PASSIVE;                             // Shaman summoning totems
     }
     if(spellProto->SpellIconID == 2056)
         m_type = TOTEM_STATUE;                              //Jewelery statue
 
-    if(totemSpell->Id == 40132 || totemSpell->Id == 40133)
-        m_type = TOTEM_PASSIVE;                             // Shaman summoning totems
 }
 
 bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const
