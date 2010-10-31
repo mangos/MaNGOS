@@ -106,6 +106,10 @@ void Totem::UnSummon()
             ((Creature*)owner)->AI()->SummonedCreatureDespawn((Creature*)this);
     }
 
+    // any totem unsummon look like as totem kill, req. for proper animation
+    if (isAlive())
+        SetDeathState(DEAD);
+
     AddObjectToRemoveList();
 }
 
