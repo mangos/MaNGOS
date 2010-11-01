@@ -2987,9 +2987,6 @@ void Spell::cast(bool skipCheck)
             // Ice Block
             if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000008000000000))
                 AddPrecastSpell(41425);                     // Hypothermia
-            // Fingers of Frost
-            else if (m_spellInfo->Id == 44544)
-                AddPrecastSpell(74396);
             break;
         }
         case SPELLFAMILY_WARRIOR:
@@ -4412,7 +4409,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 {
     // check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
     if (m_caster->GetTypeId()==TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE) &&
-        ((Player*)m_caster)->HasSpellCooldown(m_spellInfo->Id) && !m_caster->isIgnoreUnitState(m_spellInfo))
+        ((Player*)m_caster)->HasSpellCooldown(m_spellInfo->Id))
     {
         if(m_triggeredByAuraSpell)
             return SPELL_FAILED_DONT_REPORT;
@@ -4430,7 +4427,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             if(bg->GetStatus() == STATUS_WAIT_LEAVE)
                 return SPELL_FAILED_DONT_REPORT;
 
-    if (m_caster->isInCombat() && IsNonCombatSpell(m_spellInfo) && !m_IsTriggeredSpell && !m_caster->isIgnoreUnitState(m_spellInfo))
+    if (m_caster->isInCombat() && IsNonCombatSpell(m_spellInfo) && !m_IsTriggeredSpell)
         return SPELL_FAILED_AFFECTING_COMBAT;
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->isGameMaster() &&
@@ -4504,7 +4501,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_MOVING;
         }
 
-        if (!m_IsTriggeredSpell && NeedsComboPoints(m_spellInfo) && !m_caster->isIgnoreUnitState(m_spellInfo) &&
+        if (!m_IsTriggeredSpell && NeedsComboPoints(m_spellInfo) &&
             (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_caster)->GetComboTargetGuid()))
             // warrior not have real combo-points at client side but use this way for mark allow Overpower use
             return m_caster->getClass() == CLASS_WARRIOR ? SPELL_FAILED_CASTER_AURASTATE : SPELL_FAILED_NO_COMBO_POINTS;
@@ -4541,7 +4538,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if(non_caster_target)
         {
             // target state requirements (apply to non-self only), to allow cast affects to self like Dirty Deeds
-            if(m_spellInfo->TargetAuraState && !target->HasAuraStateForCaster(AuraState(m_spellInfo->TargetAuraState),m_caster->GetGUID()) && !m_caster->isIgnoreUnitState(m_spellInfo))
+            if(m_spellInfo->TargetAuraState && !target->HasAuraStateForCaster(AuraState(m_spellInfo->TargetAuraState),m_caster->GetGUID()))
                 return SPELL_FAILED_TARGET_AURASTATE;
 
             // Not allow casting on flying player
@@ -4985,7 +4982,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if(m_spellInfo->SpellIconID == 1648)        // Execute
                 {
-                    if(!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetHealth() > m_targets.getUnitTarget()->GetMaxHealth()*0.2 && !m_caster->isIgnoreUnitState(m_spellInfo))
+                    if(!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetHealth() > m_targets.getUnitTarget()->GetMaxHealth()*0.2)
                         return SPELL_FAILED_BAD_TARGETS;
                 }
                 else if (m_spellInfo->Id == 51582)          // Rocket Boots Engaged
