@@ -821,6 +821,20 @@ struct FactionEntry
                                                             // 39 string flags
     //char*     description[16];                            // 40-55    m_description_lang
                                                             // 56 string flags
+
+    // helpers
+
+    int GetIndexFitTo(uint32 raceMask, uint32 classMask) const
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if ((BaseRepRaceMask[i] == 0 || (BaseRepRaceMask[i] & raceMask)) &&
+                (BaseRepClassMask[i] == 0 || (BaseRepClassMask[i] & classMask)))
+                return i;
+        }
+
+        return -1;
+    }
 };
 
 struct FactionTemplateEntry
