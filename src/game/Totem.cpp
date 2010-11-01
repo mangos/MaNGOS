@@ -115,18 +115,18 @@ void Totem::UnSummon()
 
 void Totem::SetOwner(Unit* owner)
 {
-    SetCreatorGUID(owner->GetGUID());
-    SetOwnerGUID(owner->GetGUID());
+    SetCreatorGuid(owner->GetObjectGuid());
+    SetOwnerGuid(owner->GetObjectGuid());
     setFaction(owner->getFaction());
     SetLevel(owner->getLevel());
 }
 
 Unit *Totem::GetOwner()
 {
-    uint64 ownerid = GetOwnerGUID();
-    if(!ownerid)
+    ObjectGuid ownerGuid = GetOwnerGuid();
+    if (ownerGuid.IsEmpty())
         return NULL;
-    return ObjectAccessor::GetUnit(*this, ownerid);
+    return ObjectAccessor::GetUnit(*this, ownerGuid);
 }
 
 void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)

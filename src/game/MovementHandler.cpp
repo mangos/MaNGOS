@@ -386,9 +386,9 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     recv_data >> guid.ReadAsPacked();
     recv_data >> mi;
 
-    uint64 vehicleGUID = _player->GetCharmGUID();
+    ObjectGuid vehicleGUID = _player->GetCharmGuid();
 
-    if(!vehicleGUID)                                        // something wrong here...
+    if (vehicleGUID.IsEmpty())                              // something wrong here...
         return;
 
     _player->m_movementInfo = mi;
