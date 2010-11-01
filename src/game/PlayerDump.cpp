@@ -63,6 +63,7 @@ static DumpTable dumpTables[] =
     { "pet_spell_cooldown",               DTT_PET_TABLE  }, //                  <- pet number
     { "character_gifts",                  DTT_ITEM_GIFT  }, //                  <- item guids
     { "item_instance",                    DTT_ITEM       }, //                  <- item guids
+    { "item_loot",                        DTT_ITEM_LOOT  }, //                  <- item guids
     { NULL,                               DTT_CHAR_TABLE }, // end marker
 };
 
@@ -285,6 +286,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
     {
         case DTT_ITEM:      fieldname = "guid";      guids = &items; break;
         case DTT_ITEM_GIFT: fieldname = "item_guid"; guids = &items; break;
+        case DTT_ITEM_LOOT: fieldname = "guid";      guids = &items; break;
         case DTT_PET:       fieldname = "owner";                     break;
         case DTT_PET_TABLE: fieldname = "guid";      guids = &pets;  break;
         case DTT_PET_DECL:  fieldname = "id";                        break;
@@ -608,6 +610,15 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                     ROLLBACK(DUMP_FILE_BROKEN);
                 if (!changeGuid(line, 2, items, sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed()))
                     ROLLBACK(DUMP_FILE_BROKEN);             // character_gifts.item_guid update
+                break;
+            }
+            case DTT_ITEM_LOOT:
+            {
+                // item, owner
+                if (!changeGuid(line, 1, items, sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed()))
+                    ROLLBACK(DUMP_FILE_BROKEN);             // item_loot.guid update
+                if (!changenth(line, 2, newguid))           // item_Loot.owner_guid update
+                    ROLLBACK(DUMP_FILE_BROKEN);
                 break;
             }
             case DTT_PET:
