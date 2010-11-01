@@ -1944,6 +1944,35 @@ void ObjectMgr::LoadItemPrototypes()
             const_cast<ItemPrototype*>(proto)->InventoryType = INVTYPE_NON_EQUIP;
         }
 
+        if (proto->InventoryType != INVTYPE_NON_EQUIP)
+        {
+            if(proto->Flags & ITEM_FLAG_LOOTABLE)
+            {
+                sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_LOOTABLE (%u), flag removed.", i, ITEM_FLAG_LOOTABLE);
+                const_cast<ItemPrototype*>(proto)->Flags &= ~ITEM_FLAG_LOOTABLE;
+            }
+
+            if(proto->Flags & ITEM_FLAG_MILLABLE)
+            {
+                sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_MILLABLE (%u), flag removed.", i, ITEM_FLAG_MILLABLE);
+                const_cast<ItemPrototype*>(proto)->Flags &= ~ITEM_FLAG_MILLABLE;
+            }
+
+            if(proto->Flags & ITEM_FLAG_PROSPECTABLE)
+            {
+                sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_PROSPECTABLE (%u), flag removed.", i, ITEM_FLAG_PROSPECTABLE);
+                const_cast<ItemPrototype*>(proto)->Flags &= ~ITEM_FLAG_PROSPECTABLE;
+            }
+        }
+        else if (proto->InventoryType != INVTYPE_BAG)
+        {
+            if (proto->ContainerSlots > 0)
+            {
+                sLog.outErrorDb("Non-container item (Entry: %u) has ContainerSlots (%u), set to 0.", i, proto->ContainerSlots);
+                const_cast<ItemPrototype*>(proto)->ContainerSlots = 0;
+            }
+        }
+
         if(proto->RequiredSkill >= MAX_SKILL_TYPE)
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong RequiredSkill value (%u)",i,proto->RequiredSkill);
@@ -2022,16 +2051,10 @@ void ObjectMgr::LoadItemPrototypes()
 
         if (proto->ContainerSlots)
         {
-            if(proto->ContainerSlots > MAX_BAG_SIZE)
+            if (proto->ContainerSlots > MAX_BAG_SIZE)
             {
                 sLog.outErrorDb("Item (Entry: %u) has too large value in ContainerSlots (%u), replace by hardcoded limit (%u).",i,proto->ContainerSlots,MAX_BAG_SIZE);
                 const_cast<ItemPrototype*>(proto)->ContainerSlots = MAX_BAG_SIZE;
-            }
-            
-            if(proto->Flags & ITEM_FLAG_LOOTABLE)
-            {
-                sLog.outErrorDb("Item container (Entry: %u) has not allowed for containers flag ITEM_FLAG_LOOTABLE (%u), flag removed.",i,ITEM_FLAG_LOOTABLE);
-                const_cast<ItemPrototype*>(proto)->Flags &= ~ITEM_FLAG_LOOTABLE;
             }
         }
 
@@ -3495,8 +3518,8 @@ void ObjectMgr::LoadArenaTeams()
 
     //                                                     0                      1    2           3    4               5
     QueryResult *result = CharacterDatabase.Query( "SELECT arena_team.arenateamid,name,captainguid,type,BackgroundColor,EmblemStyle,"
-    //   6           7           8            9      10    11   12     13    14
-        "EmblemColor,BorderStyle,BorderColor, rating,games,wins,played,wins2,rank "
+    //   6           7           8            9      10    	 11  	   12  		    13    	    14
+        "EmblemColor,BorderStyle,BorderColor, rating,games_week,wins_week,games_season,wins_season,rank "
         "FROM arena_team LEFT JOIN arena_team_stats ON arena_team.arenateamid = arena_team_stats.arenateamid ORDER BY arena_team.arenateamid ASC" );
 
     if( !result )
@@ -8372,6 +8395,10 @@ bool PlayerCondition::Meets(Player const * player) const
                 return true;
             return false;
         }
+        case CONDITION_ITEM_WITH_BANK:
+            return player->HasItemCount(value1, value2, true);
+        case CONDITION_NOITEM_WITH_BANK:
+            return !player->HasItemCount(value1, value2, true);
         default:
             return false;
     }
@@ -8405,6 +8432,8 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
         }
         case CONDITION_ITEM:
         case CONDITION_NOITEM:
+        case CONDITION_ITEM_WITH_BANK:
+        case CONDITION_NOITEM_WITH_BANK:
         {
             ItemPrototype const *proto = ObjectMgr::GetItemPrototype(value1);
             if (!proto)

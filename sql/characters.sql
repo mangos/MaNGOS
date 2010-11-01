@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10655_01_characters_character_queststatus_monthly` bit(1) default NULL
+  `required_10664_01_characters_arena_team_stats` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -117,10 +117,10 @@ DROP TABLE IF EXISTS `arena_team_stats`;
 CREATE TABLE `arena_team_stats` (
   `arenateamid` int(10) unsigned NOT NULL default '0',
   `rating` int(10) unsigned NOT NULL default '0',
-  `games` int(10) unsigned NOT NULL default '0',
-  `wins` int(10) unsigned NOT NULL default '0',
-  `played` int(10) unsigned NOT NULL default '0',
-  `wins2` int(10) unsigned NOT NULL default '0',
+  `games_week` int(10) unsigned NOT NULL default '0',
+  `wins_week` int(10) unsigned NOT NULL default '0',
+  `games_season` int(10) unsigned NOT NULL default '0',
+  `wins_season` int(10) unsigned NOT NULL default '0',
   `rank` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`arenateamid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -1453,6 +1453,31 @@ CREATE TABLE `item_instance` (
 LOCK TABLES `item_instance` WRITE;
 /*!40000 ALTER TABLE `item_instance` DISABLE KEYS */;
 /*!40000 ALTER TABLE `item_instance` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `item_loot`
+--
+
+DROP TABLE IF EXISTS `item_loot`;
+CREATE TABLE `item_loot` (
+  `guid` int(11) unsigned NOT NULL default '0',
+  `owner_guid` int(11) unsigned NOT NULL default '0',
+  `itemid` int(11) unsigned NOT NULL default '0',
+  `amount` int(11) unsigned NOT NULL default '0',
+  `suffix` int(11) unsigned NOT NULL default '0',
+  `property` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`guid`,`itemid`),
+  KEY `idx_owner_guid` (`owner_guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
+
+--
+-- Dumping data for table `item_instance`
+--
+
+LOCK TABLES `item_loot` WRITE;
+/*!40000 ALTER TABLE `item_loot` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_loot` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

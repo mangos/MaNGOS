@@ -908,6 +908,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADDAILYQUESTSTATUS,
     PLAYER_LOGIN_QUERY_LOADREPUTATION,
     PLAYER_LOGIN_QUERY_LOADINVENTORY,
+    PLAYER_LOGIN_QUERY_LOADITEMLOOT,
     PLAYER_LOGIN_QUERY_LOADACTIONS,
     PLAYER_LOGIN_QUERY_LOADSOCIALLIST,
     PLAYER_LOGIN_QUERY_LOADHOMEBIND,
@@ -1304,8 +1305,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
         Item* StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount);
 
-        void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
-        void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG,NULL_SLOT,loot_id,store,broadcast); }
+        void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
+        void AutoStoreLoot(Loot& loot, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
 
         uint8 _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         uint8 _CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item *pItem = NULL, bool swap = false, uint32* no_space_count = NULL ) const;
@@ -2457,6 +2458,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _LoadAuras(QueryResult *result, uint32 timediff);
         void _LoadBoundInstances(QueryResult *result);
         void _LoadInventory(QueryResult *result, uint32 timediff);
+        void _LoadItemLoot(QueryResult *result);
         void _LoadMails(QueryResult *result);
         void _LoadMailedItems(QueryResult *result);
         void _LoadQuestStatus(QueryResult *result);

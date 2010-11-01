@@ -333,6 +333,25 @@ LootItem::LootItem(LootStoreItem const& li)
     is_counted = 0;
 }
 
+LootItem::LootItem(uint32 itemid_, uint32 count_, uint32 randomSuffix_, int32 randomPropertyId_)
+{
+    itemid      = itemid_;
+    conditionId = 0;
+
+    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+    freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
+
+    needs_quest = false;
+
+    count       = count_;
+    randomSuffix = randomSuffix_;
+    randomPropertyId = randomPropertyId_;
+    is_looted = 0;
+    is_blocked = 0;
+    is_underthreshold = 0;
+    is_counted = 0;
+}
+
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
 bool LootItem::AllowedForPlayer(Player const * player) const
 {

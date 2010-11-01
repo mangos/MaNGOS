@@ -97,6 +97,8 @@ struct LootItem
     // Should be called for non-reference LootStoreItem entries only (mincountOrRef > 0)
     explicit LootItem(LootStoreItem const& li);
 
+    LootItem(uint32 itemid_, uint32 count_, uint32 randomSuffix_ = 0, int32 randomPropertyId_ = 0);
+
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
     bool AllowedForPlayer(Player const * player) const;
 };

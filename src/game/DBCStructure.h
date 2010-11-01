@@ -253,12 +253,12 @@ struct AchievementCriteriaEntry
             uint32  teamtype;                               // 3 {2,3,5}
         } highest_team_rating;
 
-        // ACHIEVEMENT_CRITERIA_TYPE_REACH_TEAM_RATING      = 39
+        // ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING= 39
         struct
         {
             uint32  teamtype;                               // 3 {2,3,5}
             uint32  teamrating;                             // 4
-        } reach_team_rating;
+        } highest_personal_rating;
 
         // ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL      = 40
         struct
@@ -821,6 +821,20 @@ struct FactionEntry
                                                             // 39 string flags
     //char*     description[16];                            // 40-55    m_description_lang
                                                             // 56 string flags
+
+    // helpers
+
+    int GetIndexFitTo(uint32 raceMask, uint32 classMask) const
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if ((BaseRepRaceMask[i] == 0 || (BaseRepRaceMask[i] & raceMask)) &&
+                (BaseRepClassMask[i] == 0 || (BaseRepClassMask[i] & classMask)))
+                return i;
+        }
+
+        return -1;
+    }
 };
 
 struct FactionTemplateEntry

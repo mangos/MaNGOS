@@ -1181,6 +1181,9 @@ void Player::Update( uint32 p_time )
     if(!IsInWorld())
         return;
 
+    // remove failed timed Achievements
+    GetAchievementMgr().DoFailedTimedAchievementCriterias();
+
     // undelivered mail
     if(m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))
     {
@@ -4309,7 +4312,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                                 }
 
                                 Item *pItem = NewItemOrBag(itemProto);
-                                if (!pItem->LoadFromDB(item_guidlow, playerguid.GetRawValue(), resultItems))
+                                if (!pItem->LoadFromDB(item_guidlow, playerguid.GetRawValue(), fields2))
                                 {
                                     pItem->FSetState(ITEM_REMOVED);
                                     pItem->SaveToDB();              // it also deletes item object !
@@ -8143,25 +8146,28 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
             loot = &item->loot;
 
-            if (!item->m_lootGenerated)
+            if (!item->HasGeneratedLoot())
             {
-                item->m_lootGenerated = true;
-                loot->clear();
+                item->loot.clear();
 
                 switch(loot_type)
                 {
                     case LOOT_DISENCHANTING:
                         loot->FillLoot(item->GetProto()->DisenchantID, LootTemplates_Disenchant, this,true);
+                        item->SetLootState(ITEM_LOOT_TEMPORARY);
                         break;
                     case LOOT_PROSPECTING:
                         loot->FillLoot(item->GetEntry(), LootTemplates_Prospecting, this,true);
+                        item->SetLootState(ITEM_LOOT_TEMPORARY);
                         break;
                     case LOOT_MILLING:
                         loot->FillLoot(item->GetEntry(), LootTemplates_Milling, this,true);
+                        item->SetLootState(ITEM_LOOT_TEMPORARY);
                         break;
                     default:
                         loot->FillLoot(item->GetEntry(), LootTemplates_Item, this,true);
                         loot->generateMoneyLoot(item->GetProto()->MinMoneyLoot,item->GetProto()->MaxMoneyLoot);
+                        item->SetLootState(ITEM_LOOT_CHANGED);
                         break;
                 }
             }
@@ -9888,14 +9894,6 @@ uint8 Player::_CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, uint3
 
     if (pItem)
     {
-        // item used
-        if(pItem->m_lootGenerated)
-        {
-            if (no_space_count)
-                *no_space_count = count;
-            return EQUIP_ERR_ALREADY_LOOTED;
-        }
-
         if (pItem->IsBindedNotWith(this))
         {
             if (no_space_count)
@@ -10383,10 +10381,6 @@ uint8 Player::CanStoreItems( Item **pItems,int count) const
         if( !pProto )
             return EQUIP_ERR_ITEM_NOT_FOUND;
 
-        // item used
-        if(pItem->m_lootGenerated)
-            return EQUIP_ERR_ALREADY_LOOTED;
-
         // item it 'bind'
         if(pItem->IsBindedNotWith(this))
             return EQUIP_ERR_DONT_OWN_THAT_ITEM;
@@ -10590,10 +10584,6 @@ uint8 Player::CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bo
         ItemPrototype const *pProto = pItem->GetProto();
         if( pProto )
         {
-            // item used
-            if(pItem->m_lootGenerated)
-                return EQUIP_ERR_ALREADY_LOOTED;
-
             if(pItem->IsBindedNotWith(this))
                 return EQUIP_ERR_DONT_OWN_THAT_ITEM;
 
@@ -10722,24 +10712,20 @@ uint8 Player::CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bo
 uint8 Player::CanUnequipItem( uint16 pos, bool swap ) const
 {
     // Applied only to equipped items and bank bags
-    if(!IsEquipmentPos(pos) && !IsBagPos(pos))
+    if (!IsEquipmentPos(pos) && !IsBagPos(pos))
         return EQUIP_ERR_OK;
 
     Item* pItem = GetItemByPos(pos);
 
     // Applied only to existing equipped item
-    if( !pItem )
+    if (!pItem)
         return EQUIP_ERR_OK;
 
     DEBUG_LOG( "STORAGE: CanUnequipItem slot = %u, item = %u, count = %u", pos, pItem->GetEntry(), pItem->GetCount());
 
     ItemPrototype const *pProto = pItem->GetProto();
-    if( !pProto )
+    if (!pProto)
         return EQUIP_ERR_ITEM_NOT_FOUND;
-
-    // item used
-    if(pItem->m_lootGenerated)
-        return EQUIP_ERR_ALREADY_LOOTED;
 
     // do not allow unequipping gear except weapons, offhands, projectiles, relics in
     // - combat
@@ -10771,10 +10757,6 @@ uint8 Player::CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec &dest, Item *p
     ItemPrototype const *pProto = pItem->GetProto();
     if (!pProto)
         return swap ? EQUIP_ERR_ITEMS_CANT_BE_SWAPPED : EQUIP_ERR_ITEM_NOT_FOUND;
-
-    // item used
-    if(pItem->m_lootGenerated)
-        return EQUIP_ERR_ALREADY_LOOTED;
 
     if (pItem->IsBindedNotWith(this))
         return EQUIP_ERR_DONT_OWN_THAT_ITEM;
@@ -11863,13 +11845,13 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
     uint8 dstslot = dst & 255;
 
     Item *pSrcItem = GetItemByPos( srcbag, srcslot );
-    if( !pSrcItem )
+    if (!pSrcItem)
     {
         SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, NULL );
         return;
     }
 
-    if(pSrcItem->m_lootGenerated)                           // prevent split looting item (item
+    if (pSrcItem->HasGeneratedLoot())                       // prevent split looting item (stackable items can has only temporary loot and this meaning that loot window open)
     {
         //best error message found for attempting to split while looting
         SendEquipError( EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, NULL );
@@ -11877,14 +11859,14 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
     }
 
     // not let split all items (can be only at cheating)
-    if(pSrcItem->GetCount() == count)
+    if (pSrcItem->GetCount() == count)
     {
         SendEquipError( EQUIP_ERR_COULDNT_SPLIT_ITEMS, pSrcItem, NULL );
         return;
     }
 
     // not let split more existing items (can be only at cheating)
-    if(pSrcItem->GetCount() < count)
+    if (pSrcItem->GetCount() < count)
     {
         SendEquipError( EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT, pSrcItem, NULL );
         return;
@@ -11892,20 +11874,20 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
 
     DEBUG_LOG( "STORAGE: SplitItem bag = %u, slot = %u, item = %u, count = %u", dstbag, dstslot, pSrcItem->GetEntry(), count);
     Item *pNewItem = pSrcItem->CloneItem( count, this );
-    if( !pNewItem )
+    if (!pNewItem)
     {
         SendEquipError( EQUIP_ERR_ITEM_NOT_FOUND, pSrcItem, NULL );
         return;
     }
 
-    if( IsInventoryPos( dst ) )
+    if (IsInventoryPos(dst))
     {
         // change item amount before check (for unique max count check)
         pSrcItem->SetCount( pSrcItem->GetCount() - count );
 
         ItemPosCountVec dest;
         uint8 msg = CanStoreItem( dstbag, dstslot, dest, pNewItem, false );
-        if( msg != EQUIP_ERR_OK )
+        if (msg != EQUIP_ERR_OK)
         {
             delete pNewItem;
             pSrcItem->SetCount( pSrcItem->GetCount() + count );
@@ -11913,12 +11895,12 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
             return;
         }
 
-        if( IsInWorld() )
+        if (IsInWorld())
             pSrcItem->SendCreateUpdateToPlayer( this );
         pSrcItem->SetState(ITEM_CHANGED, this);
         StoreItem( dest, pNewItem, true);
     }
-    else if( IsBankPos ( dst ) )
+    else if (IsBankPos (dst))
     {
         // change item amount before check (for unique max count check)
         pSrcItem->SetCount( pSrcItem->GetCount() - count );
@@ -11933,19 +11915,19 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
             return;
         }
 
-        if( IsInWorld() )
+        if (IsInWorld())
             pSrcItem->SendCreateUpdateToPlayer( this );
         pSrcItem->SetState(ITEM_CHANGED, this);
         BankItem( dest, pNewItem, true);
     }
-    else if( IsEquipmentPos ( dst ) )
+    else if (IsEquipmentPos (dst))
     {
         // change item amount before check (for unique max count check), provide space for splitted items
         pSrcItem->SetCount( pSrcItem->GetCount() - count );
 
         uint16 dest;
         uint8 msg = CanEquipItem( dstslot, dest, pNewItem, false );
-        if( msg != EQUIP_ERR_OK )
+        if (msg != EQUIP_ERR_OK)
         {
             delete pNewItem;
             pSrcItem->SetCount( pSrcItem->GetCount() + count );
@@ -11953,7 +11935,7 @@ void Player::SplitItem( uint16 src, uint16 dst, uint32 count )
             return;
         }
 
-        if( IsInWorld() )
+        if (IsInWorld())
             pSrcItem->SendCreateUpdateToPlayer( this );
         pSrcItem->SetState(ITEM_CHANGED, this);
         EquipItem( dest, pNewItem, true);
@@ -15817,6 +15799,7 @@ bool Player::LoadFromDB( uint32 guid, SqlQueryHolder *holder )
     m_reputationMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION));
 
     _LoadInventory(holder->GetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY), time_diff);
+    _LoadItemLoot(holder->GetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT));
 
     // update items with duration and realtime
     UpdateItemDuration(time_diff, true);
@@ -16228,7 +16211,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
 
             Item *item = NewItemOrBag(proto);
 
-            if(!item->LoadFromDB(item_guid, GetGUID(), result))
+            if(!item->LoadFromDB(item_guid, GetGUID(), fields))
             {
                 sLog.outError( "Player::_LoadInventory: Player %s has broken item (id: #%u) in inventory, deleted.", GetName(),item_id );
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_guid);
@@ -16352,8 +16335,37 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             draft.SendMailTo(this, MailSender(this, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
         }
     }
+
     //if(isAlive())
     _ApplyAllItemMods();
+}
+
+void Player::_LoadItemLoot(QueryResult *result)
+{
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT guid,itemid,amount,suffix,property FROM item_loot WHERE guid = '%u'", GetGUIDLow());
+
+    if (result)
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+            uint32 item_guid   = fields[0].GetUInt32();
+
+            Item* item = GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, item_guid));
+
+            if (!item)
+            {
+                CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", item_guid);
+                sLog.outError("Player::_LoadItemLoot: Player %s has loot for not existed item (GUID: %u) in `item_loot`, deleted.", GetName(), item_guid );
+                continue;
+            }
+
+            item->LoadLootFromDB(fields);
+
+        } while (result->NextRow());
+
+        delete result;
+    }
 }
 
 // load mailed item which should receive current player
@@ -16389,7 +16401,7 @@ void Player::_LoadMailedItems(QueryResult *result)
 
         Item *item = NewItemOrBag(proto);
 
-        if(!item->LoadFromDB(item_guid_low, 0, result))
+        if(!item->LoadFromDB(item_guid_low, 0, fields))
         {
             sLog.outError( "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, item_guid_low);
             CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid = '%u'", item_guid_low);
@@ -21439,11 +21451,16 @@ bool Player::IsBaseRuneSlotsOnCooldown( RuneType runeType ) const
     return true;
 }
 
-void Player::AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast)
+void Player::AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast, uint8 bag, uint8 slot)
 {
     Loot loot;
-    loot.FillLoot (loot_id,store,this,true);
+    loot.FillLoot (loot_id, store, this, true);
 
+    AutoStoreLoot(loot, broadcast, bag, slot);
+}
+
+void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
+{
     uint32 max_slot = loot.GetMaxSlotInLootFor(this);
     for(uint32 i = 0; i < max_slot; ++i)
     {
