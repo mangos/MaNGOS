@@ -196,7 +196,6 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return true;
     }
 
-
     switch (getPetType())
     {
         case SUMMON_PET:
@@ -342,7 +341,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         return;
 
     // not save not player pets
-    if(!IS_PLAYER_GUID(GetOwnerGUID()))
+    if (!GetOwnerGuid().IsPlayer())
         return;
 
     Player* pOwner = (Player*)GetOwner();
@@ -375,29 +374,29 @@ void Pet::SavePetToDB(PetSaveMode mode)
         _SaveSpellCooldowns();
         _SaveAuras();
 
-        uint32 owner = GUID_LOPART(GetOwnerGUID());
+        uint32 ownerLow = GetOwnerGuid().GetCounter();
         std::string name = m_name;
         CharacterDatabase.escape_string(name);
         CharacterDatabase.BeginTransaction();
         // remove current data
-        CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u' AND id = '%u'", owner,m_charmInfo->GetPetNumber() );
+        CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u' AND id = '%u'", ownerLow, m_charmInfo->GetPetNumber());
 
         // prevent duplicate using slot (except PET_SAVE_NOT_IN_SLOT)
-        if(mode <= PET_SAVE_LAST_STABLE_SLOT)
+        if (mode <= PET_SAVE_LAST_STABLE_SLOT)
             CharacterDatabase.PExecute("UPDATE character_pet SET slot = '%u' WHERE owner = '%u' AND slot = '%u'",
-                PET_SAVE_NOT_IN_SLOT, owner, uint32(mode) );
+                PET_SAVE_NOT_IN_SLOT, ownerLow, uint32(mode) );
 
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
-        if(getPetType()==HUNTER_PET && (mode==PET_SAVE_AS_CURRENT||mode > PET_SAVE_LAST_STABLE_SLOT))
+        if (getPetType()==HUNTER_PET && (mode==PET_SAVE_AS_CURRENT||mode > PET_SAVE_LAST_STABLE_SLOT))
             CharacterDatabase.PExecute("DELETE FROM character_pet WHERE owner = '%u' AND (slot = '%u' OR slot > '%u')",
-                owner,PET_SAVE_AS_CURRENT,PET_SAVE_LAST_STABLE_SLOT);
+                ownerLow, PET_SAVE_AS_CURRENT, PET_SAVE_LAST_STABLE_SLOT);
         // save pet
         std::ostringstream ss;
         ss  << "INSERT INTO character_pet ( id, entry,  owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, curhappiness, abdata, savetime, resettalents_cost, resettalents_time, CreatedBySpell, PetType) "
             << "VALUES ("
             << m_charmInfo->GetPetNumber() << ", "
             << GetEntry() << ", "
-            << owner << ", "
+            << ownerLow << ", "
             << GetNativeDisplayId() << ", "
             << getLevel() << ", "
             << GetUInt32Value(UNIT_FIELD_PETEXPERIENCE) << ", "
@@ -500,27 +499,17 @@ void Pet::Update(uint32 diff)
                 return;
             }
 
-            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || (isControlled() && !owner->GetPetGUID()) || (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID())))
+//            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || (isControlled() && !owner->GetPetGUID()) || (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID())))
+            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (!owner->GetCharmGuid().IsEmpty() && (owner->GetCharmGuid() != GetObjectGuid())) || (isControlled() && owner->GetPetGuid().IsEmpty()))
             {
-                DEBUG_LOG("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGUID());
+                DEBUG_LOG("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGuid().GetCounter());
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
                 return;
             }
 
-            if(isControlled())
+            if (isControlled())
             {
-                bool needdelete = true;
-                GroupPetList m_groupPets = owner->GetPets();
-                if (!m_groupPets.empty())
-                {
-                    for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-                        if (GetGUID() == (*itr)) needdelete = false;
-                }
-                else
-                    if( owner->GetPetGUID() == GetGUID())
-                        needdelete = false;
-
-                if (needdelete)
+                if (owner->GetPetGuid() != GetObjectGuid())
                 {
                     sLog.outError("Pet %d controlled, but not in list, removed.", GetGUID());
                     Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);
@@ -530,12 +519,12 @@ void Pet::Update(uint32 diff)
             else if (getPetType() == MINI_PET || getPetType() == GUARDIAN_PET)
                 if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()))
                 {
-                    sLog.outError("Not controlled pet %d lost view from owner, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGUID());
+                    sLog.outError("Not controlled pet %d lost view from owner, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGuid().GetCounter());
                     Remove(PET_SAVE_AS_DELETED);
                     return;
                 }
 
-            if(m_duration > 0)
+            if (m_duration > 0)
             {
                 if(m_duration > (int32)diff)
                     m_duration -= (int32)diff;
@@ -633,7 +622,7 @@ void Pet::Remove(PetSaveMode mode, bool returnreagent)
     Unit* owner = GetOwner();
     m_removed = true;
 
-    if (owner && owner->GetTypeId() == TYPEID_PLAYER && owner->GetPetGUID() == GetGUID())
+    if (owner && owner->GetTypeId() == TYPEID_PLAYER && owner->GetPetGuid() == GetObjectGuid())
     {
         ((Player*)owner)->RemovePet(this,mode,returnreagent);
 
@@ -668,7 +657,7 @@ void Pet::_Remove(PetSaveMode mode, bool returnreagent)
                 break;
             default:
                 owner->RemovePetFromList(this);
-                if(owner->GetPetGUID() == GetGUID())
+                if(owner->GetPetGuid() == GetObjectGuid())
                     owner->SetPet(0);
                 break;
         }
@@ -1885,8 +1874,9 @@ bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint3
 
     setFaction(owner->getFaction());
                                    // Faction be owerwritten later, if ForceFaction present
-    SetOwnerGUID(owner->GetGUID());
-    SetCreatorGUID(owner->GetGUID());
+
+    SetOwnerGuid(owner->GetObjectGuid());
+    SetCreatorGuid(owner->GetObjectGuid());
 
     if (GetCreateSpellID())
         SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
@@ -2888,9 +2878,9 @@ Unit* Pet::GetOwner() const
     Unit* owner = Unit::GetOwner();
 
     if (!owner)
-        if (uint64 ownerguid = GetOwnerGUID())
+        if (!GetOwnerGuid().IsEmpty())
             if (Map* pMap = GetMap())
-                owner = pMap->GetAnyTypeCreature(ownerguid);
+                owner = pMap->GetAnyTypeCreature(GetOwnerGuid());
 
     if (owner && owner->GetTypeId() == TYPEID_UNIT && ((Creature*)owner)->IsTotem())
         if (Unit* ownerOfOwner = owner->GetOwner())

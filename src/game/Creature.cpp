@@ -585,7 +585,7 @@ void Creature::Regenerate(Powers power)
         case POWER_MANA:
         {
             // Combat and any controlled creature
-            if (isInCombat() || GetCharmerOrOwnerGUID())
+            if (isInCombat() || !GetCharmerOrOwnerGuid().IsEmpty())
             {
                 if(!IsUnderLastManaUseEffect())
                 {
@@ -658,7 +658,7 @@ void Creature::RegenerateHealth()
     uint32 addvalue = 0;
 
     // Not only pet, but any controlled creature
-    if(GetCharmerOrOwnerGUID())
+    if (!GetCharmerOrOwnerGuid().IsEmpty())
     {
         float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
         float Spirit = GetStat(STAT_SPIRIT);
@@ -1743,7 +1743,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
         return false;
 
     // only free creature
-    if (GetCharmerOrOwnerGUID())
+    if (!GetCharmerOrOwnerGuid().IsEmpty())
         return false;
 
     // only from same creature faction

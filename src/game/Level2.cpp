@@ -2188,6 +2188,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
     PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU_NOW, creature->GetName());
     return true;
 }
+
 //npc phasemask handling
 //change phasemask of creature or pet
 bool ChatHandler::HandleNpcSetPhaseCommand(char* args)

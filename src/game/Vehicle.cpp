@@ -156,7 +156,7 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
         m_pBase->CombatStop(true);
         m_pBase->DeleteThreatList();
         m_pBase->getHostileRefManager().deleteReferences();
-        m_pBase->SetCharmerGUID(passenger->GetGUID());
+        m_pBase->SetCharmerGuid(passenger->GetObjectGuid());
         m_pBase->addUnitState(UNIT_STAT_CONTROLLED);
 
         passenger->SetCharm(m_pBase);
@@ -225,7 +225,7 @@ void VehicleKit::RemovePassenger(Unit *passenger)
         passenger->SetCharm(NULL);
         passenger->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
 
-        m_pBase->SetCharmerGUID(0);
+        m_pBase->SetCharmerGuid(ObjectGuid());
         m_pBase->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         m_pBase->clearUnitState(UNIT_STAT_CONTROLLED);
 
