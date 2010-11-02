@@ -90,7 +90,7 @@ void Pet::RemoveFromWorld()
     Unit::RemoveFromWorld();
 }
 
-bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool current )
+bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool current,  float x, float y, float z )
 {
     m_loading = true;
 
@@ -178,7 +178,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, fields[5].GetUInt32());
     m_charmInfo->SetReactState(ReactStates(fields[6].GetUInt8()));
 
-    if (!SetSummonPosition())
+    if (!SetSummonPosition( x, y, z))
     {
         sLog.outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
             GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
@@ -499,8 +499,7 @@ void Pet::Update(uint32 diff)
                 return;
             }
 
-//            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || (isControlled() && !owner->GetPetGUID()) || (owner->GetCharmGUID() && (owner->GetCharmGUID() != GetGUID())))
-            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (!owner->GetCharmGuid().IsEmpty() && (owner->GetCharmGuid() != GetObjectGuid())) || (isControlled() && owner->GetPetGuid().IsEmpty()))
+            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || owner->GetCharmGuid().IsEmpty())
             {
                 DEBUG_LOG("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGuid().GetCounter());
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
@@ -509,7 +508,8 @@ void Pet::Update(uint32 diff)
 
             if (isControlled())
             {
-                if (owner->GetPetGuid() != GetObjectGuid())
+                GroupPetList m_groupPets = owner->GetPets();
+                if (m_groupPets.find(GetObjectGuid().GetRawValue()) == m_groupPets.end())
                 {
                     sLog.outError("Pet %d controlled, but not in list, removed.", GetGUID());
                     Remove(getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT);

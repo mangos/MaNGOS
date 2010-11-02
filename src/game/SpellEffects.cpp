@@ -4364,7 +4364,20 @@ void Spell::DoSummonGroupPets(SpellEffectIndex eff_idx)
                     pet->SetDuration(duration);
                     pet->SetCreateSpellID(originalSpellID);
                     pet->SetPetCounter(amount-1);
-                    if (pet->LoadPetFromDB((Player*)m_caster,pet_entry, petnumber[i]))
+                    bool _summoned = false;
+
+                    if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+                    {
+                        if (pet->LoadPetFromDB((Player*)m_caster,pet_entry, petnumber[i]), false, m_targets.m_destX,m_targets.m_destY,m_targets.m_destZ)
+                            _summoned = true;
+                    }
+                    else
+                    {
+                        if (pet->LoadPetFromDB((Player*)m_caster,pet_entry, petnumber[i]))
+                            _summoned = true;
+                    }
+
+                    if ( _summoned )
                     {
                          --amount;
                         DEBUG_LOG("Pet (guidlow %d, entry %d) summoned (from database). Counter is %d ",
