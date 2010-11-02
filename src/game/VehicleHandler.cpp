@@ -132,3 +132,45 @@ void WorldSession::HandleEjectPasenger(WorldPacket &recv_data)
 
     passenger->ExitVehicle();
 }
+
+void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data)
+{
+    sLog.outDebug("WORLD: Recvd CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE");
+    recv_data.hexlike();
+
+    ObjectGuid guid, guid2;
+    recv_data >> guid.ReadAsPacked();
+
+    MovementInfo mi;
+    recv_data >> mi;
+    GetPlayer()->m_movementInfo = mi;
+
+    recv_data >> guid2.ReadAsPacked(); //guid of vehicle or of vehicle in target seat
+
+    int8 seatId;
+    recv_data >> seatId;
+
+    if (GetSecurity() <= SEC_PLAYER)  // Only for testing now!
+        return;
+
+    VehicleKit* pVehicle = GetPlayer()->GetVehicle();
+
+    if (!pVehicle)
+        return;
+
+    if(guid.GetRawValue() == guid2.GetRawValue())
+        GetPlayer()->ChangeSeat(seatId, false);
+
+    else if (guid2.IsVehicle())
+    {
+        if (Creature* vehicle = GetPlayer()->GetMap()->GetAnyTypeCreature(guid2))
+        {
+            if (VehicleKit* pVehicle2 = vehicle->GetVehicleKit())
+                if(pVehicle2->HasEmptySeat(seatId))
+                {
+                    GetPlayer()->ExitVehicle();
+                    GetPlayer()->EnterVehicle(pVehicle2, seatId);
+                }
+        }
+    }
+}

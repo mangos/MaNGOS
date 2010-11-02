@@ -441,6 +441,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleRequestVehicleSwitchSeat(WorldPacket &recv_data);
         void HandleEnterPlayerVehicle(WorldPacket &recv_data);
         void HandleEjectPasenger(WorldPacket &recv_data);
+        void HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data);
 
         void HandleRequestRaidInfoOpcode( WorldPacket & recv_data );
 
