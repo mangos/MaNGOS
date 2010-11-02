@@ -430,6 +430,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                     if(count > 5)
                         count = 5;
 
+                    // reset loot for allow repeat looting if stack > 5
+                    pItem->loot.clear();
+                    pItem->SetLootState(ITEM_LOOT_REMOVED);
+
                     player->DestroyItemCount(pItem, count, true);
                     break;
                 }
@@ -446,7 +450,10 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 {
                     // must be destroyed only if no loot 
                     if (pItem->loot.isLooted())
+                    {
+                        pItem->SetLootState(ITEM_LOOT_REMOVED);
                         player->DestroyItem( pItem->GetBagSlot(),pItem->GetSlot(), true);
+                    }
                     break;
                 }
             }
