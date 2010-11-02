@@ -180,6 +180,11 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
+#    ACE mtmaps
+#    MapUpdate.Threads
+#        Number of threads to run if the binary was compiled with mtmaps support.
+#        Default: 2
+#        For stable works 1-3 threads (?) testing. Recommendation for low LA - (num of CPU - 1).
 ###################################################################################################################
 
 UseProcessors = 0
@@ -206,6 +211,7 @@ UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
 AddonChannel = 1
 CleanCharacterDB = 1
+MapUpdate.Threads = 2
 
 ###################################################################################################################
 # SERVER LOGGING
