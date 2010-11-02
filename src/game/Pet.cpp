@@ -499,7 +499,7 @@ void Pet::Update(uint32 diff)
                 return;
             }
 
-            if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) || owner->GetCharmGuid().IsEmpty())
+            if (isControlled() && !IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()))
             {
                 DEBUG_LOG("Pet %d lost control, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGuid().GetCounter());
                 Remove(PET_SAVE_NOT_IN_SLOT, true);
@@ -516,7 +516,7 @@ void Pet::Update(uint32 diff)
                     return;
                 }
             }
-            else if (getPetType() == MINI_PET || getPetType() == GUARDIAN_PET)
+            else 
                 if (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()))
                 {
                     sLog.outError("Not controlled pet %d lost view from owner, removed. Owner = %d, distance = %d, pet GUID = ", GetGUID(),owner->GetGUID(), GetDistance2d(owner), owner->GetPetGuid().GetCounter());
