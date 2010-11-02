@@ -816,6 +816,8 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                     switch(spellproto->EffectMiscValue[effIndex])
                     {
                         case SPELLMOD_COST:                 // dependent from bas point sign (negative -> positive)
+                            if(spellproto->Id == 12042)     // Arcane Power workaround
+                                break;
                             if(spellproto->CalculateSimpleValue(effIndex) > 0)
                                 return false;
                             break;
