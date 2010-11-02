@@ -1156,7 +1156,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             // Arcane Potency
             if (dummySpell->SpellIconID == 2120)
             {
-                if(!procSpell)
+                if(!procSpell || procSpell->Id == 44401)
                     return SPELL_AURA_PROC_FAILED;
 
                 target = this;
