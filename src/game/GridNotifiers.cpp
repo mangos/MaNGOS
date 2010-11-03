@@ -187,9 +187,7 @@ template<class T> void
 ObjectUpdater::Visit(GridRefManager<T> &m)
 {
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        iter->getSource()->Update(i_timeDiff);
-    }
+        iter->getSource()->UpdateCall(i_time, i_diff);
 }
 
 bool CannibalizeObjectCheck::operator()(Corpse* u)

@@ -342,7 +342,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
     public:
         virtual ~WorldObject ( ) {}
 
-        virtual void Update ( uint32 /*time_diff*/ ) { }
+        void UpdateCall(uint32 newtime, uint32 diff);       // tick time and tick diff in msecs, must be called instead direct call Update
 
         void _Create( uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
 
@@ -492,8 +492,11 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 
         ViewPoint& GetViewPoint() { return m_viewPoint; }
+
     protected:
         explicit WorldObject();
+
+        virtual void Update(uint32 /*update_diff*/, uint32 /*tick_diff*/) { }
 
         //these functions are used mostly for Relocate() and Corpse/Player specific stuff...
         //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
@@ -517,6 +520,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float m_orientation;
 
         ViewPoint m_viewPoint;
+
+        uint32 m_lastUpdateTime;
 };
 
 #endif

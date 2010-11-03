@@ -31,7 +31,7 @@ Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
     m_type = TOTEM_PASSIVE;
 }
 
-void Totem::Update( uint32 time )
+void Totem::Update(uint32 update_diff, uint32 tick_diff)
 {
     Unit *owner = GetOwner();
     if (!owner || !owner->isAlive() || !isAlive())
@@ -40,15 +40,15 @@ void Totem::Update( uint32 time )
         return;
     }
 
-    if (m_duration <= time)
+    if (m_duration <= update_diff)
     {
         UnSummon();                                         // remove self
         return;
     }
     else
-        m_duration -= time;
+        m_duration -= update_diff;
 
-    Creature::Update( time );
+    Creature::Update(update_diff, tick_diff);
 }
 
 void Totem::Summon(Unit* owner)
@@ -106,23 +106,27 @@ void Totem::UnSummon()
             ((Creature*)owner)->AI()->SummonedCreatureDespawn((Creature*)this);
     }
 
+    // any totem unsummon look like as totem kill, req. for proper animation
+    if (isAlive())
+        SetDeathState(DEAD);
+
     AddObjectToRemoveList();
 }
 
 void Totem::SetOwner(Unit* owner)
 {
-    SetCreatorGUID(owner->GetGUID());
-    SetOwnerGUID(owner->GetGUID());
+    SetCreatorGuid(owner->GetObjectGuid());
+    SetOwnerGuid(owner->GetObjectGuid());
     setFaction(owner->getFaction());
     SetLevel(owner->getLevel());
 }
 
 Unit *Totem::GetOwner()
 {
-    uint64 ownerid = GetOwnerGUID();
-    if(!ownerid)
+    ObjectGuid ownerGuid = GetOwnerGuid();
+    if (ownerGuid.IsEmpty())
         return NULL;
-    return ObjectAccessor::GetUnit(*this, ownerid);
+    return ObjectAccessor::GetUnit(*this, ownerGuid);
 }
 
 void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)

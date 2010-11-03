@@ -134,7 +134,7 @@ enum QuestTypes
     QUEST_TYPE_RAID_25             = 89
 };
 
-enum __QuestFlags
+enum QuestFlags
 {
     // Flags used at server and sent to client
     QUEST_FLAGS_NONE           = 0x00000000,
@@ -158,18 +158,23 @@ enum __QuestFlags
     QUEST_FLAGS_UNK5           = 0x00020000,                // has something to do with ReqItemId and SrcItemId
     QUEST_FLAGS_UNK6           = 0x00040000,                // use Objective text as Complete text
     QUEST_FLAGS_AUTO_ACCEPT    = 0x00080000,                // quests in starting areas
+};
 
+enum QuestSpecialFlags
+{
     // Mangos flags for set SpecialFlags in DB if required but used only at server
-    QUEST_MANGOS_FLAGS_REPEATABLE           = 0x01000000,   // Set by 1 in SpecialFlags from DB
-    QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT = 0x02000000,   // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
-    QUEST_MANGOS_FLAGS_DB_ALLOWED = 0xFFFFFF | QUEST_MANGOS_FLAGS_REPEATABLE | QUEST_MANGOS_FLAGS_EXPLORATION_OR_EVENT,
+    QUEST_SPECIAL_FLAG_REPEATABLE           = 0x001,        // |1 in SpecialFlags from DB
+    QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT = 0x002,        // |2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script DLL)
+    QUEST_SPECIAL_FLAG_MONTHLY              = 0x004,        // |4 in SpecialFlags. Quest reset for player at beginning of month.
 
     // Mangos flags for internal use only
-    QUEST_MANGOS_FLAGS_DELIVER              = 0x04000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_SPEAKTO              = 0x08000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_KILL_OR_CAST         = 0x10000000,   // Internal flag computed only
-    QUEST_MANGOS_FLAGS_TIMED                = 0x20000000,   // Internal flag computed only
+    QUEST_SPECIAL_FLAG_DELIVER              = 0x008,        // Internal flag computed only
+    QUEST_SPECIAL_FLAG_SPEAKTO              = 0x010,        // Internal flag computed only
+    QUEST_SPECIAL_FLAG_KILL_OR_CAST         = 0x020,        // Internal flag computed only
+    QUEST_SPECIAL_FLAG_TIMED                = 0x040,        // Internal flag computed only
 };
+
+#define QUEST_SPECIAL_FLAG_DB_ALLOWED (QUEST_SPECIAL_FLAG_REPEATABLE | QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAG_MONTHLY)
 
 struct QuestLocale
 {
@@ -195,8 +200,10 @@ class Quest
         Quest(Field * questRecord);
         uint32 XPValue( Player *pPlayer ) const;
 
-        bool HasFlag( uint32 flag ) const { return ( QuestFlags & flag ) != 0; }
-        void SetFlag( uint32 flag ) { QuestFlags |= flag; }
+        uint32 GetQuestFlags() const { return m_QuestFlags; }
+        bool HasQuestFlag(QuestFlags flag) const { return (m_QuestFlags & flag) != 0; }
+        bool HasSpecialFlag(QuestSpecialFlags flag) const { return (m_SpecialFlags & flag) != 0; }
+        void SetSpecialFlag(QuestSpecialFlags flag) { m_SpecialFlags |= flag; }
 
         // table data accessors:
         uint32 GetQuestId() const { return QuestId; }
@@ -252,14 +259,19 @@ class Quest
         uint32 GetCompleteEmote() const { return CompleteEmote; }
         uint32 GetQuestStartScript() const { return QuestStartScript; }
         uint32 GetQuestCompleteScript() const { return QuestCompleteScript; }
-        bool   IsRepeatable() const { return QuestFlags & QUEST_MANGOS_FLAGS_REPEATABLE; }
+
+        bool   IsRepeatable() const { return m_SpecialFlags & QUEST_SPECIAL_FLAG_REPEATABLE; }
         bool   IsAutoComplete() const { return QuestMethod ? false : true; }
-        uint32 GetFlags() const { return QuestFlags; }
-        bool   IsDaily() const { return QuestFlags & QUEST_FLAGS_DAILY; }
-        bool   IsWeekly() const { return QuestFlags & QUEST_FLAGS_WEEKLY; }
-        bool   IsDailyOrWeekly() const { return QuestFlags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
-        bool   IsAutoAccept() const { return QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
+        bool   IsDaily() const { return m_QuestFlags & QUEST_FLAGS_DAILY; }
+        bool   IsWeekly() const { return m_QuestFlags & QUEST_FLAGS_WEEKLY; }
+        bool   IsMonthly() const { return m_SpecialFlags & QUEST_SPECIAL_FLAG_MONTHLY; }
+        bool   IsDailyOrWeekly() const { return m_QuestFlags & (QUEST_FLAGS_DAILY | QUEST_FLAGS_WEEKLY); }
+        bool   IsAutoAccept() const { return m_QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
         bool   IsAllowedInRaid() const;
+
+        // quest can be fully deactivated and will not be available for any player
+        void SetQuestActiveState(bool state) { m_isActive = state; }
+        bool IsActive() const { return m_isActive; }
 
         // multiple values
         std::string ObjectiveText[QUEST_OBJECTIVES_COUNT];
@@ -299,6 +311,8 @@ class Quest
         uint32 m_rewchoiceitemscount;
         uint32 m_rewitemscount;
 
+        bool m_isActive;
+
         // table data
     protected:
         uint32 QuestId;
@@ -319,7 +333,8 @@ class Quest
         int32  RequiredMaxRepValue;
         uint32 SuggestedPlayers;
         uint32 LimitTime;
-        uint32 QuestFlags;
+        uint32 m_QuestFlags;
+        uint32 m_SpecialFlags;
         uint32 CharTitleId;
         uint32 PlayersSlain;
         uint32 BonusTalents;

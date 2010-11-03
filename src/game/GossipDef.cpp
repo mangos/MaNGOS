@@ -179,7 +179,7 @@ void PlayerMenu::SendGossipMenu(uint32 TitleTextId, uint64 objectGUID)
         data << uint32(questID);
         data << uint32(qItem.m_qIcon);
         data << int32(pQuest->GetQuestLevel());
-        data << uint32(pQuest->GetFlags());                 // 3.3.3 quest flags
+        data << uint32(pQuest->GetQuestFlags());            // 3.3.3 quest flags
         data << uint8(0);                                   // 3.3.3 changes icon: blue question or yellow exclamation
         std::string Title = pQuest->GetTitle();
 
@@ -420,7 +420,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
             data << uint32(questID);
             data << uint32(qmi.m_qIcon);
             data << int32(pQuest->GetQuestLevel());
-            data << uint32(pQuest->GetFlags());             // 3.3.3 quest flags
+            data << uint32(pQuest->GetQuestFlags());        // 3.3.3 quest flags
             data << uint8(0);                               // 3.3.3 changes icon: blue question or yellow exclamation
             data << title;
         }
@@ -468,11 +468,11 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
     data << Details;
     data << Objectives;
     data << uint8(ActivateAccept ? 1 : 0);                  // auto finish
-    data << uint32(pQuest->GetFlags());                     // 3.3.3 questFlags
+    data << uint32(pQuest->GetQuestFlags());                // 3.3.3 questFlags
     data << uint32(pQuest->GetSuggestedPlayers());
     data << uint8(0);                                       // IsFinished? value is sent back to server in quest accept packet
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
         data << uint32(0);                                  // Rewarded chosen items hidden
         data << uint32(0);                                  // Rewarded items hidden
@@ -618,7 +618,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << uint32(pQuest->GetNextQuestInChain());          // client will request this quest from NPC, if not 0
     data << uint32(pQuest->GetRewXPId());                   // column index in QuestXP.dbc (row based on quest level)
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
         data << uint32(0);                                  // Hide money rewarded
     else
         data << uint32(pQuest->GetRewOrReqMoney());         // reward money (below max lvl)
@@ -632,7 +632,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
     data << float(pQuest->GetRewHonorMultiplier());         // new reward honor (multiplied by ~62 at client side)
 
     data << uint32(pQuest->GetSrcItemId());                 // source item id
-    data << uint32(pQuest->GetFlags() & 0xFFFF);            // quest flags
+    data << uint32(pQuest->GetQuestFlags());                // quest flags
     data << uint32(pQuest->GetCharTitleId());               // CharTitleId, new 2.4.0, player gets this title (id from CharTitles)
     data << uint32(pQuest->GetPlayersSlain());              // players slain
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
@@ -641,7 +641,7 @@ void PlayerMenu::SendQuestQueryResponse( Quest const *pQuest )
 
     int iI;
 
-    if (pQuest->HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (pQuest->HasQuestFlag(QUEST_FLAGS_HIDDEN_REWARDS))
     {
         for (iI = 0; iI < QUEST_REWARDS_COUNT; ++iI)
             data << uint32(0) << uint32(0);
@@ -750,7 +750,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << OfferRewardText;
 
     data << uint8(EnableNext ? 1 : 0);                      // Auto Finish
-    data << uint32(pQuest->GetFlags());                     // 3.3.3 questFlags
+    data << uint32(pQuest->GetQuestFlags());                // 3.3.3 questFlags
     data << uint32(pQuest->GetSuggestedPlayers());          // SuggestedGroupNum
 
     uint32 EmoteCount = 0;
@@ -877,7 +877,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcG
     else
         data << uint32(0x00);
 
-    data << uint32(pQuest->GetFlags());                     // 3.3.3 questFlags
+    data << uint32(pQuest->GetQuestFlags());                // 3.3.3 questFlags
     data << uint32(pQuest->GetSuggestedPlayers());          // SuggestedGroupNum
 
     // Required Money

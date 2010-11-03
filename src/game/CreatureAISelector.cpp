@@ -91,7 +91,7 @@ namespace FactorySelector
         MovementGeneratorRegistry &mv_registry(MovementGeneratorRepository::Instance());
         MANGOS_ASSERT( creature->GetCreatureInfo() != NULL );
         MovementGeneratorCreator const * mv_factory = mv_registry.GetRegistryItem(
-            IS_PLAYER_GUID(creature->GetOwnerGUID()) ? FOLLOW_MOTION_TYPE : creature->GetDefaultMovementType());
+            creature->GetOwnerGuid().IsPlayer() ? FOLLOW_MOTION_TYPE : creature->GetDefaultMovementType());
 
         /* if( mv_factory == NULL  )
         {
