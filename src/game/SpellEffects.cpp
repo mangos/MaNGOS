@@ -1820,6 +1820,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 54586, true);
                     return;
                 }
+                case 53475:                                 // Reputation spells
+                case 53487:
+                case 54015:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(m_spellInfo->EffectBasePoints[EFFECT_INDEX_0]+1))
+                        ((Player*)unitTarget)->GetReputationMgr().ModifyReputation(factionEntry, m_spellInfo->EffectBasePoints[EFFECT_INDEX_1]+1);
+
+                    finish();
+                    return;
+                }
                 case 53808:                                 // Pygmy Oil
                 {
                     const uint32 spellShrink = 53805;
