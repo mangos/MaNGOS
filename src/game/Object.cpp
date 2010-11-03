@@ -103,6 +103,16 @@ void Object::_Create(uint32 guidlow, uint32 entry, HighGuid guidhigh)
     m_PackGUID.Set(guid);
 }
 
+void WorldObject::UpdateCall(uint32 newtime, uint32 diff)
+{
+    // use real time diff from last object update call
+    // this can have big diff from tick diff time for object returning to active zone)
+    uint32 realDiff = getMSTimeDiff(m_lastUpdateTime, newtime);
+    m_lastUpdateTime = newtime;
+
+    Update(realDiff, diff);
+}
+
 void Object::SetObjectScale(float newScale)
 {
     SetFloatValue(OBJECT_FIELD_SCALE_X, newScale);
@@ -1121,7 +1131,7 @@ void Object::BuildUpdateData( UpdateDataMapType& /*update_players */)
 
 WorldObject::WorldObject()
     : m_isActiveObject(false), m_currMap(NULL), m_mapId(0), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL),
-    m_positionX(0.0f), m_positionY(0.0f), m_positionZ(0.0f), m_orientation(0.0f)
+    m_positionX(0.0f), m_positionY(0.0f), m_positionZ(0.0f), m_orientation(0.0f), m_lastUpdateTime(getMSTime())
 {
 }
 
