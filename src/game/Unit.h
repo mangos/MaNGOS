@@ -1184,8 +1184,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ApplyDiminishingAura(DiminishingGroup  group, bool apply);
         void ClearDiminishings() { m_Diminishing.clear(); }
 
-        virtual void Update( uint32 time );
-
         void setAttackTimer(WeaponAttackType type, uint32 time) { m_attackTimer[type] = time; }
         void resetAttackTimer(WeaponAttackType type = BASE_ATTACK);
         uint32 getAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
@@ -2018,6 +2016,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
     protected:
         explicit Unit ();
 
+        void Update(uint32 update_diff, uint32 tick_diff);  // overwrite WorldObject::Update
         void _UpdateSpells(uint32 time);
         void _UpdateAutoRepeatSpell();
 

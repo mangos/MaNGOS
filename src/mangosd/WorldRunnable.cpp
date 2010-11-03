@@ -57,7 +57,7 @@ void WorldRunnable::run()
 
         uint32 diff = getMSTimeDiff(realPrevTime,realCurrTime);
 
-        sWorld.Update( diff );
+        sWorld.Update(realCurrTime, diff);
         realPrevTime = realCurrTime;
 
         // diff (D0) include time of previous sleep (d0) + tick time (t0)

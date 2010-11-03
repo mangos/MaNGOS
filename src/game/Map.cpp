@@ -514,20 +514,18 @@ bool Map::loaded(const GridPair &p) const
     return ( getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord) );
 }
 
-void Map::Update(const uint32 &t_diff)
+void Map::Update(uint32 time_, uint32 diff)
 {
     /// update players at tick
     for(m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
-    {
-        Player* plr = m_mapRefIter->getSource();
-        if(plr && plr->IsInWorld())
-            plr->Update(t_diff);
-    }
+        if (Player* plr = m_mapRefIter->getSource())
+            if (plr->IsInWorld())
+                plr->UpdateCall(time_, diff);
 
     /// update active cells around players and active objects
     resetMarkedCells();
 
-    MaNGOS::ObjectUpdater updater(t_diff);
+    MaNGOS::ObjectUpdater updater(time_, diff);
     // for creature
     TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
     // for pets
@@ -638,7 +636,7 @@ void Map::Update(const uint32 &t_diff)
             GridInfo *info = i->getSource()->getGridInfoRef();
             ++i;                                                // The update might delete the map and we need the next map before the iterator gets invalid
             MANGOS_ASSERT(grid->GetGridState() >= 0 && grid->GetGridState() < MAX_GRID_STATE);
-            sMapMgr.UpdateGridState(grid->GetGridState(), *this, *grid, *info, grid->getX(), grid->getY(), t_diff);
+            sMapMgr.UpdateGridState(grid->GetGridState(), *this, *grid, *info, grid->getX(), grid->getY(), diff);
         }
     }
 
@@ -1856,17 +1854,17 @@ bool InstanceMap::Add(Player *player)
     return true;
 }
 
-void InstanceMap::Update(const uint32& t_diff)
+void InstanceMap::Update(uint32 time_, uint32 diff)
 {
-    Map::Update(t_diff);
+    Map::Update(time_, diff);
 
     if(i_data)
-        i_data->Update(t_diff);
+        i_data->Update(diff);
 }
 
-void BattleGroundMap::Update(const uint32& diff)
+void BattleGroundMap::Update(uint32 time_, uint32 diff)
 {
-    Map::Update(diff);
+    Map::Update(time_, diff);
 
     GetBG()->Update(diff);
 }

@@ -67,7 +67,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         }
 
         void Initialize(void);
-        void Update(uint32);
+        void Update(const uint32 time, const uint32 diff);
 
         void SetGridCleanUpDelay(uint32 t)
         {

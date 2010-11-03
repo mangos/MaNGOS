@@ -108,7 +108,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         template<class T> void Add(T *);
         template<class T> void Remove(T *, bool);
 
-        virtual void Update(const uint32&);
+        virtual void Update(uint32 time_, uint32 diff);
 
         void MessageBroadcast(Player *, WorldPacket *, bool to_self);
         void MessageBroadcast(WorldObject *, WorldPacket *);
@@ -381,7 +381,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         ~InstanceMap();
         bool Add(Player *);
         void Remove(Player *, bool);
-        void Update(const uint32&);
+        void Update(uint32 time_, uint32 diff);
         void CreateInstanceData(bool load);
         bool Reset(uint8 method);
         uint32 GetScriptId() { return i_script_id; }
@@ -406,7 +406,7 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
         BattleGroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent, uint8 spawnMode);
         ~BattleGroundMap();
 
-        void Update(const uint32&);
+        void Update(uint32 time_, uint32 diff);
         bool Add(Player *);
         void Remove(Player *, bool);
         bool CanEnter(Player* player);
