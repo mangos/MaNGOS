@@ -6623,15 +6623,8 @@ SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, Ski
  */
 void Spell::FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster /*=NULL*/)
 {
-    CellPair p(MaNGOS::ComputeCellPair(x, y));
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
     MaNGOS::SpellNotifierCreatureAndPlayer notifier(*this, targetUnitMap, radius, pushType, spellTargets, originalCaster);
-    TypeContainerVisitor<MaNGOS::SpellNotifierCreatureAndPlayer, WorldTypeMapContainer > world_notifier(notifier);
-    TypeContainerVisitor<MaNGOS::SpellNotifierCreatureAndPlayer, GridTypeMapContainer > grid_notifier(notifier);
-    cell.Visit(p, world_notifier, *m_caster->GetMap(), *m_caster, radius);
-    cell.Visit(p, grid_notifier, *m_caster->GetMap(), *m_caster, radius);
+    Cell::VisitAllObjects(x, y, m_caster->GetMap(), notifier, radius);
 }
 
 void Spell::FillRaidOrPartyTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster)
