@@ -1191,10 +1191,10 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadGameTele();
 
     sLog.outString( "Loading Npc Text Id..." );
-    sObjectMgr.LoadNpcTextId();                                 // must be after load Creature and NpcText
+    sObjectMgr.LoadNpcTextId();                             // must be after load Creature and NpcText
 
     sLog.outString( "Loading Gossip scripts..." );
-    sObjectMgr.LoadGossipScripts();                             // must be before gossip menu options
+    sObjectMgr.LoadGossipScripts();                         // must be before gossip menu options
 
     sLog.outString( "Loading Gossip menus..." );
     sObjectMgr.LoadGossipMenu();
@@ -1203,12 +1203,13 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadGossipMenuItems();
 
     sLog.outString( "Loading Vendors..." );
-    sObjectMgr.LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
+    sObjectMgr.LoadVendorTemplates();                       // must be after load ItemTemplate
+    sObjectMgr.LoadVendors();                               // must be after load CreatureTemplate, VendorTemplate, and ItemTemplate
 
     sLog.outString( "Loading Trainers..." );
-    sObjectMgr.LoadTrainerSpell();                              // must be after load CreatureTemplate
+    sObjectMgr.LoadTrainerSpell();                          // must be after load CreatureTemplate
 
-    sLog.outString( "Loading Waypoint scripts..." );            // before loading from creature_movement
+    sLog.outString( "Loading Waypoint scripts..." );        // before loading from creature_movement
     sObjectMgr.LoadCreatureMovementScripts();
 
     sLog.outString( "Loading Waypoints..." );
