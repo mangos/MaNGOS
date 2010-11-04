@@ -18704,12 +18704,31 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
     }
 
     VendorItem const* crItem = vendorslot < vCount ? vItems->GetItem(vendorslot) : tItems->GetItem(vendorslot - vCount);
-    if(!crItem || crItem->item != item)                     // store diff item (cheating)
+    if (!crItem)                                            // store diff item (cheating)
     {
         SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
         return false;
     }
 
+    if (crItem->item != item)                               // store diff item (cheating or special convert)
+    {
+        ItemPrototype const* crProto = ObjectMgr::GetItemPrototype(crItem->item);
+        // possible item coverting for BoA case
+        if (crProto->Flags & ITEM_FLAG_BOA)
+        {
+            // convert if can use and then buy
+            if (crProto->RequiredReputationFaction && uint32(GetReputationRank(crProto->RequiredReputationFaction)) >= crProto->RequiredReputationRank)
+            {
+                uint32 newitemid = sObjectMgr.GetItemConvert(crItem->item, getRaceMask());
+
+                if (newitemid != item)                      // store diff item (cheating or special convert)
+                {
+                    SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
+                    return false;
+                }
+            }
+        }
+    }
 
     // check current item amount if it limited
     if (crItem->maxcount != 0)

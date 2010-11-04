@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10679_02_mangos_creature_template` bit(1) default NULL
+  `required_10682_01_mangos_item_convert` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2141,6 +2141,26 @@ CREATE TABLE `instance_template` (
 LOCK TABLES `instance_template` WRITE;
 /*!40000 ALTER TABLE `instance_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `instance_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `item_convert`
+--
+
+DROP TABLE IF EXISTS `item_convert`;
+CREATE TABLE `item_convert` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Npc System';
+
+--
+-- Dumping data for table `item_convert`
+--
+
+LOCK TABLES `item_convert` WRITE;
+/*!40000 ALTER TABLE `item_convert` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_convert` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
