@@ -33,20 +33,15 @@ Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
 
 void Totem::Update(uint32 update_diff, uint32 tick_diff)
 {
-    if (update_diff > m_duration)
-        update_diff = tick_diff;
-
     Unit *owner = GetOwner();
     if (!owner || !owner->isAlive() || !isAlive())
     {
-        DEBUG_LOG("Totem %d lost owner, removed.", GetObjectGuid().GetCounter());
         UnSummon();                                         // remove self
         return;
     }
 
     if (m_duration <= update_diff)
     {
-        DEBUG_LOG("Totem %d removed by duration %d expired (diff = %d).", GetObjectGuid().GetCounter(), m_duration, update_diff);
         UnSummon();                                         // remove self
         return;
     }
