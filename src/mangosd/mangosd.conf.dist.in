@@ -845,6 +845,7 @@ SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
 PetUnsummonAtMount = 1
+AllowFlightOnOldMaps = 0
 ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
