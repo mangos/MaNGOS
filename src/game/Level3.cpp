@@ -946,6 +946,11 @@ bool ChatHandler::HandleReloadNpcTrainerCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadNpcVendorCommand(char* /*args*/)
 {
+    // not safe reload vendor template tables independent...
+    sLog.outString( "Re-Loading `npc_vendor_template` Table!" );
+    sObjectMgr.LoadVendorTemplates();
+    SendGlobalSysMessage("DB table `npc_vendor_template` reloaded.");
+
     sLog.outString( "Re-Loading `npc_vendor` Table!" );
     sObjectMgr.LoadVendors();
     SendGlobalSysMessage("DB table `npc_vendor` reloaded.");
