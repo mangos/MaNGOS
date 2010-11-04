@@ -34,99 +34,6 @@ inline Cell::Cell(CellPair const& p)
     data.Part.reserved = 0;
 }
 
-template<class T, class CONTAINER>
-inline void
-Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m) const
-{
-    if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
-        return;
-
-    uint16 district = (District)this->data.Part.reserved;
-    if(district == CENTER_DISTRICT)
-    {
-        m.Visit(*this, visitor);
-        return;
-    }
-
-    // set up the cell range based on the district
-    // the overloaded operators handle range checking
-    CellPair begin_cell = standing_cell;
-    CellPair end_cell = standing_cell;
-
-    switch( district )
-    {
-        case ALL_DISTRICT:
-        {
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            end_cell >> 1; end_cell += 1;                   // lower right
-            break;
-        }
-        case UPPER_LEFT_DISTRICT:
-        {
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            break;
-        }
-        case UPPER_RIGHT_DISTRICT:
-        {
-            begin_cell -= 1;                                // up
-            end_cell >> 1;                                  // right
-            break;
-        }
-        case LOWER_LEFT_DISTRICT:
-        {
-            begin_cell << 1;                                // left
-            end_cell += 1;                                  // down
-            break;
-        }
-        case LOWER_RIGHT_DISTRICT:
-        {
-            end_cell >> 1; end_cell += 1;                   // lower right
-            break;
-        }
-        case LEFT_DISTRICT:
-        {
-            begin_cell -= 1;                                // up
-            end_cell >> 1; end_cell += 1;                   // lower right
-            break;
-        }
-        case RIGHT_DISTRICT:
-        {
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            end_cell += 1;                                  // down
-            break;
-        }
-        case UPPER_DISTRICT:
-        {
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            end_cell >> 1;                                  // right
-            break;
-        }
-        case LOWER_DISTRICT:
-        {
-            begin_cell << 1;                                // left
-            end_cell >> 1; end_cell += 1;                   // lower right
-            break;
-        }
-        default:
-        {
-            MANGOS_ASSERT( false );
-            break;
-        }
-    }
-
-    // loop the cell range
-    for(uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; x++)
-    {
-        for(uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; y++)
-        {
-            CellPair cell_pair(x,y);
-            Cell r_zone(cell_pair);
-            r_zone.data.Part.nocreate = data.Part.nocreate;
-            m.Visit(r_zone, visitor);
-        }
-    }
-}
-
 inline int CellHelper(const float radius)
 {
     if(radius < 1.0f)
@@ -135,18 +42,15 @@ inline int CellHelper(const float radius)
     return (int)ceilf(radius/SIZE_OF_GRID_CELL);
 }
 
-inline CellArea Cell::CalculateCellArea(const WorldObject &obj, float radius)
+inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
 {
     if(radius <= 0.0f)
         return CellArea();
 
-    //we should increase search radius by object's radius, otherwise
-    //we could have problems with huge creatures, which won't attack nearest players etc
-    radius += obj.GetObjectBoundingRadius();
     //lets calculate object coord offsets from cell borders.
     //TODO: add more correct/generic method for this task
-    const float x_offset = (obj.GetPositionX() - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
-    const float y_offset = (obj.GetPositionY() - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
+    const float x_offset = (x - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
+    const float y_offset = (y - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
 
     const float x_val = floor(x_offset + CENTER_GRID_CELL_ID + 0.5f);
     const float y_val = floor(y_offset + CENTER_GRID_CELL_ID + 0.5f);
@@ -166,7 +70,15 @@ inline CellArea Cell::CalculateCellArea(const WorldObject &obj, float radius)
 
 template<class T, class CONTAINER>
 inline void
-Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject &obj, float radius) const
+Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject& obj, float radius) const
+{
+    Cell::Visit(standing_cell, visitor, m, obj.GetPositionX(), obj.GetPositionY(), radius + obj.GetObjectBoundingRadius());
+}
+
+
+template<class T, class CONTAINER>
+inline void
+Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, float x, float y, float radius) const
 {
     if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
         return;
@@ -184,7 +96,7 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
         radius = 333.0f;
 
     //lets calculate object coord offsets from cell borders.
-    CellArea area = Cell::CalculateCellArea(obj, radius);
+    CellArea area = Cell::CalculateCellArea(x, y, radius);
     //if radius fits inside standing cell
     if(!area)
     {
@@ -313,6 +225,41 @@ inline void Cell::VisitAllObjects(const WorldObject *center_obj, T &visitor, flo
     TypeContainerVisitor<T, WorldTypeMapContainer > wnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
+}
+
+template<class T>
+inline void Cell::VisitGridObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+{
+    CellPair p(MaNGOS::ComputeCellPair(x, y));
+    Cell cell(p);
+    if (dont_load)
+        cell.SetNoCreate();
+    TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
+    cell.Visit(p, gnotifier, *map, x, y, radius);
+}
+
+template<class T>
+inline void Cell::VisitWorldObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+{
+    CellPair p(MaNGOS::ComputeCellPair(x, y));
+    Cell cell(p);
+    if (dont_load)
+        cell.SetNoCreate();
+    TypeContainerVisitor<T, WorldTypeMapContainer > gnotifier(visitor);
+    cell.Visit(p ,gnotifier, *map, x, y, radius);
+}
+
+template<class T>
+inline void Cell::VisitAllObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+{
+    CellPair p(MaNGOS::ComputeCellPair(x, y));
+    Cell cell(p);
+    if (dont_load)
+        cell.SetNoCreate();
+    TypeContainerVisitor<T, GridTypeMapContainer > gnotifier(visitor);
+    TypeContainerVisitor<T, WorldTypeMapContainer > wnotifier(visitor);
+    cell.Visit(p, gnotifier, *map, x, y, radius);
+    cell.Visit(p, wnotifier, *map, x, y, radius);
 }
 
 #endif
