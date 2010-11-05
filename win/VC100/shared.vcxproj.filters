@@ -51,6 +51,9 @@
     <ClCompile Include="..\..\src\shared\Log.cpp">
       <Filter>Log</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\DelayExecutor.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\MemoryLeaks.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -159,6 +162,9 @@
       <Filter>Log</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\shared\ByteBuffer.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shared\DelayExecutor.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Errors.h">
