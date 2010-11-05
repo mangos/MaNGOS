@@ -74,6 +74,12 @@ INSERT INTO `spell_pet_auras` VALUES
 (0,0,37994,34947),
 (0,0,37994,34956);
 
+-- Mage water elemental (old guardian)
+DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 510;
+INSERT INTO `spell_pet_auras` VALUES
+(0,0,510,34947),
+(0,0,510,34956);
+
 -- Mage mirror image
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 31216;
 INSERT INTO `spell_pet_auras` VALUES
