@@ -1,0 +1,10 @@
+-- Data for commit 10682
+-- from jethro84530
+INSERT IGNORE INTO item_convert VALUES ('50335', '44133');
+INSERT IGNORE INTO item_convert VALUES ('50370', '44152');
+INSERT IGNORE INTO item_convert VALUES ('50367', '44149');
+INSERT IGNORE INTO item_convert VALUES ('50368', '44159');
+INSERT IGNORE INTO item_convert VALUES ('50369', '44150');
+INSERT IGNORE INTO item_convert VALUES ('50372', '44171');
+INSERT IGNORE INTO item_convert VALUES ('50336', '44134');
+INSERT IGNORE INTO item_convert VALUES ('50338', '44135');
