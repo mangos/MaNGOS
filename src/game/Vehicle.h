@@ -36,6 +36,7 @@ class Vehicle : public Creature
         bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
+        void Update(uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
 
         uint32 GetVehicleId() { return m_vehicleId; }
         void SetVehicleId(uint32 vehicleid) { m_vehicleId = vehicleid; }
@@ -43,8 +44,6 @@ class Vehicle : public Creature
         void Dismiss();
 
     protected:
-        void Update(uint32 update_diff, uint32 tick_diff);  // overwrite virtual Creature::Update and Unit::Update
-
         uint32 m_vehicleId;
 
     private:

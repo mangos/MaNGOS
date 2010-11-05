@@ -239,17 +239,17 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
 }
 
 void
-MapManager::Update(const uint32 time_, const uint32 diff)
+MapManager::Update(uint32 diff)
 {
     i_timer.Update(diff);
     if( !i_timer.Passed() )
         return;
 
     for(MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
-        iter->second->Update(time_, (uint32)i_timer.GetCurrent());
+        iter->second->Update((uint32)i_timer.GetCurrent());
 
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
-        (*iter)->UpdateCall(time_, (uint32)i_timer.GetCurrent());
+        (*iter)->Update((uint32)i_timer.GetCurrent());
 
     i_timer.SetCurrent(0);
 }
