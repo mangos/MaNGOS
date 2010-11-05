@@ -291,7 +291,7 @@ Unit::~Unit()
     MANGOS_ASSERT(m_deletedHolders.size() == 0);
 }
 
-void Unit::Update(uint32 update_diff, uint32 tick_diff)
+void Unit::Update( uint32 p_time )
 {
     if(!IsInWorld())
         return;
@@ -306,21 +306,21 @@ void Unit::Update(uint32 update_diff, uint32 tick_diff)
     // WARNING! Order of execution here is important, do not change.
     // Spells must be processed with event system BEFORE they go to _UpdateSpells.
     // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
-    m_Events.Update(update_diff);
-    _UpdateSpells(update_diff);
+    m_Events.Update( p_time );
+    _UpdateSpells( p_time );
 
     CleanupDeletedAuras();
 
     if (m_lastManaUseTimer)
     {
-        if (update_diff >= m_lastManaUseTimer)
+        if (p_time >= m_lastManaUseTimer)
             m_lastManaUseTimer = 0;
         else
-            m_lastManaUseTimer -= update_diff;
+            m_lastManaUseTimer -= p_time;
     }
 
     if (CanHaveThreatList())
-        getThreatManager().UpdateForClient(update_diff);
+        getThreatManager().UpdateForClient(p_time);
 
     // update combat timer only for players and pets
     if (isInCombat() && (GetTypeId() == TYPEID_PLAYER || ((Creature*)this)->IsPet() || ((Creature*)this)->isCharmed()))
@@ -331,24 +331,26 @@ void Unit::Update(uint32 update_diff, uint32 tick_diff)
         if (m_HostileRefManager.isEmpty())
         {
             // m_CombatTimer set at aura start and it will be freeze until aura removing
-            if (m_CombatTimer <= update_diff)
+            if (m_CombatTimer <= p_time)
                 CombatStop();
             else
-                m_CombatTimer -= update_diff;
+                m_CombatTimer -= p_time;
         }
     }
 
     if (uint32 base_att = getAttackTimer(BASE_ATTACK))
-        setAttackTimer(BASE_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff) );
+    {
+        setAttackTimer(BASE_ATTACK, (p_time >= base_att ? 0 : base_att - p_time) );
+    }
 
     // update abilities available only for fraction of time
-    UpdateReactives(update_diff);
+    UpdateReactives( p_time );
 
     ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth()*0.20f);
     ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, GetHealth() < GetMaxHealth()*0.35f);
     ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, GetHealth() > GetMaxHealth()*0.75f);
 
-    i_motionMaster.UpdateMotion(tick_diff);                 // movegens expected non freeze time diff
+    i_motionMaster.UpdateMotion(p_time);
 }
 
 bool Unit::haveOffhandWeapon() const
