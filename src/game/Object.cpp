@@ -106,14 +106,10 @@ void WorldObject::UpdateCall(uint32 newtime, uint32 diff)
 {
     // use real time diff from last object update call
     // this can have big diff from tick diff time for object returning to active zone)
-    int32 realDiff = getMSTimeDiff(m_lastUpdateTime, newtime);
-
-    if ( realDiff < 0)
-        realDiff = 0;
-
+    uint32 realDiff = getMSTimeDiff(m_lastUpdateTime, newtime);
     m_lastUpdateTime = newtime;
 
-    Update(uint32(realDiff), diff);
+    Update(realDiff, diff);
 }
 
 void Object::SetObjectScale(float newScale)
