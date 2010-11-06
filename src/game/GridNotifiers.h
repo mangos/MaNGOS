@@ -61,13 +61,14 @@ namespace MaNGOS
     struct MANGOS_DLL_DECL GridUpdater
     {
         GridType &i_grid;
+        uint32 i_realdiff;
         uint32 i_timeDiff;
-        GridUpdater(GridType &grid, uint32 diff) : i_grid(grid), i_timeDiff(diff) {}
+        GridUpdater(GridType &grid, uint32 realdiff, uint32 diff) : i_grid(grid), i_realdiff(realdiff), i_timeDiff(diff) {}
 
         template<class T> void updateObjects(GridRefManager<T> &m)
         {
             for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
-                iter->getSource()->Update(i_timeDiff);
+                iter->getSource()->Update(i_realdiff, i_timeDiff);
         }
 
         void Visit(PlayerMapType &m) { updateObjects<Player>(m); }
@@ -136,8 +137,9 @@ namespace MaNGOS
 
     struct MANGOS_DLL_DECL ObjectUpdater
     {
-        uint32 i_timeDiff;
-        explicit ObjectUpdater(const uint32 &diff) : i_timeDiff(diff) {}
+        uint32 i_realdiff;                                  // time from last update in msecs 
+        uint32 i_diff;                                      // current tick time diff in msecs 
+        explicit ObjectUpdater(uint32 realdiff, uint32 diff) : i_realdiff(realdiff), i_diff(diff) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
         void Visit(CorpseMapType &) {}

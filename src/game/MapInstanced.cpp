@@ -43,24 +43,24 @@ void MapInstanced::InitVisibilityDistance()
     }
 }
 
-void MapInstanced::Update(const uint32& t)
+void MapInstanced::Update(uint32 time_, uint32 diff)
 {
     // take care of loaded GridMaps (when unused, unload it!)
-    Map::Update(t);
+    Map::Update(time_, diff);
 
     // update the instanced maps
     InstancedMaps::iterator i = m_InstancedMaps.begin();
 
     while (i != m_InstancedMaps.end())
     {
-        if(i->second->CanUnload(t))
+        if(i->second->CanUnload(diff))
         {
             DestroyInstance(i);                             // iterator incremented
         }
         else
         {
             // update only here, because it may schedule some bad things before delete
-            i->second->Update(t);
+            i->second->Update(time_, diff);
             ++i;
         }
     }
