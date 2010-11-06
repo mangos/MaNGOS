@@ -7197,13 +7197,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         //}
                     }
 
-                    if (spellId && m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->HasSpellCooldown(spellId))
-                    {
+                    if (spellId)
                         m_caster->CastCustomSpell(target, spellId, &basePoint, 0, 0, false);
- 
-                        if (spellId == 53359) // Disarm from Chimera Shot should have 1 min cooldown
-                            ((Player*)m_caster)->AddSpellCooldown(spellId, 0, uint32(time(NULL) + MINUTE));
-                    }
 
                     return;
                 }
