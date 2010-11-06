@@ -358,6 +358,8 @@ class MANGOS_DLL_SPEC Item : public Object
 
         void SetLootState(ItemLootUpdateState state);
         bool HasGeneratedLoot() const { return m_lootState != ITEM_LOOT_NONE && m_lootState != ITEM_LOOT_REMOVED; }
+        bool HasTemporaryLoot() const { return m_lootState == ITEM_LOOT_TEMPORARY; }
+
         bool HasSavedLoot() const { return m_lootState != ITEM_LOOT_NONE && m_lootState != ITEM_LOOT_NEW && m_lootState != ITEM_LOOT_TEMPORARY; }
 
         // Update States
