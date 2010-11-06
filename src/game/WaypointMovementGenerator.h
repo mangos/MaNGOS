@@ -99,7 +99,7 @@ public PathMovementBase<Creature, WaypointPath const*>
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
-        TimeTrackerSmall i_nextMoveTime;
+        ShortTimeTracker i_nextMoveTime;
         bool m_isArrivalDone;
         bool m_isStoppedByPlayer;
 };

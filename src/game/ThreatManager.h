@@ -215,7 +215,7 @@ class MANGOS_DLL_SPEC ThreatManager
     private:
         HostileReference* iCurrentVictim;
         Unit* iOwner;
-        TimeTrackerSmall iUpdateTimer;
+        ShortTimeTracker iUpdateTimer;
         bool iUpdateNeed;
         ThreatContainer iThreatContainer;
         ThreatContainer iThreatOfflineContainer;

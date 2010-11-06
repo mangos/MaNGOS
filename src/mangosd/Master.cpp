@@ -76,32 +76,17 @@ public:
             uint32 curtime = getMSTime();
             //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
 
-            // There is no Master anymore
-            // TODO: clear the rest of the code
-//            // normal work
-//            if(m_loops != Master::m_masterLoopCounter)
-//            {
-//                m_lastchange = curtime;
-//                m_loops = Master::m_masterLoopCounter;
-//            }
-//            // possible freeze
-//            else if(getMSTimeDiff(m_lastchange,curtime) > _delaytime)
-//            {
-//                sLog.outError("Main/Sockets Thread hangs, kicking out server!");
-//                *((uint32 volatile*)NULL) = 0;                       // bang crash
-//            }
-
             // normal work
-            if(w_loops != World::m_worldLoopCounter)
+            if (w_loops != World::m_worldLoopCounter)
             {
                 w_lastchange = curtime;
                 w_loops = World::m_worldLoopCounter;
             }
             // possible freeze
-            else if(getMSTimeDiff(w_lastchange,curtime) > _delaytime)
+            else if (getMSTimeDiff(w_lastchange, curtime) > _delaytime)
             {
                 sLog.outError("World Thread hangs, kicking out server!");
-                *((uint32 volatile*)NULL) = 0;                       // bang crash
+                *((uint32 volatile*)NULL) = 0;              // bang crash
             }
         }
         sLog.outString("Anti-freeze thread exiting without problems.");
