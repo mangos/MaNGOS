@@ -108,7 +108,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         template<class T> void Add(T *);
         template<class T> void Remove(T *, bool);
 
-        virtual void Update(const uint32&);
+        virtual void Update(uint32 time_, uint32 diff);
 
         void MessageBroadcast(Player *, WorldPacket *, bool to_self);
         void MessageBroadcast(WorldObject *, WorldPacket *);
@@ -270,6 +270,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 GenerateLocalLowGuid(HighGuid guidhigh);
         bool GetAreaInfo(float x, float y, float z, uint32 &mogpflags, int32 &adtId, int32 &rootId, int32 &groupId) const;
         bool IsOutdoors(float x, float y, float z) const;
+
+        uint32 GetLastUpdateTime() const { return m_lastUpdateTime; }
     private:
         void LoadMapAndVMap(int gx, int gy);
         void LoadVMap(int gx, int gy);
@@ -346,6 +348,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         std::set<WorldObject *> i_objectsToRemove;
         std::multimap<time_t, ScriptAction> m_scriptSchedule;
 
+        uint32 m_lastUpdateTime;                            // time in past when called Update last time, set to object at adding to Map
+
         // Map local low guid counters
         ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
         ObjectGuidGenerator<HIGHGUID_PET> m_PetGuids;
@@ -382,7 +386,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         ~InstanceMap();
         bool Add(Player *);
         void Remove(Player *, bool);
-        void Update(const uint32&);
+        void Update(uint32 time_, uint32 diff);
         void CreateInstanceData(bool load);
         bool Reset(uint8 method);
         uint32 GetScriptId() { return i_script_id; }
@@ -407,7 +411,7 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
         BattleGroundMap(uint32 id, time_t, uint32 InstanceId, Map* _parent, uint8 spawnMode);
         ~BattleGroundMap();
 
-        void Update(const uint32&);
+        void Update(uint32 time_, uint32 diff);
         bool Add(Player *);
         void Remove(Player *, bool);
         bool CanEnter(Player* player);

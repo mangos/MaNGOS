@@ -117,12 +117,20 @@ class MANGOS_DLL_DECL Grid
             return i_container.template remove<SPECIFIC_OBJECT>(obj);
         }
 
+        uint32 SetLastUpdateTimeAndReturnDiff(uint32 newtime)
+        {
+            uint32 realdiff = getMSTimeDiff(m_LastUpdateTime,newtime);
+            m_LastUpdateTime = newtime;
+            return realdiff;
+        }
+
     private:
 
         TypeMapContainer<GRID_OBJECT_TYPES> i_container;
         TypeMapContainer<WORLD_OBJECT_TYPES> i_objects;
         typedef std::set<void*> ActiveGridObjects;
         ActiveGridObjects m_activeGridObjects;
+        uint32 m_LastUpdateTime;                            // last time when Update call has been or current started, used and set Map::Update
 };
 
 #endif
