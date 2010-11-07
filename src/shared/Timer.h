@@ -19,31 +19,14 @@
 #ifndef MANGOS_TIMER_H
 #define MANGOS_TIMER_H
 
-#include "Platform/CompilerDefs.h"
+#include "Common.h"
+#include <ace/OS_NS_sys_time.h>
 
-#if PLATFORM == PLATFORM_WINDOWS
-#   include <ace/config-all.h>
-#   include <mmsystem.h>
-#   include <time.h>
-#else
-# if defined(__APPLE_CC__)
-#   include <time.h>
-# endif
-#   include <sys/time.h>
-#   include <sys/timeb.h>
-#endif
-
-#if PLATFORM == PLATFORM_WINDOWS
-inline uint32 getMSTime() { return GetTickCount(); }
-#else
 inline uint32 getMSTime()
 {
-    struct timeval tv;
-    struct timezone tz;
-    gettimeofday( &tv, &tz );
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+    static const ACE_Time_Value ApplicationStartTime = ACE_OS::gettimeofday();
+    return (ACE_OS::gettimeofday() - ApplicationStartTime).msec();
 }
-#endif
 
 inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
 {
