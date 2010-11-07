@@ -117,12 +117,8 @@ class MANGOS_DLL_DECL Grid
             return i_container.template remove<SPECIFIC_OBJECT>(obj);
         }
 
-        uint32 SetLastUpdateTimeAndReturnDiff(uint32 newtime)
-        {
-            uint32 realdiff = getMSTimeDiff(m_LastUpdateTime,newtime);
-            m_LastUpdateTime = newtime;
-            return realdiff;
-        }
+        uint32 GetLastUpdateTime() const { return m_LastUpdateTime; }
+        void SetLastUpdateTime(uint32 newtime) { m_LastUpdateTime = newtime; }
 
     private:
 
