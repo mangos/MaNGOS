@@ -6464,8 +6464,8 @@ bool ChatHandler::HandleAccountSetAddonCommand(char* args)
         return false;
 
     // No SQL injection
-    LoginDatabase.PExecute("UPDATE account SET expansion = '%d' WHERE id = '%u'",lev,account_id);
-    PSendSysMessage(LANG_ACCOUNT_SETADDON,account_name.c_str(),account_id,lev);
+    LoginDatabase.PExecute("UPDATE account SET expansion = '%u' WHERE id = '%u'", lev, account_id);
+    PSendSysMessage(LANG_ACCOUNT_SETADDON,account_name.c_str(), account_id, lev);
     return true;
 }
 
