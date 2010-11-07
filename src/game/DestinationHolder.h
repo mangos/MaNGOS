@@ -30,7 +30,7 @@ class Map;
 template<typename TRAVELLER>
 class MANGOS_DLL_DECL DestinationHolder
 {
-    TimeTrackerSmall i_tracker;
+    ShortTimeTracker i_tracker;
     uint32 i_totalTravelTime;
     uint32 i_timeElapsed;
     bool i_destSet;

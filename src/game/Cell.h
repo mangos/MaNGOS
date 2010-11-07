@@ -78,6 +78,8 @@ struct MANGOS_DLL_DECL Cell
     bool NoCreate() const { return data.Part.nocreate; }
     void SetNoCreate() { data.Part.nocreate = 1; }
 
+    GridPair gridPair() const { return GridPair(GridX(),GridY()); }
+
     CellPair cellPair() const
     {
         return CellPair(

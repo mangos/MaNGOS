@@ -255,16 +255,16 @@ MapManager::Update(const uint32 time_, const uint32 diff)
     for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
     {
         if (m_updater.activated())
-            m_updater.schedule_update(*iter->second, time_, (uint32)i_timer.GetCurrent());
+            m_updater.schedule_update(*iter->second, time_, i_timer.GetCurrent());
         else
-            iter->second->Update(time_, (uint32)i_timer.GetCurrent());
+            iter->second->Update(time_, i_timer.GetCurrent());
     }
 
     if (m_updater.activated())
         m_updater.wait();
 
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
-        (*iter)->UpdateCall(time_, (uint32)i_timer.GetCurrent());
+        (*iter)->Update(i_timer.GetCurrent(), i_timer.GetCurrent());
 
     i_timer.SetCurrent(0);
 }

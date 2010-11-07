@@ -44,7 +44,7 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
 
         bool GetResetPosition(T&, float& x, float& y, float& z);
     private:
-        TimeTrackerSmall i_nextMoveTime;
+        ShortTimeTracker i_nextMoveTime;
 
         DestinationHolder< Traveller<T> > i_destinationHolder;
         uint32 i_nextMove;

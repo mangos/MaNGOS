@@ -131,7 +131,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode, Map* _par
   i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
   m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), m_instanceSave(NULL),
   m_activeNonPlayersIter(m_activeNonPlayers.end()),
-  i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this)
+  i_gridExpiry(expiry), m_parentMap(_parent ? _parent : this),
+  m_lastUpdateTime(getMSTime())                             // expected that next update call will not long after map creating
 {
     for(unsigned int idx=0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
@@ -512,20 +513,16 @@ bool Map::loaded(const GridPair &p) const
 
 void Map::Update(uint32 time_, uint32 diff)
 {
+    m_lastUpdateTime = time_;
+
     /// update players at tick
     for(m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
         if (Player* plr = m_mapRefIter->getSource())
             if (plr->IsInWorld())
-                plr->UpdateCall(time_, diff);
+                plr->Update(diff, diff);
 
     /// update active cells around players and active objects
     resetMarkedCells();
-
-    MaNGOS::ObjectUpdater updater(time_, diff);
-    // for creature
-    TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
-    // for pets
-    TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
 
     // the player iterator is stored in the map object
     // to make sure calls to Map::Remove don't invalidate it
@@ -559,9 +556,21 @@ void Map::Update(uint32 time_, uint32 diff)
                 if(!isCellMarked(cell_id))
                 {
                     markCell(cell_id);
+
                     CellPair pair(x,y);
                     Cell cell(pair);
                     cell.SetNoCreate();
+
+                    uint32 realdiff = diff;
+                    if (loaded(cell.gridPair()) )
+                        realdiff = (*getNGrid(cell.GridX(),cell.GridY()))(cell.CellX(),cell.CellY()).SetLastUpdateTimeAndReturnDiff(time_);
+
+                    MaNGOS::ObjectUpdater updater(realdiff, diff);
+                    // for creature
+                    TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
+                    // for pets
+                    TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
+
                     Visit(cell, grid_object_update);
                     Visit(cell, world_object_update);
                 }
@@ -606,9 +615,21 @@ void Map::Update(uint32 time_, uint32 diff)
                     if(!isCellMarked(cell_id))
                     {
                         markCell(cell_id);
+
                         CellPair pair(x,y);
                         Cell cell(pair);
                         cell.SetNoCreate();
+
+                        uint32 realdiff = diff;
+                        if (loaded(cell.gridPair()) )
+                            realdiff = (*getNGrid(cell.GridX(),cell.GridY()))(cell.CellX(),cell.CellY()).SetLastUpdateTimeAndReturnDiff(time_);
+
+                        MaNGOS::ObjectUpdater updater(realdiff, diff);
+                        // for creature
+                        TypeContainerVisitor<MaNGOS::ObjectUpdater, GridTypeMapContainer  > grid_object_update(updater);
+                        // for pets
+                        TypeContainerVisitor<MaNGOS::ObjectUpdater, WorldTypeMapContainer > world_object_update(updater);
+
                         Visit(cell, grid_object_update);
                         Visit(cell, world_object_update);
                     }
