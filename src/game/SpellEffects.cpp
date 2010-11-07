@@ -1820,17 +1820,36 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 54586, true);
                     return;
                 }
-                case 53475:                                 // Reputation spells
-                case 53487:
-                case 54015:
+                case 53475:                                 // Set Oracle Faction Friendly
+                case 53487:                                 // Set Wolvar Faction Honored
+                case 54015:                                 // Set Oracle Faction Honored
                 {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(m_spellInfo->EffectBasePoints[EFFECT_INDEX_0]+1))
-                        ((Player*)unitTarget)->GetReputationMgr().ModifyReputation(factionEntry, m_spellInfo->EffectBasePoints[EFFECT_INDEX_1]+1);
+                    switch(eff_idx)
+                    {
+                        case EFFECT_INDEX_0:
+                        {
+                            Player* pPlayer = (Player*)m_caster;
 
-                    finish();
+                            uint32 faction_id = m_currentBasePoints[eff_idx];
+                            int32  rep_change = m_currentBasePoints[EFFECT_INDEX_1];
+
+                            FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
+
+                            if (!factionEntry)
+                                return;
+
+                            // set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
+                            pPlayer->GetReputationMgr().SetReputation(factionEntry, rep_change);
+                            break;
+                        }
+                        case EFFECT_INDEX_2:
+                            // unclear what this effect is for.
+                            break;
+                    }
+
                     return;
                 }
                 case 53808:                                 // Pygmy Oil
