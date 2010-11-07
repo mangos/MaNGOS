@@ -563,7 +563,11 @@ void Map::Update(uint32 time_, uint32 diff)
 
                     uint32 realdiff = diff;
                     if (loaded(cell.gridPair()) )
-                        realdiff = (*getNGrid(cell.GridX(),cell.GridY()))(cell.CellX(),cell.CellY()).SetLastUpdateTimeAndReturnDiff(time_);
+                    {
+                        GridType& celldata = (*getNGrid(cell.GridX(), cell.GridY()))(cell.CellX(), cell.CellY());
+                        uint32 realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
+                        celldata.SetLastUpdateTime(time_);
+                    }
 
                     MaNGOS::ObjectUpdater updater(realdiff, diff);
                     // for creature
@@ -622,7 +626,11 @@ void Map::Update(uint32 time_, uint32 diff)
 
                         uint32 realdiff = diff;
                         if (loaded(cell.gridPair()) )
-                            realdiff = (*getNGrid(cell.GridX(),cell.GridY()))(cell.CellX(),cell.CellY()).SetLastUpdateTimeAndReturnDiff(time_);
+                        {
+                            GridType& celldata = (*getNGrid(cell.GridX(), cell.GridY()))(cell.CellX(), cell.CellY());
+                            uint32 realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
+                            celldata.SetLastUpdateTime(time_);
+                        }
 
                         MaNGOS::ObjectUpdater updater(realdiff, diff);
                         // for creature
