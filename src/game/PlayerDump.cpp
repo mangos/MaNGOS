@@ -423,7 +423,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
     bool incHighest = true;
     if (guid != 0 && guid < sObjectMgr.m_CharGuids.GetNextAfterMaxUsed())
     {
-        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE guid = '%d'", guid);
+        result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE guid = '%u'", guid);
         if (result)
         {
             guid = sObjectMgr.m_CharGuids.GetNextAfterMaxUsed();
