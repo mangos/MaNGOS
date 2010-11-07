@@ -2153,7 +2153,7 @@ void Player::Regenerate(Powers power, uint32 diff)
                     uint32 cd_diff = diff;
                     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
                     for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-                        if ((*i)->GetModifier()->m_miscvalue == power && (*i)->GetMiscBValue()==GetCurrentRune(rune))
+                        if ((*i)->GetModifier()->m_miscvalue == int32(power) && (*i)->GetMiscBValue()==GetCurrentRune(rune))
                             cd_diff = cd_diff * ((*i)->GetModifier()->m_amount + 100) / 100;
 
                     SetRuneCooldown(rune, (cd < cd_diff) ? 0 : cd - cd_diff);
@@ -2188,7 +2188,7 @@ void Player::Regenerate(Powers power, uint32 diff)
     {
         AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
         for(AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if ((*i)->GetModifier()->m_miscvalue == power)
+            if ((*i)->GetModifier()->m_miscvalue == int32(power))
                 addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
     }
 
@@ -3563,8 +3563,8 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
             if (!pSkill)
                 continue;
 
-            if(_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL &&
-                pSkill->categoryId != SKILL_CATEGORY_CLASS ||// not unlearn class skills (spellbook/talent pages)
+            if ((_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL &&
+                pSkill->categoryId != SKILL_CATEGORY_CLASS) ||// not unlearn class skills (spellbook/talent pages)
                 // lockpicking/runeforging special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
                 ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->max_value == 0))
             {
@@ -5290,6 +5290,8 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
             ApplyCastTimePercentMod(RatingChange,apply);
             break;
         }
+        default:
+            break;
     }
 
     UpdateRating(cr);
@@ -6416,7 +6418,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
 
     percent += rep > 0 ? repMod : -repMod;
 
-    float rate = 1.0f;
+    float rate;
     switch (source)
     {
         case REPUTATION_SOURCE_KILL:
@@ -6424,6 +6426,10 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
             break;
         case REPUTATION_SOURCE_QUEST:
             rate = sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_LOWLEVEL_QUEST);
+            break;
+        case REPUTATION_SOURCE_SPELL:
+        default:
+            rate = 1.0f;
             break;
     }
 
@@ -9703,7 +9709,7 @@ uint8 Player::_CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountV
                 return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
             // prevent cheating
-            if (slot >= BUYBACK_SLOT_START && slot < BUYBACK_SLOT_END || slot >= PLAYER_SLOT_END)
+            if ((slot >= BUYBACK_SLOT_START && slot < BUYBACK_SLOT_END) || slot >= PLAYER_SLOT_END)
                 return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
         }
         else
@@ -13516,7 +13522,7 @@ bool Player::IsCurrentQuest( uint32 quest_id ) const
     if (itr == mQuestStatus.end())
         return false;
 
-    return itr->second.m_status == QUEST_STATUS_INCOMPLETE || itr->second.m_status == QUEST_STATUS_COMPLETE && !itr->second.m_rewarded;
+    return itr->second.m_status == QUEST_STATUS_INCOMPLETE || (itr->second.m_status == QUEST_STATUS_COMPLETE && !itr->second.m_rewarded);
 }
 
 Quest const* Player::GetNextQuest(ObjectGuid guid, Quest const *pQuest)
@@ -16428,8 +16434,8 @@ void Player::_LoadMailedItems(QueryResult *result)
 void Player::_LoadMails(QueryResult *result)
 {
     m_mail.clear();
-    //        0  1           2      3        4       5    6         7           8            9     10  11      12         13
-    //"SELECT id,messageType,sender,receiver,subject,body,has_items,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow()
+    //        0  1           2      3        4       5    6           7            8     9   10      11         12
+    //"SELECT id,messageType,sender,receiver,subject,body,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow()
     if(!result)
         return;
 
@@ -16443,14 +16449,13 @@ void Player::_LoadMails(QueryResult *result)
         m->receiver = fields[3].GetUInt32();
         m->subject = fields[4].GetCppString();
         m->body = fields[5].GetCppString();
-        bool has_items = fields[6].GetBool();
-        m->expire_time = (time_t)fields[7].GetUInt64();
-        m->deliver_time = (time_t)fields[8].GetUInt64();
-        m->money = fields[9].GetUInt32();
-        m->COD = fields[10].GetUInt32();
-        m->checked = fields[11].GetUInt32();
-        m->stationery = fields[12].GetUInt8();
-        m->mailTemplateId = fields[13].GetInt16();
+        m->expire_time = (time_t)fields[6].GetUInt64();
+        m->deliver_time = (time_t)fields[7].GetUInt64();
+        m->money = fields[8].GetUInt32();
+        m->COD = fields[9].GetUInt32();
+        m->checked = fields[10].GetUInt32();
+        m->stationery = fields[11].GetUInt8();
+        m->mailTemplateId = fields[12].GetInt16();
 
         if(m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
         {
@@ -16705,7 +16710,8 @@ void Player::_LoadSpells(QueryResult *result)
             // skip talents & drop unneeded data
             if(GetTalentSpellPos(spell_id))
             {
-                sLog.outError("Player::_LoadSpells: Player (GUID: %u) has talent spell in character_spell, removing it.", GetGUIDLow(), spell_id);
+                sLog.outError("Player::_LoadSpells: %s has talent spell %u in character_spell, removing it.",
+                    GetObjectGuid().GetString().c_str(), spell_id);
                 CharacterDatabase.PExecute("DELETE FROM character_spell WHERE spell = '%u'", spell_id);
                 continue;
             }
@@ -16843,14 +16849,14 @@ void Player::_LoadBoundInstances(QueryResult *result)
             if(!mapEntry || !mapEntry->IsDungeon())
             {
                 sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent or not dungeon map %d", GetName(), GetGUIDLow(), mapId);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND instance = '%u'", GetGUIDLow(), instanceId);
                 continue;
             }
 
             if(difficulty >= MAX_DIFFICULTY)
             {
                 sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND instance = '%u'", GetGUIDLow(), instanceId);
                 continue;
             }
 
@@ -16858,7 +16864,7 @@ void Player::_LoadBoundInstances(QueryResult *result)
             if(!mapDiff)
             {
                 sLog.outError("_LoadBoundInstances: player %s(%d) has bind to nonexistent difficulty %d instance for map %u", GetName(), GetGUIDLow(), difficulty, mapId);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'", GetGUIDLow(), instanceId);
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND instance = '%u'", GetGUIDLow(), instanceId);
                 continue;
             }
 
@@ -16866,7 +16872,7 @@ void Player::_LoadBoundInstances(QueryResult *result)
             {
                 sLog.outError("_LoadBoundInstances: %s is in group (Id: %d) but has a non-permanent character bind to map %d,%d,%d",
                     GetObjectGuid().GetString().c_str(), group->GetId(), mapId, instanceId, difficulty);
-                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND instance = '%d'",
+                CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND instance = '%u'",
                     GetGUIDLow(), instanceId);
                 continue;
             }
@@ -17085,7 +17091,7 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, ObjectGuid pl
 
     // the following should not get executed when changing leaders
     if(!player || has_solo)
-        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%d' AND permanent = 0", player_lowguid);
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE guid = '%u' AND permanent = 0", player_lowguid);
 }
 
 bool Player::_LoadHomeBind(QueryResult *result)
@@ -17423,7 +17429,7 @@ void Player::_SaveAuras()
                 continue;
 
             CharacterDatabase.PExecute("INSERT INTO character_aura (guid, caster_guid, item_guid, spell, stackcount, remaincharges, basepoints0, basepoints1, basepoints2, maxduration0, maxduration1, maxduration2, remaintime0, remaintime1, remaintime2, effIndexMask) VALUES "
-                "('%u', '" UI64FMTD "', '%u', '%u', '%u', '%u', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%u')",
+                "('%u', '" UI64FMTD "', '%u', '%u', '%u', '%u', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%i', '%u')",
                 GetGUIDLow(), holder->GetCasterGUID(), GUID_LOPART(holder->GetCastItemGUID()), holder->GetId(), holder->GetStackAmount(), holder->GetAuraCharges(),
                 damage[EFFECT_INDEX_0], damage[EFFECT_INDEX_1], damage[EFFECT_INDEX_2],
                 maxduration[EFFECT_INDEX_0], maxduration[EFFECT_INDEX_1], maxduration[EFFECT_INDEX_2],
@@ -17686,6 +17692,10 @@ void Player::_SaveSkills()
             case SKILL_CHANGED:
                 CharacterDatabase.PExecute("UPDATE character_skills SET value = '%u',max = '%u'WHERE guid = '%u' AND skill = '%u' ",
                     value, max, GetGUIDLow(), itr->first );
+                break;
+            case SKILL_UNCHANGED:
+            case SKILL_DELETED:
+                MANGOS_ASSERT(false);
                 break;
         };
         itr->second.uState = SKILL_UNCHANGED;
@@ -19328,13 +19338,13 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
     // cooldown information stored in item prototype
     // This used in same way in WorldSession::HandleItemQuerySingleOpcode data sending to client.
 
-    if(itemId)
+    if (itemId)
     {
-        if(ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId))
+        if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId))
         {
             for(int idx = 0; idx < 5; ++idx)
             {
-                if(proto->Spells[idx].SpellId == spellInfo->Id)
+                if (proto->Spells[idx].SpellId == spellInfo->Id)
                 {
                     cat    = proto->Spells[idx].SpellCategory;
                     rec    = proto->Spells[idx].SpellCooldown;
@@ -19346,7 +19356,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
     }
 
     // if no cooldown found above then base at DBC data
-    if(rec < 0 && catrec < 0)
+    if (rec < 0 && catrec < 0)
     {
         cat = spellInfo->Category;
         rec = spellInfo->RecoveryTime;
@@ -19359,7 +19369,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
     time_t recTime;
 
     // overwrite time for selected category
-    if(infinityCooldown)
+    if (infinityCooldown)
     {
         // use +MONTH as infinity mark for spell cooldown (will checked as MONTH/2 at save ans skipped)
         // but not allow ignore until reset or re-login
@@ -19370,14 +19380,14 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
     {
         // shoot spells used equipped item cooldown values already assigned in GetAttackTime(RANGED_ATTACK)
         // prevent 0 cooldowns set by another way
-        if (rec <= 0 && catrec <= 0 && (cat == 76 || IsAutoRepeatRangedSpell(spellInfo) && spellInfo->Id != SPELL_ID_AUTOSHOT))
+        if (rec <= 0 && catrec <= 0 && (cat == 76 || (IsAutoRepeatRangedSpell(spellInfo) && spellInfo->Id != SPELL_ID_AUTOSHOT)))
             rec = GetAttackTime(RANGED_ATTACK);
 
         // Now we have cooldown data (if found any), time to apply mods
-        if(rec > 0)
+        if (rec > 0)
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
 
-        if(catrec > 0)
+        if (catrec > 0)
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
 
         // replace negative cooldowns by 0
@@ -19385,7 +19395,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
         if (catrec < 0) catrec = 0;
 
         // no cooldown after applying spell mods
-        if( rec == 0 && catrec == 0)
+        if (rec == 0 && catrec == 0)
             return;
 
         catrecTime = catrec ? curTime+catrec/IN_MILLISECONDS : 0;
@@ -19393,18 +19403,18 @@ void Player::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 it
     }
 
     // self spell cooldown
-    if(recTime > 0)
+    if (recTime > 0)
         AddSpellCooldown(spellInfo->Id, itemId, recTime);
 
     // category spells
     if (cat && catrec > 0)
     {
         SpellCategoryStore::const_iterator i_scstore = sSpellCategoryStore.find(cat);
-        if(i_scstore != sSpellCategoryStore.end())
+        if (i_scstore != sSpellCategoryStore.end())
         {
             for(SpellCategorySet::const_iterator i_scset = i_scstore->second.begin(); i_scset != i_scstore->second.end(); ++i_scset)
             {
-                if(*i_scset == spellInfo->Id)                    // skip main spell, already handled above
+                if (*i_scset == spellInfo->Id)              // skip main spell, already handled above
                     continue;
 
                 AddSpellCooldown(*i_scset, itemId, catrecTime);
@@ -21041,23 +21051,23 @@ void Player::UpdateCorpseReclaimDelay()
 void Player::SendCorpseReclaimDelay(bool load)
 {
     Corpse* corpse = GetCorpse();
-    if(!corpse)
+    if (!corpse)
         return;
 
     uint32 delay;
-    if(load)
+    if (load)
     {
-        if(corpse->GetGhostTime() > m_deathExpireTime)
+        if (corpse->GetGhostTime() > m_deathExpireTime)
             return;
 
         bool pvp = corpse->GetType()==CORPSE_RESURRECTABLE_PVP;
 
         uint32 count;
-        if( pvp && sWorld.getConfig(CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVP) ||
-           !pvp && sWorld.getConfig(CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVE) )
+        if ((pvp && sWorld.getConfig(CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVP)) ||
+            (!pvp && sWorld.getConfig(CONFIG_BOOL_DEATH_CORPSE_RECLAIM_DELAY_PVE)))
         {
             count = uint32(m_deathExpireTime-corpse->GetGhostTime())/DEATH_EXPIRE_STEP;
-            if(count>=MAX_DEATH_COUNT)
+            if (count>=MAX_DEATH_COUNT)
                 count = MAX_DEATH_COUNT-1;
         }
         else
@@ -21066,7 +21076,7 @@ void Player::SendCorpseReclaimDelay(bool load)
         time_t expected_time = corpse->GetGhostTime()+copseReclaimDelay[count];
 
         time_t now = time(NULL);
-        if(now >= expected_time)
+        if (now >= expected_time)
             return;
 
         delay = uint32(expected_time-now);
@@ -22723,6 +22733,7 @@ Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
         case HIGHGUID_TRANSPORT:
         case HIGHGUID_CORPSE:
         case HIGHGUID_MO_TRANSPORT:
+        case HIGHGUID_INSTANCE:
             break;
     }
 

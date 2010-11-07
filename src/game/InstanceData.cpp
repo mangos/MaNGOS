@@ -26,7 +26,7 @@ void InstanceData::SaveToDB()
     if(!Save()) return;
     std::string data = Save();
     CharacterDatabase.escape_string(data);
-    CharacterDatabase.PExecute("UPDATE instance SET data = '%s' WHERE id = '%d'", data.c_str(), instance->GetInstanceId());
+    CharacterDatabase.PExecute("UPDATE instance SET data = '%s' WHERE id = '%u'", data.c_str(), instance->GetInstanceId());
 }
 
 bool InstanceData::CheckAchievementCriteriaMeet( uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/ )

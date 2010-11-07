@@ -189,7 +189,7 @@ bool IsAcceptableClientBuild(uint32 build)
 {
     int accepted_versions[] = EXPECTED_MANGOSD_CLIENT_BUILD;
     for(int i = 0; accepted_versions[i]; ++i)
-        if(build == accepted_versions[i])
+        if(int(build) == accepted_versions[i])
             return true;
 
     return false;

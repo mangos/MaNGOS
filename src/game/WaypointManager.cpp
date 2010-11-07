@@ -461,7 +461,9 @@ void WaypointManager::AddAfterNode(uint32 id, uint32 point, float x, float y, fl
 void WaypointManager::_addNode(uint32 id, uint32 point, float x, float y, float z, float o, uint32 delay, uint32 wpGuid)
 {
     if(point == 0) return;                                  // counted from 1 in the DB
-    WorldDatabase.PExecuteLog("INSERT INTO creature_movement (id,point,position_x,position_y,position_z,orientation,wpguid,waittime) VALUES ('%u','%u','%f', '%f', '%f', '%f', '%d', '%d')", id, point, x, y, z, o, wpGuid, delay);
+    WorldDatabase.PExecuteLog("INSERT INTO creature_movement (id,point,position_x,position_y,position_z,orientation,wpguid,waittime) "
+        "VALUES ('%u','%u','%f', '%f', '%f', '%f', '%u', '%u')",
+        id, point, x, y, z, o, wpGuid, delay);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if(itr == m_pathMap.end())
         itr = m_pathMap.insert(WaypointPathMap::value_type(id, WaypointPath())).first;

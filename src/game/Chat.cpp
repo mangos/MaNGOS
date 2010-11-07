@@ -1240,7 +1240,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
         {
             // command have subcommands, but not '' subcommand and then any data in `command` useless for it.
             if (cmdName.empty())
-                sLog.outErrorDb("Table `command` have command '%s' that only used with some subcommand selection, it can't have help or overwritten access level, skip.", cmdName.c_str(), fullcommand.c_str());
+                sLog.outErrorDb("Table `command` have command '%s' that only used with some subcommand selection, it can't have help or overwritten access level, skip.", cmdName.c_str());
             else
                 sLog.outErrorDb("Table `command` have unexpected subcommand '%s' in command '%s', skip.", cmdName.c_str(), fullcommand.c_str());
             return false;
@@ -2305,7 +2305,7 @@ char* ChatHandler::ExtractQuotedArg( char** args, bool asis /*= false*/ )
     while (*tail && *tail != guard)
         ++tail;
 
-    if (!*tail || tail[1] && !isWhiteSpace(tail[1]))        // fail
+    if (!*tail || (tail[1] && !isWhiteSpace(tail[1])))      // fail
         return NULL;
 
     if (!tail[1])                                           // quote is last char in string
@@ -2523,7 +2523,7 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
     tail += 2;                                              // skip h|
 
     // r
-    if (!*tail || *tail != 'r' || *(tail+1) && !isWhiteSpace(*(tail+1)))
+    if (!*tail || *tail != 'r' || (*(tail+1) && !isWhiteSpace(*(tail+1))))
         return NULL;
 
     ++tail;                                                 // skip r

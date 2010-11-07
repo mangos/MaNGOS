@@ -460,6 +460,30 @@ void Log::outError( const char * err, ... )
     fflush(stderr);
 }
 
+void Log::outErrorDb()
+{
+    if (m_includeTime)
+        outTime();
+
+    fprintf( stderr, "\n" );
+
+    if (logfile)
+    {
+        outTimestamp(logfile);
+        fprintf(logfile, "ERROR:\n" );
+        fflush(logfile);
+    }
+
+    if (dberLogfile)
+    {
+        outTimestamp(dberLogfile);
+        fprintf(dberLogfile, "\n" );
+        fflush(dberLogfile);
+    }
+
+    fflush(stderr);
+}
+
 void Log::outErrorDb( const char * err, ... )
 {
     if (!err)

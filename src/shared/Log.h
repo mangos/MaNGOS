@@ -135,6 +135,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         void outDebug( const char * str, ... )       ATTR_PRINTF(2,3);
                                                             // any log level
         void outMenu( const char * str, ... )        ATTR_PRINTF(2,3);
+        void outErrorDb();                                  // any log level
                                                             // any log level
         void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);
                                                             // any log level
