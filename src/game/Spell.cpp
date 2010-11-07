@@ -4451,10 +4451,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_targets.m_targetMask == TARGET_FLAG_SELF &&
                     m_spellInfo->GetEffectImplicitTargetAByIndex(EFFECT_INDEX_1) == TARGET_CHAIN_DAMAGE)
                 {
-                    if (target = m_caster->GetMap()->GetUnit(((Player *)m_caster)->GetSelectionGuid()))
-                        m_targets.setUnitTarget(target);
-                    else
+                    target = m_caster->GetMap()->GetUnit(((Player *)m_caster)->GetSelectionGuid());
+                    if (!target)
                         return SPELL_FAILED_BAD_TARGETS;
+
+                    m_targets.setUnitTarget(target);
                 }
             }
 
@@ -5032,9 +5033,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_POWER_DRAIN:
             {
                 // Can be area effect, Check only for players and not check if target - caster (spell can have multiply drain/burn effects)
-                if(m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if(Unit* target = m_targets.getUnitTarget())
-                        if(target != m_caster && target->getPowerType() != spellEffect->EffectMiscValue)
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    if (Unit* target = m_targets.getUnitTarget())
+                        if (target != m_caster && int32(target->getPowerType()) != spellEffect->EffectMiscValue)
                             return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
@@ -6525,7 +6526,7 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
 bool Spell::IsNeedSendToClient() const
 {
     return m_spellInfo->SpellVisual[0] || m_spellInfo->SpellVisual[1] || IsChanneledSpell(m_spellInfo) ||
-        m_spellInfo->speed > 0.0f || !m_triggeredByAuraSpell && !m_IsTriggeredSpell;
+        m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell);
 }
 
 bool Spell::IsTriggeredSpellWithRedundentData() const

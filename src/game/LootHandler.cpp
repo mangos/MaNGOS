@@ -416,8 +416,6 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (!pItem)
                 return;
 
-            ItemPrototype const* proto = pItem->GetProto();
-
             switch (pItem->loot.loot_type)
             {
                 // temporary loot in stacking items, clear loot state, no auto loot move

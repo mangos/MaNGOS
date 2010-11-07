@@ -225,8 +225,9 @@ enum AchievementCriteriaTypes
     // 132 Earn a battleground rating of X.
     // 133 Create and purchase a guild crest.
     // 0..133 => 134 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 134,
 };
+
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 134
 
 enum AchievementCriteriaMoreReqType
 {

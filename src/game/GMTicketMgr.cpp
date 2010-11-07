@@ -74,7 +74,7 @@ void GMTicketMgr::LoadGMTickets()
     delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %d GM tickets", GetTicketCount());
+    sLog.outString(">> Loaded " SIZEFMTD " GM tickets", GetTicketCount());
 }
 
 void GMTicketMgr::DeleteAll()

@@ -1658,8 +1658,9 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                                 m_caster->CastSpell(m_caster, spellID, true, NULL);
                             return;
                         }
-                        case EFFECT_INDEX_1:
-                            return;                         // additional data for dummy[0]
+                        case EFFECT_INDEX_1:                // additional data for dummy[0]
+                        case EFFECT_INDEX_2:
+                            return;                         
                     }
                     return;
                 }
@@ -3844,8 +3845,8 @@ void Spell::EffectOpenLock(SpellEffectEntry const* effect)
     {
         GameObjectInfo const* goInfo = gameObjTarget->GetGOInfo();
         // Arathi Basin banner opening !
-        if (goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune ||
-            goInfo->type == GAMEOBJECT_TYPE_GOOBER && goInfo->goober.losOK)
+        if ((goInfo->type == GAMEOBJECT_TYPE_BUTTON && goInfo->button.noDamageImmune) ||
+            (goInfo->type == GAMEOBJECT_TYPE_GOOBER && goInfo->goober.losOK))
         {
             //CanUseBattleGroundObject() already called in CheckCast()
             // in battleground check
@@ -5878,7 +5879,7 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                     if (const SpellEntry *pSpell = sSpellStore.LookupEntry(m_spellInfo->CalculateSimpleValue(SpellEffectIndex(effect->EffectIndex))))
                     {
                         // if we used item at least once...
-                        if (pTarget->IsTemporarySummon() && pTarget->GetEntry() == pSpell->GetEffectMiscValue(SpellEffectIndex(effect->EffectIndex)))
+                        if (pTarget->IsTemporarySummon() && int32(pTarget->GetEntry()) == pSpell->GetEffectMiscValue(SpellEffectIndex(effect->EffectIndex)))
                         {
                             TemporarySummon* pSummon = (TemporarySummon*)pTarget;
 
