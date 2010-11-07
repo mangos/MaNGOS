@@ -128,7 +128,7 @@ void MotionMaster::DelayedClean(bool reset, bool all)
     else
         m_cleanFlag &= ~MMCF_RESET;
 
-    if (empty() || !all && size() == 1)
+    if (empty() || (!all && size() == 1))
         return;
 
     if (!m_expList)

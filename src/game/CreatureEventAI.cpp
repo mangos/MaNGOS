@@ -540,10 +540,14 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                                 m_creature->GetMotionMaster()->Clear(false);
                                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
                                 break;
+                            default:
+                                break;
                         }
                     }
                     break;
                 }
+                default:
+                    break;
             }
 
             break;

@@ -206,8 +206,9 @@ enum AchievementCriteriaTypes
     // 122
     // 123
     // 0..123 => 124 criteria types total
-    ACHIEVEMENT_CRITERIA_TYPE_TOTAL = 124,
 };
+
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 124
 
 enum AreaFlags
 {

@@ -705,6 +705,8 @@ void WorldSession::SaveTutorialsData()
             CharacterDatabase.PExecute("INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",
                 GetAccountId(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
             break;
+        case TUTORIALDATA_UNCHANGED:
+            break;
     }
 
     m_tutorialState = TUTORIALDATA_UNCHANGED;

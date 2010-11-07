@@ -237,11 +237,11 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
         if(!reqName.empty())
         {
             sLog.outErrorDb("The table `%s` in your [%s] database indicates that this database is out of date!",table_name,db_name);
-            sLog.outErrorDb("");
+            sLog.outErrorDb();
             sLog.outErrorDb("  [A] You have: --> `%s.sql`",cur_sql_update_name.c_str());
-            sLog.outErrorDb("");
+            sLog.outErrorDb();
             sLog.outErrorDb("  [B] You need: --> `%s.sql`",req_sql_update_name);
-            sLog.outErrorDb("");
+            sLog.outErrorDb();
             sLog.outErrorDb("You must apply all updates after [A] to [B] to use mangos with this database.");
             sLog.outErrorDb("These updates are included in the sql/updates folder.");
             sLog.outErrorDb("Please read the included [README] in sql/updates for instructions on updating.");
@@ -250,10 +250,10 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
         {
             sLog.outErrorDb("The table `%s` in your [%s] database is missing its version info.",table_name,db_name);
             sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.",table_name,db_name);
-            sLog.outErrorDb("");
+            sLog.outErrorDb();
             sLog.outErrorDb("This revision of MaNGOS requires a database updated to:");
             sLog.outErrorDb("`%s.sql`",req_sql_update_name);
-            sLog.outErrorDb("");
+            sLog.outErrorDb();
 
             if(!strcmp(db_name, "WORLD"))
                 sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
@@ -265,10 +265,10 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
     {
         sLog.outErrorDb("The table `%s` in your [%s] database is missing or corrupt.",table_name,db_name);
         sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.",table_name,db_name);
-        sLog.outErrorDb("");
+        sLog.outErrorDb();
         sLog.outErrorDb("This revision of mangos requires a database updated to:");
         sLog.outErrorDb("`%s.sql`",req_sql_update_name);
-        sLog.outErrorDb("");
+        sLog.outErrorDb();
 
         if(!strcmp(db_name, "WORLD"))
             sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
