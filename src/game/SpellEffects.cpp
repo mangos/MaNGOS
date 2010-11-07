@@ -4951,8 +4951,16 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
 void Spell::DoSummonVehicle(SpellEffectIndex eff_idx, uint32 forceFaction)
 {
-    if (!m_caster || m_caster->hasUnitState(UNIT_STAT_ON_VEHICLE))
+    if (!m_caster)
         return;
+
+    if (m_caster->hasUnitState(UNIT_STAT_ON_VEHICLE))
+    {
+        if (m_spellInfo->Attributes & SPELL_ATTR_UNK7)
+            m_caster->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
+        else 
+            return;
+    }
 
     uint32 vehicle_entry = m_spellInfo->EffectMiscValue[eff_idx];
 
