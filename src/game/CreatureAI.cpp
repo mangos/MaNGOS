@@ -19,6 +19,7 @@
 #include "CreatureAI.h"
 #include "Creature.h"
 #include "DBCStores.h"
+#include "Spell.h"
 
 CreatureAI::~CreatureAI()
 {

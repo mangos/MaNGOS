@@ -2669,7 +2669,7 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
     }
 
     // Fill cost data
-    m_powerCost = CalculatePowerCost();
+    m_powerCost = CalculatePowerCost(m_spellInfo, m_caster, this, m_CastItem);
 
     SpellCastResult result = CheckCast(true);
     if(result != SPELL_CAST_OK && !IsAutoRepeat())          //always cast autorepeat dummy for triggering
@@ -5716,22 +5716,22 @@ SpellCastResult Spell::CheckRange(bool strict)
     return SPELL_CAST_OK;
 }
 
-int32 Spell::CalculatePowerCost()
+uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell const* spell, Item* castItem)
 {
     // item cast not used power
-    if (m_CastItem)
+    if (castItem)
         return 0;
 
     // Spell drain all exist power on cast (Only paladin lay of Hands)
-    if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_DRAIN_ALL_POWER)
+    if (spellInfo->AttributesEx & SPELL_ATTR_EX_DRAIN_ALL_POWER)
     {
         // If power type - health drain all
-        if (m_spellInfo->powerType == POWER_HEALTH)
-            return m_caster->GetHealth();
+        if (spellInfo->powerType == POWER_HEALTH)
+            return caster->GetHealth();
         // Else drain all power
-        if (m_spellInfo->powerType < MAX_POWERS)
-            return m_caster->GetPower(Powers(m_spellInfo->powerType));
-        sLog.outError("Spell::CalculateManaCost: Unknown power type '%d' in spell %d", m_spellInfo->powerType, m_spellInfo->Id);
+        if (spellInfo->powerType < MAX_POWERS)
+            return caster->GetPower(Powers(spellInfo->powerType));
+        sLog.outError("Spell::CalculateManaCost: Unknown power type '%d' in spell %d", spellInfo->powerType, spellInfo->Id);
         return 0;
     }
 
@@ -5740,7 +5740,7 @@ int32 Spell::CalculatePowerCost()
     // PCT cost from total amount
     if (uint32 manaCostPct = m_spellInfo->GetManaCostPercentage())
     {
-        switch (m_spellInfo->powerType)
+        switch (spellInfo->powerType)
         {
             // health as power used
             case POWER_HEALTH:
@@ -5760,25 +5760,26 @@ int32 Spell::CalculatePowerCost()
                 DEBUG_LOG("Spell::CalculateManaCost: Not implemented yet!");
                 break;
             default:
-                sLog.outError("Spell::CalculateManaCost: Unknown power type '%d' in spell %d", m_spellInfo->powerType, m_spellInfo->Id);
+                sLog.outError("Spell::CalculateManaCost: Unknown power type '%d' in spell %d", spellInfo->powerType, spellInfo->Id);
                 return 0;
         }
     }
-    SpellSchools school = GetFirstSchoolInMask(m_spellSchoolMask);
+    SpellSchools school = GetFirstSchoolInMask(spell ? spell->m_spellSchoolMask : GetSpellSchoolMask(spellInfo));
     // Flat mod from caster auras by spell school
-    powerCost += m_caster->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + school);
+    powerCost += caster->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + school);
     // Shiv - costs 20 + weaponSpeed*10 energy (apply only to non-triggered spell with energy cost)
-    if ( m_spellInfo->AttributesEx4 & SPELL_ATTR_EX4_SPELL_VS_EXTEND_COST )
-        powerCost += m_caster->GetAttackTime(OFF_ATTACK) / 100;
+    if (spellInfo->AttributesEx4 & SPELL_ATTR_EX4_SPELL_VS_EXTEND_COST)
+        powerCost += caster->GetAttackTime(OFF_ATTACK) / 100;
     // Apply cost mod by spell
-    if(Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, powerCost, this);
+    if (spell)
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, powerCost, spell);
 
-    if(m_spellInfo->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION)
+    if (spellInfo->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION)
         powerCost = int32(powerCost/ (1.117f * m_spellInfo->GetSpellLevel() / m_caster->getLevel() -0.1327f));
 
     // PCT mod from user auras by school
-    powerCost = int32(powerCost * (1.0f + m_caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
+    powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));
     if (powerCost < 0)
         powerCost = 0;
     return powerCost;
@@ -5800,33 +5801,33 @@ SpellCastResult Spell::CheckPower()
     }
 
     // health as power used - need check health amount
-    if(m_spellInfo->powerType == POWER_HEALTH)
+    if (m_spellInfo->powerType == POWER_HEALTH)
     {
-        if((int32)m_caster->GetHealth() <= m_powerCost)
+        if (m_caster->GetHealth() <= m_powerCost)
             return SPELL_FAILED_CASTER_AURASTATE;
         return SPELL_CAST_OK;
     }
     // Check valid power type
-    if( m_spellInfo->powerType >= MAX_POWERS )
+    if (m_spellInfo->powerType >= MAX_POWERS)
     {
         sLog.outError("Spell::CheckMana: Unknown power type '%d'", m_spellInfo->powerType);
         return SPELL_FAILED_UNKNOWN;
     }
 
     //check rune cost only if a spell has PowerType == POWER_RUNE
-    if(m_spellInfo->powerType == POWER_RUNE)
+    if (m_spellInfo->powerType == POWER_RUNE)
     {
         SpellCastResult failReason = CheckOrTakeRunePower(false);
-        if(failReason != SPELL_CAST_OK)
+        if (failReason != SPELL_CAST_OK)
             return failReason;
     }
 
     // Check power amount
     Powers powerType = Powers(m_spellInfo->powerType);
-    if((int32)m_caster->GetPower(powerType) < m_powerCost)
+    if (m_caster->GetPower(powerType) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
-    else
-        return SPELL_CAST_OK;
+
+    return SPELL_CAST_OK;
 }
 
 bool Spell::IgnoreItemRequirements() const

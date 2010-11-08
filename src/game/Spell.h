@@ -373,7 +373,7 @@ class Spell
         SpellCastResult CheckCasterAuras() const;
 
         int32 CalculateDamage(SpellEffectIndex i, Unit* target) { return m_caster->CalculateSpellDamage(target, m_spellInfo, i, &m_currentBasePoints[i]); }
-        int32 CalculatePowerCost();
+        static uint32 CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spell const* spell = NULL, Item* castItem = NULL);
 
         bool HaveTargetsForEffect(SpellEffectIndex effect) const;
         void Delayed();
@@ -469,7 +469,7 @@ class Spell
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
 
-        int32 GetPowerCost() const { return m_powerCost; }
+        uint32 GetPowerCost() const { return m_powerCost; }
 
         void UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
 
@@ -506,7 +506,7 @@ class Spell
         //Spell data
         SpellSchoolMask m_spellSchoolMask;                  // Spell school (can be overwrite for some spells (wand shoot for example)
         WeaponAttackType m_attackType;                      // For weapon based attack
-        int32 m_powerCost;                                  // Calculated spell cost     initialized only in Spell::prepare
+        uint32 m_powerCost;                                 // Calculated spell cost     initialized only in Spell::prepare
         int32 m_casttime;                                   // Calculated spell cast time initialized only in Spell::prepare
         bool m_canReflect;                                  // can reflect this spell?
         bool m_autoRepeat;
