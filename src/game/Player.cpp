@@ -12739,7 +12739,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
             switch(itr->second.option_id)
             {
                 case GOSSIP_OPTION_GOSSIP:
-                    if (itr->second.action_menu_id)         // has sub menu, so do not "talk" with this NPC yet
+                    if (itr->second.action_menu_id != 0)    // has sub menu (or close gossip), so do not "talk" with this NPC yet
                         canTalkToCredit = false;
                     break;
                 case GOSSIP_OPTION_QUESTGIVER:
@@ -12950,10 +12950,16 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId, uint32 me
             if (pMenuData.m_gAction_poi)
                 PlayerTalkClass->SendPointOfInterest(pMenuData.m_gAction_poi);
 
-            if (pMenuData.m_gAction_menu)
+            // send new menu || close gossip || stay at current menu
+            if (pMenuData.m_gAction_menu > 0)
             {
-                PrepareGossipMenu(pSource, pMenuData.m_gAction_menu);
+                PrepareGossipMenu(pSource, uint32(pMenuData.m_gAction_menu));
                 SendPreparedGossip(pSource);
+            }
+            else if (pMenuData.m_gAction_menu < 0)
+            {
+                PlayerTalkClass->CloseGossip();
+                TalkedToCreature(pSource->GetEntry(), pSource->GetGUID());
             }
 
             if (pMenuData.m_gAction_script)

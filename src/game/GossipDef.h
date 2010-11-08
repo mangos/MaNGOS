@@ -139,7 +139,7 @@ typedef std::vector<GossipMenuItem> GossipMenuItemList;
 
 struct GossipMenuItemData
 {
-    uint32 m_gAction_menu;
+    int32  m_gAction_menu;                                  // negative for close gossip
     uint32 m_gAction_poi;
     uint32 m_gAction_script;
 };
@@ -172,7 +172,7 @@ class MANGOS_DLL_SPEC GossipMenu
         void SetMenuId(uint32 menu_id) { m_gMenuId = menu_id; }
         uint32 GetMenuId() { return m_gMenuId; }
 
-        void AddGossipMenuItemData(uint32 action_menu, uint32 action_poi, uint32 action_script);
+        void AddGossipMenuItemData(int32 action_menu, uint32 action_poi, uint32 action_script);
 
         unsigned int MenuItemCount() const
         {
