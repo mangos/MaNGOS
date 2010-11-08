@@ -606,8 +606,8 @@ void Map::Update(uint32 time_, uint32 diff)
             // the overloaded operators handle range checking
             // so ther's no need for range checking inside the loop
             CellPair begin_cell(standing_cell), end_cell(standing_cell);
-            begin_cell << 1; begin_cell -= 1;               // upper left
-            end_cell >> 1; end_cell += 1;                   // lower right
+            CellArea area = Cell::CalculateCellArea(obj->GetPositionX(), obj->GetPositionY(), GetVisibilityDistance());
+            area.ResizeBorders(begin_cell, end_cell);
 
             for(uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; ++x)
             {
