@@ -375,8 +375,8 @@ void ReputationMgr::SetAtWar( RepListID repListID, bool on )
 
 void ReputationMgr::SetAtWar(FactionState* faction, bool atWar)
 {
-    // not allow declare war to own faction
-    if(atWar && (faction->Flags & FACTION_FLAG_PEACE_FORCED) )
+    // not allow declare war to faction unless already hated or less
+    if (atWar && (faction->Flags & FACTION_FLAG_PEACE_FORCED) && ReputationToRank(faction->Standing) > REP_HATED)
         return;
 
     // already set

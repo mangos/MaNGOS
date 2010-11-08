@@ -1700,27 +1700,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    switch(eff_idx)
+                    if (eff_idx == EFFECT_INDEX_0)
                     {
-                        case EFFECT_INDEX_0:
-                        {
-                            Player* pPlayer = (Player*)m_caster;
+                        Player* pPlayer = (Player*)m_caster;
 
-                            uint32 faction_id = m_currentBasePoints[eff_idx];
-                            int32  rep_change = m_currentBasePoints[EFFECT_INDEX_1];
+                        uint32 faction_id = m_currentBasePoints[eff_idx];
+                        int32  rep_change = m_currentBasePoints[EFFECT_INDEX_1];
 
-                            FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
+                        FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
 
-                            if (!factionEntry)
-                                return;
+                        if (!factionEntry)
+                            return;
 
-                            // set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
-                            pPlayer->GetReputationMgr().SetReputation(factionEntry, rep_change);
-                            break;
-                        }
-                        case EFFECT_INDEX_2:
-                            // unclear what this effect is for.
-                            break;
+                        // set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
+                        pPlayer->GetReputationMgr().SetReputation(factionEntry, rep_change);
+
+                        // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
                     }
 
                     return;
