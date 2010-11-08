@@ -121,6 +121,13 @@ struct MANGOS_DLL_DECL CoordPair
             y_coord = LIMIT - 1;
     }
 
+    CoordPair& normalize()
+    {
+        x_coord = std::min(x_coord, LIMIT);
+        y_coord = std::min(y_coord, LIMIT);
+        return *this;
+    }
+
     uint32 x_coord;
     uint32 y_coord;
 };

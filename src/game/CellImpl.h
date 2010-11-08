@@ -34,38 +34,19 @@ inline Cell::Cell(CellPair const& p)
     data.Part.reserved = 0;
 }
 
-inline int CellHelper(const float radius)
-{
-    if(radius < 1.0f)
-        return 0;
-
-    return (int)ceilf(radius/SIZE_OF_GRID_CELL);
-}
-
 inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
 {
-    if(radius <= 0.0f)
-        return CellArea();
+    if (radius <= 0.0f)
+    {
+        CellPair center = MaNGOS::ComputeCellPair(x, y).normalize();
+        return CellArea(center, center);
+    }
 
-    //lets calculate object coord offsets from cell borders.
-    //TODO: add more correct/generic method for this task
-    const float x_offset = (x - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
-    const float y_offset = (y - CENTER_GRID_CELL_OFFSET)/SIZE_OF_GRID_CELL;
-
-    const float x_val = floor(x_offset + CENTER_GRID_CELL_ID + 0.5f);
-    const float y_val = floor(y_offset + CENTER_GRID_CELL_ID + 0.5f);
-
-    const float x_off = (x_offset - x_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-    const float y_off = (y_offset - y_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-
-    const float tmp_diff = radius - CENTER_GRID_CELL_OFFSET;
-    //lets calculate upper/lower/right/left corners for cell search
-    int right = CellHelper(tmp_diff + x_off);
-    int left  = CellHelper(tmp_diff - x_off);
-    int upper = CellHelper(tmp_diff + y_off);
-    int lower = CellHelper(tmp_diff - y_off);
-
-    return CellArea(right, left, upper, lower);
+    return CellArea
+    (
+        MaNGOS::ComputeCellPair(x - radius, y - radius).normalize(),
+        MaNGOS::ComputeCellPair(x + radius, y + radius).normalize()
+    );
 }
 
 template<class T, class CONTAINER>
@@ -104,10 +85,8 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
         return;
     }
 
-    CellPair begin_cell = standing_cell;
-    CellPair end_cell = standing_cell;
-
-    area.ResizeBorders(begin_cell, end_cell);
+    CellPair &begin_cell = area.low_bound;
+    CellPair &end_cell = area.high_bound;
     //visit all cells, found in CalculateCellArea()
     //if radius is known to reach cell area more than 4x4 then we should call optimized VisitCircle
     //currently this technique works with MAX_NUMBER_OF_CELLS 16 and higher, with lower values

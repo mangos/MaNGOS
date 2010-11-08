@@ -29,22 +29,19 @@ class WorldObject;
 
 struct MANGOS_DLL_DECL CellArea
 {
-    CellArea() : right_offset(0), left_offset(0), upper_offset(0), lower_offset(0) {}
-    CellArea(int right, int left, int upper, int lower) : right_offset(right), left_offset(left), upper_offset(upper), lower_offset(lower) {}
-    bool operator!() const { return !right_offset && !left_offset && !upper_offset && !lower_offset; }
+    CellArea() {}
+    CellArea(CellPair low, CellPair high) : low_bound(low), high_bound(high) {}
+
+    bool operator!() const { return low_bound == high_bound; }
 
     void ResizeBorders(CellPair& begin_cell, CellPair& end_cell) const
     {
-        begin_cell << left_offset;
-        begin_cell -= lower_offset;
-        end_cell >> right_offset;
-        end_cell += upper_offset;
+        begin_cell = low_bound;
+        end_cell = high_bound;
     }
 
-    int right_offset;
-    int left_offset;
-    int upper_offset;
-    int lower_offset;
+    CellPair low_bound;
+    CellPair high_bound;
 };
 
 struct MANGOS_DLL_DECL Cell
