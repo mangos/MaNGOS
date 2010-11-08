@@ -4148,6 +4148,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
         {
             // TODO
             // EffectSummonVehicle(i);
+            sLog.outDebug("EffectSummonType: Unhandled summon group type SUMMON_PROP_GROUP_VEHICLE(%u)", summon_prop->Group);
             break;
         }
         default:
