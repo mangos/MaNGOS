@@ -2795,33 +2795,41 @@ void Unit::SendMeleeAttackStop(Unit* victim)
     ((Creature*)victim)->AI().EnterEvadeMode(this);*/
 }
 
-bool Unit::IsSpellBlocked(Unit *pCaster, SpellEntry const * /*spellProto*/, WeaponAttackType attackType)
+bool Unit::IsSpellBlocked(Unit *pCaster, SpellEntry const *spellEntry, WeaponAttackType attackType)
 {
-    if (HasInArc(M_PI_F,pCaster))
+    if (!HasInArc(M_PI_F, pCaster))
+        return false;
+
+    if (spellEntry)
     {
-        /* Currently not exist spells with ignore block
-        // Ignore combat result aura (parry/dodge check on prepare)
-        AuraList const& ignore = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
-        for(AuraList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
-        {
-            if (!(*i)->isAffectedOnSpell(spellProto))
-                continue;
-            if ((*i)->GetModifier()->m_miscvalue == )
-                return false;
-        }
-        */
-
-        // Check creatures flags_extra for disable block
-        if(GetTypeId()==TYPEID_UNIT &&
-           ((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK )
-                return false;
-
-        float blockChance = GetUnitBlockChance();
-        blockChance += (int32(pCaster->GetWeaponSkillValue(attackType)) - int32(GetMaxSkillValueForLevel()))*0.04f;
-        if (roll_chance_f(blockChance))
-            return true;
+        // Some spells cannot be blocked
+        if (spellEntry->Attributes & SPELL_ATTR_IMPOSSIBLE_DODGE_PARRY_BLOCK)
+            return false;
     }
-    return false;
+
+    /*
+    // Ignore combat result aura (parry/dodge check on prepare)
+    AuraList const& ignore = GetAurasByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
+    for(AuraList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
+    {
+        if (!(*i)->isAffectedOnSpell(spellProto))
+            continue;
+        if ((*i)->GetModifier()->m_miscvalue == )
+            return false;
+    }
+    */
+
+    // Check creatures flags_extra for disable block
+    if (GetTypeId() == TYPEID_UNIT)
+    {
+        if (((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
+            return false;
+    }
+
+    float blockChance = GetUnitBlockChance();
+    blockChance += (int32(pCaster->GetWeaponSkillValue(attackType)) - int32(GetMaxSkillValueForLevel()))*0.04f;
+    
+    return roll_chance_f(blockChance);
 }
 
 // Melee based spells can be miss, parry or dodge on this step
