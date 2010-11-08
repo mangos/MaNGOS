@@ -117,6 +117,7 @@ pkgdata_DATA = \
 	10679_01_mangos_npc_vendor_template.sql \
 	10679_02_mangos_creature_template.sql \
 	10682_01_mangos_item_convert.sql \
+	10704_01_mangos_gossip_menu_option.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -214,4 +215,5 @@ EXTRA_DIST = \
 	10679_01_mangos_npc_vendor_template.sql \
 	10679_02_mangos_creature_template.sql \
 	10682_01_mangos_item_convert.sql \
+	10704_01_mangos_gossip_menu_option.sql \
 	README
