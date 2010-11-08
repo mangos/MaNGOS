@@ -4326,6 +4326,8 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
             // TODO
             // EffectSummonVehicle(i);
                DoSummonVehicle(eff_idx, summon_prop->FactionId);
+//            sLog.outDebug("EffectSummonType: Unhandled summon group type SUMMON_PROP_GROUP_VEHICLE(%u)", summon_prop->Group);
+//            Mangos developers thinking - this summon is not supported. But in this his worked fine :)
             break;
         }
         default:
