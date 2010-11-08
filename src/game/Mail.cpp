@@ -937,6 +937,13 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_lowguid, uin
         return;
     }
 
+    // Hack - if aucbot functional, drop returned to this mail anywhere
+    if (sender_lowguid == auctionbot.GetAHBplayerGUID().GetCounter())
+    {
+        deleteIncludedItems(true);
+        return;
+    }
+
     // prepare mail and send in other case
     bool needItemDelay = false;
 
@@ -961,16 +968,7 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_lowguid, uin
     uint32 deliver_delay = needItemDelay ? sWorld.getConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY) : 0;
 
     // will delete item or place to receiver mail list
-
-    if (sender_lowguid == auctionbot.GetAHBplayerGUID().GetCounter())
-    {
-        SendMailTo(MailReceiver(receiver,receiver_lowguid), MailSender(MAIL_CREATURE, sender_lowguid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
-    }
-    else
-    {
-        SendMailTo(MailReceiver(receiver,receiver_lowguid), MailSender(MAIL_NORMAL, sender_lowguid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
-    }
-
+    SendMailTo(MailReceiver(receiver,receiver_lowguid), MailSender(MAIL_CREATURE, sender_lowguid), MAIL_CHECK_MASK_RETURNED, deliver_delay);
 }
 /**
  * Sends a mail.
@@ -982,9 +980,8 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, uint32 sender_lowguid, uin
  */
 void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked, uint32 deliver_delay)
 {
-    Player* pReceiver = receiver.GetPlayer();               // can be NULL
-
-    if (pReceiver && pReceiver->GetGUIDLow() == auctionbot.GetAHBplayerGUID().GetCounter())
+    // Hack - if aucbot functional, drop sended to this mail anywhere
+    if (receiver.GetPlayerGUIDLow() == auctionbot.GetAHBplayerGUID().GetCounter())
     {
         if (!m_items.empty())
         {
@@ -992,6 +989,8 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
         }
         return;
     }
+
+    Player* pReceiver = receiver.GetPlayer();               // can be NULL
 
     if (pReceiver)
         prepareItems(pReceiver);                            // generate mail template items
