@@ -111,11 +111,12 @@ class SpellCastTargets
             m_itemTarget = target.m_itemTarget;
             m_GOTarget   = target.m_GOTarget;
 
-            m_unitTargetGUID   = target.m_unitTargetGUID;
-            m_GOTargetGUID     = target.m_GOTargetGUID;
-            m_CorpseTargetGUID = target.m_CorpseTargetGUID;
-            m_itemTargetGUID   = target.m_itemTargetGUID;
-            m_transportGUID    = target.m_transportGUID;
+            m_unitTargetGUID    = target.m_unitTargetGUID;
+            m_GOTargetGUID      = target.m_GOTargetGUID;
+            m_CorpseTargetGUID  = target.m_CorpseTargetGUID;
+            m_itemTargetGUID    = target.m_itemTargetGUID;
+            m_srcTransportGUID  = target.m_srcTransportGUID;
+            m_destTransportGUID = target.m_destTransportGUID;
 
             m_itemTargetEntry  = target.m_itemTargetEntry;
 
@@ -180,7 +181,8 @@ class SpellCastTargets
         ObjectGuid m_GOTargetGUID;
         ObjectGuid m_CorpseTargetGUID;
         ObjectGuid m_itemTargetGUID;
-        ObjectGuid m_transportGUID;
+        ObjectGuid m_srcTransportGUID;
+        ObjectGuid m_destTransportGUID;
         uint32 m_itemTargetEntry;
 };
 

@@ -241,7 +241,7 @@ void SpellCastTargets::read( ByteBuffer& data, Unit *caster )
 
     if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
-        data >> m_transportGUID.ReadAsPacked();
+        data >> m_srcTransportGUID.ReadAsPacked();
         data >> m_srcX >> m_srcY >> m_srcZ;
         if(!MaNGOS::IsValidMapCoord(m_srcX, m_srcY, m_srcZ))
             throw ByteBufferException(false, data.rpos(), 0, data.size());
@@ -249,7 +249,7 @@ void SpellCastTargets::read( ByteBuffer& data, Unit *caster )
 
     if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
-        data >> m_transportGUID.ReadAsPacked();
+        data >> m_destTransportGUID.ReadAsPacked();
         data >> m_destX >> m_destY >> m_destZ;
         if(!MaNGOS::IsValidMapCoord(m_destX, m_destY, m_destZ))
             throw ByteBufferException(false, data.rpos(), 0, data.size());
@@ -298,13 +298,13 @@ void SpellCastTargets::write( ByteBuffer& data ) const
 
     if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
-        data << m_transportGUID.WriteAsPacked();
+        data << m_srcTransportGUID.WriteAsPacked();
         data << m_srcX << m_srcY << m_srcZ;
     }
 
     if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
-        data << m_transportGUID.WriteAsPacked();
+        data << m_destTransportGUID.WriteAsPacked();
         data << m_destX << m_destY << m_destZ;
     }
 

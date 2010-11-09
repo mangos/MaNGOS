@@ -9322,7 +9322,7 @@ void ObjectMgr::LoadGossipMenuItems()
         gMenuItem.option_text           = fields[3].GetCppString();
         gMenuItem.option_id             = fields[4].GetUInt32();
         gMenuItem.npc_option_npcflag    = fields[5].GetUInt32();
-        gMenuItem.action_menu_id        = fields[6].GetUInt32();
+        gMenuItem.action_menu_id        = fields[6].GetInt32();
         gMenuItem.action_poi_id         = fields[7].GetUInt32();
         gMenuItem.action_script_id      = fields[8].GetUInt32();
         gMenuItem.box_coded             = fields[9].GetUInt8() != 0;
