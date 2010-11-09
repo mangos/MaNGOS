@@ -2465,8 +2465,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
         if (GetSpellProto()->SpellFamilyName == SPELLFAMILY_MAGE && (GetSpellProto()->SpellFamilyFlags & UI64LIT(0x2000000000000)))
         {
             if (m_removeMode == AURA_REMOVE_BY_EXPIRE || m_removeMode == AURA_REMOVE_BY_DISPEL)
-                target->CastSpell(target,m_modifier.m_amount,true,NULL,this);
-
+                if (this->GetCaster())
+                    GetCaster()->CastSpell(target,m_modifier.m_amount,true,NULL,this);
+                else
+                    target->CastSpell(target,m_modifier.m_amount,true,NULL,this);
             return;
         }
     }
