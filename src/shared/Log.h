@@ -45,7 +45,7 @@ enum LogFilters
     LOG_FILTER_SQL_TEXT           = 0x0040,                 // raw SQL text send to DB engine
     LOG_FILTER_PLAYER_MOVES       = 0x0080,                 // player moves by grid/cell
     LOG_FILTER_PERIODIC_AFFECTS   = 0x0100,                 // DoT/HoT apply trace
-    LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 // DoT/HoT apply trace
+    LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 // AI/movement generators debug output
     LOG_FILTER_DAMAGE             = 0x0400,                 // Direct/Area damage trace
     LOG_FILTER_COMBAT             = 0x0800,                 // attack states/roll attack results/etc
     LOG_FILTER_SPELL_CAST         = 0x1000,                 // spell cast/aura apply/spell proc events

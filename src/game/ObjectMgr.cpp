@@ -301,6 +301,12 @@ void ObjectMgr::LoadCreatureLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
+        if (!GetCreatureTemplate(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_creature` has data for not existed creature entry %u, skipped.", entry);
+            continue;
+        }
+
         CreatureLocale& data = mCreatureLocaleMap[entry];
 
         for(int i = 1; i < MAX_LOCALE; ++i)
@@ -370,6 +376,27 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
         uint16 menuId   = fields[0].GetUInt16();
         uint16 id       = fields[1].GetUInt16();
 
+        GossipMenuItemsMapBounds bounds = GetGossipMenuItemsMapBounds(menuId);
+
+        bool found = false;
+        if (bounds.first != bounds.second)
+        {
+            for (GossipMenuItemsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+            {
+                if (itr->second.id == id)
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_gossip_menu_option` has data for nonexistent gossip menu %u item %u, skipped.", menuId, id);
+            continue;
+        }
+
         GossipMenuItemsLocale& data = mGossipMenuItemsLocaleMap[MAKE_PAIR32(menuId,id)];
 
         for(int i = 1; i < MAX_LOCALE; ++i)
@@ -432,6 +459,12 @@ void ObjectMgr::LoadPointOfInterestLocales()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
+
+        if (!GetPointOfInterest(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_points_of_interest` has data for nonexistent POI entry %u, skipped.", entry);
+            continue;
+        }
 
         PointOfInterestLocale& data = mPointOfInterestLocaleMap[entry];
 
@@ -1771,6 +1804,12 @@ void ObjectMgr::LoadItemLocales()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
+
+        if (!GetItemPrototype(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
+            continue;
+        }
 
         ItemLocale& data = mItemLocaleMap[entry];
 
@@ -4389,6 +4428,12 @@ void ObjectMgr::LoadQuestLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
+        if (!GetQuestTemplate(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_quest` has data for nonexistent quest entry %u, skipped.", entry);
+            continue;
+        }
+
         QuestLocale& data = mQuestLocaleMap[entry];
 
         for(int i = 1; i < MAX_LOCALE; ++i)
@@ -5160,6 +5205,12 @@ void ObjectMgr::LoadPageTextLocales()
 
         uint32 entry = fields[0].GetUInt32();
 
+        if (!sPageTextStore.LookupEntry<PageText>(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_page_text` has data for nonexistent page text entry %u, skipped.", entry);
+            continue;
+        }
+
         PageTextLocale& data = mPageTextLocaleMap[entry];
 
         for(int i = 1; i < MAX_LOCALE; ++i)
@@ -5347,6 +5398,12 @@ void ObjectMgr::LoadNpcTextLocales()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
+
+        if (!GetGossipText(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_npc_text` has data for nonexistent gossip text entry %u, skipped.", entry);
+            continue;
+        }
 
         NpcTextLocale& data = mNpcTextLocaleMap[entry];
 
@@ -6423,6 +6480,12 @@ void ObjectMgr::LoadGameObjectLocales()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
+
+        if (!GetGameObjectInfo(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_gameobject` has data for nonexistent gameobject entry %u, skipped.", entry);
+            continue;
+        }
 
         GameObjectLocale& data = mGameObjectLocaleMap[entry];
 

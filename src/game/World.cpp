@@ -922,6 +922,7 @@ void World::SetInitialWorldSettings()
     sLog.outString("Initialize data stores...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
+    sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());    // Get once for all the locale index of DBC language (console/broadcasts)
 
     sLog.outString( "Loading Script Names...");
     sObjectMgr.LoadScriptNames();
@@ -944,19 +945,6 @@ void World::SetInitialWorldSettings()
 
     ///- Init highest guids before any guid using table loading to prevent using not initialized guids in some code.
     sObjectMgr.SetHighestGuids();                           // must be after packing instances
-
-    sLog.outString();
-    sLog.outString( "Loading Localization strings..." );
-    sObjectMgr.LoadCreatureLocales();
-    sObjectMgr.LoadGameObjectLocales();
-    sObjectMgr.LoadItemLocales();
-    sObjectMgr.LoadQuestLocales();
-    sObjectMgr.LoadNpcTextLocales();
-    sObjectMgr.LoadPageTextLocales();
-    sObjectMgr.LoadGossipMenuItemsLocales();
-    sObjectMgr.LoadPointOfInterestLocales();
-    sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
-    sLog.outString( ">>> Localization strings loaded" );
     sLog.outString();
 
     sLog.outString( "Loading Page Texts..." );
@@ -972,7 +960,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr.LoadSpellElixirs();
 
     sLog.outString( "Loading Spell Learn Skills..." );
-    sSpellMgr.LoadSpellLearnSkills();                        // must be after LoadSpellChains
+    sSpellMgr.LoadSpellLearnSkills();                       // must be after LoadSpellChains
 
     sLog.outString( "Loading Spell Learn Spells..." );
     sSpellMgr.LoadSpellLearnSpells();
@@ -1014,7 +1002,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadCreatureModelRace();
 
     sLog.outString( "Loading SpellsScriptTarget...");
-    sSpellMgr.LoadSpellScriptTarget();                       // must be after LoadCreatureTemplates and LoadGameobjectInfo
+    sSpellMgr.LoadSpellScriptTarget();                      // must be after LoadCreatureTemplates and LoadGameobjectInfo
 
     sLog.outString( "Loading ItemRequiredTarget...");
     sObjectMgr.LoadItemRequiredTarget();
@@ -1042,7 +1030,7 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading Creature Addon Data..." );
     sLog.outString();
-    sObjectMgr.LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
+    sObjectMgr.LoadCreatureAddons();                        // must be after LoadCreatureTemplates() and LoadCreatures()
     sLog.outString( ">>> Creature Addon Data loaded" );
     sLog.outString();
 
@@ -1062,14 +1050,14 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadWeatherZoneChances();
 
     sLog.outString( "Loading Quests..." );
-    sObjectMgr.LoadQuests();                                    // must be loaded after DBCs, creature_template, item_template, gameobject tables
+    sObjectMgr.LoadQuests();                                // must be loaded after DBCs, creature_template, item_template, gameobject tables
 
     sLog.outString( "Loading Quest POI" );
     sObjectMgr.LoadQuestPOI();
 
     sLog.outString( "Loading Quests Relations..." );
     sLog.outString();
-    sObjectMgr.LoadQuestRelations();                            // must be after quest load
+    sObjectMgr.LoadQuestRelations();                        // must be after quest load
     sLog.outString( ">>> Quests Relations loaded" );
     sLog.outString();
 
@@ -1086,10 +1074,10 @@ void World::SetInitialWorldSettings()
     sSpellMgr.LoadSpellAreas();
 
     sLog.outString( "Loading AreaTrigger definitions..." );
-    sObjectMgr.LoadAreaTriggerTeleports();                      // must be after item template load
+    sObjectMgr.LoadAreaTriggerTeleports();                  // must be after item template load
 
     sLog.outString( "Loading Quest Area Triggers..." );
-    sObjectMgr.LoadQuestAreaTriggers();                         // must be after LoadQuests
+    sObjectMgr.LoadQuestAreaTriggers();                     // must be after LoadQuests
 
     sLog.outString( "Loading Tavern Area Triggers..." );
     sObjectMgr.LoadTavernAreaTriggers();
@@ -1161,6 +1149,45 @@ void World::SetInitialWorldSettings()
     sLog.outString( ">>> Achievements loaded" );
     sLog.outString();
 
+    sLog.outString( "Loading Npc Text Id..." );
+    sObjectMgr.LoadNpcTextId();                             // must be after load Creature and LoadGossipText
+
+    sLog.outString( "Loading Gossip scripts..." );
+    sObjectMgr.LoadGossipScripts();                         // must be before gossip menu options
+
+    sLog.outString( "Loading Gossip menus..." );
+    sObjectMgr.LoadGossipMenu();
+
+    sLog.outString( "Loading Gossip menu options..." );
+    sObjectMgr.LoadGossipMenuItems();
+
+    sLog.outString( "Loading Vendors..." );
+    sObjectMgr.LoadVendorTemplates();                       // must be after load ItemTemplate
+    sObjectMgr.LoadVendors();                               // must be after load CreatureTemplate, VendorTemplate, and ItemTemplate
+
+    sLog.outString( "Loading Trainers..." );
+    sObjectMgr.LoadTrainerSpell();                          // must be after load CreatureTemplate
+
+    sLog.outString( "Loading Waypoint scripts..." );        // before loading from creature_movement
+    sObjectMgr.LoadCreatureMovementScripts();
+
+    sLog.outString( "Loading Waypoints..." );
+    sLog.outString();
+    sWaypointMgr.Load();
+
+    ///- Loading localization data
+    sLog.outString( "Loading Localization strings..." );
+    sObjectMgr.LoadCreatureLocales();                       // must be after CreatureInfo loading
+    sObjectMgr.LoadGameObjectLocales();                     // must be after GameobjectInfo loading
+    sObjectMgr.LoadItemLocales();                           // must be after ItemPrototypes loading
+    sObjectMgr.LoadQuestLocales();                          // must be after QuestTemplates loading
+    sObjectMgr.LoadNpcTextLocales();                        // must be after LoadGossipText
+    sObjectMgr.LoadPageTextLocales();                       // must be after PageText loading
+    sObjectMgr.LoadGossipMenuItemsLocales();                // must be after gossip menu items loading
+    sObjectMgr.LoadPointOfInterestLocales();                // must be after POI loading
+    sLog.outString( ">>> Localization strings loaded" );
+    sLog.outString();
+
     ///- Load dynamic data tables from the database
     sLog.outString( "Loading Auctions..." );
     sLog.outString();
@@ -1192,32 +1219,6 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading GameTeleports..." );
     sObjectMgr.LoadGameTele();
-
-    sLog.outString( "Loading Npc Text Id..." );
-    sObjectMgr.LoadNpcTextId();                             // must be after load Creature and NpcText
-
-    sLog.outString( "Loading Gossip scripts..." );
-    sObjectMgr.LoadGossipScripts();                         // must be before gossip menu options
-
-    sLog.outString( "Loading Gossip menus..." );
-    sObjectMgr.LoadGossipMenu();
-
-    sLog.outString( "Loading Gossip menu options..." );
-    sObjectMgr.LoadGossipMenuItems();
-
-    sLog.outString( "Loading Vendors..." );
-    sObjectMgr.LoadVendorTemplates();                       // must be after load ItemTemplate
-    sObjectMgr.LoadVendors();                               // must be after load CreatureTemplate, VendorTemplate, and ItemTemplate
-
-    sLog.outString( "Loading Trainers..." );
-    sObjectMgr.LoadTrainerSpell();                          // must be after load CreatureTemplate
-
-    sLog.outString( "Loading Waypoint scripts..." );        // before loading from creature_movement
-    sObjectMgr.LoadCreatureMovementScripts();
-
-    sLog.outString( "Loading Waypoints..." );
-    sLog.outString();
-    sWaypointMgr.Load();
 
     sLog.outString( "Loading GM tickets...");
     sTicketMgr.LoadGMTickets();

@@ -208,8 +208,8 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     // difficulties for dungeons/battleground ordered in normal way
     // and if more high version not exist must be used lesser version
     // for raid order different:
-    // 10 man normal version must be used instead not existed 10 man heroic version
-    // 25 man normal version must be used instead not existed 25 man heroic version
+    // 10 man normal version must be used instead nonexistent 10 man heroic version
+    // 25 man normal version must be used instead nonexistent 25 man heroic version
     CreatureInfo const *cinfo = normalInfo;
     for (uint8 diff = uint8(GetMap()->GetDifficulty()); diff > 0;)
     {
