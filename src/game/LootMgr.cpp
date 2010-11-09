@@ -1217,7 +1217,7 @@ void LoadLootTemplates_Item()
             if (ids_set.find(proto->ItemId) != ids_set.end() || proto->MaxMoneyLoot > 0)
                 ids_set.erase(proto->ItemId);
             // wdb have wrong data cases, so skip by default
-            else if ((sLog.getLogFilter() & LOG_FILTER_DB_STRICTED_CHECK) == 0)
+            else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
                 LootTemplates_Item.ReportNotExistedId(proto->ItemId);
         }
     }

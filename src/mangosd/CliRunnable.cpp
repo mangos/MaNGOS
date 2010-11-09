@@ -512,12 +512,10 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
 {
     if (!*args)
     {
-        uint32 logfiler = sLog.getLogFilter();
-
         SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
         for(int i = 0; i < LOG_FILTER_COUNT; ++i)
             if (*logFilterData[i].name)
-                PSendSysMessage("  %-20s = %s",logFilterData[i].name,(logfiler & (1 << i)) !=0 ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
+                PSendSysMessage("  %-20s = %s",logFilterData[i].name, sLog.HasLogFilter(1 << i) ? GetMangosString(LANG_ON) : GetMangosString(LANG_OFF));
         return true;
     }
 

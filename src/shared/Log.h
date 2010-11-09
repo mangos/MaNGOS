@@ -153,7 +153,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         void outTime();
         static void outTimestamp(FILE* file);
         static std::string GetTimestampStr();
-        uint32 getLogFilter() const { return m_logFilter; }
+        bool HasLogFilter(uint32 filter) const { return m_logFilter & filter; }
         void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
         bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
@@ -201,7 +201,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define BASIC_FILTER_LOG(F,...)                         \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && !sLog.HasLogFilter(F)) \
             sLog.outBasic(__VA_ARGS__);                 \
     } while(0)
 
@@ -213,7 +213,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define DETAIL_FILTER_LOG(F,...)                        \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && !sLog.HasLogFilter(F)) \
             sLog.outDetail(__VA_ARGS__);                \
     } while(0)
 
@@ -225,13 +225,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define DEBUG_FILTER_LOG(F,...)                         \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && !sLog.HasLogFilter(F)) \
             sLog.outDebug(__VA_ARGS__);                 \
     } while(0)
 
 #define ERROR_DB_FILTER_LOG(F,...)                      \
     do {                                                \
-        if ((sLog.getLogFilter() & (F))==0)             \
+        if (!sLog.HasLogFilter(F))                      \
             sLog.outErrorDb(__VA_ARGS__);               \
     } while(0)
 
