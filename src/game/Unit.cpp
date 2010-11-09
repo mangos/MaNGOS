@@ -3100,7 +3100,7 @@ bool Unit::IsSpellBlocked(Unit *pCaster, SpellEntry const *spellEntry, WeaponAtt
     {
         if (!(*i)->isAffectedOnSpell(spellProto))
             continue;
-        if ((*i)->GetModifier()->m_miscvalue == )
+        if ((*i)->GetModifier()->m_miscvalue == ???)
             return false;
     }
     */

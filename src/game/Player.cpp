@@ -13336,7 +13336,10 @@ uint32 Player::GetGossipTextId(uint32 menuId)
     for(GossipMenusMap::const_iterator itr = pMenuBounds.first; itr != pMenuBounds.second; ++itr)
     {
         if (sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_1) && sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_2))
+        {
             textId = itr->second.text_id;
+            break;
+        }
     }
 
     return textId;
@@ -16377,7 +16380,7 @@ void Player::_LoadItemLoot(QueryResult *result)
             if (!item)
             {
                 CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", item_guid);
-                sLog.outError("Player::_LoadItemLoot: Player %s has loot for not existed item (GUID: %u) in `item_loot`, deleted.", GetName(), item_guid );
+                sLog.outError("Player::_LoadItemLoot: Player %s has loot for nonexistent item (GUID: %u) in `item_loot`, deleted.", GetName(), item_guid );
                 continue;
             }
 
@@ -17798,7 +17801,7 @@ void Player::_SaveStats()
 void Player::outDebugStatsValues() const
 {
     // optimize disabled debug output
-    if(!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) || (sLog.getLogFilter() & LOG_FILTER_PLAYER_STATS)!=0)
+    if(!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) || sLog.HasLogFilter(LOG_FILTER_PLAYER_STATS))
         return;
 
     sLog.outDebug("HP is: \t\t\t%u\t\tMP is: \t\t\t%u",GetMaxHealth(), GetMaxPower(POWER_MANA));

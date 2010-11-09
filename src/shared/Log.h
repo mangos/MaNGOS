@@ -45,7 +45,7 @@ enum LogFilters
     LOG_FILTER_SQL_TEXT           = 0x0040,                 // raw SQL text send to DB engine
     LOG_FILTER_PLAYER_MOVES       = 0x0080,                 // player moves by grid/cell
     LOG_FILTER_PERIODIC_AFFECTS   = 0x0100,                 // DoT/HoT apply trace
-    LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 // DoT/HoT apply trace
+    LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 // AI/movement generators debug output
     LOG_FILTER_DAMAGE             = 0x0400,                 // Direct/Area damage trace
     LOG_FILTER_COMBAT             = 0x0800,                 // attack states/roll attack results/etc
     LOG_FILTER_SPELL_CAST         = 0x1000,                 // spell cast/aura apply/spell proc events
@@ -153,7 +153,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         void outTime();
         static void outTimestamp(FILE* file);
         static std::string GetTimestampStr();
-        uint32 getLogFilter() const { return m_logFilter; }
+        bool HasLogFilter(uint32 filter) const { return m_logFilter & filter; }
         void SetLogFilter(LogFilters filter, bool on) { if (on) m_logFilter |= filter; else m_logFilter &= ~filter; }
         bool HasLogLevelOrHigher(LogLevel loglvl) const { return m_logLevel >= loglvl || (m_logFileLevel >= loglvl && logfile); }
         bool IsOutCharDump() const { return m_charLog_Dump; }
@@ -201,7 +201,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define BASIC_FILTER_LOG(F,...)                         \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_BASIC) && !sLog.HasLogFilter(F)) \
             sLog.outBasic(__VA_ARGS__);                 \
     } while(0)
 
@@ -213,7 +213,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define DETAIL_FILTER_LOG(F,...)                        \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DETAIL) && !sLog.HasLogFilter(F)) \
             sLog.outDetail(__VA_ARGS__);                \
     } while(0)
 
@@ -225,13 +225,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define DEBUG_FILTER_LOG(F,...)                         \
     do {                                                \
-        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && (sLog.getLogFilter() & (F))==0) \
+        if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG) && !sLog.HasLogFilter(F)) \
             sLog.outDebug(__VA_ARGS__);                 \
     } while(0)
 
 #define ERROR_DB_FILTER_LOG(F,...)                      \
     do {                                                \
-        if ((sLog.getLogFilter() & (F))==0)             \
+        if (!sLog.HasLogFilter(F))                      \
             sLog.outErrorDb(__VA_ARGS__);               \
     } while(0)
 
