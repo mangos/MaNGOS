@@ -39,11 +39,17 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
     if(!GetPlayer()->GetVehicle())
         return;
 
+    bool dismiss = true;
+
+    if (GetPlayer()->GetVehicle()->GetVehicleInfo()->m_flags & VEHICLE_FLAG_NOT_DISMISS)
+        dismiss = false;
+
     GetPlayer()->m_movementInfo = mi;
     GetPlayer()->ExitVehicle();
 
-    if (Creature* vehicle = GetPlayer()->GetMap()->GetAnyTypeCreature(guid))
-        vehicle->ForcedDespawn();
+    if (dismiss)
+        if (Creature* vehicle = GetPlayer()->GetMap()->GetAnyTypeCreature(guid))
+            vehicle->ForcedDespawn();
 
 }
 
