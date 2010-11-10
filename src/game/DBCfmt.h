@@ -124,6 +124,7 @@ const char TalentTabEntryfmt[]="nxxiiixxxxx";
 const char TaxiNodesEntryfmt[]="nifffsii";
 const char TaxiPathEntryfmt[]="niii";
 const char TaxiPathNodeEntryfmt[]="diiifffiiii";
+const char TeamContributionPointsfmt[]="df";
 const char TotemCategoryEntryfmt[]="nxii";
 const char VehicleEntryfmt[]="niffffiiiiiiiifffffffffffffffssssfifixxx";
 const char VehicleSeatEntryfmt[]="niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxxxxxxxxxx";
