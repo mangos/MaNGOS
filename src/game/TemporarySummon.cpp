@@ -26,7 +26,7 @@ Creature(CREATURE_SUBTYPE_TEMPORARY_SUMMON), m_type(TEMPSUMMON_TIMED_OR_CORPSE_D
 {
 }
 
-void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
+void TemporarySummon::Update( uint32 diff )
 {
     switch(m_type)
     {
@@ -34,26 +34,26 @@ void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
             break;
         case TEMPSUMMON_TIMED_DESPAWN:
         {
-            if (m_timer <= update_diff)
+            if (m_timer <= diff)
             {
                 UnSummon();
                 return;
             }
 
-            m_timer -= update_diff;
+            m_timer -= diff;
             break;
         }
         case TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT:
         {
             if (!isInCombat())
             {
-                if (m_timer <= update_diff)
+                if (m_timer <= diff)
                 {
                     UnSummon();
                     return;
                 }
 
-                m_timer -= update_diff;
+                m_timer -= diff;
             }
             else if (m_timer != m_lifetime)
                 m_timer = m_lifetime;
@@ -65,13 +65,13 @@ void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
         {
             if (IsCorpse())
             {
-                if (m_timer <= update_diff)
+                if (m_timer <= diff)
                 {
                     UnSummon();
                     return;
                 }
 
-                m_timer -= update_diff;
+                m_timer -= diff;
             }
             break;
         }
@@ -106,13 +106,13 @@ void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
 
             if (!isInCombat())
             {
-                if (m_timer <= update_diff)
+                if (m_timer <= diff)
                 {
                     UnSummon();
                     return;
                 }
                 else
-                    m_timer -= update_diff;
+                    m_timer -= diff;
             }
             else if (m_timer != m_lifetime)
                 m_timer = m_lifetime;
@@ -129,13 +129,13 @@ void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
 
             if (!isInCombat() && isAlive() )
             {
-                if (m_timer <= update_diff)
+                if (m_timer <= diff)
                 {
                     UnSummon();
                     return;
                 }
                 else
-                    m_timer -= update_diff;
+                    m_timer -= diff;
             }
             else if (m_timer != m_lifetime)
                 m_timer = m_lifetime;
@@ -147,7 +147,7 @@ void TemporarySummon::Update(uint32 update_diff, uint32 tick_diff)
             break;
     }
 
-    Creature::Update(update_diff, tick_diff);
+    Creature::Update( diff );
 }
 
 void TemporarySummon::Summon(TempSummonType type, uint32 lifetime)
