@@ -779,7 +779,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
                 }
                 // Black Arrow
-                else if (m_spellProto->SpellFamilyFlags & UI64LIT(0x0800000000000080))
+                else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0800000000000080))
                 {
                     damage += int32(m_caster->GetTotalAttackPowerValue(RANGED_ATTACK)*0.1f);
                 }
