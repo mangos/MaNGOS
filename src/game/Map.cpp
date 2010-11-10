@@ -555,7 +555,7 @@ void Map::Update(uint32 time_, uint32 diff)
                     if (loaded(cell.gridPair()) )
                     {
                         GridType& celldata = (*getNGrid(cell.GridX(), cell.GridY()))(cell.CellX(), cell.CellY());
-                        uint32 realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
+                        realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
                         celldata.SetLastUpdateTime(time_);
                     }
 
@@ -609,7 +609,7 @@ void Map::Update(uint32 time_, uint32 diff)
                         if (loaded(cell.gridPair()) )
                         {
                             GridType& celldata = (*getNGrid(cell.GridX(), cell.GridY()))(cell.CellX(), cell.CellY());
-                            uint32 realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
+                            realdiff = getMSTimeDiff(celldata.GetLastUpdateTime(), time_);
                             celldata.SetLastUpdateTime(time_);
                         }
 
