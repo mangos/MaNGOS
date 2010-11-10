@@ -160,6 +160,7 @@ extern TaxiMask                                  sTaxiNodesMask;
 extern TaxiMask                                  sOldContinentsNodesMask;
 extern TaxiPathSetBySource                       sTaxiPathSetBySource;
 extern TaxiPathNodesByPath                       sTaxiPathNodesByPath;
+extern DBCStorage <TeamContributionPoints>       sTeamContributionPoints;
 extern DBCStorage <TotemCategoryEntry>           sTotemCategoryStore;
 extern DBCStorage <VehicleEntry>                 sVehicleStore;
 extern DBCStorage <VehicleSeatEntry>             sVehicleSeatStore;

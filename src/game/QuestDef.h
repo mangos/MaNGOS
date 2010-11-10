@@ -273,6 +273,8 @@ class Quest
         void SetQuestActiveState(bool state) { m_isActive = state; }
         bool IsActive() const { return m_isActive; }
 
+        uint32 CalculateRewardHonor(uint32 level) const;
+
         // multiple values
         std::string ObjectiveText[QUEST_OBJECTIVES_COUNT];
         uint32 ReqItemId[QUEST_ITEM_OBJECTIVES_COUNT];
