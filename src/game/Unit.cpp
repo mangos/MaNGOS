@@ -6784,17 +6784,16 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
                         break;
                     }
                 }
-                if(!found)
-                    break;
 
-                // search for Glacier Rot dummy aura
+                // search for Glacier Rot and  Improved Icy Touch dummy aura
+                bool isIcyTouch=(spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000002));
                 Unit::AuraList const& dummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
                 for(Unit::AuraList::const_iterator i = dummyAuras.begin(); i != dummyAuras.end(); ++i)
                 {
-                    if ((*i)->GetSpellProto()->EffectMiscValue[(*i)->GetEffIndex()] == 7244)
+                    if ((found && (*i)->GetSpellProto()->EffectMiscValue[(*i)->GetEffIndex()] == 7244) || //Glacier Rot
+                        (isIcyTouch && (*i)->GetSpellProto()->SpellIconID == 2721))                       //Improved Icy Touch 
                     {
                         DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f) / 100.0f;
-                        break;
                     }
                 }
 
