@@ -9210,6 +9210,14 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectInde
     {
         switch(spellProto->SpellFamilyName)
         {
+            case SPELLFAMILY_POTION:
+                {
+                    // Mixology
+                    if (HasAura(53042))
+                        duration *= 2;
+
+                    break;
+                }
             case SPELLFAMILY_DRUID:
                 if (spellProto->SpellFamilyFlags & UI64LIT(0x100))
                 {
