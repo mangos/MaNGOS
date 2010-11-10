@@ -754,7 +754,7 @@ void Spell::prepareDataForTriggerSystem()
         {
             case SPELLFAMILY_MAGE:
                 // Arcane Missles / Blizzard triggers need do it
-                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000200080))
+                if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000200080)|| m_spellInfo->SpellIconID == 212)
                     m_canTrigger = true;
                 // Clearcasting trigger need do it
                 else if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000200000000) && m_spellInfo->SpellFamilyFlags2 & 0x8)
