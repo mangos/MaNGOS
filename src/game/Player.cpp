@@ -12377,7 +12377,35 @@ void Player::SendEquipError( uint8 msg, Item* pItem, Item *pItem2, uint32 itemid
             case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS:
             {
                 ItemPrototype const* proto = pItem ? pItem->GetProto() : sObjectMgr.GetItemPrototype(itemid);
-                data << uint32(proto ? proto->ItemLimitCategory : 0);
+                uint32 LimitCategory=proto ? proto->ItemLimitCategory : 0;
+                if (pItem)
+                    // check unique-equipped on gems
+                    for(uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT+3; ++enchant_slot)
+                    {
+                        uint32 enchant_id = pItem->GetEnchantmentId(EnchantmentSlot(enchant_slot));
+                        if(!enchant_id)
+                            continue;
+                        SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
+                        if(!enchantEntry)
+                            continue;
+
+                        ItemPrototype const* pGem = ObjectMgr::GetItemPrototype(enchantEntry->GemID);
+                        if(!pGem)
+                            continue;
+
+                        // include for check equip another gems with same limit category for not equipped item (and then not counted)
+                        uint32 gem_limit_count = !pItem->IsEquipped() && pGem->ItemLimitCategory
+                            ? pItem->GetGemCountWithLimitCategory(pGem->ItemLimitCategory) : 1;
+
+                        if( msg == CanEquipUniqueItem(pGem, pItem->GetSlot(),gem_limit_count))
+                        {
+                            LimitCategory=pGem->ItemLimitCategory;
+                            break;
+                         
+                        }
+                    }
+
+                data << uint32(LimitCategory);
                 break;
             }
             default:
