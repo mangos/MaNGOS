@@ -1287,7 +1287,7 @@ void World::SetInitialWorldSettings()
     //one second is 1000 -(tested on win system)
     mail_timer = uint32((((localtime( &m_gameTime )->tm_hour + 20) % 24)* HOUR * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval() );
                                                             //1440
-    mail_timer_expires = (DAY * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval();
+    mail_timer_expires = uint32( (DAY * IN_MILLISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
     DEBUG_LOG("Mail timer set to: %u, mail return is called every %u minutes", mail_timer, mail_timer_expires);
 
     ///- Initialize static helper structures
@@ -1385,7 +1385,12 @@ void World::Update(uint32 diff)
 {
     ///- Update the different timers
     for(int i = 0; i < WUPDATE_COUNT; ++i)
-        m_timers[i].Update(diff);
+    {
+        if (m_timers[i].GetCurrent()>=0)
+            m_timers[i].Update(diff);
+        else
+            m_timers[i].SetCurrent(0);
+    }
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
