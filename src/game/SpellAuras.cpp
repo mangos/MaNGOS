@@ -2205,6 +2205,42 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 break;
             }
+            case SPELLFAMILY_ROGUE:
+            {
+                // Honor Among Thieves
+                if (GetId() == 52916)
+                {
+                    // Get Honor Among Thieves party aura
+                    Unit::AuraList const &procTriggerSpellAuras = target->GetAurasByType(SPELL_AURA_PROC_TRIGGER_SPELL);
+                    for (Unit::AuraList::const_iterator i = procTriggerSpellAuras.begin(); i != procTriggerSpellAuras.end(); ++i)
+                    {
+                        SpellEntry const *spellInfo = (*i)->GetSpellProto();
+
+                        if (!spellInfo)
+                            continue;
+
+                        if (spellInfo->EffectTriggerSpell[0] == 52916)
+                        {
+                            // Get caster of aura
+                            if(!(*i)->GetCaster() || (*i)->GetCaster()->GetTypeId() != TYPEID_PLAYER)
+                                continue;
+
+                            Player *pCaster = (Player*)((*i)->GetCaster());
+
+                            // do not proc if player has CD, or if player has no target, or if player's target is not valid
+                            if (pCaster->HasAura(51699, EFFECT_INDEX_1) || !pCaster->getVictim() || pCaster->IsFriendlyTo(pCaster->getVictim()))
+                                continue;
+                            // give combo point and aura for cooldown on success
+                            else if (roll_chance_i(spellInfo->CalculateSimpleValue(EFFECT_INDEX_0)))
+                                pCaster->CastSpell(pCaster->getVictim(), 51699, true);
+                        }
+                    }
+
+                    // return after loop to make sure all rogues with Honor Among Thieves get the benefit of this proc rather than only first
+                    return;
+                }
+                break;
+            }
             case SPELLFAMILY_MAGE:
             {
                 // hack for Fingers of Frost stacks
