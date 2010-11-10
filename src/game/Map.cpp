@@ -1740,7 +1740,7 @@ bool InstanceMap::Add(Player *player)
         if (IsDungeon())
         {
             // check for existing instance binds
-            InstancePlayerBind *playerBind = player->GetBoundInstance(GetId(), Difficulty(GetSpawnMode()));
+            InstancePlayerBind *playerBind = player->GetBoundInstance(GetId(), GetDifficulty());
             if (playerBind && playerBind->perm)
             {
                 // cannot enter other instances if bound permanently
@@ -1778,8 +1778,11 @@ bool InstanceMap::Add(Player *player)
                                 pGroup->GetId(),
                                 groupBind->save->GetMapId(), groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty(),
                                 groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount(), groupBind->save->CanReset());
-                        MANGOS_ASSERT(false);
+
+                        // no reason crash if we can fix state
+                        player->UnbindInstance(GetId(), GetDifficulty());
                     }
+
                     // bind to the group or keep using the group save
                     if (!groupBind)
                         pGroup->BindToInstance(GetInstanceSave(), false);
@@ -1922,7 +1925,7 @@ void InstanceMap::CreateInstanceData(bool load)
 /*
     Returns true if there are no players in the instance
 */
-bool InstanceMap::Reset(uint8 method)
+bool InstanceMap::Reset(InstanceResetMethod method)
 {
     // note: since the map may not be loaded when the instance needs to be reset
     // the instance must be deleted from the DB by InstanceSaveManager
