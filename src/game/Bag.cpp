@@ -195,36 +195,29 @@ Item* Bag::GetItemByLimitedCategory(uint32 limitedCategory) const
     return NULL;
 }
 
-uint32 Bag::GetItemCount( uint32 item, Item* eItem ) const
+uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
 {
-    Item *pItem;
     uint32 count = 0;
     for(uint32 i=0; i < GetBagSize(); ++i)
-    {
-        pItem = m_bagslot[i];
-        if( pItem && pItem != eItem && pItem->GetEntry() == item )
-            count += pItem->GetCount();
-    }
+        if (m_bagslot[i])
+            if (m_bagslot[i] != eItem && m_bagslot[i]->GetEntry() == item)
+                count += m_bagslot[i]->GetCount();
 
-    if(eItem && eItem->GetProto()->GemProperties)
-    {
+    if (eItem && eItem->GetProto()->GemProperties)
         for(uint32 i=0; i < GetBagSize(); ++i)
-        {
-            pItem = m_bagslot[i];
-            if( pItem && pItem != eItem && pItem->GetProto()->Socket[0].Color )
-                count += pItem->GetGemCountWithID(item);
-        }
-    }
+            if (m_bagslot[i])
+                if (m_bagslot[i] != eItem && m_bagslot[i]->GetProto()->Socket[0].Color)
+                    count += m_bagslot[i]->GetGemCountWithID(item);
 
     return count;
 }
 
-uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory) const
+uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* eItem) const
 {
     uint32 count = 0;
     for(uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i])
-            if (m_bagslot[i]->GetProto()->ItemLimitCategory == limitCategory )
+            if (m_bagslot[i] != eItem && m_bagslot[i]->GetProto()->ItemLimitCategory == limitCategory )
                 count += m_bagslot[i]->GetCount();
 
     return count;
