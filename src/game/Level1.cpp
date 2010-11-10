@@ -553,8 +553,16 @@ bool ChatHandler::HandleGonameCommand(char* args)
                 InstanceGroupBind *gBind = group ? group->GetBoundInstance(target->GetMapId(), target) : NULL;
                 // if no bind exists, create a solo bind
                 if (!gBind)
+                {
                     if (InstanceSave *save = target->GetMap()->GetInstanceSave())
-                        _player->BindToInstance(save, !save->CanReset());
+                    {
+                        // if player is group leader then we need add group bind
+                        if (group && group->IsLeader(_player->GetObjectGuid()))
+                            group->BindToInstance(save, !save->CanReset());
+                        else
+                            _player->BindToInstance(save, !save->CanReset());
+                    }
+                }
             }
 
             if(cMap->IsRaid())
