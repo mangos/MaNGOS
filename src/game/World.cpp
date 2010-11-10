@@ -1381,7 +1381,7 @@ void World::DetectDBCLang()
 }
 
 /// Update the World !
-void World::Update(uint32 time_, uint32 diff)
+void World::Update(uint32 diff)
 {
     ///- Update the different timers
     for(int i = 0; i < WUPDATE_COUNT; ++i)
@@ -1461,7 +1461,7 @@ void World::Update(uint32 time_, uint32 diff)
     {
         m_timers[WUPDATE_OBJECTS].Reset();
         ///- Update objects when the timer has passed (maps, transport, creatures,...)
-        sMapMgr.Update(time_, diff);                // As interval = 0
+        sMapMgr.Update(diff);                // As interval = 0
 
         sBattleGroundMgr.Update(diff);
     }

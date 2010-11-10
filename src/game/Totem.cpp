@@ -31,7 +31,7 @@ Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
     m_type = TOTEM_PASSIVE;
 }
 
-void Totem::Update(uint32 update_diff, uint32 tick_diff)
+void Totem::Update( uint32 time )
 {
     Unit *owner = GetOwner();
     if (!owner || !owner->isAlive() || !isAlive())
@@ -40,15 +40,15 @@ void Totem::Update(uint32 update_diff, uint32 tick_diff)
         return;
     }
 
-    if (m_duration <= update_diff)
+    if (m_duration <= time)
     {
         UnSummon();                                         // remove self
         return;
     }
     else
-        m_duration -= update_diff;
+        m_duration -= time;
 
-    Creature::Update(update_diff, tick_diff);
+    Creature::Update( time );
 }
 
 void Totem::Summon(Unit* owner)

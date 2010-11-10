@@ -509,7 +509,7 @@ class World
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
         static bool IsStopped() { return m_stopEvent; }
 
-        void Update(uint32 time_, uint32 diff);
+        void Update(uint32 diff);
 
         void UpdateSessions( uint32 diff );
 
