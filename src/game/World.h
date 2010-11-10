@@ -517,7 +517,7 @@ class World
         static void StopNow(uint8 exitcode) { m_stopEvent = true; m_ExitCode = exitcode; }
         static bool IsStopped() { return m_stopEvent; }
 
-        void Update(uint32 time_, uint32 diff);
+        void Update(uint32 diff);
 
         void UpdateSessions( uint32 diff );
 
@@ -650,7 +650,7 @@ class World
 
         time_t m_startTime;
         time_t m_gameTime;
-        ShortIntervalTimer m_timers[WUPDATE_COUNT];
+        IntervalTimer m_timers[WUPDATE_COUNT];
         uint32 mail_timer;
         uint32 mail_timer_expires;
 

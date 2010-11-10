@@ -35,7 +35,7 @@ class MapUpdater
 
         friend class MapUpdateRequest;
 
-        int schedule_update(Map& map, ACE_UINT32 time_, ACE_UINT32 diff);
+        int schedule_update(Map& map, ACE_UINT32 diff);
 
         int wait();
 

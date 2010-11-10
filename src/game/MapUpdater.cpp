@@ -60,19 +60,18 @@ class MapUpdateRequest : public ACE_Method_Request
 
         Map& m_map;
         MapUpdater& m_updater;
-        ACE_UINT32 m_time_;
         ACE_UINT32 m_diff;
 
     public:
 
-        MapUpdateRequest(Map& m, MapUpdater& u, ACE_UINT32 t, ACE_UINT32 d)
-            : m_map(m), m_updater(u), m_time_(t), m_diff(d)
+        MapUpdateRequest(Map& m, MapUpdater& u, ACE_UINT32 d)
+            : m_map(m), m_updater(u), m_diff(d)
         {
         }
 
         virtual int call()
         {
-            m_map.Update (m_time_, m_diff);
+            m_map.Update (m_diff);
             m_updater.update_finished ();
             return 0;
         }
@@ -110,13 +109,13 @@ int MapUpdater::wait()
     return 0;
 }
 
-int MapUpdater::schedule_update(Map& map,ACE_UINT32 time_, ACE_UINT32 diff)
+int MapUpdater::schedule_update(Map& map, ACE_UINT32 diff)
 {
     ACE_GUARD_RETURN(ACE_Thread_Mutex, guard, m_mutex, -1);
 
     ++pending_requests;
 
-    if (m_executor.execute(new MapUpdateRequest(map, *this, time_, diff)) == -1)
+    if (m_executor.execute(new MapUpdateRequest(map, *this, diff)) == -1)
     {
         ACE_DEBUG((LM_ERROR, ACE_TEXT("(%t) \n"), ACE_TEXT("Failed to schedule Map Update")));
 

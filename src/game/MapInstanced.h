@@ -34,7 +34,7 @@ class MANGOS_DLL_DECL MapInstanced : public Map
         ~MapInstanced() {}
 
         // functions overwrite Map versions
-        void Update(uint32 time_, uint32 diff);
+        void Update(const uint32&);
         void RemoveAllObjectsInRemoveList();
         void UnloadAll(bool pForce);
 

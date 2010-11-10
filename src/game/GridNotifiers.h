@@ -117,9 +117,8 @@ namespace MaNGOS
 
     struct MANGOS_DLL_DECL ObjectUpdater
     {
-        uint32 i_realdiff;                                  // time from last update in msecs
-        uint32 i_diff;                                      // current tick time diff in msecs
-        explicit ObjectUpdater(uint32 realdiff, uint32 diff) : i_realdiff(realdiff), i_diff(diff) {}
+        uint32 i_timeDiff;
+        explicit ObjectUpdater(const uint32 &diff) : i_timeDiff(diff) {}
         template<class T> void Visit(GridRefManager<T> &m);
         void Visit(PlayerMapType &) {}
         void Visit(CorpseMapType &) {}

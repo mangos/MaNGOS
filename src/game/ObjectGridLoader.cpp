@@ -227,8 +227,6 @@ ObjectGridLoader::Load(GridType &grid)
 
 void ObjectGridLoader::LoadN(void)
 {
-    uint32 updatetime = i_map->GetLastUpdateTime();
-
     i_gameObjects = 0; i_creatures = 0; i_corpses = 0;
     i_cell.data.Part.cell_y = 0;
     for(unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
@@ -239,9 +237,6 @@ void ObjectGridLoader::LoadN(void)
             i_cell.data.Part.cell_y = y;
             GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
             loader.Load(i_grid(x, y), *this);
-
-            // setup last update time for loaded cell
-            i_grid(x, y).SetLastUpdateTime(updatetime);
         }
     }
     DEBUG_LOG("%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses,i_grid.GetGridId(), i_map->GetId());
