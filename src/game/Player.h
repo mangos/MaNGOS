@@ -37,6 +37,7 @@
 #include "ReputationMgr.h"
 #include "BattleGround.h"
 #include "DBCEnums.h"
+#include "SharedDefines.h"
 
 #include<string>
 #include<vector>
@@ -1919,7 +1920,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SendDungeonDifficulty(bool IsInGroup);
         void SendRaidDifficulty(bool IsInGroup);
-        void ResetInstances(uint8 method, bool isRaid);
+        void ResetInstances(InstanceResetMethod method, bool isRaid);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
         void SendResetFailedNotify(uint32 mapid);
