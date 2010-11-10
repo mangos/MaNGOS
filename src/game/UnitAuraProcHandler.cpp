@@ -3445,6 +3445,17 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                     if (GetStat(STAT_AGILITY)  > stat) { trigger_spell_id = 67772;                               }
                     break;
                 }
+                // Blade Warding
+                case 64440:
+                {
+                      if (SpellEntry const *S=sSpellStore.LookupEntry(64442))
+                      {
+                          basepoints[0] = triggeredByAura->GetStackAmount()*CalculateSpellDamage(pVictim, S, EFFECT_INDEX_0);
+                          RemoveAurasDueToSpell(64440);
+                          trigger_spell_id=64442;  //Blade Warding damage
+                      }
+                        break;
+                }
             }
             break;
         case SPELLFAMILY_MAGE:
