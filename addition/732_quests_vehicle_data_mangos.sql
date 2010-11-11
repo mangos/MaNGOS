@@ -184,6 +184,9 @@ WHERE entry IN (28670);
 
 UPDATE creature_template SET maxhealth = 133525, minhealth = 133525, maxmana = 51360, minmana = 51360, InhabitType = 3 WHERE entry = 28670;
 
+REPLACE INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `bytes2`, `emote`, `moveflags`, `auras`) VALUES
+(28670, 0, 50331648, 1, 0, 1024, '53112 0 53112 1');
+
 -- from me
 -- into realm of shadows
 UPDATE `creature_template` SET `IconName` = 'vehichleCursor',
