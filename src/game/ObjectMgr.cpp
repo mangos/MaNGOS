@@ -9380,12 +9380,8 @@ void ObjectMgr::LoadGossipMenuItems()
     if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))   // check unused menu ids only in strict mode
     {
         for (GossipMenusMap::const_iterator itr = m_mGossipMenusMap.begin(); itr != m_mGossipMenusMap.end(); ++itr)
-            menu_ids.insert(itr->first);
-
-        for(uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
-            if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-                if (cInfo->GossipMenuId)
-                    menu_ids.erase(cInfo->GossipMenuId);
+            if (itr->first)
+                menu_ids.insert(itr->first);
 
         for(uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
             if (GameObjectInfo const* gInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
@@ -9478,6 +9474,33 @@ void ObjectMgr::LoadGossipMenuItems()
 
         if (gMenuItem.option_id >= GOSSIP_OPTION_MAX)
             sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_id);
+
+        if (gMenuItem.menu_id && (gMenuItem.npc_option_npcflag || !sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK)))
+        {
+            bool found_menu_uses = false;
+            bool found_flags_uses = false;
+            for(uint32 i = 1; !found_flags_uses && i < sCreatureStorage.MaxEntry; ++i)
+            {
+                if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+                {
+                    if (cInfo->GossipMenuId == gMenuItem.menu_id)
+                    {
+                        found_menu_uses = true;
+
+                        // some from creatures with gossip menu can use gossip option base at npc_flags
+                        if (gMenuItem.npc_option_npcflag & cInfo->npcflag)
+                            found_flags_uses = true;
+
+                        // unused check data preparing part
+                        if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
+                            menu_ids.erase(cInfo->GossipMenuId);
+                    }
+                }
+            }
+
+            if (found_menu_uses && !found_flags_uses)
+                sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding`npcflag`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
+        }
 
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
         {
