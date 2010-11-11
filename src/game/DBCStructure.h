@@ -1704,6 +1704,12 @@ struct TaxiPathNodeEntry
     uint32    departureEventID;                             // 10       m_departureEventID
 };
 
+struct TeamContributionPoints
+{
+    //uint32    Entry;                                      // 0
+    float     Value;                                        // 1 (???)
+};
+
 struct TotemCategoryEntry
 {
     uint32    ID;                                           // 0
