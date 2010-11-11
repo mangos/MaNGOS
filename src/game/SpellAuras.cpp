@@ -8375,13 +8375,6 @@ m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0)
     if(modOwner)
         modOwner->ApplySpellMod(GetId(), SPELLMOD_CHARGES, m_procCharges);
 
-    if (caster && caster->GetObjectGuid().IsUnit() && m_spellProto->Id == 22959)                // Improved Scorch
-    {
-        // Glyph of Improved Scorch
-        if (Aura* glyph = ((Unit*)caster)->GetDummyAura(56371))
-            m_stackAmount = glyph->GetModifier()->m_amount;
-    }
-
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         m_auras[i] = NULL;
 }
