@@ -2990,6 +2990,10 @@ void Spell::cast(bool skipCheck)
         if(const SpellEntry* spellInfo = sSpellStore.LookupEntry(m_spellInfo->Id))
             const_cast<SpellEntry*>(spellInfo)->AuraInterruptFlags = 0;
 
+    if (m_spellInfo->Id == 32592)                           // Mass Dispel - immunity bypass hack
+        if(const SpellEntry* spellInfo = sSpellStore.LookupEntry(m_spellInfo->Id))
+            const_cast<SpellEntry*>(spellInfo)->Attributes |= SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY;
+
     // different triggred (for caster) and precast (casted before apply effect to target) cases
     switch(m_spellInfo->SpellFamilyName)
     {
@@ -3022,8 +3026,11 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_WARRIOR:
         {
+            // Shattering Throw
+            if (m_spellInfo->Id == 64382)
+                AddTriggeredSpell(64380);                    // Shattering Throw
             // Shield Slam
-            if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000020000000000)) && m_spellInfo->Category==1209)
+            else if ((m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000020000000000)) && m_spellInfo->Category==1209)
                 if (m_caster->HasAura(58375))               // Glyph of Blocking
                     AddTriggeredSpell(58374);               // Glyph of Blocking
             // Shattering Throw
