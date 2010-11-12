@@ -1281,6 +1281,24 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     ((Player*)this)->RemoveSpellCategoryCooldown(35, true);
                     return SPELL_AURA_PROC_OK;
                 }
+                // Glyph of Icy Veins
+                case 56374:
+                {
+                    Unit::AuraList const& hasteAuras = GetAurasByType(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK);
+                    for(Unit::AuraList::const_iterator i = hasteAuras.begin(); i != hasteAuras.end();)
+                    {
+                        if (!IsPositiveSpell((*i)->GetId()))
+                        {
+                            RemoveAurasDueToSpell((*i)->GetId());
+                            i = hasteAuras.begin();
+                        }
+                        else
+                            ++i;
+                    }
+                    RemoveSpellsCausingAura(SPELL_AURA_HASTE_SPELLS);
+                    RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    return SPELL_AURA_PROC_OK;
+                }
                 // Glyph of Polymorph
                 case 56375:
                 {
