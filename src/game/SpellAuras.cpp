@@ -321,7 +321,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraModAttackPowerOfStatPercent,           //268 SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT
     &Aura::HandleNoImmediateEffect,                         //269 SPELL_AURA_MOD_IGNORE_DAMAGE_REDUCTION_SCHOOL   implemented in Unit::CalcNotIgnoreDamageRedunction
     &Aura::HandleUnused,                                    //270 SPELL_AURA_MOD_IGNORE_TARGET_RESIST (unused in 3.2.2a)
-    &Aura::HandleNoImmediateEffect,                         //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER    implemented in Unit::SpellDamageBonusTaken
+    &Aura::HandleNoImmediateEffect,                         //271 SPELL_AURA_MOD_DAMAGE_FROM_CASTER    implemented in Unit::MeleeDamageBonusTaken and Unit::SpellDamageBonusTaken
     &Aura::HandleNoImmediateEffect,                         //272 SPELL_AURA_MAELSTROM_WEAPON (unclear use for aura, it used in (3.2.2a...3.3.0) in single spell 53817 that spellmode stacked and charged spell expected to be drop as stack
     &Aura::HandleNoImmediateEffect,                         //273 SPELL_AURA_X_RAY (client side implementation)
     &Aura::HandleNULL,                                      //274 proc free shot?
@@ -5208,6 +5208,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                     m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 0.2 / 5);
                 // Immolation Trap
                 if ((spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000004)) && spellProto->SpellIconID == 678)
+                    // $RAP*0.1/5 bonus per tick
+                    m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 10 / 500);
+                // Black Arrow
+                if (spellProto->SpellFamilyFlags & UI64LIT(0x0800000000000000))
                     // $RAP*0.1/5 bonus per tick
                     m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(RANGED_ATTACK) * 10 / 500);
                 break;
