@@ -6157,7 +6157,10 @@ Pet* Unit::GetPet() const
 
 Pet* Unit::_GetPet(ObjectGuid guid) const
 {
-    return GetMap()->GetPet(guid);
+    if (Map* pMap = GetMap())
+        return pMap->GetPet(guid);
+    else
+        return NULL;
 }
 
 void Unit::RemoveMiniPet()
