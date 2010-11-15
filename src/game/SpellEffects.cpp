@@ -1717,11 +1717,11 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    if (eff_idx == EFFECT_INDEX_0)
+                    if (effect->EffectIndex == EFFECT_INDEX_0)
                     {
                         Player* pPlayer = (Player*)m_caster;
 
-                        uint32 faction_id = m_currentBasePoints[eff_idx];
+                        uint32 faction_id = m_currentBasePoints[effect->EffectIndex];
                         int32  rep_change = m_currentBasePoints[EFFECT_INDEX_1];
 
                         FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);

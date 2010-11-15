@@ -2747,10 +2747,12 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, 0.0f );
 
     SetInt32Value(UNIT_FIELD_ATTACK_POWER,            0 );
-    SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS,       0 );
+    SetInt32Value(UNIT_FIELD_ATTACK_POWER_MOD_POS,    0 );
+    SetInt32Value(UNIT_FIELD_ATTACK_POWER_MOD_NEG,    0 );
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER,0.0f);
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER,     0 );
-    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS,0 );
+    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MOD_POS,0 );
+    SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MOD_NEG,0 );
     SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER,0.0f);
 
     // Base crit values (will be recalculated in UpdateAllStats() at loading and in _ApplyAllStatBonuses() at reset

@@ -3967,7 +3967,6 @@ void SpellMgr::CheckUsedSpells(char const* table)
                             spell, name.c_str(), familyMaskA, familyMaskB, code.c_str());
                         continue;
                     }
-
                 }
                 else
                 {
@@ -3976,7 +3975,6 @@ void SpellMgr::CheckUsedSpells(char const* table)
                         sLog.outError("Spell %u '%s' not fit to (" I64FMT "," I32FMT ") but used in %s.",spell,name.c_str(),familyMaskA,familyMaskB,code.c_str());
                         continue;
                     }
-
                 }
             }
 
@@ -4013,7 +4011,6 @@ void SpellMgr::CheckUsedSpells(char const* table)
                     sLog.outError("Spell %u '%s' aura%d <> %u but used in %s.",spell,name.c_str(),effectIdx+1,auraType,code.c_str());
                     continue;
                 }
-
             }
             else
             {
@@ -4066,7 +4063,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 if (spellVisual >= 0 && spellEntry->SpellVisual[0] != uint32(spellVisual))
                     continue;
 
-                if(category >= 0 && spellEntry->GetCategory() != uint32(category)
+                if(category >= 0 && spellEntry->GetCategory() != uint32(category))
                     continue;
 
                 if (effectIdx >= 0)
