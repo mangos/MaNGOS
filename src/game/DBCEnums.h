@@ -254,6 +254,8 @@ enum AchievementCriteriaMoreReqType
     ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_GUILD_REP              = 62,
 };
 
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 124
+
 enum AreaFlags
 {
     AREA_FLAG_SNOW                  = 0x00000001,           // snow (only Dun Morogh, Naxxramas, Razorfen Downs and Winterspring)
