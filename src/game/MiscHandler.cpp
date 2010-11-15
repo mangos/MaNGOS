@@ -797,6 +797,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             // hack for "Opening of the Dark Portal"
             if(missingQuest && at->target_mapId == 269)
                 SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
+            else if(missingQuest && mapEntry->IsContinent())// do not report anything for quest areatriggers
+                return;
             // hack for TBC heroics
             else if(missingLevel && !mapEntry->IsRaid() && GetPlayer()->GetDifficulty(false) == DUNGEON_DIFFICULTY_HEROIC && mapEntry->addon == 1)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), at->requiredLevel);
