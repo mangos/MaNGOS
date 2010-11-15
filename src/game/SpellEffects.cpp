@@ -4094,6 +4094,9 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
                     break;
                 case SUMMON_PROP_TYPE_CRITTER:
                     DoSummonCritter(eff_idx, summon_prop->FactionId);
+                    // TODO: differenciate between regular 'critter' types and 'critter' that are fighting.
+                    // prop_id == 387 are expected to be fighting (but they have postfix 'companion').
+                    // Note: summon_prop->Slot==6 may be related to how selection are done for this type (need more research)
                     break;
                 case SUMMON_PROP_TYPE_PHASING:
                 case SUMMON_PROP_TYPE_LIGHTWELL:
