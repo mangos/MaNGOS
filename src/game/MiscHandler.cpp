@@ -753,6 +753,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         if(GetPlayer()->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
             missingLevel = true;
 
+        // must have one or the other, report the first one that's missing
         if(at->requiredItem)
         {
             if(!GetPlayer()->HasItemCount(at->requiredItem, 1) &&

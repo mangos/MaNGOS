@@ -1968,6 +1968,7 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
             existExpired = true;
             continue;
         }
+
         // Handle custom absorb auras
         // TODO: try find better way
         SpellClassOptionsEntry const* classOptions = spellProto->GetSpellClassOptions();
@@ -7438,6 +7439,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsPet())
             TakenPercent *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_PET_AOE_DAMAGE_AVOIDANCE, schoolMask);
     }
+
     // special dummys/class scripts and other effects
     // =============================================
 

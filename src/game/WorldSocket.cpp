@@ -762,7 +762,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     recvPacket >> account;
     recvPacket.read_skip<uint32>();                         // addon data size
 
-    DEBUG_LOG ("WorldSocket::HandleAuthSession: client %u, account %s, clientseed %X",
+    DEBUG_LOG ("WorldSocket::HandleAuthSession: client build %u, account %s, clientseed %X",
                 ClientBuild,
                 account.c_str(),
                 clientSeed);

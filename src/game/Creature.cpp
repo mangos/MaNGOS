@@ -1913,7 +1913,7 @@ bool Creature::LoadCreatureAddon(bool reload)
             else
                 AddSpellAuraHolder(holder);
 
-            SpellEffectEntry const* effectEntry = AdditionalSpellInfo->GetSpellEffect(cAura->effect_idx);
+            SpellEffectEntry const* effectEntry = AdditionalSpellInfo->GetSpellEffect(EFFECT_INDEX_0);
             DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, effectEntry ? effectEntry->EffectApplyAuraName : 0, GetGUIDLow(), GetEntry());
         }
     }

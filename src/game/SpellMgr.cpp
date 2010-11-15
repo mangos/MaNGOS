@@ -1856,7 +1856,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         return false;
 
                     // Improved Hamstring -> Hamstring (multi-family check)
-                    if( classOptions2 && (classOptions2->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_1->Id == 23694 )
+                    if (classOptions2 && (classOptions2->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_1->Id == 23694 )
                         return false;
 
                     break;
@@ -1888,7 +1888,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         return false;
 
                     // Improved Wing Clip -> Wing Clip (multi-family check)
-                    if( classOptions2 && (classOptions2->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_1->Id == 19229 )
+                    if (classOptions2 && (classOptions2->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_1->Id == 19229 )
                         return false;
                     break;
                 }
@@ -1914,25 +1914,25 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_MAGE:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_MAGE )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_MAGE )
             {
                 // Blizzard & Chilled (and some other stacked with blizzard spells
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x80)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x100000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x80)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x100000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x80)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x100000)) )
                     return false;
 
                 // Blink & Improved Blink
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_2->SpellVisual[0] == 72 && spellInfo_2->SpellIconID == 1499) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_2->SpellVisual[0] == 72 && spellInfo_2->SpellIconID == 1499) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_1->SpellVisual[0] == 72 && spellInfo_1->SpellIconID == 1499) )
                     return false;
 
                 // Living Bomb & Ignite (Dots)
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2000000000000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x8000000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2000000000000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x8000000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x2000000000000)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x8000000)) )
                     return false;
 
                 // Fireball & Pyroblast (Dots)
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x1)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x400000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x1)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x400000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x1)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x400000)) )
                     return false;
             }
@@ -1982,10 +1982,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_WARRIOR:
-            if( classOptions2 && classOptions1->SpellFamilyName == SPELLFAMILY_WARRIOR )
+            if (classOptions2 && classOptions1->SpellFamilyName == SPELLFAMILY_WARRIOR )
             {
                 // Rend and Deep Wound
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x1000000000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x1000000000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x1000000000)) )
                     return false;
 
@@ -1996,7 +1996,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
 
             // Hamstring -> Improved Hamstring (multi-family check)
-            if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_2->Id == 23694 )
+            if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2)) && spellInfo_2->Id == 23694 )
                 return false;
 
             // Defensive Stance and Scroll of Protection (multi-family check)
@@ -2009,15 +2009,15 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
             break;
         case SPELLFAMILY_PRIEST:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_PRIEST )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_PRIEST )
             {
                 //Devouring Plague and Shadow Vulnerability
-                if ( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2000000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x800000000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x2000000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x800000000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x2000000)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x800000000)))
                     return false;
 
                 //StarShards and Shadow Word: Pain
-                if ( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x200000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x8000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x200000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x8000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x200000)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x8000)))
                     return false;
                 // Dispersion
@@ -2027,11 +2027,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
             break;
         case SPELLFAMILY_DRUID:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_DRUID )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_DRUID )
             {
                 //Omen of Clarity and Blood Frenzy
-                if( classOptions1 && (classOptions1->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_1->SpellIconID == 108) && (classOptions2->SpellFamilyFlags & UI64LIT(0x20000000000000)) ||
-                    (classOptions2->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_2->SpellIconID == 108) && (classOptions1->SpellFamilyFlags & UI64LIT(0x20000000000000)) )
+                if ((classOptions1 && (classOptions1->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_1->SpellIconID == 108) && (classOptions2->SpellFamilyFlags & UI64LIT(0x20000000000000))) ||
+                    ((classOptions2->SpellFamilyFlags == UI64LIT(0x0) && spellInfo_2->SpellIconID == 108) && (classOptions1->SpellFamilyFlags & UI64LIT(0x20000000000000))))
                     return false;
 
                 //  Tree of Life (Shapeshift) and 34123 Tree of Life (Passive)
@@ -2088,7 +2088,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
             break;
         case SPELLFAMILY_ROGUE:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_ROGUE )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_ROGUE )
             {
                 // Master of Subtlety
                 if ((spellId_1 == 31665 && spellId_2 == 31666) ||
@@ -2097,8 +2097,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
                 // Sprint & Sprint (waterwalk)
                 if (spellInfo_1->SpellIconID == 516 && spellInfo_2->SpellIconID == 516 &&
-                    (spellInfo_1->GetCategory() == 44 && spellInfo_2->GetCategory() == 0 ||
-                    spellInfo_2->GetCategory() == 44 && spellInfo_1->GetCategory() == 0))
+                    ((spellInfo_1->GetCategory() == 44 && spellInfo_2->GetCategory() == 0) ||
+                    (spellInfo_2->GetCategory() == 44 && spellInfo_1->GetCategory() == 0)))
                     return false;
             }
 
@@ -2111,15 +2111,15 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_HUNTER:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_HUNTER )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_HUNTER )
             {
                 // Rapid Fire & Quick Shots
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x20000000000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x20000000000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x20)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x20000000000)) )
                     return false;
 
                 // Serpent Sting & (Immolation/Explosive Trap Effect)
-                if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x4)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x00000004000)) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x4)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x00000004000)) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x4)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x00000004000)) )
                     return false;
 
@@ -2129,7 +2129,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
 
             // Wing Clip -> Improved Wing Clip (multi-family check)
-            if( classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_2->Id == 19229 )
+            if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x40)) && spellInfo_2->Id == 19229 )
                 return false;
 
             // Concussive Shot and Imp. Concussive Shot (multi-family check)
@@ -2137,14 +2137,14 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_PALADIN:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_PALADIN )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_PALADIN )
             {
                 // Paladin Seals
                 if (IsSealSpell(spellInfo_1) && IsSealSpell(spellInfo_2))
                     return true;
 
                 // Swift Retribution / Improved Devotion Aura (talents) and Paladin Auras
-                if ( classOptions1 && (classOptions1->SpellFamilyFlags2 & 0x00000020) && (spellInfo_2->SpellIconID == 291 || spellInfo_2->SpellIconID == 3028) ||
+                if (classOptions1 && (classOptions1->SpellFamilyFlags2 & 0x00000020) && (spellInfo_2->SpellIconID == 291 || spellInfo_2->SpellIconID == 3028) ||
                     (classOptions2->SpellFamilyFlags2 & 0x00000020) && (spellInfo_1->SpellIconID == 291 || spellInfo_1->SpellIconID == 3028))
                     return false;
 
@@ -2174,7 +2174,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
 
             // *Sanctity Aura -> Unstable Currents and other (multi-family check)
-            if( spellInfo_1->SpellIconID==502 && classOptions2->SpellFamilyName == SPELLFAMILY_GENERIC && spellInfo_2->SpellIconID==502 && spellInfo_2->SpellVisual[0]==969 )
+            if (spellInfo_1->SpellIconID==502 && classOptions2->SpellFamilyName == SPELLFAMILY_GENERIC && spellInfo_2->SpellIconID==502 && spellInfo_2->SpellVisual[0]==969 )
                 return false;
 
             // *Seal of Command and Band of Eternal Champion (multi-family check)
@@ -2182,7 +2182,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_SHAMAN:
-            if( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_SHAMAN )
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_SHAMAN )
             {
                 // Windfury weapon
                 if (spellInfo_1->SpellIconID==220 && spellInfo_2->SpellIconID==220 &&
@@ -2202,7 +2202,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 return false;
             break;
         case SPELLFAMILY_DEATHKNIGHT:
-            if ( classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
+            if (classOptions2 && classOptions2->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
             {
                 // Lichborne  and Lichborne (triggered)
                 if (spellInfo_1->SpellIconID == 61 && spellInfo_2->SpellIconID == 61)
@@ -3951,7 +3951,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
 
             SpellClassOptionsEntry const* classOptions = spellEntry->GetSpellClassOptions();
 
-            if(family >= 0 && classOptions && classOptions->SpellFamilyName != family)
+            if(family >= 0 && classOptions && classOptions->SpellFamilyName != uint32(family))
             {
                 sLog.outError("Spell %u '%s' family(%u) <> %u but used in %s.",spell,name.c_str(),classOptions->SpellFamilyName,family,code.c_str());
                 continue;
@@ -3992,7 +3992,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 continue;
             }
 
-            if(category >= 0 && spellEntry->GetCategory() != category)
+            if(category >= 0 && spellEntry->GetCategory() != uint32(category))
             {
                 sLog.outError("Spell %u '%s' category(%u) <> %u but used in %s.",spell,name.c_str(),spellEntry->GetCategory(),category,code.c_str());
                 continue;
@@ -4002,13 +4002,13 @@ void SpellMgr::CheckUsedSpells(char const* table)
             {
                 SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(effectIdx));
 
-                if(effectType >= 0 && spellEffect && spellEffect->Effect != effectType)
+                if(effectType >= 0 && spellEffect && spellEffect->Effect != uint32(effectType))
                 {
                     sLog.outError("Spell %u '%s' effect%d <> %u but used in %s.",spell,name.c_str(),effectIdx+1,effectType,code.c_str());
                     continue;
                 }
 
-                if(auraType >= 0 && spellEffect && spellEffect->EffectApplyAuraName != auraType)
+                if(auraType >= 0 && spellEffect && spellEffect->EffectApplyAuraName != uint32(auraType))
                 {
                     sLog.outError("Spell %u '%s' aura%d <> %u but used in %s.",spell,name.c_str(),effectIdx+1,auraType,code.c_str());
                     continue;
@@ -4043,7 +4043,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
 
                 SpellClassOptionsEntry const* classOptions = spellEntry->GetSpellClassOptions();
 
-                if(family >=0 && classOptions && classOptions->SpellFamilyName != family)
+                if(family >=0 && classOptions && classOptions->SpellFamilyName != uint32(family))
                     continue;
 
                 if (familyMaskA != UI64LIT(0xFFFFFFFFFFFFFFFF) || familyMaskB != 0xFFFFFFFF)
@@ -4066,17 +4066,17 @@ void SpellMgr::CheckUsedSpells(char const* table)
                 if (spellVisual >= 0 && spellEntry->SpellVisual[0] != uint32(spellVisual))
                     continue;
 
-                if(category >= 0 && spellEntry->GetCategory() != category)
+                if(category >= 0 && spellEntry->GetCategory() != uint32(category)
                     continue;
 
                 if (effectIdx >= 0)
                 {
                     SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(effectIdx));
 
-                    if(effectType >=0 && spellEffect && spellEffect->Effect != effectType)
+                    if(effectType >=0 && spellEffect && spellEffect->Effect != uint32(effectType))
                         continue;
 
-                    if(auraType >=0 && spellEffect && spellEffect->EffectApplyAuraName != auraType)
+                    if(auraType >=0 && spellEffect && spellEffect->EffectApplyAuraName != uint32(auraType))
                         continue;
                 }
                 else

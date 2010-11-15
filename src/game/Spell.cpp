@@ -5729,24 +5729,24 @@ uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spel
     }
 
     // Base powerCost
-    int32 powerCost = m_spellInfo->GetManaCost();
+    int32 powerCost = spellInfo->GetManaCost();
     // PCT cost from total amount
-    if (uint32 manaCostPct = m_spellInfo->GetManaCostPercentage())
+    if (uint32 manaCostPct = spellInfo->GetManaCostPercentage())
     {
         switch (spellInfo->powerType)
         {
             // health as power used
             case POWER_HEALTH:
-                powerCost += manaCostPct * m_caster->GetCreateHealth() / 100;
+                powerCost += manaCostPct * caster->GetCreateHealth() / 100;
                 break;
             case POWER_MANA:
-                powerCost += manaCostPct * m_caster->GetCreateMana() / 100;
+                powerCost += manaCostPct * caster->GetCreateMana() / 100;
                 break;
             case POWER_RAGE:
             case POWER_FOCUS:
             case POWER_ENERGY:
             case POWER_HAPPINESS:
-                powerCost += manaCostPct * m_caster->GetMaxPower(Powers(m_spellInfo->powerType)) / 100;
+                powerCost += manaCostPct * caster->GetMaxPower(Powers(spellInfo->powerType)) / 100;
                 break;
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
@@ -5769,7 +5769,7 @@ uint32 Spell::CalculatePowerCost(SpellEntry const* spellInfo, Unit* caster, Spel
             modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_COST, powerCost, spell);
 
     if (spellInfo->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION)
-        powerCost = int32(powerCost/ (1.117f * m_spellInfo->GetSpellLevel() / m_caster->getLevel() -0.1327f));
+        powerCost = int32(powerCost/ (1.117f * spellInfo->GetSpellLevel() / caster->getLevel() -0.1327f));
 
     // PCT mod from user auras by school
     powerCost = int32(powerCost * (1.0f + caster->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + school)));

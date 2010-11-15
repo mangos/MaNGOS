@@ -754,20 +754,6 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
     }
 
-    //if(getPowerType() == POWER_RUNIC_POWER)
-    //{
-    //    SetPower(POWER_RUNE, 8);
-    //    SetMaxPower(POWER_RUNE, 8);
-    //    SetPower(POWER_RUNIC_POWER, 0);
-    //    SetMaxPower(POWER_RUNIC_POWER, 1000);
-    //}
-
-    //if(getPowerType() == POWER_FOCUS)
-    //{
-    //    SetPower(POWER_FOCUS, 100);
-    //    SetMaxPower(POWER_FOCUS, 100);
-    //}
-
     if(getPowerType() != POWER_MANA)                        // hide additional mana bar if we have no mana
     {
         SetPower(POWER_MANA, 0);
@@ -14846,7 +14832,7 @@ void Player::SendQuestReward( Quest const *pQuest, uint32 XP, Object * questGive
         GetMap()->ScriptsStart(sQuestEndScripts, pQuest->GetQuestCompleteScript(), questGiver, this);
 }
 
-void Player::SendQuestFailed( uint32 quest_id, InventoryChangeFailure reason )
+void Player::SendQuestFailed( uint32 quest_id, InventoryChangeFailure reason)
 {
     if( quest_id )
     {
