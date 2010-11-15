@@ -19,7 +19,7 @@
 #ifndef _UPDATEFIELDS_AUTO_H
 #define _UPDATEFIELDS_AUTO_H
 
-// Auto generated for version 4, 0, 3, 13221
+// Auto generated for version 4, 0, 3, 13287
 
 enum EObjectFields
 {
@@ -174,19 +174,21 @@ enum EUnitFields
     UNIT_FIELD_BASE_HEALTH                    = OBJECT_END + 0x0083, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
     UNIT_FIELD_BYTES_2                        = OBJECT_END + 0x0084, // Size: 1, Type: BYTES, Flags: PUBLIC
     UNIT_FIELD_ATTACK_POWER                   = OBJECT_END + 0x0085, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_ATTACK_POWER_MODS              = OBJECT_END + 0x0086, // Size: 1, Type: TWO_SHORT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_ATTACK_POWER_MULTIPLIER        = OBJECT_END + 0x0087, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_RANGED_ATTACK_POWER            = OBJECT_END + 0x0088, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_RANGED_ATTACK_POWER_MODS       = OBJECT_END + 0x0089, // Size: 1, Type: TWO_SHORT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = OBJECT_END + 0x008A, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_MINRANGEDDAMAGE                = OBJECT_END + 0x008B, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_MAXRANGEDDAMAGE                = OBJECT_END + 0x008C, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_POWER_COST_MODIFIER            = OBJECT_END + 0x008D, // Size: 7, Type: INT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_POWER_COST_MULTIPLIER          = OBJECT_END + 0x0094, // Size: 7, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_MAXHEALTHMODIFIER              = OBJECT_END + 0x009B, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
-    UNIT_FIELD_HOVERHEIGHT                    = OBJECT_END + 0x009C, // Size: 1, Type: FLOAT, Flags: PUBLIC
-    UNIT_FIELD_MAXITEMLEVEL                   = OBJECT_END + 0x009D, // Size: 1, Type: INT, Flags: PUBLIC
-    UNIT_END                                  = OBJECT_END + 0x009E,
+    UNIT_FIELD_ATTACK_POWER_MOD_POS           = OBJECT_END + 0x0086, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_ATTACK_POWER_MOD_NEG           = OBJECT_END + 0x0087, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_ATTACK_POWER_MULTIPLIER        = OBJECT_END + 0x0088, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_RANGED_ATTACK_POWER            = OBJECT_END + 0x0089, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_RANGED_ATTACK_POWER_MOD_POS    = OBJECT_END + 0x008A, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_RANGED_ATTACK_POWER_MOD_NEG    = OBJECT_END + 0x008B, // Size: 1, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = OBJECT_END + 0x008C, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_MINRANGEDDAMAGE                = OBJECT_END + 0x008D, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_MAXRANGEDDAMAGE                = OBJECT_END + 0x008E, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_POWER_COST_MODIFIER            = OBJECT_END + 0x008F, // Size: 7, Type: INT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_POWER_COST_MULTIPLIER          = OBJECT_END + 0x0096, // Size: 7, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_MAXHEALTHMODIFIER              = OBJECT_END + 0x009D, // Size: 1, Type: FLOAT, Flags: PRIVATE, OWNER
+    UNIT_FIELD_HOVERHEIGHT                    = OBJECT_END + 0x009E, // Size: 1, Type: FLOAT, Flags: PUBLIC
+    UNIT_FIELD_MAXITEMLEVEL                   = OBJECT_END + 0x009F, // Size: 1, Type: INT, Flags: PUBLIC
+    UNIT_END                                  = OBJECT_END + 0x00A0,
 
     PLAYER_DUEL_ARBITER                       = UNIT_END + 0x0000, // Size: 2, Type: LONG, Flags: PUBLIC
     PLAYER_FLAGS                              = UNIT_END + 0x0002, // Size: 1, Type: INT, Flags: PUBLIC

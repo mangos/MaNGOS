@@ -1971,6 +1971,9 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_UNK27            = 0x04000000,       // creature has no type, or forces creature to be considered as in party, may be related to creature assistance
     CREATURE_TYPEFLAGS_UNK28            = 0x08000000,       // used in Lua_ForceGossip
     CREATURE_TYPEFLAGS_UNK29            = 0x10000000,       // no idea, but it used by client
+    CREATURE_TYPEFLAGS_UNK30            = 0x20000000,
+    CREATURE_TYPEFLAGS_UNK31            = 0x40000000,
+    CREATURE_TYPEFLAGS_QUEST_BOSS       = 0x80000000,       // Lua_UnitIsQuestBoss
 };
 
 enum CreatureEliteType
@@ -2765,9 +2768,9 @@ enum TradeStatus
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC, WoW:WotLK and WoW:Cataclysm 4.0.3 client build 13221...
+// will only support WoW, WoW:TBC, WoW:WotLK and WoW:Cataclysm 4.0.3 client build 13287...
 
-#define EXPECTED_MANGOSD_CLIENT_BUILD        {13221, 0}
+#define EXPECTED_MANGOSD_CLIENT_BUILD        {13287, 0}
 
 // max supported expansion level in mangosd
 // NOTE: not set it more that supported by targeted client version with all expansions installed

@@ -997,7 +997,7 @@ bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, flo
         // rotate the players position instead of rotating the whole cube, that way we can make a simplified
         // is-in-cube check and we have to calculate only one point instead of 4
 
-        // 2PI = 360 , keep in mind that ingame orientation is counter-clockwise
+        // 2PI = 360
         double rotation = 2*M_PI-atEntry->box_orientation;
         double sinVal = sin(rotation);
         double cosVal = cos(rotation);
