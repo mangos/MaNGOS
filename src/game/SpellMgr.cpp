@@ -491,7 +491,6 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
     return SPELL_NORMAL;
 }
 
-
 // target not allow have more one spell specific from same caster
 bool IsSingleFromSpellSpecificPerTargetPerCaster(SpellSpecific spellSpec1,SpellSpecific spellSpec2)
 {
@@ -627,7 +626,8 @@ bool IsExplicitNegativeTarget(uint32 targetA)
 bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
 {
     SpellEntry const *spellproto = sSpellStore.LookupEntry(spellId);
-    if (!spellproto) return false;
+    if (!spellproto)
+        return false;
 
     switch(spellproto->Effect[effIndex])
     {
@@ -849,7 +849,7 @@ bool IsPositiveSpell(uint32 spellId)
     if (!spellproto)
         return false;
 
-    // spells with atleast one negative effect are considered negative
+    // spells with at least one negative effect are considered negative
     // some self-applied spells have negative effects but in self casting case negative check ignored.
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         if (!IsPositiveEffect(spellId, SpellEffectIndex(i)))
@@ -925,7 +925,7 @@ SpellCastResult GetErrorAtShapeshiftedCast (SpellEntry const *spellInfo, uint32 
     bool actAsShifted = false;
     if (form > 0)
     {
-        SpellShapeshiftEntry const *shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const *shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
             sLog.outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
@@ -961,7 +961,6 @@ void SpellMgr::LoadSpellTargetPositions()
     QueryResult *result = WorldDatabase.Query("SELECT id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position");
     if (!result)
     {
-
         barGoLink bar( 1 );
 
         bar.step();
@@ -2868,7 +2867,7 @@ void SpellMgr::LoadSpellLearnSpells()
                 dbc_node.spell       = entry->EffectTriggerSpell[i];
                 dbc_node.active      = true;                // all dbc based learned spells is active (show in spell book or hide by client itself)
 
-                // ignore learning nonexistent spells (broken/outdated/or generic learnig spell 483
+                // ignore learning nonexistent spells (broken/outdated/or generic learning spell 483
                 if (!sSpellStore.LookupEntry(dbc_node.spell))
                     continue;
 
@@ -3602,10 +3601,11 @@ void SpellMgr::LoadSpellAreas()
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spellInfo, uint32 map_id, uint32 zone_id, uint32 area_id, Player const* player)
 {
     // normal case
-    if (spellInfo->AreaGroupId > 0)
+    int32 areaGroupId = spellInfo->AreaGroupId;
+    if (areaGroupId > 0)
     {
         bool found = false;
-        AreaGroupEntry const* groupEntry = sAreaGroupStore.LookupEntry(spellInfo->AreaGroupId);
+        AreaGroupEntry const* groupEntry = sAreaGroupStore.LookupEntry(areaGroupId);
         while (groupEntry)
         {
             for (uint32 i=0; i<6; ++i)
@@ -3969,7 +3969,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
                     if (effectType >=0 && spellEntry->Effect[effectIdx] != uint32(effectType))
                         continue;
 
-                    if (auraType >=0 && spellEntry->EffectApplyAuraName[effectIdx] !=uint32(auraType))
+                    if (auraType >=0 && spellEntry->EffectApplyAuraName[effectIdx] != uint32(auraType))
                         continue;
                 }
                 else
