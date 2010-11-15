@@ -377,9 +377,10 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
             *data << float(0);                              // added in 3.1
             *data << float(0);                              // added in 3.1
-            *data << float(0);                              // added in 3.1
 
-            *data << uint32(0);                             // added in 3.1
+            // data as in SMSG_MONSTER_MOVE with flag SPLINEFLAG_TRAJECTORY
+            *data << float(0);                              // parabolic speed, added in 3.1
+            *data << uint32(0);                             // parabolic time, added in 3.1
 
             uint32 poscount = uint32(path.size());
             *data << uint32(poscount);                      // points count
