@@ -1823,7 +1823,15 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
                         if ((*iter)->GetEntry() == i_spellST->second.targetEntry)
                         {
-                            targetUnitMap.push_back((*iter));
+                            if (i_spellST->second.type == SPELL_TARGET_TYPE_DEAD && ((Creature*)(*iter))->IsCorpse())
+                            {
+                                targetUnitMap.push_back((*iter));
+                            }
+                            else if (i_spellST->second.type == SPELL_TARGET_TYPE_CREATURE && (*iter)->isAlive())
+                            {
+                                targetUnitMap.push_back((*iter));
+                            }
+
                             break;
                         }
                     }
