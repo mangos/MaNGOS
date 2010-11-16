@@ -847,7 +847,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Blood Boil - bonus for diseased targets
                 if (m_spellInfo->SpellFamilyFlags & 0x00040000 && unitTarget->GetAura(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0, 0x00000002, m_caster->GetGUID()))
                 {
-                    damage += m_damage / 2;
+                    damage += damage / 2;
                     damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK)* 0.035f);
                 }
                 break;
