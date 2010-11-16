@@ -26,7 +26,6 @@
 #include "CellImpl.h"
 #include "Map.h"
 #include "MapManager.h"
-#include "MapInstanced.h"
 #include "Timer.h"
 #include "GridNotifiersImpl.h"
 #include "Transports.h"
@@ -581,8 +580,8 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
 void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 {
     DEBUG_LOG("InstanceSaveMgr::_ResetInstance %u, %u", mapid, instanceId);
-    Map *map = (MapInstanced*)sMapMgr.CreateBaseMap(mapid);
-    if (!map->Instanceable())
+    Map * iMap = sMapMgr.FindMap(mapid, instanceId);
+    if (!iMap || !iMap->Instanceable())
         return;
 
     InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(instanceId);
@@ -591,8 +590,7 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 
     DeleteInstanceFromDB(instanceId);                       // even if save not loaded
 
-    Map* iMap = ((MapInstanced*)map)->FindMap(instanceId);
-    if (iMap && iMap->IsDungeon())
+    if (iMap->IsDungeon())
         ((InstanceMap*)iMap)->Reset(INSTANCE_RESET_RESPAWN_DELAY);
     else
         sObjectMgr.DeleteRespawnTimeForInstance(instanceId);// even if map is not loaded
@@ -639,14 +637,14 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     }
 
     // note: this isn't fast but it's meant to be executed very rarely
-    Map const *map = sMapMgr.CreateBaseMap(mapid);          // _not_ include difficulty
-    MapInstanced::InstancedMaps &instMaps = ((MapInstanced*)map)->GetInstancedMaps();
-    MapInstanced::InstancedMaps::iterator mitr;
-    for(mitr = instMaps.begin(); mitr != instMaps.end(); ++mitr)
+    const MapManager::MapMapType& maps = sMapMgr.Maps();
+
+    MapManager::MapMapType::const_iterator iter_last = maps.lower_bound(MapID(mapid + 1));
+    for(MapManager::MapMapType::const_iterator mitr = maps.lower_bound(MapID(mapid)); mitr != iter_last; ++mitr)
     {
         Map *map2 = mitr->second;
-        if (!map2->IsDungeon())
-            continue;
+        if(map2->GetId() != mapid)
+            break;
 
         if (warn)
             ((InstanceMap*)map2)->SendResetWarnings(timeLeft);

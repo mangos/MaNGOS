@@ -35,7 +35,6 @@
 #include "BattleGroundRB.h"
 #include "MapManager.h"
 #include "Map.h"
-#include "MapInstanced.h"
 #include "ObjectMgr.h"
 #include "ProgressBar.h"
 #include "Chat.h"

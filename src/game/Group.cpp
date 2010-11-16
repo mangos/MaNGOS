@@ -30,7 +30,6 @@
 #include "BattleGround.h"
 #include "MapManager.h"
 #include "InstanceSaveMgr.h"
-#include "MapInstanced.h"
 #include "Util.h"
 #include "LootMgr.h"
 

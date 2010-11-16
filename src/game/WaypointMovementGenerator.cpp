@@ -335,7 +335,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     player.clearUnitState(UNIT_STAT_TAXI_FLIGHT);
 
     float x, y, z;
-    i_destinationHolder.GetLocationNow(player.GetBaseMap(), x, y, z);
+    i_destinationHolder.GetLocationNow(player.GetMap(), x, y, z);
     player.SetPosition(x, y, z, player.GetOrientation());
 
     player.Unmount();

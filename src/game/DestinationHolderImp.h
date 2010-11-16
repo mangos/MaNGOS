@@ -133,9 +133,9 @@ DestinationHolder<TRAVELLER>::UpdateTraveller(TRAVELLER &traveller, uint32 diff,
 
         float x,y,z;
         if (traveller.GetTraveller().hasUnitState(UNIT_STAT_TAXI_FLIGHT))
-            GetLocationNow(traveller.GetTraveller().GetBaseMap() ,x, y, z, true);                  // Should reposition Object with right Coord, so I can bypass some Grid Relocation
+            GetLocationNow(traveller.GetTraveller().GetMap() ,x, y, z, true);                  // Should reposition Object with right Coord, so I can bypass some Grid Relocation
         else
-            GetLocationNow(traveller.GetTraveller().GetBaseMap(), x, y, z, false);
+            GetLocationNow(traveller.GetTraveller().GetMap(), x, y, z, false);
 
         if (traveller.GetTraveller().GetPositionX() != x || traveller.GetTraveller().GetPositionY() != y || traveller.GetTraveller().GetPositionZ() != z)
         {
@@ -185,7 +185,7 @@ DestinationHolder<TRAVELLER>::GetLocationNow(const Map * map, float &x, float &y
         else
         {
             //That part is good for mob Walking on the floor. But the floor is not always what we thought.
-            z = map->GetHeight(x,y,i_fromZ,false); // Disable cave check
+            z = map->GetTerrain()->GetHeight(x,y,i_fromZ,false); // Disable cave check
             const float groundDist = sqrt(distanceX*distanceX + distanceY*distanceY);
             const float zDist = fabs(i_fromZ - z) + 0.000001f;
             const float slope = groundDist / zDist;

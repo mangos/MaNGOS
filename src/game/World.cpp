@@ -1507,6 +1507,9 @@ void World::Update(uint32 diff)
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();
+
+    //cleanup unused GridMap objects as well as VMaps
+    sTerrainMgr.Update(diff);
 }
 
 /// Send a packet to all players (except self if mentioned)

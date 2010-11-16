@@ -61,7 +61,7 @@ FleeingMovementGenerator<T>::_getPoint(T &owner, float &x, float &y, float &z)
     z = owner.GetPositionZ();
 
     float temp_x, temp_y, angle;
-    const Map * _map = owner.GetBaseMap();
+    const TerrainInfo * _map = owner.GetTerrain();
     //primitive path-finding
     for(uint8 i = 0; i < 18; ++i)
     {
