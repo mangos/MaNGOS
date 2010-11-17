@@ -382,7 +382,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual float GetObjectBoundingRadius() const { return DEFAULT_WORLD_OBJECT_SIZE; }
 
         bool IsPositionValid() const;
-        void UpdateGroundPositionZ(float x, float y, float &z) const;
+        void UpdateGroundPositionZ(float x, float y, float &z, float maxDiff = 30.0f) const;
         void UpdateAllowedPositionZ(float x, float y, float &z) const;
 
         void GetRandomPoint( float x, float y, float z, float distance, float &rand_x, float &rand_y, float &rand_z ) const;
