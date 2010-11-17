@@ -1632,7 +1632,7 @@ struct SummonPropertiesEntry
     uint32  Group;                                          // 1, enum SummonPropGroup
     uint32  FactionId;                                      // 2,                        14 rows > 0
     uint32  Type;                                           // 3, enum SummonPropType
-    uint32  Slot;                                           // 4,   if type = SUMMON_PROP_TYPE_TOTEM, its actual slot    0-6
+    uint32  Slot;                                           // 4, if type = SUMMON_PROP_TYPE_TOTEM, its actual slot (0-6). Slot may have other uses, selection of pet type in some cases?
     uint32  Flags;                                          // 5, enum SummonPropFlags
 };
 

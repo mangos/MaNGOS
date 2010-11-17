@@ -430,7 +430,6 @@
     <ClCompile Include="..\..\src\game\LootMgr.cpp" />
     <ClCompile Include="..\..\src\game\Mail.cpp" />
     <ClCompile Include="..\..\src\game\Map.cpp" />
-    <ClCompile Include="..\..\src\game\MapInstanced.cpp" />
     <ClCompile Include="..\..\src\game\MapManager.cpp" />
     <ClCompile Include="..\..\src\game\MapUpdater.cpp" />
     <ClCompile Include="..\..\src\game\MiscHandler.cpp" />
@@ -583,7 +582,6 @@
     <ClInclude Include="..\..\src\game\LootMgr.h" />
     <ClInclude Include="..\..\src\game\Mail.h" />
     <ClInclude Include="..\..\src\game\Map.h" />
-    <ClInclude Include="..\..\src\game\MapInstanced.h" />
     <ClInclude Include="..\..\src\game\MapManager.h" />
     <ClInclude Include="..\..\src\game\MapUpdater.h" />
     <ClInclude Include="..\..\src\game\MapReference.h" />

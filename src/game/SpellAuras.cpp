@@ -2608,6 +2608,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
+                case 47178:                                 // Plague Effect Self
+                    target->SetFeared(apply, GetCasterGUID(), GetId());
+                    return;
                 case 58204:                                 // LK Intro VO (1)
                     if (target->GetTypeId() == TYPEID_PLAYER)
                     {

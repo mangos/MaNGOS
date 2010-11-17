@@ -20,6 +20,7 @@
 #define MANGOS_GRIDMAP_H
 
 #include "Platform/Define.h"
+#include "Policies/Singleton.h"
 #include "DBCStructure.h"
 #include "GridDefines.h"
 #include "Object.h"
@@ -37,6 +38,7 @@ class InstanceSave;
 struct ScriptInfo;
 struct ScriptAction;
 class BattleGround;
+class Map;
 
 struct GridMapFileHeader
 {
@@ -179,5 +181,144 @@ class GridMap
         uint8 getTerrainType(float x, float y);
         GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData *data = 0);
 };
+
+template<typename Countable>
+class MANGOS_DLL_SPEC Referencable
+{
+public:
+    Referencable() { m_count = 0; }
+
+    void AddRef() { ++m_count; }
+    bool Release() { return (--m_count < 1); }
+    bool IsReferenced() const { return (m_count > 0); }
+
+private:
+    Referencable(const Referencable&);
+    Referencable& operator=(const Referencable&);
+
+    Countable m_count;
+};
+
+typedef ACE_Atomic_Op<ACE_Thread_Mutex, long> AtomicLong;
+
+#define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
+#define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
+#define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
+#define DEFAULT_HEIGHT_SEARCH     10.0f                     // default search distance to find height at nearby locations
+#define DEFAULT_WATER_SEARCH      50.0f                     // default search distance to case detection water level
+
+//class for sharing and managin GridMap objects
+class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
+{
+public:
+    TerrainInfo(uint32 mapid);
+    ~TerrainInfo();
+
+    uint32 GetMapId() const { return m_mapId; }
+
+    //TODO: move all terrain/vmaps data info query functions
+    //from 'Map' class into this class
+    float GetHeight(float x, float y, float z, bool pCheckVMap=true, float maxSearchDist=DEFAULT_HEIGHT_SEARCH) const;
+    float GetWaterLevel(float x, float y, float z, float* pGround = NULL) const;
+    float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = NULL, bool swim = false) const;
+    bool IsInWater(float x, float y, float z, GridMapLiquidData *data = 0) const;
+    bool IsUnderWater(float x, float y, float z) const;
+
+    GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData *data = 0) const;
+
+    uint16 GetAreaFlag(float x, float y, float z, bool *isOutdoors=0) const;
+    uint8 GetTerrainType(float x, float y ) const;
+
+    uint32 GetAreaId(float x, float y, float z) const;
+    uint32 GetZoneId(float x, float y, float z) const;
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, float x, float y, float z) const;
+
+    bool GetAreaInfo(float x, float y, float z, uint32 &mogpflags, int32 &adtId, int32 &rootId, int32 &groupId) const;
+    bool IsOutdoors(float x, float y, float z) const;
+
+
+    //this method should be used only by TerrainManager
+    //to cleanup unreferenced GridMap objects - they are too heavy
+    //to destroy them dynamically, especially on highly populated servers
+    //THIS METHOD IS NOT THREAD-SAFE!!!! AND IT SHOULDN'T BE THREAD-SAFE!!!!
+    void CleanUpGrids(const uint32 diff);
+
+protected:
+    friend class Map;
+    //load/unload terrain data 
+    GridMap * Load(const uint32 x, const uint32 y);
+    void Unload(const uint32 x, const uint32 y);
+
+private:
+    TerrainInfo(const TerrainInfo&);
+    TerrainInfo& operator=(const TerrainInfo&);
+
+    GridMap * GetGrid( const float x, const float y );
+    GridMap * LoadMapAndVMap(const uint32 x, const uint32 y );
+
+    int RefGrid(const uint32& x, const uint32& y);
+    int UnrefGrid(const uint32& x, const uint32& y);
+
+    const uint32 m_mapId;
+
+    GridMap *m_GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
+    int16 m_GridRef[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
+
+    //global garbage collection timer
+    ShortIntervalTimer i_timer;
+
+    typedef ACE_Thread_Mutex LOCK_TYPE;
+    typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
+    LOCK_TYPE m_mutex;
+    LOCK_TYPE m_refMutex;
+};
+
+//class for managing TerrainData object and all sort of geometry querying operations
+class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
+{
+    typedef UNORDERED_MAP<uint32,  TerrainInfo *> TerrainDataMap;
+    friend class MaNGOS::OperatorNew<TerrainManager>;
+
+public:
+    TerrainInfo * LoadTerrain(const uint32 mapId);
+    void UnloadTerrain(const uint32 mapId);
+
+    void Update(const uint32 diff);
+    void UnloadAll();
+
+    uint16 GetAreaFlag(uint32 mapid, float x, float y, float z) const
+    {
+        TerrainInfo *pData = const_cast<TerrainManager*>(this)->LoadTerrain(mapid);
+        return pData->GetAreaFlag(x, y, z);
+    }
+    uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
+    {
+        return TerrainManager::GetAreaIdByAreaFlag(GetAreaFlag(mapid, x, y, z),mapid);
+    }
+    uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
+    {
+        return TerrainManager::GetZoneIdByAreaFlag(GetAreaFlag(mapid, x, y, z),mapid);
+    }
+    void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, float x, float y, float z)
+    {
+        TerrainManager::GetZoneAndAreaIdByAreaFlag(zoneid,areaid,GetAreaFlag(mapid, x, y, z),mapid);
+    }
+
+    static uint32 GetAreaIdByAreaFlag(uint16 areaflag,uint32 map_id);
+    static uint32 GetZoneIdByAreaFlag(uint16 areaflag,uint32 map_id);
+    static void GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 areaflag,uint32 map_id);
+
+private:
+    TerrainManager();
+    ~TerrainManager();
+
+    TerrainManager(const TerrainManager &);
+    TerrainManager& operator=(const TerrainManager &);
+
+    typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex>::Lock Guard;
+    TerrainDataMap i_TerrainMap;
+};
+
+#define sTerrainMgr TerrainManager::Instance()
 
 #endif

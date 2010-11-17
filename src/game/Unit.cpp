@@ -4014,12 +4014,12 @@ bool Unit::isInAccessablePlaceFor(Creature const* c) const
 
 bool Unit::IsInWater() const
 {
-    return GetBaseMap()->IsInWater(GetPositionX(),GetPositionY(), GetPositionZ());
+    return GetTerrain()->IsInWater(GetPositionX(),GetPositionY(), GetPositionZ());
 }
 
 bool Unit::IsUnderWater() const
 {
-    return GetBaseMap()->IsUnderWater(GetPositionX(),GetPositionY(),GetPositionZ());
+    return GetTerrain()->IsUnderWater(GetPositionX(),GetPositionY(),GetPositionZ());
 }
 
 void Unit::DeMorph()

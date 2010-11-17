@@ -34,7 +34,6 @@
 #include "GridNotifiersImpl.h"
 #include "Opcodes.h"
 #include "ObjectGuid.h"
-#include "MapInstanced.h"
 #include "World.h"
 
 #include <cmath>
