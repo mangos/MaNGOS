@@ -774,6 +774,13 @@ float TerrainInfo::GetHeight(float x, float y, float z, bool pUseVmaps, float ma
     else
         vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
 
+    //hack for LK frozen throne true height
+    if (GetAreaId(x,y,z) == 4859)
+    {
+        mapHeight  += 200.0f;
+        vmapHeight += 200.0f;
+    } 
+
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
     // vmapheight set for any under Z value or <= INVALID_HEIGHT
 
