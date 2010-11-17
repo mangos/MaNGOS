@@ -1404,6 +1404,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget,46798,true,m_CastItem,NULL,m_originalCasterGUID);
                     break;
                 }
+                case 47176:                                 // Infect Ice Troll
+                {
+                    // Spell has wrong areaGroupid, so it can not be casted where expected.
+                    // TODO: research if spells casted by NPC, having TARGET_SCRIPT, can have disabled area check
+                    if (!unitTarget)
+                        return;
+
+                    // Plague Effect Self
+                    unitTarget->CastSpell(unitTarget, 47178, true);
+                    return;
+                }
                 case 49357:                                 // Brewfest Mount Transformation
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
