@@ -4814,7 +4814,7 @@ void Unit::RemoveAuraHolderFromStack(uint32 spellId, int32 stackAmount, uint64 c
     {
         if (!casterGUID || iter->second->GetCasterGUID() == casterGUID)
         {
-            if (iter->second->GetAuraCharges() > 0)
+            if (iter->second->GetAuraCharges() > 1)
             {
                 while (stackAmount--)
                 {
