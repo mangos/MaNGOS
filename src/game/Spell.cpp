@@ -5383,6 +5383,9 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             if(!_target->isAlive())
                 return SPELL_FAILED_BAD_TARGETS;
 
+            if (!_target->isTargetableForAttack())
+                return SPELL_FAILED_BAD_TARGETS;            // guessed error
+
             if(IsPositiveSpell(m_spellInfo->Id))
             {
                 if(m_caster->IsHostileTo(_target))
