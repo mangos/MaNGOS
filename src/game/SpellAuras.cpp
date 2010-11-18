@@ -2430,7 +2430,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (apply)
                             owner->CastSpell(owner, 8985, true);
                         else
-                            ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                            ((Player*)owner)->RemovePet(PET_SAVE_REAGENTS);
                     }
                     return;
                 }
@@ -2446,7 +2446,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (apply)
                             owner->CastSpell(owner, 19704, true);
                         else
-                            ((Player*)owner)->RemovePet(NULL, PET_SAVE_NOT_IN_SLOT, true);
+                            ((Player*)owner)->RemovePet(PET_SAVE_REAGENTS);
                     }
                     return;
                 }
@@ -3595,7 +3595,7 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
         // out of range pet dismissed
         if (!pet->IsWithinDistInMap(p_caster, pet->GetMap()->GetVisibilityDistance()))
         {
-            pet->Remove(PET_SAVE_NOT_IN_SLOT, true);
+            p_caster->RemovePet(PET_SAVE_REAGENTS);
         }
         else
         {
@@ -7595,24 +7595,23 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
         return;
     Vehicle* vehicle = (Vehicle*)target;
 
-    Unit *player = GetCaster();
-    if(!player || player->GetTypeId() != TYPEID_PLAYER)
+    Unit *caster = GetCaster();
+    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
     if (apply)
     {
-        if(Pet *pet = player->GetPet())
-            pet->Remove(PET_SAVE_AS_CURRENT);
-        ((Player*)player)->EnterVehicle(vehicle);
+        ((Player*)caster)->RemovePet(PET_SAVE_AS_CURRENT);
+        ((Player*)caster)->EnterVehicle(vehicle);
     }
     else
     {
         SpellEntry const *spell = GetSpellProto();
 
         // some SPELL_AURA_CONTROL_VEHICLE auras have a dummy effect on the player - remove them
-        player->RemoveAurasDueToSpell(spell->Id);
+        caster->RemoveAurasDueToSpell(spell->Id);
 
-        ((Player*)player)->ExitVehicle(vehicle);
+        ((Player*)caster)->ExitVehicle(vehicle);
     }
 }
 
