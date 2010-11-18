@@ -2746,6 +2746,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_FLAGS, 0);
             SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+//            SetName("");
             SetNeedSave(false);
             owner->AddGuardian(this);
             break;
@@ -2758,7 +2759,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-            SetName("");
+//            SetName("");
             SetNeedSave(true);
             owner->SetPet(this);
             break;
