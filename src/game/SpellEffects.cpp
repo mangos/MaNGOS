@@ -1541,13 +1541,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    // Not expecting any MINI_PET here, the ones used for related quests are
-                    // fighting "companions" (effMiscValueB 387). Needs to be corrected.
-                    Pet* pPet = ((Player*)m_caster)->GetMiniPet();
-
+                    // only spell related protector pets exist currently
+                    Pet* pPet = m_caster->GetProtectorPet();
                     if (!pPet)
                         return;
 

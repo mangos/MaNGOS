@@ -1532,6 +1532,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveGuardian(Pet* pet);
         void RemoveGuardians();
         Pet* FindGuardianWithEntry(uint32 entry);
+        Pet* GetProtectorPet();                             // expected single case in guardian list
 
         bool isCharmed() const { return !GetCharmerGuid().IsEmpty(); }
 
