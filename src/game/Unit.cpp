@@ -5911,12 +5911,11 @@ Pet* Unit::FindGuardianWithEntry(uint32 entry)
 {
     for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
         if(Pet* pet = GetMap()->GetPet(*itr))
-            if (pet->getPetType() == entry)
+            if (pet->GetEntry() == entry)
                 return pet;
 
     return NULL;
 }
-
 
 Pet* Unit::GetProtectorPet()
 {
