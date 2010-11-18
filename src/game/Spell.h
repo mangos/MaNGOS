@@ -336,7 +336,7 @@ class Spell
         void EffectTriggerSpellWithValue(SpellEffectIndex eff_idx);
         void EffectTriggerRitualOfSummoning(SpellEffectIndex eff_idx);
         void EffectKillCreditPersonal(SpellEffectIndex eff_idx);
-        void EffectKillCredit(SpellEffectIndex eff_idx);
+        void EffectKillCreditGroup(SpellEffectIndex eff_idx);
         void EffectQuestFail(SpellEffectIndex eff_idx);
         void EffectActivateRune(SpellEffectIndex eff_idx);
 
