@@ -360,21 +360,21 @@ enum SummonPropGroup
 };
 
 // SummonProperties.dbc, col 3
-enum SummonPropType
+enum UnitNameSummonTitle
 {
-    SUMMON_PROP_TYPE_OTHER           = 0,                   // different summons, 1330 spells in 3.0.3
-    SUMMON_PROP_TYPE_SUMMON          = 1,                   // generic summons, 49 spells in 3.0.3
-    SUMMON_PROP_TYPE_GUARDIAN        = 2,                   // summon guardian, 393 spells in 3.0.3
-    SUMMON_PROP_TYPE_ARMY            = 3,                   // summon army, 5 spells in 3.0.3
-    SUMMON_PROP_TYPE_TOTEM           = 4,                   // summon totem, 169 spells in 3.0.3
-    SUMMON_PROP_TYPE_CRITTER         = 5,                   // critter/minipet, 195 spells in 3.0.3
-    SUMMON_PROP_TYPE_DK              = 6,                   // summon DRW/Ghoul, 2 spells in 3.0.3 "%s's Runeblade"
-    SUMMON_PROP_TYPE_CONSTRUCT       = 7,                   // summon bot/bomb, 4 spells in 3.0.3 "%s's Construct"
-    SUMMON_PROP_TYPE_PHASING         = 8,                   // something todo with DK prequest line, 2 spells in 3.0.3 "%s's Opponent"
-    SUMMON_PROP_TYPE_SIEGE_VEH       = 9,                   // summon different vehicles, 14 spells in 3.0.3 "%s's Vehicle"
-    SUMMON_PROP_TYPE_DRAKE_VEH       = 10,                  // summon drake (vehicle), 3 spells
-    SUMMON_PROP_TYPE_LIGHTWELL       = 11,                  // summon lightwell, 6 spells in 3.0.3
-    SUMMON_PROP_TYPE_REPAIR_BOT      = 12                   // summon repir bot, 1 spells in 3.2.2a
+    UNITNAME_SUMMON_TITLE_NONE         = 0,                 // no default title, different summons, 1330 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_PET          = 1,                 // 's Pet,           generic summons, 49 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_GUARDIAN     = 2,                 // 's Guardian,      summon guardian, 393 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_MINION       = 3,                 // 's Minion,        summon army, 5 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_TOTEM        = 4,                 // 's Totem,         summon totem, 169 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_COMPANION    = 5,                 // 's Companion,     critter/minipet, 195 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_RUNEBLADE    = 6,                 // 's Runeblade,     summon DRW/Ghoul, 2 spells in 3.0.3"
+    UNITNAME_SUMMON_TITLE_CONSTRUCT    = 7,                 // 's Construct,     summon bot/bomb, 4 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_OPPONENT     = 8,                 // 's Opponent,      something todo with DK prequest line, 2 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_VEHICLE      = 9,                 // 's Vehicle,       summon different vehicles, 14 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_MOUNT        = 10,                // 's Mount,         summon drake (vehicle), 3 spells
+    UNITNAME_SUMMON_TITLE_LIGHTWELL    = 11,                // 's Lightwell,     summon lightwell, 6 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_BUTLER       = 12                 // 's Butler,        summon repair bot, 1 spells in 3.2.2a
 };
 
 // SummonProperties.dbc, col 5

@@ -1631,8 +1631,10 @@ struct SummonPropertiesEntry
     uint32  Id;                                             // 0
     uint32  Group;                                          // 1, enum SummonPropGroup
     uint32  FactionId;                                      // 2,                        14 rows > 0
-    uint32  Type;                                           // 3, enum SummonPropType
-    uint32  Slot;                                           // 4, if type = SUMMON_PROP_TYPE_TOTEM, its actual slot (0-6). Slot may have other uses, selection of pet type in some cases?
+    uint32  Title;                                          // 3, enum UnitNameSummonTitle
+    uint32  Slot;                                           // 4, if title = UNITNAME_SUMMON_TITLE_TOTEM, its actual slot (0-6).
+                                                            //    if title = UNITNAME_SUMMON_TITLE_COMPANION, slot=6 -> defensive guardian, in other cases criter/minipet
+                                                            //    Slot may have other uses, selection of pet type in some cases?
     uint32  Flags;                                          // 5, enum SummonPropFlags
 };
 
