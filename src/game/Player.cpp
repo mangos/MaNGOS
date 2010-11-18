@@ -17816,6 +17816,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         case MINI_PET:
             m_miniPet = 0;
             break;
+        case PROTECTOR_PET:
         case GUARDIAN_PET:
             RemoveGuardian(pet);
             break;
