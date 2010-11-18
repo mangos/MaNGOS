@@ -28,15 +28,6 @@
 #include "Unit.h"
 #include "Util.h"
 
-char const* petTypeSuffix[MAX_PET_TYPE] =
-{
-    "'s Minion",                                            // SUMMON_PET
-    "'s Pet",                                               // HUNTER_PET
-    "'s Guardian",                                          // GUARDIAN_PET
-    "'s Companion",                                         // PROTECTOR_PET
-    "'s Companion"                                          // MINI_PET
-};
-
 Pet::Pet(PetType type) :
 Creature(CREATURE_SUBTYPE_PET),
 m_resetTalentsCost(0), m_resetTalentsTime(0), m_usedTalentCount(0),
@@ -2739,7 +2730,7 @@ bool Pet::Summon()
     if (GetCreateSpellID())
         SetUInt32Value(UNIT_CREATED_BY_SPELL, GetCreateSpellID());
 
-    if (isTemporarySummoned())
+    if (isTemporarySummoned() && getPetType() !=  PROTECTOR_PET)
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
     else
         GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
@@ -2749,6 +2740,7 @@ bool Pet::Summon()
     switch (getPetType())
     {
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
         {
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
             SetUInt32Value(UNIT_FIELD_FLAGS, 0);
@@ -2766,10 +2758,7 @@ bool Pet::Summon()
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
-            // generate new name for summon pet
-            std::string new_name = sObjectMgr.GeneratePetName(GetEntry());
-            if(!new_name.empty())
-                SetName(new_name);
+            SetName("");
             SetNeedSave(true);
             owner->SetPet(this);
             break;
@@ -2794,9 +2783,7 @@ bool Pet::Summon()
         {
             SelectLevel(GetCreatureInfo());
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
-            std::string name = owner->GetName();
-            name.append(petTypeSuffix[getPetType()]);
-            SetName( name );
+            SetName("");
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 ((Player*)owner)->SetMiniPet(this);
             else
