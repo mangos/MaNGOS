@@ -30,7 +30,8 @@ enum PetType
     HUNTER_PET              = 1,
     GUARDIAN_PET            = 2,
     MINI_PET                = 3,
-    MAX_PET_TYPE            = 4
+    PROTECTOR_PET           = 4,                            // work as defensive guardian with mini pet suffix in name
+    MAX_PET_TYPE            = 5
 };
 
 extern char const* petTypeSuffix[MAX_PET_TYPE];

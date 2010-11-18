@@ -33,6 +33,7 @@ char const* petTypeSuffix[MAX_PET_TYPE] =
     "'s Minion",                                            // SUMMON_PET
     "'s Pet",                                               // HUNTER_PET
     "'s Guardian",                                          // GUARDIAN_PET
+    "'s Companion",                                         // PROTECTOR_PET
     "'s Companion"                                          // MINI_PET
 };
 
@@ -55,6 +56,8 @@ m_petFollowAngle(PET_FOLLOW_ANGLE), m_needSave(true), m_petCounter(0), m_PetScal
 
     if (type == MINI_PET)                                    // always passive
         GetCharmInfo()->SetReactState(REACT_PASSIVE);
+    else if(type == PROTECTOR_PET)                          // always defensive 
+        GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
     else if (type == GUARDIAN_PET)                           // always aggressive
         GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
 
@@ -655,6 +658,7 @@ void Pet::_Remove(PetSaveMode mode, bool returnreagent)
                 owner->SetCritterGUID(0);
                 break;
             case GUARDIAN_PET:
+            case PROTECTOR_PET:
                 owner->RemoveGuardian(this);
                 break;
             default:
@@ -874,6 +878,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             break;
         }
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
         {
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
