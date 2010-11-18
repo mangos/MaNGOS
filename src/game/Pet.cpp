@@ -2188,6 +2188,7 @@ void Pet::ApplyAttackPowerScalingBonus(bool apply)
     switch(getPetType())
     {
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
         {
             if (owner->getClass() == CLASS_SHAMAN)
             {
@@ -2301,6 +2302,7 @@ void Pet::ApplyDamageScalingBonus(bool apply)
     {
         case SUMMON_PET:
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
         case HUNTER_PET:
         {
             switch(owner->getClass())
@@ -2388,6 +2390,7 @@ void Pet::ApplySpellDamageScalingBonus(bool apply)
     switch(getPetType())
     {
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
         {
             if (owner->getClass() == CLASS_SHAMAN)
             {
@@ -2854,7 +2857,7 @@ bool Pet::Summon()
 
         if (!GetPetCounter() && getPetType() == HUNTER_PET)
             SavePetToDB(PET_SAVE_AS_CURRENT);
-        else if (getPetType() != GUARDIAN_PET)
+        else if (getPetType() == SUMMON_PET)
             SavePetToDB(PET_SAVE_NOT_IN_SLOT);
         else
             SetNeedSave(false);
@@ -2929,6 +2932,7 @@ void Pet::CastPetPassiveAuras(bool current)
     {
         case SUMMON_PET:
         case GUARDIAN_PET:
+        case PROTECTOR_PET:
             creature_id = GetEntry();
             break;
         case HUNTER_PET:
@@ -2977,7 +2981,7 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
         pScalingDataList = sObjectMgr.GetPetScalingData(0);
     else if (getPetType() == HUNTER_PET)                      // Using creature_id = 1 for hunter pets
         pScalingDataList = sObjectMgr.GetPetScalingData(1);
-    else if (getPetType() == SUMMON_PET || getPetType() == GUARDIAN_PET)
+    else if (getPetType() == SUMMON_PET || getPetType() == GUARDIAN_PET || getPetType() == PROTECTOR_PET )
     {
         pScalingDataList = sObjectMgr.GetPetScalingData(GetEntry());
         if (!pScalingDataList)
