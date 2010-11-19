@@ -40,9 +40,9 @@
 
 struct ScriptAction
 {
-    uint64 sourceGUID;
-    uint64 targetGUID;
-    uint64 ownerGUID;                                       // owner of source if source is item
+    ObjectGuid sourceGuid;
+    ObjectGuid targetGuid;
+    ObjectGuid ownerGuid;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
 };
 
@@ -1681,8 +1681,8 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         return;
 
     // prepare static data
-    uint64 sourceGUID = source->GetGUID();
-    uint64 targetGUID = target ? target->GetGUID() : (uint64)0;
+    ObjectGuid sourceGuid = source->GetObjectGuid();
+    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
     ObjectGuid ownerGuid  = (source->GetTypeId()==TYPEID_ITEM) ? ((Item*)source)->GetOwnerGuid() : ObjectGuid();
 
     ///- Schedule script execution for all scripts in the script map
@@ -1691,9 +1691,9 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
     for (ScriptMap::const_iterator iter = s2->begin(); iter != s2->end(); ++iter)
     {
         ScriptAction sa;
-        sa.sourceGUID = sourceGUID;
-        sa.targetGUID = targetGUID;
-        sa.ownerGUID  = ownerGuid.GetRawValue();
+        sa.sourceGuid = sourceGuid;
+        sa.targetGuid = targetGuid;
+        sa.ownerGuid  = ownerGuid;
 
         sa.script = &iter->second;
         m_scriptSchedule.insert(std::pair<time_t, ScriptAction>(time_t(sWorld.GetGameTime() + iter->first), sa));
@@ -1712,14 +1712,14 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     // NOTE: script record _must_ exist until command executed
 
     // prepare static data
-    uint64 sourceGUID = source->GetGUID();
-    uint64 targetGUID = target ? target->GetGUID() : (uint64)0;
+    ObjectGuid sourceGuid = source->GetObjectGuid();
+    ObjectGuid targetGuid = target ? target->GetObjectGuid() : ObjectGuid();
     ObjectGuid ownerGuid  = (source->GetTypeId()==TYPEID_ITEM) ? ((Item*)source)->GetOwnerGuid() : ObjectGuid();
 
     ScriptAction sa;
-    sa.sourceGUID = sourceGUID;
-    sa.targetGUID = targetGUID;
-    sa.ownerGUID  = ownerGuid.GetRawValue();
+    sa.sourceGuid = sourceGuid;
+    sa.targetGuid = targetGuid;
+    sa.ownerGuid  = ownerGuid;
 
     sa.script = &script;
     m_scriptSchedule.insert(std::pair<time_t, ScriptAction>(time_t(sWorld.GetGameTime() + delay), sa));
@@ -1746,38 +1746,37 @@ void Map::ScriptsProcess()
 
         Object* source = NULL;
 
-        if (step.sourceGUID)
+        if (!step.sourceGuid.IsEmpty())
         {
-            switch(GUID_HIPART(step.sourceGUID))
+            switch(step.sourceGuid.GetHigh())
             {
                 case HIGHGUID_ITEM:
                 // case HIGHGUID_CONTAINER: ==HIGHGUID_ITEM
                 {
-                    Player* player = HashMapHolder<Player>::Find(step.ownerGUID);
-                    if(player)
-                        source = player->GetItemByGuid(step.sourceGUID);
+                    if (Player* player = HashMapHolder<Player>::Find(step.ownerGuid))
+                        source = player->GetItemByGuid(step.sourceGuid);
                     break;
                 }
                 case HIGHGUID_UNIT:
-                    source = GetCreature(step.sourceGUID);
+                    source = GetCreature(step.sourceGuid);
                     break;
                 case HIGHGUID_PET:
-                    source = GetPet(step.sourceGUID);
+                    source = GetPet(step.sourceGuid);
                     break;
                 case HIGHGUID_VEHICLE:
-                    source = GetVehicle(step.sourceGUID);
+                    source = GetVehicle(step.sourceGuid);
                     break;
                 case HIGHGUID_PLAYER:
-                    source = HashMapHolder<Player>::Find(step.sourceGUID);
+                    source = HashMapHolder<Player>::Find(step.sourceGuid);
                     break;
                 case HIGHGUID_GAMEOBJECT:
-                    source = GetGameObject(step.sourceGUID);
+                    source = GetGameObject(step.sourceGuid);
                     break;
                 case HIGHGUID_CORPSE:
-                    source = HashMapHolder<Corpse>::Find(step.sourceGUID);
+                    source = HashMapHolder<Corpse>::Find(step.sourceGuid);
                     break;
                 default:
-                    sLog.outError("*_script source with unsupported high guid value %u",GUID_HIPART(step.sourceGUID));
+                    sLog.outError("*_script source with unsupported guid %s", step.sourceGuid.GetString().c_str());
                     break;
             }
         }
@@ -1787,30 +1786,30 @@ void Map::ScriptsProcess()
 
         Object* target = NULL;
 
-        if (step.targetGUID)
+        if (!step.targetGuid.IsEmpty())
         {
-            switch(GUID_HIPART(step.targetGUID))
+            switch(step.targetGuid.GetHigh())
             {
                 case HIGHGUID_UNIT:
-                    target = GetCreature(step.targetGUID);
+                    target = GetCreature(step.targetGuid);
                     break;
                 case HIGHGUID_PET:
-                    target = GetPet(step.targetGUID);
+                    target = GetPet(step.targetGuid);
                     break;
                 case HIGHGUID_VEHICLE:
-                    target = GetVehicle(step.targetGUID);
+                    target = GetVehicle(step.targetGuid);
                     break;
-                case HIGHGUID_PLAYER:                       // empty GUID case also
-                    target = HashMapHolder<Player>::Find(step.targetGUID);
+                case HIGHGUID_PLAYER:
+                    target = HashMapHolder<Player>::Find(step.targetGuid);
                     break;
                 case HIGHGUID_GAMEOBJECT:
-                    target = GetGameObject(step.targetGUID);
+                    target = GetGameObject(step.targetGuid);
                     break;
                 case HIGHGUID_CORPSE:
-                    target = HashMapHolder<Corpse>::Find(step.targetGUID);
+                    target = HashMapHolder<Corpse>::Find(step.targetGuid);
                     break;
                 default:
-                    sLog.outError("*_script source with unsupported high guid value %u",GUID_HIPART(step.targetGUID));
+                    sLog.outError("*_script target with unsupported guid %s", step.targetGuid.GetString().c_str());
                     break;
             }
         }
@@ -1878,7 +1877,7 @@ void Map::ScriptsProcess()
                 if (step.script->talk.flags & 0x02)
                     target = source;
 
-                uint64 unit_target = target ? target->GetGUID() : 0;
+                ObjectGuid unitTargetGuid = target ? target->GetObjectGuid() : ObjectGuid();
                 int32 textId = step.script->talk.textId[0];
 
                 // May have text for random
@@ -1898,35 +1897,35 @@ void Map::ScriptsProcess()
                 switch(step.script->talk.chatType)
                 {
                     case CHAT_TYPE_SAY:
-                        pSource->MonsterSay(textId, step.script->talk.language, unit_target);
+                        pSource->MonsterSay(textId, step.script->talk.language, unitTargetGuid);
                         break;
                     case CHAT_TYPE_YELL:
-                        pSource->MonsterYell(textId, step.script->talk.language, unit_target);
+                        pSource->MonsterYell(textId, step.script->talk.language, unitTargetGuid);
                         break;
                     case CHAT_TYPE_TEXT_EMOTE:
-                        pSource->MonsterTextEmote(textId, unit_target);
+                        pSource->MonsterTextEmote(textId, unitTargetGuid);
                         break;
                     case CHAT_TYPE_BOSS_EMOTE:
-                        pSource->MonsterTextEmote(textId, unit_target, true);
+                        pSource->MonsterTextEmote(textId, unitTargetGuid, true);
                         break;
                     case CHAT_TYPE_WHISPER:
-                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
+                        if (!unitTargetGuid.IsPlayer())
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->talk.chatType);
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTargetGuid.GetString().c_str());
                             break;
                         }
-                        pSource->MonsterWhisper(textId, unit_target);
+                        pSource->MonsterWhisper(textId, unitTargetGuid);
                         break;
                     case CHAT_TYPE_BOSS_WHISPER:
-                        if (!unit_target || !IS_PLAYER_GUID(unit_target))
+                        if (!unitTargetGuid.IsPlayer())
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) 0-guid or non-player, skipping.", step.script->id, step.script->talk.chatType);
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTargetGuid.GetString().c_str());
                             break;
                         }
-                        pSource->MonsterWhisper(textId, unit_target, true);
+                        pSource->MonsterWhisper(textId, unitTargetGuid, true);
                         break;
                     case CHAT_TYPE_ZONE_YELL:
-                        pSource->MonsterYellToZone(textId, step.script->talk.language, unit_target);
+                        pSource->MonsterYellToZone(textId, step.script->talk.language, unitTargetGuid);
                         break;
                     default:
                         break;                              // must be already checked at load
