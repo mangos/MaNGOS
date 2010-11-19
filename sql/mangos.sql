@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10742_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_10743_02_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14368,10 +14368,13 @@ LOCK TABLES `spell_bonus_data` WRITE;
 INSERT INTO `spell_bonus_data` VALUES
 /* Death Knight */
 (48721, 0,      0,       0.04,  0,     'Death Knight - Blood Boil'),
+(55078, 0,      0,       0,     0.06325,'Death Knight - Blood Plague'),
 (50444, 0,      0,       0.105, 0,     'Death Knight - Corpse Explosion Triggered'),
 (52212, 0,      0,       0.0475,0,     'Death Knight - Death and Decay Triggered'),
 (47632, 0,      0,       0.15,  0,     'Death Knight - Death Coil Damage'),
 (47633, 0,      0,       0.15,  0,     'Death Knight - Death Coil Heal'),
+(48743, 0,      0,       0,     0,     'Death Knight - Death Pact'),
+(55095, 0,      0,       0,     0.06325,'Death Knight - Frost Fever'),
 (49184, 0,      0,       0.1,   0,     'Death Knight - Howling Blast'),
 (45477, 0,      0,       0.1,   0,     'Death Knight - Icy Touch'),
 (56903, 0,      0,       0,     0,     'Death Knight - Lichflame'),
@@ -14379,16 +14382,19 @@ INSERT INTO `spell_bonus_data` VALUES
 (50401, 0,      0,       0,     0,     'Death Knight - Razor Frost'),
 (47476, 0,      0,       0.06,  0,     'Death Knight - Strangulate'),
 (50536, 0,      0,       0,     0.013, 'Death Knight - Unholy Blight Triggered'),
-(48743, 0,      0,       0,     0,     'Death Knight - Death Pact'),
 /* Druid */
 (5185,  1.6104, 0,       0,     0,     'Druid - Healing Touch'),
 (339,   0,      0.1,     0,     0,     'Druid - Entangling Roots'),
 (60089, 0,      0,       0.15,  0,     'Druid - Faerie Fire (Feral) Triggered'),
 (42231, 0.12898,0,       0,     0,     'Druid - Hurricane Triggered'),
 (5570,  0,      0.2,     0,     0,     'Druid - Insect Swarm'),
+(33745, 0,      0,       0.01,  0.01,  'Druid - Lacerate'),
 (33763, 0,      0.09518, 0,     0,     'Druid - Lifebloom'),
+(48628, 0,      0,       0,     0.15,  'Druid - Lock Jaw'),
 (8921,  0.1515, 0.13,    0,     0,     'Druid - Moonfire'),
 (50464, 0.6611, 0,       0,     0,     'Druid - Nourish'),
+(9007,  0,      0,       0,     0.03,  'Druid - Pounce Bleed'),
+(1822,  0,      0,       0,     0.06,  'Druid - Rake'),
 (8936,  0.539,  0.188,   0,     0,     'Druid - Regrowth'),
 (50288, 0.05,   0,       0,     0,     'Druid - Starfall'),
 (50294, 0.012,  0,       0,     0,     'Druid - Starfall AOE'),
@@ -14398,6 +14404,15 @@ INSERT INTO `spell_bonus_data` VALUES
 (5176,  0.5714, 0,       0,     0,     'Druid - Wrath'),
 /* Generic */
 (54757, 0,      0,       0,     0,     'Generic - Pyro Rocket'),
+/* Hunter */
+(3044,  0,      0,       0.15,  0,     'Hunter - Arcane Shot'),
+(3674,  0,      0,       0,     0.02,  'Hunter - Black Arrow'),
+(19306, 0,      0,       0.2,   0,     'Hunter - Counterattack'),
+(13812, 0,      0,       0.1,   0.1,   'Hunter - Explosive Trap'),
+(13797, 0,      0,       0,     0.02,  'Hunter - Immolation Trap'),
+(1495,  0,      0,       0.2,   0,     'Hunter - Mongoose Bite'),
+(1978,  0,      0,       0,     0.04,  'Hunter - Serpent Sting'),
+(42243, 0,      0,       0.0837,0,     'Hunter - Volley'),
 /* Mage */
 (44425, 0.714286,0,      0,     0,     'Mage - Arcane Barrage'),
 (7268,  0.2857, 0,       0,     0,     'Mage - Arcane Missiles Triggered Spell'),
@@ -14447,6 +14462,9 @@ INSERT INTO `spell_bonus_data` VALUES
 (585,   0.714,  0,       0,     0,     'Priest - Smite'),
 (34914, 0,      0.4,     0,     0,     'Priest - Vampiric Touch'),
 (64085, 1.2,    0,       0,     0,     'Priest - Vampiric Touch Dispel'),
+/* Rogue */
+(2818,  0,      0,       0,     0.03,  'Rogue - Deadly Poison'),
+(703,   0,      0,       0,     0.07,  'Rogue - Garrote'),
 /* Shaman */
 (974,   0.4762, 0,       0,     0,     'Shaman - Earth Shield'),
 (379,   0,      0,       0,     0,     'Shaman - Earth Shield Triggered'),
@@ -14525,6 +14543,16 @@ INSERT INTO spell_chain VALUES
 -- ------------------
 -- (0) Not associated with skills
 -- ------------------
+/* Deadly Poison Triggered */
+(2818,0,2818,1,0),
+(2819,2818,2818,2,0),
+(11353,2819,2818,3,0),
+(11354,11353,2818,4,0),
+(25349,11354,2818,5,0),
+(26968,25349,2818,6,0),
+(27187,26968,2818,7,0),
+(57969,27187,2818,8,0),
+(57970,57969,2818,9,0),
 /* Flametongue Weapon Proc */
 (8026,0,8026,1,0),
 (8028,8026,8026,2,0),
@@ -14845,6 +14873,13 @@ INSERT INTO spell_chain VALUES
 (27025,14317,13813,4,0),
 (49066,27025,13813,5,0),
 (49067,49066,13813,6,0),
+/* Explosive Trap Effect */
+(13812,0,13812,1,0),
+(14314,13812,13812,2,0),
+(14315,14314,13812,3,0),
+(27026,14315,13812,4,0),
+(49064,27026,13812,5,0),
+(49065,49064,13812,6,0),
 /* Freezing Trap */
 (1499,0,1499,1,0),
 (14310,1499,1499,2,0),
@@ -14858,6 +14893,15 @@ INSERT INTO spell_chain VALUES
 (27023,14305,13795,6,0),
 (49055,27023,13795,7,0),
 (49056,49055,13795,8,0),
+/* Immolation Trap Triggered */
+(13797,0,13797,1,0),
+(14298,13797,13797,2,0),
+(14299,14298,13797,3,0),
+(14300,14299,13797,4,0),
+(14301,14300,13797,5,0),
+(27024,14301,13797,6,0),
+(49053,27024,13797,7,0),
+(49054,49053,13797,8,0),
 /* Mongoose Bite */
 (1495,0,1495,1,0),
 (14269,1495,1495,2,0),
@@ -15183,6 +15227,13 @@ INSERT INTO spell_chain VALUES
 (27022,14295,1510,4,0),
 (58431,27022,1510,5,0),
 (58434,58431,1510,6,0),
+/* Volley Triggered */
+(42243,0,42243,1,0),
+(42244,42243,42243,2,0),
+(42245,42244,42243,3,0),
+(42234,42245,42243,4,0),
+(58432,42234,42243,5,0),
+(58433,58432,42243,6,0),
 -- ------------------
 -- (164) Blacksmithing
 -- ------------------
