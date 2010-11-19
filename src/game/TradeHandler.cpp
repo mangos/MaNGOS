@@ -216,7 +216,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item **m
     {
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
-            DEBUG_LOG("player trade item %s bag: %u slot: %u", item->GetObjectGuid().GetString().c_str(), item->GetBagSlot(), item->GetSlot());
+            DEBUG_LOG("player trade %s bag: %u slot: %u", item->GetObjectGuid().GetString().c_str(), item->GetBagSlot(), item->GetSlot());
             //Can return NULL
             myItems[i] = item;
             myItems[i]->SetInTrade();
@@ -224,7 +224,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item **m
 
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
-            DEBUG_LOG("partner trade item %s bag: %u slot: %u", item->GetObjectGuid().GetString().c_str(), item->GetBagSlot(), item->GetSlot());
+            DEBUG_LOG("partner trade %s bag: %u slot: %u", item->GetObjectGuid().GetString().c_str(), item->GetBagSlot(), item->GetSlot());
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
         }

@@ -513,10 +513,10 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemByGuid( itemguid );
-    if( pItem )
+    if (pItem)
     {
         // prevent sell not owner item
-        if(_player->GetGUID() != pItem->GetOwnerGUID())
+        if (_player->GetObjectGuid() != pItem->GetOwnerGuid())
         {
             _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
             return;
@@ -1189,7 +1189,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
     }
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", GUID_LOPART(item->GetOwnerGUID()), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
+    CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
     item->SetEntry(gift->GetEntry());
 
     switch (item->GetEntry())
