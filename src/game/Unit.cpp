@@ -8049,6 +8049,11 @@ void Unit::Mount(uint32 mount, uint32 spellId, uint32 vehicleId)
                 else
                     pet->ApplyModeFlags(PET_MODE_DISABLE_ACTIONS,true);
             }
+            else if (Pet* minipet = GetMiniPet())
+            {
+                if (sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
+                    minipet->Unsummon(PET_SAVE_AS_DELETED, this);
+            }
         }
 
         if (vehicleId)

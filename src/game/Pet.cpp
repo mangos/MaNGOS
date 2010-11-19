@@ -2825,10 +2825,7 @@ bool Pet::Summon()
             SelectLevel(GetCreatureInfo());
             SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
             SetName("");
-            if (owner->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)owner)->SetMiniPet(this);
-            else
-                SetCritterGuid(GetObjectGuid());
+            owner->SetMiniPet((Unit*)this);
             InitPetCreateSpells();
             AIM_Initialize();
             SetNeedSave(false);
