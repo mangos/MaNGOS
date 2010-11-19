@@ -10361,6 +10361,10 @@ uint8 Player::CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bo
                             return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
                 }
 
+                // prevent equip item in process logout
+                if (GetSession()->isLogingOut())
+                    return EQUIP_ERR_YOU_ARE_STUNNED;
+
                 if (isInCombat()&& pProto->Class == ITEM_CLASS_WEAPON && m_weaponChangeTimer != 0)
                     return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
 
@@ -10491,6 +10495,10 @@ uint8 Player::CanUnequipItem( uint16 pos, bool swap ) const
             if( bg->isArena() && bg->GetStatus() == STATUS_IN_PROGRESS )
                 return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
     }
+
+    // prevent unequip item in process logout
+    if (GetSession()->isLogingOut())
+        return EQUIP_ERR_YOU_ARE_STUNNED;
 
     if(!swap && pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
