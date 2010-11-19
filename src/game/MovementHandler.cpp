@@ -75,7 +75,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // relocate the player to the teleport destination
     GetPlayer()->SetMap(sMapMgr.CreateMap(loc.mapid, GetPlayer()));
     GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
-    GetPlayer()->GetAntiCheat()->m_anti_TeleTime=time(NULL);
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     // the CanEnter checks are done in TeleporTo but conditions may change
@@ -168,9 +167,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
 
-    GetPlayer()->GetAntiCheat()->Anti__SetLastTeleTime(::time(NULL));
-    GetPlayer()->GetAntiCheat()->m_anti_BeginFallZ=INVALID_HEIGHT;
-
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 }
@@ -219,8 +215,6 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
-    GetPlayer()->GetAntiCheat()->Anti__SetLastTeleTime(::time(NULL));
-    GetPlayer()->GetAntiCheat()->m_anti_BeginFallZ=INVALID_HEIGHT;
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
@@ -256,10 +250,6 @@ void WorldSession::HandleMovementOpcodes( WorldPacket & recv_data )
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && plMover && !plMover->IsTaxiFlying())
         plMover->HandleFall(movementInfo);
-
-    /* process anticheat check */
-    if (GetPlayer()->GetAntiCheat()->CheckNeeded(plMover))
-        GetPlayer()->GetAntiCheat()->CheckMovement(plMover,movementInfo, opcode);
 
     /* process position-change */
     HandleMoverRelocation(movementInfo);
@@ -509,12 +499,6 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
         {
             if (!plMover->GetTransport())
             {
-
-                /* process anticheat check */
-                if (GetPlayer()->GetAntiCheat()->CheckNeeded(plMover))
-                    if (!GetPlayer()->GetAntiCheat()->CheckOnTransport(movementInfo))
-                        return;
-
                 // elevators also cause the client to send MOVEFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
                 for (MapManager::TransportSet::const_iterator iter = sMapMgr.m_Transports.begin(); iter != sMapMgr.m_Transports.end(); ++iter)
                 {
@@ -542,11 +526,6 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
         {
             // now client not include swimming flag in case jumping under water
             plMover->SetInWater( !plMover->IsInWater() || plMover->GetTerrain()->IsUnderWater(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z) );
-        }
-
-        if(plMover->GetTerrain()->IsUnderWater(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z-7.0f))
-        {
-            plMover->GetAntiCheat()->m_anti_BeginFallZ=INVALID_HEIGHT;
         }
 
         plMover->SetPosition(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o);

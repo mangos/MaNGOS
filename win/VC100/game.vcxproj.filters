@@ -454,18 +454,12 @@
     <ClCompile Include="..\..\src\game\AuctionHouseBot.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\game\AntiCheat.cpp">
-      <Filter>World/Handlers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
       <Filter>World/Handlers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\AchievementMgr.h">
-      <Filter>World/Handlers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\game\AntiCheat.h">
       <Filter>World/Handlers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\BattleGround.h">
