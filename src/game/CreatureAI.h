@@ -101,6 +101,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when the creature kills a unit
         virtual void KilledUnit(Unit *) {}
 
+        // Called when owner of m_creature (if m_creature is PROTECTOR_PET) kills a unit
+        virtual void OwnerKilledUnit(Unit *) {}
+
         // Called when the creature summon successfully other creature
         virtual void JustSummoned(Creature* ) {}
 

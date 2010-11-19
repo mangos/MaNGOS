@@ -785,7 +785,18 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // Call KilledUnit for creatures
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+        {
             ((Creature*)this)->AI()->KilledUnit(pVictim);
+        }
+        else if (GetTypeId() == TYPEID_PLAYER)
+        {
+            // currently not known if other pet types (not controllable) may have some action at owner kills
+            if (Pet* pProtector = GetProtectorPet())
+            {
+                if (pProtector->AI())
+                    pProtector->AI()->OwnerKilledUnit(pVictim);
+            }
+        }
 
         // achievement stuff
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
