@@ -40,7 +40,7 @@ class DynamicObject : public WorldObject
         uint32 GetSpellId() const { return m_spellId; }
         SpellEffectIndex GetEffIndex() const { return m_effIndex; }
         uint32 GetDuration() const { return m_aliveDuration; }
-        uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
+        ObjectGuid const& GetCasterGuid() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
         Unit* GetCaster() const;
         float GetRadius() const { return m_radius; }
         bool IsAffecting(Unit *unit) const { return m_affected.find(unit->GetObjectGuid()) != m_affected.end(); }
