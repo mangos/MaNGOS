@@ -1722,6 +1722,30 @@ SOAP.IP = 127.0.0.1
 SOAP.Port = 7878
 
 ###################################################################################################################
+# ANTICHEAT
+# Initially from gimly, CWN && many other. current from /dev/rsa
+# all other config optons moved to SQL
+#
+#    Anticheat.Enable
+#        Enable Movement Anticheat
+#        Default: 0 - off
+#                 1 - on
+#
+#    Anticheat.DelayAfterAction
+#        Delay new action after occured action.
+#        Default: 30 seconds - 30
+#
+#    Anticheat.GmLevel
+#        Only accounts that are below this gm-level or exact at the same, are reported for cheating.
+#        Default: Only normal Players - 0
+#
+###################################################################################################################
+
+Anticheat.Enable = 1
+Anticheat.DelayAfterAction = 30
+Anticheat.GmLevel = 0
+
+###################################################################################################################
 #    CharDelete.Method
 #        Character deletion behavior
 #        Default: 0  - Completely remove the character from the database
