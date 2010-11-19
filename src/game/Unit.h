@@ -1536,11 +1536,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        void SetCritterGUID(uint64 critter) { SetUInt64Value(UNIT_FIELD_CRITTER, critter); }
-        uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
+        void SetCritterGuid(ObjectGuid critter) { SetGuidValue(UNIT_FIELD_CRITTER, critter); }
+        ObjectGuid const& GetCritterGuid() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
+
         void RemoveMiniPet();
         Pet* GetMiniPet() const;
-        void SetMiniPet(Unit* pet) { SetCritterGUID(pet->GetGUID()); }
+        void SetMiniPet(Unit* pet) { SetCritterGuid(pet ? pet->GetObjectGuid() : ObjectGuid()); }
 
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return !GetCharmerGuid().IsEmpty() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const

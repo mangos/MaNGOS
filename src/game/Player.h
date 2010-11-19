@@ -1226,7 +1226,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         time_t GetTimeInnEnter() const { return time_inn_enter; }
         void UpdateInnerTime (time_t time) { time_inn_enter = time; }
 
-        void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
+        void RemovePet(PetSaveMode mode);
 
         uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 

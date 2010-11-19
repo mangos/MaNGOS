@@ -43,7 +43,8 @@ enum PetSaveMode
     PET_SAVE_AS_CURRENT        =  0,                        // in current slot (with player)
     PET_SAVE_FIRST_STABLE_SLOT =  1,
     PET_SAVE_LAST_STABLE_SLOT  =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
-    PET_SAVE_NOT_IN_SLOT       =  100                       // for avoid conflict with stable size grow will use 100
+    PET_SAVE_NOT_IN_SLOT       =  100,                      // for avoid conflict with stable size grow will use 100
+    PET_SAVE_REAGENTS          =  101                       // PET_SAVE_NOT_IN_SLOT with reagents return
 };
 
 // There might be a lot more
@@ -177,7 +178,7 @@ class Pet : public Creature
         bool CreateBaseAtCreature(Creature* creature, Unit* owner);
         bool LoadPetFromDB( Player* owner, uint32 petentry = 0, uint32 petnumber = 0, bool current = false, float x = 0.0f, float y = 0.0f, float z = 0.0f );
         void SavePetToDB(PetSaveMode mode);
-        void Remove(PetSaveMode mode, bool returnreagent = false);
+        void Unsummon(PetSaveMode mode, Unit* owner = NULL);
         static void DeleteFromDB(uint32 guidlow);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
@@ -298,7 +299,6 @@ class Pet : public Creature
         bool Create (uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number, Unit* owner);
         bool Create (Unit* owner, uint32 Entry);
         bool IsInWorld() const { return ( !m_loading && !m_removed && Object::IsInWorld()); }
-        void _Remove(PetSaveMode mode, bool returnreagent = false);
 
         // overwrite Creature function for name localization back to WorldObject version without localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const { return WorldObject::GetNameForLocaleIdx(locale_idx); }

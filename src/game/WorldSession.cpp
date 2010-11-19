@@ -391,7 +391,8 @@ void WorldSession::LogoutPlayer(bool Save)
         }
 
         ///- Remove pet
-        _player->RemovePet(NULL, PET_SAVE_AS_CURRENT, true);
+        _player->RemovePet(PET_SAVE_AS_CURRENT);
+
         _player->InterruptNonMeleeSpells(true);
 
         ///- empty buyback items and save the player in the database

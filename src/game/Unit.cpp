@@ -968,7 +968,18 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         // Call KilledUnit for creatures
         if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+        {
             ((Creature*)this)->AI()->KilledUnit(pVictim);
+        }
+        else if (GetTypeId() == TYPEID_PLAYER)
+        {
+            // currently not known if other pet types (not controllable) may have some action at owner kills
+            if (Pet* pProtector = GetProtectorPet())
+            {
+                if (pProtector->AI())
+                    pProtector->AI()->OwnerKilledUnit(pVictim);
+            }
+        }
 
         // achievement stuff
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
@@ -6181,14 +6192,17 @@ Pet* Unit::_GetPet(ObjectGuid guid) const
 void Unit::RemoveMiniPet()
 {
     if (Pet* pet = GetMiniPet())
-        pet->Remove(PET_SAVE_AS_DELETED);
+        pet->Unsummon(PET_SAVE_AS_DELETED,this);
     else
-        SetCritterGUID(0);
+        SetCritterGuid(ObjectGuid());
 }
 
 Pet* Unit::GetMiniPet() const
 {
-    return GetMap()->GetPet(GetCritterGUID());
+    if (GetCritterGuid().IsEmpty())
+        return NULL;
+
+    return GetMap()->GetPet(GetCritterGuid());
 }
 
 Unit* Unit::GetCharm() const
@@ -6293,9 +6307,8 @@ void Unit::RemoveGuardians()
     {
         uint64 guid = *m_guardianPets.begin();
         if(Pet* pet = GetMap()->GetPet(guid))
-        {
-            pet->_Remove(PET_SAVE_AS_DELETED);
-        }
+            pet->Unsummon(PET_SAVE_AS_DELETED, this);
+
         m_guardianPets.erase(guid);
     }
     m_guardianPets.clear();
@@ -6476,9 +6489,9 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
         coeff = damagetype == DOT ? bonus->dot_damage : bonus->direct_damage;
 
         // apply ap bonus at done part calculation only (it flat total mod so common with taken)
-        if (donePart && bonus->ap_bonus)
+        if (donePart && (bonus->ap_bonus || bonus->ap_dot_bonus))
         {
-            float ap_bonus = bonus->ap_bonus;
+            float ap_bonus = damagetype == DOT ? bonus->ap_dot_bonus : bonus->ap_bonus;
 
             // Impurity
             if (GetTypeId() == TYPEID_PLAYER && spellProto->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT)
@@ -6487,7 +6500,7 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
                     ap_bonus += ((spell->CalculateSimpleValue(EFFECT_INDEX_0) * ap_bonus) / 100.0f);
             }
 
-            total += int32(ap_bonus * (GetTotalAttackPowerValue(BASE_ATTACK) + ap_benefit));
+            total += int32(ap_bonus * (GetTotalAttackPowerValue(IsSpellRequiresRangedAP(spellProto) ? RANGED_ATTACK : BASE_ATTACK) + ap_benefit));
         }
     }
     // Default calculation
@@ -10251,7 +10264,7 @@ void Unit::DoPetAction( Player* owner, uint8 flag, uint32 spellid, ObjectGuid pe
                     {
                         Pet* p = (Pet*)this;
                         if(p->getPetType() == HUNTER_PET)
-                            p->Remove(PET_SAVE_AS_DELETED);
+                            p->Unsummon(PET_SAVE_AS_DELETED, owner);
                         else
                             //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                             p->SetDeathState(CORPSE);
@@ -11466,7 +11479,7 @@ void Unit::EnterVehicle(VehicleKit *vehicle, int8 seatId)
     m_pVehicle = vehicle;
 
     if (Pet *pet = GetPet())
-        pet->Remove(PET_SAVE_AS_CURRENT);
+        pet->Unsummon(PET_SAVE_AS_CURRENT,this);
 
     if (GetTypeId() == TYPEID_PLAYER)
     {
