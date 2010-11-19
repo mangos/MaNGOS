@@ -68,10 +68,9 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         uint32 GetId() const { return m_spellProto->Id; }
         SpellEntry const* GetSpellProto() const { return m_spellProto; }
 
-        uint64 const& GetCasterGUID() const { return m_caster_guid.GetRawValue(); }
-        void SetCasterGUID(uint64 guid) { m_caster_guid = ObjectGuid(guid); }
-        ObjectGuid const& GetCasterGuid() const { return m_caster_guid; }
-        void SetCasterGuid(ObjectGuid guid) { m_caster_guid = guid; }
+        uint64 const& GetCasterGUID() const { return m_casterGuid.GetRawValue(); }
+        ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
+        void SetCasterGuid(ObjectGuid guid) { m_casterGuid = guid; }
         uint64 GetCastItemGUID() const { return m_castItemGuid; }
         Unit* GetCaster() const;
         Unit* GetTarget() const { return m_target; }
@@ -148,7 +147,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
         void SetLoadedState(ObjectGuid casterGUID, ObjectGuid itemGUID, int32 stackAmount, int32 charges)
         {
-            m_caster_guid = casterGUID;
+            m_casterGuid = casterGUID;
             m_castItemGuid = itemGUID.GetRawValue();
             m_procCharges = charges;
             m_stackAmount = stackAmount;
@@ -160,7 +159,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         ~SpellAuraHolder();
     private:
         Unit* m_target;
-        ObjectGuid m_caster_guid;
+        ObjectGuid m_casterGuid;
         uint64 m_castItemGuid;                              // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
 

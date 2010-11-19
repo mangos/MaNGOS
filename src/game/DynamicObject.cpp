@@ -73,7 +73,7 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, SpellE
     SetEntry(spellId);
     SetObjectScale(DEFAULT_OBJECT_SCALE);
 
-    SetUInt64Value(DYNAMICOBJECT_CASTER, caster->GetGUID());
+    SetGuidValue(DYNAMICOBJECT_CASTER, caster->GetObjectGuid());
 
     /* Bytes field, so it's really 4 bit fields. These flags are unknown, but we do know that 0x00000001 is set for most.
        Farsight for example, does not have this flag, instead it has 0x80000002.
@@ -103,7 +103,7 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, SpellE
 Unit* DynamicObject::GetCaster() const
 {
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this, GetCasterGUID());
+    return ObjectAccessor::GetUnit(*this, GetCasterGuid());
 }
 
 void DynamicObject::Update(uint32 p_time)
@@ -152,7 +152,7 @@ void DynamicObject::Delay(int32 delaytime)
         Unit *target = GetMap()->GetUnit((*iter));
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGUID());
+            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid().GetRawValue());
             if (!holder)
             {
                 ++iter;
@@ -175,7 +175,7 @@ void DynamicObject::Delay(int32 delaytime)
                 continue;
             }
 
-            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGUID());
+            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid().GetRawValue());
             ++iter;
         }
         else
@@ -185,11 +185,11 @@ void DynamicObject::Delay(int32 delaytime)
 
 bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    if(!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !u->IsInWorld())
         return false;
 
     // always seen by owner
-    if(GetCasterGUID()==u->GetGUID())
+    if (GetCasterGuid() == u->GetObjectGuid())
         return true;
 
     // normal case
