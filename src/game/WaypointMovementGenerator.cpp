@@ -220,10 +220,10 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
                                 break;
                         }
 
-                        creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL, ObjectGuid());
+                        creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL);
                     }
                     else
-                        creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL, ObjectGuid());
+                        creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL);
                 }
             }                                               // wpBehaviour found
 
