@@ -83,12 +83,6 @@ class Corpse : public WorldObject
         Player* lootRecipient;
         bool lootForBody;
 
-        void Say(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterSay(textId, language, targetGuid); }
-        void Yell(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterYell(textId, language, targetGuid); }
-        void TextEmote(int32 textId, ObjectGuid targetGuid) { MonsterTextEmote(textId, targetGuid); }
-        void Whisper(int32 textId, ObjectGuid targetGuid) { MonsterWhisper(textId, targetGuid); }
-        void YellToZone(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterYellToZone(textId,language, targetGuid); }
-
         GridReference<Corpse> &GetGridRef() { return m_gridRef; }
 
         bool IsExpired(time_t t) const;

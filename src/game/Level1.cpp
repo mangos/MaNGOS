@@ -51,7 +51,7 @@ bool ChatHandler::HandleNpcSayCommand(char* args)
         return false;
     }
 
-    pCreature->MonsterSay(args, LANG_UNIVERSAL, ObjectGuid());
+    pCreature->MonsterSay(args, LANG_UNIVERSAL);
 
     return true;
 }
@@ -69,7 +69,7 @@ bool ChatHandler::HandleNpcYellCommand(char* args)
         return false;
     }
 
-    pCreature->MonsterYell(args, LANG_UNIVERSAL, ObjectGuid());
+    pCreature->MonsterYell(args, LANG_UNIVERSAL);
 
     return true;
 }
@@ -89,7 +89,7 @@ bool ChatHandler::HandleNpcTextEmoteCommand(char* args)
         return false;
     }
 
-    pCreature->MonsterTextEmote(args, ObjectGuid());
+    pCreature->MonsterTextEmote(args, NULL);
 
     return true;
 }
@@ -114,7 +114,7 @@ bool ChatHandler::HandleNpcWhisperCommand(char* args)
     if (HasLowerSecurity(target, 0))
         return false;
 
-    pCreature->MonsterWhisper(args, target->GetObjectGuid());
+    pCreature->MonsterWhisper(args, target);
 
     return true;
 }

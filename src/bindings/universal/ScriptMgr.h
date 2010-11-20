@@ -123,7 +123,7 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
 
     void DoSay(int32 text_id, uint32 language)
     {
-        m_creature->Say(text_id, language, ObjectGuid());
+        m_creature->MonsterSay(text_id, language);
     }
 
     void DoGoHome();
