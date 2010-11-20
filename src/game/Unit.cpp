@@ -832,10 +832,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     {
         Player *killer = ((Player*)this);
 
-        /* process anticheat check */
-        killer->GetAntiCheat()->DoAntiCheatCheck(CHECK_DAMAGE, 0, 0, damage);
-
-
         // in bg, count dmg if victim is also a player
         if (pVictim->GetTypeId()==TYPEID_PLAYER)
         {
