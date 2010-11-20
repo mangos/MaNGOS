@@ -496,7 +496,7 @@ struct AchievementCriteriaEntry
                                                             // 1: ByEventId(?) (serverside IDs),    2: ByQuestId,   5: ByCastSpellId(?)
                                                             // 6: BySpellIdTarget(some of these are unknown spells, some not, some maybe spells)
                                                             // 7: ByKillNpcId,  9: ByUseItemId
-    uint32  timedCriteriaMiscId;                            // 28 Alway appears with timed events, used internally to start the achievement, store 
+    uint32  timedCriteriaMiscId;                            // 28 Alway appears with timed events, used internally to start the achievement, store
     uint32  timeLimit;                                      // 29 time limit in seconds
     uint32  showOrder;                                      // 30 show order, also used in achievement shift-links as index in state bitmask
 
@@ -921,6 +921,8 @@ struct GlyphSlotEntry
 
 // All Gt* DBC store data for 100 levels, some by 100 per class/race
 #define GT_MAX_LEVEL    100
+// gtOCTClassCombatRatingScalar.dbc stores data for 32 ratings, look at MAX_COMBAT_RATING for real used amount
+#define GT_MAX_RATING   32
 
 struct GtBarberShopCostBaseEntry
 {
@@ -948,6 +950,11 @@ struct GtChanceToSpellCritBaseEntry
 };
 
 struct GtChanceToSpellCritEntry
+{
+    float    ratio;
+};
+
+struct GtOCTClassCombatRatingScalarEntry
 {
     float    ratio;
 };
