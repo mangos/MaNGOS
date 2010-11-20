@@ -1214,11 +1214,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateInnerTime (time_t time) { time_inn_enter = time; }
 
         void RemovePet(PetSaveMode mode);
-        void RemoveMiniPet();
-        Pet* GetMiniPet() const;
-
-        // use only in Pet::Unsummon/Spell::DoSummon
-        void _SetMiniPet(Pet* pet) { m_miniPetGuid = pet ? pet->GetObjectGuid() : ObjectGuid(); }
 
         template<typename Func>
         void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet);
@@ -2625,8 +2620,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         Group *m_groupInvite;
         uint32 m_groupUpdateMask;
         uint64 m_auraUpdateMask;
-
-        ObjectGuid m_miniPetGuid;
 
         // Player summoning
         time_t m_summon_expire;
