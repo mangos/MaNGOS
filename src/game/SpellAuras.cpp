@@ -4606,6 +4606,7 @@ void Aura::HandleAuraModIncreaseFlightSpeed(bool apply, bool Real)
             data.Initialize(SMSG_MOVE_SET_CAN_FLY, 12);
         else
             data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 12);
+
         data << target->GetPackGUID();
         data << uint32(0);                                      // unknown
         target->SendMessageToSet(&data, true);

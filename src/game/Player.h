@@ -38,6 +38,7 @@
 #include "BattleGround.h"
 #include "DBCEnums.h"
 #include "SharedDefines.h"
+#include "AntiCheat.h"
 
 #include<string>
 #include<vector>
@@ -2253,6 +2254,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool isMoving() const { return m_movementInfo.HasMovementFlag(movementFlagsMask); }
         bool isMovingOrTurning() const { return m_movementInfo.HasMovementFlag(movementOrTurningFlagsMask); }
 
+        AntiCheat* GetAntiCheat() { return m_anticheat; }
+
         bool CanFly() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_CAN_FLY); }
         bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING); }
         bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED) || HasAuraType(SPELL_AURA_FLY); }
@@ -2622,6 +2625,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         // Transports
 //        Transport * m_transport;
+
+        AntiCheat* m_anticheat;
 
         uint32 m_resetTalentsCost;
         time_t m_resetTalentsTime;
