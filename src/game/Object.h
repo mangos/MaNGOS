@@ -350,7 +350,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void Relocate(float x, float y, float z, float orientation);
         void Relocate(float x, float y, float z);
 
-        void SetOrientation(float orientation) { m_orientation = orientation; }
+        void SetOrientation(float orientation);
 
         float GetPositionX( ) const { return m_positionX; }
         float GetPositionY( ) const { return m_positionY; }
