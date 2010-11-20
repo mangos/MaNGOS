@@ -82,7 +82,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
     }
 
     if (((Creature*)pet)->IsPet())
-        GetPlayer()->CallForAllControlledUnits(DoPetActionWithHelper(GetPlayer(), flag, spellid, petGuid, targetGuid),false,false,false);
+        GetPlayer()->CallForAllControlledUnits(DoPetActionWithHelper(GetPlayer(), flag, spellid, petGuid, targetGuid),CONTROLED_PET|CONTROLED_GUARDIANS|CONTROLED_CHARM);
     else if (pet->isCharmed())
         GetPlayer()->DoPetAction(GetPlayer(), flag, spellid, petGuid, targetGuid);
 }
@@ -532,7 +532,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
     recvPacket >> targets->ReadForCaster(pet);
 
     if (pet->IsPet())
-        GetPlayer()->CallForAllControlledUnits(DoPetCastWithHelper(GetPlayer(), cast_count, targets, spellInfo ),false,false,false);
+        GetPlayer()->CallForAllControlledUnits(DoPetCastWithHelper(GetPlayer(), cast_count, targets, spellInfo ),CONTROLED_PET|CONTROLED_GUARDIANS|CONTROLED_CHARM);
     else if (pet->isCharmed())
         pet->DoPetCastSpell(GetPlayer(), cast_count, targets, spellInfo);
 

@@ -1781,8 +1781,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateZone(uint32 newZone,uint32 newArea);
         void UpdateArea(uint32 newArea);
 
-        void UpdateZoneDependentAuras( uint32 zone_id );    // zones
-        void UpdateAreaDependentAuras( uint32 area_id );    // subzones
+        void UpdateZoneDependentAuras();
+        void UpdateAreaDependentAuras();                    // subzones
+        void UpdateZoneDependentPets();
 
         void UpdateAfkReport(time_t currTime);
         void UpdatePvPFlag(time_t currTime);
@@ -1882,7 +1883,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         float GetSpellCritFromIntellect();
         float OCTRegenHPPerSpirit();
         float OCTRegenMPPerSpirit();
-        float GetRatingCoefficient(CombatRating cr) const;
+        float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
         uint32 GetBaseSpellPowerBonus() { return m_baseSpellPower; }
 

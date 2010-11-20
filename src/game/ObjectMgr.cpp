@@ -7760,7 +7760,7 @@ void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
         next = itr;
         ++next;
 
-        if(GUID_HIPART(itr->first)==instance)
+        if (PAIR64_HIPART(itr->first)==instance)
             mGORespawnTimes.erase(itr);
     }
 
@@ -7769,7 +7769,7 @@ void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
         next = itr;
         ++next;
 
-        if(GUID_HIPART(itr->first)==instance)
+        if (PAIR64_HIPART(itr->first)==instance)
             mCreatureRespawnTimes.erase(itr);
     }
 

@@ -76,8 +76,6 @@ enum HighGuid
 };
 
 //*** Must be replaced by ObjectGuid use ***
-#define IS_PLAYER_GUID(Guid)         ( GUID_HIPART(Guid) == HIGHGUID_PLAYER && Guid!=0 )
-                                                            // special case for empty guid need check
 #define GUID_HIPART(x)   (uint32)((uint64(x) >> 48) & 0x0000FFFF)
 
 // We have different low and middle part size for different guid types

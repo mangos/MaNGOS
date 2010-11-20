@@ -1126,6 +1126,16 @@ struct CharmInfo
         GlobalCooldownMgr m_GlobalCooldownMgr;
 };
 
+// used in CallForAllControlledUnits/CheckAllControlledUnits
+enum ControledUnitMask
+{
+    CONTROLED_PET       = 0x01,
+    CONTROLED_MINIPET   = 0x02,
+    CONTROLED_GUARDIANS = 0x04,                             // including PROTECTOR_PET
+    CONTROLED_CHARM     = 0x08,
+    CONTROLED_TOTEMS    = 0x10,
+};
+
 // for clearing special attacks
 #define REACTIVE_TIMER_START 4000
 
@@ -1536,7 +1546,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        void SetCritterGuid(ObjectGuid critter) { SetGuidValue(UNIT_FIELD_CRITTER, critter); }
+        void SetCritterGuid(ObjectGuid critterGuid) { SetGuidValue(UNIT_FIELD_CRITTER, critterGuid); }
         ObjectGuid const& GetCritterGuid() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
 
         void RemoveMiniPet();
@@ -1600,9 +1610,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void _RemoveTotem(Totem* totem);                    // only for call from Totem class
 
         template<typename Func>
-        void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet = false);
+        void CallForAllControlledUnits(Func const& func, uint32 controledMask);
         template<typename Func>
-        bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet = false) const;
+        bool CheckAllControlledUnits(Func const& func, uint32 controledMask) const;
 
         bool AddSpellAuraHolder(SpellAuraHolder *holder);
         void AddAuraToModList(Aura *aura);
@@ -2118,60 +2128,69 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 };
 
 template<typename Func>
-void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet)
+void Unit::CallForAllControlledUnits(Func const& func, uint32 controledMask)
 {
-    if (!m_groupPets.empty())
+    if (controledMask & CONTROLED_PET)
     {
-        GroupPetList m_groupPetsTmp = GetPets();  // Original list may be modified in this function
-        for (GroupPetList::const_iterator itr = m_groupPetsTmp.begin(); itr != m_groupPetsTmp.end(); ++itr)
+        if (!m_groupPets.empty())
         {
-            if (Pet* pet = _GetPet(*itr))
-                func(pet);
+            GroupPetList m_groupPetsTmp = GetPets();  // Original list may be modified in this function
+            for (GroupPetList::const_iterator itr = m_groupPetsTmp.begin(); itr != m_groupPetsTmp.end(); ++itr)
+            {
+                if (Pet* pet = _GetPet(*itr))
+                    func(pet);
+            }
         }
     }
 
-    if (withGuardians)
+    if (controledMask & CONTROLED_MINIPET)
+        if (Unit* mini = GetMiniPet())
+            func(mini);
+
+    if (controledMask & CONTROLED_GUARDIANS)
     {
-        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet* guardian = _GetPet(*itr))
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end();)
+            if (Pet* guardian = _GetPet(*(itr++)))
                 func(guardian);
     }
 
-    if (withTotems)
+    if (controledMask & CONTROLED_TOTEMS)
     {
         for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
             if (Unit *totem = _GetTotem(TotemSlot(i)))
                 func(totem);
     }
 
-    if (withCharms)
+    if (controledMask & CONTROLED_CHARM)
         if (Unit* charm = GetCharm())
             func(charm);
 
-    if (withMiniPet)
-        if(Unit* mini = GetMiniPet())
-            func(mini);
 }
 
 template<typename Func>
-bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms, bool withMiniPet) const
+bool Unit::CheckAllControlledUnits(Func const& func, uint32 controledMask) const
 {
+    if (controledMask & CONTROLED_PET)
+        for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+           if (Pet* pet = _GetPet(*itr))
+               if (func(pet))
+                   return true;
 
-   for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
-       if (Pet* pet = _GetPet(*itr))
-           if (func(pet))
-               return true;
+    if (controledMask & CONTROLED_MINIPET)
+        if(Unit const* mini = GetMiniPet())
+            if (func(mini))
+                return true;
 
-    if (withGuardians)
+    if (controledMask & CONTROLED_GUARDIANS)
     {
-        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet const* guardian = _GetPet(*itr))
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end();)
+            if (Pet const* guardian = _GetPet(*(itr++)))
                 if (func(guardian))
                     return true;
 
     }
 
-    if (withTotems)
+    if (controledMask & CONTROLED_TOTEMS)
     {
         for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
             if (Unit const* totem = _GetTotem(TotemSlot(i)))
@@ -2179,14 +2198,9 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
                     return true;
     }
 
-    if (withCharms)
+    if (controledMask & CONTROLED_CHARM)
         if (Unit const* charm = GetCharm())
             if (func(charm))
-                return true;
-
-    if (withMiniPet)
-        if(Unit const* mini = GetMiniPet())
-            if (func(mini))
                 return true;
 
     return false;
