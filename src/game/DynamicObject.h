@@ -58,12 +58,6 @@ class DynamicObject : public WorldObject
 
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 
-        void Say(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterSay(textId, language, targetGuid); }
-        void Yell(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterYell(textId, language, targetGuid); }
-        void TextEmote(int32 textId, ObjectGuid targetGuid) { MonsterTextEmote(textId, targetGuid); }
-        void Whisper(int32 textId, ObjectGuid targetGuid) { MonsterWhisper(textId, targetGuid); }
-        void YellToZone(int32 textId, uint32 language, ObjectGuid targetGuid) { MonsterYellToZone(textId, language, targetGuid); }
-
         GridReference<DynamicObject> &GetGridRef() { return m_gridRef; }
 
     protected:
