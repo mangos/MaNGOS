@@ -2359,7 +2359,7 @@ void Player::SetGameMaster(bool on)
         setFaction(35);
         SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
 
-        CallForAllControlledUnits(SetGameMasterOnHelper(), CONTROLED_PET|CONTROLED_TOTEMS|CONTROLED_GUARDIANS|CONTROLED_CHARM);
+        CallForAllControlledUnits(SetGameMasterOnHelper(), CONTROLLED_PET|CONTROLLED_TOTEMS|CONTROLLED_GUARDIANS|CONTROLLED_CHARM);
 
         SetFFAPvP(false);
         ResetContestedPvP();
@@ -2379,7 +2379,7 @@ void Player::SetGameMaster(bool on)
         setFactionForRace(getRace());
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM);
 
-        CallForAllControlledUnits(SetGameMasterOffHelper(getFaction()), CONTROLED_PET|CONTROLED_TOTEMS|CONTROLED_GUARDIANS|CONTROLED_CHARM);
+        CallForAllControlledUnits(SetGameMasterOffHelper(getFaction()), CONTROLLED_PET|CONTROLLED_TOTEMS|CONTROLLED_GUARDIANS|CONTROLLED_CHARM);
 
         // restore FFA PvP Server state
         if(sWorld.IsFFAPvPRealm())
@@ -20628,7 +20628,7 @@ struct UpdateZoneDependentPetsHelper
 void Player::UpdateZoneDependentPets()
 {
     // check pet (permanent pets ignored), minipet, guardians (including protector)
-    CallForAllControlledUnits(UpdateZoneDependentPetsHelper(this, m_zoneUpdateId, m_areaUpdateId), CONTROLED_PET|CONTROLED_GUARDIANS|CONTROLED_MINIPET);
+    CallForAllControlledUnits(UpdateZoneDependentPetsHelper(this, m_zoneUpdateId, m_areaUpdateId), CONTROLLED_PET|CONTROLLED_GUARDIANS|CONTROLLED_MINIPET);
 }
 
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const
