@@ -8089,7 +8089,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 {
                     if(Group* group = GetGroup())
                     {
-                        if (group == this->GetGroup())
+                        if (group == go->GetGroupLootRecipient())
                         {
                             if (group->GetLootMethod() == FREE_FOR_ALL)
                                 permission = ALL_PERMISSION;
