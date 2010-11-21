@@ -104,17 +104,6 @@ bool PetAI::_needToStop() const
 void PetAI::_stopAttack()
 {
     inCombat = false;
-    if( !m_creature->isAlive() )
-    {
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "PetAI (guid = %u) stopped attack, he is dead.", m_creature->GetGUIDLow());
-        m_creature->StopMoving();
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MoveIdle();
-        m_creature->CombatStop();
-        m_creature->getHostileRefManager().deleteReferences();
-
-        return;
-    }
 
     Unit* owner = m_creature->GetCharmerOrOwner();
 
