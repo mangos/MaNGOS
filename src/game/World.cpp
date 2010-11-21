@@ -514,6 +514,12 @@ void World::LoadConfigSettings(bool reload)
     setConfigPos(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
 
     ///- Read other configuration items from the config file
+
+    // movement anticheat
+    setConfig(CONFIG_BOOL_ANTICHEAT_ENABLE,              "Anticheat.Enable", false);
+    setConfigPos(CONFIG_UINT32_ANTICHEAT_ACTION_DELAY,   "Anticheat.DelayAfterAction",30);
+    setConfigPos(CONFIG_UINT32_ANTICHEAT_GMLEVEL,        "Anticheat.GmLevel",0);
+
     setConfigMinMax(CONFIG_UINT32_COMPRESSION, "Compression", 1, 1, 9);
     setConfig(CONFIG_BOOL_ADDON_CHANNEL, "AddonChannel", true);
     setConfig(CONFIG_BOOL_CLEAN_CHARACTER_DB, "CleanCharacterDB", true);
@@ -1237,6 +1243,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "Loading GM tickets...");
     sTicketMgr.LoadGMTickets();
+
+    sLog.outString( "Loading AntiCheat config..." );
+    sObjectMgr.LoadAntiCheatConfig();
 
     ///- Handle outdated emails (delete/return)
     sLog.outString( "Returning old mails..." );
