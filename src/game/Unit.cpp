@@ -6949,11 +6949,18 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
 
     // Healing taken percent
     float minval = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
-    if(minval)
+    if (damagetype == DOT)
+    {
+        // overwrite max SPELL_AURA_MOD_HEALING_PCT if greater negative effect
+        float minDotVal = float(GetMaxNegativeAuraModifier(SPELL_AURA_MOD_PERIODIC_HEAL));
+        minval = (minDotVal < minval) ? minDotVal : minval;
+    }
+    if (minval)
         TakenTotalMod *= (100.0f + minval) / 100.0f;
 
     float maxval = float(GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
-    if(maxval)
+    // no SPELL_AURA_MOD_PERIODIC_HEAL positive cases
+    if (maxval)
         TakenTotalMod *= (100.0f + maxval) / 100.0f;
 
     // No heal amount for this class spells
