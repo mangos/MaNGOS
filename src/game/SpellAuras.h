@@ -376,13 +376,13 @@ class MANGOS_DLL_SPEC Aura
         int32 GetMiscValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValue[m_effIndex]; }
         int32 GetMiscBValue() const { return m_spellAuraHolder->GetSpellProto()->EffectMiscValueB[m_effIndex]; }
 
-        SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
-        uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
-        uint64 GetCastItemGUID() const { return GetHolder()->GetCastItemGUID(); }
+        SpellEntry const* GetSpellProto() const { return ( GetHolder() ? GetHolder()->GetSpellProto() : NULL); }
+        uint32 GetId() const{ return ( GetHolder() ? GetHolder()->GetSpellProto()->Id : 0 ); }
+        uint64 GetCastItemGUID() const { return ( GetHolder() ? GetHolder()->GetCastItemGUID() : 0); }
         uint64 const& GetCasterGUID() const { return GetHolder()->GetCasterGUID(); }//can't be easy replaced by GetCasterGuid until AuraHolders backporting ig we don't want create additional problems for this.
-        ObjectGuid GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
-        Unit* GetCaster() const { return GetHolder()->GetCaster(); }
-        Unit* GetTarget() const { return GetHolder()->GetTarget(); }
+        ObjectGuid GetCasterGuid() const { return ( GetHolder() ? GetHolder()->GetCasterGuid() : ObjectGuid()); }
+        Unit* GetCaster() const { return ( GetHolder() ? GetHolder()->GetCaster() : NULL); }
+        Unit* GetTarget() const { return ( GetHolder() ? GetHolder()->GetTarget() : NULL); }
 
         SpellEffectIndex GetEffIndex() const{ return m_effIndex; }
         int32 GetBasePoints() const { return m_currentBasePoints; }
@@ -394,7 +394,7 @@ class MANGOS_DLL_SPEC Aura
         time_t GetAuraApplyTime() const { return m_applyTime; }
         uint32 GetAuraTicks() const { return m_periodicTick; }
         uint32 GetAuraMaxTicks() const { return m_maxduration > 0 && m_modifier.periodictime > 0 ? m_maxduration / m_modifier.periodictime : 0; }
-        uint32 GetStackAmount() const { return GetHolder()->GetStackAmount(); }
+        uint32 GetStackAmount() const { return ( GetHolder() ? GetHolder()->GetStackAmount() : 0); }
         void SetAuraPeriodicTimer (int32 timer) { m_periodicTimer = timer; }
 
         void SetLoadedState(int32 damage,int32 maxduration,int32 duration)
