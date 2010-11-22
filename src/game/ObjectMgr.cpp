@@ -7092,7 +7092,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded `reputation_spillover_template`, table is empty!");
+        sLog.outString(">> Loaded `reputation_spillover_template`, table is empty.");
         return;
     }
 
