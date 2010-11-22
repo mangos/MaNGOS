@@ -95,6 +95,7 @@ bool DatabasePostgre::Initialize(const char *infoString)
         sLog.outError( "Could not connect to Postgre database at %s: %s",
             host.c_str(), PQerrorMessage(mPGconn));
         PQfinish(mPGconn);
+        mPGconn = NULL;
         return false;
     }
     else
