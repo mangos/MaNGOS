@@ -1129,6 +1129,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if (m_canTrigger && missInfo != SPELL_MISS_REFLECT)
             caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo);
 
+        // trigger weapon enchants for weapon based spells; exclude spells that stop attack, because may break CC
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
+            !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET))
+            ((Player*)m_caster)->CastItemCombatSpell(unitTarget, m_attackType);
+
         // Haunt (NOTE: for avoid use additional field damage stored in dummy value (replace unused 100%)
         // apply before deal damage because aura can be removed at target kill
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->SpellIconID == 3172 &&
@@ -4609,7 +4614,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
         else if (m_caster == target)
         {
-            if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsInWorld())     
+            if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsInWorld())
             {
                 // Additional check for some spells
                 // If 0 spell effect empty - client not send target data (need use selection)
