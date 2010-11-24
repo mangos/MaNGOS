@@ -340,7 +340,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
         return;
     BG_AB_Nodes node = BG_AB_Nodes(event);
 
-    BattleGroundTeamId teamIndex = GetTeamIndexByTeamId(source->GetTeam());
+    BattleGroundTeamIndex teamIndex = GetTeamIndexByTeamId(source->GetTeam());
 
     // Check if player really could use this banner, not cheated
     if (!(m_Nodes[node] == 0 || teamIndex == m_Nodes[node] % 2))
@@ -500,7 +500,7 @@ void BattleGroundAB::EndBattleGround(uint32 winner)
 
 WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
 {
-    BattleGroundTeamId teamIndex = GetTeamIndexByTeamId(player->GetTeam());
+    BattleGroundTeamIndex teamIndex = GetTeamIndexByTeamId(player->GetTeam());
 
     // Is there any occupied node for this team?
     std::vector<uint8> nodes;

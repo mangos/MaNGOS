@@ -113,7 +113,7 @@ void BattleGroundEY::StartingEventOpenDoors()
 
 void BattleGroundEY::AddPoints(uint32 Team, uint32 Points)
 {
-    BattleGroundTeamId team_index = GetTeamIndexByTeamId(Team);
+    BattleGroundTeamIndex team_index = GetTeamIndexByTeamId(Team);
     m_TeamScores[team_index] += Points;
     m_HonorScoreTics[team_index] += Points;
     if (m_HonorScoreTics[team_index] >= m_HonorTics )

@@ -509,11 +509,11 @@ void BattleGround::Update(uint32 diff)
 
 void BattleGround::SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O)
 {
-    BattleGroundTeamId idx = GetTeamIndexByTeamId(TeamID);
-    m_TeamStartLocX[idx] = X;
-    m_TeamStartLocY[idx] = Y;
-    m_TeamStartLocZ[idx] = Z;
-    m_TeamStartLocO[idx] = O;
+    BattleGroundTeamIndex teamIdx = GetTeamIndexByTeamId(TeamID);
+    m_TeamStartLocX[teamIdx] = X;
+    m_TeamStartLocY[teamIdx] = Y;
+    m_TeamStartLocZ[teamIdx] = Z;
+    m_TeamStartLocO[teamIdx] = O;
 }
 
 void BattleGround::SendPacketToAll(WorldPacket *packet)
@@ -1822,7 +1822,7 @@ WorldSafeLocsEntry const* BattleGround::GetClosestGraveYard( Player* player )
 
 bool BattleGround::IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const
 {
-    BattleGroundTeamId team_idx = GetTeamIndexByTeamId(team);
+    BattleGroundTeamIndex team_idx = GetTeamIndexByTeamId(team);
     uint32 score = (m_TeamScores[team_idx] < 0) ? 0 : uint32(m_TeamScores[team_idx]);
     return score >= minScore && score <= maxScore;
 }
