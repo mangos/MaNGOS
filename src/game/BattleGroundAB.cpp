@@ -484,7 +484,7 @@ void BattleGroundAB::Reset()
 
 }
 
-void BattleGroundAB::EndBattleGround(uint32 winner)
+void BattleGroundAB::EndBattleGround(Team winner)
 {
     //win reward
     if (winner == ALLIANCE)
@@ -557,7 +557,7 @@ void BattleGroundAB::UpdatePlayerScore(Player *Source, uint32 type, uint32 value
     }
 }
 
-bool BattleGroundAB::IsAllNodesConrolledByTeam(uint32 team) const
+bool BattleGroundAB::IsAllNodesConrolledByTeam(Team team) const
 {
     uint32 count = 0;
     for (int i = 0; i < BG_AB_NODES_MAX; ++i)

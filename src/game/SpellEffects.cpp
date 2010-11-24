@@ -5627,12 +5627,9 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
             {
                 if(bg && bg->GetTypeID()==BATTLEGROUND_WS && bg->GetStatus() == STATUS_IN_PROGRESS)
                 {
-                    uint32 team = ALLIANCE;
+                    Team team = pl->GetTeam() == ALLIANCE ? HORDE : ALLIANCE;
 
-                    if(pl->GetTeam() == team)
-                        team = HORDE;
-
-                    ((BattleGroundWS*)bg)->SetDroppedFlagGUID(pGameObj->GetGUID(),team);
+                    ((BattleGroundWS*)bg)->SetDroppedFlagGUID(pGameObj->GetGUID(), team);
                 }
                 break;
             }
@@ -7031,7 +7028,7 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
         if (Totem *OldTotem = m_caster->GetTotem(TotemSlot(slot)))
             OldTotem->UnSummon();
 
-    uint32 team = 0;
+    Team team = TEAM_NONE;
     if (m_caster->GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)m_caster)->GetTeam();
 

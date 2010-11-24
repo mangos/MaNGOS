@@ -61,13 +61,13 @@ void Vehicle::Update(uint32 diff)
     Creature::Update(diff);
 }
 
-bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team)
+bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, Team team)
 {
     SetMap(map);
 
     Object::_Create(guidlow, Entry, HIGHGUID_VEHICLE);
 
-    if(!InitEntry(Entry, team))
+    if(!InitEntry(Entry))
         return false;
 
     m_defaultMovementType = IDLE_MOTION_TYPE;

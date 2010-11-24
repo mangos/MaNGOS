@@ -339,13 +339,13 @@ class BattleGroundAV : public BattleGround
         void HandleKillPlayer(Player* player, Player *killer);
         void HandleKillUnit(Creature *creature, Player *killer);
         void HandleQuestComplete(uint32 questid, Player *player);
-        bool PlayerCanDoMineQuest(int32 GOId,uint32 team);
+        bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
-        void EndBattleGround(uint32 winner);
+        void EndBattleGround(Team winner);
 
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player *plr);
 
-        static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(uint32 Team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(Team)); }
+        static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
     private:
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node);

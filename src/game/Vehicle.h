@@ -23,6 +23,7 @@
 #include "ObjectGuid.h"
 #include "Creature.h"
 #include "Unit.h"
+#include "SharedDefines.h"
 
 class Vehicle : public Creature
 {
@@ -33,7 +34,7 @@ class Vehicle : public Creature
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, uint32 team);
+        bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, Team team);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
         void Update(uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update

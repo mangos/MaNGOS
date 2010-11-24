@@ -943,7 +943,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                         {
                             if (bg->GetTypeID() != BATTLEGROUND_AB)
                                 continue;
-                            if(!((BattleGroundAB*)bg)->IsTeamScores500Disadvantage(GetPlayer()->GetTeam()))
+                            if (!((BattleGroundAB*)bg)->IsTeamScores500Disadvantage(GetPlayer()->GetTeam()))
                                 continue;
                             break;
                         }
@@ -1178,7 +1178,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     continue;
 
                 // if team check required: must kill by opposition faction
-                if(achievement->ID==318 && miscvalue2==GetPlayer()->GetTeam())
+                if(achievement->ID==318 && miscvalue2==uint32(GetPlayer()->GetTeam()))
                     continue;
 
                 change = 1;

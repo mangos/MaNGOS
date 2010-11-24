@@ -290,7 +290,7 @@ void BattleGroundAV::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetGUID()] = sc;
 }
 
-void BattleGroundAV::EndBattleGround(uint32 winner)
+void BattleGroundAV::EndBattleGround(Team winner)
 {
     // calculate bonuskills for both teams:
     uint32 tower_survived[BG_TEAMS_COUNT]  = {0, 0};
@@ -316,7 +316,7 @@ void BattleGroundAV::EndBattleGround(uint32 winner)
             ++mines_owned[m_Mine_Owner[i]];
 
     // now we have the values give the honor/reputation to the teams:
-    uint32 team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
+    Team team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
     uint32 faction[BG_TEAMS_COUNT]   = { BG_AV_FACTION_A, BG_AV_FACTION_H };
     for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
     {
@@ -416,11 +416,11 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
 void BattleGroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
 {
-    MANGOS_ASSERT(m_Nodes[node].Owner != BG_AV_TEAM_NEUTRAL)
-
     DEBUG_LOG("BattleGroundAV: player destroyed point node %i", node);
 
-    BattleGroundTeamIndex owner = BattleGroundTeamIndex(m_Nodes[node].Owner);
+    MANGOS_ASSERT(m_Nodes[node].Owner != BG_AV_TEAM_NEUTRAL)
+    BattleGroundTeamIndex ownerTeamIdx = BattleGroundTeamIndex(m_Nodes[node].Owner);
+    Team ownerTeam = ownerTeamIdx == BG_TEAM_ALLIANCE ? ALLIANCE : HORDE;
 
     // despawn banner
     DestroyNode(node);
@@ -433,14 +433,14 @@ void BattleGroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
         // despawn marshal (one of those guys protecting the boss)
         SpawnEvent(BG_AV_MARSHAL_A_SOUTH + tmp, 0, false);
 
-        UpdateScore(GetOtherTeamIndex(owner), (-1) * BG_AV_RES_TOWER);
-        RewardReputationToTeam((owner == BG_TEAM_ALLIANCE) ? BG_AV_FACTION_A : BG_AV_FACTION_H, m_RepTowerDestruction, owner);
-        RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_TOWER), owner);
-        SendYell2ToAll(LANG_BG_AV_TOWER_TAKEN, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0), GetNodeName(node), ( owner == BG_TEAM_ALLIANCE ) ? LANG_BG_ALLY : LANG_BG_HORDE);
+        UpdateScore(GetOtherTeamIndex(ownerTeamIdx), (-1) * BG_AV_RES_TOWER);
+        RewardReputationToTeam((ownerTeam == ALLIANCE) ? BG_AV_FACTION_A : BG_AV_FACTION_H, m_RepTowerDestruction, ownerTeam);
+        RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_TOWER), ownerTeam);
+        SendYell2ToAll(LANG_BG_AV_TOWER_TAKEN, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0), GetNodeName(node), (ownerTeam == ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
     }
     else
     {
-        SendYell2ToAll(LANG_BG_AV_GRAVE_TAKEN, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0), GetNodeName(node), ( owner == BG_TEAM_ALLIANCE ) ? LANG_BG_ALLY : LANG_BG_HORDE);
+        SendYell2ToAll(LANG_BG_AV_GRAVE_TAKEN, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0), GetNodeName(node), (ownerTeam == ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
     }
 }
 
@@ -472,7 +472,7 @@ void BattleGroundAV::ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx
     }
 }
 
-bool BattleGroundAV::PlayerCanDoMineQuest(int32 GOId, uint32 team)
+bool BattleGroundAV::PlayerCanDoMineQuest(int32 GOId, Team team)
 {
     if (GOId == BG_AV_OBJECTID_MINE_N)
         return (m_Mine_Owner[BG_AV_NORTH_MINE] == GetTeamIndexByTeamId(team));

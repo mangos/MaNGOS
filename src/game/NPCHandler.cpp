@@ -384,7 +384,7 @@ void WorldSession::SendSpiritResurrect()
     Corpse *corpse = _player->GetCorpse();
     if(corpse)
         corpseGrave = sObjectMgr.GetClosestGraveYard(
-            corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeam() );
+            corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeam());
 
     // now can spawn bones
     _player->SpawnCorpseBones();
@@ -393,7 +393,7 @@ void WorldSession::SendSpiritResurrect()
     if(corpseGrave)
     {
         WorldSafeLocsEntry const *ghostGrave = sObjectMgr.GetClosestGraveYard(
-            _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam() );
+            _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam());
 
         if(corpseGrave != ghostGrave)
             _player->TeleportTo(corpseGrave->map_id, corpseGrave->x, corpseGrave->y, corpseGrave->z, _player->GetOrientation());

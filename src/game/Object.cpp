@@ -1735,7 +1735,7 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 {
     TemporarySummon* pCreature = new TemporarySummon(GetObjectGuid());
 
-    uint32 team = 0;
+    Team team = TEAM_NONE;
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 

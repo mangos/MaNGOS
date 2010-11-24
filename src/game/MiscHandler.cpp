@@ -132,7 +132,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
     if(level_max >= MAX_LEVEL)
         level_max = STRONG_MAX_LEVEL;
 
-    uint32 team = _player->GetTeam();
+    Team team = _player->GetTeam();
     uint32 security = GetSecurity();
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
     AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
@@ -459,12 +459,12 @@ void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 acc
 
     uint32 friendLowGuid = (*result)[0].GetUInt32();
     ObjectGuid friendGuid = ObjectGuid(HIGHGUID_PLAYER, friendLowGuid);
-    uint32 team = Player::TeamForRace((*result)[1].GetUInt8());
+    Team team = Player::TeamForRace((*result)[1].GetUInt8());
 
     delete result;
 
     WorldSession * session = sWorld.FindSession(accountId);
-    if(!session || !session->GetPlayer())
+    if (!session || !session->GetPlayer())
         return;
 
     FriendsResult friendResult = FRIEND_NOT_FOUND;

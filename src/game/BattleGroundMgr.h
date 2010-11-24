@@ -48,7 +48,7 @@ struct PlayerQueueInfo                                      // stores informatio
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
 {
     std::map<uint64, PlayerQueueInfo*> Players;             // player queue info map
-    uint32  Team;                                           // Player team (ALLIANCE/HORDE)
+    Team  GroupTeam;                                        // Player team (ALLIANCE/HORDE)
     BattleGroundTypeId BgTypeId;                            // battleground type id
     bool    IsRated;                                        // rated
     uint8   ArenaType;                                      // 2v2, 3v3, 5v5 or 0 when BG
@@ -128,7 +128,7 @@ class BattleGroundQueue
         //one selection pool for horde, other one for alliance
         SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
 
-        bool InviteGroupToBG(GroupQueueInfo * ginfo, BattleGround * bg, uint32 side);
+        bool InviteGroupToBG(GroupQueueInfo * ginfo, BattleGround * bg, Team side);
         uint32 m_WaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];
         uint32 m_WaitTimeLastPlayer[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];
         uint32 m_SumOfWaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS];

@@ -982,7 +982,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
         void AppendTaximaskTo(ByteBuffer& data, bool all);
 
         // Destinations
-        bool LoadTaxiDestinationsFromString(const std::string& values, uint32 team);
+        bool LoadTaxiDestinationsFromString(const std::string& values, Team team);
         std::string SaveTaxiDestinationsToString();
 
         void ClearTaxiDestinations() { m_TaxiDestinations.clear(); }
@@ -1009,7 +1009,7 @@ std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi);
 struct BGData
 {
     BGData() : bgInstanceID(0), bgTypeID(BATTLEGROUND_TYPE_NONE), bgAfkReportedCount(0), bgAfkReportedTimer(0),
-        bgTeam(0), mountSpell(0) { ClearTaxiPath(); }
+        bgTeam(TEAM_NONE), mountSpell(0) { ClearTaxiPath(); }
 
 
     uint32 bgInstanceID;                                    ///< This variable is set to bg->m_InstanceID,
@@ -1020,7 +1020,7 @@ struct BGData
     uint8              bgAfkReportedCount;
     time_t             bgAfkReportedTimer;
 
-    uint32 bgTeam;                                          ///< What side the player will be added to
+    Team bgTeam;                                            ///< What side the player will be added to
 
 
     uint32 mountSpell;
@@ -1984,8 +1984,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void CheckAreaExploreAndOutdoor(void);
 
-        static uint32 TeamForRace(uint8 race);
-        uint32 GetTeam() const { return m_team; }
+        static Team TeamForRace(uint8 race);
+        Team GetTeam() const { return m_team; }
         static uint32 getFactionForRace(uint8 race);
         void setFactionForRace(uint8 race);
 
@@ -2183,8 +2183,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         WorldLocation const& GetBattleGroundEntryPoint() const { return m_bgData.joinPos; }
         void SetBattleGroundEntryPoint();
 
-        void SetBGTeam(uint32 team) { m_bgData.bgTeam = team; }
-        uint32 GetBGTeam() const { return m_bgData.bgTeam ? m_bgData.bgTeam : GetTeam(); }
+        void SetBGTeam(Team team) { m_bgData.bgTeam = team; }
+        Team GetBGTeam() const { return m_bgData.bgTeam ? m_bgData.bgTeam : GetTeam(); }
 
         void LeaveBattleground(bool teleportToEntryPoint = true);
         bool CanJoinToBattleground() const;
@@ -2497,7 +2497,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void outDebugStatsValues() const;
         ObjectGuid m_lootGuid;
 
-        uint32 m_team;
+        Team m_team;
         uint32 m_nextSave;
         time_t m_speakTime;
         uint32 m_speakCount;
