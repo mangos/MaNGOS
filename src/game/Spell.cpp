@@ -1141,10 +1141,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if(Aura* dummy = unitTarget->GetDummyAura(m_spellInfo->Id))
                 dummy->GetModifier()->m_amount = damageInfo.damage;
 
-        /* process anticheat check */
-        if (caster->GetObjectGuid().IsPlayer())
-            ((Player*)caster)->GetAntiCheat()->DoAntiCheatCheck(CHECK_DAMAGE_SPELL, m_spellInfo->Id, 0, damageInfo.damage);
-
         caster->DealSpellDamage(&damageInfo, true);
 
         // Scourge Strike, here because needs to use final damage in second part of the spell
