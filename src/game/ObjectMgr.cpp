@@ -2870,6 +2870,92 @@ PetScalingDataList const* ObjectMgr::GetPetScalingData(uint32 creature_id) const
         return itr->second;
 }
 
+void ObjectMgr::LoadAntiCheatConfig()
+{
+    //                                                             0             1           2                 3           4
+    QueryResult *result  = CharacterDatabase.Query("SELECT checktype, check_period,alarmscount, disableoperation, messagenum,"
+    //                                                             5          6             7             8
+                                                           "intparam1, intparam2,  floatparam1,  floatparam2,"
+    //                                                            9              10        11             12
+                                                           "action1,   actionparam1,  action2,  actionparam2,"
+                                                           "description FROM anticheat_config");
+
+    uint32 count = 0;
+
+    if (!result)
+    {
+        barGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u anticheat config definitions", count);
+        sLog.outErrorDb("Error loading `anticheat_config` table or table is empty.");
+        return;
+    }
+
+    barGoLink bar( (int)result->GetRowCount() );
+
+    m_AntiCheatConfig.clear();
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        AntiCheatConfig AntiCheatConfigEntry;
+
+        AntiCheatConfigEntry.checkType = fields[0].GetUInt32();
+
+        if (AntiCheatConfigEntry.checkType > 9999)
+        {
+            sLog.outErrorDb("Wrong check type id %u in `anticheat_config` table, ignoring.",AntiCheatConfigEntry.checkType);
+            continue;
+        }
+
+        AntiCheatConfigEntry.checkPeriod = fields[1].GetUInt32();
+        AntiCheatConfigEntry.alarmsCount = fields[2].GetUInt32();
+        AntiCheatConfigEntry.disableOperation = fields[3].GetBool();
+        AntiCheatConfigEntry.messageNum  = fields[4].GetUInt32();
+
+        for (int i=0; i < ANTICHEAT_CHECK_PARAMETERS; ++i )
+        {
+            AntiCheatConfigEntry.checkParam[i] = fields[5+i].GetUInt32();
+        }
+
+        for (int i=0; i < ANTICHEAT_CHECK_PARAMETERS; ++i )
+        {
+            AntiCheatConfigEntry.checkFloatParam[i] = fields[5+ANTICHEAT_CHECK_PARAMETERS+i].GetFloat();
+        }
+
+        for (int i=0; i < ANTICHEAT_ACTIONS; ++i )
+        {
+            AntiCheatConfigEntry.actionType[i] = fields[5+ANTICHEAT_CHECK_PARAMETERS*2+i*2].GetUInt32();
+            AntiCheatConfigEntry.actionParam[i] = fields[6+ANTICHEAT_CHECK_PARAMETERS*2+i*2].GetUInt32();
+        };
+
+        AntiCheatConfigEntry.description  = fields[5+ANTICHEAT_CHECK_PARAMETERS*2+ANTICHEAT_ACTIONS*2].GetCppString();
+
+        m_AntiCheatConfig.insert(std::make_pair(AntiCheatConfigEntry.checkType, AntiCheatConfigEntry));
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %u anticheat config definitions", count );
+
+}
+
+AntiCheatConfig const* ObjectMgr::GetAntiCheatConfig(uint32 checkType) const
+{
+    AntiCheatConfigMap::const_iterator itr = m_AntiCheatConfig.find(checkType);
+    if (itr == m_AntiCheatConfig.end())
+        return NULL;
+    else
+        return &itr->second;
+}
+
 
 void ObjectMgr::LoadPlayerInfo()
 {

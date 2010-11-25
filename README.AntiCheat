@@ -1,0 +1,268 @@
+==============================================================================================
+English translations, big thx to Faq
+
+AntiCheat v3 for mangos, (c) 2010 /dev/rsa
+http://github.com/rsa
+
+I express gratitude to authors of previous anticheat versions, on what base is made this code
+- gimly
+- CWN
+also thnx to those who wrote code for extra checking, what used in this code
+- Insider42
+
+Anticheat configs can be changed in characters/anticheat_config table.
+Config can be reloaded with ".reload anticheat"  command.
+In mangos configs left only these:
+
+Anticheat.Enable = 1 (Yes/No)
+Anticheat.DelayAfterAction = 30 (skip this time after any actions, applyed to player
+before other action be apply to his, but still all actions will be logged.)
+Anticheat.GmLevel = 0 (level, higher levels wont be checked. 0 - player lvl.)
+
+== Base
+
+1. Checks
+
+There are usual checks (from 0 to 99) and additional (sub-checks, numbers - 100* number of usual check + 1...99)
+1st INT parameter is checked for all checks by default - time after what, countdown of puncture will drop.
+If not set - time is taken from "Anticheat.DelayAfterAction".
+
+main checks:
+    // Check types
+    CHECK_NULL = 0,
+No parameters, empty check.
+
+    CHECK_MOVEMENT = 1,
+Pseudo-check. this function holds information about other movement checks.
+Parameters - period (should be 0), actions and messages(not used)
+
+    CHECK_SPELL = 2,
+Pseudo-check. For now, nothing happens.
+
+    CHECK_QUEST = 3,
+In progress.
+
+    CHECK_TRANSPORT = 4,
+Check ON_TRANSPORT condition by Insider42
+
+    CHECK_DAMAGE = 5,
+Check server bugs with damage.
+
+2. Subchecks
+additional checks:
+    // Check subtypes
+    // Movement checks
+    CHECK_MOVEMENT_SPEED = 100 * CHECK_MOVEMENT + 1,
+Check for speed hack. Parameters - period (check default value in db), 1 float - speed (0,01 - max normal speed. In rare cases including lags can be 0,02).
+
+    CHECK_MOVEMENT_FLY = 100 * CHECK_MOVEMENT + 2,
+check for fly hack
+First parameter - height from what check is started (for avoiding (crashes, loops?? колодцев) and bug holes in vmaps).
+
+    CHECK_MOVEMENT_MOUNTAIN = 100 * CHECK_MOVEMENT + 3,
+Checking Wall climb hack. First float parameter - Z speed max, second - tangens of moving angle.
+
+    CHECK_MOVEMENT_WATERWALKING = 100 * CHECK_MOVEMENT + 4,
+Checking for water walk hack.
+
+    CHECK_MOVEMENT_TP2PLANE = 100 * CHECK_MOVEMENT + 5,
+Parameter - delta from 0 for plane and delta for check. With default parameters works fine.
+
+    CHECK_MOVEMENT_AIRJUMP = 100 * CHECK_MOVEMENT + 6,
+Jumping in air. First parameter - from what height check is triggered.
+
+    CHECK_MOVEMENT_TELEPORT = 100 * CHECK_MOVEMENT + 7,
+If distance is greater then 1 (opcode) from number in parameter - alarm is triggered.
+
+In future:
+    CHECK_MOVEMENT_FALL = 100 * CHECK_MOVEMENT + 8,
+
+    // Spell checks
+    CHECK_SPELL_VALID = 100 * CHECK_SPELL + 1,
+If client is sending spell cast, but its not in dbc file - alarm is triggered.
+Also could be result of damaged packets from clients.
+
+    CHECK_SPELL_ONDEATH = 100 * CHECK_SPELL + 2,
+Not done yet
+
+    CHECK_SPELL_FAMILY = 100 * CHECK_SPELL + 3,
+Check works only for skill 769 (only GM spells).
+
+    CHECK_SPELL_INBOOK = 100 * CHECK_SPELL + 4,
+Still in progress (will do simple check - if player has spell in spell-book)
+
+    // Damage checks
+    CHECK_DAMAGE_SPELL = 100 * CHECK_DAMAGE + 1,
+Spell damage limit. Parameter - limited meaning.
+ 
+
+    CHECK_DAMAGE_MELEE = 100 * CHECK_DAMAGE + 2,
+Melee damage limit. Parameter - limited meaning.
+    // End of list
+    CHECK_MAX
+
+3. Actions (what will happen if Anticheat will detect cheat)
+
+Can be set to any check.
+
+    ANTICHEAT_ACTION_NULL = 0,
+Empty action. Doesn't do nothing. If action1 = 0 then wont be logged.
+
+    ANTICHEAT_ACTION_LOG = 1,
+Will only registrate detected check fails.
+
+    ANTICHEAT_ACTION_ANNOUNCE_GM = 2,
+Announce to GMs about detected cheating action (GMs with lvl higher or equal to param1). If 0 - then message will be sent to all.
+
+    ANTICHEAT_ACTION_ANNOUNCE_ALL = 3,
+Announce into public chat about detected cheating action.
+
+    ANTICHEAT_ACTION_KICK = 4,
+Just kick.
+
+    ANTICHEAT_ACTION_BAN = 5,
+Just ban. Parameter - time in seconds.
+
+    ANTICHEAT_ACTION_SHEEP = 6,
+Transformation into random animal (if in fly - then with parachute).
+Parameter -  time in milliseconds.
+
+    ANTICHEAT_ACTION_STUN = 7,
+Simple stun. Parameter -  time in milliseconds.
+
+    ANTICHEAT_ACTION_SICKNESS = 8,
+Adding resurrection sickness spell. Parameter -  time in milliseconds.
+
+================================================================================================
+AntiCheat v3 for mangos, (c) 2010 /dev/rsa
+http://github.com/rsa
+
+Выражаю благодарность авторам предыдущих атичитов, на базе которых сделан этот -
+- gimly
+- CWN
+а также людям написавшим отдельные проверки, использованные здесь
+- Insider42
+
+Настройка античита производится в таблице characters/anticheat_config
+Конфиг перегружается онлайн командой .reload anticheat
+в конфиге мангоса остались только 
+
+Anticheat.Enable = 1 (да/нет)
+Anticheat.DelayAfterAction = 30 (время, которое после акции плеер не трогается (не применяются другие
+actions). лог все равно ведется.)
+Anticheat.GmLevel = 0 (уровень, выше которого не проверять. 0 - только игроков)
+
+== база
+
+1. Проверки
+Проверки бывают основные (номера с 0 до 99) и дополнительные (subchecks, номера - 100* номер основной 
+проверки + 1...99)
+у всех проверок 1й INT параметр по умолчанию - время через которого счетчик проколов сбрасывается.
+если не указано - берется время из Anticheat.DelayAfterAction
+
+основные проверки:
+    // Check types
+    CHECK_NULL              = 0,
+нет параметров. пустая проверка-заглушка.
+
+    CHECK_MOVEMENT          = 1,
+псевдопроверка. в ней проводится накопление информации для других проверок движения.
+параметры - период (должен быть 0), экшны и сообщения (не используются)
+
+    CHECK_SPELL             = 2,
+псевдопроверка. в ней пока ничего не проводится.
+
+    CHECK_QUEST             = 3,
+в процессе.
+
+    CHECK_TRANSPORT         = 4,
+проверка ON_TRANSPORT состояния by Insider42
+
+    CHECK_DAMAGE            = 5,
+проверка на баги сервера с дамагом.
+
+2. Субпроверки
+дополнительные проверки:
+    // Check subtypes
+    // Movement checks
+    CHECK_MOVEMENT_SPEED        = 100 * CHECK_MOVEMENT + 1,
+Проверка на СХ. параметры - период (умолчания смотрите в базе), 1 float - скорость (0,01 - максимальная
+нормализованная скорость. с учетом лагов божет быть до 0,02 но редко)
+
+    CHECK_MOVEMENT_FLY          = 100 * CHECK_MOVEMENT + 2,
+первый параметр - высота с которой начинаем проверять (для обхода колодцев и дыр в вмапсах).
+
+    CHECK_MOVEMENT_MOUNTAIN     = 100 * CHECK_MOVEMENT + 3,
+проверка на чит Wall climb. Первый параметр float - скорость перемещения по Z, второй - тангенс угла.
+
+    CHECK_MOVEMENT_WATERWALKING = 100 * CHECK_MOVEMENT + 4,
+проверка на чит с хождением по воде.
+
+    CHECK_MOVEMENT_TP2PLANE     = 100 * CHECK_MOVEMENT + 5,
+параметры - дельта от 0 для plane и дельта для проверки. с дефолтными ловит нормально.
+
+    CHECK_MOVEMENT_AIRJUMP      = 100 * CHECK_MOVEMENT + 6,
+прыжок в воздухе. первый параметр - от какой высоты начинаем проверять.
+
+    CHECK_MOVEMENT_TELEPORT     = 100 * CHECK_MOVEMENT + 7,
+если расстояние за 1 тик (опкод) больше чем параметр - сразу аларм.
+
+в планах:
+    CHECK_MOVEMENT_FALL     = 100 * CHECK_MOVEMENT + 8,
+
+    // Spell checks
+    CHECK_SPELL_VALID           = 100 * CHECK_SPELL + 1,
+если клиент присылает каст спелла, а его в ДБЦ нету - сразу будет этот аларм.
+может быть результатом битых пакетов.
+
+    CHECK_SPELL_ONDEATH         = 100 * CHECK_SPELL + 2,
+в процессе
+
+    CHECK_SPELL_FAMILY          = 100 * CHECK_SPELL + 3,
+в настоящее время проверка идет только на скилл 769 (ГМ-онли спеллы)
+
+    CHECK_SPELL_INBOOK          = 100 * CHECK_SPELL + 4,
+в процессе (будет просто проверка есть ли спелл в книге у плеера)
+
+    // Damage checks
+    CHECK_DAMAGE_SPELL          = 100 * CHECK_DAMAGE + 1,
+ограничение по спеллдамаге. параметр - просто предельное значение.
+
+    CHECK_DAMAGE_MELEE          = 100 * CHECK_DAMAGE + 2,
+ограничение по мили-дамаге. параметр - просто предельное значение.
+    // End of list
+    CHECK_MAX
+
+3. Экшны (действия которые производит античит по обнаружению чита)
+
+можно поставить на любую проверку.
+
+    ANTICHEAT_ACTION_NULL             = 0,
+пустой экшн. ничего не делать. если action1 = 0 то даже лог не ведется.
+
+    ANTICHEAT_ACTION_LOG              = 1,
+только регистрация срабатываний.
+
+    ANTICHEAT_ACTION_ANNOUNCE_GM      = 2,
+анонс найденного читера только ГМам с уровнем доступа выше или равным param1. если 0 -
+значит всем
+
+    ANTICHEAT_ACTION_ANNOUNCE_ALL     = 3,
+анонс найденного читера в общий чат.
+
+    ANTICHEAT_ACTION_KICK             = 4,
+просто кик.
+
+    ANTICHEAT_ACTION_BAN              = 5,
+просто бан. параметр - время в секундах.
+
+    ANTICHEAT_ACTION_SHEEP            = 6,
+превращение в случайное животное (если в полете - то с парашютом).
+параметр - время в миллисекундах.
+
+    ANTICHEAT_ACTION_STUN             = 7,
+просто стан. параметр - время в миллисекундах.
+
+    ANTICHEAT_ACTION_SICKNESS         = 8,
+наложение resurrection sickness. параметр - время в миллисекундах.
+================================================================================================
