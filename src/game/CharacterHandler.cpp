@@ -211,7 +211,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
         {
             bool disabled = false;
 
-            uint32 team = Player::TeamForRace(race_);
+            Team team = Player::TeamForRace(race_);
             switch(team)
             {
                 case ALLIANCE: disabled = mask & (1 << 0); break;
@@ -351,7 +351,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
             GetAccountId(), (skipCinematics == CINEMATICS_SKIP_SAME_RACE || class_ == CLASS_DEATH_KNIGHT) ? "" : "LIMIT 1");
         if(result2)
         {
-            uint32 team_= Player::TeamForRace(race_);
+            Team team_= Player::TeamForRace(race_);
 
             Field* field = result2->Fetch();
             uint8 acc_race  = field[1].GetUInt32();
@@ -385,11 +385,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
             // TODO: what to if account already has characters of both races?
             if (!AllowTwoSideAccounts)
             {
-                uint32 acc_team = 0;
-                if(acc_race > 0)
-                    acc_team = Player::TeamForRace(acc_race);
-
-                if(acc_team != team_)
+                if (acc_race == 0 || Player::TeamForRace(acc_race) != team_)
                 {
                     data << (uint8)CHAR_CREATE_PVP_TEAMS_VIOLATION;
                     SendPacket( &data );

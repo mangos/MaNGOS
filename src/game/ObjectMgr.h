@@ -661,7 +661,7 @@ struct WeatherZoneChances
 struct GraveYardData
 {
     uint32 safeLocId;
-    uint32 team;
+    Team team;
 };
 typedef std::multimap<uint32, GraveYardData> GraveYardMap;
 typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> GraveYardMapBounds;
@@ -878,13 +878,13 @@ class ObjectMgr
 
         uint64 GetPlayerGUIDByName(std::string name) const;
         bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
-        uint32 GetPlayerTeamByGUID(ObjectGuid guid) const;
+        Team GetPlayerTeamByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
 
-        uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid, uint32 team );
+        uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid, Team team );
         void GetTaxiPath( uint32 source, uint32 destination, uint32 &path, uint32 &cost);
-        uint32 GetTaxiMountDisplayId( uint32 id, uint32 team, bool allowed_alt_team = false);
+        uint32 GetTaxiMountDisplayId( uint32 id, Team team, bool allowed_alt_team = false);
 
         Quest const* GetQuestTemplate(uint32 quest_id) const
         {
@@ -912,8 +912,8 @@ class ObjectMgr
 
         GossipText const* GetGossipText(uint32 Text_ID) const;
 
-        WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team);
-        bool AddGraveYardLink(uint32 id, uint32 zone, uint32 team, bool inDB = true);
+        WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
+        bool AddGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = true);
         void LoadGraveyardZones();
         GraveYardData const* FindGraveYardData(uint32 id, uint32 zone) const;
 

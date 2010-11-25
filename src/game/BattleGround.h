@@ -155,7 +155,7 @@ enum BattleGroundStatus
 struct BattleGroundPlayer
 {
     time_t  OfflineRemoveTime;                              // for tracking and removing offline players from queue after 5 minutes
-    uint32  Team;                                           // Player's team
+    Team    PlayerTeam;                                     // Player's team
 };
 
 struct BattleGroundObjectInfo
@@ -227,11 +227,12 @@ enum BattleGroundWinner
     WINNER_NONE             = 2
 };
 
-enum BattleGroundTeamId
+enum BattleGroundTeamIndex
 {
     BG_TEAM_ALLIANCE        = 0,
     BG_TEAM_HORDE           = 1
 };
+
 #define BG_TEAMS_COUNT  2
 
 enum BattleGroundStartingEvents
@@ -315,8 +316,8 @@ class BattleGround
         virtual void StartingEventOpenDoors() {}
 
         /* achievement req. */
-        virtual bool IsAllNodesConrolledByTeam(uint32 /*team*/) const { return false; }
-        bool IsTeamScoreInRange(uint32 team, uint32 minScore, uint32 maxScore) const;
+        virtual bool IsAllNodesConrolledByTeam(Team /*team*/) const { return false; }
+        bool IsTeamScoreInRange(Team team, uint32 minScore, uint32 maxScore) const;
 
         /* Battleground */
         // Get methods:
@@ -373,10 +374,11 @@ class BattleGround
         void AddToBGFreeSlotQueue();                        //this queue will be useful when more battlegrounds instances will be available
         void RemoveFromBGFreeSlotQueue();                   //this method could delete whole BG instance, if another free is available
 
-        void DecreaseInvitedCount(uint32 team)      { (team == ALLIANCE) ? --m_InvitedAlliance : --m_InvitedHorde; }
-        void IncreaseInvitedCount(uint32 team)      { (team == ALLIANCE) ? ++m_InvitedAlliance : ++m_InvitedHorde; }
+        void DecreaseInvitedCount(Team team)      { (team == ALLIANCE) ? --m_InvitedAlliance : --m_InvitedHorde; }
+        void IncreaseInvitedCount(Team team)      { (team == ALLIANCE) ? ++m_InvitedAlliance : ++m_InvitedHorde; }
         void SetRandom(bool isRandom) { m_IsRandom = isRandom; }
-        uint32 GetInvitedCount(uint32 team) const
+
+        uint32 GetInvitedCount(Team team) const
         {
             if (team == ALLIANCE)
                 return m_InvitedAlliance;
@@ -384,7 +386,7 @@ class BattleGround
                 return m_InvitedHorde;
         }
         bool HasFreeSlots() const;
-        uint32 GetFreeSlotsForTeam(uint32 Team) const;
+        uint32 GetFreeSlotsForTeam(Team team) const;
 
         bool isArena() const        { return m_IsArena; }
         bool isBattleGround() const { return !m_IsArena; }
@@ -413,10 +415,10 @@ class BattleGround
             return m_Map;
         }
 
-        void SetTeamStartLoc(uint32 TeamID, float X, float Y, float Z, float O);
-        void GetTeamStartLoc(uint32 TeamID, float &X, float &Y, float &Z, float &O) const
+        void SetTeamStartLoc(Team team, float X, float Y, float Z, float O);
+        void GetTeamStartLoc(Team team, float &X, float &Y, float &Z, float &O) const
         {
-            BattleGroundTeamId idx = GetTeamIndexByTeamId(TeamID);
+            BattleGroundTeamIndex idx = GetTeamIndexByTeamId(team);
             X = m_TeamStartLocX[idx];
             Y = m_TeamStartLocY[idx];
             Z = m_TeamStartLocZ[idx];
@@ -426,17 +428,17 @@ class BattleGround
         /* Packet Transfer */
         // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
         virtual void FillInitialWorldStates(WorldPacket& /*data*/, uint32& /*count*/) {}
-        void SendPacketToTeam(uint32 TeamID, WorldPacket *packet, Player *sender = NULL, bool self = true);
+        void SendPacketToTeam(Team team, WorldPacket *packet, Player *sender = NULL, bool self = true);
         void SendPacketToAll(WorldPacket *packet);
 
         template<class Do>
         void BroadcastWorker(Do& _do);
 
-        void PlaySoundToTeam(uint32 SoundID, uint32 TeamID);
+        void PlaySoundToTeam(uint32 SoundID, Team team);
         void PlaySoundToAll(uint32 SoundID);
-        void CastSpellOnTeam(uint32 SpellID, uint32 TeamID);
-        void RewardHonorToTeam(uint32 Honor, uint32 TeamID);
-        void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, uint32 TeamID);
+        void CastSpellOnTeam(uint32 SpellID, Team team);
+        void RewardHonorToTeam(uint32 Honor, Team team);
+        void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team team);
         void RewardMark(Player *plr,uint32 count);
         void SendRewardMarkByMail(Player *plr,uint32 mark, uint32 count);
         void RewardItem(Player *plr, uint32 item_id, uint32 count);
@@ -444,7 +446,7 @@ class BattleGround
         void RewardSpellCast(Player *plr, uint32 spell_id);
         void UpdateWorldState(uint32 Field, uint32 Value);
         void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player *Source);
-        void EndBattleGround(uint32 winner);
+        virtual void EndBattleGround(Team winner);
         void BlockMovement(Player *plr);
 
         void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = NULL);
@@ -456,27 +458,27 @@ class BattleGround
         void SendYell2ToAll(int32 entry, uint32 language, uint64 const& guid, int32 arg1, int32 arg2);
 
         /* Raid Group */
-        Group *GetBgRaid(uint32 TeamID) const { return TeamID == ALLIANCE ? m_BgRaids[BG_TEAM_ALLIANCE] : m_BgRaids[BG_TEAM_HORDE]; }
-        void SetBgRaid(uint32 TeamID, Group *bg_raid);
+        Group *GetBgRaid(Team team) const { return m_BgRaids[GetTeamIndexByTeamId(team)]; }
+        void SetBgRaid(Team team, Group *bg_raid);
 
         virtual void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
 
-        static BattleGroundTeamId GetTeamIndexByTeamId(uint32 Team) { return Team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
-        uint32 GetPlayersCountByTeam(uint32 Team) const { return m_PlayersCount[GetTeamIndexByTeamId(Team)]; }
-        uint32 GetAlivePlayersCountByTeam(uint32 Team) const;   // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
-        void UpdatePlayersCountByTeam(uint32 Team, bool remove)
+        static BattleGroundTeamIndex GetTeamIndexByTeamId(Team team) { return team == ALLIANCE ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE; }
+        uint32 GetPlayersCountByTeam(Team team) const { return m_PlayersCount[GetTeamIndexByTeamId(team)]; }
+        uint32 GetAlivePlayersCountByTeam(Team team) const; // used in arenas to correctly handle death in spirit of redemption / last stand etc. (killer = killed) cases
+        void UpdatePlayersCountByTeam(Team team, bool remove)
         {
             if (remove)
-                --m_PlayersCount[GetTeamIndexByTeamId(Team)];
+                --m_PlayersCount[GetTeamIndexByTeamId(team)];
             else
-                ++m_PlayersCount[GetTeamIndexByTeamId(Team)];
+                ++m_PlayersCount[GetTeamIndexByTeamId(team)];
         }
 
         // used for rated arena battles
-        void SetArenaTeamIdForTeam(uint32 Team, uint32 ArenaTeamId) { m_ArenaTeamIds[GetTeamIndexByTeamId(Team)] = ArenaTeamId; }
-        uint32 GetArenaTeamIdForTeam(uint32 Team) const             { return m_ArenaTeamIds[GetTeamIndexByTeamId(Team)]; }
-        void SetArenaTeamRatingChangeForTeam(uint32 Team, int32 RatingChange) { m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)] = RatingChange; }
-        int32 GetArenaTeamRatingChangeForTeam(uint32 Team) const    { return m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(Team)]; }
+        void SetArenaTeamIdForTeam(Team team, uint32 ArenaTeamId) { m_ArenaTeamIds[GetTeamIndexByTeamId(team)] = ArenaTeamId; }
+        uint32 GetArenaTeamIdForTeam(Team team) const             { return m_ArenaTeamIds[GetTeamIndexByTeamId(team)]; }
+        void SetArenaTeamRatingChangeForTeam(Team team, int32 RatingChange) { m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(team)] = RatingChange; }
+        int32 GetArenaTeamRatingChangeForTeam(Team team) const    { return m_ArenaTeamRatingChanges[GetTeamIndexByTeamId(team)]; }
         void CheckArenaWinConditions();
 
         /* Triggers handle */
@@ -498,7 +500,7 @@ class BattleGround
 
         virtual void AddPlayer(Player *plr);                // must be implemented in BG subclass
 
-        void AddOrSetPlayerToCorrectBgGroup(Player *plr, ObjectGuid plr_guid, uint32 team);
+        void AddOrSetPlayerToCorrectBgGroup(Player *plr, ObjectGuid plr_guid, Team team);
 
         virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
                                                             // can be extended in in BG subclass
@@ -539,8 +541,9 @@ class BattleGround
         virtual bool HandlePlayerUnderMap(Player * /*plr*/) { return false; }
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
-        uint32 GetPlayerTeam(uint64 guid);
-        uint32 GetOtherTeam(uint32 teamId){ return (teamId) ? ((teamId == ALLIANCE) ? HORDE : ALLIANCE) : 0; }
+        Team GetPlayerTeam(uint64 guid);
+        static Team GetOtherTeam(Team team){ return team ? ((team == ALLIANCE) ? HORDE : ALLIANCE) : TEAM_NONE; }
+        static BattleGroundTeamIndex GetOtherTeamIndex(BattleGroundTeamIndex teamIdx){ return teamIdx == BG_TEAM_ALLIANCE ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE; }
         bool IsPlayerInBattleGround(uint64 guid);
 
         /* virtual score-array - get's used in bg-subclasses */

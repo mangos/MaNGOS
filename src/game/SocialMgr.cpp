@@ -186,7 +186,7 @@ void SocialMgr::GetFriendInfo(Player *player, uint32 friend_lowguid, FriendInfo 
 
     Player *pFriend = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, friend_lowguid));
 
-    uint32 team = player->GetTeam();
+    Team team = player->GetTeam();
     AccountTypes security = player->GetSession()->GetSecurity();
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
     AccountTypes gmLevelInWhoList = AccountTypes (sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST));
@@ -268,7 +268,7 @@ void SocialMgr::BroadcastToFriendListers(Player *player, WorldPacket *packet)
     if(!player)
         return;
 
-    uint32 team     = player->GetTeam();
+    Team team = player->GetTeam();
     AccountTypes security = player->GetSession()->GetSecurity();
     uint32 guid     = player->GetGUIDLow();
     AccountTypes gmLevelInWhoList = AccountTypes(sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST));

@@ -1472,7 +1472,7 @@ CREATE TABLE `item_loot` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Item System';
 
 --
--- Dumping data for table `item_instance`
+-- Dumping data for table `item_loot`
 --
 
 LOCK TABLES `item_loot` WRITE;

@@ -23,6 +23,7 @@
 #include "Unit.h"
 #include "UpdateMask.h"
 #include "ItemPrototype.h"
+#include "SharedDefines.h"
 #include "LootMgr.h"
 #include "DBCEnums.h"
 #include "Database/DatabaseEnv.h"
@@ -394,7 +395,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data = NULL);
+        bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team = TEAM_NONE, const CreatureData *data = NULL);
         bool LoadCreatureAddon(bool reload = false);
         void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
@@ -495,7 +496,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool HasSpell(uint32 spellID) const;
 
-        bool UpdateEntry(uint32 entry, uint32 team = ALLIANCE, const CreatureData* data = NULL, bool preserveHPAndPower = true);
+        bool UpdateEntry(uint32 entry, Team team = ALLIANCE, const CreatureData* data = NULL, bool preserveHPAndPower = true);
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
         void UpdateResistances(uint32 school);
@@ -627,8 +628,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void LockAI(bool lock) { m_AI_locked = lock; }
 
     protected:
-        bool CreateFromProto(ObjectGuid guid, uint32 Entry, uint32 team, const CreatureData *data = NULL);
-        bool InitEntry(uint32 entry, uint32 team=ALLIANCE, const CreatureData* data=NULL);
+        bool CreateFromProto(ObjectGuid guid, uint32 Entry, Team team, const CreatureData *data = NULL);
+        bool InitEntry(uint32 entry, const CreatureData* data=NULL);
         void RelocationNotify();
 
         // vendor items
