@@ -46,7 +46,7 @@ struct VehicleAccessory
 typedef std::vector<VehicleAccessory> VehicleAccessoryList;
 typedef std::map<uint32, VehicleAccessoryList> VehicleAccessoryMap;
 
-class VehicleKit
+class MANGOS_DLL_SPEC VehicleKit
 {
 public:
     explicit VehicleKit(Unit* base, VehicleEntry const* vehicleInfo);
