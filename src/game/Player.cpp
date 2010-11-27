@@ -2532,6 +2532,9 @@ void Player::GiveXP(uint32 xp, Unit* victim)
     if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_XP_USER_DISABLED))
         return;
 
+    if(hasUnitState(UNIT_STAT_ON_VEHICLE))
+        return;
+
     uint32 level = getLevel();
 
     //prevent Northrend Level Leeching :P
