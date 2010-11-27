@@ -101,7 +101,9 @@ void BattleGroundAV::HandleQuestComplete(uint32 questid, Player *player)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
-    BattleGroundTeamIndex teamIdx = GetTeamIndexByTeamId(player->GetTeam());
+    BattleGroundAVTeamIndex teamIdx = GetAVTeamIndexByTeamId(player->GetTeam());
+    MANGOS_ASSERT(teamIdx != BG_AV_TEAM_NEUTRAL);
+
     uint32 reputation = 0;                                  // reputation for the whole team (other reputation must be done in db)
     // TODO add events (including quest not available anymore, next quest availabe, go/npc de/spawning)
     sLog.outError("BattleGroundAV: Quest %i completed", questid);
