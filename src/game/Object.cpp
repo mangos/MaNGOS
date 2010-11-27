@@ -1770,11 +1770,11 @@ void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
     SendMessageToSet(&data, true);
 }
 
-void WorldObject::SendGameObjectCustomAnim(uint64 guid)
+void WorldObject::SendGameObjectCustomAnim(uint64 guid, uint32 animprogress)
 {
     WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8+4);
     data << uint64(guid);
-    data << uint32(0);                                      // not known what this is
+    data << uint32(animprogress);
     SendMessageToSet(&data, true);
 }
 

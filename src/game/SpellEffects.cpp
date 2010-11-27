@@ -147,8 +147,8 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectStuck,                                    // 84 SPELL_EFFECT_STUCK
     &Spell::EffectSummonPlayer,                             // 85 SPELL_EFFECT_SUMMON_PLAYER
     &Spell::EffectActivateObject,                           // 86 SPELL_EFFECT_ACTIVATE_OBJECT
-    &Spell::EffectNULL,                                     // 87 SPELL_EFFECT_WMO_DAMAGE (57 spells in 3.3.2)
-    &Spell::EffectNULL,                                     // 88 SPELL_EFFECT_WMO_REPAIR (2 spells in 3.3.2)
+    &Spell::EffectWMODamage,                                // 87 SPELL_EFFECT_WMO_DAMAGE (57 spells in 3.3.2)
+    &Spell::EffectWMORepair,                                // 88 SPELL_EFFECT_WMO_REPAIR (2 spells in 3.3.2)
     &Spell::EffectNULL,                                     // 89 SPELL_EFFECT_WMO_CHANGE (7 spells in 3.3.2)
     &Spell::EffectKillCreditPersonal,                       // 90 SPELL_EFFECT_KILL_CREDIT_PERSONAL     Kill credit but only for single person
     &Spell::EffectUnused,                                   // 91 SPELL_EFFECT_THREAT_ALL               one spell: zzOLDBrainwash
@@ -9037,4 +9037,48 @@ void Spell::EffectQuestStart(SpellEffectIndex eff_idx)
         if (player->CanTakeQuest(qInfo, false) && player->CanAddQuest(qInfo, false))
             player->AddQuest(qInfo, NULL);
     }
+}
+
+void Spell::EffectWMODamage(SpellEffectIndex eff_idx)
+{
+    if (!gameObjTarget || gameObjTarget->GetGoType() != GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING || !gameObjTarget->GetHealth())
+    {
+        DEBUG_LOG( "Spell::EffectWMODamage called, but no valid targets. Spell ID %u", m_spellInfo->Id );
+        return;
+    }
+
+    Unit *caster = m_originalCaster;
+
+    if (!caster)
+        return;
+
+    DEBUG_LOG( "Spell::EffectWMODamage,  spell ID %u, object %u, damage %u", m_spellInfo->Id,gameObjTarget->GetEntry(),uint32(damage));
+
+    gameObjTarget->DamageTaken(caster, uint32(damage));
+
+    WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8+8+8+4+4);
+    data << gameObjTarget->GetPackGUID();
+    data << caster->GetPackGUID();
+
+    if (Unit *who = caster->GetCharmerOrOwner()) //check for pet / vehicle
+        data << who->GetPackGUID();
+    else
+        data << caster->GetPackGUID();
+
+    data << uint32(damage);
+    data << uint32(m_spellInfo->Id);
+
+    gameObjTarget->SendMessageToSet(&data, false);
+}
+
+void Spell::EffectWMORepair(SpellEffectIndex eff_idx)
+{
+    if (gameObjTarget && gameObjTarget->GetGoType() == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
+    {
+        DEBUG_LOG( "Spell::EffectWMORepair,  spell ID %u, object %u", m_spellInfo->Id,gameObjTarget->GetEntry());
+        gameObjTarget->Rebuild(m_caster);
+    }
+    else
+        DEBUG_LOG( "Spell::EffectWMORepair called, but no valid targets. Spell ID %u", m_spellInfo->Id);
+
 }

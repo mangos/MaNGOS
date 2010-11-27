@@ -360,26 +360,26 @@ struct GameObjectInfo
             uint32 creditProxyCreature;                     //1
             uint32 empty1;                                  //2
             uint32 intactEvent;                             //3
-            uint32 empty2;                                  //4
+            uint32 damagedDisplayId;                        //4
             uint32 damagedNumHits;                          //5
-            uint32 empty3;                                  //6
-            uint32 empty4;                                  //7
-            uint32 empty5;                                  //8
+            uint32 empty2;                                  //6
+            uint32 empty3;                                  //7
+            uint32 empty4;                                  //8
             uint32 damagedEvent;                            //9
-            uint32 empty6;                                  //10
-            uint32 empty7;                                  //11
-            uint32 empty8;                                  //12
-            uint32 empty9;                                  //13
+            uint32 destroyedDisplayId;                      //10
+            uint32 empty5;                                  //11
+            uint32 empty6;                                  //12
+            uint32 empty7;                                  //13
             uint32 destroyedEvent;                          //14
-            uint32 empty10;                                 //15
+            uint32 empty8;                                  //15
             uint32 debuildingTimeSecs;                      //16
-            uint32 empty11;                                 //17
+            uint32 empty9;                                  //17
             uint32 destructibleData;                        //18
             uint32 rebuildingEvent;                         //19
-            uint32 empty12;                                 //20
-            uint32 empty13;                                 //21
+            uint32 empty10;                                 //20
+            uint32 empty11;                                 //21
             uint32 damageEvent;                             //22
-            uint32 empty14;                                 //23
+            uint32 empty12;                                 //23
         } destructibleBuilding;
         //34 GAMEOBJECT_TYPE_GUILDBANK - empty
         //35 GAMEOBJECT_TYPE_TRAPDOOR
@@ -705,6 +705,14 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
 
         uint64 GetRotation() const { return m_rotation; }
+
+        bool IsInRange(float x, float y, float z, float radius) const;
+        void DamageTaken(Unit *pDoneBy, uint32 uiDamage);
+        void Rebuild(Unit *pWho);
+
+        uint32 GetHealth() const { return m_health; }
+        uint32 GetMaxHealth() const { return m_goInfo->destructibleBuilding.intactNumHits + m_goInfo->destructibleBuilding.damagedNumHits; }
+
     protected:
         uint32      m_spellId;
         time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
@@ -713,7 +721,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool        m_spawnedByDefault;
         time_t      m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
                                                             // For traps this: spell casting cooldown, for doors/buttons: reset time.
-
+        uint32      m_health;
         typedef std::set<ObjectGuid> GuidsSet;
 
         GuidsSet m_SkillupSet;                              // players that already have skill-up at GO use

@@ -385,4 +385,5 @@ Map::Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER> &visitor)
         getNGrid(x, y)->Visit(cell_x, cell_y, visitor);
     }
 }
+
 #endif
