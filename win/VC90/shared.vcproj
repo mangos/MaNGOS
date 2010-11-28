@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -130,7 +130,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -212,7 +212,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -293,7 +293,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -374,7 +374,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -455,7 +455,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\dep\include\g3dlite;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -720,78 +720,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\shared\Auth\Sha1.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="vmaps"
-			>
-			<File
-				RelativePath="..\..\src\shared\vmap\BIH.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\BIH.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\IVMapManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\MapTree.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\MapTree.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\ModelInstance.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\ModelInstance.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\TileAssembler.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\TileAssembler.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapDefinitions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapFactory.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapFactory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapManager2.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapManager2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\VMapTools.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\WorldModel.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\shared\vmap\WorldModel.h"
 				>
 			</File>
 		</Filter>

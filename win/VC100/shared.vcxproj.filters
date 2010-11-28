@@ -19,9 +19,6 @@
     <Filter Include="Auth">
       <UniqueIdentifier>{e35fd108-bd39-46ae-83f9-09cf1ebf4ea8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vmaps">
-      <UniqueIdentifier>{948284d3-9d89-4609-8cdd-28a213edb53e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\shared\Database\Database.cpp">
@@ -77,36 +74,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\shared\Auth\Sha1.cpp">
       <Filter>Auth</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\BaseModel.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\CoordModelMapping.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\DebugCmdLogger.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\ManagedModelContainer.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\ModelContainer.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\SubModel.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\TileAssembler.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\TreeNode.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\VMapFactory.cpp">
-      <Filter>vmaps</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\shared\vmap\VMapManager.cpp">
-      <Filter>vmaps</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\shared\Common.cpp" />
     <ClCompile Include="..\..\src\shared\ServiceWin32.cpp" />
@@ -199,57 +166,6 @@
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Auth\Sha1.h">
       <Filter>Auth</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\AABSPTree.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\BaseModel.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\CoordModelMapping.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\DebugCmdLogger.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\IVMapManager.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\ManagedModelContainer.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\ModelContainer.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\NodeValueAccess.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\ShortBox.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\ShortVector.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\SubModel.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\TileAssembler.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\TreeNode.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\VMapDefinitions.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\VMapFactory.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\VMapManager.h">
-      <Filter>vmaps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\vmap\VMapTools.h">
-      <Filter>vmaps</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Common.h" />
     <ClInclude Include="..\..\src\shared\LockedQueue.h" />
