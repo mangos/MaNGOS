@@ -301,11 +301,11 @@ void BattleGroundAV::EndBattleGround(Team winner)
     // towers all not destroyed:
     for(BG_AV_Nodes i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_STONEHEART_BUNKER; ++i)
         if (m_Nodes[i].State == POINT_CONTROLLED)
-            if (m_Nodes[i].TotalOwner == BG_TEAM_ALLIANCE)
+            if (m_Nodes[i].TotalOwner == BG_AV_TEAM_ALLIANCE)
                 ++tower_survived[BG_TEAM_ALLIANCE];
     for(BG_AV_Nodes i = BG_AV_NODES_ICEBLOOD_TOWER; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)
         if (m_Nodes[i].State == POINT_CONTROLLED)
-            if (m_Nodes[i].TotalOwner == BG_TEAM_HORDE)
+            if (m_Nodes[i].TotalOwner == BG_AV_TEAM_HORDE)
                 ++tower_survived[BG_TEAM_HORDE];
 
     // graves all controlled
@@ -466,10 +466,10 @@ void BattleGroundAV::ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx
 
     if (teamIdx != BG_AV_TEAM_NEUTRAL)
     {
-        PlaySoundToAll((teamIdx == BG_TEAM_ALLIANCE) ? BG_AV_SOUND_ALLIANCE_GOOD : BG_AV_SOUND_HORDE_GOOD);
+        PlaySoundToAll((teamIdx == BG_AV_TEAM_ALLIANCE) ? BG_AV_SOUND_ALLIANCE_GOOD : BG_AV_SOUND_HORDE_GOOD);
         m_Mine_Reclaim_Timer[mine] = BG_AV_MINE_RECLAIM_TIMER;
         SendYell2ToAll(LANG_BG_AV_MINE_TAKEN , LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
-            (teamIdx == BG_TEAM_ALLIANCE ) ? LANG_BG_ALLY : LANG_BG_HORDE,
+            (teamIdx == BG_AV_TEAM_ALLIANCE ) ? LANG_BG_ALLY : LANG_BG_HORDE,
             (mine == BG_AV_NORTH_MINE) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH);
     }
 }
@@ -618,9 +618,9 @@ void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
         {
             stateok = (m_Nodes[i].State == j);
             FillInitialWorldState(data, count, BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_AV_TEAM_ALLIANCE)],
-                m_Nodes[i].Owner == BG_TEAM_ALLIANCE && stateok);
+                m_Nodes[i].Owner == BG_AV_TEAM_ALLIANCE && stateok);
             FillInitialWorldState(data, count, BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_AV_TEAM_HORDE)],
-                m_Nodes[i].Owner == BG_TEAM_HORDE && stateok);
+                m_Nodes[i].Owner == BG_AV_TEAM_HORDE && stateok);
         }
     }
 
