@@ -28,7 +28,7 @@ void SQLStorageLoaderBase<T>::convert(uint32 /*field_pos*/, S src, D &dst)
 }
 
 template<class T>
-void SQLStorageLoaderBase<T>::convert_str_to_str(uint32 /*field_pos*/, char *src, char *&dst)
+void SQLStorageLoaderBase<T>::convert_str_to_str(uint32 /*field_pos*/, char const *src, char *&dst)
 {
     if(!src)
     {
@@ -53,14 +53,14 @@ void SQLStorageLoaderBase<T>::convert_to_str(uint32 /*field_pos*/, S /*src*/, ch
 
 template<class T>
 template<class D>
-void SQLStorageLoaderBase<T>::convert_from_str(uint32 /*field_pos*/, char * /*src*/, D& dst)
+void SQLStorageLoaderBase<T>::convert_from_str(uint32 /*field_pos*/, char const* /*src*/, D& dst)
 {
     dst = 0;
 }
 
 template<class T>
 template<class V>
-void SQLStorageLoaderBase<T>::storeValue(V value, SQLStorage &store, char *p, int x, uint32 &offset)
+void SQLStorageLoaderBase<T>::storeValue(V value, SQLStorage &store, char *p, uint32 x, uint32 &offset)
 {
     T * subclass = (static_cast<T*>(this));
     switch(store.dst_format[x])
@@ -89,7 +89,7 @@ void SQLStorageLoaderBase<T>::storeValue(V value, SQLStorage &store, char *p, in
 }
 
 template<class T>
-void SQLStorageLoaderBase<T>::storeValue(char * value, SQLStorage &store, char *p, int x, uint32 &offset)
+void SQLStorageLoaderBase<T>::storeValue(char const* value, SQLStorage &store, char *p, uint32 x, uint32 &offset)
 {
     T * subclass = (static_cast<T*>(this));
     switch(store.dst_format[x])
@@ -203,7 +203,7 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store)
                 case FT_FLOAT:
                     storeValue((float)fields[x].GetFloat(), store, p, x, offset); break;
                 case FT_STRING:
-                    storeValue((char*)fields[x].GetString(), store, p, x, offset); break;
+                    storeValue((char const*)fields[x].GetString(), store, p, x, offset); break;
             }
         ++count;
     }while( result->NextRow() );

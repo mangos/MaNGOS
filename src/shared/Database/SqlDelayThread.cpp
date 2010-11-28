@@ -41,7 +41,7 @@ void SqlDelayThread::run()
         // empty the queue before exiting
 
         ACE_Based::Thread::Sleep(loopSleepms);
-        SqlOperation* s;
+        SqlOperation* s = NULL;
         while (m_sqlQueue.next(s))
         {
             s->Execute(m_dbEngine);

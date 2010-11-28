@@ -67,7 +67,7 @@ void SQLStorage::EraseEntry(uint32 id)
         else
             offset += 4;
 
-    reinterpret_cast<void*&>(pIndex[id]) = NULL;
+    pIndex[id] = NULL;
 }
 
 void SQLStorage::Free ()
