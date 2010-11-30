@@ -22119,10 +22119,8 @@ void Player::UnsummonPetTemporaryIfAny()
         minipet->Unsummon(PET_SAVE_AS_DELETED, this);
 
     Pet* pet = GetPet();
-    if(!pet)
-        return;
 
-    if(!m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned() )
+    if (pet && !m_temporaryUnsummonedPetNumber && pet->isControlled() && !pet->isTemporarySummoned())
         m_temporaryUnsummonedPetNumber = pet->GetCharmInfo()->GetPetNumber();
 
     GroupPetList m_groupPetsTmp = GetPets();  // Original list may be modified in this function
