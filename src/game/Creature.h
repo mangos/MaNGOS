@@ -203,7 +203,7 @@ struct CreatureDataAddon
     uint32 guidOrEntry;
     uint32 mount;
     uint32 bytes1;
-    uint8  stash;                                           // SheathState
+    uint8  sheath_state;                                    // SheathState
     uint8  pvp_state;                                       // UnitPVPStateFlags
     uint32 emote;
     uint32 splineFlags;
