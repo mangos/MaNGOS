@@ -36,7 +36,7 @@
 #include "AchievementMgr.h"
 #include "ReputationMgr.h"
 #include "BattleGround.h"
-#include "DBCEnums.h"
+#include "DBCStores.h"
 #include "SharedDefines.h"
 #include "AntiCheat.h"
 
