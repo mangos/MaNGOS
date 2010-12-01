@@ -59,10 +59,10 @@ void BattleGroundRV::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in constructor
     BattleGroundRVScore* sc = new BattleGroundRVScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundRV::RemovePlayer(Player * /*plr*/, uint64 /*guid*/)
+void BattleGroundRV::RemovePlayer(Player * /*plr*/, ObjectGuid /*guid*/)
 {
 }
 

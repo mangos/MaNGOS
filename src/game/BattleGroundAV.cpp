@@ -289,7 +289,7 @@ void BattleGroundAV::AddPlayer(Player *plr)
     BattleGround::AddPlayer(plr);
     // create score and add it to map, default values are set in constructor
     BattleGroundAVScore* sc = new BattleGroundAVScore;
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
 void BattleGroundAV::EndBattleGround(Team winner)
@@ -349,7 +349,7 @@ void BattleGroundAV::EndBattleGround(Team winner)
     BattleGround::EndBattleGround(winner);
 }
 
-void BattleGroundAV::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
+void BattleGroundAV::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
@@ -389,7 +389,7 @@ void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
 void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
 
-    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetGUID());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
     if(itr == m_PlayerScores.end())                         // player not found...
         return;
 

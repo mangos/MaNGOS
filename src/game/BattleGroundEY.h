@@ -254,14 +254,15 @@ class BattleGroundEY : public BattleGround
         virtual void StartingEventOpenDoors();
 
         /* BG Flags */
-        uint64 GetFlagPickerGUID() const    { return m_FlagKeeper; }
-        void SetFlagPicker(uint64 guid)     { m_FlagKeeper = guid; }
-        bool IsFlagPickedup() const         { return m_FlagKeeper != 0; }
+        ObjectGuid const& GetFlagPickerGuid() const { return m_FlagKeeper; }
+        void SetFlagPicker(ObjectGuid guid) { m_FlagKeeper = guid; }
+        void ClearFlagPicker()              { m_FlagKeeper.Clear(); }
+        bool IsFlagPickedup() const         { return !m_FlagKeeper.IsEmpty(); }
         uint8 GetFlagState() const          { return m_FlagState; }
         void RespawnFlag(bool send_message);
         void RespawnFlagAfterDrop();
 
-        void RemovePlayer(Player *plr,uint64 guid);
+        void RemovePlayer(Player *plr, ObjectGuid guid);
         void HandleBuffUse(uint64 const& buff_guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         void HandleKillPlayer(Player *player, Player *killer);
@@ -306,7 +307,7 @@ class BattleGroundEY : public BattleGround
 
         uint32 m_Points_Trigger[BG_EY_NODES_MAX];
 
-        uint64 m_FlagKeeper;                                // keepers guid
+        ObjectGuid m_FlagKeeper;                            // keepers guid
         uint64 m_DroppedFlagGUID;
         uint8 m_FlagState;                                  // for checking flag state
         int32 m_FlagsTimer;
@@ -315,7 +316,7 @@ class BattleGroundEY : public BattleGround
         Team m_PointOwnedByTeam[BG_EY_NODES_MAX];
         uint8 m_PointState[BG_EY_NODES_MAX];
         int32 m_PointBarStatus[BG_EY_NODES_MAX];
-        typedef std::vector<uint64> PlayersNearPointType;
+        typedef std::vector<ObjectGuid> PlayersNearPointType;
         PlayersNearPointType m_PlayersNearPoint[BG_EY_NODES_MAX_WITH_SPEIAL];
         uint8 m_CurrentPointPlayersCount[2*BG_EY_NODES_MAX];
 

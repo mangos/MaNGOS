@@ -229,11 +229,11 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode( WorldPacket & /*recv
                 uint32 count1 = 0;                          // always constant zero?
                 uint32 count2 = 0;                          // count of next fields
 
-                Player *ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGUID());
+                Player *ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
                 if (ali_plr)
                     ++count2;
 
-                Player *horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGUID());
+                Player *horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
                 if (horde_plr)
                     ++count2;
 
@@ -430,7 +430,7 @@ void WorldSession::HandleBattleFieldPortOpcode( WorldPacket &recv_data )
             // this is still needed here if battleground "jumping" shouldn't add deserter debuff
             // also this is required to prevent stuck at old battleground after SetBattleGroundId set to new
             if (BattleGround *currentBg = _player->GetBattleGround())
-                currentBg->RemovePlayerAtLeave(_player->GetGUID(), false, true);
+                currentBg->RemovePlayerAtLeave(_player->GetObjectGuid(), false, true);
 
             // set the destination instance id
             _player->SetBattleGroundId(bg->GetInstanceID(), bgTypeId);

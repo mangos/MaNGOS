@@ -202,7 +202,7 @@ template<class Do>
 void BattleGround::BroadcastWorker(Do& _do)
 {
     for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-        if (Player *plr = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+        if (Player *plr = ObjectAccessor::FindPlayer(itr->first))
             _do(plr);
 }
 
@@ -457,7 +457,7 @@ void BattleGround::Update(uint32 diff)
             {
                 //TODO : add arena sound PlaySoundToAll(SOUND_ARENA_START);
 
-                for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
                     if (Player *plr = sObjectMgr.GetPlayer(itr->first))
                         plr->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
 
@@ -468,7 +468,7 @@ void BattleGround::Update(uint32 diff)
 
                 PlaySoundToAll(SOUND_BG_START);
 
-                for(BattleGroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
                     if (Player* plr = sObjectMgr.GetPlayer(itr->first))
                         plr->RemoveAurasDueToSpell(SPELL_PREPARATION);
                 //Announce BG starting
@@ -522,11 +522,11 @@ void BattleGround::SendPacketToAll(WorldPacket *packet)
     {
         if (itr->second.OfflineRemoveTime)
             continue;
-        Player *plr = sObjectMgr.GetPlayer(itr->first);
-        if (plr)
+
+        if (Player *plr = sObjectMgr.GetPlayer(itr->first))
             plr->GetSession()->SendPacket(packet);
         else
-            sLog.outError("BattleGround:SendPacketToAll: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:SendPacketToAll: %s not found!", itr->first.GetString().c_str());
     }
 }
 
@@ -536,10 +536,11 @@ void BattleGround::SendPacketToTeam(Team teamId, WorldPacket *packet, Player *se
     {
         if (itr->second.OfflineRemoveTime)
             continue;
+
         Player *plr = sObjectMgr.GetPlayer(itr->first);
         if (!plr)
         {
-            sLog.outError("BattleGround:SendPacketToTeam: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:SendPacketToTeam: %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -569,11 +570,11 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
     {
         if (itr->second.OfflineRemoveTime)
             continue;
-        Player *plr = sObjectMgr.GetPlayer(itr->first);
 
+        Player *plr = sObjectMgr.GetPlayer(itr->first);
         if (!plr)
         {
-            sLog.outError("BattleGround:PlaySoundToTeam: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:PlaySoundToTeam: %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -594,11 +595,12 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
     {
         if (itr->second.OfflineRemoveTime)
             continue;
+
         Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:CastSpellOnTeam: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:CastSpellOnTeam: %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -616,11 +618,12 @@ void BattleGround::RewardHonorToTeam(uint32 Honor, Team teamId)
     {
         if (itr->second.OfflineRemoveTime)
             continue;
+
         Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:RewardHonorToTeam: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:RewardHonorToTeam: %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -643,11 +646,12 @@ void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
     {
         if (itr->second.OfflineRemoveTime)
             continue;
+
         Player *plr = sObjectMgr.GetPlayer(itr->first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:RewardReputationToTeam: Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:RewardReputationToTeam: %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -747,10 +751,11 @@ void BattleGround::EndBattleGround(Team winner)
             }
             continue;
         }
+
         Player *plr = sObjectMgr.GetPlayer(itr->first);
         if (!plr)
         {
-            sLog.outError("BattleGround:EndBattleGround Player (GUID: %u) not found!", GUID_LOPART(itr->first));
+            sLog.outError("BattleGround:EndBattleGround %s not found!", itr->first.GetString().c_str());
             continue;
         }
 
@@ -993,7 +998,7 @@ void BattleGround::BlockMovement(Player *plr)
     plr->SetClientControl(plr, 0);                          // movement disabled NOTE: the effect will be automatically removed by client when the player is teleported from the battleground, so no need to send with uint8(1) in RemovePlayerAtLeave()
 }
 
-void BattleGround::RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket)
+void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool SendPacket)
 {
     Team team = GetPlayerTeam(guid);
     bool participant = false;
@@ -1183,7 +1188,7 @@ void BattleGround::AddPlayer(Player *plr)
     bp.PlayerTeam = team;
 
     // Add to list/maps
-    m_Players[guid.GetRawValue()] = bp;
+    m_Players[guid] = bp;
 
     UpdatePlayersCountByTeam(team, false);                  // +1 player
 
@@ -1267,10 +1272,10 @@ void BattleGround::AddOrSetPlayerToCorrectBgGroup(Player *plr, ObjectGuid plr_gu
 }
 
 // This method should be called when player logs into running battleground
-void BattleGround::EventPlayerLoggedIn(Player* player, uint64 plr_guid)
+void BattleGround::EventPlayerLoggedIn(Player* player, ObjectGuid plr_guid)
 {
     // player is correct pointer
-    for(std::deque<uint64>::iterator itr = m_OfflineQueue.begin(); itr != m_OfflineQueue.end(); ++itr)
+    for(OfflineQueue::iterator itr = m_OfflineQueue.begin(); itr != m_OfflineQueue.end(); ++itr)
     {
         if (*itr == plr_guid)
         {
@@ -1288,12 +1293,12 @@ void BattleGround::EventPlayerLoggedIn(Player* player, uint64 plr_guid)
 void BattleGround::EventPlayerLoggedOut(Player* player)
 {
     // player is correct pointer, it is checked in WorldSession::LogoutPlayer()
-    m_OfflineQueue.push_back(player->GetGUID());
-    m_Players[player->GetGUID()].OfflineRemoveTime = sWorld.GetGameTime() + MAX_OFFLINE_TIME;
+    m_OfflineQueue.push_back(player->GetObjectGuid());
+    m_Players[player->GetObjectGuid()].OfflineRemoveTime = sWorld.GetGameTime() + MAX_OFFLINE_TIME;
     if (GetStatus() == STATUS_IN_PROGRESS)
     {
         // drop flag and handle other cleanups
-        RemovePlayer(player, player->GetGUID());
+        RemovePlayer(player, player->GetObjectGuid());
 
         // 1 player is logging out, if it is the last, then end arena!
         if (isArena())
@@ -1347,7 +1352,7 @@ bool BattleGround::HasFreeSlots() const
 void BattleGround::UpdatePlayerScore(Player *Source, uint32 type, uint32 value)
 {
     //this procedure is called from virtual function implemented in bg subclass
-    BattleGroundScoreMap::const_iterator itr = m_PlayerScores.find(Source->GetGUID());
+    BattleGroundScoreMap::const_iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
 
     if(itr == m_PlayerScores.end())                         // player not found...
         return;
@@ -1751,7 +1756,7 @@ void BattleGround::HandleKillPlayer( Player *player, Player *killer )
 
 // return the player's team based on battlegroundplayer info
 // used in same faction arena matches mainly
-Team BattleGround::GetPlayerTeam(uint64 guid)
+Team BattleGround::GetPlayerTeam(ObjectGuid guid)
 {
     BattleGroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())
@@ -1759,7 +1764,7 @@ Team BattleGround::GetPlayerTeam(uint64 guid)
     return TEAM_NONE;
 }
 
-bool BattleGround::IsPlayerInBattleGround(uint64 guid)
+bool BattleGround::IsPlayerInBattleGround(ObjectGuid guid)
 {
     BattleGroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())

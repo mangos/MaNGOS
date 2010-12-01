@@ -375,11 +375,11 @@ class BattleGround
         bool isBattleGround() const { return !m_IsArena; }
         bool isRated() const        { return m_IsRated; }
 
-        typedef std::map<uint64, BattleGroundPlayer> BattleGroundPlayerMap;
+        typedef std::map<ObjectGuid, BattleGroundPlayer> BattleGroundPlayerMap;
         BattleGroundPlayerMap const& GetPlayers() const { return m_Players; }
         uint32 GetPlayersSize() const { return m_Players.size(); }
 
-        typedef std::map<uint64, BattleGroundScore*> BattleGroundScoreMap;
+        typedef std::map<ObjectGuid, BattleGroundScore*> BattleGroundScoreMap;
         BattleGroundScoreMap::const_iterator GetPlayerScoresBegin() const { return m_PlayerScores.begin(); }
         BattleGroundScoreMap::const_iterator GetPlayerScoresEnd() const { return m_PlayerScores.end(); }
         uint32 GetPlayerScoresSize() const { return m_PlayerScores.size(); }
@@ -475,7 +475,7 @@ class BattleGround
         virtual void EventPlayerDroppedFlag(Player* /*player*/) {}
         virtual void EventPlayerClickedOnFlag(Player* /*player*/, GameObject* /*target_obj*/) {}
         virtual void EventPlayerCapturedFlag(Player* /*player*/) {}
-        void EventPlayerLoggedIn(Player* player, uint64 plr_guid);
+        void EventPlayerLoggedIn(Player* player, ObjectGuid plr_guid);
         void EventPlayerLoggedOut(Player* player);
 
         /* Death related */
@@ -485,7 +485,7 @@ class BattleGround
 
         void AddOrSetPlayerToCorrectBgGroup(Player *plr, ObjectGuid plr_guid, Team team);
 
-        virtual void RemovePlayerAtLeave(uint64 guid, bool Transport, bool SendPacket);
+        virtual void RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool SendPacket);
                                                             // can be extended in in BG subclass
 
         /* event related */
@@ -524,10 +524,10 @@ class BattleGround
         virtual bool HandlePlayerUnderMap(Player * /*plr*/) { return false; }
 
         // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
-        Team GetPlayerTeam(uint64 guid);
+        Team GetPlayerTeam(ObjectGuid guid);
         static Team GetOtherTeam(Team team){ return team ? ((team == ALLIANCE) ? HORDE : ALLIANCE) : TEAM_NONE; }
         static BattleGroundTeamIndex GetOtherTeamIndex(BattleGroundTeamIndex teamIdx){ return teamIdx == BG_TEAM_ALLIANCE ? BG_TEAM_HORDE : BG_TEAM_ALLIANCE; }
-        bool IsPlayerInBattleGround(uint64 guid);
+        bool IsPlayerInBattleGround(ObjectGuid guid);
 
         /* virtual score-array - get's used in bg-subclasses */
         int32 m_TeamScores[BG_TEAMS_COUNT];
@@ -557,7 +557,7 @@ class BattleGround
 
         BattleGroundScoreMap m_PlayerScores;                // Player scores
         // must be implemented in BG subclass
-        virtual void RemovePlayer(Player * /*player*/, uint64 /*guid*/) {}
+        virtual void RemovePlayer(Player * /*player*/, ObjectGuid /*guid*/) {}
 
         /* Player lists, those need to be accessible by inherited classes */
         BattleGroundPlayerMap  m_Players;
@@ -592,8 +592,8 @@ class BattleGround
         char const *m_Name;
 
         /* Player lists */
-        std::vector<uint64> m_ResurrectQueue;               // Player GUID
-        std::deque<uint64> m_OfflineQueue;                  // Player GUID
+        typedef std::deque<ObjectGuid> OfflineQueue;
+        OfflineQueue m_OfflineQueue;                        // Player GUID
 
         /* Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction */
         /* Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG */
