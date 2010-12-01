@@ -4260,7 +4260,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
 
                     uint32 pl_account = sObjectMgr.GetPlayerAccountIdByGUID(playerguid);
 
-                    draft.AddMoney(money).SendReturnToSender(pl_account, lowguid, sender);
+                    draft.AddMoney(money).SendReturnToSender(pl_account, playerguid, ObjectGuid(HIGHGUID_PLAYER, sender));
                 }
                 while (resultMail->NextRow());
 
@@ -16155,7 +16155,7 @@ void Player::_LoadMails(QueryResult *result)
         m->messageID = fields[0].GetUInt32();
         m->messageType = fields[1].GetUInt8();
         m->sender = fields[2].GetUInt32();
-        m->receiver = fields[3].GetUInt32();
+        m->receiverGuid = ObjectGuid(HIGHGUID_PLAYER, fields[3].GetUInt32());
         m->subject = fields[4].GetCppString();
         m->body = fields[5].GetCppString();
         m->expire_time = (time_t)fields[6].GetUInt64();

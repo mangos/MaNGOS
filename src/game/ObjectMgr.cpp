@@ -5472,7 +5472,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->messageID = fields[0].GetUInt32();
         m->messageType = fields[1].GetUInt8();
         m->sender = fields[2].GetUInt32();
-        m->receiver = fields[3].GetUInt32();
+        m->receiverGuid = ObjectGuid(HIGHGUID_PLAYER, fields[3].GetUInt32());
         bool has_items = fields[4].GetBool();
         m->expire_time = (time_t)fields[5].GetUInt64();
         m->deliver_time = 0;
@@ -5482,7 +5482,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 
         Player *pl = 0;
         if (serverUp)
-            pl = GetPlayer((uint64)m->receiver);
+            pl = GetPlayer(m->receiverGuid);
         if (pl)
         {                                                   //this code will run very improbably (the time is between 4 and 5 am, in game is online a player, who has old mail
             //his in mailbox and he has already listed his mails )
@@ -5518,7 +5518,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             else
             {
                 //mail will be returned:
-                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'", m->receiver, m->sender, (uint64)(basetime + 30*DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, m->messageID);
+                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'",
+                    m->receiverGuid.GetCounter(), m->sender, (uint64)(basetime + 30*DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, m->messageID);
                 delete m;
                 continue;
             }
