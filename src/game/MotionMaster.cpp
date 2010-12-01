@@ -216,11 +216,11 @@ void MotionMaster::MoveRandom()
 {
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        sLog.outError("%s attempt to move random.", m_owner->GetObjectGuid().GetString().c_str());
+        sLog.outError("%s attempt to move random.", m_owner->GetGuidStr().c_str());
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move random.", m_owner->GetObjectGuid().GetString().c_str());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move random.", m_owner->GetGuidStr().c_str());
         Mutate(new RandomMovementGenerator<Creature>(*m_owner));
     }
 }
@@ -234,28 +234,28 @@ void MotionMaster::MoveTargetedHome()
 
     if (m_owner->GetTypeId() == TYPEID_UNIT && ((Creature*)m_owner)->GetCharmerOrOwnerGuid().IsEmpty())
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted home", m_owner->GetObjectGuid().GetString().c_str());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted home", m_owner->GetGuidStr().c_str());
         Mutate(new HomeMovementGenerator<Creature>());
     }
     else if (m_owner->GetTypeId() == TYPEID_UNIT && !((Creature*)m_owner)->GetCharmerOrOwnerGuid().IsEmpty())
     {
         if (Unit *target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetObjectGuid().GetString().c_str(), target->GetObjectGuid().GetString().c_str());
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
         }
         else
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s attempt but fail to follow owner", m_owner->GetObjectGuid().GetString().c_str());
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s attempt but fail to follow owner", m_owner->GetGuidStr().c_str());
         }
     }
     else
-        sLog.outError("%s attempt targeted home", m_owner->GetObjectGuid().GetString().c_str());
+        sLog.outError("%s attempt targeted home", m_owner->GetGuidStr().c_str());
 }
 
 void MotionMaster::MoveConfused()
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move confused", m_owner->GetObjectGuid().GetString().c_str());
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move confused", m_owner->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new ConfusedMovementGenerator<Player>());
@@ -269,7 +269,7 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     if (!target)
         return;
 
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s chase to %s", m_owner->GetObjectGuid().GetString().c_str(), target->GetObjectGuid().GetString().c_str());
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s chase to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new ChaseMovementGenerator<Player>(*target,dist,angle));
@@ -288,7 +288,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle)
     if (!target)
         return;
 
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetObjectGuid().GetString().c_str(), target->GetObjectGuid().GetString().c_str());
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new FollowMovementGenerator<Player>(*target,dist,angle));
@@ -298,7 +298,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle)
 
 void MotionMaster::MovePoint(uint32 id, float x, float y, float z)
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted point (Id: %u X: %f Y: %f Z: %f)", m_owner->GetObjectGuid().GetString().c_str(), id, x, y, z );
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted point (Id: %u X: %f Y: %f Z: %f)", m_owner->GetGuidStr().c_str(), id, x, y, z );
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new PointMovementGenerator<Player>(id,x,y,z));
@@ -310,12 +310,12 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
 {
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        sLog.outError("%s attempt to seek assistance", m_owner->GetObjectGuid().GetString().c_str());
+        sLog.outError("%s attempt to seek assistance", m_owner->GetGuidStr().c_str());
     }
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s seek assistance (X: %f Y: %f Z: %f)",
-            m_owner->GetObjectGuid().GetString().c_str(), x, y, z );
+            m_owner->GetGuidStr().c_str(), x, y, z );
         Mutate(new AssistanceMovementGenerator(x,y,z));
     }
 }
@@ -324,12 +324,12 @@ void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
 {
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        sLog.outError("%s attempt to call distract after assistance", m_owner->GetObjectGuid().GetString().c_str());
+        sLog.outError("%s attempt to call distract after assistance", m_owner->GetGuidStr().c_str());
     }
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s is distracted after assistance call (Time: %u)",
-            m_owner->GetObjectGuid().GetString().c_str(), time );
+            m_owner->GetGuidStr().c_str(), time );
         Mutate(new AssistanceDistractMovementGenerator(time));
     }
 }
@@ -339,7 +339,7 @@ void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
     if (!enemy)
         return;
 
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s flee from %s", m_owner->GetObjectGuid().GetString().c_str(), enemy->GetObjectGuid().GetString().c_str());
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s flee from %s", m_owner->GetGuidStr().c_str(), enemy->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new FleeingMovementGenerator<Player>(enemy->GetGUID()));
@@ -358,18 +358,18 @@ void MotionMaster::MoveWaypoint()
     {
         if (GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
         {
-            sLog.outError("Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetObjectGuid().GetString().c_str(), m_owner->GetEntry());
+            sLog.outError("Creature %s (Entry %u) attempt to MoveWaypoint() but creature is already using waypoint", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
             return;
         }
 
         Creature* creature = (Creature*)m_owner;
 
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature %s (Entry %u) start MoveWaypoint()", m_owner->GetObjectGuid().GetString().c_str(), m_owner->GetEntry());
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature %s (Entry %u) start MoveWaypoint()", m_owner->GetGuidStr().c_str(), m_owner->GetEntry());
         Mutate(new WaypointMovementGenerator<Creature>(*creature));
     }
     else
     {
-        sLog.outError("Non-creature %s attempt to MoveWaypoint()", m_owner->GetObjectGuid().GetString().c_str());
+        sLog.outError("Non-creature %s attempt to MoveWaypoint()", m_owner->GetGuidStr().c_str());
     }
 }
 
@@ -379,26 +379,26 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
     {
         if (path < sTaxiPathNodesByPath.size())
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s taxi to (Path %u node %u)", m_owner->GetObjectGuid().GetString().c_str(), path, pathnode);
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s taxi to (Path %u node %u)", m_owner->GetGuidStr().c_str(), path, pathnode);
             FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(sTaxiPathNodesByPath[path],pathnode);
             Mutate(mgen);
         }
         else
         {
             sLog.outError("%s attempt taxi to (nonexistent Path %u node %u)",
-                m_owner->GetObjectGuid().GetString().c_str(), path, pathnode);
+                m_owner->GetGuidStr().c_str(), path, pathnode);
         }
     }
     else
     {
         sLog.outError("%s attempt taxi to (Path %u node %u)",
-            m_owner->GetObjectGuid().GetString().c_str(), path, pathnode);
+            m_owner->GetGuidStr().c_str(), path, pathnode);
     }
 }
 
 void MotionMaster::MoveDistract(uint32 timer)
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s distracted (timer: %u)", m_owner->GetObjectGuid().GetString().c_str(), timer);
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s distracted (timer: %u)", m_owner->GetGuidStr().c_str(), timer);
     DistractMovementGenerator* mgen = new DistractMovementGenerator(timer);
     Mutate(mgen);
 }

@@ -582,7 +582,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket & recv_data)
     ObjectGuid petitionGuid;
     recv_data >> petitionGuid;                              // petition guid
 
-    DEBUG_LOG("Petition %s declined by %s", petitionGuid.GetString().c_str(), _player->GetObjectGuid().GetString().c_str());
+    DEBUG_LOG("Petition %s declined by %s", petitionGuid.GetString().c_str(), _player->GetGuidStr().c_str());
 
     uint32 petitionLowGuid = petitionGuid.GetCounter();
 

@@ -1298,11 +1298,11 @@ void WorldSession::HandleFarSightOpcode( WorldPacket & recv_data )
     switch(op)
     {
         case 0:
-            DEBUG_LOG("Removed FarSight from %s", _player->GetObjectGuid().GetString().c_str());
+            DEBUG_LOG("Removed FarSight from %s", _player->GetGuidStr().c_str());
             _player->GetCamera().ResetView(false);
             break;
         case 1:
-            DEBUG_LOG("Added FarSight %s to %s", _player->GetFarSightGuid().GetString().c_str(), _player->GetObjectGuid().GetString().c_str());
+            DEBUG_LOG("Added FarSight %s to %s", _player->GetFarSightGuid().GetString().c_str(), _player->GetGuidStr().c_str());
             _player->GetCamera().SetView(obj, false);
             break;
     }
