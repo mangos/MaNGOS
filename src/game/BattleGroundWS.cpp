@@ -176,13 +176,13 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
 
     PlaySoundToAll(BG_WS_SOUND_FLAGS_RESPAWNED);
 
-    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGUID(team));
+    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGuid(team));
     if (obj)
         obj->Delete();
     else
-        sLog.outError("unknown droped flag bg, guid: %u",GUID_LOPART(GetDroppedFlagGUID(team)));
+        sLog.outError("Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
 
-    SetDroppedFlagGUID(0,team);
+    ClearDroppedFlagGuid(team);
 }
 
 void BattleGroundWS::EventPlayerCapturedFlag(Player *Source)
@@ -543,7 +543,7 @@ void BattleGroundWS::Reset()
 
     for(uint32 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
-        m_DroppedFlagGUID[i] = 0;
+        m_DroppedFlagGuid[i].Clear();
         m_FlagKeepers[i].Clear();
         m_FlagState[i]       = BG_WS_FLAG_STATE_ON_BASE;
         m_TeamScores[i]      = 0;

@@ -138,8 +138,9 @@ class BattleGroundWS : public BattleGround
         void UpdateFlagState(Team team, uint32 value);
         void UpdateTeamScore(Team team);
         void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
-        void SetDroppedFlagGUID(uint64 guid, Team team)  { m_DroppedFlagGUID[GetTeamIndexByTeamId(team)] = guid;}
-        uint64 GetDroppedFlagGUID(Team team)             { return m_DroppedFlagGUID[GetTeamIndexByTeamId(team)];}
+        void SetDroppedFlagGuid(ObjectGuid guid, Team team)  { m_DroppedFlagGuid[GetTeamIndexByTeamId(team)] = guid;}
+        void ClearDroppedFlagGuid(Team team)  { m_DroppedFlagGuid[GetTeamIndexByTeamId(team)].Clear();}
+        ObjectGuid const& GetDroppedFlagGuid(Team team) const { return m_DroppedFlagGuid[GetTeamIndexByTeamId(team)];}
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
         /* Scorekeeping */
@@ -150,7 +151,7 @@ class BattleGroundWS : public BattleGround
     private:
         ObjectGuid m_FlagKeepers[BG_TEAMS_COUNT];
 
-        uint64 m_DroppedFlagGUID[BG_TEAMS_COUNT];
+        ObjectGuid m_DroppedFlagGuid[BG_TEAMS_COUNT];
         uint8 m_FlagState[BG_TEAMS_COUNT];
         int32 m_FlagsTimer[BG_TEAMS_COUNT];
         int32 m_FlagsDropTimer[BG_TEAMS_COUNT];

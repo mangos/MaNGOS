@@ -273,8 +273,9 @@ class BattleGroundEY : public BattleGround
         void EndBattleGround(Team winner);
         void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
-        void SetDroppedFlagGUID(uint64 guid)       { m_DroppedFlagGUID = guid;}
-        uint64 GetDroppedFlagGUID() const          { return m_DroppedFlagGUID;}
+        void SetDroppedFlagGuid(ObjectGuid guid)     { m_DroppedFlagGuid = guid;}
+        void ClearDroppedFlagGuid()                  { m_DroppedFlagGuid.Clear();}
+        ObjectGuid const& GetDroppedFlagGuid() const { return m_DroppedFlagGuid;}
 
         /* Battleground Events */
         virtual void EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj);
@@ -308,7 +309,7 @@ class BattleGroundEY : public BattleGround
         uint32 m_Points_Trigger[BG_EY_NODES_MAX];
 
         ObjectGuid m_FlagKeeper;                            // keepers guid
-        uint64 m_DroppedFlagGUID;
+        ObjectGuid m_DroppedFlagGuid;
         uint8 m_FlagState;                                  // for checking flag state
         int32 m_FlagsTimer;
         int32 m_TowerCapCheckTimer;

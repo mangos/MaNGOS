@@ -418,7 +418,7 @@ void BattleGroundEY::Reset()
     m_HonorScoreTics[BG_TEAM_HORDE] = 0;
     m_FlagState = BG_EY_FLAG_STATE_ON_BASE;
     m_FlagKeeper.Clear();
-    m_DroppedFlagGUID = 0;
+    m_DroppedFlagGuid.Clear();
     m_PointAddingTimer = 0;
     m_TowerCapCheckTimer = 0;
     bool isBGWeekend = BattleGroundMgr::IsBGWeekend(GetTypeID());
@@ -459,13 +459,13 @@ void BattleGroundEY::RespawnFlagAfterDrop()
 {
     RespawnFlag(true);
 
-    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGUID());
+    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGuid());
     if (obj)
         obj->Delete();
     else
-        sLog.outError("BattleGroundEY: Unknown dropped flag guid: %u",GUID_LOPART(GetDroppedFlagGUID()));
+        sLog.outError("BattleGroundEY: Unknown dropped flag: %s", GetDroppedFlagGuid().GetString().c_str());
 
-    SetDroppedFlagGUID(0);
+    ClearDroppedFlagGuid();
 }
 
 void BattleGroundEY::HandleKillPlayer(Player *player, Player *killer)
