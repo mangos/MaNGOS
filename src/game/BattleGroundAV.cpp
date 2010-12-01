@@ -477,9 +477,9 @@ void BattleGroundAV::ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx
 bool BattleGroundAV::PlayerCanDoMineQuest(int32 GOId, Team team)
 {
     if (GOId == BG_AV_OBJECTID_MINE_N)
-        return (m_Mine_Owner[BG_AV_NORTH_MINE] == GetTeamIndexByTeamId(team));
+        return (m_Mine_Owner[BG_AV_NORTH_MINE] == GetAVTeamIndexByTeamId(team));
     if (GOId == BG_AV_OBJECTID_MINE_S)
-        return (m_Mine_Owner[BG_AV_SOUTH_MINE] == GetTeamIndexByTeamId(team));
+        return (m_Mine_Owner[BG_AV_SOUTH_MINE] == GetAVTeamIndexByTeamId(team));
     return true;                                            // cause it's no mine'object it is ok if this is true
 }
 
@@ -537,7 +537,7 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
 
     BattleGroundTeamIndex teamIdx = GetTeamIndexByTeamId(player->GetTeam());
 
-    if (m_Nodes[node].Owner == teamIdx || m_Nodes[node].State != POINT_ASSAULTED)
+    if (m_Nodes[node].Owner == BattleGroundAVTeamIndex(teamIdx) || m_Nodes[node].State != POINT_ASSAULTED)
         return;
     if( m_Nodes[node].TotalOwner == BG_AV_TEAM_NEUTRAL )    // initial snowfall capture
     {
@@ -549,7 +549,7 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
     }
 
     DEBUG_LOG("BattleGroundAV: player defends node: %i", node);
-    if (m_Nodes[node].PrevOwner != teamIdx)
+    if (m_Nodes[node].PrevOwner != BattleGroundAVTeamIndex(teamIdx))
     {
         sLog.outError("BattleGroundAV: player defends point which doesn't belong to his team %i", node);
         return;
@@ -583,7 +583,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
     // TODO implement quest 7101, 7081
     BattleGroundTeamIndex teamIdx  = GetTeamIndexByTeamId(player->GetTeam());
     DEBUG_LOG("BattleGroundAV: player assaults node %i", node);
-    if (m_Nodes[node].Owner == teamIdx || teamIdx == m_Nodes[node].TotalOwner)
+    if (m_Nodes[node].Owner == BattleGroundAVTeamIndex(teamIdx) || BattleGroundAVTeamIndex(teamIdx) == m_Nodes[node].TotalOwner)
         return;
 
     AssaultNode(node, teamIdx);                                // update nodeinfo variables
@@ -724,8 +724,8 @@ uint32 BattleGroundAV::GetNodeName(BG_AV_Nodes node)
 
 void BattleGroundAV::AssaultNode(BG_AV_Nodes node, BattleGroundTeamIndex teamIdx)
 {
-    MANGOS_ASSERT(m_Nodes[node].TotalOwner != teamIdx);
-    MANGOS_ASSERT(m_Nodes[node].Owner != teamIdx);
+    MANGOS_ASSERT(m_Nodes[node].TotalOwner != BattleGroundAVTeamIndex(teamIdx));
+    MANGOS_ASSERT(m_Nodes[node].Owner != BattleGroundAVTeamIndex(teamIdx));
     // only assault an assaulted node if no totalowner exists:
     MANGOS_ASSERT(m_Nodes[node].State != POINT_ASSAULTED || m_Nodes[node].TotalOwner == BG_AV_TEAM_NEUTRAL);
     // the timer gets another time, if the previous owner was 0 == Neutral
@@ -764,8 +764,8 @@ void BattleGroundAV::InitNode(BG_AV_Nodes node, BattleGroundAVTeamIndex teamIdx,
 
 void BattleGroundAV::DefendNode(BG_AV_Nodes node, BattleGroundTeamIndex teamIdx)
 {
-    MANGOS_ASSERT(m_Nodes[node].TotalOwner == teamIdx);
-    MANGOS_ASSERT(m_Nodes[node].Owner != teamIdx);
+    MANGOS_ASSERT(m_Nodes[node].TotalOwner == BattleGroundAVTeamIndex(teamIdx));
+    MANGOS_ASSERT(m_Nodes[node].Owner != BattleGroundAVTeamIndex(teamIdx));
     MANGOS_ASSERT(m_Nodes[node].State != POINT_CONTROLLED);
     m_Nodes[node].PrevOwner  = m_Nodes[node].Owner;
     m_Nodes[node].Owner      = BattleGroundAVTeamIndex(teamIdx);
