@@ -37,8 +37,8 @@ typedef std::map<uint32,time_t>                       AchievementCriteriaFailTim
 
 struct CriteriaProgress
 {
-    uint32 counter;
     time_t date;
+    uint32 counter;
     bool changed;
     bool timedCriteriaFailed;
 };
