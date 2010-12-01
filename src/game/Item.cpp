@@ -741,7 +741,7 @@ void Item::AddToUpdateQueueOf(Player *player)
         if (!player)
         {
             sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
-                GetObjectGuid().GetString().c_str(), GetOwnerGuid().GetString().c_str());
+                GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
     }
@@ -749,7 +749,7 @@ void Item::AddToUpdateQueueOf(Player *player)
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
         sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
-            GetObjectGuid().GetString().c_str(), GetOwnerGuid().GetString().c_str(), player->GetObjectGuid().GetString().c_str());
+            GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
 
@@ -771,7 +771,7 @@ void Item::RemoveFromUpdateQueueOf(Player *player)
         if (!player)
         {
             sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
-                GetObjectGuid().GetString().c_str(), GetOwnerGuid().GetString().c_str());
+                GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
     }
@@ -779,7 +779,7 @@ void Item::RemoveFromUpdateQueueOf(Player *player)
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
         sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
-            GetObjectGuid().GetString().c_str(), GetOwnerGuid().GetString().c_str(), player->GetObjectGuid().GetString().c_str());
+            GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
 

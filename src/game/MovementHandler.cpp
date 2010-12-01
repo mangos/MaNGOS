@@ -349,10 +349,12 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    if (Unit *pMover = ObjectAccessor::GetUnit(*GetPlayer(), guid))
-        GetPlayer()->SetMover(pMover);
-    else
-        GetPlayer()->SetMover(NULL);
+    if(_player->GetMover()->GetObjectGuid() != guid)
+    {
+        sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
+            _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
+        return;
+    }
 }
 
 void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
@@ -369,8 +371,8 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
     if(_player->GetMover()->GetObjectGuid() == old_mover_guid)
     {
         sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is %s and should be %s instead of %s",
-            _player->GetMover()->GetObjectGuid().GetString().c_str(),
-            _player->GetObjectGuid().GetString().c_str(),
+            _player->GetMover()->GetGuidStr().c_str(),
+            _player->GetGuidStr().c_str(),
             old_mover_guid.GetString().c_str());
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;

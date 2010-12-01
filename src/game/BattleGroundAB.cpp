@@ -182,10 +182,10 @@ void BattleGroundAB::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in the constructor
     BattleGroundABScore* sc = new BattleGroundABScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundAB::RemovePlayer(Player * /*plr*/, uint64 /*guid*/)
+void BattleGroundAB::RemovePlayer(Player * /*plr*/, ObjectGuid /*guid*/)
 {
 
 }
@@ -539,7 +539,7 @@ WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
 
 void BattleGroundAB::UpdatePlayerScore(Player *Source, uint32 type, uint32 value)
 {
-    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetGUID());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
     if( itr == m_PlayerScores.end() )                         // player not found...
         return;
 

@@ -80,13 +80,13 @@ void BattleGroundDS::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in constructor
     BattleGroundDSScore* sc = new BattleGroundDSScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 
     UpdateWorldState(0xe11, GetAlivePlayersCountByTeam(ALLIANCE));
     UpdateWorldState(0xe10, GetAlivePlayersCountByTeam(HORDE));
 }
 
-void BattleGroundDS::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
+void BattleGroundDS::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
     if (GetStatus() == STATUS_WAIT_LEAVE)
         return;

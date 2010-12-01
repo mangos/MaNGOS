@@ -1341,7 +1341,7 @@ bool InstanceMap::Add(Player *player)
                     if (playerBind)
                     {
                         sLog.outError("InstanceMap::Add: %s is being put in instance %d,%d,%d,%d,%d,%d but he is in group (Id: %d) and is bound to instance %d,%d,%d,%d,%d,%d!",
-                            player->GetObjectGuid().GetString().c_str(), GetInstanceSave()->GetMapId(), GetInstanceSave()->GetInstanceId(),
+                            player->GetGuidStr().c_str(), GetInstanceSave()->GetMapId(), GetInstanceSave()->GetInstanceId(),
                             GetInstanceSave()->GetDifficulty(), GetInstanceSave()->GetPlayerCount(), GetInstanceSave()->GetGroupCount(),
                             GetInstanceSave()->CanReset(), pGroup->GetId(),
                             playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(),
@@ -1366,7 +1366,7 @@ bool InstanceMap::Add(Player *player)
                         if (groupBind->save != GetInstanceSave())
                         {
                             sLog.outError("InstanceMap::Add: %s is being put in instance %d,%d,%d but he is in group (Id: %d) which is bound to instance %d,%d,%d!",
-                                player->GetObjectGuid().GetString().c_str(), GetInstanceSave()->GetMapId(),
+                                player->GetGuidStr().c_str(), GetInstanceSave()->GetMapId(),
                                 GetInstanceSave()->GetInstanceId(), GetInstanceSave()->GetDifficulty(),
                                 pGroup->GetId(), groupBind->save->GetMapId(),
                                 groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty());
@@ -1912,7 +1912,7 @@ void Map::ScriptsProcess()
                     case CHAT_TYPE_WHISPER:
                         if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetObjectGuid().GetString().c_str() : "<no target>");
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetGuidStr().c_str() : "<no target>");
                             break;
                         }
                         pSource->MonsterWhisper(textId, unitTarget);
@@ -1920,7 +1920,7 @@ void Map::ScriptsProcess()
                     case CHAT_TYPE_BOSS_WHISPER:
                         if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetObjectGuid().GetString().c_str() : "<no target>");
+                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetGuidStr().c_str() : "<no target>");
                             break;
                         }
                         pSource->MonsterWhisper(textId, unitTarget, true);

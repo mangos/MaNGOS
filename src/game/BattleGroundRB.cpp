@@ -54,10 +54,10 @@ void BattleGroundRB::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in constructor
     BattleGroundABGScore* sc = new BattleGroundABGScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundRB::RemovePlayer(Player* /*plr*/,uint64 /*guid*/)
+void BattleGroundRB::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 
 }
@@ -72,7 +72,7 @@ void BattleGroundRB::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
 void BattleGroundRB::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
 
-    std::map<uint64, BattleGroundScore*>::iterator itr = m_PlayerScores.find(Source->GetGUID());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
 
     if(itr == m_PlayerScores.end())                         // player not found...
         return;

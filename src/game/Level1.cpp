@@ -1803,10 +1803,10 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     std::string text    = msgText;
 
     // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL,m_session ? m_session->GetPlayer()->GetGUIDLow() : 0, MAIL_STATIONERY_GM);
+    MailSender sender(m_session ? m_session->GetPlayer() : NULL, MAIL_STATIONERY_GM);
 
     MailDraft(subject, text)
-        .SendMailTo(MailReceiver(target,GUID_LOPART(target_guid)),sender);
+        .SendMailTo(MailReceiver(target, target_guid),sender);
 
     std::string nameLink = playerLink(target_name);
     PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
