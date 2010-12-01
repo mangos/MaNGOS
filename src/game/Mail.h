@@ -33,6 +33,7 @@
 #define MANGOS_MAIL_H
 
 #include "Common.h"
+#include "ObjectGuid.h"
 #include <map>
 
 struct AuctionEntry;
