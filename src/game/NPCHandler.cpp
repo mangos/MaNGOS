@@ -414,16 +414,16 @@ void WorldSession::SendSpiritResurrect()
 
 void WorldSession::HandleBinderActivateOpcode( WorldPacket & recv_data )
 {
-    uint64 npcGUID;
-    recv_data >> npcGUID;
+    ObjectGuid npcGuid;
+    recv_data >> npcGuid;
 
     if(!GetPlayer()->IsInWorld() || !GetPlayer()->isAlive())
         return;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID,UNIT_NPC_FLAG_INNKEEPER);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid,UNIT_NPC_FLAG_INNKEEPER);
     if (!unit)
     {
-        DEBUG_LOG( "WORLD: HandleBinderActivateOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
+        DEBUG_LOG("WORLD: HandleBinderActivateOpcode - %s not found or you can't interact with him.", npcGuid.GetString().c_str());
         return;
     }
 
@@ -807,15 +807,16 @@ void WorldSession::HandleRepairItemOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: CMSG_REPAIR_ITEM");
 
-    uint64 npcGUID, itemGUID;
+    ObjectGuid npcGuid;
+    ObjectGuid itemGuid;
     uint8 guildBank;                                        // new in 2.3.2, bool that means from guild bank money
 
-    recv_data >> npcGUID >> itemGUID >> guildBank;
+    recv_data >> npcGuid >> itemGuid >> guildBank;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_REPAIR);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_REPAIR);
     if (!unit)
     {
-        DEBUG_LOG( "WORLD: HandleRepairItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
+        DEBUG_LOG( "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with him.", npcGuid.GetString().c_str());
         return;
     }
 
@@ -827,20 +828,20 @@ void WorldSession::HandleRepairItemOpcode( WorldPacket & recv_data )
     float discountMod = _player->GetReputationPriceDiscount(unit);
 
     uint32 TotalCost = 0;
-    if (itemGUID)
+    if (!itemGuid.IsEmpty())
     {
-        DEBUG_LOG("ITEM: Repair item, itemGUID = %u, npcGUID = %u", GUID_LOPART(itemGUID), GUID_LOPART(npcGUID));
+        DEBUG_LOG("ITEM: %s repair of %s", npcGuid.GetString().c_str(), itemGuid.GetString().c_str());
 
-        Item* item = _player->GetItemByGuid(itemGUID);
+        Item* item = _player->GetItemByGuid(itemGuid);
 
         if(item)
-            TotalCost= _player->DurabilityRepair(item->GetPos(),true,discountMod,guildBank>0?true:false);
+            TotalCost= _player->DurabilityRepair(item->GetPos(), true, discountMod, (guildBank > 0));
     }
     else
     {
-        DEBUG_LOG("ITEM: Repair all items, npcGUID = %u", GUID_LOPART(npcGUID));
+        DEBUG_LOG("ITEM: %s repair all items", npcGuid.GetString().c_str());
 
-        TotalCost = _player->DurabilityRepairAll(true,discountMod,guildBank>0?true:false);
+        TotalCost = _player->DurabilityRepairAll(true, discountMod, (guildBank > 0));
     }
     if (guildBank)
     {

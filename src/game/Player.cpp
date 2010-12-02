@@ -6605,10 +6605,10 @@ uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
     return id;
 }
 
-uint32 Player::GetRankFromDB(uint64 guid)
+uint32 Player::GetRankFromDB(ObjectGuid guid)
 {
-    QueryResult *result = CharacterDatabase.PQuery( "SELECT rank FROM guild_member WHERE guid='%u'", GUID_LOPART(guid) );
-    if( result )
+    QueryResult *result = CharacterDatabase.PQuery("SELECT rank FROM guild_member WHERE guid='%u'", guid.GetCounter());
+    if (result)
     {
         uint32 v = result->Fetch()[0].GetUInt32();
         delete result;
@@ -15035,9 +15035,9 @@ void Player::_LoadBGData(QueryResult* result)
     delete result;
 }
 
-bool Player::LoadPositionFromDB(uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight, uint64 guid)
+bool Player::LoadPositionFromDB(uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight, ObjectGuid guid)
 {
-    QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'",GUID_LOPART(guid));
+    QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'", guid.GetCounter());
     if(!result)
         return false;
 
@@ -17572,13 +17572,13 @@ void Player::SendAttackSwingNotInRange()
     GetSession()->SendPacket( &data );
 }
 
-void Player::SavePositionInDB(uint32 mapid, float x,float y,float z,float o,uint32 zone,uint64 guid)
+void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid)
 {
     std::ostringstream ss;
     ss << "UPDATE characters SET position_x='"<<x<<"',position_y='"<<y
         << "',position_z='"<<z<<"',orientation='"<<o<<"',map='"<<mapid
         << "',zone='"<<zone<<"',trans_x='0',trans_y='0',trans_z='0',"
-        << "transguid='0',taxi_path='' WHERE guid='"<< GUID_LOPART(guid) <<"'";
+        << "transguid='0',taxi_path='' WHERE guid='"<< guid.GetCounter() <<"'";
     DEBUG_LOG("%s", ss.str().c_str());
     CharacterDatabase.Execute(ss.str().c_str());
 }
@@ -18643,7 +18643,7 @@ void Player::InitDisplayIds()
 }
 
 // Return true is the bought item has a max count to force refresh of window by caller
-bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
+bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
     // cheating attempt
     if (count < 1) count = 1;
@@ -18658,11 +18658,11 @@ bool Player::BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 
         return false;
     }
 
-    Creature *pCreature = GetNPCIfCanInteractWith(vendorguid,UNIT_NPC_FLAG_VENDOR);
+    Creature *pCreature = GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
-        DEBUG_LOG( "WORLD: BuyItemFromVendor - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(vendorguid)) );
-        SendBuyError( BUY_ERR_DISTANCE_TOO_FAR, NULL, item, 0);
+        DEBUG_LOG("WORLD: BuyItemFromVendor - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
+        SendBuyError(BUY_ERR_DISTANCE_TOO_FAR, NULL, item, 0);
         return false;
     }
 

@@ -1228,14 +1228,14 @@ void WorldSession::HandleComplainOpcode( WorldPacket & recv_data )
     recv_data.hexlike();
 
     uint8 spam_type;                                        // 0 - mail, 1 - chat
-    uint64 spammer_guid;
+    ObjectGuid spammerGuid;
     uint32 unk1 = 0;
     uint32 unk2 = 0;
     uint32 unk3 = 0;
     uint32 unk4 = 0;
     std::string description = "";
     recv_data >> spam_type;                                 // unk 0x01 const, may be spam type (mail/chat)
-    recv_data >> spammer_guid;                              // player guid
+    recv_data >> spammerGuid;                               // player guid
     switch(spam_type)
     {
         case 0:
@@ -1260,7 +1260,7 @@ void WorldSession::HandleComplainOpcode( WorldPacket & recv_data )
     data << uint8(0);
     SendPacket(&data);
 
-    DEBUG_LOG("REPORT SPAM: type %u, guid %u, unk1 %u, unk2 %u, unk3 %u, unk4 %u, message %s", spam_type, GUID_LOPART(spammer_guid), unk1, unk2, unk3, unk4, description.c_str());
+    DEBUG_LOG("REPORT SPAM: type %u, spammer %s, unk1 %u, unk2 %u, unk3 %u, unk4 %u, message %s", spam_type, spammerGuid.GetString().c_str(), unk1, unk2, unk3, unk4, description.c_str());
 }
 
 void WorldSession::HandleRealmSplitOpcode( WorldPacket & recv_data )
