@@ -71,7 +71,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         uint64 const& GetCasterGUID() const { return m_casterGuid.GetRawValue(); }
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
         void SetCasterGuid(ObjectGuid guid) { m_casterGuid = guid; }
-        uint64 GetCastItemGUID() const { return m_castItemGuid; }
+        ObjectGuid const& GetCastItemGuid() const { return m_castItemGuid; }
         Unit* GetCaster() const;
         Unit* GetTarget() const { return m_target; }
         void SetTarget(Unit* target) { m_target = target; }
@@ -148,7 +148,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void SetLoadedState(ObjectGuid casterGUID, ObjectGuid itemGUID, int32 stackAmount, int32 charges)
         {
             m_casterGuid = casterGUID;
-            m_castItemGuid = itemGUID.GetRawValue();
+            m_castItemGuid = itemGUID;
             m_procCharges = charges;
             m_stackAmount = stackAmount;
         }
@@ -160,7 +160,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
     private:
         Unit* m_target;
         ObjectGuid m_casterGuid;
-        uint64 m_castItemGuid;                              // it is NOT safe to keep a pointer to the item because it may get deleted
+        ObjectGuid m_castItemGuid;                          // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
 
         SpellEntry const* m_spellProto;
@@ -375,7 +375,7 @@ class MANGOS_DLL_SPEC Aura
         
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
         uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
-        uint64 GetCastItemGUID() const { return GetHolder()->GetCastItemGUID(); }
+        uint64 GetCastItemGUID() const { return GetHolder()->GetCastItemGuid().GetRawValue(); }
         uint64 const& GetCasterGUID() const { return GetHolder()->GetCasterGUID(); }//can't be easy replaced by GetCasterGuid until AuraHolders backporting ig we don't want create additional problems for this.
         ObjectGuid GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
         Unit* GetCaster() const { return GetHolder()->GetCaster(); }
