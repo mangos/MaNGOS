@@ -8869,7 +8869,7 @@ void Spell::EffectRenamePet(SpellEffectIndex /*eff_idx*/)
         !((Creature*)unitTarget)->IsPet() || ((Pet*)unitTarget)->getPetType() != HUNTER_PET)
         return;
 
-    unitTarget->RemoveByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
+    unitTarget->SetByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
 }
 
 void Spell::EffectPlayMusic(SpellEffectIndex eff_idx)
