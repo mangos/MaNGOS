@@ -375,9 +375,9 @@ class MANGOS_DLL_SPEC Aura
         
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
         uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
-        uint64 GetCastItemGUID() const { return GetHolder()->GetCastItemGuid().GetRawValue(); }
+        ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         uint64 const& GetCasterGUID() const { return GetHolder()->GetCasterGUID(); }//can't be easy replaced by GetCasterGuid until AuraHolders backporting ig we don't want create additional problems for this.
-        ObjectGuid GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
+        ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
         Unit* GetCaster() const { return GetHolder()->GetCaster(); }
         Unit* GetTarget() const { return GetHolder()->GetTarget(); }
 
