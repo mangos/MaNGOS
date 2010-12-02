@@ -87,7 +87,7 @@ void WorldSession::HandleGroupInviteOpcode( WorldPacket & recv_data )
         return;
     }
     // just ignore us
-    if(player->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
+    if(player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
         return;
