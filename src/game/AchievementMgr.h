@@ -24,6 +24,7 @@
 #include "DBCEnums.h"
 #include "DBCStores.h"
 #include "SharedDefines.h"
+#include "ObjectGuid.h"
 
 #include <map>
 #include <string>
