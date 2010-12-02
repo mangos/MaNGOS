@@ -597,7 +597,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
+    if (pOther->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
         SendTradeStatus(TRADE_STATUS_IGNORE_YOU);
         return;

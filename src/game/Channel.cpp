@@ -623,7 +623,7 @@ void Channel::Invite(uint64 p, const char *newname)
     }
 
     WorldPacket data;
-    if(!newp->GetSocial()->HasIgnore(GUID_LOPART(p)))
+    if(!newp->GetSocial()->HasIgnore(p))
     {
         MakeInvite(&data, p);
         SendToOne(&data, newp->GetGUID());
@@ -668,7 +668,7 @@ void Channel::SendToAll(WorldPacket *data, uint64 p)
         Player *plr = sObjectMgr.GetPlayer(i->first);
         if(plr)
         {
-            if(!p || !plr->GetSocial()->HasIgnore(GUID_LOPART(p)))
+            if(!p || !plr->GetSocial()->HasIgnore(p))
                 plr->GetSession()->SendPacket(data);
         }
     }
