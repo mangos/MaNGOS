@@ -76,6 +76,6 @@ class Transport : public GameObject
         void TeleportTransport(uint32 newMapid, float x, float y, float z);
         void UpdateForMap(Map const* map);
         void DoEventIfAny(WayPointMap::value_type const& node, bool departure);
-        WayPointMap::const_iterator GetNextWayPoint();
+        void MoveToNextWayPoint();                          // move m_next/m_cur to next points
 };
 #endif

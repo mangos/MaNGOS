@@ -1094,7 +1094,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     }
 
     // check online security
-    if (HasLowerSecurity(chr, 0))
+    if (HasLowerSecurity(chr))
         return false;
 
     PSendSysMessage(LANG_YOU_CHANGE_SPELLMODS, opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct",

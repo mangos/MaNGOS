@@ -265,7 +265,7 @@ BattleGround::BattleGround()
     m_TeamScores[BG_TEAM_HORDE]         = 0;
 
     m_PrematureCountDown = false;
-    m_PrematureCountDown = 0;
+    m_PrematureCountDownTimer = 0;
 
     m_StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_2M;
     m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_1M;

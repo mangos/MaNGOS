@@ -55,13 +55,15 @@ void GMTicketMgr::LoadGMTickets()
 
         Field* fields = result->Fetch();
 
-        uint32 guid = fields[0].GetUInt32();
-        if (!guid)
+        uint32 guidlow = fields[0].GetUInt32();
+        if (!guidlow)
             continue;
+
+        ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, guidlow);
 
         GMTicket& ticket = m_GMTicketMap[guid];
 
-        if (ticket.GetPlayerLowGuid() != 0)                 // already exist
+        if (!ticket.GetPlayerGuid().IsEmpty())              // already exist
         {
             CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE ticket_id = '%u'", fields[4].GetUInt32());
             continue;
@@ -81,7 +83,7 @@ void GMTicketMgr::DeleteAll()
 {
     for(GMTicketMap::const_iterator itr = m_GMTicketMap.begin(); itr != m_GMTicketMap.end(); ++itr)
     {
-        if(Player* owner = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+        if(Player* owner = sObjectMgr.GetPlayer(itr->first))
             owner->GetSession()->SendGMTicketGetTicket(0x0A);
     }
     CharacterDatabase.Execute("DELETE FROM character_ticket");

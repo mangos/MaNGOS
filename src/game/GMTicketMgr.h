@@ -22,16 +22,17 @@
 #include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "Util.h"
+#include "ObjectGuid.h"
 #include <map>
 
 class GMTicket
 {
     public:
-        explicit GMTicket() : m_guid(0), m_lastUpdate(0)
+        explicit GMTicket() : m_lastUpdate(0)
         {
         }
 
-        void Init(uint32 guid, const std::string& text, const std::string& responsetext, time_t update)
+        void Init(ObjectGuid guid, const std::string& text, const std::string& responsetext, time_t update)
         {
             m_guid = guid;
             m_text = text;
@@ -39,7 +40,7 @@ class GMTicket
             m_lastUpdate =update;
         }
 
-        uint32 GetPlayerLowGuid() const
+        ObjectGuid const& GetPlayerGuid() const
         {
             return m_guid;
         }
@@ -66,7 +67,7 @@ class GMTicket
 
             std::string escapedString = m_text;
             CharacterDatabase.escape_string(escapedString);
-            CharacterDatabase.PExecute("UPDATE character_ticket SET ticket_text = '%s' WHERE guid = '%u'", escapedString.c_str(), m_guid);
+            CharacterDatabase.PExecute("UPDATE character_ticket SET ticket_text = '%s' WHERE guid = '%u'", escapedString.c_str(), m_guid.GetCounter());
         }
 
         void SetResponseText(const char* text)
@@ -76,14 +77,14 @@ class GMTicket
 
             std::string escapedString = m_responseText;
             CharacterDatabase.escape_string(escapedString);
-            CharacterDatabase.PExecute("UPDATE character_ticket SET response_text = '%s' WHERE guid = '%u'", escapedString.c_str(), m_guid);
+            CharacterDatabase.PExecute("UPDATE character_ticket SET response_text = '%s' WHERE guid = '%u'", escapedString.c_str(), m_guid.GetCounter());
         }
 
         bool HasResponse() { return !m_responseText.empty(); }
 
         void DeleteFromDB() const
         {
-            CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE guid = '%u' LIMIT 1", m_guid);
+            CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE guid = '%u' LIMIT 1", m_guid.GetCounter());
         }
 
         void SaveToDB() const
@@ -97,16 +98,16 @@ class GMTicket
             std::string escapedString2 = m_responseText;
             CharacterDatabase.escape_string(escapedString2);
 
-            CharacterDatabase.PExecute("INSERT INTO character_ticket (guid, ticket_text, response_text) VALUES ('%u', '%s', '%s')", m_guid, escapedString.c_str(), escapedString2.c_str());
+            CharacterDatabase.PExecute("INSERT INTO character_ticket (guid, ticket_text, response_text) VALUES ('%u', '%s', '%s')", m_guid.GetCounter(), escapedString.c_str(), escapedString2.c_str());
             CharacterDatabase.CommitTransaction();
         }
     private:
-        uint32 m_guid;
+        ObjectGuid m_guid;
         std::string m_text;
         std::string m_responseText;
         time_t m_lastUpdate;
 };
-typedef std::map<uint32, GMTicket> GMTicketMap;
+typedef std::map<ObjectGuid, GMTicket> GMTicketMap;
 typedef std::list<GMTicket*> GMTicketList;                  // for creating order access
 
 class GMTicketMgr
@@ -117,7 +118,7 @@ class GMTicketMgr
 
         void LoadGMTickets();
 
-        GMTicket* GetGMTicket(uint32 guid)
+        GMTicket* GetGMTicket(ObjectGuid guid)
         {
             GMTicketMap::iterator itr = m_GMTicketMap.find(guid);
             if(itr == m_GMTicketMap.end())
@@ -143,7 +144,7 @@ class GMTicketMgr
         }
 
 
-        void Delete(uint32 guid)
+        void Delete(ObjectGuid guid)
         {
             GMTicketMap::iterator itr = m_GMTicketMap.find(guid);
             if(itr == m_GMTicketMap.end())
@@ -155,10 +156,10 @@ class GMTicketMgr
 
         void DeleteAll();
 
-        void Create(uint32 guid, const char* text)
+        void Create(ObjectGuid guid, const char* text)
         {
             GMTicket& ticket = m_GMTicketMap[guid];
-            if (ticket.GetPlayerLowGuid() != 0)             // overwrite ticket
+            if (!ticket.GetPlayerGuid().IsEmpty())          // overwrite ticket
             {
                 ticket.DeleteFromDB();
                 m_GMTicketListByCreatingOrder.remove(&ticket);

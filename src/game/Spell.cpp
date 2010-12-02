@@ -466,7 +466,7 @@ bool Spell::FillCustomTargetMap(SpellEffectIndex i, UnitList &targetUnitMap)
                             break;
                         case TYPEID_CORPSE:
                             m_targets.setCorpseTarget((Corpse*)result);
-                            if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGUID()))
+                            if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGuid()))
                                 targetUnitMap.push_back(owner);
                             break;
                         default:
@@ -2669,7 +2669,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                                         break;
                                     case TYPEID_CORPSE:
                                         m_targets.setCorpseTarget((Corpse*)result);
-                                        if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGUID()))
+                                        if (Player* owner = ObjectAccessor::FindPlayer(((Corpse*)result)->GetOwnerGuid()))
                                             targetUnitMap.push_back(owner);
                                         break;
                                 }
@@ -2724,7 +2724,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         Corpse *corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGUID());
                         if(corpse)
                         {
-                            Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGUID());
+                            Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGuid());
                             if(owner)
                                 targetUnitMap.push_back(owner);
                         }
@@ -2780,7 +2780,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     else if (m_targets.getCorpseTargetGUID())
                     {
                         if (Corpse *corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGUID()))
-                            if (Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGUID()))
+                            if (Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGuid()))
                                 targetUnitMap.push_back(owner);
                     }
                     break;
@@ -6720,7 +6720,7 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
                 if(!corpse)
                     return false;
 
-                if(target->GetGUID() != corpse->GetOwnerGUID())
+                if(target->GetObjectGuid() != corpse->GetOwnerGuid())
                     return false;
 
                 if(!corpse->IsWithinLOSInMap(m_caster))

@@ -90,7 +90,7 @@ bool Corpse::Create( uint32 guidlow, Player *owner)
     }
 
     SetObjectScale(DEFAULT_OBJECT_SCALE);
-    SetUInt64Value( CORPSE_FIELD_OWNER, owner->GetGUID() );
+    SetGuidValue(CORPSE_FIELD_OWNER, owner->GetObjectGuid());
 
     m_grid = MaNGOS::ComputeGridPair(GetPositionX(), GetPositionY());
 
@@ -109,7 +109,7 @@ void Corpse::SaveToDB()
     std::ostringstream ss;
     ss  << "INSERT INTO corpse (guid,player,position_x,position_y,position_z,orientation,map,time,corpse_type,instance,phaseMask) VALUES ("
         << GetGUIDLow() << ", "
-        << GUID_LOPART(GetOwnerGUID()) << ", "
+        << GetOwnerGuid().GetCounter() << ", "
         << GetPositionX() << ", "
         << GetPositionY() << ", "
         << GetPositionZ() << ", "
@@ -143,7 +143,7 @@ void Corpse::DeleteFromDB()
     MANGOS_ASSERT(GetType() != CORPSE_BONES);
 
     // all corpses (not bones)
-    CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%u' AND corpse_type <> '0'",  GUID_LOPART(GetOwnerGUID()));
+    CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%u' AND corpse_type <> '0'",  GetOwnerGuid().GetCounter());
 }
 
 bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
@@ -166,7 +166,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 
     if(m_type >= MAX_CORPSE_TYPE)
     {
-        sLog.outError("Corpse (guidlow %d, owner %d) have wrong corpse type, not load.",GetGUIDLow(),GUID_LOPART(GetOwnerGUID()));
+        sLog.outError("%s Owner %s have wrong corpse type (%i), not load.", GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), m_type);
         return false;
     }
 
@@ -240,8 +240,8 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 
     if(!IsPositionValid())
     {
-        sLog.outError("Corpse (guidlow %d, owner %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-            GetGUIDLow(), GUID_LOPART(GetOwnerGUID()), GetPositionX(), GetPositionY());
+        sLog.outError("%s Owner %s not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), GetPositionX(), GetPositionY());
         return false;
     }
 
@@ -257,7 +257,7 @@ bool Corpse::isVisibleForInState(Player const* u, WorldObject const* viewPoint, 
 
 bool Corpse::IsHostileTo( Unit const* unit ) const
 {
-    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGUID()))
+    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGuid()))
         return owner->IsHostileTo(unit);
     else
         return false;
@@ -265,7 +265,7 @@ bool Corpse::IsHostileTo( Unit const* unit ) const
 
 bool Corpse::IsFriendlyTo( Unit const* unit ) const
 {
-    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGUID()))
+    if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGuid()))
         return owner->IsFriendlyTo(unit);
     else
         return true;
