@@ -198,7 +198,7 @@ bool CannibalizeObjectCheck::operator()(Corpse* u)
     if(u->GetType()==CORPSE_BONES)
         return false;
 
-    Player* owner = ObjectAccessor::FindPlayer(u->GetOwnerGUID());
+    Player* owner = ObjectAccessor::FindPlayer(u->GetOwnerGuid());
 
     if( !owner || i_fobj->IsFriendlyTo(owner))
         return false;
