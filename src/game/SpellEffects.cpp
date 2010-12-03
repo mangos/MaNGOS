@@ -7507,6 +7507,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch(m_spellInfo->Id)
             {
+                case 47962:                                 // Resque  inquired soldier
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(m_caster, m_spellInfo->CalculateSimpleValue(eff_idx), true);
+                    m_caster->CastSpell(m_caster, 47967, true);
+                    return;
+                }
                 case 64380:                                 // Shattering Throw
                 {
                     if (!unitTarget || !unitTarget->isAlive())

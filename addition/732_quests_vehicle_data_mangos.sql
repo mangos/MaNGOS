@@ -228,3 +228,37 @@ DELETE FROM `creature_template_addon` WHERE `entry` = 28782;
 DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (28782);
 INSERT INTO `npc_spellclick_spells` VALUES
 (28782, 46598, 0, 0, 0, 1);
+
+-- from lanc
+-- Infected Kodo fix quest (11690)
+UPDATE `creature_template` SET
+spell1 = 45877,
+spell2 = 0,
+spell3 = 0,
+spell4 = 0,
+spell5 = 0,
+spell6 = 0,
+VehicleId = 29
+WHERE `entry` IN (25596);
+
+INSERT IGNORE INTO `spell_script_target` VALUES (45877, 1, 25596);
+
+-- Horde Siege Tank
+UPDATE `creature_template` SET
+spell1 = 50672,
+spell2 = 45750,
+spell3 = 50677,
+spell4 = 47849,
+spell5 = 47962,
+spell6 = 0,
+VehicleId = 26
+WHERE `entry` IN (25334);
+
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (25334, 27107);
+INSERT INTO `npc_spellclick_spells` VALUES
+(25334, 47917, 11652, 1, 11652, 1);
+
+REPLACE INTO `spell_script_target` VALUES (47962, 1, 27107);
+
+REPLACE INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_start_active`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`) 
+VALUES ('47917','4027','11652','1','11652','0','0','2','0'), ('47917','4130','11652','1','11652','0','0','2','0');
