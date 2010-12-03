@@ -8250,6 +8250,22 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
         if (speed < min_speed)
             speed = min_speed;
     }
+
+    if (GetTypeId() == TYPEID_UNIT)
+    {
+        switch(mtype)
+        {
+        case MOVE_RUN:
+            speed *= ((Creature*)this)->GetCreatureInfo()->speed_run;
+            break;
+        case MOVE_WALK:
+            speed *= ((Creature*)this)->GetCreatureInfo()->speed_walk;
+            break;
+        default:
+            break;
+        }
+    }
+
     SetSpeedRate(mtype, speed * ratio, forced);
 }
 
