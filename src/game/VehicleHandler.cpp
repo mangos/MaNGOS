@@ -41,7 +41,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket &recv_data)
 
     bool dismiss = true;
 
-    if (GetPlayer()->GetVehicle()->GetVehicleInfo()->m_flags & VEHICLE_FLAG_NOT_DISMISS)
+    if (GetPlayer()->GetVehicle()->GetVehicleInfo()->m_flags & (VEHICLE_FLAG_NOT_DISMISS | SEAT_FLAG_HIDE_PASSENGER))
         dismiss = false;
 
     GetPlayer()->m_movementInfo = mi;
@@ -88,6 +88,9 @@ void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket &recv_data)
     VehicleKit* pVehicle = GetPlayer()->GetVehicle();
 
     if (!pVehicle)
+        return;
+
+    if (GetPlayer()->GetVehicle()->GetVehicleInfo()->m_flags & VEHICLE_FLAG_DISABLE_SWITCH)
         return;
 
     if (pVehicle->GetBase()->GetObjectGuid() == guid)
@@ -137,6 +140,10 @@ void WorldSession::HandleEjectPasenger(WorldPacket &recv_data)
         return;
 
     passenger->ExitVehicle();
+
+    // eject and remove creatures of player mounts
+    if (passenger->GetTypeId() == TYPEID_UNIT)
+        passenger->AddObjectToRemoveList();
 }
 
 void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data)
@@ -156,12 +163,12 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data)
     int8 seatId;
     recv_data >> seatId;
 
-    if (GetSecurity() <= SEC_PLAYER)  // Only for testing now!
-        return;
-
     VehicleKit* pVehicle = GetPlayer()->GetVehicle();
 
     if (!pVehicle)
+        return;
+
+    if (GetPlayer()->GetVehicle()->GetVehicleInfo()->m_flags & VEHICLE_FLAG_DISABLE_SWITCH)
         return;
 
     if(guid.GetRawValue() == guid2.GetRawValue())

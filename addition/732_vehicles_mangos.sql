@@ -274,3 +274,14 @@ WHERE `entry` IN (33060);
 UPDATE `creature_template` SET `IconName` = 'vehichleCursor', `PowerType` = 3,
 `spell1` = 62306, `spell2` = 62490, `spell3` = 62308, `spell4` =  62324, `AIName` = 'NullAI'
 WHERE `entry` IN (33109);
+
+-- from traponinet
+
+-- Salvaged Siege Turret
+UPDATE `creature_template` SET `PowerType`=3,spell1=62358,spell2=62359,spell3=64677,spell4=0,spell5=0,spell6=0 WHERE `entry`=33067;
+
+-- Salvaged Demolisher Mechanic Seat
+UPDATE `creature_template` SET `PowerType`=3,spell1=62634,spell2=64979,spell3=62479,spell4=62471,spell5=0,spell6=62428 WHERE `entry`=33167;
+
+-- Earthen Stoneshaper
+UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry`=33620;

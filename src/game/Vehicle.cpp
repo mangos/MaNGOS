@@ -52,7 +52,13 @@ void VehicleKit::RemoveAllPassengers()
     for (SeatMap::iterator itr = m_Seats.begin(); itr != m_Seats.end(); ++itr)
     {
         if (Unit *passenger = itr->second.passenger)
+        {
             passenger->ExitVehicle();
+
+            // remove creatures of player mounts
+            if (passenger->GetTypeId() == TYPEID_UNIT)
+                passenger->AddObjectToRemoveList();
+        }
     }
 }
 
@@ -260,7 +266,36 @@ void VehicleKit::RemovePassenger(Unit *passenger)
 
 void VehicleKit::Reset()
 {
+    InstallAllAccessories(m_pBase->GetEntry());
     UpdateFreeSeatCount();
+}
+
+void VehicleKit::InstallAllAccessories(uint32 entry)
+{
+    VehicleAccessoryList const* mVehicleList = sObjectMgr.GetVehicleAccessoryList(entry);
+    if (!mVehicleList)
+        return;
+
+    for (VehicleAccessoryList::const_iterator itr = mVehicleList->begin(); itr != mVehicleList->end(); ++itr)
+        InstallAccessory(itr->uiAccessory, itr->uiSeat, itr->bMinion);
+}
+
+void VehicleKit::InstallAccessory( uint32 entry, int8 seatId, bool minion)
+{
+    if (Unit *passenger = GetPassenger(seatId))
+    {
+        // already installed
+        if (passenger->GetEntry() == entry)
+            return;
+
+        passenger->ExitVehicle();
+    }
+
+    if (Creature *accessory = m_pBase->SummonCreature(entry, m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
+    {
+        accessory->EnterVehicle(this, seatId);
+        accessory->SendHeartBeat(false);
+    }
 }
 
 void VehicleKit::UpdateFreeSeatCount()
