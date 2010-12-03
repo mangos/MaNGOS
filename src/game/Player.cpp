@@ -18692,21 +18692,18 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
     if (crItem->item != item)                               // store diff item (cheating or special convert)
     {
-        ItemPrototype const* crProto = ObjectMgr::GetItemPrototype(crItem->item);
-        // possible item coverting for BoA case
-        if (crProto->Flags & ITEM_FLAG_BOA)
-        {
-            // convert if can use and then buy
-            if (crProto->RequiredReputationFaction && uint32(GetReputationRank(crProto->RequiredReputationFaction)) >= crProto->RequiredReputationRank)
-            {
-                uint32 newitemid = sObjectMgr.GetItemConvert(crItem->item, getRaceMask());
+        bool converted = false;
 
-                if (newitemid != item)                      // store diff item (cheating or special convert)
-                {
-                    SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
-                    return false;
-                }
-            }
+        // possible item converted for BoA case
+        ItemPrototype const* crProto = ObjectMgr::GetItemPrototype(crItem->item);
+        if (crProto->Flags & ITEM_FLAG_BOA && crProto->RequiredReputationFaction &&
+            uint32(GetReputationRank(crProto->RequiredReputationFaction)) >= crProto->RequiredReputationRank)
+            converted = item == sObjectMgr.GetItemConvert(crItem->item, getRaceMask());;
+
+        if(!converted)
+        {
+            SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, item, 0);
+            return false;
         }
     }
 
