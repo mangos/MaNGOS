@@ -1809,7 +1809,7 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint32 level)
 
 void Pet::ToggleAutocast(uint32 spellid, bool apply)
 {
-    if(IsPassiveSpell(spellid))
+    if(IsPassiveSpell(spellid) || !isControlled() || !IsInWorld())
         return;
 
     PetSpellMap::iterator itr = m_spells.find(spellid);
