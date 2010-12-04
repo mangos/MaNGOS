@@ -5672,7 +5672,10 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             {
                 need = true;
                 if(!target)
+                {
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                    DEBUG_LOG("Charmed creature attempt to cast spell %d, but no required target",m_spellInfo->Id);
+                }
                 break;
             }
         }
@@ -5683,13 +5686,19 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         if(_target)                                         //for target dead/target not valid
         {
-            if (!_target->isTargetableForAttack())
-                return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             if(IsPositiveSpell(m_spellInfo->Id) && !IsDispelSpell(m_spellInfo))
             {
                 if(m_caster->IsHostileTo(_target))
+                {
+                    DEBUG_LOG("Charmed creature attempt to cast positive spell %d, but target is hostile",m_spellInfo->Id);
                     return SPELL_FAILED_BAD_TARGETS;
+                }
+            }
+            else if (!_target->isTargetableForAttack())
+            {
+                DEBUG_LOG("Charmed creature attempt to cast spell %d, but target is not targetable",m_spellInfo->Id);
+                return SPELL_FAILED_BAD_TARGETS;            // guessed error
             }
             else
             {
