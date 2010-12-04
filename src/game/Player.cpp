@@ -697,7 +697,7 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     SetByteValue(PLAYER_BYTES, 0, skin);
     SetByteValue(PLAYER_BYTES, 1, face);
     SetByteValue(PLAYER_BYTES, 2, hairStyle);
-    SetByteValue(PLAYER_BYTES, 2, hairColor);
+    SetByteValue(PLAYER_BYTES, 3, hairColor);
 
     SetByteValue(PLAYER_BYTES_2, 0, facialHair);
     SetByteValue(PLAYER_BYTES_2, 3, 0x02);                  // rest state = normal
