@@ -16,6 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef SQLSTORAGE_IMPL_H
+#define SQLSTORAGE_IMPL_H
+
 #include "ProgressBar.h"
 #include "Log.h"
 #include "DBCFileLoader.h"
@@ -214,3 +217,5 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store)
     store.MaxEntry = maxi;
     store.data = _data;
 }
+
+#endif

@@ -485,6 +485,7 @@
     <ClCompile Include="..\..\src\game\SocialMgr.cpp" />
     <ClCompile Include="..\..\src\game\Spell.cpp" />
     <ClCompile Include="..\..\src\game\SpellAuras.cpp" />
+    <ClCompile Include="..\..\src\game\SQLStorages.cpp" />
     <ClCompile Include="..\..\src\game\UnitAuraProcHandler.cpp" />
     <ClCompile Include="..\..\src\game\SpellEffects.cpp" />
     <ClCompile Include="..\..\src\game\SpellHandler.cpp" />
@@ -634,6 +635,7 @@
     <ClInclude Include="..\..\src\game\SpellAuraDefines.h" />
     <ClInclude Include="..\..\src\game\SpellAuras.h" />
     <ClInclude Include="..\..\src\game\SpellMgr.h" />
+    <ClInclude Include="..\..\src\game\SQLStorages.h" />
     <ClInclude Include="..\..\src\game\TargetedMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\TemporarySummon.h" />
     <ClInclude Include="..\..\src\game\ThreatManager.h" />

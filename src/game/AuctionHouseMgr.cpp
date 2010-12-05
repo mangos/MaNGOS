@@ -18,7 +18,7 @@
 
 #include "AuctionHouseMgr.h"
 #include "Database/DatabaseEnv.h"
-#include "Database/SQLStorage.h"
+#include "SQLStorages.h"
 #include "DBCStores.h"
 #include "ProgressBar.h"
 
