@@ -117,9 +117,9 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
 
     if (seatId < 0) // no specific seat requirement
     {
-        seatId = GetNextEmptySeat(0, true);
-
-        seat   = m_Seats.find(seatId);
+        for (seat = m_Seats.begin(); seat != m_Seats.end(); ++seat)
+            if (!seat->second.passenger && (seat->second.seatInfo->IsUsable() || (seat->second.seatInfo->m_flags & SEAT_FLAG_UNCONTROLLED)))
+                break;
 
         if (seat == m_Seats.end()) // no available seat
             return false;
