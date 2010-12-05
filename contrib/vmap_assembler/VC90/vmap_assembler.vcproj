@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;NO_CORE_FUNCS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;NO_CORE_FUNCS"
 				RuntimeLibrary="2"
 				EnableEnhancedInstructionSet="1"
@@ -191,55 +191,55 @@
 			Name="vmaplib"
 			>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\BIH.cpp"
+				RelativePath="..\..\..\src\game\vmap\BIH.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\BIH.h"
+				RelativePath="..\..\..\src\game\vmap\BIH.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\MapTree.cpp"
+				RelativePath="..\..\..\src\game\vmap\MapTree.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\MapTree.h"
+				RelativePath="..\..\..\src\game\vmap\MapTree.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\ModelInstance.cpp"
+				RelativePath="..\..\..\src\game\vmap\ModelInstance.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\ModelInstance.h"
+				RelativePath="..\..\..\src\game\vmap\ModelInstance.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\TileAssembler.cpp"
+				RelativePath="..\..\..\src\game\vmap\TileAssembler.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\TileAssembler.h"
+				RelativePath="..\..\..\src\game\vmap\TileAssembler.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\VMapManager2.cpp"
+				RelativePath="..\..\..\src\game\vmap\VMapManager2.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\VMapManager2.h"
+				RelativePath="..\..\..\src\game\vmap\VMapManager2.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\VMapTools.h"
+				RelativePath="..\..\..\src\game\vmap\VMapTools.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\WorldModel.cpp"
+				RelativePath="..\..\..\src\game\vmap\WorldModel.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\shared\vmap\WorldModel.h"
+				RelativePath="..\..\..\src\game\vmap\WorldModel.h"
 				>
 			</File>
 		</Filter>
