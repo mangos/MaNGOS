@@ -252,6 +252,8 @@ libmangosgame_a_SOURCES = \
 	SocialMgr.h \
 	SpellMgr.cpp \
 	SpellMgr.h \
+	SQLStorages.cpp \
+	SQLStorages.h \
 	StatSystem.cpp \
 	TargetedMovementGenerator.cpp \
 	TargetedMovementGenerator.h \

@@ -399,6 +399,9 @@
     <ClCompile Include="..\..\src\game\Opcodes.cpp">
       <Filter>Server</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\SQLStorages.cpp">
+      <Filter>Server</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\game\WorldSession.cpp">
       <Filter>Server</Filter>
     </ClCompile>
@@ -811,6 +814,9 @@
       <Filter>Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\SharedDefines.h">
+      <Filter>Server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\SQLStorages.h">
       <Filter>Server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\WorldSession.h">

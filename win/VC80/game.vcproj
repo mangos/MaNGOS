@@ -1494,6 +1494,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\SQLStorages.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\SQLStorages.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\WorldSession.cpp"
 				>
 			</File>

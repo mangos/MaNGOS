@@ -18,7 +18,7 @@
 
 #include "InstanceSaveMgr.h"
 
-#include "Database/SQLStorage.h"
+#include "SQLStorages.h"
 #include "Player.h"
 #include "GridNotifiers.h"
 #include "Log.h"
