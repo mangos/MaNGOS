@@ -805,6 +805,13 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket & /**recv_data*/ )
  */
 MailSender::MailSender( Object* sender, MailStationery stationery ) : m_stationery(stationery)
 {
+    if (!sender) // mail sended from console
+    {
+        m_messageType = MAIL_NORMAL;
+        m_senderId = 0;
+        return;
+    }
+
     switch(sender->GetTypeId())
     {
         case TYPEID_UNIT:
