@@ -7314,21 +7314,23 @@ void Aura::PeriodicTick()
             if (!target->isAlive())
                 return;
 
+            Powers powerType = Powers(m_modifier.m_miscvalue);
+
             // ignore non positive values (can be result apply spellmods to aura damage
             uint32 amount = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
 
-            uint32 pdamage = uint32(target->GetMaxPower(POWER_MANA) * amount / 100);
+            uint32 pdamage = uint32(target->GetMaxPower(powerType) * amount / 100);
 
-            DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s energize %s for %u mana inflicted by %u",
-                GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, GetId());
+            DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s energize %s for %u power %u inflicted by %u",
+                GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, powerType, GetId());
 
-            if(target->GetMaxPower(POWER_MANA) == 0)
+            if(target->GetMaxPower(powerType) == 0)
                 break;
 
             SpellPeriodicAuraLogInfo pInfo(this, pdamage, 0, 0, 0, 0.0f);
             target->SendPeriodicAuraLog(&pInfo);
 
-            int32 gain = target->ModifyPower(POWER_MANA, pdamage);
+            int32 gain = target->ModifyPower(powerType, pdamage);
 
             if(Unit* pCaster = GetCaster())
                 target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f, spellProto);
