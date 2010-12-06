@@ -909,13 +909,13 @@ bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
     return false;
 }
 
-bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procEx, bool active) const
+bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procEx, bool active, bool useClassMask) const
 {
     // Check EffectClassMask
     uint32 const *ptr = getAuraSpellClassMask();
 
-    // if no class mask defined - allow proc
-    if (!((uint64*)ptr)[0] && !ptr[2])
+    // if no class mask defined, or spell_proc_event has SpellFamilyName=0 - allow proc
+    if (!useClassMask || (!((uint64*)ptr)[0] && !ptr[2]))
     {
         if (!(EventProcEx & PROC_EX_EX_TRIGGER_ALWAYS))
         {
