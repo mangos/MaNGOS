@@ -293,6 +293,7 @@ void VehicleKit::InstallAccessory( uint32 entry, int8 seatId, bool minion)
 
     if (Creature *accessory = m_pBase->SummonCreature(entry, m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
     {
+        accessory->SetCreatorGuid(ObjectGuid());
         accessory->EnterVehicle(this, seatId);
         accessory->SendHeartBeat(false);
     }
