@@ -726,6 +726,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Steady Shot',                        'Spell::EffectSchoolDMG'),
 (    0, 9,0x0000000100000000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Steady Shot',                        'Spell::EffectDummy'),
 (    0,-1,                -1,        -1,1989,  -1,  -1, -1, 42, 0,'Sudden Death',                       'Spell::EffectDummy'),
+(    0, 4,0x0000000000004000,        -1,  -1,  -1,  -1, -1,101, 0,'Sunder Armor',                       'Spell::EffectDummy'),
 (    0, 7,                -1,        -1, 961,  -1,  -1, -1,137,-1,'Survival of the Fittest',            'Aura::HandleShapeshiftBoosts'),
 (    0, 7,0x0010000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Swipe',                              'Spell::EffectSchoolDMG'),
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
