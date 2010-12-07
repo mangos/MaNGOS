@@ -271,60 +271,54 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode( WorldPacket & recv_data )
     ObjectGuid guid;
     recv_data >> guid >> quest >> reward;
 
-    if (reward >= QUEST_REWARD_CHOICES_COUNT)
+    if(reward >= QUEST_REWARD_CHOICES_COUNT)
     {
         sLog.outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName(), _player->GetGUIDLow(), reward);
         return;
     }
 
-    if (!GetPlayer()->isAlive())
+    if(!GetPlayer()->isAlive())
         return;
 
     DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_CHOOSE_REWARD npc = %s, quest = %u, reward = %u", guid.GetString().c_str(), quest, reward);
 
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-    if (!pObject)
+    if(!pObject)
         return;
 
-    if (!pObject->HasInvolvedQuest(quest))
+    if(!pObject->HasInvolvedQuest(quest))
         return;
 
     Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest);
-    if (!pQuest)
-        return;
-
-    if (pQuest->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))    // auto-reward quests not have choices so not use this opcode
-        return;
-
-    if (!_player->FindQuestSlot(quest))                     // not active quest
-        return;
-
-    if (_player->CanRewardQuest(pQuest, reward, true))
+    if( pQuest )
     {
-        _player->RewardQuest( pQuest, reward, pObject );
-
-        switch(pObject->GetTypeId())
+        if( _player->CanRewardQuest( pQuest, reward, true ) )
         {
-            case TYPEID_UNIT:
-                if (!(Script->ChooseReward(_player, ((Creature*)pObject), pQuest, reward)))
-                {
-                    // Send next quest
-                    if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
-                        _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
-                }
-                break;
-            case TYPEID_GAMEOBJECT:
-                if (!Script->GOChooseReward(_player, ((GameObject*)pObject), pQuest, reward))
-                {
-                    // Send next quest
-                    if (Quest const* nextquest = _player->GetNextQuest(guid ,pQuest))
-                        _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
-                }
-                break;
+            _player->RewardQuest( pQuest, reward, pObject );
+
+            switch(pObject->GetTypeId())
+            {
+                case TYPEID_UNIT:
+                    if (!(Script->ChooseReward(_player, ((Creature*)pObject), pQuest, reward)))
+                    {
+                        // Send next quest
+                        if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
+                            _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
+                    }
+                    break;
+                case TYPEID_GAMEOBJECT:
+                    if (!Script->GOChooseReward(_player, ((GameObject*)pObject), pQuest, reward))
+                    {
+                        // Send next quest
+                        if (Quest const* nextquest = _player->GetNextQuest(guid ,pQuest))
+                            _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
+                    }
+                    break;
+            }
         }
+        else
+            _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
     }
-    else
-        _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
 }
 
 void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data )
@@ -342,21 +336,14 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
     if (!pObject||!pObject->HasInvolvedQuest(quest))
         return;
 
-    Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest);
-    if (!pQuest)
-        return;
-
-    // not auto-reward internal quest and not in quest book
-    if (!_player->FindQuestSlot(quest) && !pQuest->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))
-        return;
-
     if (_player->CanCompleteQuest(quest))
         _player->CompleteQuest(quest);
 
     if (_player->GetQuestStatus(quest) != QUEST_STATUS_COMPLETE)
         return;
 
-    _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+    if (Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest))
+        _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
 }
 
 void WorldSession::HandleQuestgiverCancel(WorldPacket& /*recv_data*/ )
@@ -454,29 +441,22 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
 
     DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST npc = %s, quest = %u", guid.GetString().c_str(), quest);
 
-    Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest);
-    if (!pQuest)
-        return;
-
-    if (pQuest->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))    // auto-reward quests not listed in client so not use this opcode
-        return;
-
-    if (!_player->FindQuestSlot(quest))                     // quest not in quest book (not visible in client)
-        return;
-
-    if (_player->GetQuestStatus( quest ) != QUEST_STATUS_COMPLETE)
+    if (Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest))
     {
-        if (pQuest->IsRepeatable())
-            _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanCompleteRepeatableQuest(pQuest), false);
+        if (_player->GetQuestStatus( quest ) != QUEST_STATUS_COMPLETE)
+        {
+            if (pQuest->IsRepeatable())
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanCompleteRepeatableQuest(pQuest), false);
+            else
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest,false), false);
+        }
         else
-            _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest,false), false);
-    }
-    else
-    {
-        if (pQuest->GetReqItemsCount())                 // some items required
-            _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest,false), false);
-        else                                            // no items required
-            _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+        {
+            if (pQuest->GetReqItemsCount())                 // some items required
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest,false), false);
+            else                                            // no items required
+                _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+        }
     }
 }
 
@@ -492,61 +472,53 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 
     DEBUG_LOG("WORLD: Received CMSG_PUSHQUESTTOPARTY quest = %u", questId);
 
-    Quest const *pQuest = sObjectMgr.GetQuestTemplate(questId);
-    if (!pQuest)
-        return;
-
-    if (pQuest->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))    // auto-reward quests not listed in client so not use this opcode
-        return;
-
-    if (!_player->FindQuestSlot(questId))                   // quest not in quest book (not visible in client)
-        return;
-
-    Group* pGroup = _player->GetGroup();
-    if (!pGroup)
-        return;
-
-    for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+    if (Quest const *pQuest = sObjectMgr.GetQuestTemplate(questId))
     {
-        Player *pPlayer = itr->getSource();
-
-        if (!pPlayer || pPlayer == _player)         // skip self
-            continue;
-
-        _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_SHARING_QUEST);
-
-        if (!pPlayer->SatisfyQuestStatus(pQuest, false))
+        if (Group* pGroup = _player->GetGroup())
         {
-            _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_HAVE_QUEST);
-            continue;
-        }
+            for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+            {
+                Player *pPlayer = itr->getSource();
 
-        if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
-        {
-            _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_FINISH_QUEST);
-            continue;
-        }
+                if (!pPlayer || pPlayer == _player)         // skip self
+                    continue;
 
-        if (!pPlayer->CanTakeQuest(pQuest, false))
-        {
-            _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_CANT_TAKE_QUEST);
-            continue;
-        }
+                _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_SHARING_QUEST);
 
-        if (!pPlayer->SatisfyQuestLog(false))
-        {
-            _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_LOG_FULL);
-            continue;
-        }
+                if (!pPlayer->SatisfyQuestStatus(pQuest, false))
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_HAVE_QUEST);
+                    continue;
+                }
 
-        if (pPlayer->GetDivider() != 0)
-        {
-            _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_BUSY);
-            continue;
-        }
+                if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_FINISH_QUEST);
+                    continue;
+                }
 
-        pPlayer->PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, _player->GetObjectGuid(), true);
-        pPlayer->SetDivider(_player->GetGUID());
+                if (!pPlayer->CanTakeQuest(pQuest, false))
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_CANT_TAKE_QUEST);
+                    continue;
+                }
+
+                if (!pPlayer->SatisfyQuestLog(false))
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_LOG_FULL);
+                    continue;
+                }
+
+                if (pPlayer->GetDivider() != 0)
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_BUSY);
+                    continue;
+                }
+
+                pPlayer->PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, _player->GetObjectGuid(), true);
+                pPlayer->SetDivider(_player->GetGUID());
+            }
+        }
     }
 }
 
