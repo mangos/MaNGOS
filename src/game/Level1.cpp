@@ -1768,7 +1768,7 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     std::string text    = msgText;
 
     // from console show nonexistent sender
-    MailSender sender(m_session ? m_session->GetPlayer() : NULL, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
     MailDraft(subject, text)
         .SendMailTo(MailReceiver(target, target_guid),sender);

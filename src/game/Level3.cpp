@@ -6545,7 +6545,7 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
     }
 
     // from console show nonexistent sender
-    MailSender sender(m_session ? m_session->GetPlayer() : NULL, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
     // fill mail
     MailDraft draft(subject, text);
@@ -6597,7 +6597,7 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
     std::string text    = msgText;
 
     // from console show nonexistent sender
-    MailSender sender(m_session ? m_session->GetPlayer() : NULL, MAIL_STATIONERY_GM);
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
     MailDraft(subject, text)
         .AddMoney(money)
