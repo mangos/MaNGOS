@@ -2688,7 +2688,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     if (apply)
                     {
-                        if (target->m_form != FORM_CAT)
+                        if (target->GetShapeshiftForm() != FORM_CAT)
                             return;
 
                         target->CastSpell(target, 62071, true);
@@ -2773,7 +2773,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 if (apply)
                 {
-                    if (target->m_form != FORM_MOONKIN)
+                    if (target->GetShapeshiftForm() != FORM_MOONKIN)
                         return;
 
                     target->CastSpell(target, spell_id, true);
@@ -3123,7 +3123,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_MOONKIN:
         {
             // remove movement affects
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
             Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
             for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
             {
@@ -3159,8 +3159,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     if(apply)
     {
         // remove other shapeshift before applying a new one
-        if(target->m_ShapeShiftFormSpellId)
-            target->RemoveAurasDueToSpell(target->m_ShapeShiftFormSpellId, GetHolder());
+        target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
 
         // For Shadow Dance we must apply Stealth form (30) instead of current (13)
         target->SetByteValue(UNIT_FIELD_BYTES_2, 3, (form == FORM_SHADOW_DANCE) ? uint8(FORM_STEALTH) : form);
@@ -3241,8 +3240,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             }
         }
 
-        target->m_ShapeShiftFormSpellId = GetId();
-        target->m_form = form;
+        target->SetShapeshiftForm(form);
 
         // a form can give the player a new castbar with some spells.. this is a clientside process..
         // serverside just needs to register the new spells so that player isn't kicked as cheater
@@ -3256,11 +3254,9 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     {
         if(modelid > 0)
             target->SetDisplayId(target->GetNativeDisplayId());
-        target->SetByteValue(UNIT_FIELD_BYTES_2, 3, FORM_NONE);
         if(target->getClass() == CLASS_DRUID)
             target->setPowerType(POWER_MANA);
-        target->m_ShapeShiftFormSpellId = 0;
-        target->m_form = FORM_NONE;
+        target->SetShapeshiftForm(FORM_NONE);
 
         switch(form)
         {
@@ -3474,7 +3470,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
             //dismount polymorphed target (after patch 2.4.2)
             if (target->IsMounted())
-                target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED, GetHolder());
         }
     }
     else
@@ -3886,11 +3882,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
     if( apply )
     {
-        if (!target->GetCharmerGuid().IsEmpty())
-        {
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-        }
+        // is it really need after spell check checks?
+        target->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM, GetHolder());
+        target->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS, GetHolder());
 
         target->SetCharmerGuid(GetCasterGuid());
         target->setFaction(caster->getFaction());

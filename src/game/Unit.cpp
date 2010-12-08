@@ -200,7 +200,6 @@ Unit::Unit()
     m_extraAttacks = 0;
 
     m_state = 0;
-    m_form = FORM_NONE;
     m_deathState = ALIVE;
 
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
@@ -225,7 +224,6 @@ Unit::Unit()
     m_detectInvisibilityMask = 0;
     m_invisibilityMask = 0;
     m_transform = 0;
-    m_ShapeShiftFormSpellId = 0;
     m_canModifyStats = false;
 
     for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
@@ -599,21 +597,26 @@ bool Unit::canReachWithAttack(Unit *pVictim) const
 
 void Unit::RemoveSpellsCausingAura(AuraType auraType)
 {
-    if (auraType >= TOTAL_AURAS) return;
-    AuraList::const_iterator iter, next;
-    for (iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end(); iter = next)
+    for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
-        next = iter;
-        ++next;
+        RemoveAurasDueToSpell((*iter)->GetId());
+        iter = m_modAuras[auraType].begin();
+    }
+}
 
-        if (*iter)
+void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
+{
+    for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
+    {
+        // skip `except` aura
+        if ((*iter)->GetHolder() == except)
         {
-            RemoveAurasDueToSpell((*iter)->GetId());
-            if (!m_modAuras[auraType].empty())
-                next = m_modAuras[auraType].begin();
-            else
-                return;
+            ++iter;
+            continue;
         }
+
+        RemoveAurasDueToSpell((*iter)->GetId(), except);
+        iter = m_modAuras[auraType].begin();
     }
 }
 
@@ -2304,7 +2307,7 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
                 if (spellProto->SpellIconID == 2253)
                 {
                     //reduces all damage taken while Stunned and in Cat Form
-                    if (m_form == FORM_CAT && (unitflag & UNIT_FLAG_STUNNED))
+                    if (GetShapeshiftForm() == FORM_CAT && (unitflag & UNIT_FLAG_STUNNED))
                         RemainingDamage -= RemainingDamage * currentAbsorb / 100;
                     continue;
                 }
@@ -8730,7 +8733,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
     }
 
     // Remove Druid Dash bonus if not in Cat Form
-    if (m_form != FORM_CAT)
+    if (GetShapeshiftForm() != FORM_CAT)
     {
         AuraList const& speed_increase_auras = GetAurasByType(SPELL_AURA_MOD_INCREASE_SPEED);
         for(AuraList::const_iterator itr = speed_increase_auras.begin(); itr != speed_increase_auras.end(); ++itr)
@@ -9530,7 +9533,7 @@ uint32 Unit::GetCreatureType() const
 {
     if(GetTypeId() == TYPEID_PLAYER)
     {
-        SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(m_form);
+        SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(GetShapeshiftForm());
         if(ssEntry && ssEntry->creatureType > 0)
             return ssEntry->creatureType;
         else
@@ -10652,8 +10655,8 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                             (spellProcEvent->spellFamilyMask2[i] & procSpell->SpellFamilyFlags2) == 0)
                             continue;
                     }
-                    // don't check dbc FamilyFlags unless spellFamilyName != 0
-                    else if (!triggeredByAura->CanProcFrom(procSpell, spellProcEvent->procEx, procExtra, damage != 0, spellProcEvent->spellFamilyName != 0))
+                    // don't check dbc FamilyFlags if schoolMask exists
+                    else if (!triggeredByAura->CanProcFrom(procSpell, spellProcEvent->procEx, procExtra, damage != 0, !spellProcEvent->schoolMask))
                         continue;
                 }
                 else if (!triggeredByAura->CanProcFrom(procSpell, PROC_EX_NONE, procExtra, damage != 0, true))

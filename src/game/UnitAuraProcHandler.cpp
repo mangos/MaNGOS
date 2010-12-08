@@ -2379,7 +2379,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     {
                         case CLASS_DRUID:
                         {
-                            switch(m_form)
+                            switch(GetShapeshiftForm())
                             {
                                 case FORM_CAT:
                                 {
@@ -2454,7 +2454,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     {
                         case CLASS_DRUID:
                         {
-                            switch(m_form)
+                            switch(GetShapeshiftForm())
                             {
                                 case FORM_CAT:
                                 {
@@ -3650,7 +3650,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
             // Druid Forms Trinket
             if (auraSpellInfo->Id==37336)
             {
-                switch(m_form)
+                switch(GetShapeshiftForm())
                 {
                     case FORM_NONE:     trigger_spell_id = 37344;break;
                     case FORM_CAT:      trigger_spell_id = 37341;break;
@@ -3665,7 +3665,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
             // Druid T9 Feral Relic (Lacerate, Swipe, Mangle, and Shred)
             else if (auraSpellInfo->Id==67353)
             {
-                switch(m_form)
+                switch(GetShapeshiftForm())
                 {
                     case FORM_CAT:      trigger_spell_id = 67355; break;
                     case FORM_BEAR:

@@ -614,7 +614,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     m_caster->CastCustomSpell(m_caster, 32409, &damage, 0, 0, true);
                 }
                 // Improved Mind Blast (Mind Blast in shadow form bonus)
-                else if (m_caster->m_form == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00002000)))
+                else if (m_caster->GetShapeshiftForm() == FORM_SHADOW && (m_spellInfo->SpellFamilyFlags & UI64LIT(0x00002000)))
                 {
                     Unit::AuraList const& ImprMindBlast = m_caster->GetAurasByType(SPELL_AURA_ADD_FLAT_MODIFIER);
                     for(Unit::AuraList::const_iterator i = ImprMindBlast.begin(); i != ImprMindBlast.end(); ++i)
@@ -6109,6 +6109,31 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         unitTarget->CastSpell(unitTarget, spellId, true);
                     return;
                 }
+                case 22539:                                 // Shadow Flame (All script effects, not just end ones to
+                case 22972:                                 // prevent player from dodging the last triggered spell)
+                case 22975:
+                case 22976:
+                case 22977:
+                case 22978:
+                case 22979:
+                case 22980:
+                case 22981:
+                case 22982:
+                case 22983:
+                case 22984:
+                case 22985:
+                {
+                    if (!unitTarget || !unitTarget->isAlive())
+                        return;
+
+                    // Onyxia Scale Cloak
+                    if (unitTarget->GetDummyAura(22683))
+                        return;
+
+                    // Shadow Flame
+                    m_caster->CastSpell(unitTarget, 22682, true);
+                    return;
+                }
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                     unitTarget->RemoveAuraHolderFromStack(24575);
                     return;
@@ -6128,9 +6153,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
                     return;
                 }
-                case 26465:                                 // Mercurial Shield - need remove one 26464 Mercurial Shield aura
-                    unitTarget->RemoveAuraHolderFromStack(26464);
-                    return;
                 case 25140:                                 // Orb teleport spells
                 case 25143:
                 case 25650:
@@ -6161,31 +6183,19 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget,spellid,false);
                     return;
                 }
-                case 22539:                                 // Shadow Flame (All script effects, not just end ones to
-                case 22972:                                 // prevent player from dodging the last triggered spell)
-                case 22975:
-                case 22976:
-                case 22977:
-                case 22978:
-                case 22979:
-                case 22980:
-                case 22981:
-                case 22982:
-                case 22983:
-                case 22984:
-                case 22985:
+                case 26218:                                 // Mistletoe
                 {
-                    if (!unitTarget || !unitTarget->isAlive())
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    // Onyxia Scale Cloak
-                    if (unitTarget->GetDummyAura(22683))
-                        return;
+                    uint32 spells[3] = {26206, 26207, 45036};
 
-                    // Shadow Flame
-                    m_caster->CastSpell(unitTarget, 22682, true);
+                    m_caster->CastSpell(unitTarget, spells[urand(0, 2)], true);
                     return;
                 }
+                case 26465:                                 // Mercurial Shield - need remove one 26464 Mercurial Shield aura
+                    unitTarget->RemoveAuraHolderFromStack(26464);
+                    return;
                 case 26656:                                 // Summon Black Qiraji Battle Tank
                 {
                     if (!unitTarget)

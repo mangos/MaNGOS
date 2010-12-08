@@ -267,7 +267,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
             case CLASS_ROGUE:  val2 = level        + GetStat(STAT_AGILITY) - 10.0f;    break;
             case CLASS_WARRIOR:val2 = level        + GetStat(STAT_AGILITY) - 10.0f;    break;
             case CLASS_DRUID:
-                switch(m_form)
+                switch(GetShapeshiftForm())
                 {
                     case FORM_CAT:
                     case FORM_BEAR:
@@ -292,10 +292,11 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
             case CLASS_SHAMAN:       val2 = level*2.0f + GetStat(STAT_STRENGTH) + GetStat(STAT_AGILITY) - 20.0f; break;
             case CLASS_DRUID:
             {
+                ShapeshiftForm form = GetShapeshiftForm();
                 //Check if Predatory Strikes is skilled
                 float mLevelBonus = 0.0f;
                 float mBonusWeaponAtt = 0.0f;
-                switch(m_form)
+                switch(form)
                 {
                     case FORM_CAT:
                     case FORM_BEAR:
@@ -323,7 +324,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged )
                     default: break;
                 }
 
-                switch(m_form)
+                switch(form)
                 {
                     case FORM_CAT:
                         val2 = GetStat(STAT_STRENGTH)*2.0f + GetStat(STAT_AGILITY) - 20.0f + mLevelBonus + m_baseFeralAP + mBonusWeaponAtt; break;
