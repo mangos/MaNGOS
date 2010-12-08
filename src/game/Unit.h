@@ -1160,7 +1160,7 @@ enum IgnoreUnitState
 };
 
 typedef std::set<uint64> GuardianPetList;
-typedef std::set<uint64> GroupPetList;
+typedef std::set<ObjectGuid> GroupPetList;
 
 // delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200

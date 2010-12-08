@@ -6294,12 +6294,12 @@ void Unit::SetCharm(Unit* pet)
 void Unit::AddPetToList(Pet* pet)
 {
     if (pet)
-        m_groupPets.insert(pet->GetGUID());
+        m_groupPets.insert(pet->GetObjectGuid());
 }
 
 void Unit::RemovePetFromList(Pet* pet)
 {
-    m_groupPets.erase(pet->GetGUID());
+    m_groupPets.erase(pet->GetObjectGuid());
 
     GroupPetList m_groupPetsTmp = GetPets();
     for(GroupPetList::const_iterator itr = m_groupPetsTmp.begin(); itr != m_groupPetsTmp.end(); ++itr)
