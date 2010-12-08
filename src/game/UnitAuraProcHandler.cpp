@@ -1119,6 +1119,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     }
                     break;
                 }
+                // Necrotic Touch item 50692
+                case 71875:
+                case 71877:
+                {
+                    basepoints[0] = damage * triggerAmount / 100;
+                    target = pVictim;
+                    triggered_spell_id = 71879;
+                    break;
+                }
             }
             break;
         }
