@@ -792,6 +792,11 @@ void Spell::prepareDataForTriggerSystem()
                 if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0001000900B80400))
                     m_canTrigger = true;
                 break;
+            case SPELLFAMILY_WARRIOR:
+                //For Whirlwind triggers need do it
+                if (m_spellInfo->Id== 50622)
+                    m_canTrigger = true;
+                break;
             default:
                 break;
         }
