@@ -76,6 +76,7 @@ const char MailTemplateEntryfmt[]="nxxxxxxxxxxxxxxxxxssssssssssssssssx";
 const char MapEntryfmt[]="nxixxssssssssssssssssxixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxixiffxixx";
 const char MapDifficultyEntryfmt[]="diixxxxxxxxxxxxxxxxxiix";
 const char MovieEntryfmt[]="nxx";
+const char OverrideSpellDatafmt[]="niiiiiiiiiix";
 const char QuestFactionRewardfmt[]="niiiiiiiiii";
 const char QuestSortEntryfmt[]="nxxxxxxxxxxxxxxxxx";
 const char QuestXPLevelfmt[]="niiiiiiiiix";
