@@ -120,6 +120,9 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
         void SaveAllPlayers();
 
+        // Pet access
+        static Pet* FindPet(ObjectGuid guid);               // if need pet at specific map better use Map::GetPet
+
         // Corpse access
         Corpse* GetCorpseForPlayerGUID(ObjectGuid guid);
         static Corpse* GetCorpseInMap(ObjectGuid guid, uint32 mapid);
