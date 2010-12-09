@@ -248,7 +248,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraModIncreaseEnergyPercent(bool Apply, bool Real);
         void HandleAuraModIncreaseHealthPercent(bool Apply, bool Real);
         void HandleAuraModRegenInterrupt(bool Apply, bool Real);
-        void HandleHaste(bool Apply, bool Real);
+        void HandleModMeleeSpeedPct(bool Apply, bool Real);
         void HandlePeriodicTriggerSpell(bool Apply, bool Real);
         void HandlePeriodicTriggerSpellWithValue(bool apply, bool Real);
         void HandlePeriodicEnergize(bool Apply, bool Real);
