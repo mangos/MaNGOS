@@ -1954,11 +1954,14 @@ void World::UpdateSessions( uint32 diff )
         next = itr;
         ++next;
         ///- and remove not active sessions from the list
-        if(!itr->second->Update(diff))                      // As interval = 0
+        WorldSession * pSession = itr->second;
+        WorldSessionFilter updater(pSession);
+
+        if(!pSession->Update(diff, updater))    // As interval = 0
         {
-            RemoveQueuedSession (itr->second);
-            delete itr->second;
+            RemoveQueuedSession(pSession);
             m_sessions.erase(itr);
+            delete pSession;
         }
     }
 }
