@@ -6079,9 +6079,8 @@ Unit* Unit::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectIndex eff)
                 if (magnet->isAlive() && magnet->IsWithinLOSInMap(this) && spell->CheckTarget(magnet, eff))
                 {
                     if (SpellAuraHolder *holder = (*itr)->GetHolder())
-                        if (holder->GetAuraCharges())
-                            if (holder->DropAuraCharge())
-                                victim->RemoveSpellAuraHolder(holder);
+                        if (holder->DropAuraCharge())
+                            victim->RemoveSpellAuraHolder(holder);
                     return magnet;
                 }
             }
@@ -6100,9 +6099,8 @@ Unit* Unit::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectIndex eff)
                     if (roll_chance_i((*i)->GetModifier()->m_amount))
                     {
                         if (SpellAuraHolder *holder = (*i)->GetHolder())
-                            if (holder->GetAuraCharges())
-                                if (holder->DropAuraCharge())
-                                    victim->RemoveSpellAuraHolder(holder);
+                            if (holder->DropAuraCharge())
+                                victim->RemoveSpellAuraHolder(holder);
                         return magnet;
                     }
                 }
