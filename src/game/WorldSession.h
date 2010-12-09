@@ -45,6 +45,7 @@ class LoginQueryHolder;
 class CharacterHandler;
 class GMTicket;
 class MovementInfo;
+class WorldSession;
 
 struct OpcodeHandler;
 
