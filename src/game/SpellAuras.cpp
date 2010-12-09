@@ -2301,6 +2301,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 56511:                                     // Towers of Certain Doom: Tower Bunny Smoke Flare Effect
+            {
+                // Towers of Certain Doom: Skorn Cannonfire
+                if (m_removeMode == AURA_REMOVE_BY_DEFAULT)
+                    target->CastSpell(target, 43069, true);
+
+                return;
+            }
             case 58600:                                     // Restricted Flight Area
             {
                 AreaTableEntry const* area = GetAreaEntryByAreaID(target->GetAreaId());
