@@ -4633,7 +4633,7 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
     }
 
     // protectors allowed only in single amount
-    if (petType = PROTECTOR_PET)
+    if (petType == PROTECTOR_PET)
         if (Pet* old_protector = m_caster->GetProtectorPet())
             old_protector->Unsummon(PET_SAVE_AS_DELETED, m_caster);
 
