@@ -205,7 +205,7 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
     passenger->SendMonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
 
     if (m_pBase->GetTypeId() == TYPEID_UNIT)
-        RelocatePassengers(m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ(), m_pBase->GetOrientation());
+        RelocatePassengers(m_pBase->GetPositionX(), m_pBase->GetPositionY(), m_pBase->GetPositionZ()+0.5f, m_pBase->GetOrientation());
 
     UpdateFreeSeatCount();
     return true;
@@ -264,7 +264,7 @@ void VehicleKit::RemovePassenger(Unit *passenger)
 
         WorldPacket data(SMSG_FORCE_MOVE_UNROOT, 8+4);
         data << passenger->GetPackGUID();
-        data << uint32(0);
+        data << uint32(2);
         passenger->SendMessageToSet(&data, true);
 
         ((Player*)passenger)->ResummonPetTemporaryUnSummonedIfAny();
