@@ -40,12 +40,12 @@ class Player;
 class Unit;
 class WorldPacket;
 class WorldSocket;
-class WorldSession;
 class QueryResult;
 class LoginQueryHolder;
 class CharacterHandler;
 class GMTicket;
 class MovementInfo;
+class WorldSession;
 
 struct OpcodeHandler;
 
@@ -148,37 +148,37 @@ enum TutorialDataState
 //allows to determine if next packet is safe to be processed
 class PacketFilter
 {
-public:
-    explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
-    virtual ~PacketFilter() {}
+    public:
+        explicit PacketFilter(WorldSession * pSession) : m_pSession(pSession) {}
+        virtual ~PacketFilter() {}
 
-    virtual bool Process(WorldPacket* packet) { return true; }
-    virtual bool ProcessLogout() const { return true; }
+        virtual bool Process(WorldPacket * packet) { return true; }
+        virtual bool ProcessLogout() const { return true; }
 
-protected:
-    WorldSession * const m_pSession;
+    protected:
+        WorldSession * const m_pSession;
 };
 //process only thread-safe packets in Map::Update()
 class MapSessionFilter : public PacketFilter
 {
-public:
-    explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~MapSessionFilter() {}
+    public:
+        explicit MapSessionFilter(WorldSession * pSession) : PacketFilter(pSession) {}
+        ~MapSessionFilter() {}
 
-    virtual bool Process(WorldPacket* packet);
-    //in Map::Update() we do not process player logout!
-    virtual bool ProcessLogout() const { return false; }
+        virtual bool Process(WorldPacket * packet);
+        //in Map::Update() we do not process player logout!
+        virtual bool ProcessLogout() const { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
 //in order to update only be used in World::UpdateSessions()
 class WorldSessionFilter : public PacketFilter
 {
-public:
-    explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~WorldSessionFilter() {}
+    public:
+        explicit WorldSessionFilter(WorldSession * pSession) : PacketFilter(pSession) {}
+        ~WorldSessionFilter() {}
 
-    virtual bool Process(WorldPacket* packet);
+        virtual bool Process(WorldPacket* packet);
 };
 
 /// Player session in the World
