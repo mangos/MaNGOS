@@ -835,6 +835,9 @@ void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
         return;
 
     SpellEntry const* trapSpell = sSpellStore.LookupEntry(trapInfo->trap.spellId);
+
+    // TODO: allow all traps to be activated, some are without spell
+    // but will have animation and/or are expected to despawn
     if(!trapSpell)                                          // checked at load already
         return;
 
@@ -843,14 +846,17 @@ void GameObject::TriggeringLinkedGameObject( uint32 trapEntry, Unit* target)
     // search nearest linked GO
     GameObject* trapGO = NULL;
     {
-        // using original GO distance
-        MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*target,trapEntry,range);
-        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(trapGO,go_check);
+        // search closest with base of used GO, using max range of trap spell as search radius
+        MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*this, trapEntry, range);
+        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(trapGO, go_check);
 
         Cell::VisitGridObjects(this, checker, range);
     }
 
     // found correct GO
+
+    // TODO: handle the GO with Use()
+
     // FIXME: when GO casting will be implemented trap must cast spell to target
     if(trapGO)
         target->CastSpell(target, trapSpell, true, NULL, NULL, GetGUID());
