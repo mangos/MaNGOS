@@ -1892,8 +1892,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_AREAEFFECT_GO_AROUND_DEST:
         {
-            // It may be possible to fill targets for some spell effects 
-            // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but 
+            // It may be possible to fill targets for some spell effects
+            // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but
             // for some/most spells we clearly need/want to limit with spell_target_script
 
             // Some spells untested, for affected GO type 33. May need further adjustments for spells related.
