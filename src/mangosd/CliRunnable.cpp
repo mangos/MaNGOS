@@ -410,13 +410,13 @@ bool ChatHandler::HandleCharacterDeletedOldCommand(char* args)
 bool ChatHandler::HandleCharacterEraseCommand(char* args)
 {
     char* nameStr = ExtractLiteralArg(&args);
-    if (!*nameStr)
+    if (!nameStr)
         return false;
 
     Player* target;
     ObjectGuid target_guid;
     std::string target_name;
-    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+    if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
         return false;
 
     uint32 account_id;
