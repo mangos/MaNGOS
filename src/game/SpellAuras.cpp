@@ -6265,6 +6265,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             break;
         case FORM_SHADOW:
             spellId1 = 49868;
+            spellId2 = 71167;
 
             if(target->GetTypeId() == TYPEID_PLAYER)      // Spell 49868 have same category as main form spell and share cooldown
                 ((Player*)target)->RemoveSpellCooldown(49868);
