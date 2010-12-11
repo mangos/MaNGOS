@@ -224,15 +224,20 @@ class MANGOS_DLL_SPEC Object
             return (m_uint32Values[ index ] & flag) != 0;
         }
 
+        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        {
+            if (apply)
+                SetFlag(index, flag);
+            else
+                RemoveFlag(index, flag);
+        }
+
         void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
         void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
 
-        void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
-        void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
-
-        void ToggleFlag( uint16 index, uint8 offset, uint8 flag )
+        void ToggleByteFlag( uint16 index, uint8 offset, uint8 flag )
         {
-            if(HasByteFlag(index, offset, flag))
+            if (HasByteFlag(index, offset, flag))
                 RemoveByteFlag(index, offset, flag);
             else
                 SetByteFlag(index, offset, flag);
@@ -245,9 +250,37 @@ class MANGOS_DLL_SPEC Object
             return (((uint8*)&m_uint32Values[index])[offset] & flag) != 0;
         }
 
-        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        void ApplyModByteFlag( uint16 index, uint8 offset, uint32 flag, bool apply)
         {
-            if(apply) SetFlag(index,flag); else RemoveFlag(index,flag);
+            if (apply)
+                SetByteFlag(index, offset, flag);
+            else
+                RemoveByteFlag(index, offset, flag);
+        }
+
+        void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
+        void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
+
+        void ToggleShortFlag( uint16 index, bool highpart, uint8 flag )
+        {
+            if (HasShortFlag(index, highpart, flag))
+                RemoveShortFlag(index, highpart, flag);
+            else
+                SetShortFlag(index, highpart, flag);
+        }
+
+        bool HasShortFlag( uint16 index, bool highpart, uint8 flag ) const
+        {
+            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            return (((uint16*)&m_uint32Values[index])[highpart ? 1 : 0] & flag) != 0;
+        }
+
+        void ApplyModShortFlag( uint16 index, bool highpart, uint32 flag, bool apply)
+        {
+            if (apply)
+                SetShortFlag(index, highpart, flag);
+            else
+                RemoveShortFlag(index, highpart, flag);
         }
 
         void SetFlag64( uint16 index, uint64 newFlag )
@@ -266,7 +299,7 @@ class MANGOS_DLL_SPEC Object
 
         void ToggleFlag64( uint16 index, uint64 flag)
         {
-            if(HasFlag64(index, flag))
+            if (HasFlag64(index, flag))
                 RemoveFlag64(index, flag);
             else
                 SetFlag64(index, flag);
@@ -280,7 +313,10 @@ class MANGOS_DLL_SPEC Object
 
         void ApplyModFlag64( uint16 index, uint64 flag, bool apply)
         {
-            if(apply) SetFlag64(index,flag); else RemoveFlag64(index, flag);
+            if (apply)
+                SetFlag64(index, flag);
+            else
+                RemoveFlag64(index, flag);
         }
 
         void ClearUpdateMask(bool remove);
