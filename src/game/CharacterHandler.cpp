@@ -784,7 +784,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     if (pCurrChar->isGameMaster())
         SendNotification(LANG_GM_ON);
 
-    if (pCurrChar->isGMVisible())
+    if (!pCurrChar->isGMVisible())
         SendNotification(LANG_INVISIBLE_INVISIBLE);
 
     std::string IP_str = GetRemoteAddress();
