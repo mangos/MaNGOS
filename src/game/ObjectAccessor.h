@@ -138,6 +138,10 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void RemoveObject(Corpse *object) { HashMapHolder<Corpse>::Remove(object); }
         void RemoveObject(Player *object) { HashMapHolder<Player>::Remove(object); }
 
+        // For call from Pet AddToWorld/RemoveFromWorld only
+        void AddObject(Pet* object) { HashMapHolder<Pet>::Insert(object); }
+        void RemoveObject(Pet* object) { HashMapHolder<Pet>::Remove(object); }
+
         // TODO: This methods will need lock in MT environment
         static void LinkMap(Map* map)   { ACE_Guard<ACE_Thread_Mutex> guard(m_Lock); i_mapList.push_back(map); }
         static void DelinkMap(Map* map) { ACE_Guard<ACE_Thread_Mutex> guard(m_Lock); i_mapList.remove(map); }
