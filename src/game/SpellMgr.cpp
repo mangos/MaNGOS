@@ -2964,7 +2964,9 @@ void SpellMgr::LoadSpellScriptTarget()
                 spellProto->EffectImplicitTargetA[i] == TARGET_AREAEFFECT_INSTANT ||
                 spellProto->EffectImplicitTargetB[i] == TARGET_AREAEFFECT_INSTANT ||
                 spellProto->EffectImplicitTargetA[i] == TARGET_AREAEFFECT_CUSTOM ||
-                spellProto->EffectImplicitTargetB[i] == TARGET_AREAEFFECT_CUSTOM)
+                spellProto->EffectImplicitTargetB[i] == TARGET_AREAEFFECT_CUSTOM ||
+                spellProto->EffectImplicitTargetA[i] == TARGET_AREAEFFECT_GO_AROUND_DEST ||
+                spellProto->EffectImplicitTargetB[i] == TARGET_AREAEFFECT_GO_AROUND_DEST)
             {
                 targetfound = true;
                 break;

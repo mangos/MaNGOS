@@ -1588,7 +1588,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         case TARGET_TOTEM_FIRE:
         case TARGET_SELF:
         case TARGET_SELF2:
-        case TARGET_AREAEFFECT_CUSTOM_2:
             targetUnitMap.push_back(m_caster);
             break;
         case TARGET_RANDOM_ENEMY_CHAIN_IN_AREA:
@@ -1889,6 +1888,37 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         ++itr;
                 }
             }
+            break;
+        }
+        case TARGET_AREAEFFECT_GO_AROUND_DEST:
+        {
+            // It may be possible to fill targets for some spell effects 
+            // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but 
+            // for some/most spells we clearly need/want to limit with spell_target_script
+
+            // Some spells untested, for affected GO type 33. May need further adjustments for spells related.
+
+            SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
+
+            std::list<GameObject*> tempTargetGOList;
+
+            for(SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
+            {
+                if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
+                {
+                    // search all GO's with entry, within range of m_destN
+                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, radius);
+                    MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
+                    Cell::VisitGridObjects(m_caster, checker, radius);
+                }
+            }
+
+            if (!tempTargetGOList.empty())
+            {
+                for(std::list<GameObject*>::iterator iter = tempTargetGOList.begin(); iter != tempTargetGOList.end(); ++iter)
+                    AddGOTarget(*iter, effIndex);
+            }
+
             break;
         }
         case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
