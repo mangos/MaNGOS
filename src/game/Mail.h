@@ -255,6 +255,8 @@ struct MailItemInfo
     uint32 item_guid;                                       ///< the GUID of the item.
     uint32 item_template;                                   ///< the ID of the template of the item.
 };
+
+typedef std::vector<MailItemInfo> MailItemInfoVec;
 /**
  * Structure that holds an actual mail.
  */
@@ -277,7 +279,7 @@ struct Mail
     /// the body of the mail
     std::string body;
     /// A vector containing Information about the items in this mail.
-    std::vector<MailItemInfo> items;
+    MailItemInfoVec items;
     /// A vector containing Information about the items that where already take from this mail.
     std::vector<uint32> removedItems;
     /// The time at which this mail will expire
@@ -323,7 +325,7 @@ struct Mail
      */
     bool RemoveItem(uint32 item_guid)
     {
-        for(std::vector<MailItemInfo>::iterator itr = items.begin(); itr != items.end(); ++itr)
+        for(MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             if(itr->item_guid == item_guid)
             {

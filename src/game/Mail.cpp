@@ -395,7 +395,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
 
         if(m->HasItems())
         {
-            for(std::vector<MailItemInfo>::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+            for(MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
             {
                 if(Item *item = pl->GetMItem(itr2->item_guid))
                     draft.AddItem(item);
