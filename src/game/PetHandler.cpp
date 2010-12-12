@@ -298,7 +298,8 @@ void WorldSession::HandlePetSetAction( WorldPacket & recv_data )
                     {
                         for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                             if (Pet* _pet = _player->GetMap()->GetPet(*itr))
-                                _pet->ToggleAutocast(spell_id, _action);
+                                if ( _pet->IsInWorld())
+                                    _pet->ToggleAutocast(spell_id, _action);
                     }
             }
 
@@ -482,7 +483,8 @@ void WorldSession::HandlePetSpellAutocastOpcode( WorldPacket& recvPacket )
         {
             for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
                 if (Pet* _pet = _player->GetMap()->GetPet(*itr))
-                    _pet->ToggleAutocast(spellid, state);
+                    if ( _pet->IsInWorld())
+                        _pet->ToggleAutocast(spellid, state);
         }
     }
 
