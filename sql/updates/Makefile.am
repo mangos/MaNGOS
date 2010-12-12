@@ -131,6 +131,7 @@ pkgdata_DATA = \
 	10788_02_mangos_creature_template_addon.sql \
 	10835_01_mangos_spell_proc_event.sql \
 	10862_01_characters_mail.sql \
+	10863_01_mangos_spell_proc_event.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -242,4 +243,5 @@ EXTRA_DIST = \
 	10788_02_mangos_creature_template_addon.sql \
 	10835_01_mangos_spell_proc_event.sql \
 	10862_01_characters_mail.sql \
+	10863_01_mangos_spell_proc_event.sql \
 	README
