@@ -31,8 +31,10 @@ void SqlStatement::Execute(Database *db)
 
 void SqlTransaction::Execute(Database *db)
 {
+    ACE_Guard<ACE_Thread_Mutex> _lock(m_Mutex);
     if(m_queue.empty())
         return;
+
     db->DirectExecute("START TRANSACTION");
     while(!m_queue.empty())
     {
@@ -42,17 +44,20 @@ void SqlTransaction::Execute(Database *db)
         if(!db->DirectExecute(sql))
         {
             delete [] sql;
+
             db->DirectExecute("ROLLBACK");
             while(!m_queue.empty())
             {
                 delete [] (const_cast<char*>(m_queue.front()));
                 m_queue.pop();
             }
+
             return;
         }
 
         delete [] sql;
     }
+
     db->DirectExecute("COMMIT");
 }
 

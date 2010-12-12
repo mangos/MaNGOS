@@ -55,9 +55,18 @@ class SqlTransaction : public SqlOperation
 {
     private:
         std::queue<const char *> m_queue;
+        ACE_Thread_Mutex m_Mutex;
     public:
         SqlTransaction() {}
-        void DelayExecute(const char *sql) { m_queue.push(mangos_strdup(sql)); }
+        void DelayExecute(const char *sql)
+        {
+            char* _sql = mangos_strdup(sql);
+            if (_sql)
+            {
+                ACE_Guard<ACE_Thread_Mutex> _lock(m_Mutex);
+                m_queue.push(_sql);
+            }
+        }
         void Execute(Database *db);
 };
 

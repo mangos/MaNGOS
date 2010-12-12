@@ -36,9 +36,9 @@ class SqlDelayThread : public ACE_Based::Runnable
         Database* m_dbEngine;                               ///< Pointer to used Database engine
         volatile bool m_running;
 
-        SqlDelayThread();
     public:
         SqlDelayThread(Database* db);
+        ~SqlDelayThread();
 
         ///< Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }

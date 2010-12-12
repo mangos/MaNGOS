@@ -279,6 +279,8 @@ bool DatabaseMysql::Execute(const char *sql)
     // don't use queued execution if it has not been initialized
     if (!m_threadBody) return DirectExecute(sql);
 
+    ACE_Guard<ACE_Thread_Mutex> _lock(nMutex);
+
     tranThread = ACE_Based::Thread::current();              // owner of this transaction
     TransactionQueues::iterator i = m_tranQueues.find(tranThread);
     if (i != m_tranQueues.end() && i->second != NULL)
@@ -356,6 +358,8 @@ bool DatabaseMysql::BeginTransaction()
         return true;                                        // transaction started
     }
 
+    ACE_Guard<ACE_Thread_Mutex> _lock(nMutex);
+
     tranThread = ACE_Based::Thread::current();              // owner of this transaction
     TransactionQueues::iterator i = m_tranQueues.find(tranThread);
     if (i != m_tranQueues.end() && i->second != NULL)
@@ -384,16 +388,18 @@ bool DatabaseMysql::CommitTransaction()
         return _res;
     }
 
+    ACE_Guard<ACE_Thread_Mutex> _lock(nMutex);
+
     tranThread = ACE_Based::Thread::current();
     TransactionQueues::iterator i = m_tranQueues.find(tranThread);
     if (i != m_tranQueues.end() && i->second != NULL)
     {
         m_threadBody->Delay(i->second);
-        i->second = NULL;
+        m_tranQueues.erase(i);
         return true;
     }
-    else
-        return false;
+
+    return false;
 }
 
 bool DatabaseMysql::RollbackTransaction()
@@ -412,13 +418,16 @@ bool DatabaseMysql::RollbackTransaction()
         return _res;
     }
 
+    ACE_Guard<ACE_Thread_Mutex> _lock(nMutex);
+
     tranThread = ACE_Based::Thread::current();
     TransactionQueues::iterator i = m_tranQueues.find(tranThread);
     if (i != m_tranQueues.end() && i->second != NULL)
     {
         delete i->second;
-        i->second = NULL;
+        m_tranQueues.erase(i);
     }
+
     return true;
 }
 

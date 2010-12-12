@@ -65,7 +65,8 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
         // must be call before finish thread run
         void ThreadEnd();
     private:
-        ACE_Thread_Mutex mMutex;
+        ACE_Thread_Mutex mMutex;        // For thread safe operations between core and mySQL server
+        ACE_Thread_Mutex nMutex;        // For thread safe operations on m_transQueues
 
         ACE_Based::Thread * tranThread;
 
