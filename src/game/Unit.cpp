@@ -4700,8 +4700,8 @@ void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, int32 stackAmount,
     {
         if (Aura* dotAura = GetAura(SPELL_AURA_PERIODIC_DAMAGE,SPELLFAMILY_WARLOCK,UI64LIT(0x010000000000),0x00000000,casterGUID))
         {
-            // use clean value for initial damage
-            int32 damage = dotAura->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_0);
+            // use spellpower-modified value for initial damage
+            int damage = dotAura->GetModifier()->m_amount;
             damage *= 9;
 
             // Remove spell auras from stack
