@@ -24,6 +24,14 @@ SqlDelayThread::SqlDelayThread(Database* db) : m_dbEngine(db), m_running(true)
 {
 }
 
+SqlDelayThread::~SqlDelayThread()
+{
+    //empty SQL queue before exiting
+    SqlOperation* s = NULL;
+    while (m_sqlQueue.next(s))
+        delete s;
+}
+
 void SqlDelayThread::run()
 {
     #ifndef DO_POSTGRESQL
@@ -39,14 +47,15 @@ void SqlDelayThread::run()
     {
         // if the running state gets turned off while sleeping
         // empty the queue before exiting
-
         ACE_Based::Thread::Sleep(loopSleepms);
+
         SqlOperation* s = NULL;
         while (m_sqlQueue.next(s))
         {
             s->Execute(m_dbEngine);
             delete s;
         }
+
         if((loopCounter++) >= pingEveryLoop)
         {
             loopCounter = 0;
