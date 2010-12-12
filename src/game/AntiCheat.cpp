@@ -352,6 +352,7 @@ void AntiCheat::DoAntiCheatAction(AntiCheatCheck checkType, std::string reason)
 bool AntiCheat::CheckNeeded(AntiCheatCheck checktype)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ANTICHEAT_ENABLE)
+        || !GetPlayer()->IsInWorld()
         || GetPlayer()->GetSession()->GetSecurity() > sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_GMLEVEL))
         return false;
 
@@ -396,7 +397,7 @@ bool AntiCheat::CheckNeeded(AntiCheatCheck checktype)
         case CHECK_MOVEMENT_SPEED:
             break;
         case CHECK_MOVEMENT_FLY:
-            if (isCanFly())
+            if (isCanFly() || !GetMover())
                 return false;
             break;
         case CHECK_MOVEMENT_WATERWALKING:
