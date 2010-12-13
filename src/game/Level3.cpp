@@ -939,8 +939,12 @@ bool ChatHandler::HandleReloadNpcGossipCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadNpcTrainerCommand(char* /*args*/)
 {
+    sLog.outString( "Re-Loading `npc_trainer_template` Table!" );
+    sObjectMgr.LoadTrainerTemplates();
+    SendGlobalSysMessage("DB table `npc_trainer_template` reloaded.");
+
     sLog.outString( "Re-Loading `npc_trainer` Table!" );
-    sObjectMgr.LoadTrainerSpell();
+    sObjectMgr.LoadTrainers();
     SendGlobalSysMessage("DB table `npc_trainer` reloaded.");
     return true;
 }

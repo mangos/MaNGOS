@@ -791,10 +791,11 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
     // pet trainers not have spells in fact now
     if (GetCreatureInfo()->trainer_type != TRAINER_TYPE_PETS)
     {
-        TrainerSpellData const* trainer_spells = GetTrainerSpells();
+        TrainerSpellData const* cSpells = GetTrainerSpells();
+        TrainerSpellData const* tSpells = GetTrainerTemplateSpells();
 
         // for not pet trainer expected not empty trainer list always
-        if (!trainer_spells || trainer_spells->spellList.empty())
+        if ((!cSpells || cSpells->spellList.empty()) && (!tSpells || tSpells->spellList.empty()))
         {
             sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
                 GetGUIDLow(),GetEntry());
@@ -2193,7 +2194,8 @@ VendorItemData const* Creature::GetVendorItems() const
 
 VendorItemData const* Creature::GetVendorTemplateItems() const
 {
-    return GetCreatureInfo()->vendorId ? sObjectMgr.GetNpcVendorItemList(GetCreatureInfo()->vendorId) : NULL;
+    uint32 vendorId = GetCreatureInfo()->vendorId;
+    return vendorId ? sObjectMgr.GetNpcVendorItemList(vendorId) : NULL;
 }
 
 uint32 Creature::GetVendorItemCurrentCount(VendorItem const* vItem)
@@ -2266,6 +2268,12 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
     vCount->count = vCount->count > used_count ? vCount->count-used_count : 0;
     vCount->lastIncrementTime = ptime;
     return vCount->count;
+}
+
+TrainerSpellData const* Creature::GetTrainerTemplateSpells() const
+{
+    uint32 trainerId = GetCreatureInfo()->trainerId;
+    return trainerId ? sObjectMgr.GetNpcTrainerTemplateSpells(trainerId) : NULL;
 }
 
 TrainerSpellData const* Creature::GetTrainerSpells() const
