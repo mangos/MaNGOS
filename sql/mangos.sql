@@ -4010,7 +4010,7 @@ CREATE TABLE `npc_trainer_template` (
 -- Dumping data for table `npc_trainer_template`
 --
 
-LOCK TABLES `npc_trainer` WRITE;
+LOCK TABLES `npc_trainer_template` WRITE;
 /*!40000 ALTER TABLE `npc_trainer_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `npc_trainer_template` ENABLE KEYS */;
 UNLOCK TABLES;
