@@ -972,7 +972,8 @@ class ObjectMgr
 
         void LoadVendorTemplates();
         void LoadVendors() { LoadVendors("npc_vendor", false); }
-        void LoadTrainerSpell();
+        void LoadTrainerTemplates();
+        void LoadTrainers() { LoadTrainers("npc_trainer", false); }
 
         std::string GeneratePetName(uint32 entry);
         uint32 GetBaseXP(uint32 level) const;
@@ -1202,8 +1203,17 @@ class ObjectMgr
 
         TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
         {
-            CacheTrainerSpellMap::const_iterator  iter = m_mCacheTrainerSpellMap.find(entry);
+            CacheTrainerSpellMap::const_iterator iter = m_mCacheTrainerSpellMap.find(entry);
             if(iter == m_mCacheTrainerSpellMap.end())
+                return NULL;
+
+            return &iter->second;
+        }
+
+        TrainerSpellData const* GetNpcTrainerTemplateSpells(uint32 entry) const
+        {
+            CacheTrainerSpellMap::const_iterator iter = m_mCacheTrainerTemplateSpellMap.find(entry);
+            if(iter == m_mCacheTrainerTemplateSpellMap.end())
                 return NULL;
 
             return &iter->second;
@@ -1384,6 +1394,7 @@ class ObjectMgr
         void ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr);
         void LoadQuestRelationsHelper(QuestRelationsMap& map, char const* table);
         void LoadVendors(char const* tableName, bool isTemplates);
+        void LoadTrainers(char const* tableName, bool isTemplates);
 
         MailLevelRewardMap m_mailLevelRewardMap;
 
@@ -1433,6 +1444,7 @@ class ObjectMgr
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorTemplateItemMap;
         CacheVendorItemMap m_mCacheVendorItemMap;
+        CacheTrainerSpellMap m_mCacheTrainerTemplateSpellMap;
         CacheTrainerSpellMap m_mCacheTrainerSpellMap;
 };
 
