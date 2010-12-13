@@ -262,3 +262,19 @@ REPLACE INTO `spell_script_target` VALUES (47962, 1, 27107);
 
 REPLACE INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_start_active`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`) 
 VALUES ('47917','4027','11652','1','11652','0','0','2','0'), ('47917','4130','11652','1','11652','0','0','2','0');
+
+-- from lanc
+-- Refurbished Shredder (quest 12050)
+UPDATE `creature_template` SET
+spell1 = 47938,
+spell2 = 47921,
+spell3 = 47939,
+spell4 = 0,
+spell5 = 0,
+spell6 = 0,
+VehicleId = 55
+WHERE `entry` IN (27061);
+
+DELETE FROM `npc_spellclick_spells` WHERE npc_entry IN (27061);
+INSERT INTO `npc_spellclick_spells` VALUES (27061, 67373, 0, 0, 0, 1);
+REPLACE INTO `spell_script_target` VALUES (47939, 2, 188539);

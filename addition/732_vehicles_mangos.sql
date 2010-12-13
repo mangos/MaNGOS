@@ -285,3 +285,7 @@ UPDATE `creature_template` SET `PowerType`=3,spell1=62634,spell2=64979,spell3=62
 
 -- Earthen Stoneshaper
 UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry`=33620;
+
+-- from Lordron
+-- Spectral tiger
+UPDATE `creature_template` SET `VehicleId` = 354 WHERE `entry` = 33357;
