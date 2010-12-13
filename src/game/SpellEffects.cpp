@@ -4628,8 +4628,8 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
     PetType petType = propEntry->Title == UNITNAME_SUMMON_TITLE_COMPANION ? PROTECTOR_PET : GUARDIAN_PET;
 
-    // second cast unsummon guardian(s) (guardians without like functionality have cooldown > spawn time)
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    // second direct cast unsummon guardian(s) (guardians without like functionality have cooldown > spawn time)
+    if (!m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         bool found = false;
         // including protector
