@@ -224,7 +224,7 @@ enum ItemDynFlags
     ITEM_DYNFLAG_UNK5                         = 0x00000020,
     ITEM_DYNFLAG_UNK6                         = 0x00000040, // ? old note: usable
     ITEM_DYNFLAG_UNK7                         = 0x00000080,
-    ITEM_DYNFLAG_UNK8                         = 0x00000100,
+    ITEM_DYNFLAG_BOP_TRADEABLE                = 0x00000100, // Allows trading soulbound items
     ITEM_DYNFLAG_READABLE                     = 0x00000200, // can be open for read, it or item proto pagetText make show "Right click to read"
     ITEM_DYNFLAG_UNK10                        = 0x00000400,
     ITEM_DYNFLAG_UNK11                        = 0x00000800,
@@ -299,7 +299,7 @@ class MANGOS_DLL_SPEC Item : public Object
 
         bool IsBag() const { return GetProto()->InventoryType == INVTYPE_BAG; }
         bool IsBroken() const { return GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0 && GetUInt32Value(ITEM_FIELD_DURABILITY) == 0; }
-        bool CanBeTraded(bool mail = false) const;
+        bool CanBeTraded(bool mail = false, bool trade = false) const;
         void SetInTrade(bool b = true) { mb_in_trade = b; }
         bool IsInTrade() const { return mb_in_trade; }
 
@@ -382,6 +382,18 @@ class MANGOS_DLL_SPEC Item : public Object
         void AddToClientUpdateList();
         void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType& update_players);
+
+        // Item Refunding system
+        bool IsEligibleForRefund();
+        void SetPlayedtimeField(uint32 time) { SetInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME ,time); }
+        uint32 GetPlayedtimeField() { return GetInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME); }
+
+        // Soulbound trade system
+        void SetSoulboundTradeable(AllowedLooterSet* allowedLooters, Player* currentOwner, bool apply);
+        bool CheckSoulboundTradeExpire();
+
+        AllowedLooterSet allowedGUIDs;
+
     private:
         std::string m_text;
         uint8 m_slot;

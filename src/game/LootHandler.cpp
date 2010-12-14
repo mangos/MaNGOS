@@ -131,7 +131,8 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
     uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, item->itemid, item->count );
     if ( msg == EQUIP_ERR_OK )
     {
-        Item * newitem = player->StoreNewItem( dest, item->itemid, true, item->randomPropertyId);
+        AllowedLooterSet* looters = item->GetAllowedLooters();
+        Item * newitem = player->StoreNewItem( dest, item->itemid, true, item->randomPropertyId, (looters->size() > 1) ? looters : NULL);
 
         if (qitem)
         {
@@ -560,6 +561,9 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
         _player->SendEquipError( msg, NULL, NULL, item.itemid );
         return;
     }
+
+    // list of players allowed to receive this item in trade
+    AllowedLooterSet* looters = item.GetAllowedLooters();
 
     // now move item from loot to target inventory
     Item * newitem = target->StoreNewItem( dest, item.itemid, true, item.randomPropertyId );

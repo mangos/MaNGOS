@@ -800,13 +800,10 @@ bool Item::IsEquipped() const
     return !IsInBag() && m_slot < EQUIPMENT_SLOT_END;
 }
 
-bool Item::CanBeTraded(bool mail) const
+bool Item::CanBeTraded(bool mail, bool trade) const
 {
 
-    if(!mail && IsBoundAccountWide()) // Dirty hack, because trade window is closing
-        return false;
-
-    if ((!mail || !IsBoundAccountWide()) && IsSoulBound())
+    if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOP_TRADEABLE) || !trade)))
         return false;
 
     if (IsBag() && (Player::IsBagPos(GetPos()) || !((Bag const*)this)->IsEmpty()) )
@@ -1092,6 +1089,10 @@ bool Item::IsBindedNotWith( Player const* player ) const
     if (GetOwnerGuid() == player->GetObjectGuid())
         return false;
 
+    if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOP_TRADEABLE))
+        if (allowedGUIDs.find(player->GetObjectGuid().GetCounter()) != allowedGUIDs.end())
+            return false;
+
     // has loot with diff owner
     if (HasGeneratedLoot())
         return true;
@@ -1239,4 +1240,62 @@ void Item::SetLootState( ItemLootUpdateState state )
 
     if (m_lootState != ITEM_LOOT_NONE && m_lootState != ITEM_LOOT_UNCHANGED && m_lootState != ITEM_LOOT_TEMPORARY)
         SetState(ITEM_CHANGED);
+}
+
+// "Stackable items (such as Frozen Orbs and gems) and 
+// charged items that can be purchased with an alternate currency are not eligible. "
+bool Item::IsEligibleForRefund()
+{
+    ItemPrototype const*proto = GetProto();
+
+    if (proto == NULL)
+        return false;
+
+    if (!(proto->Flags & ITEM_FLAG_REFUNDABLE))
+        return false;
+
+    if (proto->MaxCount > 1)
+        return false;
+
+    for(int i = 0; i < 5; ++i)
+    {
+        _Spell spell = proto->Spells[i];
+
+        if (spell.SpellCharges != -1  && spell.SpellCharges != 0)
+            return false;
+    }
+
+    return true;
+}
+
+void Item::SetSoulboundTradeable(AllowedLooterSet* allowedLooters, Player* currentOwner, bool apply)
+{
+    if (apply)
+    {
+        SetFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOP_TRADEABLE);
+        allowedGUIDs = *allowedLooters;
+    }
+    else
+    {
+        RemoveFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BOP_TRADEABLE);
+        if (allowedGUIDs.empty())
+            return;
+
+        allowedGUIDs.clear();
+        SetState(ITEM_CHANGED, currentOwner);
+
+        CharacterDatabase.PExecute( "DELETE FROM item_soulbound_trade_data WHERE itemGuid = '%u'", GetGUIDLow() );
+    }
+}
+
+bool Item::CheckSoulboundTradeExpire()
+{
+    // called from owner's update - GetOwner() MUST be valid
+    if (GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME) + 2*HOUR < GetOwner()->GetTotalPlayedTime())
+    {
+        SetSoulboundTradeable(NULL, GetOwner(), false);
+        return true; // remove from tradeable list
+    }
+
+    return false;
 }

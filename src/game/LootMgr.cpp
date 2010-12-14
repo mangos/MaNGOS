@@ -386,6 +386,11 @@ bool LootItem::AllowedForPlayer(Player const * player) const
     return true;
 }
 
+void LootItem::AddAllowedLooter(const Player *player)
+{
+    allowedGUIDs.insert(player->GetObjectGuid().GetCounter());
+}
+
 //
 // --------- Loot ---------
 //
@@ -532,13 +537,17 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
     for(uint8 i = 0; i < items.size(); ++i)
     {
         LootItem &item = items[i];
-        if(!item.is_looted && !item.freeforall && item.conditionId && item.AllowedForPlayer(player))
+        if(!item.is_looted && !item.freeforall && item.AllowedForPlayer(player))
         {
-            ql->push_back(QuestItem(i));
-            if(!item.is_counted)
+            item.AddAllowedLooter(player);
+            if(item.conditionId)
             {
-                ++unlootedCount;
-                item.is_counted=true;
+                ql->push_back(QuestItem(i));
+                if(!item.is_counted)
+                {
+                    ++unlootedCount;
+                    item.is_counted=true;
+                }
             }
         }
     }
