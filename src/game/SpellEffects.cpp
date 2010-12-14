@@ -2058,6 +2058,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Player*)m_caster)->RemoveSpellCooldown(53385, true);
                     return;
                 }
+                case 72202:                                 // Blade power
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->ModifyPower(unitTarget->getPowerType(), m_spellInfo->CalculateSimpleValue(eff_idx));
+                    return;
+                }
             }
             break;
         }
