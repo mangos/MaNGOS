@@ -168,7 +168,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 
     WorldPacket data( SMSG_TRAINER_LIST, 8+4+4+maxcount*38 + strTitle.size()+1);
     data << ObjectGuid(guid);
-    data << uint32(cSpells->trainerType ? cSpells->trainerType : tSpells->trainerType);
+    data << uint32(cSpells && cSpells->trainerType ? cSpells->trainerType : tSpells->trainerType);
 
     size_t count_pos = data.wpos();
     data << uint32(maxcount);
