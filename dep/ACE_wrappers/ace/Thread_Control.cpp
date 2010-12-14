@@ -1,18 +1,7 @@
-// $Id: Thread_Control.cpp 91286 2010-08-05 09:04:31Z johnnyw $
-
-// <HACK ON>
-#include "ace/config-all.h"
-#if defined (ACE_LEGACY_MODE)
-// This silly include breaks a cycle when compiling in backwards
-// compatibility mode
-#  include "ace/Thread_Exit.h"
-#endif  /* ACE_LEGACY_MODE */
-// </HACK OFF>
+// $Id: Thread_Control.cpp 91688 2010-09-09 11:21:50Z johnnyw $
 
 #include "ace/Thread_Control.h"
 #include "ace/Thread_Manager.h"
-
-
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/Thread_Control.inl"

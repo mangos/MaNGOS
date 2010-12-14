@@ -1,4 +1,4 @@
-// $Id: Timer_Hash_T.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+// $Id: Timer_Hash_T.cpp 92069 2010-09-28 11:38:59Z johnnyw $
 
 #ifndef ACE_TIMER_HASH_T_CPP
 #define ACE_TIMER_HASH_T_CPP
@@ -419,14 +419,6 @@ ACE_Timer_Hash_T<TYPE, FUNCTOR, ACE_LOCK, BUCKET>::reschedule (
                                      expired->get_interval ());
   ACE_ASSERT (h->orig_id_ != -1);
 
-#if 0
-  ACE_DEBUG ((LM_DEBUG, "Hash::reschedule() resets %d in slot %d where it's id is %d and token is %x\n",
-              expired->get_timer_value ().msec (),
-              h->pos_,
-              h->orig_id_,
-              h));
-#endif
-
   // Since schedule() above will allocate a new node
   // then here schedule <expired> for deletion. Don't call
   // this->free_node() because that will invalidate <h>
@@ -469,14 +461,6 @@ ACE_Timer_Hash_T<TYPE, FUNCTOR, ACE_LOCK, BUCKET>::schedule_i (
                                       future_time,
                                       interval);
   ACE_ASSERT (h->orig_id_ != -1);
-
-#if 0
-  ACE_DEBUG ((LM_DEBUG, "Hash::schedule() placing %d in slot %d where it's id is %d and token is %x\n",
-              future_time.msec (),
-              position,
-              h->orig_id_,
-              h));
-#endif
 
   if (this->table_[this->earliest_position_]->is_empty ()
       || this->table_[position]->earliest_time ()
@@ -805,14 +789,6 @@ ACE_Timer_Hash_T<TYPE, FUNCTOR, ACE_LOCK, BUCKET>::expire (const ACE_Time_Value 
             reinterpret_cast<Hash_Token<TYPE> *> (const_cast<void *> (act));
 
           ACE_ASSERT (h->pos_ == i);
-
-#if 0
-          ACE_DEBUG ((LM_DEBUG, "Hash::expire() expiring %d in slot %d where it's id is %d and token is %x\n",
-                      expired->get_timer_value ().msec (),
-                      h->pos_,
-                      h->orig_id_,
-                      h));
-#endif
 
           // Check if this is an interval timer.
           if (expired->get_interval () > ACE_Time_Value::zero)

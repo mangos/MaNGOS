@@ -1,4 +1,4 @@
-// $Id: Service_Config.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+// $Id: Service_Config.cpp 91693 2010-09-09 12:57:54Z johnnyw $
 
 #include "ace/Service_Config.h"
 
@@ -27,20 +27,20 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_Threading_Helper<ACE_Thread_Mutex>::~ACE_Threading_Helper ()
+ACE_Threading_Helper<ACE_Thread_Mutex>::~ACE_Threading_Helper (void)
 {
-  ACE_OS::thr_key_detach (this->key_, 0);
+  ACE_OS::thr_key_detach (this->key_);
   ACE_OS::thr_keyfree (this->key_);
 }
 
-ACE_Threading_Helper<ACE_Thread_Mutex>::ACE_Threading_Helper ()
+ACE_Threading_Helper<ACE_Thread_Mutex>::ACE_Threading_Helper (void)
   :  key_ (ACE_OS::NULL_key)
 {
 # if defined (ACE_HAS_TSS_EMULATION)
   ACE_Object_Manager::init_tss ();
 # endif
 
-  if (ACE_Thread::keycreate (&key_, 0, 0) == -1)
+  if (ACE_Thread::keycreate (&key_, 0) == -1)
     {
       ACE_ERROR ((LM_ERROR,
                   ACE_TEXT ("(%P|%t) Failed to create thread key: %p\n"),

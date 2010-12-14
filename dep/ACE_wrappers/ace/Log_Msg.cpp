@@ -1,4 +1,4 @@
-// $Id: Log_Msg.cpp 91446 2010-08-24 14:16:37Z mhengstmengel $
+// $Id: Log_Msg.cpp 92052 2010-09-27 14:20:22Z vzykov $
 
 // We need this to get the status of ACE_NTRACE...
 #include "ace/config-all.h"
@@ -40,6 +40,7 @@
 #include "ace/Log_Record.h"
 #include "ace/Recursive_Thread_Mutex.h"
 #include "ace/Stack_Trace.h"
+#include "ace/Atomic_Op.h"
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Log_Msg.inl"
@@ -1728,24 +1729,9 @@ ACE_Log_Msg::log (const ACE_TCHAR *format_str,
                       ACE_OS::sprintf (bp,
                                        format,
                                        static_cast <unsigned> (ACE_Thread::self ()));
-#elif defined (DIGITAL_UNIX)
-                  ACE_OS::strcpy (fp, ACE_TEXT ("u"));
-                  {
-                    int id =
-#  if defined (ACE_HAS_THREADS)
-                      pthread_getselfseq_np ();
-#  else
-                      ACE_Thread::self ();
-#  endif /* ACE_HAS_THREADS */
-
-                      if (can_check)
-                        this_len = ACE_OS::snprintf (bp, bspace, format, id);
-                      else
-                        this_len = ACE_OS::sprintf (bp, format, id);
-                  }
 #else
                   ACE_hthread_t t_id;
-                  ACE_Thread::self (t_id);
+                  ACE_OS::thr_self (t_id);
 
 #  if defined (ACE_MVS) || defined (ACE_TANDEM_T1248_PTHREADS)
                   // MVS's pthread_t is a struct... yuck. So use the ACE 5.0
@@ -2483,32 +2469,6 @@ ACE_Log_Msg::thr_desc (ACE_Thread_Descriptor *td)
   if (td != 0)
     td->acquire_release ();
 }
-
-#if defined (ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS) && defined(ACE_LEGACY_MODE)
-ACE_SEH_EXCEPT_HANDLER
-ACE_Log_Msg::seh_except_selector (void)
-{
-  return ACE_OS_Object_Manager::seh_except_selector ();
-}
-
-ACE_SEH_EXCEPT_HANDLER
-ACE_Log_Msg::seh_except_selector (ACE_SEH_EXCEPT_HANDLER n)
-{
-  return ACE_OS_Object_Manager::seh_except_selector (n);
-}
-
-ACE_SEH_EXCEPT_HANDLER
-ACE_Log_Msg::seh_except_handler (void)
-{
-  return ACE_OS_Object_Manager::seh_except_handler ();
-}
-
-ACE_SEH_EXCEPT_HANDLER
-ACE_Log_Msg::seh_except_handler (ACE_SEH_EXCEPT_HANDLER n)
-{
-  return ACE_OS_Object_Manager::seh_except_handler (n);
-}
-#endif /* ACE_HAS_WIN32_STRUCTURAL_EXCEPTIONS && ACE_LEGACY_MODE */
 
 ACE_Log_Msg_Backend *
 ACE_Log_Msg::msg_backend (ACE_Log_Msg_Backend *b)

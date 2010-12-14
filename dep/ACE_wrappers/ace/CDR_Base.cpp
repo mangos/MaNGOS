@@ -1,4 +1,4 @@
-// $Id: CDR_Base.cpp 91287 2010-08-05 10:30:49Z johnnyw $
+// $Id: CDR_Base.cpp 91685 2010-09-09 09:35:14Z johnnyw $
 
 #include "ace/CDR_Base.h"
 
@@ -773,28 +773,5 @@ ACE_CDR::LongDouble::operator ACE_CDR::LongDouble::NativeImpl () const
   return ret;
 }
 #endif /* NONNATIVE_LONGDOUBLE */
-
-#if defined(_UNICOS) && !defined(_CRAYMPP)
-// placeholders to get things compiling
-ACE_CDR::Float::Float (void)
-{
-}
-
-ACE_CDR::Float::Float (const float & /* init */)
-{
-}
-
-ACE_CDR::Float &
-ACE_CDR::Float::operator= (const float & /* rhs */)
-{
-  return *this;
-}
-
-bool
-ACE_CDR::Float::operator!= (const ACE_CDR::Float & /* rhs */) const
-{
-  return false;
-}
-#endif /* _UNICOS */
 
 ACE_END_VERSIONED_NAMESPACE_DECL

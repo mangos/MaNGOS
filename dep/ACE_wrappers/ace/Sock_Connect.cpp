@@ -1,4 +1,4 @@
-// $Id: Sock_Connect.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+// $Id: Sock_Connect.cpp 91685 2010-09-09 09:35:14Z johnnyw $
 
 #include "ace/Sock_Connect.h"
 #include "ace/INET_Addr.h"
@@ -242,29 +242,16 @@ ACE::get_bcast_addr (ACE_UINT32 &bcast_addr,
       if (hp == 0)
         return -1;
       else
-#if !defined(_UNICOS)
         ACE_OS::memcpy ((char *) &ip_addr.sin_addr.s_addr,
                         (char *) hp->h_addr,
                         hp->h_length);
-#else /* _UNICOS */
-      {
-        ACE_UINT64 haddr;  // a place to put the address
-        char * haddrp = (char *) &haddr;  // convert to char pointer
-        ACE_OS::memcpy(haddrp,(char *) hp->h_addr,hp->h_length);
-        ip_addr.sin_addr.s_addr = haddr;
-      }
-#endif /* ! _UNICOS */
     }
   else
     {
       ACE_OS::memset ((void *) &ip_addr, 0, sizeof ip_addr);
-#if !defined(_UNICOS)
       ACE_OS::memcpy ((void *) &ip_addr.sin_addr,
                       (void*) &host_addr,
                       sizeof ip_addr.sin_addr);
-#else /* _UNICOS */
-      ip_addr.sin_addr.s_addr = host_addr;   // just copy to the bitfield
-#endif /* ! _UNICOS */
     }
 
 #if !defined(AIX) && !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (__Lynx__)
@@ -1279,7 +1266,6 @@ ACE::get_ip_interfaces (size_t &count, ACE_INET_Addr *&addrs)
           )
 
         {
-# if !defined(_UNICOS)
           struct sockaddr_in *addr =
             reinterpret_cast<sockaddr_in *> (&pcur->IFR_ADDR);
 
@@ -1300,23 +1286,6 @@ ACE::get_ip_interfaces (size_t &count, ACE_INET_Addr *&addrs)
               addrs[count].set (addr, addrlen);
               ++count;
             }
-# else /* ! _UNICOS */
-          // need to explicitly copy on the Cray, since the bitfields kinda
-          // screw things up here
-          struct sockaddr_in inAddr;
-
-          inAddr.sin_len = pcur->IFR_ADDR.sa_len;
-          inAddr.sin_family = pcur->IFR_ADDR.sa_family;
-          memcpy((void *)&(inAddr.sin_addr),
-                 (const void *)&(pcur->IFR_ADDR.sa_data[8]),
-                 sizeof(struct in_addr));
-
-          if (inAddr.sin_addr.s_addr != 0)
-            {
-              addrs[count].set(&inAddr, sizeof(struct sockaddr_in));
-              ++count;
-            }
-# endif /* ! _UNICOS */
         }
 
 #if !defined (__QNX__) && !defined (__FreeBSD__) && !defined(__NetBSD__) && !defined (ACE_HAS_RTEMS) && !defined (__Lynx__)

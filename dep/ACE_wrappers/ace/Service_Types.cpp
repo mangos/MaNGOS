@@ -1,4 +1,4 @@
-// $Id: Service_Types.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: Service_Types.cpp 91813 2010-09-17 07:52:52Z johnnyw $
 
 #include "ace/Service_Types.h"
 
@@ -375,7 +375,7 @@ ACE_Stream_Type::fini (void) const
 
       // Final arg is an indication to *not* delete the Module.
       str->remove (m->name (),
-                   MT_Module::M_DELETE_NONE);      
+                   MT_Module::M_DELETE_NONE);
       m = t;
     }
   str->close ();

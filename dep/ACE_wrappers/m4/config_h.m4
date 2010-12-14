@@ -1,5 +1,5 @@
 dnl -------------------------------------------------------------------------
-dnl       $Id: config_h.m4 87480 2009-11-11 11:38:15Z olli $
+dnl       $Id: config_h.m4 92183 2010-10-08 08:44:15Z olli $
 dnl
 dnl       config_h.m4
 dnl
@@ -780,9 +780,6 @@ AH_TEMPLATE([ACE_LACKS_TIMESPEC_T],
 
 AH_TEMPLATE([ACE_LACKS_STRTOK_R_PROTOTYPE],
 [Platform/compiler lacks the strtok_r() prototype])
-
-AH_TEMPLATE([ACE_LACKS_PREAD_PROTOTYPE],
-[Platform/compiler lacks the pread() and pwrite() prototypes])
 
 AH_TEMPLATE([ACE_LACKS_CHAR_RIGHT_SHIFTS],
 [Compiler does not have any istream operator>> for chars, u_chars, or

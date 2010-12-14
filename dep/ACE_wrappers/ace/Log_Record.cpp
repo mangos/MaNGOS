@@ -1,4 +1,4 @@
-// $Id: Log_Record.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: Log_Record.cpp 91764 2010-09-14 13:04:37Z johnnyw $
 
 #include "ace/Log_Record.h"
 
@@ -20,8 +20,6 @@
 #endif /* ! ACE_LACKS_IOSTREAM_TOTALLY */
 
 #include "ace/OS_Memory.h"
-
-
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

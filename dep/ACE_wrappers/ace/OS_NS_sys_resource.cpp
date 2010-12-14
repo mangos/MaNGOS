@@ -1,8 +1,6 @@
-// $Id: OS_NS_sys_resource.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: OS_NS_sys_resource.cpp 91781 2010-09-15 12:49:15Z johnnyw $
 
 #include "ace/OS_NS_sys_resource.h"
-
-
 
 #if !defined (ACE_HAS_INLINED_OSCALLS)
 # include "ace/OS_NS_sys_resource.inl"

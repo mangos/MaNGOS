@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-win32-common.h 91448 2010-08-24 14:22:13Z johnnyw $
+// $Id: config-win32-common.h 92120 2010-10-01 12:00:01Z johnnyw $
 
 
 #ifndef ACE_CONFIG_WIN32_COMMON_H
@@ -166,11 +166,6 @@
 
 #define ACE_HAS_GPERF
 
-// By default, don't include RCS Id strings in object code.
-#if !defined (ACE_USE_RCSID)
-# define ACE_USE_RCSID 0
-#endif /* ! ACE_USE_RCSID */
-
 // ---------------- platform features or lack of them -------------
 
 // By default WIN32 has FD_SETSIZE of 64, which places the limit
@@ -305,12 +300,11 @@
 #define ACE_MKDIR_LACKS_MODE
 
 #define ACE_SIZEOF_LONG_LONG 8
-// Green Hills Native x86 does not support __int64 keyword
-// Neither does mingw32.
+
 #if !defined (ACE_LACKS_LONGLONG_T) && !defined (__MINGW32__)
 #define ACE_INT64_TYPE  signed __int64
 #define ACE_UINT64_TYPE unsigned __int64
-#endif /* (ghs) */
+#endif
 
 #if defined (__MINGW32__)
 #define ACE_INT64_TYPE  signed long long

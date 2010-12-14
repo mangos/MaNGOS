@@ -159,7 +159,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -197,7 +197,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4355;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -233,7 +233,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -270,7 +270,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4355;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -311,7 +311,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -349,7 +349,7 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4355;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4355;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -528,7 +528,6 @@
     <None Include="..\..\dep\ACE_wrappers\ace\Obchunk.inl" />
     <None Include="..\..\dep\ACE_wrappers\ace\Object_Manager.inl" />
     <None Include="..\..\dep\ACE_wrappers\ace\Obstack_T.inl" />
-    <None Include="..\..\dep\ACE_wrappers\ace\OS.inl" />
     <None Include="..\..\dep\ACE_wrappers\ace\OS_Errno.inl" />
     <None Include="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.inl" />
     <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_arpa_inet.inl" />
@@ -991,7 +990,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Arg_Shifter.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\ARGV.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Argv_Type_Converter.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array_Base.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array_Map.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Assert.h" />
@@ -1042,8 +1040,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Condition_Thread_Mutex.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-aix-5.x.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-all.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cray.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cxx-common.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cygwin32.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-doxygen.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-freebsd.h" />
@@ -1052,10 +1048,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-hpux-11.00.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-icc-common.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-integritySCA.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.5.x-sgic++.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-common.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-g++.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-sgic++.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-linux-common.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-linux.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-lite.h" />
@@ -1082,8 +1074,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp-pre62x.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-rtems.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0-nothread.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-suncc-common.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.10.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.11.h" />
@@ -1097,9 +1087,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem-nsk-mips-v2.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem-nsk-mips-v3.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tru64.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.udk.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-visualage.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.4.h" />
@@ -1111,7 +1098,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-cegcc.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-common.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-dmc.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-ghs.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-interix.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-mingw.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-10.h" />
@@ -1121,7 +1107,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-WinCE.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Configuration.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Configuration_Import_Export.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Connection_Recycling_Strategy.h" />
@@ -1155,7 +1140,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event_Handler.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event_Handler_T.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Exception_Macros.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv_Msg.h" />
@@ -1231,7 +1215,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Malloc_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Managed_Object.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Manual_Event.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map_Manager.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_Acceptor.h" />
@@ -1248,7 +1231,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_NT.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Method_Object.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Method_Request.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Metrics_Cache.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Metrics_Cache_T.h" />
@@ -1284,14 +1266,12 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Object_Manager_Base.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obstack.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obstack_T.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_aio.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_assert.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_byteswap.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_complex.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_cpio.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ctype.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Dirent.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_dirent.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_dlfcn.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_errno.h" />
@@ -1392,7 +1372,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdio.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdlib.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_string.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_String.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_strings.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stropts.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysctl.h" />
@@ -1424,7 +1403,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_wctype.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_wordexp.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pair.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pair_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Parse_Node.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\PI_Malloc.h" />
@@ -1452,7 +1430,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Read_Buffer.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Recursive_Thread_Mutex.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Recyclable.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcountable.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcountable_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcounted_Auto_Ptr.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Registry.h" />
@@ -1475,7 +1452,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Manager.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Object.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Repository.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Templates.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Types.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_MM.h" />
@@ -1532,7 +1508,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Handler.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Options.h" />
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_T.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Traits.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\System_Time.h" />
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Task.h" />

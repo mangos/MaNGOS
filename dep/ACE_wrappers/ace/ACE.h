@@ -4,7 +4,7 @@
 /**
  * @file    ACE.h
  *
- * $Id: ACE.h 91603 2010-09-01 21:02:28Z shuston $
+ * $Id: ACE.h 92060 2010-09-27 18:08:48Z johnnyw $
  *
  * This file contains value added ACE functions that extend the
  * behavior of the UNIX and Win32 OS calls.
@@ -90,7 +90,7 @@ namespace ACE
 
   /// Simple wildcard matching function supporting '*' and '?'
   /// return true if string s matches pattern.
-  /// If character_classes is true, '[' is treated as a wildcard character
+  /// If @a character_classes is true, '[' is treated as a wildcard character
   /// as described in the fnmatch() POSIX API.  The following POSIX "bracket
   /// expression" features are not implemented: collating symbols, equivalence
   /// class expressions, and character class expressions.  The POSIX locale is
@@ -641,6 +641,14 @@ namespace ACE
 
   /// Computes the base 2 logarithm of {num}.
   ACE_NAMESPACE_INLINE_FUNCTION u_long log2 (u_long num);
+
+  /// Helper to avoid comparing floating point values with ==
+  /// (uses < and > operators).
+  template <typename T>
+  bool is_equal (const T& a, const T& b)
+  {
+    return !((a < b) || (a > b));
+  }
 
   /// Hex conversion utility.
   extern ACE_Export ACE_TCHAR nibble2hex (u_int n);

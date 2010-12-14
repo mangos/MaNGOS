@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-sunos5.6.h 91581 2010-08-31 13:18:11Z shuston $
+// $Id: config-sunos5.6.h 91685 2010-09-09 09:35:14Z johnnyw $
 
 // The following configuration file is designed to work for SunOS 5.6
 // platforms using the SunC++ 4.x or g++ compilers.
@@ -38,13 +38,7 @@
 #ifndef ACE_TEMPLATES_REQUIRE_SOURCE
 #define ACE_TEMPLATES_REQUIRE_SOURCE            1
 #endif /* ACE_TEMPLATES_REQUIRE_SOURCE */
-#ifndef ACE_HAS_TEMPLATE_TYPEDEFS
-#define ACE_HAS_TEMPLATE_TYPEDEFS               1
-#endif /* ACE_HAS_TEMPLATE_TYPEDEFS */
 // Forte 7 seems to botch this one...
-#if __SUNPRO_CC == 0x540
-#undef ACE_HAS_TEMPLATE_TYPEDEFS
-#endif
 #ifndef ACE_HAS_THR_C_DEST
 #define ACE_HAS_THR_C_DEST                      1
 #endif /* ACE_HAS_THR_C_DEST */

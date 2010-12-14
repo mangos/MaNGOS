@@ -1,3 +1,37 @@
+USER VISIBLE CHANGES BETWEEN ACE-5.8.2 and ACE-5.8.3
+====================================================
+
+. Two new methods were added to ACE_Pipe: close_read() and close_write().
+  These methods can be used to close individual pipe handles.
+
+. The ACE::handle_ready() family of methods was changed to prefer using
+  poll() over select() on platforms where poll() is available. This
+  preference was previously only used if ACE_HAS_LIMITED_SELECT was set.
+  The ACE_HAS_LIMITED_SELECT choice is removed, making ACE_HAS_POLL the
+  setting that switches this preference. The driving reason for this
+  is that if select() is called to detect changes on a handle whose
+  values falls outside that which can safely be stored in an fdset,
+  the handle-setting macros/functions will set/clear bits outside
+  of the fdset. This results in very weird memory changes, often in
+  the stack, which are very hard to diagnose. poll()'s operation
+  does not suffer from this affect. With the growing use of large
+  numbers of handles and use of ACE_Dev_Poll_Reactor on Linux,
+  the rate at which this problem was cropping up was increasing.
+
+. Added a simple helper ACE::is_equal() which compares equality of two
+  objects without using operator==. This is useful for comparing floating
+  point values.
+
+. Removed all deprecated methods, arguments, files, classes, macros and
+  anything else we kept for years.
+
+. Removed Irix/Tru64/SCO/Uniware/Cray support
+
+. ACE_Pair has been removed. Users should now use std::pair.
+
+. This is the last micro release that will work with GCC < 3, after x.8.3
+  support for GCC < 3 will be removed
+
 USER VISIBLE CHANGES BETWEEN ACE-5.8.1 and ACE-5.8.2
 ====================================================
 
@@ -8,7 +42,7 @@ USER VISIBLE CHANGES BETWEEN ACE-5.8.1 and ACE-5.8.2
 USER VISIBLE CHANGES BETWEEN ACE-5.8.0 and ACE-5.8.1
 ====================================================
 
-. Added support for Microsoft Visual Studio 2010 using nmake 
+. Added support for Microsoft Visual Studio 2010 using nmake
 
 . Reduced the amount of doxygen pages generated, the original settings caused
   a doxygen generated html package of 1.4GB which was way too large

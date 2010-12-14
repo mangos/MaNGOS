@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><!-- $Id: ACE-INSTALL.html 90858 2010-06-25 12:47:19Z johnnyw $ -->
+<html><head><!-- $Id: ACE-INSTALL.html 92151 2010-10-05 07:27:20Z johnnyw $ -->
   <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Building and Installing ACE and Its Auxiliary Libraries and Services</title>
 
   <link rev="made" href="mailto:d.schmidt@vanderbilt.edu"></head>
@@ -123,7 +123,7 @@ document</a>.</p><p>
 </thead><tbody>
   <tr>
     <th>DOC Group</th>
-    <td>Windows 2000, XP (MSVC++ 7.1, and 8);
+    <td>Windows 2000, XP (MSVC++ 7.1, 8, 9, and 10);
         many versions of Linux/Intel (many compilers).
     </td>
     <td>DOC sites at <a href="http://www.dre.vanderbilt.edu/">ISIS</a>,
@@ -155,7 +155,7 @@ document</a>.</p><p>
     <td>Maintains ACE on many platforms required for their ACE and
         TAO service offerings. We support AIX,
         CodeGear C++ Builder 2007/2009, CodeGear RAD Studio 2007, Embarcadero C++ Builder 2010,
-        CBuilderX 1.0, Windows CE, MinGW, Microsoft Visual C++ 7.1/8/9, GCC,
+        CBuilderX 1.0, Windows CE, MinGW, Microsoft Visual C++ 7.1/8/9/10, GCC,
         Cygwin, VxWorks 5.5.x - 6.x (kernel and rtp), OpenVMS 8.2-1 &            8.3 on Alpha and IA64,
         BlueCAT Linux, RedHat Linux, Fedora, MacOSX, Solaris,
         Tru64, SuSE Linux on Alpha/IA32/EM64T/IA64, RTEMS, QNX, LynxOS 4.0/4.2,
@@ -232,7 +232,7 @@ supported by the DOC group, Riverace, OCI or Remedy IT. </p><p>
 HREF="http://downloads.ociweb.com/MPC/docs/html/MakeProjectCreator.html">MPC</A>
 (MakeProjectCreator) to generate files used by all supported build
 tools (such as GNUmakefiles for UNIX based platforms, sln and vcproj
-files for VC71/VC8 and CodeGear makefiles) on various platforms. To
+files for VC71/VC8 and Embarcadero makefiles) on various platforms. To
 help new users to bootstrap quickly the release bundles of ACE (as
 well as TAO and CIAO) include all needed files to use the build
 instructions in this document.
@@ -556,7 +556,7 @@ one will not clean up any old files, and trying to use the environment's
 
 <ul>
 <li><a href="#msvc">Microsoft Visual Studio</a></li>
-<li><a href="#codegear">CodeGear C++Builder</a></li>
+<li><a href="#codegear">Embarcadero C++Builder</a></li>
 <li><a href="#mingw">MinGW</a></li>
 <li><a href="#cygwin">Cygwin</a></li>
 </ul>
@@ -565,19 +565,18 @@ one will not clean up any old files, and trying to use the environment's
 </p><h3><a name="msvc">Building and Installing ACE on Windows with
 Microsoft Visual Studio</a></h3>
 
-<p>ACE contains project files for Microsoft Visual Studio .NET 2003 (VC7.1)
-and Visual Studio 2005 (VC8). Visual Studio 2005 supports building for
+<p>ACE contains project files for Microsoft Visual Studio .NET 2005 (VC8)
+, Visual Studio 2009 (VC9), and Visual Studio 2010 (VC10).
+Visual Studio 2005 supports building for
 desktop/server Windows as well as for Windows CE and Windows Mobile. Since
 not all users will be interested in the CE/Mobile capability, these platforms
 have separate solution and project files from the desktop/server Windows.
-Furthermore, VC7.1 and VC8 use different file formats but the same file
+Furthermore, VC7.1, VC8, VC9, and 10 use different file formats but the same file
 suffixes (<code>.sln</code> and <code>.vcproj</code>). To support both
 environments, ACE supplies files with different names for the different
 development and target platforms. The platform/name mapping is shown below.
 All solution files have a <code>.sln</code> suffix and all project files have
 a <code>.vcproj</code> suffix.</p>
-
-<p>Visual Studio 2008 (VC9) is also supported.</p>
 
 <p>
 The free Visual C++ 2008 Express Edition will work in place of the traditional
@@ -612,6 +611,11 @@ can be built with the compiler and linker included in the <a href="http://www.mi
   <tr>
     <th>VC9 for desktop/server</th>
     <td><i>name</i><code>_vc9</code>
+    </td>
+  </tr>
+  <tr>
+    <th>VC10 for desktop/server</th>
+    <td><i>name</i><code>_vc10</code>
     </td>
   </tr>
 </tbody></table>
@@ -790,7 +794,7 @@ include or library directories are specified using backslashes instead of forwar
 slashes.  If this occurs, the easiest way to fix it is to recreate it.</a></p>
 
 <hr align="left" width="50%"><p>&nbsp;</p>
-<h3><a name="codegear">Building and Installing ACE on Windows with CodeGear C++</a></h3>
+<h3><a name="codegear">Building and Installing ACE on Windows with Embarcadero C++</a></h3>
 
 If you are building for a machine without a network card, you may want
 to check <a href="#win32nonic">here</a> first. <p>
@@ -842,7 +846,7 @@ to check <a href="#win32nonic">here</a> first. <p>
       <br>
       Set the environment variable below to build a version of ACE optimized
       for a certain CPU. For this there are special compiler flags
-      (-3/-4/-5/-6), see the CodeGear help for more info.<br>
+      (-3/-4/-5/-6), see the Embarcadero help for more info.<br>
       <code>set CPU_FLAG=-6</code><br>
       <br>
       You can then start the build with the command
@@ -857,7 +861,7 @@ to check <a href="#win32nonic">here</a> first. <p>
 
 Note that when you run <code>make</code> in a sub directory you give <code>make -f Makefile.bmak all</code>. The <code>all</code> is needed to make sure the complete project is build.<p>
 
-The Borland/CodeGear C++ Builder 4.0/5.0/6.0/2006/2007/2009/2010 port has been done by Jody Hagins, <a href="mailto:chris@kohlhoff.com">Christopher Kohlhoff</a> and <a href="mailto:jwillemsen@remedy.nl">Johnny Willemsen</a>. </p><p>
+The Borland/CodeGear/Embarcadero C++ Builder 4.0/5.0/6.0/2006/2007/2009/2010 port has been done by Jody Hagins, <a href="mailto:chris@kohlhoff.com">Christopher Kohlhoff</a> and <a href="mailto:jwillemsen@remedy.nl">Johnny Willemsen</a>. </p><p>
 
 <b>ACE TESTS</b></p><p>
 

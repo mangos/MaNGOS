@@ -60,7 +60,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -150,7 +150,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -238,7 +238,7 @@
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -327,7 +327,7 @@
 				RuntimeTypeInfo="true"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -420,7 +420,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -510,7 +510,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4355;4244"
+				DisableSpecificWarnings="4355;4244;4267"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -1846,10 +1846,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Array.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Array_Base.h"
 				>
 			</File>
@@ -2050,14 +2046,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-cray.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-cxx-common.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-cygwin32.h"
 				>
 			</File>
@@ -2087,22 +2075,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-integritySCA.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-irix6.5.x-sgic++.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-irix6.x-common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-irix6.x-g++.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-irix6.x-sgic++.h"
 				>
 			</File>
 			<File
@@ -2214,14 +2186,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0-nothread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-suncc-common.h"
 				>
 			</File>
@@ -2274,18 +2238,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-tru64.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.udk.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-visualage.h"
 				>
 			</File>
@@ -2330,10 +2282,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-ghs.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-win32-interix.h"
 				>
 			</File>
@@ -2367,10 +2315,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\config-WinCE.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\config.h"
 				>
 			</File>
 			<File
@@ -2806,10 +2750,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Map.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Map_Manager.h"
 				>
 			</File>
@@ -2871,10 +2811,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Method_Object.h"
 				>
 			</File>
 			<File
@@ -3015,14 +2951,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Obstack_T.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Dirent.h"
 				>
 			</File>
 			<File
@@ -3562,10 +3490,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS_String.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\OS_Thread_Adapter.h"
 				>
 			</File>
@@ -3575,10 +3499,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Pair.h"
 				>
 			</File>
 			<File
@@ -3690,10 +3610,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Refcountable.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Refcountable_T.h"
 				>
 			</File>
@@ -3779,10 +3695,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Service_Repository.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Service_Templates.h"
 				>
 			</File>
 			<File
@@ -4007,10 +3919,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Synch_Options.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\Synch_T.h"
 				>
 			</File>
 			<File
@@ -4836,10 +4744,6 @@
 			</File>
 			<File
 				RelativePath="..\..\dep\ACE_wrappers\ace\Obstack_T.inl"
-				>
-			</File>
-			<File
-				RelativePath="..\..\dep\ACE_wrappers\ace\OS.inl"
 				>
 			</File>
 			<File
