@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: Asynch_Acceptor.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: Asynch_Acceptor.cpp 91693 2010-09-09 12:57:54Z johnnyw $
 
 #ifndef ACE_ASYNCH_ACCEPTOR_C
 #define ACE_ASYNCH_ACCEPTOR_C
@@ -443,13 +443,6 @@ ACE_Asynch_Acceptor<HANDLER>::make_handler (void)
                   HANDLER,
                   0);
   return handler;
-}
-
-/* static */
-template <class HANDLER> size_t
-ACE_Asynch_Acceptor<HANDLER>::address_size (void)
-{
-  return sizeof (sockaddr) + sizeof (sockaddr_in);
 }
 
 template <class HANDLER> bool

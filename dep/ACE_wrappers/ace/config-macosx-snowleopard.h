@@ -1,4 +1,4 @@
-// $Id: config-macosx-snowleopard.h 91319 2010-08-08 23:32:07Z wotte $
+// $Id: config-macosx-snowleopard.h 91693 2010-09-09 12:57:54Z johnnyw $
 #ifndef ACE_CONFIG_MACOSX_SNOWLEOPARD_H
 #define ACE_CONFIG_MACOSX_SNOWLEOPARD_H
 
@@ -14,7 +14,6 @@
 
 #endif
 
-// This header has been deprecated in Snow Leopard.
 #define ACE_LACKS_UCONTEXT_H
 
 #endif // ACE_CONFIG_MACOSX_SNOWLEOPARD_H

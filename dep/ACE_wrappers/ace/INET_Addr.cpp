@@ -1,4 +1,4 @@
-// $Id: INET_Addr.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+// $Id: INET_Addr.cpp 91683 2010-09-09 09:07:49Z johnnyw $
 
 // Defines the Internet domain address family address format.
 
@@ -871,10 +871,6 @@ ACE_INET_Addr::get_host_name_i (char hostname[], size_t len) const
         }
 #  endif /* ACE_HAS_IPV6 */
 
-#  if defined (DIGITAL_UNIX) && defined (__GNUC__)
-      hostent * const hp =
-        ACE_OS::gethostbyaddr (static_cast <char *> (addr), size, type);
-#  else
       int h_error;  // Not the same as errno!
       hostent hentry;
       ACE_HOSTENT_DATA buf;
@@ -885,7 +881,6 @@ ACE_INET_Addr::get_host_name_i (char hostname[], size_t len) const
                                  &hentry,
                                  buf,
                                  &h_error);
-#  endif /* DIGITAL_UNIX */
 
       if (hp == 0 || hp->h_name == 0)
         return -1;

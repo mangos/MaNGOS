@@ -978,9 +978,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Argv_Type_Converter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array_Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1131,12 +1128,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-all.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cxx-common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cygwin32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1159,18 +1150,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-integritySCA.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.5.x-sgic++.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-g++.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-irix6.x-sgic++.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-linux-common.h">
@@ -1251,12 +1230,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-rtems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0-nothread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sco-5.0.0.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-suncc-common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1296,15 +1269,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tru64.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-unixware-7.1.0.udk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-visualage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1338,9 +1302,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-dmc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-ghs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-interix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1366,9 +1327,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-WinCE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Configuration.h">
@@ -1468,9 +1426,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event_Handler_T.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Exception_Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO.h">
@@ -1698,9 +1653,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Manual_Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map_Manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1747,9 +1699,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Method_Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Method_Request.h">
@@ -1857,9 +1806,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obstack_T.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_aio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1876,9 +1822,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ctype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_dirent.h">
@@ -2184,9 +2127,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_typeinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_strings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2277,9 +2217,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pair_T.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2361,9 +2298,6 @@
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Recyclable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcountable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcountable_T.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -2428,9 +2362,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Repository.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Templates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Types.h">
@@ -2599,9 +2530,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_T.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Traits.h">
@@ -3219,9 +3147,6 @@
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\Obstack_T.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="..\..\dep\ACE_wrappers\ace\OS.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="..\..\dep\ACE_wrappers\ace\OS_Errno.inl">

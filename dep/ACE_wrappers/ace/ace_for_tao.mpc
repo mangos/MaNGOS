@@ -1,6 +1,6 @@
 //  -*- MPC -*-
 //
-// $Id: ace_for_tao.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+// $Id: ace_for_tao.mpc 92120 2010-10-01 12:00:01Z johnnyw $
 
 // The ACE_FOR_TAO subset is designed primarily for use with the
 // TAO CosNotification service.  It is not intended to be used
@@ -262,7 +262,6 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     Stream_Modules.cpp
     String_Base.cpp
     Svc_Handler.cpp
-    Synch_T.cpp
     TSS_T.cpp
     Task_Ex_T.cpp
     Task_T.cpp
@@ -287,9 +286,7 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     Guard_T.inl
     Handle_Gobbler.inl
     Lock_Adapter_T.inl
-    OS.inl
     OS_Memory.inl
-    OS_String.inl
     Refcounted_Auto_Ptr.inl
     Reverse_Lock_T.inl
     TSS_T.inl
@@ -300,7 +297,6 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
 
   Header_Files {
     ACE_export.h
-    Array.h
     Based_Pointer_Repository.h
     Bound_Ptr.h
     CORBA_macros.h
@@ -324,16 +320,12 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     Null_Mutex.h
     Null_Semaphore.h
     Numeric_Limits.h
-    OS.h
-    OS_Dirent.h
     OS_Memory.h
     OS_NS_macros.h
-    OS_String.h
     OS_Thread_Adapter.h
     Object_Manager_Base.h
     Process.h
     Process_Manager.h
-    Pair.h
     Reactor_Impl.h
     Reactor_Timer_Interface.h
     Refcounted_Auto_Ptr.h
@@ -361,8 +353,6 @@ project(ACE_FOR_TAO) : acedefaults, install, svcconf, uuid, versioned_namespace,
     config-minimal.h
     config-win32-borland.h
     config-win32-common.h
-    config-win32-ghs.h
-    config-win32-msvc-6.h
     config-win32-msvc-7.h
     config-win32-msvc.h
     config-win32.h

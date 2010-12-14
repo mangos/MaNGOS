@@ -1,7 +1,7 @@
 /**
  * @file Recursive_Thread_Mutex.cpp
  *
- * $Id: Recursive_Thread_Mutex.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+ * $Id: Recursive_Thread_Mutex.cpp 91688 2010-09-09 11:21:50Z johnnyw $
  *
  * Originally in Synch.cpp
  *
@@ -17,8 +17,6 @@
 #endif /* __ACE_INLINE__ */
 
 #include "ace/Log_Msg.h"
-
-
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 

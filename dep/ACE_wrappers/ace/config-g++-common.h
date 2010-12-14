@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: config-g++-common.h 91338 2010-08-11 13:47:26Z johnnyw $
+// $Id: config-g++-common.h 92120 2010-10-01 12:00:01Z johnnyw $
 
 // This configuration file is designed to be included by another,
 // specific configuration file.  It provides config information common
@@ -10,9 +10,15 @@
 #define ACE_GNUG_COMMON_H
 #include /**/ "ace/pre.h"
 
+#if !defined (ACE_CC_NAME)
+# define ACE_CC_NAME ACE_TEXT ("g++")
+#endif
+#define ACE_CC_MAJOR_VERSION __GNUC__
+#define ACE_CC_MINOR_VERSION __GNUC_MINOR__
+#define ACE_CC_BETA_VERSION (0)
+
 #define ACE_HAS_CPLUSPLUS_HEADERS
 #define ACE_HAS_STDCPP_STL_INCLUDES
-#define ACE_HAS_TEMPLATE_TYPEDEFS
 #define ACE_HAS_STANDARD_CPP_LIBRARY 1
 #define ACE_HAS_WORKING_EXPLICIT_TEMPLATE_DESTRUCTOR
 #define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
@@ -161,14 +167,6 @@
 # endif
 #endif
 #endif /* ACE_HAS_THREADS */
-
-#if defined (ACE_HAS_GNU_REPO)
-  // -frepo causes unresolved symbols of basic_string left- and
-  // right-shift operators with ACE_HAS_STRING_CLASS.
-# if defined (ACE_HAS_STRING_CLASS)
-#   undef ACE_HAS_STRING_CLASS
-# endif /* ACE_HAS_STRING_CLASS */
-#endif /* ! ACE_HAS_GNU_REPO */
 
 #include /**/ "ace/post.h"
 #endif /* ACE_GNUG_COMMON_H */

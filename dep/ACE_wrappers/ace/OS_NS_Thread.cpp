@@ -1,4 +1,4 @@
-// $Id: OS_NS_Thread.cpp 91523 2010-08-27 14:18:02Z johnnyw $
+// $Id: OS_NS_Thread.cpp 91693 2010-09-09 12:57:54Z johnnyw $
 
 #include "ace/OS_NS_Thread.h"
 
@@ -59,24 +59,14 @@ ACE_Thread_ID::to_string (char *thr_string) const
   ACE_OS::strcpy (fp, "u");
   ACE_OS::sprintf (thr_string,
                    format,
-                   static_cast <unsigned> (thread_id_));
-#elif defined (DIGITAL_UNIX)
-                  ACE_OS::strcpy (fp, "u");
-                  ACE_OS::sprintf (thr_string, format,
-#  if defined (ACE_HAS_THREADS)
-                                   thread_id_
-#  else
-                                   thread_id_
-#  endif /* ACE_HAS_THREADS */
-                                          );
+                   static_cast <unsigned> (this->thread_id_));
 #else
-
-#  if defined (ACE_MVS) || defined (ACE_TANDEM_T1248_PTHREADS)
+# if defined (ACE_MVS) || defined (ACE_TANDEM_T1248_PTHREADS)
                   // MVS's pthread_t is a struct... yuck. So use the ACE 5.0
                   // code for it.
                   ACE_OS::strcpy (fp, "u");
                   ACE_OS::sprintf (thr_string, format, thread_handle_);
-#  else
+# else
                   // Yes, this is an ugly C-style cast, but the
                   // correct C++ cast is different depending on
                   // whether the t_id is an integral type or a pointer
@@ -87,8 +77,7 @@ ACE_Thread_ID::to_string (char *thr_string) const
                   ACE_OS::sprintf (thr_string,
                                    format,
                                    (unsigned long) thread_handle_);
-#  endif /* ACE_MVS || ACE_TANDEM_T1248_PTHREADS */
-
+# endif /* ACE_MVS || ACE_TANDEM_T1248_PTHREADS */
 #endif /* ACE_WIN32 */
 }
 
@@ -664,7 +653,7 @@ TSS_Cleanup_Instance::TSS_Cleanup_Instance (Purpose purpose)
       ACE_NEW (condition_, ACE_Thread_Condition<ACE_Thread_Mutex> (*mutex_));
     }
 
-  ACE_Guard<ACE_Thread_Mutex> guard(*mutex_);
+  ACE_GUARD (ACE_Thread_Mutex, m, *mutex_);
 
   if (purpose == CREATE)
   {
@@ -1151,7 +1140,7 @@ ACE_OS::cond_broadcast (ACE_cond_t *cv)
     {
       return -1;
     }
-    
+
   bool have_waiters = false;
 
   if (cv->waiters_ > 0)
@@ -1163,13 +1152,13 @@ ACE_OS::cond_broadcast (ACE_cond_t *cv)
       cv->was_broadcast_ = 1;
       have_waiters = true;
     }
-    
+
   if (ACE_OS::thread_mutex_unlock (&cv->waiters_lock_) != 0)
     {
       // This is really bad, we have the lock but can't release it anymore
       return -1;
     }
-    
+
   int result = 0;
   if (have_waiters)
     {
@@ -1208,7 +1197,7 @@ ACE_OS::cond_destroy (ACE_cond_t *cv)
   int result = 0;
   if (ACE_OS::thread_mutex_destroy (&cv->waiters_lock_) != 0)
     result = -1;
-  
+
   if (ACE_OS::sema_destroy (&cv->sema_) != 0)
     result = -1;
 
@@ -1335,9 +1324,9 @@ ACE_OS::cond_wait (ACE_cond_t *cv,
   // Prevent race conditions on the <waiters_> count.
   if (ACE_OS::thread_mutex_lock (&cv->waiters_lock_) != 0)
     return -1;
-  
+
   ++cv->waiters_;
-  
+
   if (ACE_OS::thread_mutex_unlock (&cv->waiters_lock_) != 0)
     return -1;
 
@@ -1446,9 +1435,9 @@ ACE_OS::cond_timedwait (ACE_cond_t *cv,
   // Prevent race conditions on the <waiters_> count.
   if (ACE_OS::thread_mutex_lock (&cv->waiters_lock_) != 0)
     return -1;
-    
+
   ++cv->waiters_;
-  
+
   if (ACE_OS::thread_mutex_unlock (&cv->waiters_lock_) != 0)
     return -1;
 
@@ -1509,7 +1498,7 @@ ACE_OS::cond_timedwait (ACE_cond_t *cv,
   // Reacquire lock to avoid race conditions.
   if (ACE_OS::thread_mutex_lock (&cv->waiters_lock_) != 0)
     return -1;
-    
+
   --cv->waiters_;
 
   bool const last_waiter = cv->was_broadcast_ && cv->waiters_ == 0;
@@ -1648,9 +1637,9 @@ ACE_OS::cond_timedwait (ACE_cond_t *cv,
   // Prevent race conditions on the <waiters_> count.
   if (ACE_OS::thread_mutex_lock (&cv->waiters_lock_) != 0)
     return -1;
-  
+
   ++cv->waiters_;
-  
+
   if (ACE_OS::thread_mutex_unlock (&cv->waiters_lock_) != 0)
     return -1;
 
@@ -1721,7 +1710,7 @@ ACE_OS::cond_timedwait (ACE_cond_t *cv,
       if (ACE_OS::event_signal (&cv->waiters_done_) != 0)
         return -1;
     }
-    
+
   // We must always regain the <external_mutex>, even when errors
   // occur because that's the guarantee that we give to our callers.
   if (ACE_OS::thread_mutex_lock (external_mutex) != 0)
@@ -1755,7 +1744,7 @@ ACE_OS::cond_wait (ACE_cond_t *cv,
   if (ACE_OS::thread_mutex_lock (&cv->waiters_lock_) != 0)
     return -1;
   ++cv->waiters_;
-  
+
   if (ACE_OS::thread_mutex_unlock (&cv->waiters_lock_) != 0)
     return -1;
 
@@ -3570,15 +3559,7 @@ ACE_OS::sched_params (const ACE_Sched_Params &sched_params,
       int result = ::sched_setscheduler (id == ACE_SELF ? 0 : id,
                                          sched_params.policy (),
                                          &param) == -1 ? -1 : 0;
-# if defined (DIGITAL_UNIX)
-      return result == 0
-        ? // Use priocntl (2) to set the process in the RT class,
-        // if using an RT policy.
-        ACE_OS::set_scheduling_params (sched_params)
-        : result;
-# else  /* ! DIGITAL_UNIX */
       return result;
-# endif /* ! DIGITAL_UNIX */
 # endif /* ! ACE_TANDEM_T1248_PTHREADS */
     }
   else if (sched_params.scope () == ACE_SCOPE_THREAD)
@@ -4080,10 +4061,7 @@ ACE_OS::thr_create (ACE_THR_FUNC func,
           struct sched_param sparam;
           ACE_OS::memset ((void *) &sparam, 0, sizeof sparam);
 
-#     if defined (ACE_HAS_IRIX62_THREADS)
-          sparam.sched_priority = ACE_MIN (priority,
-                                           (long) PTHREAD_MAX_PRIORITY);
-#     elif defined (PTHREAD_MAX_PRIORITY) && !defined(ACE_HAS_PTHREADS)
+#     if defined (PTHREAD_MAX_PRIORITY) && !defined(ACE_HAS_PTHREADS)
           /* For MIT pthreads... */
           sparam.prio = ACE_MIN (priority, PTHREAD_MAX_PRIORITY);
 #     elif defined(ACE_HAS_PTHREADS) && !defined (ACE_HAS_STHREADS)
@@ -4105,7 +4083,7 @@ ACE_OS::thr_create (ACE_THR_FUNC func,
                                            (long) PRIORITY_MAX);
 #     else
           sparam.sched_priority = priority;
-#     endif /* ACE_HAS_IRIX62_THREADS */
+#     endif /*  PTHREAD_MAX_PRIORITY */
 
           {
 #       if defined (sun)  &&  defined (ACE_HAS_ONLY_SCHED_OTHER)
@@ -4666,7 +4644,7 @@ ACE_OS::thr_join (ACE_thread_t waiter_id,
 #endif /* ACE_HAS_VXTHREADS */
 
 int
-ACE_OS::thr_key_detach (ACE_thread_key_t key, void *)
+ACE_OS::thr_key_detach (ACE_thread_key_t key)
 {
 #if defined (ACE_HAS_WTHREADS) || defined (ACE_HAS_TSS_EMULATION)
   TSS_Cleanup_Instance cleanup;
@@ -4841,11 +4819,10 @@ ACE_OS::thr_keycreate_native (ACE_OS_thread_key_t *key,
 int
 ACE_OS::thr_keycreate (ACE_thread_key_t *key,
 # if defined (ACE_HAS_THR_C_DEST)
-                       ACE_THR_C_DEST dest,
+                       ACE_THR_C_DEST dest)
 # else
-                       ACE_THR_DEST dest,
+                       ACE_THR_DEST dest)
 # endif /* ACE_HAS_THR_C_DEST */
-                       void *)
 {
   // ACE_OS_TRACE ("ACE_OS::thr_keycreate");
 #if defined (ACE_HAS_THREADS)

@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-macosx-leopard.h 91459 2010-08-25 09:51:01Z mcorino $
+// $Id: config-macosx-leopard.h 91688 2010-09-09 11:21:50Z johnnyw $
 
 // This configuration file is designed to work with the MacOS X operating system.
 
@@ -100,7 +100,6 @@
 
 #define ACE_NEEDS_SCHED_H
 
-// Use of <malloc.h> is deprecated.
 #define ACE_LACKS_MALLOC_H
 
 #define ACE_HAS_ALT_CUSERID

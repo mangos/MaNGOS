@@ -1,4 +1,4 @@
-// $Id: Service_Gestalt.cpp 91402 2010-08-20 13:32:02Z mesnier_p $
+// $Id: Service_Gestalt.cpp 92357 2010-10-25 14:11:44Z mesnier_p $
 
 #include "ace/Svc_Conf.h"
 #include "ace/Get_Opt.h"
@@ -201,6 +201,9 @@ ACE_Service_Gestalt::~ACE_Service_Gestalt (void)
 
   delete this->svc_conf_file_queue_;
   this->svc_conf_file_queue_ = 0;
+
+  delete this->svc_queue_;
+  this->svc_queue_ = 0;
 }
 
 ACE_Service_Gestalt::ACE_Service_Gestalt (size_t size,
@@ -1059,7 +1062,7 @@ ACE_Service_Gestalt::open_i (const ACE_TCHAR program_name[],
   if (!ignore_default_svc_conf_file)
     {
       bool add_default = true;
-      bool has_files = this->svc_conf_file_queue_ && 
+      bool has_files = this->svc_conf_file_queue_ &&
         !this->svc_conf_file_queue_->is_empty ();
       bool has_cmdline = this->svc_queue_ && !this->svc_queue_->is_empty ();
       if (has_files || has_cmdline)
@@ -1109,7 +1112,12 @@ ACE_Service_Gestalt::open_i (const ACE_TCHAR program_name[],
     {
       result = this->process_directives ();
       if (result != -1)
-        result = this->process_commandline_directives ();
+        {
+          int temp = this->process_commandline_directives ();
+          if (temp == -1)
+            result = -1;
+          else result += temp;
+        }
     }
 
   // Reset debugging back to the way it was when we came into

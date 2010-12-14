@@ -6,7 +6,7 @@
  *
  * @file config-doxygen.h
  *
- * $Id: config-doxygen.h 91285 2010-08-05 08:29:30Z johnnyw $
+ * $Id: config-doxygen.h 91685 2010-09-09 09:35:14Z johnnyw $
  *
  * @author Carlos O'Ryan <coryan@uci.edu>
  * @author Darrell Brunsch <brunsch@uci.edu>
@@ -90,17 +90,11 @@
 /// Generate ACE_Dev_Poll_Reactor documentation
 #define ACE_HAS_DEV_POLL
 
-/// Generate ACE_Event_Handler_T documentation
-#define ACE_HAS_TEMPLATE_TYPEDEFS
-
 /// Generate ACE_Log_Msg_NT_Event_Log documentation
 #define ACE_HAS_LOG_MSG_NT_EVENT_LOG
 
 /// Generate icmp documentation
 #define ACE_HAS_ICMP_SUPPORT 1
-
-/// Don't expand ACE_RCSID macro
-#define ACE_USE_RCSID 0
 
 /// Parse some ACE_SSL classes that depend on recent versions of
 /// OpenSSL.

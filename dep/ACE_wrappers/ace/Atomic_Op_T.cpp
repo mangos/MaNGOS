@@ -1,4 +1,4 @@
-// $Id: Atomic_Op_T.cpp 91287 2010-08-05 10:30:49Z johnnyw $
+// $Id: Atomic_Op_T.cpp 92052 2010-09-27 14:20:22Z vzykov $
 
 #ifndef ACE_ATOMIC_OP_T_CPP
 #define ACE_ATOMIC_OP_T_CPP
@@ -38,7 +38,7 @@ ACE_Atomic_Op_Ex<ACE_LOCK, TYPE>::dump (void) const
   // ACE_TRACE ("ACE_Atomic_Op_Ex<ACE_LOCK, TYPE>::dump");
   ACE_DEBUG ((LM_DEBUG, ACE_BEGIN_DUMP, this));
   this->mutex_.dump ();
-  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP, this));
+  ACE_DEBUG ((LM_DEBUG, ACE_END_DUMP));
 #endif /* ACE_HAS_DUMP */
 }
 
