@@ -9,7 +9,7 @@ MaNGOS 0.17   (??? ??? 2010)
  ==== Server Features ====
 
  * Improved: Updated MySQL client libs to 5.1.49.
- * Improved: Updated ACE framework to 5.8.2.
+ * Improved: Updated ACE framework to 5.8.3.
 
  ==== Statistics ====
  * Fixed Bugs: ??? tickets and many bugs reported at forum resolved
