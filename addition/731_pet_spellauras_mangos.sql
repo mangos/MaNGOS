@@ -17,6 +17,13 @@ INSERT INTO `spell_pet_auras` VALUES
 (0,0,1,34904),
 (0,0,1,61017);
 
+-- Ferocious Inspiration
+DELETE FROM `spell_pet_auras` WHERE `spell` IN ('34455','34459','34460');
+INSERT INTO `spell_pet_auras` (`spell`, `effectId`, `pet`, `aura`) VALUES
+('34455','0','0','75593'),
+('34459','0','0','75446'),
+('34460','0','0','75447');
+
 -- Warlock demons
 -- imp
 DELETE FROM `spell_pet_auras` WHERE `spell` = 0 AND `pet` = 416;
