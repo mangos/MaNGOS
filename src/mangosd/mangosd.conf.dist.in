@@ -101,10 +101,6 @@ BindIP = "0.0.0.0"
 #        Default: 1 (unload grids)
 #                 0 (do not unload grids)
 #
-#    SocketSelectTime
-#        Socket select time (in milliseconds)
-#        Default: 10000 (10 secs)
-#
 #    GridCleanUpDelay
 #        Grid clean up delay (in milliseconds)
 #        Default: 300000 (5 min)

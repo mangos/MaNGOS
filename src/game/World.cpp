@@ -543,9 +543,6 @@ void World::LoadConfigSettings(bool reload)
     if (configNoReload(reload, CONFIG_UINT32_PORT_WORLD, "WorldServerPort", DEFAULT_WORLDSERVER_PORT))
         setConfig(CONFIG_UINT32_PORT_WORLD, "WorldServerPort", DEFAULT_WORLDSERVER_PORT);
 
-    if (configNoReload(reload, CONFIG_UINT32_SOCKET_SELECTTIME, "SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME))
-        setConfig(CONFIG_UINT32_SOCKET_SELECTTIME, "SocketSelectTime", DEFAULT_SOCKET_SELECT_TIME);
-
     if (configNoReload(reload, CONFIG_UINT32_GAME_TYPE, "GameType", 0))
         setConfig(CONFIG_UINT32_GAME_TYPE, "GameType", 0);
 
