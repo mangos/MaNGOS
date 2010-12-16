@@ -15301,7 +15301,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
             AddBattleGroundQueueId(bgQueueTypeId);
 
-            m_bgData.bgTypeID = currentBg->GetTypeID();
+            m_bgData.bgTypeID = currentBg->GetTypeID();     // bg data not marked as modified
 
             //join player to battleground group
             currentBg->EventPlayerLoggedIn(this, GetObjectGuid());
@@ -15321,7 +15321,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
             Relocate(_loc.coord_x, _loc.coord_y, _loc.coord_z, _loc.orientation);
 
             // We are not in BG anymore
-            m_bgData.bgInstanceID = 0;
+            SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);
         }
     }
     else
@@ -19301,6 +19301,7 @@ void Player::SetBattleGroundEntryPoint()
 
         // On taxi we don't need check for dungeon
         m_bgData.joinPos = WorldLocation(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+        m_bgData.m_needSave = true;
         return;
     }
     else
@@ -19323,6 +19324,7 @@ void Player::SetBattleGroundEntryPoint()
             if (const WorldSafeLocsEntry* entry = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam()))
             {
                 m_bgData.joinPos = WorldLocation(entry->map_id, entry->x, entry->y, entry->z, 0.0f);
+                m_bgData.m_needSave = true;
                 return;
             }
             else
@@ -19332,12 +19334,14 @@ void Player::SetBattleGroundEntryPoint()
         else if (!GetMap()->IsBattleGroundOrArena())
         {
             m_bgData.joinPos = WorldLocation(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+            m_bgData.m_needSave = true;
             return;
         }
     }
 
     // In error cases use homebind position
     m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+    m_bgData.m_needSave = true;
 }
 
 void Player::LeaveBattleground(bool teleportToEntryPoint)
@@ -22157,6 +22161,10 @@ void Player::_SaveEquipmentSets()
 
 void Player::_SaveBGData()
 {
+    // nothing save
+    if (!m_bgData.m_needSave)
+        return;
+
     CharacterDatabase.PExecute("DELETE FROM character_battleground_data WHERE guid='%u'", GetGUIDLow());
     if (m_bgData.bgInstanceID)
     {
