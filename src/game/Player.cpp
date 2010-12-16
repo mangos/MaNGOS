@@ -22173,6 +22173,8 @@ void Player::_SaveBGData()
             GetGUIDLow(), m_bgData.bgInstanceID, uint32(m_bgData.bgTeam), m_bgData.joinPos.coord_x, m_bgData.joinPos.coord_y, m_bgData.joinPos.coord_z,
             m_bgData.joinPos.orientation, m_bgData.joinPos.mapid, m_bgData.taxiPath[0], m_bgData.taxiPath[1], m_bgData.mountSpell);
     }
+
+    m_bgData.m_needSave = false;
 }
 
 void Player::DeleteEquipmentSet(uint64 setGuid)
