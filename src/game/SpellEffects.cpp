@@ -5443,7 +5443,8 @@ void Spell::EffectTameCreature(SpellEffectIndex /*eff_idx*/)
         return;
     }
 
-    uint16 level = (creatureTarget->getLevel() < (plr->getLevel() - 5)) ? (plr->getLevel() - 5) : creatureTarget->getLevel();
+    // level of hunter pet can't be less owner level at 5 levels
+    uint32 level = creatureTarget->getLevel() + 5 < plr->getLevel() ? (plr->getLevel() - 5) : creatureTarget->getLevel();
 
     // prepare visual effect for levelup
     pet->SetLevel(level - 1);

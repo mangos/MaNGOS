@@ -9190,7 +9190,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded `%s`, table is empty!", tableName);
+        sLog.outString(">> Loaded `%s`, table is empty!", tableName);
         return;
     }
 

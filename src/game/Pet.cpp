@@ -719,39 +719,39 @@ void Pet::GivePetXP(uint32 xp)
         return;
 
     uint32 level = getLevel();
+    uint32 maxlevel = std::min(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL), GetOwner()->getLevel());
 
-    // XP to money conversion processed in Player::RewardQuest
-    if(level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+    // pet not receive xp for level equal to owner level
+    if (level >= maxlevel)
         return;
 
-    uint32 curXP = GetUInt32Value(UNIT_FIELD_PETEXPERIENCE);
     uint32 nextLvlXP = GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP);
+    uint32 curXP = GetUInt32Value(UNIT_FIELD_PETEXPERIENCE);
     uint32 newXP = curXP + xp;
 
-    if(newXP >= nextLvlXP && level+1 > GetOwner()->getLevel())
-    {
-        SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, nextLvlXP-1);
-        return;
-    }
-
-    while( newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) )
+    while( newXP >= nextLvlXP && level < maxlevel)
     {
         newXP -= nextLvlXP;
+        ++level;
 
-        GivePetLevel(level+1);
-        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(level+1));
+        GivePetLevel(level);                              // also update UNIT_FIELD_PETNEXTLEVELEXP and UNIT_FIELD_PETEXPERIENCE to level start
 
-        level = getLevel();
         nextLvlXP = GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP);
     }
 
-    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, newXP);
+    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, level < maxlevel ? newXP : 0);
 }
 
 void Pet::GivePetLevel(uint32 level)
 {
-    if(!level)
+    if (!level || level == getLevel())
         return;
+
+    if (getPetType()==HUNTER_PET)
+    {
+        SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+        SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(level));
+    }
 
     InitStatsForLevel(level);
     InitLevelupSpellsForLevel();
@@ -2033,12 +2033,10 @@ void Pet::SynchronizeLevelWithOwner()
             break;
         // can't be greater owner level
         case HUNTER_PET:
-            if(getLevel() > owner->getLevel())
-            {
+            if (getLevel() > owner->getLevel())
                 GivePetLevel(owner->getLevel());
-                SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(owner->getLevel()));
-                SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP)-1);
-            }
+            else if (getLevel() + 5 < owner->getLevel())
+                GivePetLevel(owner->getLevel() - 5);
             break;
         default:
             break;
