@@ -10418,7 +10418,8 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
     if(IsFFAPvP())
         pet->SetFFAPvP(true);
 
-    uint32 level = (creatureTarget->getLevel() < (getLevel() - 5)) ? (getLevel() - 5) : creatureTarget->getLevel();
+    // level of hunter pet can't be less owner level at 5 levels
+    uint32 level = creatureTarget->getLevel() + 5 < getLevel() ? (getLevel() - 5) : creatureTarget->getLevel();
 
     if(!pet->InitStatsForLevel(level))
     {
