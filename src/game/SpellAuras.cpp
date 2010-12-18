@@ -2015,6 +2015,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         if (roll_chance_i(20))              // backfire stun
                             target->CastSpell(target, 51581, true, NULL, this);
                         return;
+                    case 42515:                                     // Jarl Beam
+                    {
+                        // aura animate dead (fainted) state for the duration, but we need to animate the death itself (correct way below?)
+                        if (Unit* pCaster = GetCaster())
+                            pCaster->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                        return;
+                    }
                     case 43873:                             // Headless Horseman Laugh
                         target->PlayDistanceSound(11965);
                         return;
@@ -2251,6 +2259,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             case 36730:                                     // Flame Strike
             {
                 target->CastSpell(target, 36731, true, NULL, this);
+                return;
+            }
+            case 42515:                                     // Jarl Beam
+            {
+                if (Unit* pCaster = GetCaster())
+                    pCaster->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
+
+                // Beam to Zelfrax
+                target->CastSpell(target, 42517, true);
                 return;
             }
             case 43874:                                     // Scourge Mur'gul Camp: Force Shield Arcane Purple x3
