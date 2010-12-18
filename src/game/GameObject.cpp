@@ -1338,7 +1338,10 @@ void GameObject::Use(Unit* user)
             if (GetUniqueUseCount() < info->summoningRitual.reqParticipants)
                 return;
 
-            spellCaster = GetMap()->GetPlayer(m_firstUser);
+            // owner is first user for non-wild GO objects, if it offline value already set to current user
+            if (GetOwnerGuid().IsEmpty())
+                if (Player* firstUser = GetMap()->GetPlayer(m_firstUser))
+                    spellCaster = firstUser;
 
             spellId = info->summoningRitual.spellId;
 
