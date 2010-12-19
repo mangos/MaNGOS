@@ -3319,6 +3319,11 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 //case 54072: break;                        // Knockback Ball Passive
                 //case 54476: break;                        // Blood Presence
                 //case 54775: break;                        // Abandon Vehicle on Poly
+                case 56702:                                 //
+                {
+                    trigger_spell_id = 56701;
+                    break;
+                }
                 case 57345:                                 // Darkmoon Card: Greatness
                 {
                     float stat = 0.0f;
