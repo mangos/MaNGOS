@@ -489,12 +489,14 @@ AC_CHECK_HEADER([dlfcn.h],
 
      case "$host_os" in
      darwin*)
+	dnl MaNGOS modification: fix MacOS build by use ACE_TEXT instead ACE_LIB_TEXT (make code similar used in config-macosx.h)
 	AC_DEFINE([ACE_LD_SEARCH_PATH],
-		  [ACE_LIB_TEXT ("DYLD_LIBRARY_PATH")],
+		  [ACE_TEXT ("DYLD_LIBRARY_PATH")],
 		  [Define to environment variable used for DLL search path])
 	AC_DEFINE([ACE_DLL_SUFFIX],
-		  [ACE_LIB_TEXT (".dylib")],
+		  [ACE_TEXT (".dylib")],
 		  [Define to DLL file suffix])
+	dnl MaNGOS modification end
 	;;
      esac
     ],[])
