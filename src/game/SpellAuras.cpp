@@ -8871,6 +8871,16 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
         {
             switch(GetId())
             {
+                case 55001:
+                {
+                    if (apply)
+                    {
+                        m_target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                        m_target->RemoveSpellsCausingAura(SPELL_AURA_FLY);
+                        m_target->RemoveSpellsCausingAura(SPELL_AURA_MOD_INCREASE_SPEED);
+                    }
+                    break;
+                }
                 case 57350:                                 // Illusionary Barrier
                 {
                     if (!apply && m_target->getPowerType() == POWER_MANA)
