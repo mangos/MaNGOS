@@ -185,7 +185,6 @@ PlayerLimit = 100
 SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
 GridUnload = 1
-SocketSelectTime = 10000
 GridCleanUpDelay = 300000
 MapUpdateInterval = 100
 ChangeWeatherInterval = 600000
