@@ -289,3 +289,5 @@ UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry`=33620;
 -- from Lordron
 -- Spectral tiger
 UPDATE `creature_template` SET `VehicleId` = 354 WHERE `entry` = 33357;
+
+UPDATE `creature_template` SET `VehicleId` = 146 WHERE `entry` = 28875;

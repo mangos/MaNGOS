@@ -268,8 +268,8 @@ VALUES ('47917','4027','11652','1','11652','0','0','2','0'), ('47917','4130','11
 UPDATE `creature_template` SET
 spell1 = 47938,
 spell2 = 47921,
-spell3 = 47939,
-spell4 = 0,
+spell3 = 47966,
+spell4 = 47939,
 spell5 = 0,
 spell6 = 0,
 VehicleId = 55
