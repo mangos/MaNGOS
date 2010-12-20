@@ -289,8 +289,6 @@ void AntiCheat::DoAntiCheatAction(AntiCheatCheck checkType, std::string reason)
                         if (checkType == CHECK_MOVEMENT_FLY ||
                             GetPlayer()->HasAuraType(SPELL_AURA_FLY))
                             {
-                                GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FLY);
-                                GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
                                 GetPlayer()->CastSpell(GetPlayer(), 55001, true);
                             }
                     }
@@ -743,7 +741,7 @@ bool AntiCheat::CheckSpellFamily()
         if (pSkill->id == 769)
         {
             checkPassed = false;
-            mode = " it's GM spell!";
+            mode = " it is GM spell!";
         }
     }
 
