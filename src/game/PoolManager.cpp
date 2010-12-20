@@ -367,37 +367,41 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj, bool instantly)
     {
         sObjectMgr.AddCreatureToGrid(obj->guid, data);
 
-        // Spawn if necessary (loaded grids only)
-        Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid));
-        if(!map)
-            return;
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
 
-        // We use spawn coords to spawn (avoid work for instances until implemented support)
-        if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
         {
-            Creature* pCreature = new Creature;
-            //DEBUG_LOG("Spawning creature %u",obj->guid);
-            if (!pCreature->LoadFromDB(obj->guid, map))
+            // Spawn if necessary (loaded grids only)
+            Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid));
+
+            // We use spawn coords to spawn
+            if (map && map->IsLoaded(data->posX, data->posY))
             {
-                delete pCreature;
-                return;
-            }
-            else
-            {
-                // if new spawn replaces a just despawned creature, not instantly spawn but set respawn timer
-                if(!instantly)
+                Creature* pCreature = new Creature;
+                //DEBUG_LOG("Spawning creature %u",obj->guid);
+                if (!pCreature->LoadFromDB(obj->guid, map))
                 {
-                    pCreature->SetRespawnTime( pCreature->GetRespawnDelay() );
-                    if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY) || pCreature->IsWorldBoss())
-                        pCreature->SaveRespawnTime();
+                    delete pCreature;
+                    return;
                 }
-                map->Add(pCreature);
+                else
+                {
+                    // if new spawn replaces a just despawned creature, not instantly spawn but set respawn timer
+                    if(!instantly)
+                    {
+                        pCreature->SetRespawnTime( pCreature->GetRespawnDelay() );
+                        if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY) || pCreature->IsWorldBoss())
+                            pCreature->SaveRespawnTime();
+                    }
+                    map->Add(pCreature);
+                }
             }
-        }
-        // for not loaded grid just update respawn time (avoid work for instances until implemented support)
-        else if(!map->Instanceable() && !instantly)
-        {
-            sObjectMgr.SaveCreatureRespawnTime(obj->guid,map->GetInstanceId(),time(NULL) + data->spawntimesecs);
+            // for not loaded grid just update respawn time (avoid work for instances until implemented support)
+            else if(!instantly)
+            {
+                sObjectMgr.SaveCreatureRespawnTime(obj->guid, 0 /*map->GetInstanceId()*/, time(NULL) + data->spawntimesecs);
+            }
         }
     }
 }
@@ -409,44 +413,47 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj, bool instantly)
     if (GameObjectData const* data = sObjectMgr.GetGOData(obj->guid))
     {
         sObjectMgr.AddGameobjectToGrid(obj->guid, data);
-        // Spawn if necessary (loaded grids only)
-        // this base map checked as non-instanced and then only existing
-        Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid));
-        if(!map)
-            return;
 
-        // We use current coords to unspawn, not spawn coords since creature can have changed grid
-        // (avoid work for instances until implemented support)
-        if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
         {
-            GameObject* pGameobject = new GameObject;
-            //DEBUG_LOG("Spawning gameobject %u", obj->guid);
-            if (!pGameobject->LoadFromDB(obj->guid, map))
+            // Spawn if necessary (loaded grids only)
+            Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid));
+
+            // We use spawn coords to spawn
+            if (map && map->IsLoaded(data->posX, data->posY))
             {
-                delete pGameobject;
-                return;
-            }
-            else
-            {
-                if (pGameobject->isSpawnedByDefault())
+                GameObject* pGameobject = new GameObject;
+                //DEBUG_LOG("Spawning gameobject %u", obj->guid);
+                if (!pGameobject->LoadFromDB(obj->guid, map))
                 {
-                    // if new spawn replaces a just despawned object, not instantly spawn but set respawn timer
-                    if(!instantly)
+                    delete pGameobject;
+                    return;
+                }
+                else
+                {
+                    if (pGameobject->isSpawnedByDefault())
                     {
-                        pGameobject->SetRespawnTime( pGameobject->GetRespawnDelay() );
-                        if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
-                            pGameobject->SaveRespawnTime();
+                        // if new spawn replaces a just despawned object, not instantly spawn but set respawn timer
+                        if(!instantly)
+                        {
+                            pGameobject->SetRespawnTime( pGameobject->GetRespawnDelay() );
+                            if (sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
+                                pGameobject->SaveRespawnTime();
+                        }
+                        map->Add(pGameobject);
                     }
-                    map->Add(pGameobject);
                 }
             }
-        }
-        // for not loaded grid just update respawn time (avoid work for instances until implemented support)
-        else if(!map->Instanceable() && !instantly)
-        {
-            // for spawned by default object only
-            if (data->spawntimesecs >= 0)
-                sObjectMgr.SaveGORespawnTime(obj->guid,map->GetInstanceId(),time(NULL) + data->spawntimesecs);
+            // for not loaded grid just update respawn time (avoid work for instances until implemented support)
+            else if(!instantly)
+            {
+                // for spawned by default object only
+                if (data->spawntimesecs >= 0)
+                    sObjectMgr.SaveGORespawnTime(obj->guid, 0 /*map->GetInstanceId()*/, time(NULL) + data->spawntimesecs);
+            }
         }
     }
 }
