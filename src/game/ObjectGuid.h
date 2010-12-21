@@ -134,7 +134,7 @@ class MANGOS_DLL_SPEC ObjectGuid
         bool IsPlayer()        const { return !IsEmpty() && GetHigh() == HIGHGUID_PLAYER; }
         bool IsUnit()          const { return IsAnyTypeCreature() || IsPlayer(); }
         bool IsItem()          const { return GetHigh() == HIGHGUID_ITEM; }
-        bool IsGameobject()    const { return GetHigh() == HIGHGUID_GAMEOBJECT; }
+        bool IsGameObject()    const { return GetHigh() == HIGHGUID_GAMEOBJECT; }
         bool IsDynamicObject() const { return GetHigh() == HIGHGUID_DYNAMICOBJECT; }
         bool IsCorpse()        const { return GetHigh() == HIGHGUID_CORPSE; }
         bool IsTransport()     const { return GetHigh() == HIGHGUID_TRANSPORT; }
