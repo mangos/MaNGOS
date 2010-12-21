@@ -9411,7 +9411,7 @@ void ObjectMgr::LoadVendorTemplates()
         {
             if (cInfo->vendorId)
             {
-                if (vendor_ids.count(cInfo->vendorId) > 0)
+                if (m_mCacheVendorTemplateItemMap.find(cInfo->vendorId) !=  m_mCacheVendorTemplateItemMap.end())
                     vendor_ids.erase(cInfo->vendorId);
                 else
                     sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", cInfo->Entry, cInfo->vendorId);

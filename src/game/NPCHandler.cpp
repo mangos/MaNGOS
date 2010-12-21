@@ -330,7 +330,7 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
     uint32 gossipListId;
     uint32 menuId;
     ObjectGuid guid;
-    std::string code = "";
+    std::string code;
 
     recv_data >> guid >> menuId >> gossipListId;
 
@@ -365,7 +365,7 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
                 _player->OnGossipSelect(pCreature, gossipListId, menuId);
         }
     }
-    else if (guid.IsGameobject())
+    else if (guid.IsGameObject())
     {
         GameObject *pGo = GetPlayer()->GetGameObjectIfCanInteractWith(guid);
 
