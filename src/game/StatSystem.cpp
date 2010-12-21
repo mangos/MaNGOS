@@ -576,14 +576,45 @@ void Player::UpdateParryPercentage()
 
 void Player::UpdateDodgePercentage()
 {
+    static const float dodge_cap[MAX_CLASSES] = {
+         88.129021f,  // Warrior
+         88.129021f,  // Paladin
+        145.560408f,  // Hunter
+        145.560408f,  // Rogue
+        150.375940f,  // Priest
+         88.129021f,  // DK
+        145.560408f,  // Shaman
+        150.375940f,  // Mage
+        150.375940f,  // Warlock
+          0.0f,       // ??
+        116.890707f   // Druid
+    };
+    static const float k[MAX_CLASSES] = {
+        0.9560f,  // Warrior
+        0.9560f,  // Paladin
+        0.9880f,  // Hunter
+        0.9880f,  // Rogue
+        0.9830f,  // Priest
+        0.9560f,  // DK
+        0.9880f,  // Shaman
+        0.9830f,  // Mage
+        0.9830f,  // Warlock
+        0.0f,     // ??
+        0.9720f   // Druid
+    };
+    float diminishing = 0.f, nondiminishing = 0.f;
     // Dodge from agility
-    float value = GetDodgeFromAgility();
+    GetDodgeFromAgility(diminishing, nondiminishing);
     // Modify value from defense skill
-    value += (int32(GetDefenseSkillValue()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+    nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;
+    diminishing += (int32(GetRatingBonusValue(CR_DEFENSE_SKILL))) * 0.04f;
     // Dodge from SPELL_AURA_MOD_DODGE_PERCENT aura
-    value += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
+    nondiminishing += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
     // Dodge from rating
-    value += GetRatingBonusValue(CR_DODGE);
+    diminishing += GetRatingBonusValue(CR_DODGE);
+    // apply diminishing formula to diminishing dodge
+    uint32 pclass = getClass()-1;
+    float value = nondiminishing + (diminishing*dodge_cap[pclass] / (diminishing + dodge_cap[pclass]*k[pclass]));
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(PLAYER_DODGE_PERCENTAGE, value);
 }
