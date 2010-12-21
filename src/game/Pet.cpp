@@ -273,6 +273,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         CastPetAuras(current);
 
     CastPetPassiveAuras(true);
+    CalculateScalingData(true);
     ApplyAllScalingBonuses(true);
 
     if (getPetType() != HUNTER_PET
@@ -3049,7 +3050,7 @@ PetScalingData* Pet::CalculateScalingData(bool recalculate)
     {
          const PetScalingData* pData = &*itr;
 
-         if (!pData->creatureID || (owner && (!pData->requiredAura || owner->HasSpell(pData->requiredAura) || owner->HasAura(pData->requiredAura))))
+         if (!pData->creatureID || (owner && (!pData->requiredAura || owner->HasSpell(pData->requiredAura) || owner->HasAura(pData->requiredAura) || HasSpell(pData->requiredAura) || HasAura(pData->requiredAura))))
          {
              m_PetScalingData->healthBasepoint  += pData->healthBasepoint;
              m_PetScalingData->healthScale      += pData->healthScale;
