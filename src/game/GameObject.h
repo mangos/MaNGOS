@@ -695,7 +695,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool IsFriendlyTo(Unit const* unit) const;
 
         void SummonLinkedTrapIfAny();
-        void TriggeringLinkedGameObject( uint32 trapEntry, Unit* target);
+        void TriggerLinkedGameObject(Unit* target);
 
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 
