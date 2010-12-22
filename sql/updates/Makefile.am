@@ -136,6 +136,8 @@ pkgdata_DATA = \
 	10867_01_mangos_npc_trainer_template.sql \
 	10867_02_mangos_creature_template.sql \
 	10883_01_mangos_spell_proc_event.sql \
+	10906_01_mangos_spell_proc_event.sql \
+	10906_02_mangos_spell_bonus_data.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -252,4 +254,6 @@ EXTRA_DIST = \
 	10867_01_mangos_npc_trainer_template.sql \
 	10867_02_mangos_creature_template.sql \
 	10883_01_mangos_spell_proc_event.sql \
+	10906_01_mangos_spell_proc_event.sql \
+	10906_02_mangos_spell_bonus_data.sql \
 	README
