@@ -289,5 +289,7 @@ UPDATE `creature_template` SET `unit_flags`=33587968 WHERE `entry`=33620;
 -- from Lordron
 -- Spectral tiger
 UPDATE `creature_template` SET `VehicleId` = 354 WHERE `entry` = 33357;
-
+-- Shalewing
 UPDATE `creature_template` SET `VehicleId` = 146 WHERE `entry` = 28875;
+-- Drakkari Skullcrusher
+UPDATE `creature_template` SET `VehicleId` = 744 WHERE `entry` = 28844;
