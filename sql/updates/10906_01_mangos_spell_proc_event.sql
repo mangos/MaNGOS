@@ -1,0 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_10883_01_mangos_spell_proc_event required_10906_01_mangos_spell_proc_event bit;
+
+DELETE FROM spell_proc_event WHERE entry=63335;
+INSERT INTO spell_proc_event VALUES
+(63335, 0x00, 15, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0);
