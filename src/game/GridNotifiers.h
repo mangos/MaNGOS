@@ -560,6 +560,24 @@ namespace MaNGOS
             float i_range;
     };
 
+    class RaiseAllyObjectCheck
+    {
+        public:
+            RaiseAllyObjectCheck(WorldObject const* fobj, float range) : i_fobj(fobj), i_range(range) {}
+            WorldObject const& GetFocusObject() const { return *i_fobj; }
+            bool operator()(Player* u)
+            {
+                if( u->isAlive() || u->IsTaxiFlying() || !i_fobj->IsFriendlyTo(u) )
+                    return false;
+
+                return i_fobj->IsWithinDistInMap(u, i_range);
+            }
+            template<class NOT_INTERESTED> bool operator()(NOT_INTERESTED*) { return false; }
+        private:
+            WorldObject const* i_fobj;
+            float i_range;
+    };
+
     class ExplodeCorpseObjectCheck
     {
         public:

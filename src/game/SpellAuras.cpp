@@ -9341,10 +9341,8 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     {
                         // convert player to ghoul
                         m_player->SetDeathState(GHOULED);
-/*                        WorldPacket data(SMSG_PRE_RESURRECT, m_player->GetPackGUID().size());
-                        data << m_player->GetPackGUID();
-                        m_player->GetSession()->SendPacket(&data);
-*/
+                        m_player->BuildPlayerRepop();
+                        m_player->SpawnCorpseBones();
                     }
                     else
                     {
