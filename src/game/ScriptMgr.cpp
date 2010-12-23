@@ -632,7 +632,7 @@ void ScriptMgr::LoadCreatureMovementScripts()
 
 void ScriptMgr::LoadDbScriptStrings()
 {
-    LoadMangosStrings(WorldDatabase,"db_script_string",MIN_DB_SCRIPT_STRING_ID,MAX_DB_SCRIPT_STRING_ID);
+    sObjectMgr.LoadMangosStrings(WorldDatabase, "db_script_string", MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID);
 
     std::set<int32> ids;
 
@@ -640,18 +640,18 @@ void ScriptMgr::LoadDbScriptStrings()
         if (sObjectMgr.GetMangosStringLocale(i))
             ids.insert(i);
 
-    CheckScriptTexts(sQuestEndScripts,ids);
-    CheckScriptTexts(sQuestStartScripts,ids);
-    CheckScriptTexts(sSpellScripts,ids);
-    CheckScriptTexts(sGameObjectScripts,ids);
-    CheckScriptTexts(sEventScripts,ids);
-    CheckScriptTexts(sGossipScripts,ids);
-    CheckScriptTexts(sCreatureMovementScripts,ids);
+    CheckScriptTexts(sQuestEndScripts, ids);
+    CheckScriptTexts(sQuestStartScripts, ids);
+    CheckScriptTexts(sSpellScripts, ids);
+    CheckScriptTexts(sGameObjectScripts, ids);
+    CheckScriptTexts(sEventScripts, ids);
+    CheckScriptTexts(sGossipScripts, ids);
+    CheckScriptTexts(sCreatureMovementScripts, ids);
 
     sWaypointMgr.CheckTextsExistance(ids);
 
     for(std::set<int32>::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
-        sLog.outErrorDb( "Table `db_script_string` has unused string id  %u", *itr);
+        sLog.outErrorDb("Table `db_script_string` has unused string id %u", *itr);
 }
 
 void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts, std::set<int32>& ids)
