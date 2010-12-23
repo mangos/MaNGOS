@@ -28,6 +28,7 @@
 #include "DBCStores.h"
 #include "ProgressBar.h"
 #include "ScriptCalls.h"
+#include "ScriptMgr.h"
 
 void MapManager::LoadTransports()
 {

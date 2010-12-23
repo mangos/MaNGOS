@@ -943,6 +943,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\ScriptMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\ScriptMgr.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\SkillDiscovery.cpp"
 				>
 			</File>

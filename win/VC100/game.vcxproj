@@ -479,6 +479,7 @@
     <ClCompile Include="..\..\src\game\ReactorAI.cpp" />
     <ClCompile Include="..\..\src\game\ReputationMgr.cpp" />
     <ClCompile Include="..\..\src\game\ScriptCalls.cpp" />
+    <ClCompile Include="..\..\src\game\ScriptMgr.cpp" />
     <ClCompile Include="..\..\src\game\SkillDiscovery.cpp" />
     <ClCompile Include="..\..\src\game\SkillExtraItems.cpp" />
     <ClCompile Include="..\..\src\game\SkillHandler.cpp" />
@@ -627,6 +628,7 @@
     <ClInclude Include="..\..\src\game\ReactorAI.h" />
     <ClInclude Include="..\..\src\game\ReputationMgr.h" />
     <ClInclude Include="..\..\src\game\ScriptCalls.h" />
+    <ClInclude Include="..\..\src\game\ScriptMgr.h" />
     <ClInclude Include="..\..\src\game\SharedDefines.h" />
     <ClInclude Include="..\..\src\game\SkillDiscovery.h" />
     <ClInclude Include="..\..\src\game\SkillExtraItems.h" />
