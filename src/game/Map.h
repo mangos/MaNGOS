@@ -336,7 +336,7 @@ class MANGOS_DLL_SPEC InstanceMap : public Map
         void Update(const uint32&);
         void CreateInstanceData(bool load);
         bool Reset(InstanceResetMethod method);
-        uint32 GetScriptId() { return i_script_id; }
+        uint32 GetScriptId() const { return i_script_id; }
         InstanceData* GetInstanceData() { return i_data; }
         void PermBindAllPlayers(Player *player);
         void UnloadAll(bool pForce);
