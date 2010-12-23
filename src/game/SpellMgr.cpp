@@ -657,6 +657,9 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
         case SPELL_EFFECT_ENERGIZE_PCT:
             return true;
 
+        case SPELL_EFFECT_SCHOOL_DAMAGE:
+            return false;
+
             // non-positive aura use
         case SPELL_EFFECT_APPLY_AURA:
         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
