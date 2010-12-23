@@ -6165,6 +6165,11 @@ bool Spell::IgnoreItemRequirements() const
             if (targetItem->GetOwnerGuid() != m_caster->GetObjectGuid())
                 return false;
 
+        /// Some triggered spells have same reagents that have master spell
+        /// expected in test: master spell have reagents in first slot then triggered don't must use own
+        if (m_triggeredBySpellInfo && !m_triggeredBySpellInfo->Reagent[0])
+            return false;
+
         return true;
     }
 
