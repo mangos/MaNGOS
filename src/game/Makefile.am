@@ -235,6 +235,8 @@ libmangosgame_a_SOURCES = \
 	ReputationMgr.h \
 	ScriptCalls.cpp \
 	ScriptCalls.h \
+	ScriptMgr.cpp \
+	ScriptMgr.h \
 	SharedDefines.h \
 	SkillHandler.cpp \
 	SpellAuraDefines.h \

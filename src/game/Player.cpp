@@ -56,6 +56,7 @@
 #include "Chat.h"
 #include "Database/DatabaseImpl.h"
 #include "Spell.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "AchievementMgr.h"
 #include "Mail.h"

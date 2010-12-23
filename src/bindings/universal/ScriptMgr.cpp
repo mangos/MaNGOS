@@ -23,6 +23,7 @@
 #include "../../game/Player.h"
 #include "../../game/Map.h"
 #include "../../game/ObjectMgr.h"
+#include "../../game/ScriptMgr.h"
 #include "../../game/SpellAuras.h"
 
 //uint8 loglevel = 0;

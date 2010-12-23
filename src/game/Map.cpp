@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "World.h"
 #include "ScriptCalls.h"
+#include "ScriptMgr.h"
 #include "Group.h"
 #include "MapRefManager.h"
 #include "DBCEnums.h"
@@ -1496,7 +1497,7 @@ void InstanceMap::CreateInstanceData(bool load)
             const char* data = fields[0].GetString();
             if(data)
             {
-                DEBUG_LOG("Loading instance data for `%s` with id %u", sObjectMgr.GetScriptName(i_script_id), i_InstanceId);
+                DEBUG_LOG("Loading instance data for `%s` with id %u", sScriptMgr.GetScriptName(i_script_id), i_InstanceId);
                 i_data->Load(data);
             }
             delete result;
@@ -1504,7 +1505,7 @@ void InstanceMap::CreateInstanceData(bool load)
     }
     else
     {
-        DEBUG_LOG("New instance data, \"%s\" ,initialized!", sObjectMgr.GetScriptName(i_script_id));
+        DEBUG_LOG("New instance data, \"%s\" ,initialized!", sScriptMgr.GetScriptName(i_script_id));
         i_data->Initialize();
     }
 }
