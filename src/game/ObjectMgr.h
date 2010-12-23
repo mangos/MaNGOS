@@ -919,8 +919,8 @@ class ObjectMgr
         AreaTrigger const* GetGoBackTrigger(uint32 Map) const;
         AreaTrigger const* GetMapEntranceTrigger(uint32 Map) const;
 
-        uint32 GetAreaTriggerScriptId(uint32 trigger_id);
-        uint32 GetEventIdScriptId(uint32 eventId);
+        uint32 GetAreaTriggerScriptId(uint32 triggerId) const;
+        uint32 GetEventIdScriptId(uint32 eventId) const;
 
         RepRewardRate const* GetRepRewardRate(uint32 factionId) const
         {
@@ -1349,9 +1349,9 @@ class ObjectMgr
         bool IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* pl = NULL, std::set<uint32>* skip_vendors = NULL) const;
 
         void LoadScriptNames();
-        ScriptNameMap &GetScriptNames() { return m_scriptNames; }
-        const char * GetScriptName(uint32 id) { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
-        uint32 GetScriptId(const char *name);
+        ScriptNameMap const& GetScriptNames() const { return m_scriptNames; }
+        const char* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
+        uint32 GetScriptId(const char *name) const;
 
         int GetOrNewIndexForLocale(LocaleConstant loc);
 
@@ -1452,8 +1452,8 @@ class ObjectMgr
         GossipTextMap       mGossipText;
         AreaTriggerMap      mAreaTriggers;
 
-        AreaTriggerScriptMap    mAreaTriggerScripts;
-        EventIdScriptMap        mEventIdScripts;
+        AreaTriggerScriptMap    m_AreaTriggerScripts;
+        EventIdScriptMap        m_EventIdScripts;
 
         RepRewardRateMap    m_RepRewardRateMap;
         RepOnKillMap        mRepOnKill;
@@ -1570,10 +1570,10 @@ class ObjectMgr
 
 // scripting access functions
 MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value = MAX_CREATURE_AI_TEXT_STRING_ID, int32 end_value = std::numeric_limits<int32>::min());
-MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 trigger_id);
-MANGOS_DLL_SPEC uint32 GetEventIdScriptId(uint32 event_id);
+MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 triggerId);
+MANGOS_DLL_SPEC uint32 GetEventIdScriptId(uint32 eventId);
 MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
-MANGOS_DLL_SPEC ObjectMgr::ScriptNameMap& GetScriptNames();
+MANGOS_DLL_SPEC ObjectMgr::ScriptNameMap const& GetScriptNames();
 MANGOS_DLL_SPEC CreatureInfo const* GetCreatureTemplateStore(uint32 entry);
 MANGOS_DLL_SPEC Quest const* GetQuestTemplateStore(uint32 entry);
 

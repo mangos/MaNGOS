@@ -23,12 +23,14 @@
 #include "ObjectMgr.h"
 #include "DBCEnums.h"
 
+class Aura;
 class Creature;
 class CreatureAI;
 class GameObject;
 class Item;
 class Player;
 class Quest;
+class Unit;
 class SpellCastTargets;
 class Map;
 class InstanceData;
