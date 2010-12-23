@@ -8926,7 +8926,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             {
                 if (tSpells->spellList.find(spell) != tSpells->spellList.end())
                 {
-                    sLog.outErrorDb("Table `%s` for trainer (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell);
+                    sLog.outErrorDb("Table `%s` for trainer (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainerId);
                     continue;
                 }
             }
