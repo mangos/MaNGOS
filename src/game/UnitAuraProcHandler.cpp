@@ -974,6 +974,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     // Cauterizing Heal or Searing Flame
                     triggered_spell_id = (procFlag & PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL) ? 69733 : 69729;
                     break;
+                case 70871:
+                    // Soul of Blood qween
+                    triggered_spell_id = 70872;
+                    basepoints[0] = int32(triggerAmount* damage /100);
+                    if (basepoints[0] < 0)
+                        return SPELL_AURA_PROC_FAILED;
+                    break;
                 // Item - Shadowmourne Legendary
                 case 71903:
                 {
@@ -4030,6 +4037,22 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
         case 62606:
         {
             basepoints[0] = int32(GetTotalAttackPowerValue(BASE_ATTACK) * triggerAmount / 100);
+            break;
+        }
+        // Hack for Blood mark (ICC Saurfang)
+        case 72255:
+        case 72444:
+        case 72445:
+        case 72446:
+        {
+            float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(auraSpellInfo->EffectRadiusIndex[EFFECT_INDEX_0]));
+            Map::PlayerList const& pList = GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                if (itr->getSource() && itr->getSource()->IsWithinDistInMap(this,radius) && itr->getSource()->HasAura(triggerEntry->targetAuraSpell))
+                {
+                    target = itr->getSource();
+                    break;
+                }
             break;
         }
     }

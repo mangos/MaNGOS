@@ -6835,6 +6835,10 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
         ((m_spellInfo->Id == 32182) && (target->HasAura(57723))))
         return false;
 
+    // Check vampiric bite
+    if (m_spellInfo->Id == 70946 && target->HasAura(70867))
+        return false;
+
     // Check targets for LOS visibility (except spells without range limitations )
     switch(m_spellInfo->Effect[eff])
     {
