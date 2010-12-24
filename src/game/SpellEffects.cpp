@@ -2885,12 +2885,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 // consume diseases
                 unitTarget->RemoveAurasWithDispelType(DISPEL_DISEASE, m_caster->GetGUID());
             }
-            else if (m_spellInfo->Id == 61999)
-            {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)m_caster)->RemoveSpellCooldown(m_spellInfo->Id,true);
-                return;
-            }
             break;
         }
     }
@@ -7621,12 +7615,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER || unitTarget->isAlive())
                     {
-                        ((Player*)m_caster)->RemoveSpellCooldown(m_spellInfo->Id,true);
+                        SendCastResult(SPELL_FAILED_TARGET_NOT_DEAD);
+                        finish(true);
+                        CancelGlobalCooldown();
                         return;
                     }
 
                     // hack remove death
                     unitTarget->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(EFFECT_INDEX_0), true);
+                    CancelGlobalCooldown();
                     return;
                 }
                 default:

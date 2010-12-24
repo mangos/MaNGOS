@@ -487,6 +487,8 @@ bool Spell::FillCustomTargetMap(SpellEffectIndex i, UnitList &targetUnitMap)
             WorldObject* result = FindCorpseUsing <MaNGOS::RaiseAllyObjectCheck>  ();
             if (result)
                 targetUnitMap.push_back((Unit*)result);
+            else
+                targetUnitMap.push_back((Unit*)m_caster);
             break;
         }
         case 65045: // Flame of demolisher
@@ -5786,7 +5788,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         Unit* _target = m_targets.getUnitTarget();
 
-        if(_target)                                         //for target dead/target not valid
+        if(_target && _target != (Unit*)m_caster)                                         //for target dead/target not valid
         {
 
             if(IsPositiveSpell(m_spellInfo->Id) && !IsDispelSpell(m_spellInfo))
