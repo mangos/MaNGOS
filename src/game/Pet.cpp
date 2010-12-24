@@ -649,11 +649,17 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
                 p_owner->GetTemporaryUnsummonedPetNumber() != GetCharmInfo()->GetPetNumber())
                 mode = PET_SAVE_NOT_IN_SLOT;
 
+            SpellEntry const *spellInfo = sSpellStore.LookupEntry(GetCreateSpellID());
+
+            // Special way for remove cooldown if SPELL_ATTR_DISABLED_WHILE_ACTIVE
+            if (spellInfo && spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
+            {
+                p_owner->SendCooldownEvent(spellInfo);
+            }
+
             if (mode == PET_SAVE_REAGENTS)
             {
                 //returning of reagents only for players, so best done here
-                uint32 spellId = GetUInt32Value(UNIT_CREATED_BY_SPELL);
-                SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
 
                 if (spellInfo)
                 {

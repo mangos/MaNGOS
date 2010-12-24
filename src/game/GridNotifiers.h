@@ -538,14 +538,7 @@ namespace MaNGOS
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
             }
-            bool operator()(Corpse* u)
-            {
-                // ignore bones
-                if(u->GetType() == CORPSE_BONES)
-                    return false;
-
-                return i_fobj->IsWithinDistInMap(u, i_range);
-            }
+            bool operator()(Corpse* u);
             bool operator()(Creature* u)
             {
                 if ( u->isAlive() || u->IsDeadByDefault() || u->IsTaxiFlying() ||
