@@ -567,6 +567,7 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_baseFeralAP = 0;
     m_baseManaRegen = 0;
     m_armorPenetrationPct = 0.0f;
+    m_spellPenetrationItemMod = 0;
 
     // Honor System
     m_lastHonorUpdateTime = time(NULL);
@@ -7170,6 +7171,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
                 break;
             case ITEM_MOD_SPELL_PENETRATION:
                 ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -int32(val), apply);
+                m_spellPenetrationItemMod += apply ? val : -val;
                 break;
             case ITEM_MOD_BLOCK_VALUE:
                 HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(val), apply);
