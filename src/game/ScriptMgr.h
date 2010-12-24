@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "Policies/Singleton.h"
+#include "ObjectGuid.h"
 
 enum eScriptCommand
 {
@@ -267,6 +268,14 @@ struct ScriptInfo
             default: return 0;
         }
     }
+};
+
+struct ScriptAction
+{
+    ObjectGuid sourceGuid;
+    ObjectGuid targetGuid;
+    ObjectGuid ownerGuid;                                   // owner of source if source is item
+    ScriptInfo const* script;                               // pointer to static script data
 };
 
 typedef std::multimap<uint32, ScriptInfo> ScriptMap;
