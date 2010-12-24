@@ -17,7 +17,3 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`,`spell_id`,`quest_start`,`cast_
 ('31894','60123','0','2'),
 ('31893','60123','0','2'),
 ('31883','60123','0','2');
-
-DELETE FROM `spell_proc_event` WHERE entry in (59907);
-INSERT INTO `spell_proc_event` VALUES
-(59907, 0x00,  0x06, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00004000, 0x00004000, 0x00004000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0);
