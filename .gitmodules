@@ -1,0 +1,3 @@
+[submodule "spell_proc_event"]
+	path = spell_proc_event
+	url = git@github.com:bwsrv/spell_proc_event.git
