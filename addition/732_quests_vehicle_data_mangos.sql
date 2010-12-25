@@ -316,3 +316,15 @@ REPLACE INTO `creature_template_addon` (entry, auras) VALUES (27996, '53112 0 53
 UPDATE `creature_template` SET `spell1` = 50978,`spell2` = 50980,`spell3` = 50983,`spell4` = 50985,
 `VehicleId` = 111
 WHERE  `entry` = 28222;
+
+-- from YTDB/TC 578
+DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` IN (27850,27881,28094,28312,28319,28670,32627,32629);
+INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `quest_start`, `quest_start_active`, `quest_end`, `cast_flags`) VALUES
+(27850, 60968, 0, 0, 0, 1),
+(27881, 60968, 0, 0, 0, 1),
+(28094, 60968, 0, 0, 0, 1),
+(28312, 60968, 0, 0, 0, 1),
+(28319, 60968, 0, 0, 0, 1),
+(28670, 52196, 0, 0, 0, 1),
+(32627, 60968, 0, 0, 0, 1),
+(32629, 60968, 0, 0, 0, 1);
