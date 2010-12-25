@@ -311,3 +311,8 @@ INSERT INTO `npc_spellclick_spells` VALUES
 
 REPLACE INTO `creature_template_addon` (entry, auras) VALUES (27996, '53112 0 53112 1 53112 2');
 
+-- from me
+-- Quest Reclamation (12546)
+UPDATE `creature_template` SET `spell1` = 50978,`spell2` = 50980,`spell3` = 50983,`spell4` = 50985,
+`VehicleId` = 111
+WHERE  `entry` = 28222;
