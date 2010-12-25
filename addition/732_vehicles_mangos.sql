@@ -293,3 +293,5 @@ UPDATE `creature_template` SET `VehicleId` = 354 WHERE `entry` = 33357;
 UPDATE `creature_template` SET `VehicleId` = 146 WHERE `entry` = 28875;
 -- Drakkari Skullcrusher
 UPDATE `creature_template` SET `VehicleId` = 744 WHERE `entry` = 28844;
+-- ICC
+UPDATE `creature_template` SET `vehicleId` = 532 WHERE `entry` IN (36609,39120,39121,39122);

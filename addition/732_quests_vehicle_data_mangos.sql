@@ -278,3 +278,36 @@ WHERE `entry` IN (27061);
 DELETE FROM `npc_spellclick_spells` WHERE npc_entry IN (27061);
 INSERT INTO `npc_spellclick_spells` VALUES (27061, 67373, 0, 0, 0, 1);
 REPLACE INTO `spell_script_target` VALUES (47939, 2, 188539);
+
+-- Argent Cannon (quest 13086)
+UPDATE `creature_template` SET
+    spell1 = 57485,
+    spell2 = 57412,
+    spell3 = 0,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 244
+WHERE `entry` IN (30236);
+
+DELETE FROM `npc_spellclick_spells` WHERE npc_entry IN (30236);
+INSERT INTO `npc_spellclick_spells` VALUES
+(30236, 57573, 13086, 1, 13086, 1);
+
+-- Wyrmrest Vanquisher (quest 12498)
+UPDATE `creature_template` SET
+    spell1 = 55987,
+    spell2 = 50348,
+    spell3 = 50430,
+    spell4 = 0,
+    spell5 = 0,
+    spell6 = 0,
+    VehicleId = 99
+WHERE `entry` IN (27996);
+
+DELETE FROM `npc_spellclick_spells` WHERE npc_entry IN (27996);
+INSERT INTO `npc_spellclick_spells` VALUES
+(27996, 50343, 12498, 1, 12498, 1);
+
+REPLACE INTO `creature_template_addon` (entry, auras) VALUES (27996, '53112 0 53112 1 53112 2');
+
