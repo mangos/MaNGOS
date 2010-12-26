@@ -328,3 +328,6 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `quest_start`, `qu
 (28670, 52196, 0, 0, 0, 1),
 (32627, 60968, 0, 0, 0, 1),
 (32629, 60968, 0, 0, 0, 1);
+
+-- Quest 12996
+UPDATE `creature_template` SET `spell1` = 54459,`spell2` = 54458,`spell3` = 54460,`VehicleId` = 208 WHERE  `creature_template`.`entry` = 29918;
