@@ -22,20 +22,44 @@
 #include "Common.h"
 #include <ace/OS_NS_sys_time.h>
 
-inline uint32 getMSTime()
+class WorldTimer
 {
-    static const ACE_Time_Value ApplicationStartTime = ACE_OS::gettimeofday();
-    return (ACE_OS::gettimeofday() - ApplicationStartTime).msec();
-}
+    public:
 
-inline uint32 getMSTimeDiff(uint32 oldMSTime, uint32 newMSTime)
-{
-    // getMSTime() have limited data range and this is case when it overflow in this tick
-    if (oldMSTime > newMSTime)
-        return (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
-    else
-        return newMSTime - oldMSTime;
-}
+        //get current server time
+        static uint32 getMSTime();
+
+        //get time difference between two timestamps
+        static inline uint32 getMSTimeDiff(const uint32& oldMSTime, const uint32& newMSTime)
+        {
+            if (oldMSTime > newMSTime)
+            {
+                const uint32 diff_1 = (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
+                const uint32 diff_2 = oldMSTime - newMSTime;
+
+                return std::min(diff_1, diff_2);
+            }
+
+            return newMSTime - oldMSTime;
+        }
+
+        //get last world tick time 
+        static MANGOS_DLL_SPEC uint32 tickTime();
+        //get previous world tick time
+        static MANGOS_DLL_SPEC uint32 tickPrevTime();
+        //tick world timer
+        static MANGOS_DLL_SPEC uint32 tick();
+
+    private:
+        WorldTimer();
+        WorldTimer(const WorldTimer& );
+
+        //analogue to getMSTime() but it persists m_SystemTickTime
+        static uint32 getMSTime_internal(bool savetime = false);
+
+        static MANGOS_DLL_SPEC uint32 m_iTime;
+        static MANGOS_DLL_SPEC uint32 m_iPrevTime;
+};
 
 class IntervalTimer
 {

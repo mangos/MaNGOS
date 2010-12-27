@@ -41,7 +41,10 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T> &m)
 inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType &m)
 {
     for(CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        iter->getSource()->Update(i_timeDiff);
+    {
+        WorldObject::UpdateHelper helper(iter->getSource());
+        helper.Update(i_timeDiff);
+    }
 }
 
 inline void PlayerCreatureRelocationWorker(Player* pl, WorldObject const* viewPoint, Creature* c)

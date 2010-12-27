@@ -276,7 +276,10 @@ MapManager::Update(uint32 diff)
         m_updater.wait();
 
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
-        (*iter)->Update((uint32)i_timer.GetCurrent());
+    {
+        WorldObject::UpdateHelper helper((*iter));
+        helper.Update((uint32)i_timer.GetCurrent());
+    }
 
     //remove all maps which can be unloaded
     MapMapType::iterator iter = i_maps.begin();

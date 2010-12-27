@@ -45,7 +45,7 @@ void WorldRunnable::run()
     sWorld.InitResultQueue();
 
     uint32 realCurrTime = 0;
-    uint32 realPrevTime = getMSTime();
+    uint32 realPrevTime = WorldTimer::tick();
 
     uint32 prevSleepTime = 0;                               // used for balanced full tick time length near WORLD_SLEEP_CONST
 
@@ -53,9 +53,9 @@ void WorldRunnable::run()
     while (!World::IsStopped())
     {
         ++World::m_worldLoopCounter;
-        realCurrTime = getMSTime();
+        realCurrTime = WorldTimer::getMSTime();
 
-        uint32 diff = getMSTimeDiff(realPrevTime,realCurrTime);
+        uint32 diff = WorldTimer::tick();
 
         sWorld.Update( diff );
         realPrevTime = realCurrTime;

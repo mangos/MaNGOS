@@ -71,8 +71,8 @@ AntiCheat::AntiCheat(Player* player)
     m_lastfalltime        = 0;
     m_lastfallz           = 0.0f;
     //
-    m_immuneTime          = getMSTime();
-    m_lastClientTime      = getMSTime();
+    m_immuneTime          = WorldTimer::getMSTime();
+    m_lastClientTime      = WorldTimer::getMSTime();
     m_lastLiveState       = ALIVE;
     //
     m_currentCheckResult.clear();
@@ -140,7 +140,7 @@ bool AntiCheat::_DoAntiCheatCheck(AntiCheatCheck checktype)
             if (m_lastalarmtime.find(checktype) == m_lastalarmtime.end())
                 m_lastalarmtime.insert(std::make_pair(checktype, 0));
 
-            m_lastalarmtime[checktype] = getMSTime();
+            m_lastalarmtime[checktype] = WorldTimer::getMSTime();
 
             if (m_counters[checktype] >= m_currentConfig->alarmsCount)
             {
@@ -152,13 +152,13 @@ bool AntiCheat::_DoAntiCheatCheck(AntiCheatCheck checktype)
         }
         else
         {
-            if (getMSTimeDiff(m_lastalarmtime[checktype],getMSTime()) > sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_ACTION_DELAY)
-                || (m_currentConfig->checkParam[0] > 0 && m_currentConfig->alarmsCount > 1 && getMSTimeDiff(m_lastalarmtime[checktype],getMSTime()) > m_currentConfig->checkParam[0]))
+            if (WorldTimer::getMSTimeDiff(m_lastalarmtime[checktype],WorldTimer::getMSTime()) > sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_ACTION_DELAY)
+                || (m_currentConfig->checkParam[0] > 0 && m_currentConfig->alarmsCount > 1 && WorldTimer::getMSTimeDiff(m_lastalarmtime[checktype],WorldTimer::getMSTime()) > m_currentConfig->checkParam[0]))
             {
                 m_counters[checktype] = 0;
             }
         }
-        m_oldCheckTime[checktype] = getMSTime();
+        m_oldCheckTime[checktype] = WorldTimer::getMSTime();
     }
 
 
@@ -188,7 +188,7 @@ bool AntiCheat::CheckTimer(AntiCheatCheck checkType)
     if (!config->checkPeriod)
         return true;
 
-    const uint32 currentTime = getMSTime();
+    const uint32 currentTime = WorldTimer::getMSTime();
 
     if (m_oldCheckTime.find(checkType) == m_oldCheckTime.end())
         m_oldCheckTime.insert(std::make_pair(checkType, currentTime));
@@ -209,9 +209,9 @@ void AntiCheat::DoAntiCheatAction(AntiCheatCheck checkType, std::string reason)
     if (m_lastactiontime.find(checkType) == m_lastactiontime.end())
         m_lastactiontime.insert(std::make_pair(checkType, 0));
 
-    if (getMSTime() - m_lastactiontime[checkType] >= sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_ACTION_DELAY) * 1000)
+    if (WorldTimer::getMSTime() - m_lastactiontime[checkType] >= sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_ACTION_DELAY) * 1000)
     {
-        m_lastactiontime[checkType] = getMSTime();
+        m_lastactiontime[checkType] = WorldTimer::getMSTime();
 
         std::string name = GetPlayer()->GetName();
         std::string namechat;
@@ -470,7 +470,7 @@ bool AntiCheat::CheckMovement()
 bool AntiCheat::CheckSpeed()
 {
     float speedRate   = 1.0f;
-    int   serverDelta = getMSTimeDiff(m_oldCheckTime[CHECK_MOVEMENT_SPEED],getMSTime());
+    int   serverDelta = WorldTimer::getMSTimeDiff(m_oldCheckTime[CHECK_MOVEMENT_SPEED],WorldTimer::getMSTime());
 
     if (m_currentTimeSkipped > 0 && (float)m_currentTimeSkipped < serverDelta)
     {
@@ -565,7 +565,7 @@ bool AntiCheat::CheckMountain()
     if ( m_currentDeltaZ > 0 )
         return true;
 
-    int  serverDelta = getMSTimeDiff(m_oldCheckTime[CHECK_MOVEMENT_MOUNTAIN],getMSTime());
+    int  serverDelta = WorldTimer::getMSTimeDiff(m_oldCheckTime[CHECK_MOVEMENT_MOUNTAIN],WorldTimer::getMSTime());
 
     float zSpeed = - m_currentDeltaZ / serverDelta;
 
@@ -846,7 +846,7 @@ bool AntiCheat::isInFall()
 
 bool AntiCheat::isImmune()
 {
-    if (m_immuneTime > getMSTime())
+    if (m_immuneTime > WorldTimer::getMSTime())
         return true;
     else
         return false;
@@ -854,7 +854,7 @@ bool AntiCheat::isImmune()
 
 void AntiCheat::SetImmune(uint32 timeDelta)
 {
-    m_immuneTime = getMSTime() + timeDelta;
+    m_immuneTime = WorldTimer::getMSTime() + timeDelta;
 }
 
 void AntiCheat::SetLastLiveState(DeathState state)
