@@ -3587,7 +3587,7 @@ void Spell::SendSpellGo()
     data << uint8(m_cast_count);                            // pending spell cast?
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint32(castFlags);                              // cast flags
-    data << uint32(getMSTime());                            // timestamp
+    data << uint32(WorldTimer::getMSTime());                            // timestamp
 
     WriteSpellGoTargets(&data);
 

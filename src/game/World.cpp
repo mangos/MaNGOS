@@ -875,7 +875,7 @@ void World::SetInitialWorldSettings()
     srand((unsigned int)time(NULL));
 
     ///- Time server startup
-    uint32 uStartTime = getMSTime();
+    uint32 uStartTime = WorldTimer::getMSTime();
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1330,7 +1330,7 @@ void World::SetInitialWorldSettings()
 
     sLog.outString( "WORLD: World initialized" );
 
-    uint32 uStartInterval = getMSTimeDiff(uStartTime, getMSTime());
+    uint32 uStartInterval = WorldTimer::getMSTimeDiff(uStartTime, WorldTimer::getMSTime());
     sLog.outString( "SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000 );
 }
 

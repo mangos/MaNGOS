@@ -1186,7 +1186,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ApplyDiminishingAura(DiminishingGroup  group, bool apply);
         void ClearDiminishings() { m_Diminishing.clear(); }
 
-        virtual void Update( uint32 time );
+        virtual void Update( uint32 update_diff, uint32 time );
 
         void setAttackTimer(WeaponAttackType type, uint32 time) { m_attackTimer[type] = time; }
         void resetAttackTimer(WeaponAttackType type = BASE_ATTACK);
@@ -2132,7 +2132,7 @@ inline void Unit::SendMonsterMoveByPath(Path<Elem,Node> const& path, uint32 star
     data << GetPositionX();
     data << GetPositionY();
     data << GetPositionZ();
-    data << uint32(getMSTime());
+    data << uint32(WorldTimer::getMSTime());
     data << uint8(SPLINETYPE_NORMAL);
     data << uint32(flags);
     data << uint32(traveltime);

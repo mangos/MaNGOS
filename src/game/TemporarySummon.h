@@ -27,7 +27,7 @@ class TemporarySummon : public Creature
     public:
         explicit TemporarySummon(ObjectGuid summoner = ObjectGuid());
         virtual ~TemporarySummon(){};
-        void Update(uint32 time);
+        void Update(uint32 update_diff, uint32 time);
         void Summon(TempSummonType type, uint32 lifetime);
         void MANGOS_DLL_SPEC UnSummon();
         void SaveToDB();
