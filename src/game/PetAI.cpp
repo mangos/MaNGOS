@@ -72,6 +72,9 @@ void PetAI::AttackStart(Unit *u)
     if(!u || (m_creature->IsPet() && ((Pet*)m_creature)->getPetType() == MINI_PET))
         return;
 
+    if (!u->isVisibleForOrDetect(m_creature,m_creature,true))
+        return;
+
     if(m_creature->Attack(u,true))
     {
         // TMGs call CreatureRelocation which via MoveInLineOfSight can call this function
@@ -96,6 +99,9 @@ bool PetAI::_needToStop() const
 {
     // This is needed for charmed creatures, as once their target was reset other effects can trigger threat
     if(m_creature->isCharmed() && m_creature->getVictim() == m_creature->GetCharmer())
+        return true;
+
+    if (!m_creature->getVictim()->isVisibleForOrDetect(m_creature,m_creature,true))
         return true;
 
     return !m_creature->getVictim()->isTargetableForAttack();
