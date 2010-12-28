@@ -6196,7 +6196,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             switch(race)
                             {
                                 case RACE_ORC:              spellId = 24104; break;
-                                case RACE_UNDEAD_PLAYER:    spellId = 24103; break;
+                                case RACE_UNDEAD:           spellId = 24103; break;
                                 case RACE_TAUREN:           spellId = 24102; break;
                                 case RACE_TROLL:            spellId = 24101; break;
                                 case RACE_BLOODELF:         spellId = 69530; break;

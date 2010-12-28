@@ -27,6 +27,7 @@
 #include "QuestDef.h"
 #include "GossipDef.h"
 #include "Player.h"
+#include "GameEventMgr.h"
 #include "PoolManager.h"
 #include "Opcodes.h"
 #include "Log.h"
@@ -199,7 +200,7 @@ void Creature::RemoveCorpse()
 /**
  * change the entry of creature until respawn
  */
-bool Creature::InitEntry(uint32 Entry, const CreatureData *data )
+bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/ )
 {
     CreatureInfo const *normalInfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!normalInfo)
@@ -246,7 +247,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData *data )
     // known valid are: CLASS_WARRIOR,CLASS_PALADIN,CLASS_ROGUE,CLASS_MAGE
     SetByteValue(UNIT_FIELD_BYTES_0, 1, uint8(cinfo->unit_class));
 
-    uint32 display_id = ChooseDisplayId(GetCreatureInfo(), data);
+    uint32 display_id = ChooseDisplayId(GetCreatureInfo(), data, eventData);
     if (!display_id)                                        // Cancel load if no display id
     {
         sLog.outErrorDb("Creature (Entry: %u) has no model defined in table `creature_template`, can't load.", Entry);
@@ -271,7 +272,11 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData *data )
     SetByteValue(UNIT_FIELD_BYTES_0, 3, uint8(cinfo->powerType));
 
     // Load creature equipment
-    if (!data || data->equipmentId == 0)
+    if (eventData && eventData->equipment_id)
+    {
+        LoadEquipment(eventData->equipment_id);             // use event equipment if any for active event
+    }
+    else if (!data || data->equipmentId == 0)
     {
         if (cinfo->equipmentId == 0)
             LoadEquipment(normalInfo->equipmentId);         // use default from normal template if diff does not have any
@@ -297,9 +302,9 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData *data )
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data, bool preserveHPAndPower)
+bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/, bool preserveHPAndPower /*=true*/)
 {
-    if (!InitEntry(Entry, data))
+    if (!InitEntry(Entry, data, eventData))
         return false;
 
     m_regenHealth = GetCreatureInfo()->RegenHealth;
@@ -358,8 +363,12 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data, bo
     return true;
 }
 
-uint32 Creature::ChooseDisplayId(const CreatureInfo *cinfo, const CreatureData *data /*= NULL*/)
+uint32 Creature::ChooseDisplayId(const CreatureInfo *cinfo, const CreatureData *data /*= NULL*/, GameEventCreatureData const* eventData /*=NULL*/)
 {
+    // Use creature event model explicit, override any other static models
+    if (eventData && eventData->modelid)
+        return eventData->modelid;
+
     // Use creature model explicit, override template (creature.modelid)
     if (data && data->modelid_override)
         return data->modelid_override;
@@ -459,7 +468,8 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                     SetDeathState( JUST_ALIVED );
 
                 //Call AI respawn virtual function
-                i_AI->JustRespawned();
+                if (AI())
+                    AI()->JustRespawned();
 
                 GetMap()->Add(this);
             }
@@ -532,10 +542,13 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
             if(!IsInEvadeMode())
             {
-                // do not allow the AI to be changed during update
-                m_AI_locked = true;
-                i_AI->UpdateAI(diff);   // AI not react good at real update delays (while freeze in non-active part of map)
-                m_AI_locked = false;
+                if (AI())
+                {
+                    // do not allow the AI to be changed during update
+                    m_AI_locked = true;
+                    AI()->UpdateAI(diff);   // AI not react good at real update delays (while freeze in non-active part of map)
+                    m_AI_locked = false;
+                }
             }
 
             // creature can be dead after UpdateAI call
@@ -718,7 +731,7 @@ bool Creature::AIM_Initialize()
     return true;
 }
 
-bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team, const CreatureData *data)
+bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team /*= TEAM_NONE*/, const CreatureData *data /*= NULL*/, GameEventCreatureData const* eventData /*= NULL*/)
 {
     CreatureInfo const *cinfo = sObjectMgr.GetCreatureTemplate(Entry);
 
@@ -750,7 +763,7 @@ bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, 
     SetPhaseMask(phaseMask,false);
 
     //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
-    const bool bResult = CreateFromProto(guid, Entry, team, data);
+    const bool bResult = CreateFromProto(guid, Entry, team, data, eventData);
 
     if (bResult)
     {
@@ -854,7 +867,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
                         case RACE_ORC:          pPlayer->PlayerTalkClass->SendGossipMenu(5863,GetGUID()); break;
                         case RACE_TAUREN:       pPlayer->PlayerTalkClass->SendGossipMenu(5864,GetGUID()); break;
                         case RACE_TROLL:        pPlayer->PlayerTalkClass->SendGossipMenu(5816,GetGUID()); break;
-                        case RACE_UNDEAD_PLAYER:pPlayer->PlayerTalkClass->SendGossipMenu( 624,GetGUID()); break;
+                        case RACE_UNDEAD:       pPlayer->PlayerTalkClass->SendGossipMenu( 624,GetGUID()); break;
                         case RACE_BLOODELF:     pPlayer->PlayerTalkClass->SendGossipMenu(5862,GetGUID()); break;
                         case RACE_DRAENEI:      pPlayer->PlayerTalkClass->SendGossipMenu(5864,GetGUID()); break;
                     }
@@ -1206,13 +1219,13 @@ float Creature::GetSpellDamageMod(int32 Rank)
     }
 }
 
-bool Creature::CreateFromProto(ObjectGuid guid, uint32 Entry, Team team, const CreatureData *data)
+bool Creature::CreateFromProto(ObjectGuid guid, uint32 Entry, Team team, const CreatureData *data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/)
 {
     m_originalEntry = Entry;
 
     Object::_Create(guid);
 
-    if (!UpdateEntry(Entry, team, data, false))
+    if (!UpdateEntry(Entry, team, data, eventData, false))
         return false;
 
     // Checked at startup
@@ -1232,9 +1245,11 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
         return false;
     }
 
+    GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
+
     m_DBTableGuid = guidlow;
 
-    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data))
+    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data, eventData))
         return false;
 
     Relocate(data->posX, data->posY, data->posZ, data->orientation);
