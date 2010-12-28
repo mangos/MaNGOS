@@ -27,7 +27,7 @@
 typedef ACE_TSS<MTRand> MTRandTSS;
 static MTRandTSS mtRand;
 
-static uint64 g_SystemTickTime = ACE_OS::gettimeofday().get_msec();
+static ACE_Time_Value g_SystemTickTime = ACE_OS::gettimeofday();
 
 uint32 WorldTimer::m_iTime = 0;
 uint32 WorldTimer::m_iPrevTime = 0;
@@ -55,14 +55,14 @@ uint32 WorldTimer::getMSTime()
 uint32 WorldTimer::getMSTime_internal(bool savetime /*= false*/)
 {
     //get current time
-    const uint64 currTime = ACE_OS::gettimeofday().get_msec();
+    const ACE_Time_Value currTime = ACE_OS::gettimeofday();
     //calculate time diff between two world ticks
     //special case: curr_time < old_time - we suppose that our time has not ticked at all
     //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
     uint32 diff = 0;
     //regular case: curr_time >= old_time
-    if(currTime >= g_SystemTickTime)
-        diff = uint32(currTime - g_SystemTickTime);
+    if(currTime > g_SystemTickTime)
+        diff = (currTime - g_SystemTickTime).msec();
 
     //reset last system time value
     if(savetime)
