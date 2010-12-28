@@ -42,13 +42,13 @@ struct GameEventData
     bool isValid() const { return length > 0; }
 };
 
-struct ModelEquip
+struct GameEventCreatureData
 {
     uint32 modelid;
     uint32 equipment_id;
-    uint32 modelid_prev;
-    uint32 equipement_id_prev;
 };
+
+typedef std::pair<uint32, GameEventCreatureData> GameEventCreatureDataPair;
 
 class GameEventMgr
 {
@@ -63,12 +63,14 @@ class GameEventMgr
         uint32 NextCheck(uint16 entry) const;
         void LoadFromDB();
         uint32 Update();
-        bool IsActiveEvent(uint16 event_id) { return ( m_ActiveEvents.find(event_id)!=m_ActiveEvents.end()); }
+        bool IsActiveEvent(uint16 event_id) const { return ( m_ActiveEvents.find(event_id)!=m_ActiveEvents.end()); }
         uint32 Initialize();
         void StartEvent(uint16 event_id, bool overwrite = false);
         void StopEvent(uint16 event_id, bool overwrite = false);
         template<typename T>
         int16 GetGameEventId(uint32 guid_or_poolid);
+
+        GameEventCreatureData const* GetCreatureUpdateDataForActiveEvent(uint32 lowguid) const;
     private:
         void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
         void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
@@ -76,7 +78,8 @@ class GameEventMgr
         void UnApplyEvent(uint16 event_id);
         void GameEventSpawn(int16 event_id);
         void GameEventUnspawn(int16 event_id);
-        void ChangeEquipOrModel(int16 event_id, bool activate);
+        void UpdateCreatureData(int16 event_id, bool activate);
+
         void UpdateEventQuests(uint16 event_id, bool Activate);
         void UpdateWorldStates(uint16 event_id, bool Activate);
     protected:
@@ -84,15 +87,17 @@ class GameEventMgr
         typedef std::list<uint16> IdList;
         typedef std::vector<GuidList> GameEventGuidMap;
         typedef std::vector<IdList> GameEventIdMap;
-        typedef std::pair<uint32, ModelEquip> ModelEquipPair;
-        typedef std::list<ModelEquipPair> ModelEquipList;
-        typedef std::vector<ModelEquipList> GameEventModelEquipMap;
+        typedef std::list<GameEventCreatureDataPair> GameEventCreatureDataList;
+        typedef std::vector<GameEventCreatureDataList> GameEventCreatureDataMap;
+        typedef UNORDERED_MAP<uint32, uint32> GameEventCreatureDataPerGuidMap;
 
         typedef std::list<uint32> QuestList;
         typedef std::vector<QuestList> GameEventQuestMap;
         GameEventQuestMap mGameEventQuests;                 // events*2-1
 
-        GameEventModelEquipMap mGameEventModelEquip;        // events*2-1
+        GameEventCreatureDataMap mGameEventCreatureData;    // events*2-1
+        GameEventCreatureDataPerGuidMap mGameEventCreatureDataPerGuid;
+
         GameEventGuidMap  mGameEventCreatureGuids;          // events*2-1
         GameEventGuidMap  mGameEventGameobjectGuids;        // events*2-1
         GameEventIdMap    mGameEventSpawnPoolIds;           // events size, only positive event case
