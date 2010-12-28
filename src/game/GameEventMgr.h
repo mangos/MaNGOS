@@ -44,8 +44,11 @@ struct GameEventData
 
 struct GameEventCreatureData
 {
+    uint32 entry_id;
     uint32 modelid;
     uint32 equipment_id;
+    uint32 spell_id_start;
+    uint32 spell_id_end;
 };
 
 typedef std::pair<uint32, GameEventCreatureData> GameEventCreatureDataPair;
@@ -79,7 +82,6 @@ class GameEventMgr
         void GameEventSpawn(int16 event_id);
         void GameEventUnspawn(int16 event_id);
         void UpdateCreatureData(int16 event_id, bool activate);
-
         void UpdateEventQuests(uint16 event_id, bool Activate);
         void UpdateWorldStates(uint16 event_id, bool Activate);
     protected:
@@ -89,7 +91,8 @@ class GameEventMgr
         typedef std::vector<IdList> GameEventIdMap;
         typedef std::list<GameEventCreatureDataPair> GameEventCreatureDataList;
         typedef std::vector<GameEventCreatureDataList> GameEventCreatureDataMap;
-        typedef UNORDERED_MAP<uint32, uint32> GameEventCreatureDataPerGuidMap;
+        typedef std::multimap<uint32, uint32> GameEventCreatureDataPerGuidMap;
+        typedef std::pair<GameEventCreatureDataPerGuidMap::const_iterator,GameEventCreatureDataPerGuidMap::const_iterator> GameEventCreatureDataPerGuidBounds;
 
         typedef std::list<uint32> QuestList;
         typedef std::vector<QuestList> GameEventQuestMap;
