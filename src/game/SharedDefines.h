@@ -34,36 +34,36 @@ enum Gender
 // Race value is index in ChrRaces.dbc
 enum Races
 {
-    RACE_HUMAN          = 1,
-    RACE_ORC            = 2,
-    RACE_DWARF          = 3,
-    RACE_NIGHTELF       = 4,
-    RACE_UNDEAD_PLAYER  = 5,
-    RACE_TAUREN         = 6,
-    RACE_GNOME          = 7,
-    RACE_TROLL          = 8,
-    //RACE_GOBLIN         = 9,
-    RACE_BLOODELF       = 10,
-    RACE_DRAENEI        = 11,
-    //RACE_FEL_ORC        = 12,
-    //RACE_NAGA           = 13,
-    //RACE_BROKEN         = 14,
-    //RACE_SKELETON       = 15,
-    //RACE_VRYKUL         = 16,
-    //RACE_TUSKARR        = 17,
-    //RACE_FOREST_TROLL   = 18,
-    //RACE_TAUNKA         = 19,
-    //RACE_NORTHREND_SKELETON = 20,
-    //RACE_ICE_TROLL      = 21
+    RACE_HUMAN              = 1,
+    RACE_ORC                = 2,
+    RACE_DWARF              = 3,
+    RACE_NIGHTELF           = 4,
+    RACE_UNDEAD             = 5,
+    RACE_TAUREN             = 6,
+    RACE_GNOME              = 7,
+    RACE_TROLL              = 8,
+    RACE_GOBLIN             = 9,
+    RACE_BLOODELF           = 10,
+    RACE_DRAENEI            = 11,
+    RACE_FEL_ORC            = 12,
+    RACE_NAGA               = 13,
+    RACE_BROKEN             = 14,
+    RACE_SKELETON           = 15,
+    RACE_VRYKUL             = 16,
+    RACE_TUSKARR            = 17,
+    RACE_FOREST_TROLL       = 18,
+    RACE_TAUNKA             = 19,
+    RACE_NORTHREND_SKELETON = 20,
+    RACE_ICE_TROLL          = 21
 };
 
 // max+1 for player race
 #define MAX_RACES         12
 
 #define RACEMASK_ALL_PLAYABLE \
-    ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
-    (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
-    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
+    ((1<<(RACE_HUMAN-1))    |(1<<(RACE_ORC-1))      |(1<<(RACE_DWARF-1))   | \
+    (1<<(RACE_NIGHTELF-1))  |(1<<(RACE_UNDEAD-1))   |(1<<(RACE_TAUREN-1))  | \
+    (1<<(RACE_GNOME-1))     |(1<<(RACE_TROLL-1))    |(1<<(RACE_BLOODELF-1))| \
     (1<<(RACE_DRAENEI-1)) )
 
 // Class value is index in ChrClasses.dbc
