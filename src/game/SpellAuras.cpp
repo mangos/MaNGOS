@@ -3193,6 +3193,28 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 case 42365:                                 // Murloc costume
                     target->SetDisplayId(21723);
                     break;
+                //case 44186:                               // Gossip NPC Appearance - All, Brewfest
+                    //break;
+                //case 48305:                               // Gossip NPC Appearance - All, Spirit of Competition
+                    //break;
+                //case 50517:                               // Dread Corsair
+                    //break;
+                //case 50531:                               // Gossip NPC Appearance - All, Pirate Day
+                    //break;
+                //case 51010:                               // Dire Brew
+                    //break;
+                //case 51926:                               // Corsair Costume
+                    //break;
+                //case 53806:                               // Pygmy Oil
+                    //break;
+                //case 62847:                               // NPC Appearance - Valiant 02
+                    //break;
+                //case 62852:                               // NPC Appearance - Champion 01
+                    //break;
+                //case 63965:                               // NPC Appearance - Champion 02
+                    //break;
+                //case 63966:                               // NPC Appearance - Valiant 03
+                    //break;
                 case 65386:                                 // Honor the Dead
                 case 65495:
                 {
@@ -3208,6 +3230,83 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     }
                     break;
                 }
+                //case 65511:                               // Gossip NPC Appearance - Brewfest
+                    //break;
+                //case 65522:                               // Gossip NPC Appearance - Winter Veil
+                    //break;
+                //case 65523:                               // Gossip NPC Appearance - Default
+                    //break;
+                //case 65524:                               // Gossip NPC Appearance - Lunar Festival
+                    //break;
+                //case 65525:                               // Gossip NPC Appearance - Hallow's End
+                    //break;
+                //case 65526:                               // Gossip NPC Appearance - Midsummer
+                    //break;
+                //case 65527:                               // Gossip NPC Appearance - Spirit of Competition
+                    //break;
+                case 65528:                                 // Gossip NPC Appearance - Pirates' Day
+                {
+                    // expecting npc's using this spell to have models with race info.
+                    uint32 race = GetCreatureModelRace(target->GetNativeDisplayId());
+
+                    // random gender, regardless of current gender
+                    switch(race)
+                    {
+                        case RACE_HUMAN:
+                            target->SetDisplayId(roll_chance_i(50) ? 25037 : 25048);
+                            break;
+                        case RACE_ORC:
+                            target->SetDisplayId(roll_chance_i(50) ? 25039 : 25050);
+                            break;
+                        case RACE_DWARF:
+                            target->SetDisplayId(roll_chance_i(50) ? 25034 : 25045);
+                            break;
+                        case RACE_NIGHTELF:
+                            target->SetDisplayId(roll_chance_i(50) ? 25038 : 25049);
+                            break;
+                        case RACE_UNDEAD:
+                            target->SetDisplayId(roll_chance_i(50) ? 25042 : 25053);
+                            break;
+                        case RACE_TAUREN:
+                            target->SetDisplayId(roll_chance_i(50) ? 25040 : 25051);
+                            break;
+                        case RACE_GNOME:
+                            target->SetDisplayId(roll_chance_i(50) ? 25035 : 25046);
+                            break;
+                        case RACE_TROLL:
+                            target->SetDisplayId(roll_chance_i(50) ? 25041 : 25052);
+                            break;
+                        case RACE_GOBLIN:
+                            target->SetDisplayId(roll_chance_i(50) ? 25036 : 25047);
+                            break;
+                        case RACE_BLOODELF:
+                            target->SetDisplayId(roll_chance_i(50) ? 25032 : 25043);
+                            break;
+                        case RACE_DRAENEI:
+                            target->SetDisplayId(roll_chance_i(50) ? 25033 : 25044);
+                            break;
+                    }
+
+                    break;
+                }
+                case 65529:                                 // Gossip NPC Appearance - Day of the Dead (DotD)
+                    // random, regardless of current gender
+                    target->SetDisplayId(roll_chance_i(50) ? 29203 : 29204);
+                    break;
+                //case 66236:                               // Incinerate Flesh
+                    //break;
+                //case 69999:                               // [DND] Swap IDs
+                    //break;
+                //case 70764:                               // Citizen Costume (note: many spells w/same name)
+                    //break;
+                //case 71309:                               // [DND] Spawn Portal
+                    //break;
+                //case 71450:                               // Crown Parcel Service Uniform
+                    //break;
+                //case 75531:                               // Gnomeregan Pride
+                    //break;
+                //case 75532:                               // Darkspear Pride
+                    //break;
                 default:
                     sLog.outError("Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined model.", GetId());
                     break;
