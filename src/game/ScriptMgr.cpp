@@ -1047,6 +1047,8 @@ bool ScriptMgr::LoadScriptLibrary(const char* libName)
 
     m_hScriptLib = MANGOS_LOAD_LIBRARY(name.c_str());
 
+    sLog.outString( ">> Loading %s Script library", name.c_str());
+
     if (!m_hScriptLib)
         return false;
 
