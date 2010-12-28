@@ -774,6 +774,22 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
     DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"DealDamageStart");
 
+    // share damage by auras
+    AuraList const& vShareDamageAuras = pVictim->GetAurasByType(SPELL_AURA_SHARE_DAMAGE_PCT);
+    for (AuraList::const_iterator itr = vShareDamageAuras.begin(); itr != vShareDamageAuras.end(); ++itr)
+    {
+        if (Unit* shareTarget = (*itr)->GetCaster())
+        {
+            if (shareTarget != pVictim && ((*itr)->GetMiscValue() & damageSchoolMask))
+            {
+                SpellEntry const * shareSpell = (*itr)->GetSpellProto();
+                uint32 shareDamage = uint32(damage * (*itr)->GetModifier()->m_amount / 100.0f);
+                DealDamageMods(shareTarget, shareDamage, NULL);
+                DealDamage(shareTarget, shareDamage, 0, damagetype, GetSpellSchoolMask(shareSpell), spellProto, false);
+            }
+        }
+    }
+
     uint32 health = pVictim->GetHealth();
     DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"deal dmg:%d to health:%d ",damage,health);
 
