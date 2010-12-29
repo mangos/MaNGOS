@@ -95,6 +95,15 @@ void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket &recv_data)
 
     if (pVehicle->GetBase()->GetObjectGuid() == guid)
         GetPlayer()->ChangeSeat(seatId);
+    else if (Unit *Vehicle2 = GetPlayer()->GetMap()->GetUnit(guid))
+    {
+        if (VehicleKit *pVehicle2 = Vehicle2->GetVehicleKit())
+            if (pVehicle2->HasEmptySeat(seatId))
+            {
+                    GetPlayer()->ExitVehicle();
+                    GetPlayer()->EnterVehicle(pVehicle2, seatId);
+            }
+    }
 }
 
 void WorldSession::HandleEnterPlayerVehicle(WorldPacket &recv_data)
