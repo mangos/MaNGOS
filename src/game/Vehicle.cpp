@@ -209,6 +209,14 @@ bool VehicleKit::AddPassenger(Unit *passenger, int8 seatId)
         }
 
         ((Creature*)m_pBase)->AIM_Initialize();
+
+        if(m_pBase->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+        {
+            WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 8+4);
+            data2 << m_pBase->GetPackGUID();
+            data2 << (uint32)(2);
+            m_pBase->SendMessageToSet(&data2,false);
+        }
     }
 
     passenger->SendMonsterMoveTransport(m_pBase, SPLINETYPE_FACINGANGLE, SPLINEFLAG_UNKNOWN5, 0, 0.0f);
