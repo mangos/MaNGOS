@@ -501,6 +501,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool HasSpell(uint32 spellID) const;
 
         bool UpdateEntry(uint32 entry, Team team = ALLIANCE, const CreatureData* data = NULL, GameEventCreatureData const* eventData = NULL, bool preserveHPAndPower = true);
+
+        void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
         void UpdateResistances(uint32 school);

@@ -202,6 +202,10 @@ void Creature::RemoveCorpse()
  */
 bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/ )
 {
+    // use game event entry if any instead default suggested
+    if (eventData && eventData->entry_id)
+        Entry = eventData->entry_id;
+
     CreatureInfo const *normalInfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!normalInfo)
     {
@@ -360,6 +364,10 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     for(int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = GetCreatureInfo()->spells[i];
 
+    // if eventData set then event active and need apply spell_start
+    if (eventData)
+        ApplyGameEventSpells(eventData, true);
+
     return true;
 }
 
@@ -450,7 +458,11 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 lootForSkin         = false;
 
                 if(m_originalEntry != GetEntry())
-                    UpdateEntry(m_originalEntry);
+                {
+                    // need preserver gameevent state
+                    GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(GetDBTableGUIDLow());
+                    UpdateEntry(m_originalEntry, TEAM_NONE, NULL, eventData);
+                }
 
                 CreatureInfo const *cinfo = GetCreatureInfo();
 
@@ -1363,7 +1375,7 @@ void Creature::DeleteFromDB()
     WorldDatabase.PExecuteLog("DELETE FROM creature_addon WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM game_event_creature WHERE guid = '%u'", m_DBTableGuid);
-    WorldDatabase.PExecuteLog("DELETE FROM game_event_model_equip WHERE guid = '%u'", m_DBTableGuid);
+    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature_data WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.PExecuteLog("DELETE FROM creature_battleground WHERE guid = '%u'", m_DBTableGuid);
     WorldDatabase.CommitTransaction();
 }
@@ -2355,4 +2367,18 @@ void Creature::RelocationNotify()
     MaNGOS::CreatureRelocationNotifier relocationNotifier(*this);
     float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     Cell::VisitAllObjects(this, relocationNotifier, radius);
+}
+
+void Creature::ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated)
+{
+    uint32 cast_spell = activated ? eventData->spell_id_start : eventData->spell_id_end;
+    uint32 remove_spell = activated ? eventData->spell_id_end : eventData->spell_id_start;
+
+    if (remove_spell)
+        if (SpellEntry const* spellEntry = sSpellStore.LookupEntry(remove_spell))
+            if (IsSpellAppliesAura(spellEntry))
+                RemoveAurasDueToSpell(remove_spell);
+
+    if (cast_spell)
+        CastSpell(this, cast_spell, true);
 }

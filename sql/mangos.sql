@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10906_02_mangos_spell_bonus_data` bit(1) default NULL
+  `required_10932_01_mangos_game_event_creature_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1650,6 +1650,31 @@ LOCK TABLES `game_event_creature` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `game_event_creature_data`
+--
+
+DROP TABLE IF EXISTS `game_event_creature_data`;
+CREATE TABLE `game_event_creature_data` (
+  `guid` int(10) unsigned NOT NULL default '0',
+  `entry_id` mediumint(8) unsigned NOT NULL default '0',
+  `modelid` mediumint(8) unsigned NOT NULL default '0',
+  `equipment_id` mediumint(8) unsigned NOT NULL default '0',
+  `spell_start` mediumint(8) unsigned NOT NULL default '0',
+  `spell_end` mediumint(8) unsigned NOT NULL default '0',
+  `event` smallint(5) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`guid`,`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `game_event_creature_data`
+--
+
+LOCK TABLES `game_event_model_equip` WRITE;
+/*!40000 ALTER TABLE `game_event_creature_data` DISABLE KEYS */;
+/*!40000 ALTER TABLE `game_event_creature_data` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `game_event_gameobject`
 --
 
@@ -1667,28 +1692,6 @@ CREATE TABLE `game_event_gameobject` (
 LOCK TABLES `game_event_gameobject` WRITE;
 /*!40000 ALTER TABLE `game_event_gameobject` DISABLE KEYS */;
 /*!40000 ALTER TABLE `game_event_gameobject` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `game_event_model_equip`
---
-
-DROP TABLE IF EXISTS `game_event_model_equip`;
-CREATE TABLE `game_event_model_equip` (
-  `guid` int(10) unsigned NOT NULL default '0',
-  `modelid` mediumint(8) unsigned NOT NULL default '0',
-  `equipment_id` mediumint(8) unsigned NOT NULL default '0',
-  `event` smallint(5) unsigned NOT NULL default '0',
-  PRIMARY KEY  (`guid`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `game_event_model_equip`
---
-
-LOCK TABLES `game_event_model_equip` WRITE;
-/*!40000 ALTER TABLE `game_event_model_equip` DISABLE KEYS */;
-/*!40000 ALTER TABLE `game_event_model_equip` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
