@@ -233,8 +233,6 @@ libmangosgame_a_SOURCES = \
 	ReactorAI.h \
 	ReputationMgr.cpp \
 	ReputationMgr.h \
-	ScriptCalls.cpp \
-	ScriptCalls.h \
 	ScriptMgr.cpp \
 	ScriptMgr.h \
 	SharedDefines.h \

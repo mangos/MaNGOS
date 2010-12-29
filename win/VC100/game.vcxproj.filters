@@ -195,9 +195,6 @@
     <ClCompile Include="..\..\src\game\QuestHandler.cpp">
       <Filter>World/Handlers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\game\ScriptCalls.cpp">
-      <Filter>World/Handlers</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\game\ScriptMgr.cpp">
       <Filter>World/Handlers</Filter>
     </ClCompile>
@@ -595,9 +592,6 @@
       <Filter>World/Handlers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\QuestDef.h">
-      <Filter>World/Handlers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\game\ScriptCalls.h">
       <Filter>World/Handlers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\game\ScriptMgr.h">

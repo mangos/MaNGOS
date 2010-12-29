@@ -28,7 +28,7 @@
 #include "Player.h"
 #include "GossipDef.h"
 #include "UpdateMask.h"
-#include "ScriptCalls.h"
+#include "ScriptMgr.h"
 #include "ObjectAccessor.h"
 #include "Creature.h"
 #include "Pet.h"
@@ -316,7 +316,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recv_data)
     if (pCreature->isSpiritGuide())
         pCreature->SendAreaSpiritHealerQueryOpcode(_player);
 
-    if (!Script->GossipHello(_player, pCreature))
+    if (!sScriptMgr.OnGossipHello(_player, pCreature))
     {
         _player->PrepareGossipMenu(pCreature, pCreature->GetCreatureInfo()->GossipMenuId);
         _player->SendPreparedGossip(pCreature);
@@ -344,6 +344,9 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
+    uint32 sender = _player->PlayerTalkClass->GossipOptionSender(gossipListId);
+    uint32 action = _player->PlayerTalkClass->GossipOptionAction(gossipListId);
+
     if (guid.IsAnyTypeCreature())
     {
         Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
@@ -354,16 +357,8 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
             return;
         }
 
-        if (!code.empty())
-        {
-            if (!Script->GossipSelectWithCode(_player, pCreature, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId), code.c_str()))
-                _player->OnGossipSelect(pCreature, gossipListId, menuId);
-        }
-        else
-        {
-            if (!Script->GossipSelect(_player, pCreature, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId)))
-                _player->OnGossipSelect(pCreature, gossipListId, menuId);
-        }
+        if (!sScriptMgr.OnGossipSelect(_player, pCreature, sender, action, code.empty() ? NULL : code.c_str()))
+            _player->OnGossipSelect(pCreature, gossipListId, menuId);
     }
     else if (guid.IsGameObject())
     {
@@ -375,16 +370,8 @@ void WorldSession::HandleGossipSelectOptionOpcode( WorldPacket & recv_data )
             return;
         }
 
-        if (!code.empty())
-        {
-            if (!Script->GOGossipSelectWithCode(_player, pGo, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId), code.c_str()))
-                _player->OnGossipSelect(pGo, gossipListId, menuId);
-        }
-        else
-        {
-            if (!Script->GOGossipSelect(_player, pGo, _player->PlayerTalkClass->GossipOptionSender(gossipListId), _player->PlayerTalkClass->GossipOptionAction(gossipListId)))
-                _player->OnGossipSelect(pGo, gossipListId, menuId);
-        }
+        if (!sScriptMgr.OnGossipSelect(_player, pGo, sender, action, code.empty() ? NULL : code.c_str()))
+            _player->OnGossipSelect(pGo, gossipListId, menuId);
     }
 }
 

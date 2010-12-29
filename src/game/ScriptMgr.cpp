@@ -34,12 +34,44 @@ ScriptMapMap sCreatureMovementScripts;
 
 INSTANTIATE_SINGLETON_1(ScriptMgr);
 
-ScriptMgr::ScriptMgr()
+ScriptMgr::ScriptMgr() :
+    m_hScriptLib(NULL),
+
+    m_pOnInitScriptLibrary(NULL),
+    m_pOnFreeScriptLibrary(NULL),
+    m_pGetScriptLibraryVersion(NULL),
+
+    m_pGetCreatureAI(NULL),
+    m_pCreateInstanceData(NULL),
+
+    m_pOnGossipHello(NULL),
+    m_pOnGOGossipHello(NULL),
+    m_pOnGossipSelect(NULL),
+    m_pOnGOGossipSelect(NULL),
+    m_pOnGossipSelectWithCode(NULL),
+    m_pOnGOGossipSelectWithCode(NULL),
+    m_pOnQuestAccept(NULL),
+    m_pOnGOQuestAccept(NULL),
+    m_pOnItemQuestAccept(NULL),
+    m_pOnQuestComplete(NULL),
+    m_pOnQuestChooseReward(NULL),
+    m_pOnGOQuestChooseReward(NULL),
+    m_pOnNPCDialogStatus(NULL),
+    m_pOnGODialogStatus(NULL),
+    m_pOnGOUse(NULL),
+    m_pOnItemUse(NULL),
+    m_pOnAreaTrigger(NULL),
+    m_pOnProcessEvent(NULL),
+    m_pOnEffectDummyCreature(NULL),
+    m_pOnEffectDummyGO(NULL),
+    m_pOnEffectDummyItem(NULL),
+    m_pOnAuraDummy(NULL)
 {
 }
 
 ScriptMgr::~ScriptMgr()
 {
+    UnloadScriptLibrary();
 }
 
 void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
@@ -878,6 +910,227 @@ uint32 ScriptMgr::GetEventIdScriptId(uint32 eventId) const
     return 0;
 }
 
+CreatureAI* ScriptMgr::GetCreatureAI(Creature* pCreature)
+{
+    if (!m_pGetCreatureAI)
+        return NULL;
+
+    return m_pGetCreatureAI(pCreature);
+}
+
+InstanceData* ScriptMgr::CreateInstanceData(Map* pMap)
+{
+    if (!m_pCreateInstanceData)
+        return NULL;
+
+    return m_pCreateInstanceData(pMap);
+}
+
+bool ScriptMgr::OnGossipHello(Player* pPlayer, Creature* pCreature)
+{
+    return m_pOnGossipHello != NULL && m_pOnGossipHello(pPlayer, pCreature);
+}
+
+bool ScriptMgr::OnGossipHello(Player* pPlayer, GameObject* pGameObject)
+{
+    return m_pOnGOGossipHello != NULL && m_pOnGOGossipHello(pPlayer, pGameObject);
+}
+
+bool ScriptMgr::OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, const char* code)
+{
+    if (code)
+        return m_pOnGossipSelectWithCode != NULL && m_pOnGossipSelectWithCode(pPlayer, pCreature, sender, action, code);
+    else
+        return m_pOnGossipSelect != NULL && m_pOnGossipSelect(pPlayer, pCreature, sender, action);
+}
+
+bool ScriptMgr::OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, const char* code)
+{
+    if (code)
+        return m_pOnGOGossipSelectWithCode != NULL && m_pOnGOGossipSelectWithCode(pPlayer, pGameObject, sender, action, code);
+    else
+        return m_pOnGOGossipSelect != NULL && m_pOnGOGossipSelect(pPlayer, pGameObject, sender, action);
+}
+
+bool ScriptMgr::OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
+{
+    return m_pOnQuestAccept != NULL && m_pOnQuestAccept(pPlayer, pCreature, pQuest);
+}
+
+bool ScriptMgr::OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest)
+{
+    return m_pOnGOQuestAccept != NULL && m_pOnGOQuestAccept(pPlayer, pGameObject, pQuest);
+}
+
+bool ScriptMgr::OnQuestAccept(Player* pPlayer, Item* pItem, Quest const* pQuest)
+{
+    return m_pOnItemQuestAccept != NULL && m_pOnItemQuestAccept(pPlayer, pItem, pQuest);
+}
+
+bool ScriptMgr::OnQuestComplete(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
+{
+    return m_pOnQuestComplete != NULL && m_pOnQuestComplete(pPlayer, pCreature, pQuest);
+}
+
+bool ScriptMgr::OnQuestChooseReward(Player* pPlayer, Creature* pCreature, Quest const* pQuest, uint32 opt)
+{
+    return m_pOnQuestChooseReward != NULL && m_pOnQuestChooseReward(pPlayer, pCreature, pQuest, opt);
+}
+
+bool ScriptMgr::OnQuestChooseReward(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest, uint32 opt)
+{
+    return m_pOnGOQuestChooseReward != NULL && m_pOnGOQuestChooseReward(pPlayer, pGameObject, pQuest, opt);
+}
+
+uint32 ScriptMgr::OnDialogStatus(Player* pPlayer, Creature* pCreature)
+{
+    if (!m_pOnNPCDialogStatus)
+        return 100;
+
+    return m_pOnNPCDialogStatus(pPlayer, pCreature);
+}
+
+uint32 ScriptMgr::OnDialogStatus(Player* pPlayer, GameObject* pGameObject)
+{
+    if (!m_pOnGODialogStatus)
+        return 100;
+
+    return m_pOnGODialogStatus(pPlayer, pGameObject);
+}
+
+bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
+{
+    return m_pOnGOUse != NULL && m_pOnGOUse(pPlayer, pGameObject);
+}
+
+bool ScriptMgr::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
+{
+    return m_pOnItemUse != NULL && m_pOnItemUse(pPlayer, pItem, targets);
+}
+
+bool ScriptMgr::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
+{
+    return m_pOnAreaTrigger != NULL && m_pOnAreaTrigger(pPlayer, atEntry);
+}
+
+bool ScriptMgr::OnProcessEvent(uint32 eventId, WorldObject* pSource, WorldObject* pTarget, bool isStart)
+{
+    return m_pOnProcessEvent != NULL && m_pOnProcessEvent(eventId, pSource, pTarget, isStart);
+}
+
+bool ScriptMgr::OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature* pTarget)
+{
+    return m_pOnEffectDummyCreature != NULL && m_pOnEffectDummyCreature(pCaster, spellId, effIndex, pTarget);
+}
+
+bool ScriptMgr::OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, GameObject* pTarget)
+{
+    return m_pOnEffectDummyGO != NULL && m_pOnEffectDummyGO(pCaster, spellId, effIndex, pTarget);
+}
+
+bool ScriptMgr::OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Item* pTarget)
+{
+    return m_pOnEffectDummyItem != NULL && m_pOnEffectDummyItem(pCaster, spellId, effIndex, pTarget);
+}
+
+bool ScriptMgr::OnAuraDummy(Aura const* pAura, bool apply)
+{
+    return m_pOnAuraDummy != NULL && m_pOnAuraDummy(pAura, apply);
+}
+
+bool ScriptMgr::LoadScriptLibrary(const char* libName)
+{
+    UnloadScriptLibrary();
+
+    std::string name = libName;
+    name = MANGOS_SCRIPT_PREFIX + name + MANGOS_SCRIPT_SUFFIX;
+
+    m_hScriptLib = MANGOS_LOAD_LIBRARY(name.c_str());
+
+    if (!m_hScriptLib)
+        return false;
+
+    GetScriptHookPtr(m_pOnInitScriptLibrary,        "InitScriptLibrary");
+    GetScriptHookPtr(m_pOnFreeScriptLibrary,        "FreeScriptLibrary");
+    GetScriptHookPtr(m_pGetScriptLibraryVersion,    "GetScriptLibraryVersion");
+
+    GetScriptHookPtr(m_pGetCreatureAI,              "GetCreatureAI");
+    GetScriptHookPtr(m_pCreateInstanceData,         "CreateInstanceData");
+
+    GetScriptHookPtr(m_pOnGossipHello,              "GossipHello");
+    GetScriptHookPtr(m_pOnGOGossipHello,            "GOGossipHello");
+    GetScriptHookPtr(m_pOnGossipSelect,             "GossipSelect");
+    GetScriptHookPtr(m_pOnGOGossipSelect,           "GOGossipSelect");
+    GetScriptHookPtr(m_pOnGossipSelectWithCode,     "GossipSelectWithCode");
+    GetScriptHookPtr(m_pOnGOGossipSelectWithCode,   "GOGossipSelectWithCode");
+    GetScriptHookPtr(m_pOnQuestAccept,              "QuestAccept");
+    GetScriptHookPtr(m_pOnGOQuestAccept,            "GOQuestAccept");
+    GetScriptHookPtr(m_pOnItemQuestAccept,          "ItemQuestAccept");
+    GetScriptHookPtr(m_pOnQuestComplete,            "QuestComplete");
+    GetScriptHookPtr(m_pOnQuestChooseReward,        "QuestChooseReward");
+    GetScriptHookPtr(m_pOnGOQuestChooseReward,      "GOQuestChooseReward");
+    GetScriptHookPtr(m_pOnNPCDialogStatus,          "NPCDialogStatus");
+    GetScriptHookPtr(m_pOnGODialogStatus,           "GODialogStatus");
+    GetScriptHookPtr(m_pOnGOUse,                    "GOUse");
+    GetScriptHookPtr(m_pOnItemUse,                  "ItemUse");
+    GetScriptHookPtr(m_pOnAreaTrigger,              "AreaTrigger");
+    GetScriptHookPtr(m_pOnProcessEvent,             "ProcessEvent");
+    GetScriptHookPtr(m_pOnEffectDummyCreature,      "EffectDummyCreature");
+    GetScriptHookPtr(m_pOnEffectDummyGO,            "EffectDummyGameObject");
+    GetScriptHookPtr(m_pOnEffectDummyItem,          "EffectDummyItem");
+    GetScriptHookPtr(m_pOnAuraDummy,                "AuraDummy");
+
+    if (m_pOnInitScriptLibrary)
+        m_pOnInitScriptLibrary();
+
+    if (m_pGetScriptLibraryVersion)
+        sWorld.SetScriptsVersion(m_pGetScriptLibraryVersion());
+
+    return true;
+}
+
+void ScriptMgr::UnloadScriptLibrary()
+{
+    if (!m_hScriptLib)
+        return;
+
+    if (m_pOnFreeScriptLibrary)
+        m_pOnFreeScriptLibrary();
+
+    MANGOS_CLOSE_LIBRARY(m_hScriptLib);
+    m_hScriptLib = NULL;
+
+    m_pOnInitScriptLibrary      = NULL;
+    m_pOnFreeScriptLibrary      = NULL;
+    m_pGetScriptLibraryVersion  = NULL;
+
+    m_pGetCreatureAI            = NULL;
+    m_pCreateInstanceData       = NULL;
+
+    m_pOnGossipHello            = NULL;
+    m_pOnGOGossipHello          = NULL;
+    m_pOnGossipSelect           = NULL;
+    m_pOnGOGossipSelect         = NULL;
+    m_pOnGossipSelectWithCode   = NULL;
+    m_pOnGOGossipSelectWithCode = NULL;
+    m_pOnQuestAccept            = NULL;
+    m_pOnGOQuestAccept          = NULL;
+    m_pOnItemQuestAccept        = NULL;
+    m_pOnQuestComplete          = NULL;
+    m_pOnQuestChooseReward      = NULL;
+    m_pOnGOQuestChooseReward    = NULL;
+    m_pOnNPCDialogStatus        = NULL;
+    m_pOnGODialogStatus         = NULL;
+    m_pOnGOUse                  = NULL;
+    m_pOnItemUse                = NULL;
+    m_pOnAreaTrigger            = NULL;
+    m_pOnProcessEvent           = NULL;
+    m_pOnEffectDummyCreature    = NULL;
+    m_pOnEffectDummyGO          = NULL;
+    m_pOnEffectDummyItem        = NULL;
+    m_pOnAuraDummy              = NULL;
+}
+
 uint32 GetAreaTriggerScriptId(uint32 triggerId)
 {
     return sScriptMgr.GetAreaTriggerScriptId(triggerId);
@@ -891,9 +1144,4 @@ uint32 GetEventIdScriptId(uint32 eventId)
 uint32 GetScriptId(const char *name)
 {
     return sScriptMgr.GetScriptId(name);
-}
-
-ScriptMgr::ScriptNameMap const& GetScriptNames()
-{
-    return sScriptMgr.GetScriptNames();
 }

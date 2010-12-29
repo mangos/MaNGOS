@@ -51,7 +51,6 @@
 #include "VMapFactory.h"
 #include "Util.h"
 #include "TemporarySummon.h"
-#include "ScriptCalls.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "Formulas.h"
@@ -2697,11 +2696,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
     // Script based implementation. Must be used only for not good for implementation in core spell effects
     // So called only for not processed cases
     if (gameObjTarget)
-        Script->EffectDummyGameObj(m_caster, m_spellInfo->Id, eff_idx, gameObjTarget);
-    else if (unitTarget && unitTarget->GetTypeId()==TYPEID_UNIT)
-        Script->EffectDummyCreature(m_caster, m_spellInfo->Id, eff_idx, (Creature*)unitTarget);
+        sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, gameObjTarget);
+    else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
+        sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, (Creature*)unitTarget);
     else if (itemTarget)
-        Script->EffectDummyItem(m_caster, m_spellInfo->Id, eff_idx, itemTarget);
+        sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, itemTarget);
 }
 
 void Spell::EffectTriggerSpellWithValue(SpellEffectIndex eff_idx)
@@ -3304,7 +3303,7 @@ void Spell::EffectSendEvent(SpellEffectIndex effectIndex)
     */
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[effectIndex], m_spellInfo->Id);
 
-    if (!Script->ProcessEventId(m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject, true))
+    if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject, true))
         m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[effectIndex], m_caster, focusObject);
 }
 
