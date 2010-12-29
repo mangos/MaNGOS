@@ -539,7 +539,7 @@ void Pet::Update(uint32 update_diff, uint32 diff)
                 else
                 {
                     DEBUG_LOG("Pet %d removed with duration expired.", GetGUID());
-                    Unsummon(getPetType() != SUMMON_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, owner);
+                    Unsummon(PET_SAVE_AS_DELETED, owner);
                     return;
                 }
             }
