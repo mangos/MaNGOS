@@ -910,14 +910,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\ScriptCalls.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\ScriptCalls.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\ScriptMgr.cpp"
 				>
 			</File>
