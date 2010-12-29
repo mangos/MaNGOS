@@ -33,6 +33,15 @@ VehicleKit::VehicleKit(Unit* base, VehicleEntry const* vehicleInfo) : m_vehicleI
         if (!seatId)
             continue;
 
+        if(base)
+        {
+            if(m_vehicleInfo->m_flags & VEHICLE_FLAG_NO_STRAFE)
+                base->m_movementInfo.AddMovementFlag2(MOVEFLAG2_NO_STRAFE);
+
+            if(m_vehicleInfo->m_flags & VEHICLE_FLAG_NO_JUMPING)
+                base->m_movementInfo.AddMovementFlag2(MOVEFLAG2_NO_JUMPING);
+        }
+
         if (VehicleSeatEntry const *seatInfo = sVehicleSeatStore.LookupEntry(seatId))
         {
             m_Seats.insert(std::make_pair(i, VehicleSeat(seatInfo)));
