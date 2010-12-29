@@ -39,7 +39,7 @@ alter table creature_movement add `wpguid` int(11) default '0';
 #include "CreatureAI.h"
 #include "WaypointManager.h"
 #include "WorldPacket.h"
-#include "ScriptCalls.h"
+#include "ScriptMgr.h"
 
 #include <cassert>
 
@@ -435,7 +435,7 @@ void FlightPathMovementGenerator::DoEventIfAny(Player& player, TaxiPathNodeEntry
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
 
-        if (!Script->ProcessEventId(eventid, &player, &player, departure))
+        if (!sScriptMgr.OnProcessEvent(eventid, &player, &player, departure))
             player.GetMap()->ScriptsStart(sEventScripts, eventid, &player, &player);
     }
 }
