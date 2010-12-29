@@ -1608,12 +1608,16 @@ void BattleGround::SpawnBGObject(ObjectGuid guid, uint32 respawntime)
             obj->SetLootState(GO_READY);
         obj->SetRespawnTime(0);
         map->Add(obj);
+        if (obj->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
+            obj->Rebuild(NULL);
     }
     else
     {
         map->Add(obj);
         obj->SetRespawnTime(respawntime);
         obj->SetLootState(GO_JUST_DEACTIVATED);
+        if (obj->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
+            obj->Rebuild(NULL);
     }
 }
 
