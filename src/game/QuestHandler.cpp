@@ -54,7 +54,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
 
             if (!cr_questgiver->IsHostileTo(_player))       // not show quest status to enemies
             {
-                dialogStatus = sScriptMgr.OnDialogStatus(_player, cr_questgiver);
+                dialogStatus = sScriptMgr.GetDialogStatus(_player, cr_questgiver);
 
                 if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                     dialogStatus = getDialogStatus(_player, cr_questgiver, DIALOG_STATUS_NONE);
@@ -64,7 +64,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode( WorldPacket & recv_data )
         case TYPEID_GAMEOBJECT:
         {
             GameObject* go_questgiver = (GameObject*)questgiver;
-            dialogStatus = sScriptMgr.OnDialogStatus(_player, go_questgiver);
+            dialogStatus = sScriptMgr.GetDialogStatus(_player, go_questgiver);
 
             if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                 dialogStatus = getDialogStatus(_player, go_questgiver, DIALOG_STATUS_NONE);
@@ -296,25 +296,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode( WorldPacket & recv_data )
         {
             _player->RewardQuest( pQuest, reward, pObject );
 
-            switch(pObject->GetTypeId())
-            {
-                case TYPEID_UNIT:
-                    if (!sScriptMgr.OnQuestChooseReward(_player, (Creature*)pObject, pQuest, reward))
-                    {
-                        // Send next quest
-                        if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
-                            _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
-                    }
-                    break;
-                case TYPEID_GAMEOBJECT:
-                    if (!sScriptMgr.OnQuestChooseReward(_player, (GameObject*)pObject, pQuest, reward))
-                    {
-                        // Send next quest
-                        if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
-                            _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
-                    }
-                    break;
-            }
+            // Send next quest
+            if (Quest const* nextquest = _player->GetNextQuest(guid, pQuest))
+                _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
         }
         else
             _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
@@ -663,7 +647,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (!questgiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                 continue;
 
-            dialogStatus = sScriptMgr.OnDialogStatus(_player, questgiver);
+            dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
 
             if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);
@@ -682,7 +666,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
             if (questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
                 continue;
 
-            dialogStatus = sScriptMgr.OnDialogStatus(_player, questgiver);
+            dialogStatus = sScriptMgr.GetDialogStatus(_player, questgiver);
 
             if (dialogStatus > DIALOG_STATUS_REWARD_REP)
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);

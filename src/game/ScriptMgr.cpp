@@ -53,11 +53,10 @@ ScriptMgr::ScriptMgr() :
     m_pOnQuestAccept(NULL),
     m_pOnGOQuestAccept(NULL),
     m_pOnItemQuestAccept(NULL),
-    m_pOnQuestComplete(NULL),
-    m_pOnQuestChooseReward(NULL),
-    m_pOnGOQuestChooseReward(NULL),
-    m_pOnNPCDialogStatus(NULL),
-    m_pOnGODialogStatus(NULL),
+    m_pOnQuestRewarded(NULL),
+    m_pOnGOQuestRewarded(NULL),
+    m_pGetNPCDialogStatus(NULL),
+    m_pGetGODialogStatus(NULL),
     m_pOnGOUse(NULL),
     m_pOnItemUse(NULL),
     m_pOnAreaTrigger(NULL),
@@ -967,35 +966,30 @@ bool ScriptMgr::OnQuestAccept(Player* pPlayer, Item* pItem, Quest const* pQuest)
     return m_pOnItemQuestAccept != NULL && m_pOnItemQuestAccept(pPlayer, pItem, pQuest);
 }
 
-bool ScriptMgr::OnQuestComplete(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
+bool ScriptMgr::OnQuestRewarded(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
-    return m_pOnQuestComplete != NULL && m_pOnQuestComplete(pPlayer, pCreature, pQuest);
+    return m_pOnQuestRewarded != NULL && m_pOnQuestRewarded(pPlayer, pCreature, pQuest);
 }
 
-bool ScriptMgr::OnQuestChooseReward(Player* pPlayer, Creature* pCreature, Quest const* pQuest, uint32 opt)
+bool ScriptMgr::OnQuestRewarded(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest)
 {
-    return m_pOnQuestChooseReward != NULL && m_pOnQuestChooseReward(pPlayer, pCreature, pQuest, opt);
+    return m_pOnGOQuestRewarded != NULL && m_pOnGOQuestRewarded(pPlayer, pGameObject, pQuest);
 }
 
-bool ScriptMgr::OnQuestChooseReward(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest, uint32 opt)
+uint32 ScriptMgr::GetDialogStatus(Player* pPlayer, Creature* pCreature)
 {
-    return m_pOnGOQuestChooseReward != NULL && m_pOnGOQuestChooseReward(pPlayer, pGameObject, pQuest, opt);
-}
-
-uint32 ScriptMgr::OnDialogStatus(Player* pPlayer, Creature* pCreature)
-{
-    if (!m_pOnNPCDialogStatus)
+    if (!m_pGetNPCDialogStatus)
         return 100;
 
-    return m_pOnNPCDialogStatus(pPlayer, pCreature);
+    return m_pGetNPCDialogStatus(pPlayer, pCreature);
 }
 
-uint32 ScriptMgr::OnDialogStatus(Player* pPlayer, GameObject* pGameObject)
+uint32 ScriptMgr::GetDialogStatus(Player* pPlayer, GameObject* pGameObject)
 {
-    if (!m_pOnGODialogStatus)
+    if (!m_pGetGODialogStatus)
         return 100;
 
-    return m_pOnGODialogStatus(pPlayer, pGameObject);
+    return m_pGetGODialogStatus(pPlayer, pGameObject);
 }
 
 bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
@@ -1013,7 +1007,7 @@ bool ScriptMgr::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
     return m_pOnAreaTrigger != NULL && m_pOnAreaTrigger(pPlayer, atEntry);
 }
 
-bool ScriptMgr::OnProcessEvent(uint32 eventId, WorldObject* pSource, WorldObject* pTarget, bool isStart)
+bool ScriptMgr::OnProcessEvent(uint32 eventId, Object* pSource, Object* pTarget, bool isStart)
 {
     return m_pOnProcessEvent != NULL && m_pOnProcessEvent(eventId, pSource, pTarget, isStart);
 }
@@ -1068,11 +1062,10 @@ bool ScriptMgr::LoadScriptLibrary(const char* libName)
     GetScriptHookPtr(m_pOnQuestAccept,              "QuestAccept");
     GetScriptHookPtr(m_pOnGOQuestAccept,            "GOQuestAccept");
     GetScriptHookPtr(m_pOnItemQuestAccept,          "ItemQuestAccept");
-    GetScriptHookPtr(m_pOnQuestComplete,            "QuestComplete");
-    GetScriptHookPtr(m_pOnQuestChooseReward,        "QuestChooseReward");
-    GetScriptHookPtr(m_pOnGOQuestChooseReward,      "GOQuestChooseReward");
-    GetScriptHookPtr(m_pOnNPCDialogStatus,          "NPCDialogStatus");
-    GetScriptHookPtr(m_pOnGODialogStatus,           "GODialogStatus");
+    GetScriptHookPtr(m_pOnQuestRewarded,            "QuestRewarded");
+    GetScriptHookPtr(m_pOnGOQuestRewarded,          "GOQuestRewarded");
+    GetScriptHookPtr(m_pGetNPCDialogStatus,         "GetNPCDialogStatus");
+    GetScriptHookPtr(m_pGetGODialogStatus,          "GetGODialogStatus");
     GetScriptHookPtr(m_pOnGOUse,                    "GOUse");
     GetScriptHookPtr(m_pOnItemUse,                  "ItemUse");
     GetScriptHookPtr(m_pOnAreaTrigger,              "AreaTrigger");
@@ -1118,11 +1111,10 @@ void ScriptMgr::UnloadScriptLibrary()
     m_pOnQuestAccept            = NULL;
     m_pOnGOQuestAccept          = NULL;
     m_pOnItemQuestAccept        = NULL;
-    m_pOnQuestComplete          = NULL;
-    m_pOnQuestChooseReward      = NULL;
-    m_pOnGOQuestChooseReward    = NULL;
-    m_pOnNPCDialogStatus        = NULL;
-    m_pOnGODialogStatus         = NULL;
+    m_pOnQuestRewarded          = NULL;
+    m_pOnGOQuestRewarded        = NULL;
+    m_pGetNPCDialogStatus       = NULL;
+    m_pGetGODialogStatus        = NULL;
     m_pOnGOUse                  = NULL;
     m_pOnItemUse                = NULL;
     m_pOnAreaTrigger            = NULL;
