@@ -1622,6 +1622,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 70836:                                 // Bone Storm
                     radius = DEFAULT_VISIBILITY_INSTANCE;
                     break;
+                case 69845:                                 // Sindragosa Frost bomb (hack!)
+                case 71053:
+                case 71054:
+                case 71055:
+                    radius = 50;
+                    break;
                 case 72350:                                 // Fury of Frostmourne
                 case 72351:                                 // Fury of Frostmourne 
                     radius = 300;
@@ -6832,6 +6838,14 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
 
     // Check vampiric bite
     if (m_spellInfo->Id == 70946 && target->HasAura(70867))
+        return false;
+
+    // Sindragosa frost bomb hack
+    if ((m_spellInfo->Id == 69845
+        || m_spellInfo->Id == 71053
+        || m_spellInfo->Id == 71054
+        || m_spellInfo->Id == 71055)
+         && target->HasAura(70867))
         return false;
 
     // Check targets for LOS visibility (except spells without range limitations )
