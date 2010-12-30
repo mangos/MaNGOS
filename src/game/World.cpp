@@ -1172,7 +1172,7 @@ void World::SetInitialWorldSettings()
     sLog.outString();
 
     sLog.outString( "Loading Npc Text Id..." );
-    sObjectMgr.LoadNpcTextId();                             // must be after load Creature and LoadGossipText
+    sObjectMgr.LoadNpcGossips();                            // must be after load Creature and LoadGossipText
 
     sLog.outString( "Loading Gossip scripts..." );
     sScriptMgr.LoadGossipScripts();                         // must be before gossip menu options
@@ -1204,7 +1204,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadGameObjectLocales();                     // must be after GameobjectInfo loading
     sObjectMgr.LoadItemLocales();                           // must be after ItemPrototypes loading
     sObjectMgr.LoadQuestLocales();                          // must be after QuestTemplates loading
-    sObjectMgr.LoadNpcTextLocales();                        // must be after LoadGossipText
+    sObjectMgr.LoadGossipTextLocales();                     // must be after LoadGossipText
     sObjectMgr.LoadPageTextLocales();                       // must be after PageText loading
     sObjectMgr.LoadGossipMenuItemsLocales();                // must be after gossip menu items loading
     sObjectMgr.LoadPointOfInterestLocales();                // must be after POI loading

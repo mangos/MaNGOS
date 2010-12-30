@@ -741,7 +741,7 @@ class ObjectMgr
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();
-        void LoadNpcTextLocales();
+        void LoadGossipTextLocales();
         void LoadPageTextLocales();
         void LoadGossipMenuItemsLocales();
         void LoadPointOfInterestLocales();
@@ -780,7 +780,7 @@ class ObjectMgr
         void LoadWeatherZoneChances();
         void LoadGameTele();
 
-        void LoadNpcTextId();
+        void LoadNpcGossips();
 
         void LoadGossipMenu();
         void LoadGossipMenuItems();

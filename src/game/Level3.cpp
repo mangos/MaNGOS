@@ -932,8 +932,16 @@ bool ChatHandler::HandleReloadMangosStringCommand(char* /*args*/)
 bool ChatHandler::HandleReloadNpcGossipCommand(char* /*args*/)
 {
     sLog.outString( "Re-Loading `npc_gossip` Table!" );
-    sObjectMgr.LoadNpcTextId();
+    sObjectMgr.LoadNpcGossips();
     SendGlobalSysMessage("DB table `npc_gossip` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadNpcTextCommand(char* /*args*/)
+{
+    sLog.outString( "Re-Loading `npc_text` Table!" );
+    sObjectMgr.LoadGossipText();
+    SendGlobalSysMessage("DB table `npc_text` reloaded.");
     return true;
 }
 
@@ -1360,7 +1368,7 @@ bool ChatHandler::HandleReloadLocalesItemCommand(char* /*args*/)
 bool ChatHandler::HandleReloadLocalesNpcTextCommand(char* /*args*/)
 {
     sLog.outString( "Re-Loading Locales NPC Text ... ");
-    sObjectMgr.LoadNpcTextLocales();
+    sObjectMgr.LoadGossipTextLocales();
     SendGlobalSysMessage("DB table `locales_npc_text` reloaded.");
     return true;
 }
