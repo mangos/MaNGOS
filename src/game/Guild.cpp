@@ -204,7 +204,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
         newmember.accountId = fields[4].GetInt32();
         delete result;
         if (newmember.Level < 1 || newmember.Level > STRONG_MAX_LEVEL ||
-            newmember.Class < CLASS_WARRIOR || newmember.Class >= MAX_CLASSES)
+            !((1 << (newmember.Class-1)) & CLASSMASK_ALL_PLAYABLE))
         {
             sLog.outError("%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
             return false;
@@ -456,7 +456,7 @@ bool Guild::LoadMembersFromDB(QueryResult *guildMembersResult)
             // the zone through xy coords .. this is a bit redundant, but shouldn't be called often
             newmember.ZoneId = Player::GetZoneIdFromDB(newmember.guid);
         }
-        if (newmember.Class < CLASS_WARRIOR || newmember.Class >= MAX_CLASSES) // can be at broken `class` field
+        if (!((1 << (newmember.Class-1)) & CLASSMASK_ALL_PLAYABLE)) // can be at broken `class` field
         {
             sLog.outError("%s has a broken data in field `characters`.`class`, deleting him from guild!", newmember.guid.GetString().c_str());
             CharacterDatabase.PExecute("DELETE FROM guild_member WHERE guid = '%u'", lowguid);
