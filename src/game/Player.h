@@ -1591,12 +1591,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         ObjectGuid const& GetSelectionGuid( ) const { return m_curSelectionGuid; }
         void SetSelectionGuid(ObjectGuid guid) { m_curSelectionGuid = guid; SetTargetGuid(guid); }
 
-        uint8 GetComboPoints() { return m_comboPoints; }
-        ObjectGuid const& GetComboTargetGuid() const { return m_comboTargetGuid; }
-
-        void AddComboPoints(Unit* target, int8 count);
-        void ClearComboPoints();
-        void SendComboPoints();
+        void SendComboPoints(ObjectGuid targetGuid, uint8 combopoints);
+        void SendPetComboPoints(Unit* pet, ObjectGuid targetGuid, uint8 combopoints);
 
         void SendCalendarResult(CalendarResponseResult result, std::string str);
 
@@ -2541,9 +2537,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 m_ExtraFlags;
         ObjectGuid m_curSelectionGuid;
-
-        ObjectGuid m_comboTargetGuid;
-        int8 m_comboPoints;
 
         QuestStatusMap mQuestStatus;
 
