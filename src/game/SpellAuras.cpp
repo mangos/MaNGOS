@@ -7851,6 +7851,21 @@ void Aura::PeriodicDummyTick()
                         target->CastCustomSpell(caster, 66125, &heal, NULL, NULL, true, NULL, this);
                     return;
                 }
+                case 71340:                                // Pact of darkfallen remove effect
+                {
+                    int32 radius = m_modifier.m_amount  / 1000;
+                    bool inRadius = true;
+                    Map::PlayerList const& pList = target->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                        if (itr->getSource() && itr->getSource()->HasAura(spell->Id) && !itr->getSource()->IsWithinDistInMap(target,radius))
+                        {
+                            inRadius = false;
+                            break;
+                        }
+                    if (inRadius)
+                        target->RemoveAurasDueToSpell(spell->Id);
+                    return;
+                }
 // Exist more after, need add later
                 default:
                     break;
@@ -8994,11 +9009,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     break;
                 }
                 case 70867:                                 // Soul of Blood Qween
-                case 70879:
                 case 71473:
-                case 71525:
-                case 71530:
-                case 71531:
                 case 71532:
                 case 71533:
                 {
