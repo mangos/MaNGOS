@@ -1669,7 +1669,7 @@ CREATE TABLE `game_event_creature_data` (
 -- Dumping data for table `game_event_creature_data`
 --
 
-LOCK TABLES `game_event_model_equip` WRITE;
+LOCK TABLES `game_event_creature_data` WRITE;
 /*!40000 ALTER TABLE `game_event_creature_data` DISABLE KEYS */;
 /*!40000 ALTER TABLE `game_event_creature_data` ENABLE KEYS */;
 UNLOCK TABLES;
