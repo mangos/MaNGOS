@@ -20070,7 +20070,7 @@ void Player::InitPrimaryProfessions()
 
 void Player::SendComboPoints(ObjectGuid targetGuid, uint8 combopoints)
 {
-    Unit *combotarget = ObjectAccessor::GetUnit(*this, targetGuid);
+    Unit* combotarget = GetMap()->GetUnit(targetGuid);
     if (combotarget)
     {
         WorldPacket data(SMSG_UPDATE_COMBO_POINTS, combotarget->GetPackGUID().size()+1);
@@ -20082,7 +20082,7 @@ void Player::SendComboPoints(ObjectGuid targetGuid, uint8 combopoints)
 
 void Player::SendPetComboPoints(Unit* pet, ObjectGuid targetGuid, uint8 combopoints)
 {
-    Unit* combotarget = ObjectAccessor::GetUnit(*this, targetGuid);
+    Unit* combotarget = pet ? pet->GetMap()->GetUnit(targetGuid) : NULL;
     if (pet && combotarget)
     {
         WorldPacket data(SMSG_PET_UPDATE_COMBO_POINTS, combotarget->GetPackGUID().size()+pet->GetPackGUID().size()+1);

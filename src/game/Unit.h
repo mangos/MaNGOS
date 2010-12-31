@@ -2152,7 +2152,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid m_comboTargetGuid;
         int8 m_comboPoints;
 
-
         GroupPetList m_groupPets;
 
         GuardianPetList m_guardianPets;
