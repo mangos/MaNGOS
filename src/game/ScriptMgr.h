@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -304,6 +304,13 @@ extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;
 
+enum ScriptLoadResult
+{
+    SCRIPT_LOAR_OK,
+    SCRIPT_LOAR_ERR_NOT_FOUND,
+    SCRIPT_LOAR_ERR_WRONG_API
+};
+
 class ScriptMgr
 {
     public:
@@ -330,7 +337,7 @@ class ScriptMgr
         const char* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
         uint32 GetScriptId(const char *name) const;
 
-        bool LoadScriptLibrary(const char* libName);
+        ScriptLoadResult LoadScriptLibrary(const char* libName);
         void UnloadScriptLibrary();
 
         CreatureAI* GetCreatureAI(Creature* pCreature);

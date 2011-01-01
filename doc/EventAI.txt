@@ -2,6 +2,8 @@
 EventAI Documentation: (Last Updated: January 8, 2010)
 ======================================================
 
+Copyright (c) 2009-2011 MaNGOS <http://getmangos.com/>
+
 EventAI allows users to create new creature scripts entirely within the database.
 
 For the AI to be used, you must first make sure to set AIname for each creature that should use this AI.
