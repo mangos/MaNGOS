@@ -938,10 +938,20 @@ bool ChatHandler::HandleLoadScriptsCommand(char* args)
     if (!*args)
         return false;
 
-    if (!sScriptMgr.LoadScriptLibrary(args))
-        return true;
+    switch(sScriptMgr.LoadScriptLibrary(args))
+    {
+    case SCRIPT_LOAR_OK:
+        sWorld.SendWorldText(LANG_SCRIPTS_RELOADED_ANNOUNCE);
+        SendSysMessage(LANG_SCRIPTS_RELOADED_OK);
+        break;
+    case SCRIPT_LOAR_ERR_NOT_FOUND:
+        SendSysMessage(LANG_SCRIPTS_NOT_FOUND);
+        break;
+    case SCRIPT_LOAR_ERR_WRONG_API:
+        SendSysMessage(LANG_SCRIPTS_WRONG_API);
+        break;
+    }
 
-    sWorld.SendWorldText(LANG_SCRIPTS_RELOADED);
     return true;
 }
 

@@ -1032,7 +1032,7 @@ bool ScriptMgr::OnAuraDummy(Aura const* pAura, bool apply)
     return m_pOnAuraDummy != NULL && m_pOnAuraDummy(pAura, apply);
 }
 
-bool ScriptMgr::LoadScriptLibrary(const char* libName)
+ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
 {
     UnloadScriptLibrary();
 
@@ -1042,7 +1042,7 @@ bool ScriptMgr::LoadScriptLibrary(const char* libName)
     m_hScriptLib = MANGOS_LOAD_LIBRARY(name.c_str());
 
     if (!m_hScriptLib)
-        return false;
+        return SCRIPT_LOAR_ERR_NOT_FOUND;
 
     GetScriptHookPtr(m_pOnInitScriptLibrary,        "InitScriptLibrary");
     GetScriptHookPtr(m_pOnFreeScriptLibrary,        "FreeScriptLibrary");
@@ -1073,13 +1073,24 @@ bool ScriptMgr::LoadScriptLibrary(const char* libName)
     GetScriptHookPtr(m_pOnEffectDummyItem,          "EffectDummyItem");
     GetScriptHookPtr(m_pOnAuraDummy,                "AuraDummy");
 
+    if (!m_pOnInitScriptLibrary || !m_pOnFreeScriptLibrary    || !m_pGetScriptLibraryVersion  ||
+        !m_pGetCreatureAI       || !m_pCreateInstanceData     ||
+        !m_pOnGossipHello       || !m_pOnGOGossipHello        || !m_pOnGossipSelect           ||
+        !m_pOnGOGossipSelect    || !m_pOnGossipSelectWithCode || !m_pOnGOGossipSelectWithCode ||
+        !m_pOnQuestAccept       || !m_pOnGOQuestAccept        || !m_pOnItemQuestAccept        ||
+        !m_pOnQuestRewarded     || !m_pOnGOQuestRewarded      || !m_pGetNPCDialogStatus       ||
+        !m_pGetGODialogStatus   || !m_pOnGOUse                || !m_pOnItemUse                ||
+        !m_pOnAreaTrigger       || !m_pOnProcessEvent         || !m_pOnEffectDummyCreature    ||
+        !m_pOnEffectDummyGO     || !m_pOnEffectDummyItem      || !m_pOnAuraDummy)
+        return SCRIPT_LOAR_ERR_WRONG_API;
+
     if (m_pOnInitScriptLibrary)
         m_pOnInitScriptLibrary();
 
     if (m_pGetScriptLibraryVersion)
         sWorld.SetScriptsVersion(m_pGetScriptLibraryVersion());
 
-    return true;
+    return SCRIPT_LOAR_OK;
 }
 
 void ScriptMgr::UnloadScriptLibrary()

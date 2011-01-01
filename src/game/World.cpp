@@ -1249,8 +1249,19 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading CreatureEventAI Scripts...");
     sEventAIMgr.LoadCreatureEventAI_Scripts();
 
-    sLog.outString( "Initializing Scripts..." );
-    sScriptMgr.LoadScriptLibrary(MANGOS_SCRIPT_NAME);
+    sLog.outString("Initializing Scripts...");
+    switch(sScriptMgr.LoadScriptLibrary(MANGOS_SCRIPT_NAME))
+    {
+        case SCRIPT_LOAR_OK:
+            sLog.outString("Scripting library loaded.");
+            break;
+        case SCRIPT_LOAR_ERR_NOT_FOUND:
+            sLog.outError("Scripting library not found or not accessable.");
+            break;
+        case SCRIPT_LOAR_ERR_WRONG_API:
+            sLog.outError("Scripting library has wrong list functions (outdated?).");
+            break;
+    }
 
     ///- Initialize game time and timers
     sLog.outString( "DEBUG:: Initialize game time and timers" );
