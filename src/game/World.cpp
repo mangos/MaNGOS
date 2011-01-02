@@ -1256,7 +1256,7 @@ void World::SetInitialWorldSettings()
             sLog.outString("Scripting library loaded.");
             break;
         case SCRIPT_LOAD_ERR_NOT_FOUND:
-            sLog.outError("Scripting library not found or not accessable.");
+            sLog.outError("Scripting library not found or not accessible.");
             break;
         case SCRIPT_LOAD_ERR_WRONG_API:
             sLog.outError("Scripting library has wrong list functions (outdated?).");
