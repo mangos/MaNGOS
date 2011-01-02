@@ -1279,13 +1279,13 @@ void World::SetInitialWorldSettings()
     sLog.outString("Initializing Scripts...");
     switch(sScriptMgr.LoadScriptLibrary(MANGOS_SCRIPT_NAME))
     {
-        case SCRIPT_LOAR_OK:
+        case SCRIPT_LOAD_OK:
             sLog.outString("Scripting library loaded.");
             break;
-        case SCRIPT_LOAR_ERR_NOT_FOUND:
-            sLog.outError("Scripting library not found or not accessable.");
+        case SCRIPT_LOAD_ERR_NOT_FOUND:
+            sLog.outError("Scripting library not found or not accessible.");
             break;
-        case SCRIPT_LOAR_ERR_WRONG_API:
+        case SCRIPT_LOAD_ERR_WRONG_API:
             sLog.outError("Scripting library has wrong list functions (outdated?).");
             break;
     }

@@ -1044,7 +1044,7 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
     sLog.outString( ">> Loading %s Script library", name.c_str());
 
     if (!m_hScriptLib)
-        return SCRIPT_LOAR_ERR_NOT_FOUND;
+        return SCRIPT_LOAD_ERR_NOT_FOUND;
 
     GetScriptHookPtr(m_pOnInitScriptLibrary,        "InitScriptLibrary");
     GetScriptHookPtr(m_pOnFreeScriptLibrary,        "FreeScriptLibrary");
@@ -1084,7 +1084,7 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
         !m_pGetGODialogStatus   || !m_pOnGOUse                || !m_pOnItemUse                ||
         !m_pOnAreaTrigger       || !m_pOnProcessEvent         || !m_pOnEffectDummyCreature    ||
         !m_pOnEffectDummyGO     || !m_pOnEffectDummyItem      || !m_pOnAuraDummy)
-        return SCRIPT_LOAR_ERR_WRONG_API;
+        return SCRIPT_LOAD_ERR_WRONG_API;
 
     if (m_pOnInitScriptLibrary)
         m_pOnInitScriptLibrary();
@@ -1092,7 +1092,7 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
     if (m_pGetScriptLibraryVersion)
         sWorld.SetScriptsVersion(m_pGetScriptLibraryVersion());
 
-    return SCRIPT_LOAR_OK;
+    return SCRIPT_LOAD_OK;
 }
 
 void ScriptMgr::UnloadScriptLibrary()

@@ -306,9 +306,9 @@ extern ScriptMapMap sCreatureMovementScripts;
 
 enum ScriptLoadResult
 {
-    SCRIPT_LOAR_OK,
-    SCRIPT_LOAR_ERR_NOT_FOUND,
-    SCRIPT_LOAR_ERR_WRONG_API
+    SCRIPT_LOAD_OK,
+    SCRIPT_LOAD_ERR_NOT_FOUND,
+    SCRIPT_LOAD_ERR_WRONG_API
 };
 
 class ScriptMgr
