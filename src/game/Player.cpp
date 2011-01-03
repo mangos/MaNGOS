@@ -3713,7 +3713,6 @@ void Player::_SaveSpellCooldowns()
     time_t curTime = time(NULL);
     time_t infTime = curTime + infinityCooldownDelayCheck;
 
-    /* copied following sql-code partly from achievementmgr */
     bool first_round = true;
     std::ostringstream ss;
 
@@ -17176,8 +17175,6 @@ void Player::_SaveAuras()
 
     if (auraHolders.empty())
         return;
-
-    /* copied following sql-code partly from achievementmgr */
 
     for(SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
     {
