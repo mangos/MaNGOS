@@ -230,3 +230,8 @@ spell_scripts
                                             * datalong2 = creature entry (searching for a buddy, closest to source)
                                             * datalong3 = creature search radius
                                             * data_flags =  flag_target_as_source    = 0x01
+29 SCRIPT_COMMAND_MODIFY_NPC_FLAGS          source=worldobject or target=worldobject (datalong1==0), else source or target = creature
+                                            * datalong=NPCFlags
+                                            * datalong1=creature entry
+                                            * datalong2=search radius
+                                            * data_flags = 0x00=toggle, 0x01=add, 0x02=remove
