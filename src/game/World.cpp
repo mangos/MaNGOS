@@ -1288,6 +1288,9 @@ void World::SetInitialWorldSettings()
         case SCRIPT_LOAD_ERR_WRONG_API:
             sLog.outError("Scripting library has wrong list functions (outdated?).");
             break;
+        case SCRIPT_LOAD_ERR_OUTDATED:
+            sLog.outError("Scripting library build for old mangosd revision. You need rebuild it.");
+            break;
     }
 
     ///- Initialize game time and timers

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -142,6 +142,8 @@ pkgdata_DATA = \
 	10945_01_mangos_mangos_string.sql \
 	10946_01_mangos_spell_proc_event.sql \
 	10949_01_mangos_mangos_string.sql \
+	10950_01_mangos_mangos_string.sql \
+	10951_01_mangos_spell_proc_event.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -264,4 +266,6 @@ EXTRA_DIST = \
 	10945_01_mangos_mangos_string.sql \
 	10946_01_mangos_spell_proc_event.sql \
 	10949_01_mangos_mangos_string.sql \
+	10950_01_mangos_mangos_string.sql \
+	10951_01_mangos_spell_proc_event.sql \
 	README

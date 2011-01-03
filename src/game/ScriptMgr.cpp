@@ -24,6 +24,8 @@
 #include "WaypointManager.h"
 #include "World.h"
 
+#include "revision_nr.h"
+
 ScriptMapMap sQuestEndScripts;
 ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
@@ -1046,45 +1048,53 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
     if (!m_hScriptLib)
         return SCRIPT_LOAD_ERR_NOT_FOUND;
 
-    GetScriptHookPtr(m_pOnInitScriptLibrary,        "InitScriptLibrary");
-    GetScriptHookPtr(m_pOnFreeScriptLibrary,        "FreeScriptLibrary");
-    GetScriptHookPtr(m_pGetScriptLibraryVersion,    "GetScriptLibraryVersion");
+#   define GET_SCRIPT_HOOK_PTR(P,N)             \
+        GetScriptHookPtr((P), (N));             \
+        if (!(P))                               \
+        {                                       \
+            MANGOS_CLOSE_LIBRARY(m_hScriptLib); \
+            m_hScriptLib = NULL;                \
+            return SCRIPT_LOAD_ERR_WRONG_API;   \
+        }
 
-    GetScriptHookPtr(m_pGetCreatureAI,              "GetCreatureAI");
-    GetScriptHookPtr(m_pCreateInstanceData,         "CreateInstanceData");
+    // let check used mangosd revision for build library (unsafe use with different revision because changes in inline functions, define and etc)
+    char const* (MANGOS_IMPORT* pGetMangosRevStr) ();
 
-    GetScriptHookPtr(m_pOnGossipHello,              "GossipHello");
-    GetScriptHookPtr(m_pOnGOGossipHello,            "GOGossipHello");
-    GetScriptHookPtr(m_pOnGossipSelect,             "GossipSelect");
-    GetScriptHookPtr(m_pOnGOGossipSelect,           "GOGossipSelect");
-    GetScriptHookPtr(m_pOnGossipSelectWithCode,     "GossipSelectWithCode");
-    GetScriptHookPtr(m_pOnGOGossipSelectWithCode,   "GOGossipSelectWithCode");
-    GetScriptHookPtr(m_pOnQuestAccept,              "QuestAccept");
-    GetScriptHookPtr(m_pOnGOQuestAccept,            "GOQuestAccept");
-    GetScriptHookPtr(m_pOnItemQuestAccept,          "ItemQuestAccept");
-    GetScriptHookPtr(m_pOnQuestRewarded,            "QuestRewarded");
-    GetScriptHookPtr(m_pOnGOQuestRewarded,          "GOQuestRewarded");
-    GetScriptHookPtr(m_pGetNPCDialogStatus,         "GetNPCDialogStatus");
-    GetScriptHookPtr(m_pGetGODialogStatus,          "GetGODialogStatus");
-    GetScriptHookPtr(m_pOnGOUse,                    "GOUse");
-    GetScriptHookPtr(m_pOnItemUse,                  "ItemUse");
-    GetScriptHookPtr(m_pOnAreaTrigger,              "AreaTrigger");
-    GetScriptHookPtr(m_pOnProcessEvent,             "ProcessEvent");
-    GetScriptHookPtr(m_pOnEffectDummyCreature,      "EffectDummyCreature");
-    GetScriptHookPtr(m_pOnEffectDummyGO,            "EffectDummyGameObject");
-    GetScriptHookPtr(m_pOnEffectDummyItem,          "EffectDummyItem");
-    GetScriptHookPtr(m_pOnAuraDummy,                "AuraDummy");
+    GET_SCRIPT_HOOK_PTR(pGetMangosRevStr,              "GetMangosRevStr");
 
-    if (!m_pOnInitScriptLibrary || !m_pOnFreeScriptLibrary    || !m_pGetScriptLibraryVersion  ||
-        !m_pGetCreatureAI       || !m_pCreateInstanceData     ||
-        !m_pOnGossipHello       || !m_pOnGOGossipHello        || !m_pOnGossipSelect           ||
-        !m_pOnGOGossipSelect    || !m_pOnGossipSelectWithCode || !m_pOnGOGossipSelectWithCode ||
-        !m_pOnQuestAccept       || !m_pOnGOQuestAccept        || !m_pOnItemQuestAccept        ||
-        !m_pOnQuestRewarded     || !m_pOnGOQuestRewarded      || !m_pGetNPCDialogStatus       ||
-        !m_pGetGODialogStatus   || !m_pOnGOUse                || !m_pOnItemUse                ||
-        !m_pOnAreaTrigger       || !m_pOnProcessEvent         || !m_pOnEffectDummyCreature    ||
-        !m_pOnEffectDummyGO     || !m_pOnEffectDummyItem      || !m_pOnAuraDummy)
-        return SCRIPT_LOAD_ERR_WRONG_API;
+    GET_SCRIPT_HOOK_PTR(m_pOnInitScriptLibrary,        "InitScriptLibrary");
+    GET_SCRIPT_HOOK_PTR(m_pOnFreeScriptLibrary,        "FreeScriptLibrary");
+    GET_SCRIPT_HOOK_PTR(m_pGetScriptLibraryVersion,    "GetScriptLibraryVersion");
+
+    GET_SCRIPT_HOOK_PTR(m_pGetCreatureAI,              "GetCreatureAI");
+    GET_SCRIPT_HOOK_PTR(m_pCreateInstanceData,         "CreateInstanceData");
+
+    GET_SCRIPT_HOOK_PTR(m_pOnGossipHello,              "GossipHello");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOGossipHello,            "GOGossipHello");
+    GET_SCRIPT_HOOK_PTR(m_pOnGossipSelect,             "GossipSelect");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOGossipSelect,           "GOGossipSelect");
+    GET_SCRIPT_HOOK_PTR(m_pOnGossipSelectWithCode,     "GossipSelectWithCode");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOGossipSelectWithCode,   "GOGossipSelectWithCode");
+    GET_SCRIPT_HOOK_PTR(m_pOnQuestAccept,              "QuestAccept");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOQuestAccept,            "GOQuestAccept");
+    GET_SCRIPT_HOOK_PTR(m_pOnItemQuestAccept,          "ItemQuestAccept");
+    GET_SCRIPT_HOOK_PTR(m_pOnQuestRewarded,            "QuestRewarded");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOQuestRewarded,          "GOQuestRewarded");
+    GET_SCRIPT_HOOK_PTR(m_pGetNPCDialogStatus,         "GetNPCDialogStatus");
+    GET_SCRIPT_HOOK_PTR(m_pGetGODialogStatus,          "GetGODialogStatus");
+    GET_SCRIPT_HOOK_PTR(m_pOnGOUse,                    "GOUse");
+    GET_SCRIPT_HOOK_PTR(m_pOnItemUse,                  "ItemUse");
+    GET_SCRIPT_HOOK_PTR(m_pOnAreaTrigger,              "AreaTrigger");
+    GET_SCRIPT_HOOK_PTR(m_pOnProcessEvent,             "ProcessEvent");
+    GET_SCRIPT_HOOK_PTR(m_pOnEffectDummyCreature,      "EffectDummyCreature");
+    GET_SCRIPT_HOOK_PTR(m_pOnEffectDummyGO,            "EffectDummyGameObject");
+    GET_SCRIPT_HOOK_PTR(m_pOnEffectDummyItem,          "EffectDummyItem");
+    GET_SCRIPT_HOOK_PTR(m_pOnAuraDummy,                "AuraDummy");
+
+#   undef GET_SCRIPT_HOOK_PTR
+
+    if (strcmp(pGetMangosRevStr(), REVISION_NR) != 0)
+        return SCRIPT_LOAD_ERR_OUTDATED;
 
     if (m_pOnInitScriptLibrary)
         m_pOnInitScriptLibrary();
