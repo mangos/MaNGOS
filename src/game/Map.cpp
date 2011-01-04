@@ -2397,7 +2397,7 @@ void Map::ScriptsProcess()
                 Unit* spellSource = (Unit*)cmdSource;
 
                 //TODO: when GO cast implemented, code below must be updated accordingly to also allow GO spell cast
-                spellSource->CastSpell(spellTarget, step.script->castSpell.spellId, step.script->castSpell.flags & 0x04);
+                spellSource->CastSpell(spellTarget, step.script->castSpell.spellId, (step.script->castSpell.flags & 0x04) != 0);
 
                 break;
             }

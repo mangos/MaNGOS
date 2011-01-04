@@ -2070,6 +2070,22 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         uint64 m_TotemSlot[MAX_TOTEM_SLOT];
+
+    private:                                                // Error traps for some wrong args using
+        // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
+        // no bodies expected for this declarations
+        template <typename TR>
+        void CastSpell(Unit* Victim, uint32 spell, TR triggered);
+        template <typename TR>
+        void CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
+        template <typename TR>
+        void CastCustomSpell(Unit* Victim, uint32 spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
+        template <typename SP, typename TR>
+        void CastCustomSpell(Unit* Victim, SpellEntry const* spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
+        template <typename TR>
+        void CastSpell(float x, float y, float z, uint32 spell, TR triggered);
+        template <typename TR>
+        void CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
 template<typename Func>
