@@ -353,7 +353,7 @@ void Unit::Update( uint32 update_diff, uint32 p_time )
 
 bool Unit::haveOffhandWeapon() const
 {
-    if (!IsUseEquipedWeapon(OFF_ATTACK))
+    if (!CanUseEquippedWeapon(OFF_ATTACK))
         return false;
 
     if(GetTypeId() == TYPEID_PLAYER)
@@ -3330,7 +3330,7 @@ float Unit::GetUnitBlockChance() const
     if(GetTypeId() == TYPEID_PLAYER)
     {
         Player const* player = (Player const*)this;
-        if(player->CanBlock() && player->IsUseEquipedWeapon(OFF_ATTACK))
+        if(player->CanBlock() && player->CanUseEquippedWeapon(OFF_ATTACK))
         {
             Item *tmpitem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
             if(tmpitem && !tmpitem->IsBroken() && tmpitem->GetProto()->Block)
