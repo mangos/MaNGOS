@@ -332,7 +332,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                         tablename, tmp.castSpell.spellId, tmp.id);
                     continue;
                 }
-                if (tmp.castSpell.flags & ~0x3)             // 2 bits
+                if (tmp.castSpell.flags & ~0x7)             // 3 bits
                 {
                     sLog.outErrorDb("Table `%s` using unknown flags in datalong2 (%u)i n SCRIPT_COMMAND_CAST_SPELL for script id %u",
                         tablename, tmp.castSpell.flags, tmp.id);
