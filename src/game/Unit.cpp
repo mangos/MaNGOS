@@ -7719,6 +7719,10 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         // should probably be removed for the attacked (+ it's party/group) only, not global
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
 
+        // client does not handle this state on it's own (reset to default at LoadCreatureAddon)
+        if (getStandState() == UNIT_STAND_STATE_CUSTOM)
+            SetStandState(UNIT_STAND_STATE_STAND);
+
         if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterCombat(enemy);
 

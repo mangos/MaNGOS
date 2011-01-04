@@ -141,7 +141,7 @@ enum UnitStandStateType
     UNIT_STAND_STATE_SIT_HIGH_CHAIR    = 6,
     UNIT_STAND_STATE_DEAD              = 7,
     UNIT_STAND_STATE_KNEEL             = 8,
-    UNIT_STAND_STATE_SUBMERGED         = 9
+    UNIT_STAND_STATE_CUSTOM            = 9                  // Depends on model animation. Submerge, freeze, hide, hibernate, rest
 };
 
 // byte flags value (UNIT_FIELD_BYTES_1,2)
