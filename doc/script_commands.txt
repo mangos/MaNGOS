@@ -157,7 +157,7 @@ spell_scripts
 
 15 SCRIPT_COMMAND_CAST_SPELL                source/target cast spell at target/source
                                             * datalong = spell id
-                                            * datalong2 = 0: s->t 1: s->s 2: t->t 3: t->s
+                                            * datalong2 = 0: s->t 1: s->s 2: t->t 3: t->s 4: cast triggered
 
 16 SCRIPT_COMMAND_PLAY_SOUND                source = any object, target=any/player
                                             * datalong = sound_id
