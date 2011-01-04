@@ -578,7 +578,7 @@ enum UnitFlags
 enum UnitFlags2
 {
     UNIT_FLAG2_FEIGN_DEATH          = 0x00000001,
-    UNIT_FLAG2_UNK1                 = 0x00000002,           // Hides unit model (show only player equip)
+    UNIT_FLAG2_UNK1                 = 0x00000002,           // Hides body and body armor. Weapons and shoulder and head armor still visible
     UNIT_FLAG2_UNK2                 = 0x00000004,
     UNIT_FLAG2_COMPREHEND_LANG      = 0x00000008,
     UNIT_FLAG2_UNK4                 = 0x00000010,
