@@ -2499,6 +2499,8 @@ enum DiminishingGroup
     DIMINISHING_SILENCE,                                    // From 2.3.0
     DIMINISHING_FREEZE_SLEEP,                               // Hunter's Freezing Trap
     DIMINISHING_BANISH,
+    // Warrior Specific
+    DIMINISHING_CHARGE,
     // Other
     // Don't Diminish, but limit duration to 10s
     DIMINISHING_LIMITONLY

@@ -4208,6 +4208,9 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellEntry const* spellproto
             // Hamstring - limit duration to 10s in PvP
             if (spellproto->SpellFamilyFlags & UI64LIT(0x00000000002))
                 return DIMINISHING_LIMITONLY;
+            // Charge - since 3.1.0
+            if (spellproto->Id == 7922)
+                return DIMINISHING_CHARGE;
             break;
         }
         case SPELLFAMILY_PRIEST:
