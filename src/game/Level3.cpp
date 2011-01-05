@@ -6514,10 +6514,6 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
     if (!msgText)
         return false;
 
-    // msgSubject, msgText isn't NUL after prev. check
-    std::string subject = msgSubject;
-    std::string text    = msgText;
-
     // extract items
     typedef std::pair<uint32,uint32> ItemPair;
     typedef std::list< ItemPair > ItemPairs;
@@ -6575,7 +6571,7 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
     MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
     // fill mail
-    MailDraft draft(subject, text);
+    MailDraft draft(msgSubject, msgText);
 
     for(ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
     {
@@ -6619,15 +6615,11 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
     if (money <= 0)
         return false;
 
-    // msgSubject, msgText isn't NUL after prev. check
-    std::string subject = msgSubject;
-    std::string text    = msgText;
-
     // from console show nonexistent sender
     MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-    MailDraft(subject, text)
-        .AddMoney(money)
+    MailDraft(msgSubject, msgText)
+        .SetMoney(money)
         .SendMailTo(MailReceiver(receiver, receiver_guid),sender);
 
     std::string nameLink = playerLink(receiver_name);

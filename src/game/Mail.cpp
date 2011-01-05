@@ -272,8 +272,8 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     // will delete item or place to receiver mail list
     draft
-        .AddMoney(money)
-        .AddCOD(COD)
+        .SetMoney(money)
+        .SetCOD(COD)
         .SendMailTo(MailReceiver(receive, rc), pl, body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     CharacterDatabase.BeginTransaction();
@@ -389,9 +389,11 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
     // send back only to existing players and simple drop for other cases
     if (m->messageType == MAIL_NORMAL && m->sender)
     {
-        MailDraft draft(m->subject, m->body);
+        MailDraft draft;
         if (m->mailTemplateId)
-            draft = MailDraft(m->mailTemplateId, false);    // items already included
+            draft.SetMailTemplate(m->mailTemplateId, false);// items already included
+        else
+            draft.SetSubjectAndBody(m->subject, m->body);
 
         if(m->HasItems())
         {
@@ -404,7 +406,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
             }
         }
 
-        draft.AddMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
+        draft.SetMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
     }
 
     delete m;                                               // we can deallocate old mail
@@ -484,7 +486,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
             if(sender || sender_accId)
             {
                 MailDraft(m->subject, "")
-                    .AddMoney(m->COD)
+                    .SetMoney(m->COD)
                     .SendMailTo(MailReceiver(sender, sender_guid), _player, MAIL_CHECK_MASK_COD_PAYMENT);
             }
 

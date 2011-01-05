@@ -1763,14 +1763,10 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     if (!msgText)
         return false;
 
-    // msgSubject, msgText isn't NUL after prev. check
-    std::string subject = msgSubject;
-    std::string text    = msgText;
-
     // from console show nonexistent sender
     MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-    MailDraft(subject, text)
+    MailDraft(msgSubject, msgText)
         .SendMailTo(MailReceiver(target, target_guid),sender);
 
     std::string nameLink = playerLink(target_name);
