@@ -489,8 +489,10 @@ void ReputationMgr::LoadFromDB(QueryResult *result)
 
                 // reset changed flag if values similar to saved in DB
                 if(faction->Flags==dbFactionFlags)
+                {
                     faction->needSend = false;
                     faction->needSave = false;
+                }
             }
         }
         while( result->NextRow() );
