@@ -6626,7 +6626,25 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
             (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0 )
                                                             // 0 == any inventory type (not wand then)
         {
-            DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
+            // bonus stored in another auras basepoints
+            if ((*i)->GetModifier()->m_amount == 0)
+            {
+                // Clearcasting - bonus from Elemental Oath
+                if ((*i)->GetSpellProto()->Id == 16246)
+                {
+                    AuraList const& aurasCrit = GetAurasByType(SPELL_AURA_MOD_SPELL_CRIT_CHANCE);
+                    for (AuraList::const_iterator itr = aurasCrit.begin(); itr != aurasCrit.end(); itr++)
+                    {
+                        if ((*itr)->GetSpellProto()->SpellIconID == 3053)
+                        {
+                            DoneTotalMod *= ((*itr)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_1) + 100.0f) / 100.0f;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+                DoneTotalMod *= ((*i)->GetModifier()->m_amount+100.0f)/100.0f;
         }
     }
 
