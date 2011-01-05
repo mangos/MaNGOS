@@ -68,7 +68,7 @@ namespace MaNGOS
         public:
             _Callback(Class *object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : m_object(object), m_method(method),
-                m_param1(param1), m_param2(param2)
+                m_param1(param1), m_param2(param2), m_param3(param3)
             {
             }
 
