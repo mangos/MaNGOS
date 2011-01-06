@@ -33,14 +33,16 @@
 # quest_template      - 500002
 
 # _Event_ ------------------------------------------------------------------------
+DELETE FROM `game_event` WHERE `entry` = 105;
 INSERT INTO `game_event` 
 (`entry`, `start_time`,          `end_time`,           `occurence`, `length`, `Holiday`, `description`) VALUES 
 ( 105,     '2009-04-15 19:00:00', '2020-12-31 05:00:00', 4800,        60,       0,        'Invasion of rabbits in Dalaran');
 
 # Quest --------------------------------------------------------------------------
+DELETE FROM `quest_template` WHERE `entry` = 500002;
 INSERT INTO `quest_template` 
-(`entry`,                `Method`,                `ZoneOrSort`,            `SkillOrClass`,          `MinLevel`, 
-`QuestLevel`,            `Type`,                  `RequiredRaces`,         `RequiredSkillValue`,    `RepObjectiveFaction`, 
+(`entry`,                `Method`,                `ZoneOrSort`,            `MinLevel`,              `QuestLevel`, 
+`RequiredClasses`,       `Type`,                  `RequiredRaces`,         `RequiredSkill`,         `RequiredSkillValue`,    `RepObjectiveFaction`, 
 `RepObjectiveValue`,     `RequiredMinRepFaction`, `RequiredMinRepValue`,   `RequiredMaxRepFaction`, `RequiredMaxRepValue`, 
 `SuggestedPlayers`,      `LimitTime`,             `QuestFlags`,            `SpecialFlags`,          `CharTitleId`, 
 `PlayersSlain`,          `BonusTalents`,          `PrevQuestId`,           `NextQuestId`,           `ExclusiveGroup`, 
@@ -63,8 +65,8 @@ INSERT INTO `quest_template`
 `PointX`,                `PointY`,                `PointOpt`,              `DetailsEmote1`,         `DetailsEmote2`, 
 `DetailsEmote3`,         `DetailsEmote4`,         `IncompleteEmote`,       `CompleteEmote`,         `OfferRewardEmote1`, 
 `OfferRewardEmote2`,     `OfferRewardEmote3`,     `OfferRewardEmote4`,     `StartScript`,           `CompleteScript`) VALUES 
-(500002, 2,    14,   0, 70, 
- 80,     0,    0,    0, 0, 
+(500002, 2,    14,   70,  80, 
+ 0,    0,    0, 0, 0, 0,
  0,      0,    0,    0, 0, 
  0,      1020, 4232, 1, 0, 
  0,      0,    0,    0, 0, 
@@ -91,7 +93,9 @@ INSERT INTO `quest_template`
  0,      0,  0,     0,      0,
  0,      0,  0,     1,      0,
  0,      0,  0,     0,      0);
-INSERT INTO game_event_creature_quest VALUES (500025,500002,105);
+
+REPLACE INTO game_event_creature VALUES (500025, 105);
+REPLACE INTO game_event_quest VALUES (500002, 105);
 
 # QuestGiver ---------------------------------------------------------------------
 INSERT INTO `creature_template` 

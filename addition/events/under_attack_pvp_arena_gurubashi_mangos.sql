@@ -86,7 +86,9 @@ INSERT INTO `creature_questrelation`    (`id`, `quest`) VALUES (500011, 500000);
 INSERT INTO `creature_involvedrelation` (`id`, `quest`) VALUES (500011, 500000);
 INSERT INTO `creature` VALUES ('500011', '500011', '0', '1', '1', '0', '0', '-13225.1', '235.282', '33.4367', '4.2376', '25', '0', '0', '10000', '5000', '0', '0');
 INSERT INTO `game_event_creature` VALUES ('500011', '109');
-INSERT INTO `game_event_creature_quest` VALUES ('500011', '500000', '109');
+
+REPLACE INTO game_event_creature VALUES (500011, 109);
+REPLACE INTO game_event_quest VALUES (500000, 109);
 
 # Stone ---------------------------------------------------------------------------------
 INSERT INTO `item_template` 
@@ -95,8 +97,8 @@ INSERT INTO `item_template`
 
 # Quests --------------------------------------------------------------------------------
 INSERT INTO `quest_template` (
-`entry`, `Method`, `ZoneOrSort`, `SkillOrClass`, `MinLevel`, 
-`QuestLevel`, `Type`, `RequiredRaces`, `RequiredSkillValue`, `RepObjectiveFaction`, 
+`entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, 
+`Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RepObjectiveFaction`,
 `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, 
 `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `CharTitleId`, 
 `PlayersSlain`, `BonusTalents`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, 
@@ -119,8 +121,8 @@ INSERT INTO `quest_template` (
 `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, 
 `DetailsEmote3`, `DetailsEmote4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, 
 `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `StartScript`, `CompleteScript`) VALUES 
-(500000,2,     0,     0,     80, 
- 80,    0,     0,     0,     0, 
+(500000,2,     0,     80,    80, 
+ 0,     0,     0,     0,     0, 0,
  0,     0,     0,     0,     0, 
  0,     750,   2,     0,     0, 
  0,     0,     0,     0,     0, 
@@ -149,5 +151,3 @@ INSERT INTO `quest_template` (
  0,     0,     0,     0,     0);
 
 # *The_END*
-
-
