@@ -71,7 +71,7 @@ void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender sender, char 
     CharacterDatabase.AsyncPQuery(&massMailerQueryHandler, &MassMailerQueryHandler::HandleQueryCallback, mailProto, sender, query);
 }
 
-void MassMailMgr::Update()
+void MassMailMgr::Update(bool sendall /*= false*/)
 {
     if (m_massMails.empty())
         return;
@@ -82,7 +82,7 @@ void MassMailMgr::Update()
     {
         MassMail& task = m_massMails.front();
 
-        while (!task.m_recivers.empty() && maxcount > 0)
+        while (!task.m_recivers.empty() && (sendall || maxcount > 0))
         {
             uint32 receiver_lowguid = *task.m_recivers.begin();
             task.m_recivers.erase(task.m_recivers.begin());
@@ -96,7 +96,8 @@ void MassMailMgr::Update()
                 // prevent mail return
                 task.m_protoMail->SendMailTo(MailReceiver(receiver, receiver_guid), task.m_sender, MAIL_CHECK_MASK_RETURNED);
 
-                --maxcount;
+                if (!sendall)
+                    --maxcount;
                 break;
             }
 
@@ -107,13 +108,14 @@ void MassMailMgr::Update()
             // prevent mail return
             draft.SendMailTo(MailReceiver(receiver, receiver_guid), task.m_sender, MAIL_CHECK_MASK_RETURNED);
 
-            --maxcount;
+            if (!sendall)
+                --maxcount;
         }
 
         if (task.m_recivers.empty())
             m_massMails.pop_front();
     }
-    while(!m_massMails.empty() && maxcount > 0);
+    while(!m_massMails.empty() && (sendall || maxcount > 0));
 }
 
 void MassMailMgr::GetStatistic(uint32& tasks, uint32& mails, uint32& needTime) const

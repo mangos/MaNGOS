@@ -93,7 +93,7 @@ class MassMailMgr
         /**
          * Next step in mass mail activity, send some amount mails from queued tasks
          */
-        void Update();
+        void Update(bool sendall = false);
 
     private:
 
