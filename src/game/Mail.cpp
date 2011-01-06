@@ -918,6 +918,33 @@ void MailDraft::deleteIncludedItems( bool inDB /**= false*/ )
 
     m_items.clear();
 }
+/**
+ * Clone MailDraft from another MailDraft.
+ *
+ * @param draft Point to source for draft cloning.
+ */
+void MailDraft::CloneFrom(MailDraft const& draft)
+{
+    m_mailTemplateId = draft.GetMailTemplateId();
+    m_mailTemplateItemsNeed = draft.m_mailTemplateItemsNeed;
+
+    m_subject = draft.GetSubject();
+    m_body = draft.GetBody();
+    m_money = draft.GetMoney();
+    m_COD = draft.GetCOD();
+
+    for(MailItemMap::const_iterator mailItemIter = draft.m_items.begin(); mailItemIter != draft.m_items.end(); ++mailItemIter)
+    {
+        Item* item = mailItemIter->second;
+
+        if(Item* newitem = item->CloneItem(item->GetCount()))
+        {
+            newitem->SaveToDB();
+            AddItem(newitem);
+        }
+    }
+}
+
 /*
  * Returns a mail to its sender.
  * @param sender_acc           The id of the account of the sender.

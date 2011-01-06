@@ -18,9 +18,11 @@
 
 /**
  * @addtogroup mailing The mail system
- * The mailing system in MaNGOS consists of mostly two files:
+ * The mailing system in MaNGOS consists of mostly 4 files:
  * - Mail.h
  * - Mail.cpp
+ * - MassMailMgr.h
+ * - MassMailMgr.cpp
  *
  * @{
  *
@@ -237,6 +239,8 @@ class MailDraft
          * @param COD the amount to which the cod should be set.
          */
         MailDraft& SetCOD(uint32 COD) { m_COD = COD; return *this; }
+
+        void CloneFrom(MailDraft const& draft);
     public:                                                 // finishers
         void SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, ObjectGuid receiver_guid);
         void SendMailTo(MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0);

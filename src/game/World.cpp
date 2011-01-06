@@ -42,6 +42,7 @@
 #include "SpellMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
+#include "MassMailMgr.h"
 #include "LootMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "MapManager.h"
@@ -617,6 +618,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_GROUP_VISIBILITY, "Visibility.GroupMode", 0);
 
     setConfig(CONFIG_UINT32_MAIL_DELIVERY_DELAY, "MailDeliveryDelay", HOUR);
+
+    setConfigMin(CONFIG_UINT32_MASS_MAILER_SEND_PER_TICK, "MassMailer.SendPerTick", 10, 1);
 
     setConfigPos(CONFIG_UINT32_UPTIME_UPDATE, "UpdateUptimeInterval", 10);
     if (reload)
@@ -1403,6 +1406,9 @@ void World::Update(uint32 diff)
 
     ///- Update the game time and check for shutdown time
     _UpdateGameTime();
+
+    ///-Update mass mailer tasks if any
+    sMassMailMgr.Update();
 
     /// Handle daily quests reset time
     if (m_gameTime > m_NextDailyQuestReset)
