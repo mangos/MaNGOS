@@ -743,6 +743,11 @@ LexicsCutterNoActionOnGM = 1
 #        Mail delivery delay time for item sending
 #        Default: 3600 sec (1 hour)
 #
+#    MassMailer.SendPerTick
+#        Max amount mail send each tick from mails list scheduled for mass mailer proccesing.
+#        More mails increase server load but speedup mass mail proccess. Normal tick length: 50 msecs, so 20 ticks in sec and 200 mails in sec by default.
+#        Default: 10
+#
 #    SkillChance.Prospecting
 #        For prospecting skillup impossible by default, but can be allowed as custom setting
 #        Default: 0 - no skilups
@@ -842,6 +847,7 @@ MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
+MassMailer.SendPerTick = 10
 SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0

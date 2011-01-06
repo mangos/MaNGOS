@@ -18,9 +18,11 @@
 
 /**
  * @addtogroup mailing The mail system
- * The mailing system in MaNGOS consists of mostly two files:
+ * The mailing system in MaNGOS consists of mostly 4 files:
  * - Mail.h
  * - Mail.cpp
+ * - MassMailMgr.h
+ * - MassMailMgr.cpp
  *
  * @{
  *
@@ -111,6 +113,8 @@ enum MailAuctionAnswers
 class MailSender
 {
     public:                                                 // Constructors
+        MailSender() : m_messageType(MAIL_NORMAL), m_senderId(0), m_stationery(MAIL_STATIONERY_DEFAULT) {}
+
        /**
         * Creates a new MailSender object.
         *
@@ -182,6 +186,12 @@ class MailDraft
 
     public:                                                 // Constructors
        /**
+        * Creates a new blank MailDraft object
+        *
+        */
+        MailDraft()
+            : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_money(0), m_COD(0) {}
+       /**
         * Creates a new MailDraft object using mail template id.
         *
         * @param mailTemplateId The ID of the Template to be used.
@@ -211,23 +221,33 @@ class MailDraft
         /// Returns the Cost of delivery of this MailDraft.
         uint32 GetCOD() const { return m_COD; }
     public:                                                 // modifiers
+
+        // this two modifiers expected to be applied in normal case to blank draft and exclusively, it will work and with mixed cases but this will be not normal way use.
+        MailDraft& SetSubjectAndBody(std::string subject, std::string body) { m_subject = subject; m_body = body; return *this; }
+        MailDraft& SetMailTemplate(uint16 mailTemplateId, bool need_items = true) { m_mailTemplateId = mailTemplateId, m_mailTemplateItemsNeed = need_items; return *this; }
+
         MailDraft& AddItem(Item* item);
         /**
          * Modifies the amount of money in a MailDraft.
          *
          * @param money The amount of money included in this MailDraft.
          */
-        MailDraft& AddMoney(uint32 money) { m_money = money; return *this; }
+        MailDraft& SetMoney(uint32 money) { m_money = money; return *this; }
         /**
          * Modifies the cost of delivery of the MailDraft.
          *
          * @param COD the amount to which the cod should be set.
          */
-        MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
+        MailDraft& SetCOD(uint32 COD) { m_COD = COD; return *this; }
+
+        void CloneFrom(MailDraft const& draft);
     public:                                                 // finishers
         void SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, ObjectGuid receiver_guid);
         void SendMailTo(MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0);
     private:
+        MailDraft(MailDraft const&);                        // trap decl, no body, mail draft must cloned only explicitly...
+        MailDraft& operator=(MailDraft const&);             // trap decl, no body, ...because items clone is high price operation
+
         void deleteIncludedItems(bool inDB = false);
         void prepareItems(Player* receiver);                ///< called from SendMailTo for generate mailTemplateBase items
 

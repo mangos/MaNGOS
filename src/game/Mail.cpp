@@ -273,8 +273,8 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     // will delete item or place to receiver mail list
     draft
-        .AddMoney(money)
-        .AddCOD(COD)
+        .SetMoney(money)
+        .SetCOD(COD)
         .SendMailTo(MailReceiver(receive, rc), pl, body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     CharacterDatabase.BeginTransaction();
@@ -390,9 +390,11 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
     // send back only to existing players and simple drop for other cases
     if (m->messageType == MAIL_NORMAL && m->sender)
     {
-        MailDraft draft(m->subject, m->body);
+        MailDraft draft;
         if (m->mailTemplateId)
-            draft = MailDraft(m->mailTemplateId, false);    // items already included
+            draft.SetMailTemplate(m->mailTemplateId, false);// items already included
+        else
+            draft.SetSubjectAndBody(m->subject, m->body);
 
         if(m->HasItems())
         {
@@ -405,7 +407,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
             }
         }
 
-        draft.AddMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
+        draft.SetMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
     }
 
     delete m;                                               // we can deallocate old mail
@@ -485,7 +487,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
             if(sender || sender_accId)
             {
                 MailDraft(m->subject, "")
-                    .AddMoney(m->COD)
+                    .SetMoney(m->COD)
                     .SendMailTo(MailReceiver(sender, sender_guid), _player, MAIL_CHECK_MASK_COD_PAYMENT);
             }
 
@@ -917,6 +919,33 @@ void MailDraft::deleteIncludedItems( bool inDB /**= false*/ )
 
     m_items.clear();
 }
+/**
+ * Clone MailDraft from another MailDraft.
+ *
+ * @param draft Point to source for draft cloning.
+ */
+void MailDraft::CloneFrom(MailDraft const& draft)
+{
+    m_mailTemplateId = draft.GetMailTemplateId();
+    m_mailTemplateItemsNeed = draft.m_mailTemplateItemsNeed;
+
+    m_subject = draft.GetSubject();
+    m_body = draft.GetBody();
+    m_money = draft.GetMoney();
+    m_COD = draft.GetCOD();
+
+    for(MailItemMap::const_iterator mailItemIter = draft.m_items.begin(); mailItemIter != draft.m_items.end(); ++mailItemIter)
+    {
+        Item* item = mailItemIter->second;
+
+        if(Item* newitem = item->CloneItem(item->GetCount()))
+        {
+            newitem->SaveToDB();
+            AddItem(newitem);
+        }
+    }
+}
+
 /*
  * Returns a mail to its sender.
  * @param sender_acc           The id of the account of the sender.

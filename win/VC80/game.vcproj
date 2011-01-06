@@ -882,6 +882,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\MassMailMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MassMailMgr.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\MiscHandler.cpp"
 				>
 			</File>

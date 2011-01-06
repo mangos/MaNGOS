@@ -193,6 +193,8 @@ libmangosgame_a_SOURCES = \
 	MapUpdater.h \
 	MapReference.h \
 	MapRefManager.h \
+	MassMailMgr.cpp \
+	MassMailMgr.h \
 	MiscHandler.cpp \
 	MotionMaster.cpp \
 	MotionMaster.h \
