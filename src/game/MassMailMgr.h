@@ -106,6 +106,11 @@ class MassMailMgr
                 MANGOS_ASSERT(mailProto);
             }
 
+            explicit MassMail(MassMail const& massmail)
+                : m_protoMail(const_cast<MassMail&>(massmail).m_protoMail), m_sender(massmail.m_sender)
+            {
+            }
+
             /// m_protoMail is owned by MassMail, so at copy original MassMail field set to NULL
             std::auto_ptr<MailDraft> m_protoMail;
 
