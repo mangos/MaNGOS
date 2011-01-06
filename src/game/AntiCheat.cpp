@@ -351,6 +351,7 @@ bool AntiCheat::CheckNeeded(AntiCheatCheck checktype)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_ANTICHEAT_ENABLE)
         || !GetPlayer()->IsInWorld()
+        || GetPlayer()->IsBeingTeleported()
         || GetPlayer()->GetSession()->GetSecurity() > sWorld.getConfig(CONFIG_UINT32_ANTICHEAT_GMLEVEL))
         return false;
 
