@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10862_01_characters_mail` bit(1) default NULL
+  `required_10973_01_characters_game_event_status` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1058,6 +1058,25 @@ CREATE TABLE `creature_respawn` (
 LOCK TABLES `creature_respawn` WRITE;
 /*!40000 ALTER TABLE `creature_respawn` DISABLE KEYS */;
 /*!40000 ALTER TABLE `creature_respawn` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `game_event_status`
+--
+
+DROP TABLE IF EXISTS `game_event_status`;
+CREATE TABLE `game_event_status` (
+  `event` smallint(6) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Game event system';
+
+--
+-- Dumping data for table `game_event_status`
+--
+
+LOCK TABLES `game_event_status` WRITE;
+/*!40000 ALTER TABLE `game_event_status` DISABLE KEYS */;
+/*!40000 ALTER TABLE `game_event_status` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

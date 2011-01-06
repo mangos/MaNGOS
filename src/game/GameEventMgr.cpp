@@ -26,15 +26,15 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "BattleGroundMgr.h"
+#include "MassMailMgr.h"
 #include "SpellMgr.h"
 #include "Policies/SingletonImp.h"
 
 INSTANTIATE_SINGLETON_1(GameEventMgr);
 
-bool GameEventMgr::CheckOneGameEvent(uint16 entry) const
+bool GameEventMgr::CheckOneGameEvent(uint16 entry, time_t currenttime) const
 {
     // Get the event information
-    time_t currenttime = time(NULL);
     if( mGameEvent[entry].start < currenttime && currenttime < mGameEvent[entry].end &&
         ((currenttime - mGameEvent[entry].start) % (mGameEvent[entry].occurence * MINUTE)) < (mGameEvent[entry].length * MINUTE) )
         return true;
@@ -68,10 +68,9 @@ uint32 GameEventMgr::NextCheck(uint16 entry) const
         return delay;
 }
 
-void GameEventMgr::StartEvent( uint16 event_id, bool overwrite )
+void GameEventMgr::StartEvent( uint16 event_id, bool overwrite /*=false*/, bool resume /*=false*/)
 {
-    AddActiveEvent(event_id);
-    ApplyNewEvent(event_id);
+    ApplyNewEvent(event_id, resume);
     if(overwrite)
     {
         mGameEvent[event_id].start = time(NULL);
@@ -82,7 +81,6 @@ void GameEventMgr::StartEvent( uint16 event_id, bool overwrite )
 
 void GameEventMgr::StopEvent( uint16 event_id, bool overwrite )
 {
-    RemoveActiveEvent(event_id);
     UnApplyEvent(event_id);
     if(overwrite)
     {
@@ -482,29 +480,131 @@ void GameEventMgr::LoadFromDB()
         sLog.outString();
         sLog.outString( ">> Loaded %u quest additions in game events", count );
     }
+
+    mGameEventMails.resize(mGameEvent.size()*2-1);
+
+    result = WorldDatabase.Query("SELECT event, raceMask, quest, mailTemplateId, senderEntry FROM game_event_mail");
+
+    count = 0;
+    if (!result)
+    {
+        barGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u start/end game event mails", count );
+    }
+    else
+    {
+
+        barGoLink bar((int)result->GetRowCount());
+        do
+        {
+            Field *fields = result->Fetch();
+
+            bar.step();
+            uint16 event_id = fields[0].GetUInt16();
+
+            GameEventMail mail;
+            mail.raceMask       = fields[1].GetUInt32();
+            mail.questId        = fields[2].GetUInt32();
+            mail.mailTemplateId = fields[3].GetUInt32();
+            mail.senderEntry    = fields[4].GetUInt32();
+
+            if (event_id == 0)
+            {
+                sLog.outErrorDb("`game_event_mail` game event id (%i) not allowed", event_id);
+                continue;
+            }
+
+            int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+            if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventMails.size())
+            {
+                sLog.outErrorDb("`game_event_mail` game event id (%i) is out of range compared to max event id in `game_event`", event_id);
+                continue;
+            }
+
+            if (!(mail.raceMask & RACEMASK_ALL_PLAYABLE))
+            {
+                sLog.outErrorDb("Table `game_event_mail` have raceMask (%u) requirement for game event %i that not include any player races, ignoring.", mail.raceMask, event_id);
+                continue;
+            }
+
+            if (mail.questId && !sObjectMgr.GetQuestTemplate(mail.questId))
+            {
+                sLog.outErrorDb("Table `game_event_mail` have nonexistent quest (%u) requirement for game event %i, ignoring.", mail.questId, event_id);
+                continue;
+            }
+
+            if (!sMailTemplateStore.LookupEntry(mail.mailTemplateId))
+            {
+                sLog.outErrorDb("Table `game_event_mail` have invalid mailTemplateId (%u) for game event %i that invalid not include any player races, ignoring.", mail.mailTemplateId, event_id);
+                continue;
+            }
+
+            if (!ObjectMgr::GetCreatureTemplate(mail.senderEntry))
+            {
+                sLog.outErrorDb("Table `game_event_mail` have nonexistent sender creature entry (%u) for game event %i that invalid not include any player races, ignoring.", mail.senderEntry, event_id);
+                continue;
+            }
+
+            ++count;
+
+            MailList& maillist = mGameEventMails[internal_event_id];
+            maillist.push_back(mail);
+
+        } while( result->NextRow() );
+        delete result;
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u start/end game event mails", count );
+    }
 }
 
 uint32 GameEventMgr::Initialize()                           // return the next event delay in ms
 {
     m_ActiveEvents.clear();
-    uint32 delay = Update();
+
+    ActiveEvents activeAtShutdown;
+
+    if (QueryResult *result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+            uint16 event_id = fields[0].GetUInt16();
+            activeAtShutdown.insert(event_id);
+        } while( result->NextRow() );
+        delete result;
+
+        CharacterDatabase.Execute("TRUNCATE game_event_status");
+    }
+
+    uint32 delay = Update(&activeAtShutdown);
     BASIC_LOG("Game Event system initialized." );
     m_IsGameEventsInit = true;
     return delay;
 }
 
-uint32 GameEventMgr::Update()                               // return the next event delay in ms
+// return the next event delay in ms
+uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
 {
+    time_t currenttime = time(NULL);
+
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
     uint32 calcDelay;
     for (uint16 itr = 1; itr < mGameEvent.size(); ++itr)
     {
         //sLog.outErrorDb("Checking event %u",itr);
-        if (CheckOneGameEvent(itr))
+        if (CheckOneGameEvent(itr, currenttime))
         {
             //DEBUG_LOG("GameEvent %u is active",itr->first);
             if (!IsActiveEvent(itr))
-                StartEvent(itr);
+            {
+                bool resume = activeAtShutdown && (activeAtShutdown->find(itr) != activeAtShutdown->end());
+                StartEvent(itr, false, resume);
+            }
         }
         else
         {
@@ -532,6 +632,9 @@ uint32 GameEventMgr::Update()                               // return the next e
 
 void GameEventMgr::UnApplyEvent(uint16 event_id)
 {
+    m_ActiveEvents.erase(event_id);
+    CharacterDatabase.PQuery("DELETE FROM game_event_status WHERE event = %u", event_id);
+
     sLog.outString("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
     // un-spawn positive event tagged objects
     GameEventUnspawn(event_id);
@@ -543,10 +646,14 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     // Remove quests that are events only to non event npc
     UpdateEventQuests(event_id, false);
     UpdateWorldStates(event_id, false);
+    SendEventMails(event_nid);
 }
 
-void GameEventMgr::ApplyNewEvent(uint16 event_id)
+void GameEventMgr::ApplyNewEvent(uint16 event_id, bool resume)
 {
+    m_ActiveEvents.insert(event_id); 
+    CharacterDatabase.PQuery("INSERT INTO game_event_status (event) VALUES (%u)", event_id);
+
     if (sWorld.getConfig(CONFIG_BOOL_EVENT_ANNOUNCE))
         sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());
 
@@ -561,6 +668,10 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
     // Add quests that are events only to non event npc
     UpdateEventQuests(event_id, true);
     UpdateWorldStates(event_id, true);
+
+    // Not send mails at game event startup, if game event just resume after server shutdown (has been active at server before shutdown)
+    if (!resume)
+        SendEventMails(event_id);
 }
 
 void GameEventMgr::GameEventSpawn(int16 event_id)
@@ -830,6 +941,31 @@ void GameEventMgr::UpdateWorldStates(uint16 event_id, bool Activate)
                 sWorld.SendGlobalMessage(&data);
             }
         }
+    }
+}
+
+void GameEventMgr::SendEventMails(int16 event_id)
+{
+    int32 internal_event_id = mGameEvent.size() + event_id - 1;
+
+    MailList const& mails = mGameEventMails[internal_event_id];
+
+    for (MailList::const_iterator itr = mails.begin(); itr != mails.end(); ++itr)
+    {
+        if (itr->questId)
+        {
+            // need special query
+            std::ostringstream ss;
+            ss << "SELECT characters.guid FROM characters, character_queststatus "
+                  "WHERE (1 << (characters.race - 1)) & "
+               << itr->raceMask
+               << " AND characters.deleteDate IS NULL AND character_queststatus.guid = characters.guid AND character_queststatus.quest = "
+               << itr->questId
+               << " AND character_queststatus.rewarded <> 0";
+            sMassMailMgr.AddMassMailTask(new MailDraft(itr->mailTemplateId), MailSender(MAIL_CREATURE, itr->senderEntry), ss.str().c_str());
+        }
+        else
+            sMassMailMgr.AddMassMailTask(new MailDraft(itr->mailTemplateId), MailSender(MAIL_CREATURE, itr->senderEntry), itr->raceMask);
     }
 }
 
