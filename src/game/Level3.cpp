@@ -33,6 +33,7 @@
 #include "Guild.h"
 #include "ObjectAccessor.h"
 #include "MapManager.h"
+#include "MassMailMgr.h"
 #include "ScriptMgr.h"
 #include "Language.h"
 #include "GridNotifiersImpl.h"
@@ -6496,16 +6497,56 @@ bool ChatHandler::HandleAccountSetAddonCommand(char* args)
     return true;
 }
 
-//Send items by mail
-bool ChatHandler::HandleSendItemsCommand(char* args)
+bool ChatHandler::HandleSendMailHelper(MailDraft& draft, char* args)
 {
-    // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
-    Player* receiver;
-    ObjectGuid receiver_guid;
-    std::string receiver_name;
-    if (!ExtractPlayerTarget(&args, &receiver, &receiver_guid, &receiver_name))
+    // format: "subject text" "mail text"
+    char* msgSubject = ExtractQuotedArg(&args);
+    if (!msgSubject)
         return false;
 
+    char* msgText = ExtractQuotedArg(&args);
+    if (!msgText)
+        return false;
+
+    // msgSubject, msgText isn't NUL after prev. check
+    draft.SetSubjectAndBody(msgSubject, msgText);
+
+    return true;
+}
+
+bool ChatHandler::HandleSendMassMailCommand(char* args)
+{
+    // format: raceMask "subject text" "mail text"
+    uint32 raceMask = 0;
+    char const* name = NULL;
+
+    if (!ExtractRaceMask(&args, raceMask, &name))
+        return false;
+
+    // need dynamic object because it trasfered to mass mailer
+    MailDraft* draft = new MailDraft;
+
+    // fill mail
+    if (!HandleSendMailHelper(*draft, args))
+    {
+        delete draft;
+        return false;
+    }
+
+    // from console show nonexistent sender
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+    sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
+
+    PSendSysMessage(LANG_MAIL_SENT, name);
+    return true;
+}
+
+
+
+bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
+{
+    // format: "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
     char* msgSubject = ExtractQuotedArg(&args);
     if (!msgSubject)
         return false;
@@ -6567,11 +6608,8 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
         }
     }
 
-    // from console show nonexistent sender
-    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
-
     // fill mail
-    MailDraft draft(msgSubject, msgText);
+    draft.SetSubjectAndBody(msgSubject, msgText);
 
     for(ItemPairs::const_iterator itr = items.begin(); itr != items.end(); ++itr)
     {
@@ -6582,6 +6620,27 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
         }
     }
 
+    return true;
+}
+
+bool ChatHandler::HandleSendItemsCommand(char* args)
+{
+    // format: name "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
+    Player* receiver;
+    ObjectGuid receiver_guid;
+    std::string receiver_name;
+    if (!ExtractPlayerTarget(&args, &receiver, &receiver_guid, &receiver_name))
+        return false;
+
+    MailDraft draft;
+
+    // fill mail
+    if (!HandleSendItemsHelper(draft, args))
+        return false;
+
+    // from console show nonexistent sender
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
     draft.SendMailTo(MailReceiver(receiver, receiver_guid), sender);
 
     std::string nameLink = playerLink(receiver_name);
@@ -6589,16 +6648,39 @@ bool ChatHandler::HandleSendItemsCommand(char* args)
     return true;
 }
 
-///Send money by mail
-bool ChatHandler::HandleSendMoneyCommand(char* args)
+bool ChatHandler::HandleSendMassItemsCommand(char* args)
 {
-    /// format: name "subject text" "mail text" money
+    // format: racemask "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
 
-    Player* receiver;
-    ObjectGuid receiver_guid;
-    std::string receiver_name;
-    if (!ExtractPlayerTarget(&args, &receiver, &receiver_guid, &receiver_name))
+    uint32 raceMask = 0;
+    char const* name = NULL;
+
+    if (!ExtractRaceMask(&args, raceMask, &name))
         return false;
+
+    // need dynamic object because it trasfered to mass mailer
+    MailDraft* draft = new MailDraft;
+
+
+    // fill mail
+    if (!HandleSendItemsHelper(*draft, args))
+    {
+        delete draft;
+        return false;
+    }
+
+    // from console show nonexistent sender
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+    sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
+
+    PSendSysMessage(LANG_MAIL_SENT, name);
+    return true;
+}
+
+bool ChatHandler::HandleSendMoneyHelper(MailDraft& draft, char* args)
+{
+    /// format: "subject text" "mail text" money
 
     char* msgSubject = ExtractQuotedArg(&args);
     if (!msgSubject)
@@ -6615,15 +6697,64 @@ bool ChatHandler::HandleSendMoneyCommand(char* args)
     if (money <= 0)
         return false;
 
+    // msgSubject, msgText isn't NUL after prev. check
+    draft.SetSubjectAndBody(msgSubject, msgText).SetMoney(money);
+
+    return true;
+}
+
+bool ChatHandler::HandleSendMoneyCommand(char* args)
+{
+    /// format: name "subject text" "mail text" money
+
+    Player* receiver;
+    ObjectGuid receiver_guid;
+    std::string receiver_name;
+    if (!ExtractPlayerTarget(&args, &receiver, &receiver_guid, &receiver_name))
+        return false;
+
+    MailDraft draft;
+
+    // fill mail
+    if (!HandleSendMoneyHelper(draft, args))
+        return false;
+
     // from console show nonexistent sender
     MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-    MailDraft(msgSubject, msgText)
-        .SetMoney(money)
-        .SendMailTo(MailReceiver(receiver, receiver_guid),sender);
+    draft.SendMailTo(MailReceiver(receiver, receiver_guid),sender);
 
     std::string nameLink = playerLink(receiver_name);
     PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
+    return true;
+}
+
+bool ChatHandler::HandleSendMassMoneyCommand(char* args)
+{
+    /// format: raceMask "subject text" "mail text" money
+
+    uint32 raceMask = 0;
+    char const* name = NULL;
+
+    if (!ExtractRaceMask(&args, raceMask, &name))
+        return false;
+
+    // need dynamic object because it trasfered to mass mailer
+    MailDraft* draft = new MailDraft;
+
+    // fill mail
+    if (!HandleSendMoneyHelper(*draft, args))
+    {
+        delete draft;
+        return false;
+    }
+
+    // from console show nonexistent sender
+    MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
+
+    sMassMailMgr.AddMassMailTask(draft, sender, raceMask);
+
+    PSendSysMessage(LANG_MAIL_SENT, name);
     return true;
 }
 

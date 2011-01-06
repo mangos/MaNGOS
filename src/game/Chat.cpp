@@ -546,8 +546,18 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
+    static ChatCommand sendMassCommandTable[] =
+    {
+        { "items",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMassItemsCommand,       "", NULL },
+        { "mail",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMassMailCommand,        "", NULL },
+        { "money",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMassMoneyCommand,       "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
     static ChatCommand sendCommandTable[] =
     {
+        { "mass",           SEC_ADMINISTRATOR,  true,  NULL,                                           "", sendMassCommandTable },
+
         { "items",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendItemsCommand,           "", NULL },
         { "mail",           SEC_MODERATOR,      true,  &ChatHandler::HandleSendMailCommand,            "", NULL },
         { "message",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSendMessageCommand,         "", NULL },
@@ -3262,6 +3272,63 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
         *targetIfNullArg = NULL;
 
     return account_id;
+}
+
+struct RaceMaskName
+{
+    char const* literal;
+    uint32 raceMask;
+};
+
+static RaceMaskName const raceMaskNames[] =
+{
+    // races
+    { "human",    (1<<(RACE_HUMAN-1))   },
+    { "orc",      (1<<(RACE_ORC-1))     },
+    { "dwarf",    (1<<(RACE_DWARF-1))   },
+    { "nightelf", (1<<(RACE_NIGHTELF-1))},
+    { "undead",   (1<<(RACE_UNDEAD-1))  },
+    { "tauren",   (1<<(RACE_TAUREN-1))  },
+    { "gnome",    (1<<(RACE_GNOME-1))   },
+    { "troll",    (1<<(RACE_TROLL-1))   },
+    { "bloodelf", (1<<(RACE_BLOODELF-1))},
+    { "draenei",  (1<<(RACE_DRAENEI-1)) },
+
+    // masks
+    { "alliance", RACEMASK_ALLIANCE },
+    { "horde",    RACEMASK_HORDE },
+    { "all", RACEMASK_ALL_PLAYABLE },
+
+    // terminator
+    { NULL, 0 }
+};
+
+bool ChatHandler::ExtractRaceMask(char** text, uint32& raceMask, char const** maskName /*=NULL*/)
+{
+    if (ExtractUInt32(text, raceMask))
+    {
+        if (maskName)
+            *maskName = "custom mask";
+    }
+    else
+    {
+        for (RaceMaskName const* itr = raceMaskNames; itr->literal; ++itr)
+        {
+            if (ExtractLiteralArg(text, itr->literal))
+            {
+                raceMask = itr->raceMask;
+
+                if (maskName)
+                    *maskName = itr->literal;
+                break;
+            }
+        }
+
+        if (!raceMask)
+            return false;
+    }
+
+    return true;
 }
 
 std::string ChatHandler::GetNameLink(Player* chr) const

@@ -1755,19 +1755,16 @@ bool ChatHandler::HandleSendMailCommand(char* args)
     if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
-    char* msgSubject = ExtractQuotedArg(&args);
-    if (!msgSubject)
-        return false;
+    MailDraft draft;
 
-    char* msgText = ExtractQuotedArg(&args);
-    if (!msgText)
+    // fill draft
+    if (!HandleSendMailHelper(draft, args))
         return false;
 
     // from console show nonexistent sender
     MailSender sender(MAIL_NORMAL, m_session ? m_session->GetPlayer()->GetObjectGuid().GetCounter() : 0, MAIL_STATIONERY_GM);
 
-    MailDraft(msgSubject, msgText)
-        .SendMailTo(MailReceiver(target, target_guid),sender);
+    draft.SendMailTo(MailReceiver(target, target_guid),sender);
 
     std::string nameLink = playerLink(target_name);
     PSendSysMessage(LANG_MAIL_SENT, nameLink.c_str());
