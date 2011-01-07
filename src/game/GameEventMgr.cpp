@@ -633,7 +633,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
 void GameEventMgr::UnApplyEvent(uint16 event_id)
 {
     m_ActiveEvents.erase(event_id);
-    CharacterDatabase.PQuery("DELETE FROM game_event_status WHERE event = %u", event_id);
+    CharacterDatabase.PExecute("DELETE FROM game_event_status WHERE event = %u", event_id);
 
     sLog.outString("GameEvent %u \"%s\" removed.", event_id, mGameEvent[event_id].description.c_str());
     // un-spawn positive event tagged objects
@@ -651,8 +651,8 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
 
 void GameEventMgr::ApplyNewEvent(uint16 event_id, bool resume)
 {
-    m_ActiveEvents.insert(event_id); 
-    CharacterDatabase.PQuery("INSERT INTO game_event_status (event) VALUES (%u)", event_id);
+    m_ActiveEvents.insert(event_id);
+    CharacterDatabase.PExecute("INSERT INTO game_event_status (event) VALUES (%u)", event_id);
 
     if (sWorld.getConfig(CONFIG_BOOL_EVENT_ANNOUNCE))
         sWorld.SendWorldText(LANG_EVENTMESSAGE, mGameEvent[event_id].description.c_str());

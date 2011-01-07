@@ -1374,6 +1374,11 @@ Visibility.Distance.Grey.Object = 10
 #         Default: 1 (enabled)
 #                  0 (disabled)
 #
+#    Death.Ghost.RunSpeed.World
+#    Death.Ghost.RunSpeed.Battleground
+#         Modifies the speed of player's ghosts, removed upon reviving, not permanent/saved, in non-BG and BG maps
+#         Default: 1.0 (normal speed)
+#
 ###################################################################################################################
 
 Rate.Health = 1
@@ -1432,6 +1437,8 @@ Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
 Death.Bones.World = 1
 Death.Bones.BattlegroundOrArena = 1
+Death.Ghost.RunSpeed.World = 1.0
+Death.Ghost.RunSpeed.Battleground = 1.0
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG
