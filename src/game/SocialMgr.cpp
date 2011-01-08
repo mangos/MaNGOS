@@ -202,11 +202,12 @@ void SocialMgr::GetFriendInfo(Player *player, uint32 friend_lowguid, FriendInfo 
         ((pFriend->GetTeam() == team || allowTwoSideWhoList) && (pFriend->GetSession()->GetSecurity() <= gmLevelInWhoList))) &&
         pFriend->IsVisibleGloballyFor(player))
     {
-        friendInfo.Status = FRIEND_STATUS_ONLINE;
-        if(pFriend->isAFK())
-            friendInfo.Status = FRIEND_STATUS_AFK;
-        if(pFriend->isDND())
-            friendInfo.Status = FRIEND_STATUS_DND;
+        friendInfo.Status |= FRIEND_STATUS_ONLINE;
+
+        pFriend->isAFK() ? friendInfo.Status |= FRIEND_STATUS_AFK : friendInfo.Status &= ~FRIEND_STATUS_AFK;
+        pFriend->isDND() ? friendInfo.Status |= FRIEND_STATUS_DND : friendInfo.Status &= ~FRIEND_STATUS_DND;
+        pFriend->IsReferAFriendLinked(player) ? friendInfo.Status |= FRIEND_STATUS_RAF : friendInfo.Status &= ~FRIEND_STATUS_RAF;
+
         friendInfo.Area = pFriend->GetZoneId();
         friendInfo.Level = pFriend->getLevel();
         friendInfo.Class = pFriend->getClass();

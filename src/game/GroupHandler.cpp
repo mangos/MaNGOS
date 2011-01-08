@@ -835,7 +835,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
     if(pet)
         mask1 = 0x7FFFFFFF;                                 // for hunters and other classes with pets
 
-    uint16 online_status = GetPlayer()->IsReferAFriendLinked(player) ?  (MEMBER_STATUS_ONLINE | MEMBER_STATUS_2_RAF) : MEMBER_STATUS_ONLINE;
+    uint16 online_status = GetPlayer()->IsReferAFriendLinked(player) ?  (MEMBER_STATUS_ONLINE | MEMBER_STATUS_RAF) : MEMBER_STATUS_ONLINE;
 
     Powers powerType = player->getPowerType();
     data << uint32(mask1);                                  // group update mask

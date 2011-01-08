@@ -30,11 +30,11 @@ class WorldPacket;
 
 enum FriendStatus
 {
-    FRIEND_STATUS_OFFLINE   = 0,
-    FRIEND_STATUS_ONLINE    = 1,
-    FRIEND_STATUS_AFK       = 2,
-    FRIEND_STATUS_DND       = 4,
-    FRIEND_STATUS_RAF       = 8,
+    FRIEND_STATUS_OFFLINE   = 0x00,
+    FRIEND_STATUS_ONLINE    = 0x01,
+    FRIEND_STATUS_AFK       = 0x02,
+    FRIEND_STATUS_DND       = 0x04,
+    FRIEND_STATUS_RAF       = 0x08,
 };
 
 enum SocialFlag
@@ -42,12 +42,11 @@ enum SocialFlag
     SOCIAL_FLAG_FRIEND      = 0x01,
     SOCIAL_FLAG_IGNORED     = 0x02,
     SOCIAL_FLAG_MUTED       = 0x04,                         // guessed
-    SOCIAL_FLAG_RAF         = 0x08,                         // Recruit-A-Friend
 };
 
 struct FriendInfo
 {
-    FriendStatus Status;
+    uint8  Status;
     uint32 Flags;
     uint32 Area;
     uint32 Level;
