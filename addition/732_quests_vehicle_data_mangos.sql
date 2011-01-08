@@ -266,17 +266,17 @@ VALUES ('47917','4027','11652','1','11652','0','0','2','0'), ('47917','4130','11
 -- from lanc
 -- Refurbished Shredder (quest 12050)
 UPDATE `creature_template` SET
-spell1 = 47938,
+spell1 = 47939,
 spell2 = 47921,
 spell3 = 47966,
-spell4 = 47939,
+spell4 = 47938,
 spell5 = 0,
 spell6 = 0,
-VehicleId = 55
+VehicleId = 300
 WHERE `entry` IN (27061);
 
 DELETE FROM `npc_spellclick_spells` WHERE npc_entry IN (27061);
-INSERT INTO `npc_spellclick_spells` VALUES (27061, 67373, 0, 0, 0, 1);
+INSERT INTO `npc_spellclick_spells` VALUES (27061, 47920, 0, 0, 0, 1);
 REPLACE INTO `spell_script_target` VALUES (47939, 2, 188539);
 
 -- Argent Cannon (quest 13086)
