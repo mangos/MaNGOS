@@ -29,7 +29,7 @@ class MANGOS_DLL_SPEC barGoLink
     public:                                                 // modifiers
         void step( void );
 
-        static void SetOutputState(bool on) { m_showOutput = on; }
+        static void SetOutputState(bool on);
     private:
         static bool m_showOutput;                           // not recommended change with existed active bar
         static char const * const empty;

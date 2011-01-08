@@ -92,3 +92,9 @@ void barGoLink::step()
         rec_pos = n;
     }
 }
+
+// avoid use inline version because linking problems with private static field
+void barGoLink::SetOutputState(bool on)
+{
+    m_showOutput = on;
+}
