@@ -74,6 +74,14 @@ ChatCommand * ChatHandler::getCommandTable()
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
+    static ChatCommand accountFriendCommandTable[] =
+    {
+        { "add"  ,          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountFriendAddCommand,    "", NULL },
+        { "delete",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountFriendDeleteCommand, "", NULL },
+        { "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountFriendListCommand,   "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
     static ChatCommand accountCommandTable[] =
     {
         { "characters",     SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAccountCharactersCommand,   "", NULL },
@@ -82,6 +90,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "onlinelist",     SEC_CONSOLE,        true,  &ChatHandler::HandleAccountOnlineListCommand,   "", NULL },
         { "lock",           SEC_PLAYER,         true,  &ChatHandler::HandleAccountLockCommand,         "", NULL },
         { "set",            SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountSetCommandTable },
+        { "friend",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", accountFriendCommandTable },
         { "password",       SEC_PLAYER,         true,  &ChatHandler::HandleAccountPasswordCommand,     "", NULL },
         { "",               SEC_PLAYER,         true,  &ChatHandler::HandleAccountCommand,             "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }

@@ -60,6 +60,7 @@
 #include "SocialMgr.h"
 #include "AchievementMgr.h"
 #include "Mail.h"
+#include "AccountMgr.h"
 
 #include <cmath>
 
@@ -585,6 +586,9 @@ Player::Player (WorldSession *session): Unit(), m_mover(this), m_camera(this), m
     m_lastFallTime = 0;
     m_lastFallZ = 0;
 
+    // Refer-A-Friend
+    m_GrantableLevelsCount = 0;
+
     m_anticheat = new AntiCheat(this);
 }
 
@@ -702,7 +706,13 @@ bool Player::Create( uint32 guidlow, const std::string& name, uint8 race, uint8 
     SetByteValue(PLAYER_BYTES, 3, hairColor);
 
     SetByteValue(PLAYER_BYTES_2, 0, facialHair);
-    SetByteValue(PLAYER_BYTES_2, 3, 0x02);                  // rest state = normal
+
+    LoadAccountLinkedState();
+
+    if (GetAccountLinkedState() != STATE_NOT_LINKED)
+        SetByteValue(PLAYER_BYTES_2, 3, 0x06);              // rest state = refer-a-friend
+    else
+        SetByteValue(PLAYER_BYTES_2, 3, 0x02);              // rest state = normal
 
     SetUInt16Value(PLAYER_BYTES_3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
     SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
@@ -2525,18 +2535,18 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
     }
 }
 
-void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP)
+void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool ReferAFriend)
 {
     WorldPacket data(SMSG_LOG_XPGAIN, 21);
     data << (victim ? victim->GetObjectGuid() : ObjectGuid());// guid
-    data << uint32(GivenXP+RestXP);                         // given experience
+    data << uint32(GivenXP+BonusXP);                        // total experience
     data << uint8(victim ? 0 : 1);                          // 00-kill_xp type, 01-non_kill_xp type
     if(victim)
     {
         data << uint32(GivenXP);                            // experience without rested bonus
         data << float(1);                                   // 1 - none 0 - 100% group bonus output
     }
-    data << uint8(0);                                       // new 2.4.0
+    data << uint8(ReferAFriend ? 1 : 0);                    // Refer-A-Friend State
     GetSession()->SendPacket(&data);
 }
 
@@ -2579,14 +2589,23 @@ void Player::GiveXP(uint32 xp, Unit* victim)
             xp = uint32(xp*(1.0f + (*i)->GetModifier()->m_amount / 100.0f));
     }
 
-    // XP resting bonus for kill
-    uint32 rested_bonus_xp = victim ? GetXPRestBonus(xp) : 0;
+    uint32 bonus_xp = 0;
+    bool ReferAFriend = false;
+    if (CheckRAFConditions())
+    {
+        // RAF bonus exp don't decrease rest exp
+        bool ReferAFriend = true;
+        bonus_xp = xp * (sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_XP) - 1);
+    }
+    else
+        // XP resting bonus for kill
+        bonus_xp = victim ? GetXPRestBonus(xp) : 0;
 
-    SendLogXPGain(xp,victim,rested_bonus_xp);
+    SendLogXPGain(xp,victim,bonus_xp,ReferAFriend);
 
     uint32 curXP = GetUInt32Value(PLAYER_XP);
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
-    uint32 newXP = curXP + xp + rested_bonus_xp;
+    uint32 newXP = curXP + xp + bonus_xp;
 
     while( newXP >= nextLvlXP && level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) )
     {
@@ -2676,6 +2695,21 @@ void Player::GiveLevel(uint32 level)
         MailDraft(mailReward->mailTemplateId).SendMailTo(this,MailSender(MAIL_CREATURE,mailReward->senderEntry));
 
     GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
+
+    // Refer-A-Friend
+    if (GetAccountLinkedState() == STATE_REFERRAL || GetAccountLinkedState() == STATE_DUAL)
+    {
+        if (level < sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
+        {
+            if (sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL) < 1.0f)
+            {
+                if (!(level%uint8(1/sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL))))
+                    ChangeGrantableLevels(1);
+            }
+            else
+                ChangeGrantableLevels(uint8(sWorld.getConfig(CONFIG_FLOAT_RATE_RAF_LEVELPERLEVEL)));
+        }
+    }
 }
 
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
@@ -4566,6 +4600,10 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     if(getRace() == RACE_NIGHTELF)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
+
+    // refer-a-friend flag - maybe wrong and hacky
+    if (GetAccountLinkedState() != STATE_NOT_LINKED)
+        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
@@ -15535,8 +15573,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
     // 39           40                41                42                    43          44          45              46           47               48              49
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-    // 50      51      52      53      54      55      56      57      58         59          60             61              62      63           64
-    //"health, power1, power2, power3, power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles, actionBars  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+    // 50      51      52      53      54      55      56      57      58         59          60             61              62      63           64          65
+    //"health, power1, power2, power3, power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels  FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
     if(!result)
@@ -15955,6 +15993,17 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
     m_specsCount = fields[58].GetUInt8();
     m_activeSpec = fields[59].GetUInt8();
+
+    m_GrantableLevelsCount = fields[65].GetUInt32();
+
+    // refer-a-friend flag - maybe wrong and hacky
+    LoadAccountLinkedState();
+    if (GetAccountLinkedState() != STATE_NOT_LINKED)
+        SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
+
+    // set grant flag
+    if (m_GrantableLevelsCount > 0)
+        SetByteValue(PLAYER_FIELD_BYTES, 1, 0x01);
 
     _LoadGlyphs(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGLYPHS));
 
@@ -17374,7 +17423,7 @@ void Player::SaveToDB()
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
         "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, "
         "todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, health, power1, power2, power3, "
-        "power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles, actionBars) VALUES ("
+        "power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels) VALUES ("
         << GetGUIDLow() << ", "
         << GetSession()->GetAccountId() << ", '"
         << sql_name << "', "
@@ -17496,6 +17545,8 @@ void Player::SaveToDB()
     }
     ss << "',";
     ss << uint32(GetByteValue(PLAYER_FIELD_BYTES, 2));
+    ss << ", ";
+    ss << uint32(m_GrantableLevelsCount);
     ss << ")";
 	
     CharacterDatabase.BeginTransaction();
@@ -18756,10 +18807,15 @@ void Player::SetRestBonus (float rest_bonus_new)
         m_rest_bonus = rest_bonus_new;
 
     // update data for client
-    if(m_rest_bonus>10)
-        SetByteValue(PLAYER_BYTES_2, 3, 0x01);              // Set Reststate = Rested
-    else if(m_rest_bonus<=1)
-        SetByteValue(PLAYER_BYTES_2, 3, 0x02);              // Set Reststate = Normal
+    if (GetAccountLinkedState() != STATE_NOT_LINKED)
+        SetByteValue(PLAYER_BYTES_2, 3, 0x06);                  // Set Reststate = Refer-A-Friend
+    else
+    {
+        if(m_rest_bonus>10)
+            SetByteValue(PLAYER_BYTES_2, 3, 0x01);              // Set Reststate = Rested
+        else if(m_rest_bonus<=1)
+            SetByteValue(PLAYER_BYTES_2, 3, 0x02);              // Set Reststate = Normal
+    }
 
     //RestTickUpdate
     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(m_rest_bonus));
@@ -22966,4 +23022,163 @@ void Player::_LoadRandomBGStatus(QueryResult *result)
         m_IsBGRandomWinner = true;
         delete result;
     }
+}
+
+// Refer-A-Friend
+void Player::SendReferFriendError(ReferAFriendError err, Player * target)
+{
+    WorldPacket data(SMSG_REFER_A_FRIEND_ERROR, 24);
+    data << uint32(err);
+    if (target && (err == ERR_REFER_A_FRIEND_NOT_IN_GROUP || err == ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S))
+        data << target->GetName();
+
+    GetSession()->SendPacket(&data);
+}
+
+ReferAFriendError Player::GetReferFriendError(Player * target, bool summon)
+{
+    if (!target || target->GetTypeId() != TYPEID_PLAYER)
+        return summon ? ERR_REFER_A_FRIEND_SUMMON_OFFLINE_S : ERR_REFER_A_FRIEND_NO_TARGET;
+
+    if (!IsReferAFriendLinked(target))
+        return ERR_REFER_A_FRIEND_NOT_REFERRED_BY;
+
+    if (Group * gr1 = GetGroup())
+    {
+        Group * gr2 = target->GetGroup();
+
+        if (!gr2 || gr1->GetId() != gr2->GetId())
+            return ERR_REFER_A_FRIEND_NOT_IN_GROUP;
+    }
+
+    if (summon)
+    {
+        if (HasSpellCooldown(45927))
+            return ERR_REFER_A_FRIEND_SUMMON_COOLDOWN;
+        if (target->getLevel() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
+            return ERR_REFER_A_FRIEND_SUMMON_LEVEL_MAX_I;
+
+        if (MapEntry const* mEntry = sMapStore.LookupEntry(GetMapId()))
+            if (mEntry->Expansion() > target->GetSession()->Expansion())
+                return ERR_REFER_A_FRIEND_INSUF_EXPAN_LVL;
+    }
+    else
+    {
+        if (GetTeam() != target->GetTeam() && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+            return ERR_REFER_A_FRIEND_DIFFERENT_FACTION;
+        if (getLevel() <= target->getLevel())
+            return ERR_REFER_A_FRIEND_TARGET_TOO_HIGH;
+        if (!GetGrantableLevels())
+            return ERR_REFER_A_FRIEND_INSUFFICIENT_GRANTABLE_LEVELS;
+        if (GetDistance(target) > DEFAULT_VISIBILITY_DISTANCE || !target->IsVisibleGloballyFor(this))
+            return ERR_REFER_A_FRIEND_TOO_FAR;
+        if (target->getLevel() >= sWorld.getConfig(CONFIG_UINT32_RAF_MAXGRANTLEVEL))
+            return ERR_REFER_A_FRIEND_GRANT_LEVEL_MAX_I;
+    }
+
+    return ERR_REFER_A_FRIEND_NONE;
+}
+
+void Player::ChangeGrantableLevels(uint8 increase) 
+{
+    if (increase)
+        m_GrantableLevelsCount += increase;
+    else
+    {
+        m_GrantableLevelsCount -= 1; 
+
+        if (m_GrantableLevelsCount < 0) 
+            m_GrantableLevelsCount = 0; 
+    }
+
+    // set/unset flag - granted levels
+    if (m_GrantableLevelsCount > 0)
+    {
+        if (!HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
+            SetByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
+    }
+    else
+    {
+        if (HasByteFlag(PLAYER_FIELD_BYTES, 1, 0x01))
+            RemoveByteFlag(PLAYER_FIELD_BYTES, 1, 0x01);
+    }
+
+}
+
+bool Player::CheckRAFConditions()
+{
+    if (Group * grp = GetGroup())
+    {
+        for(GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        {
+            Player* member = itr->getSource();
+
+            if (!member || !member->isAlive())
+                continue;
+
+            if (GetObjectGuid() == member->GetObjectGuid())
+                continue;
+
+            if (member->GetAccountLinkedState() == STATE_NOT_LINKED)
+                continue;
+
+            if (GetDistance(member) < 100 && (getLevel() <= member->getLevel() + 4))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+AccountLinkedState Player::GetAccountLinkedState()
+{
+
+    if (!m_referredAccounts.empty() && !m_referalAccounts.empty())
+        return STATE_DUAL;
+
+    if (!m_referredAccounts.empty())
+        return STATE_REFER;
+
+    if (!m_referalAccounts.empty())
+        return STATE_REFERRAL;
+
+    return STATE_NOT_LINKED;
+}
+
+void Player::LoadAccountLinkedState()
+{
+    m_referredAccounts.clear();
+    m_referredAccounts = sAccountMgr.GetRAFAccounts(GetSession()->GetAccountId(), true);
+
+    if (m_referredAccounts.size() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS))
+        sLog.outError("Player:RAF:Warning: loaded %u referred accounts instead of %u for player %u",m_referredAccounts.size(),sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS),GetObjectGuid().GetCounter());
+    else
+        DEBUG_LOG("Player:RAF: loaded %u referred accounts for player %u",m_referredAccounts.size(),GetObjectGuid().GetCounter());
+
+    m_referalAccounts.clear();
+    m_referalAccounts  = sAccountMgr.GetRAFAccounts(GetSession()->GetAccountId(), false);
+
+    if (m_referalAccounts.size() > sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS))
+        sLog.outError("Player:RAF:Warning: loaded %u referal accounts instead of %u for player %u",m_referalAccounts.size(),sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS),GetObjectGuid().GetCounter());
+    else
+        DEBUG_LOG("Player:RAF: loaded %u referal accounts for player %u",m_referalAccounts.size(),GetObjectGuid().GetCounter());
+}
+
+bool Player::IsReferAFriendLinked(Player* target)
+{
+    // check link this(refer) - target(referral)
+    for (std::vector<uint32>::const_iterator itr = m_referalAccounts.begin(); itr != m_referalAccounts.end(); ++itr)
+    {
+        if ((*itr) == target->GetSession()->GetAccountId())
+            return true;
+    }
+
+    // check link target(refer) - this(referral)
+    for (std::vector<uint32>::const_iterator itr = m_referredAccounts.begin(); itr != m_referredAccounts.end(); ++itr)
+    {
+        if ((*itr) == target->GetSession()->GetAccountId())
+            return true;
+    }
+
+    return false;
 }

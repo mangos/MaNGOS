@@ -33,8 +33,8 @@ enum FriendStatus
     FRIEND_STATUS_OFFLINE   = 0,
     FRIEND_STATUS_ONLINE    = 1,
     FRIEND_STATUS_AFK       = 2,
-    FRIEND_STATUS_UNK3      = 3,
-    FRIEND_STATUS_DND       = 4
+    FRIEND_STATUS_DND       = 4,
+    FRIEND_STATUS_RAF       = 8,
 };
 
 enum SocialFlag
@@ -42,7 +42,7 @@ enum SocialFlag
     SOCIAL_FLAG_FRIEND      = 0x01,
     SOCIAL_FLAG_IGNORED     = 0x02,
     SOCIAL_FLAG_MUTED       = 0x04,                         // guessed
-    SOCIAL_FLAG_RAF         = 0x08                          // Recruit-A-Friend
+    SOCIAL_FLAG_RAF         = 0x08,                         // Recruit-A-Friend
 };
 
 struct FriendInfo

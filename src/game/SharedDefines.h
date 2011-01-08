@@ -701,7 +701,7 @@ enum SpellEffects
     SPELL_EFFECT_CHARGE2                   = 149,
     SPELL_EFFECT_QUEST_START               = 150,
     SPELL_EFFECT_TRIGGER_SPELL_2           = 151,
-    SPELL_EFFECT_152                       = 152,
+    SPELL_EFFECT_FRIEND_SUMMON             = 152,
     SPELL_EFFECT_CREATE_PET                = 153,
     SPELL_EFFECT_TEACH_TAXI_NODE           = 154,
     SPELL_EFFECT_TITAN_GRIP                = 155,

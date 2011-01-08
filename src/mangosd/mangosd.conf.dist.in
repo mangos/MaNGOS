@@ -1785,3 +1785,18 @@ Anticheat.GmLevel = 0
 CharDelete.Method = 1
 CharDelete.MinLevel = 10
 CharDelete.KeepDays = 30
+
+###################################################################################################################
+#    Refer-A-Friend system by Mas0n
+#    RAF.MaxGrantLevel       = 60  (max level for granting level bonuses)
+#    RAF.MaxReferals         = 5   (max referals for one account)
+#    RAF.MaxReferers         = 5   (max referred accounts for one account)
+#    Rate.RAF.XP             = 3   (XP bonus for referred friends in party)
+#    Rate.RAF.LevelPerLevel  = 0.5 (bonus levels per referal level)
+#
+###################################################################################################################
+RAF.MaxGrantLevel       = 60
+RAF.MaxReferals         = 5
+RAF.MaxReferers         = 5
+Rate.RAF.XP             = 3
+Rate.RAF.LevelPerLevel  = 0.5

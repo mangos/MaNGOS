@@ -1091,7 +1091,7 @@ enum Opcodes
     SMSG_SEND_UNLEARN_SPELLS                        = 0x41E,
     SMSG_PROPOSE_LEVEL_GRANT                        = 0x41F,
     CMSG_ACCEPT_LEVEL_GRANT                         = 0x420,
-    SMSG_REFER_A_FRIEND_FAILURE                     = 0x421,
+    SMSG_REFER_A_FRIEND_ERROR                       = 0x421,
     SMSG_SPLINE_MOVE_SET_FLYING                     = 0x422,
     SMSG_SPLINE_MOVE_UNSET_FLYING                   = 0x423,
     SMSG_SUMMON_CANCEL                              = 0x424,

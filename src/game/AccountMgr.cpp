@@ -21,6 +21,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Player.h"
+#include "World.h"
 #include "Policies/SingletonImp.h"
 #include "Util.h"
 #include "Auth/Sha1.h"
@@ -242,4 +243,47 @@ std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& pas
     hexEncodeByteArray(sha.GetDigest(), sha.GetLength(), encoded);
 
     return encoded;
+}
+
+std::vector<uint32> AccountMgr::GetRAFAccounts(uint32 accid, bool referred)
+{
+
+    QueryResult* result;
+
+    if (referred)
+        result = LoginDatabase.PQuery("SELECT `friend_id` FROM `account_friends` WHERE `id` = %u AND `expire_date` > NOW() LIMIT %u", accid, sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERERS));
+    else
+        result = LoginDatabase.PQuery("SELECT `id` FROM `account_friends` WHERE `friend_id` = %u AND `expire_date` > NOW() LIMIT %u", accid, sWorld.getConfig(CONFIG_UINT32_RAF_MAXREFERALS));
+
+    std::vector<uint32> acclist;
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 refaccid = fields[0].GetUInt32();
+            acclist.push_back(refaccid);
+        }
+        while (result->NextRow());
+        delete result;
+    }
+
+    return acclist;
+}
+
+AccountOpResult AccountMgr::AddRAFLink(uint32 accid, uint32 friendid)
+{
+    if (!LoginDatabase.PExecute("INSERT INTO `account_friends`  (`id`, `friend_id`, `expire_date`) VALUES (%u,%u,NOW() + INTERVAL 3 MONTH)", accid, friendid))
+        return AOR_DB_INTERNAL_ERROR;
+
+    return AOR_OK;
+}
+
+AccountOpResult AccountMgr::DeleteRAFLink(uint32 accid, uint32 friendid)
+{
+    if (!LoginDatabase.PExecute("DELETE FROM `account_friends` WHERE `id` = %u AND `friend_id` = %u", accid, friendid))
+        return AOR_DB_INTERNAL_ERROR;
+
+    return AOR_OK;
 }

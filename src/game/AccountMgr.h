@@ -53,6 +53,10 @@ class AccountMgr
         uint32 GetCharactersCount(uint32 acc_id);
         std::string CalculateShaPassHash(std::string& name, std::string& password);
 
+        std::vector<uint32> GetRAFAccounts(uint32 accid, bool referred = true);
+        AccountOpResult AddRAFLink(uint32 accid, uint32 friendid);
+        AccountOpResult DeleteRAFLink(uint32 accid, uint32 friendid);
+
         static bool normalizeString(std::string& utf8str);
 };
 
