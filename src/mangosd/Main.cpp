@@ -23,6 +23,7 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "Config/Config.h"
+#include "ProgressBar.h"
 #include "Log.h"
 #include "Master.h"
 #include "SystemConfig.h"
@@ -173,6 +174,9 @@ extern int main(int argc, char **argv)
     }
 
     DETAIL_LOG("Using ACE: %s", ACE_VERSION);
+
+    ///- Set progress bars show mode
+    barGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));
 
     ///- and run the 'Master'
     /// \todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

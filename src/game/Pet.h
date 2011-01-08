@@ -154,7 +154,7 @@ typedef std::vector<uint32> AutoSpellList;
 #define ACTIVE_SPELLS_MAX           4
 
 #define PET_FOLLOW_DIST  1.0f
-#define PET_FOLLOW_ANGLE M_PI_F/2
+#define PET_FOLLOW_ANGLE (M_PI_F/2.0f)
 
 class Player;
 struct PetScalingData;

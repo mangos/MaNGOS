@@ -22,18 +22,22 @@
 
 class MANGOS_DLL_SPEC barGoLink
 {
-    static char const * const empty;
-    static char const * const full;
-
-    int rec_no;
-    int rec_pos;
-    int num_rec;
-    int indic_len;
-
-    public:
-
-        void step( void );
-        barGoLink( int );
+    public:                                                 // constructors
+        barGoLink(int row_count);
         ~barGoLink();
+
+    public:                                                 // modifiers
+        void step( void );
+
+        static void SetOutputState(bool on);
+    private:
+        static bool m_showOutput;                           // not recommended change with existed active bar
+        static char const * const empty;
+        static char const * const full;
+
+        int rec_no;
+        int rec_pos;
+        int num_rec;
+        int indic_len;
 };
 #endif
