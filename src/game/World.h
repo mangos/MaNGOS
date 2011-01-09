@@ -593,10 +593,6 @@ class World
         char const* GetDBVersion() { return m_DBVersion.c_str(); }
         char const* GetCreatureEventAIVersion() { return m_CreatureEventAIVersion.c_str(); }
 
-        //used Script version
-        void SetScriptsVersion(char const* version) { m_ScriptsVersion = version ? version : "unknown scripting library"; }
-        char const* GetScriptsVersion() { return m_ScriptsVersion.c_str(); }
-
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
@@ -697,7 +693,6 @@ class World
         //used versions
         std::string m_DBVersion;
         std::string m_CreatureEventAIVersion;
-        std::string m_ScriptsVersion;
 };
 
 extern uint32 realmID;

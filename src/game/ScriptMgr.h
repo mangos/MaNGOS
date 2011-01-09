@@ -341,10 +341,12 @@ class ScriptMgr
 
         ScriptLoadResult LoadScriptLibrary(const char* libName);
         void UnloadScriptLibrary();
+        bool IsScriptLibraryLoaded() const { return m_hScriptLib != NULL; }
 
         CreatureAI* GetCreatureAI(Creature* pCreature);
         InstanceData* CreateInstanceData(Map* pMap);
 
+        char const* GetScriptLibraryVersion() const;
         bool OnGossipHello(Player* pPlayer, Creature* pCreature);
         bool OnGossipHello(Player* pPlayer, GameObject* pGameObject);
         bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, const char* code);

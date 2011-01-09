@@ -911,6 +911,14 @@ uint32 ScriptMgr::GetEventIdScriptId(uint32 eventId) const
     return 0;
 }
 
+char const* ScriptMgr::GetScriptLibraryVersion() const
+{
+    if (!m_pGetScriptLibraryVersion)
+        return "";
+    
+    return m_pGetScriptLibraryVersion();
+}
+
 CreatureAI* ScriptMgr::GetCreatureAI(Creature* pCreature)
 {
     if (!m_pGetCreatureAI)
@@ -1097,12 +1105,7 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
     if (strcmp(pGetMangosRevStr(), REVISION_NR) != 0)
         return SCRIPT_LOAD_ERR_OUTDATED;
 
-    if (m_pOnInitScriptLibrary)
-        m_pOnInitScriptLibrary();
-
-    if (m_pGetScriptLibraryVersion)
-        sWorld.SetScriptsVersion(m_pGetScriptLibraryVersion());
-
+    m_pOnInitScriptLibrary();
     return SCRIPT_LOAD_OK;
 }
 
