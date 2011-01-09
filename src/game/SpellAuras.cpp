@@ -7815,34 +7815,6 @@ void Aura::PeriodicDummyTick()
                     target->CastSpell(target, 53521, true, NULL, this);
                     target->CastSpell(target, 53521, true, NULL, this);
                     return;
-                case 54798: // FLAMING Arrow Triggered Effect
-                {
-                    Unit * caster = GetCaster();
-                    if (!caster)
-                        return;
-
-                    if (target->GetTypeId() == TYPEID_UNIT || !caster->GetObjectGuid().IsVehicle())
-                        return;
-
-                    Unit *rider = caster->GetVehicleKit()->GetPassenger(0);
-                    if (!rider)
-                        return;
-
-                    // set ablaze
-                    if (target->HasAura(54683, EFFECT_INDEX_0))
-                        return;
-                    else
-                        target->CastSpell(target, 54683, true);
-
-                    // Credit Frostworgs
-                    if (target->GetEntry() == 29358)
-                        rider->CastSpell(rider, 54896, true);
-                    // Credit Frost Giants
-                    else if (target->GetEntry() == 29351)
-                        rider->CastSpell(rider, 54893, true);
-
-                    break;
-                }
                 case 55592:                                 // Clean
                     switch(urand(0,2))
                     {
