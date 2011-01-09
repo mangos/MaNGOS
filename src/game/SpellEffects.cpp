@@ -1027,6 +1027,18 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 13166, true, m_CastItem);
                     return;
                 }
+                case 23138:                                 // Gate of Shazzrah
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Effect probably include a threat change, but it is unclear if fully
+                    // reset or just forced upon target for teleport (SMSG_HIGHEST_THREAT_UPDATE)
+
+                    // Gate of Shazzrah
+                    m_caster->CastSpell(unitTarget, 23139, true);
+                    return;
+                }
                 case 23448:                                 // Transporter Arrival - Ultrasafe Transporter: Gadgetzan - backfires
                 {
                     int32 r = irand(0, 119);
