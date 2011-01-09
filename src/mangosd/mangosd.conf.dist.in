@@ -1239,6 +1239,21 @@ Visibility.Distance.Grey.Object = 10
 #         Default: 0  - no decrease
 #                  75 - in 2 times each 75 skill points
 #
+#    SkillFail.Loot.Fishing
+#         For fishing instead fail provided junk loot
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
+#    SkillFail.Gain.Fishing
+#         For fishing skill gain possible at fail also
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
+#    SkillFail.Possible.FishingPool
+#         For fishing pool impossible fail from low skill by default
+#         Default: 0 (disabled)
+#                  1 (enabled)
+#
 #    DurabilityLossChance.Damage
 #         Chance lost one from equiped items durability point at damage apply or receive.
 #         Default: 0.5 (100/0.5 = 200) Each 200 damage apply one from 19 possible equipped items
@@ -1327,6 +1342,9 @@ SkillChance.Green  = 25
 SkillChance.Grey   = 0
 SkillChance.MiningSteps   = 0
 SkillChance.SkinningSteps = 0
+SkillFailLoot.Fishing = 1
+SkillFail.Gain.Fishing = 1
+SkillFail.Possible.FishingPool = 0
 DurabilityLossChance.Damage = 0.5
 DurabilityLossChance.Absorb = 0.5
 DurabilityLossChance.Parry  = 0.05
