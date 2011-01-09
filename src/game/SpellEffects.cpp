@@ -914,6 +914,46 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 19411:                                 // Lava Bomb
+                case 20474:                                 // Lava Bomb
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Hack alert!
+                    // This dummy are expected to cast spell 20494 to summon GO entry 177704
+                    // Spell does not exist client side, so we have to make a hack, creating the GO (SPELL_EFFECT_SUMMON_OBJECT_WILD)
+                    // Spell should appear in both SMSG_SPELL_START/GO and SMSG_SPELLLOGEXECUTE
+
+                    // For later, creating custom spell
+                    // _START: packguid: target, cast flags: 0xB, TARGET_FLAG_SELF
+                    // _GO: packGuid: target, cast flags: 0x4309, TARGET_FLAG_DEST_LOCATION
+                    // LOG: spell: 20494, effect, pguid: goguid
+
+                    GameObject* pGameObj = new GameObject;
+
+                    Map *map = unitTarget->GetMap();
+
+                    if (!pGameObj->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_GAMEOBJECT), 177704,
+                        map, m_caster->GetPhaseMask(),
+                        unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(),
+                        unitTarget->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
+                    {
+                        delete pGameObj;
+                        return;
+                    }
+
+                    DEBUG_LOG("Gameobject, create custom in SpellEffects.cpp EffectDummy");
+
+                    // Expect created without owner, but with level from _template
+                    pGameObj->SetRespawnTime(MINUTE/2);
+                    pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, pGameObj->GetGOInfo()->trap.level);
+                    pGameObj->SetSpellId(m_spellInfo->Id);
+
+                    map->Add(pGameObj);
+
+                    return;
+                }
                 case 20577:                                 // Cannibalize
                 {
                     if (unitTarget)
