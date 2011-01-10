@@ -1201,6 +1201,9 @@ void LoadLootTemplates_Fishing()
                 ids_set.erase(areaEntry->ID);
     }
 
+    // by default (look config options) fishing at fail provide junk loot, entry 0 use for store this loot
+    ids_set.erase(0);
+
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Fishing.ReportUnusedIds(ids_set);
 }

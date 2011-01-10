@@ -1232,24 +1232,43 @@ void GameObject::Use(Unit* user)
 
                     DEBUG_LOG("Fishing check (skill: %i zone min skill: %i chance %i roll: %i",skill,zone_skill,chance,roll);
 
-                    if (skill >= zone_skill && chance >= roll)
+                    // normal chance
+                    bool success = skill >= zone_skill && chance >= roll;
+                    GameObject* fishingHole = NULL;
+
+                    // overwrite fail in case fishhole if allowed (after 3.3.0)
+                    if (!success)
+                    {
+                        if (!sWorld.getConfig(CONFIG_BOOL_SKILL_FAIL_POSSIBLE_FISHINGPOOL))
+                        {
+                            //TODO: find reasonable value for fishing hole search
+                            fishingHole = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
+                            if (fishingHole)
+                                success = true;
+                        }
+                    }
+                    // just search fishhole for success case
+                    else
+                        //TODO: find reasonable value for fishing hole search
+                        fishingHole = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
+
+                    if (success || sWorld.getConfig(CONFIG_BOOL_SKILL_FAIL_GAIN_FISHING))
+                        player->UpdateFishingSkill();
+
+                    // fish catch or fail and junk allowed (after 3.1.0)
+                    if (success || sWorld.getConfig(CONFIG_BOOL_SKILL_FAIL_LOOT_FISHING))
                     {
                         // prevent removing GO at spell cancel
                         player->RemoveGameObject(this,false);
                         SetOwnerGuid(player->GetObjectGuid());
 
-                        //fish catched
-                        player->UpdateFishingSkill();
-
-                        //TODO: find reasonable value for fishing hole search
-                        GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
-                        if (ok)
+                        if (fishingHole)                    // will set at success only
                         {
-                            ok->Use(player);
+                            fishingHole->Use(player);
                             SetLootState(GO_JUST_DEACTIVATED);
                         }
                         else
-                            player->SendLoot(GetObjectGuid(),LOOT_FISHING);
+                            player->SendLoot(GetObjectGuid(), success ? LOOT_FISHING : LOOT_FISHING_FAIL);
                     }
                     else
                     {

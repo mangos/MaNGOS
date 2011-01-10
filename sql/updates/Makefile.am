@@ -148,6 +148,7 @@ pkgdata_DATA = \
 	10973_01_characters_game_event_status.sql \
 	10973_01_mangos_game_event_mail.sql \
 	10988_01_mangos_mangos_string.sql \
+	10989_01_mangos_loot_template.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -276,4 +277,5 @@ EXTRA_DIST = \
 	10973_01_characters_game_event_status.sql \
 	10973_01_mangos_game_event_mail.sql \
 	10988_01_mangos_mangos_string.sql \
+	10989_01_mangos_loot_template.sql \
 	README

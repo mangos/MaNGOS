@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_10988_01_mangos_mangos_string` bit(1) default NULL
+  `required_10989_01_mangos_loot_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -927,7 +927,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `creature_loot_template`;
 CREATE TABLE `creature_loot_template` (
-  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'entry 0 used for player insignia loot',
   `item` mediumint(8) unsigned NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
@@ -1586,7 +1586,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `fishing_loot_template`;
 CREATE TABLE `fishing_loot_template` (
-  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'entry 0 used for junk loot at fishing fail (if allowed by config option',
   `item` mediumint(8) unsigned NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
