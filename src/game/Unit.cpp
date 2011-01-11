@@ -8501,6 +8501,7 @@ void Unit::SetDeathState(DeathState s)
 ########       AGGRO SYSTEM       ########
 ########                          ########
 ########################################*/
+
 bool Unit::CanHaveThreatList() const
 {
     // only creatures can have threat list
@@ -8552,7 +8553,7 @@ float Unit::ApplyTotalThreatModifier(float threat, SpellSchoolMask schoolMask)
 void Unit::AddThreat(Unit* pVictim, float threat /*= 0.0f*/, bool crit /*= false*/, SpellSchoolMask schoolMask /*= SPELL_SCHOOL_MASK_NONE*/, SpellEntry const *threatSpell /*= NULL*/)
 {
     // Only mobs can manage threat lists
-    if(CanHaveThreatList())
+    if (CanHaveThreatList())
         m_ThreatManager.addThreat(pVictim, threat, crit, schoolMask, threatSpell);
 }
 
@@ -8560,8 +8561,9 @@ void Unit::AddThreat(Unit* pVictim, float threat /*= 0.0f*/, bool crit /*= false
 
 void Unit::DeleteThreatList()
 {
-    if(CanHaveThreatList() && !m_ThreatManager.isThreatListEmpty())
+    if (CanHaveThreatList() && !m_ThreatManager.isThreatListEmpty())
         SendThreatClear();
+
     m_ThreatManager.clearReferences();
 }
 
@@ -8569,19 +8571,21 @@ void Unit::DeleteThreatList()
 
 void Unit::TauntApply(Unit* taunter)
 {
-    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId() == TYPEID_UNIT);
 
-    if(!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
+    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
         return;
 
-    if(!CanHaveThreatList())
+    if (!CanHaveThreatList())
         return;
 
     Unit *target = getVictim();
-    if(target && target == taunter)
+
+    if (target && target == taunter)
         return;
 
     SetInFront(taunter);
+
     if (((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackStart(taunter);
 
@@ -8592,21 +8596,22 @@ void Unit::TauntApply(Unit* taunter)
 
 void Unit::TauntFadeOut(Unit *taunter)
 {
-    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId() == TYPEID_UNIT);
 
-    if(!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
+    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
         return;
 
-    if(!CanHaveThreatList())
+    if (!CanHaveThreatList())
         return;
 
     Unit *target = getVictim();
-    if(!target || target != taunter)
+
+    if (!target || target != taunter)
         return;
 
-    if(m_ThreatManager.isThreatListEmpty())
+    if (m_ThreatManager.isThreatListEmpty())
     {
-        if(((Creature*)this)->AI())
+        if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->EnterEvadeMode();
 
         if (InstanceData* mapInstance = GetInstanceData())
@@ -8621,6 +8626,7 @@ void Unit::TauntFadeOut(Unit *taunter)
     if (target && target != taunter)
     {
         SetInFront(target);
+
         if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->AttackStart(target);
     }
@@ -8634,10 +8640,11 @@ bool Unit::SelectHostileTarget()
     //next-victim-selection algorithm and evade mode are called
     //threat list sorting etc.
 
-    MANGOS_ASSERT(GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(GetTypeId() == TYPEID_UNIT);
 
     if (!this->isAlive())
         return false;
+
     //This function only useful once AI has been initialized
     if (!((Creature*)this)->AI())
         return false;
@@ -8646,12 +8653,12 @@ bool Unit::SelectHostileTarget()
 
     // First checking if we have some taunt on us
     const AuraList& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
-    if ( !tauntAuras.empty() )
+    if (!tauntAuras.empty())
     {
         Unit* caster;
 
         // The last taunt aura caster is alive an we are happy to attack him
-        if ( (caster = tauntAuras.back()->GetCaster()) && caster->isAlive() )
+        if ((caster = tauntAuras.back()->GetCaster()) && caster->isAlive())
             return true;
         else if (tauntAuras.size() > 1)
         {
@@ -8663,8 +8670,8 @@ bool Unit::SelectHostileTarget()
             do
             {
                 --aura;
-                if ( (caster = (*aura)->GetCaster()) &&
-                     caster->IsInMap(this) && caster->isTargetableForAttack() && caster->isInAccessablePlaceFor((Creature*)this) )
+                if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) &&
+                    caster->isTargetableForAttack() && caster->isInAccessablePlaceFor((Creature*)this))
                 {
                     target = caster;
                     break;
@@ -8673,8 +8680,8 @@ bool Unit::SelectHostileTarget()
         }
     }
 
-    if ( !target && !m_ThreatManager.isThreatListEmpty() )
-        // No taunt aura or taunt aura caster is dead standart target selection
+    // No taunt aura or taunt aura caster is dead, standard target selection
+    if (!target && !m_ThreatManager.isThreatListEmpty())
         target = m_ThreatManager.getHostileTarget();
 
     if (target)
@@ -8688,7 +8695,7 @@ bool Unit::SelectHostileTarget()
     }
 
     // no target but something prevent go to evade mode
-    if( !isInCombat() || HasAuraType(SPELL_AURA_MOD_TAUNT) )
+    if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_TAUNT))
         return false;
 
     // last case when creature don't must go to evade mode:
