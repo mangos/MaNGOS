@@ -2035,9 +2035,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         // Pet will be following owner, this makes him stop
                         target->addUnitState(UNIT_STAT_STUNNED);
                         return;
-                    case 58914:                             // Kill Command
-                        target->CastSpell(target, 34027, true, NULL, this);
-                        return;
                     case 62061:                             // Festive Holiday Mount
                         if (target->HasAuraType(SPELL_AURA_MOUNTED))
                             // Reindeer Transformation
@@ -2116,6 +2113,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 // Fingers of Frost stacks set to max at apply
                 if (GetId() == 74396)
                     GetHolder()->SetAuraCharges(GetSpellProto()->StackAmount);
+                break;
+            }
+            case SPELLFAMILY_HUNTER:
+            {
+                /* disabled until full implementation
+                switch(GetId())
+                {
+                    case 34026:                             // Kill Command
+                        target->CastSpell(target, 34027, true, NULL, this);
+                        return;
+                }
+                */
                 break;
             }
             case SPELLFAMILY_SHAMAN:
