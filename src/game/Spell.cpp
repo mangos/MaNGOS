@@ -3953,7 +3953,7 @@ void Spell::SendSpellGo()
 
     if ( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION )
     {
-        data << uint8(0);
+        data << uint8(0);                                   // The value increase for each time, can remind of a cast count for the spell
     }
 
     m_caster->SendMessageToSet(&data, true);
