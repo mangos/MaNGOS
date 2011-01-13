@@ -261,5 +261,7 @@ void BufferedSocket::close_connection(void)
 {
     this->peer().close_reader();
     this->peer().close_writer();
+
+    reactor()->remove_handler(this, ACE_Event_Handler::DONT_CALL | ACE_Event_Handler::ALL_EVENTS_MASK);
 }
 
