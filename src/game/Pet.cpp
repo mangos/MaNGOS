@@ -276,18 +276,12 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     CalculateScalingData(true);
     ApplyAllScalingBonuses(true);
 
-    if (getPetType() != HUNTER_PET
-        && (owner->GetTypeId() == TYPEID_PLAYER && owner->GetTemporaryUnsummonedPetNumber() != pet_number))
-     //all (?) summon pets come with full health when called, but not when they are current
+    if (isControlled())
+     //all (?) summon pets come with full health when called, note by virusav
     {
         SetHealth(GetMaxHealth());
         SetPower(getPowerType(), GetMaxPower(getPowerType()));
         LoadCreatureAddon(true);
-    }
-    else
-    {
-        SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
-        SetPower(getPowerType(), savedmana > GetMaxPower(getPowerType()) ? GetMaxPower(getPowerType()) : savedmana);
     }
 
     UpdateWalkMode(owner);
