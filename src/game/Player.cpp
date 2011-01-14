@@ -3153,7 +3153,7 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
 
             if(active)
             {
-                if (IsPassiveSpell(spellInfo) && IsNeedCastPassiveSpellAtLearn(spellInfo))
+                if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
                     CastSpell (this, spell_id, true);
             }
             else if(IsInWorld())
@@ -3343,11 +3343,10 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
         // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
         CastSpell(this, spell_id, true);
     }
-    // also cast passive spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
-    else if (IsPassiveSpell(spellInfo))
+    // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
+    else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
     {
-        if (IsNeedCastPassiveSpellAtLearn(spellInfo))
-            CastSpell(this, spell_id, true);
+        CastSpell(this, spell_id, true);
     }
     else if (IsSpellHaveEffect(spellInfo,SPELL_EFFECT_SKILL_STEP))
     {
@@ -3441,13 +3440,19 @@ bool Player::addSpell(uint32 spell_id, bool active, bool learning, bool dependen
     return active && !disabled && !superceded_old;
 }
 
-bool Player::IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const
+bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const
 {
+    ShapeshiftForm form = GetShapeshiftForm();
+
+    if (IsNeedCastSpellAtFormApply(spellInfo, form))        // SPELL_ATTR_PASSIVE | SPELL_ATTR_UNK7 spells
+        return true;                                        // all stance req. cases, not have auarastate cases
+
+    if (!(spellInfo->Attributes & SPELL_ATTR_PASSIVE))
+        return false;
+
     // note: form passives activated with shapeshift spells be implemented by HandleShapeshiftBoosts instead of spell_learn_spell
     // talent dependent passives activated at form apply have proper stance data
-    ShapeshiftForm form = GetShapeshiftForm();
-    bool need_cast = (!spellInfo->Stances || (form && (spellInfo->Stances & (1 << (form - 1)))) ||
-                      (!form && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT)));
+    bool need_cast = (!spellInfo->Stances || !form && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
 
     // Check CasterAuraStates
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
