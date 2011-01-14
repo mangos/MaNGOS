@@ -63,10 +63,7 @@ void HostileRefManager::threatAssist(Unit *pVictim, float pThreat, SpellEntry co
             }
         }
 
-        if (pVictim == getOwner())
-            ref->addThreat(float (threat) / size);          // It is faster to modify the threat durectly if possible
-        else
-            ref->getSource()->addThreat(pVictim, float (threat) / size);
+        ref->getSource()->addThreat(pVictim, float (threat) / size);
 
         ref = ref->next();
     }
