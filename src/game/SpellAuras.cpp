@@ -6050,7 +6050,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
     uint32 HotWSpellId = 0;
     uint32 MasterShaperSpellId = 0;
 
-    uint32 form = GetModifier()->m_miscvalue;
+    ShapeshiftForm form = ShapeshiftForm(GetModifier()->m_miscvalue);
 
     Unit *target = GetTarget();
 
@@ -6145,11 +6145,9 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 if (itr->second.state == PLAYERSPELL_REMOVED) continue;
                 if (itr->first==spellId1 || itr->first==spellId2) continue;
                 SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
-                if (!spellInfo || !(spellInfo->Attributes & (SPELL_ATTR_PASSIVE | SPELL_ATTR_UNK7)))
+                if (!spellInfo || !IsNeedCastSpellAtFormApply(spellInfo, form))
                     continue;
-                // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
-                if (spellInfo->Stances & (1<<(form-1)) && !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT))
-                    target->CastSpell(target, itr->first, true, NULL, this);
+                target->CastSpell(target, itr->first, true, NULL, this);
             }
             // remove auras that do not require shapeshift, but are not active in this specific form (like Improved Barkskin)
             Unit::SpellAuraHolderMap& tAuras = target->GetSpellAuraHolderMap();

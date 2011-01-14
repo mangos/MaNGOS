@@ -1634,7 +1634,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasActiveSpell(uint32 spell) const;            // show in spellbook
         TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
         bool IsSpellFitByClassAndRace( uint32 spell_id ) const;
-        bool IsNeedCastPassiveSpellAtLearn(SpellEntry const* spellInfo) const;
+        bool IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const;
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const;
 
         void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
