@@ -5222,7 +5222,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (m_spellInfo->Id == 51582)          // Rocket Boots Engaged
                 {
-                    if(m_caster->IsInWater())
+                    if (m_caster->IsInWater())
                         return SPELL_FAILED_ONLY_ABOVEWATER;
                 }
                 else if (m_spellInfo->SpellFamilyFlags == UI64LIT(0x2000)) // Death Coil (DeathKnight)
@@ -5235,7 +5235,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     // spell different for friends and enemies
                     // hart version required facing
-                    if(m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc( M_PI_F, m_targets.getUnitTarget() ))
+                    if (m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc( M_PI_F, m_targets.getUnitTarget() ))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
                 // Fire Nova
@@ -5634,8 +5634,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                 //custom check
                 switch(m_spellInfo->Id)
                 {
+                    case 34026:                             // Kill Command
+                        if (!m_caster->GetPet())
+                            return SPELL_FAILED_NO_PET;
+                        break;
                     case 61336:                             // Survival Instincts
-                        if(m_caster->GetTypeId() != TYPEID_PLAYER || !((Player*)m_caster)->IsInFeralForm())
+                        if (m_caster->GetTypeId() != TYPEID_PLAYER || !((Player*)m_caster)->IsInFeralForm())
                             return SPELL_FAILED_ONLY_SHAPESHIFT;
                         break;
                     default:

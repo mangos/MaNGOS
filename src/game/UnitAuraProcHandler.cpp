@@ -960,6 +960,17 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     owner->CastSpell(owner,58227,true,castItem,triggeredByAura);
                     return SPELL_AURA_PROC_OK;
                 }
+                // Kill Command, pet aura
+                case 58914:
+                {
+                    // also decrease owner buff stack
+                    if (Unit* owner = GetOwner())
+                        owner->RemoveAuraHolderFromStack(34027);
+
+                    // Remove only single aura from stack
+                    if (triggeredByAura->GetStackAmount() > 1 && !triggeredByAura->GetHolder()->ModStackAmount(-1))
+                        return SPELL_AURA_PROC_CANT_TRIGGER;
+                }
                 // Glyph of Life Tap
                 case 63320:
                     triggered_spell_id = 63321;
@@ -4377,16 +4388,6 @@ SpellAuraProcResult Unit::HandleAddPctModifierAuraProc(Unit* /*pVictim*/, uint32
 
     switch(spellInfo->SpellFamilyName)
     {
-        case SPELLFAMILY_GENERIC:
-        {
-            if (spellInfo->Id == 34027)                     // Kill Command
-            {
-                // Remove only single aura from stack
-                if (triggeredByAura->GetStackAmount() > 1 && !triggeredByAura->GetHolder()->ModStackAmount(-1))
-                    return SPELL_AURA_PROC_CANT_TRIGGER;
-            }
-            break;
-        }
         case SPELLFAMILY_MAGE:
         {
             // Combustion
