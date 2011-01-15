@@ -39,7 +39,6 @@
 #include "Language.h"
 #include "AuctionHouseBot.h"
 #include "DBCStores.h"
-#include "BattleGroundMgr.h"
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 
@@ -1033,9 +1032,6 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     // auction mail without any items and money (auction sale note) pending 1 hour
     if (sender.GetMailMessageType() == MAIL_AUCTION && m_items.empty() && !m_money)
         expire_delay = HOUR;
-    // mail from battlemaster (rewardmarks) should last only one day
-    else if (sender.GetMailMessageType() == MAIL_CREATURE && sBattleGroundMgr.GetBattleMasterBG(sender.GetSenderId()) != BATTLEGROUND_TYPE_NONE)
-        expire_delay = DAY;
     // default case: expire time if COD 3 days, if no COD 30 days
     else
         expire_delay = (m_COD > 0) ? 3 * DAY : 30 * DAY;
@@ -1044,13 +1040,12 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
     // Add to DB
     std::string safe_subject = GetSubject();
-    CharacterDatabase.BeginTransaction();
     CharacterDatabase.escape_string(safe_subject);
 
     std::string safe_body = GetBody();
-    CharacterDatabase.BeginTransaction();
     CharacterDatabase.escape_string(safe_body);
 
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("INSERT INTO mail (id,messageType,stationery,mailTemplateId,sender,receiver,subject,body,has_items,expire_time,deliver_time,money,cod,checked) "
         "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%s', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%u')",
         mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), safe_body.c_str(), (m_items.empty() ? 0 : 1), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);

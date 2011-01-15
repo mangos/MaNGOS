@@ -3937,16 +3937,6 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
         if(!bg_mark)
             player->UpdateCraftSkill(m_spellInfo->Id);
     }
-
-    // for battleground marks send by mail if not add all expected
-    // FIXME: single existing bg marks for outfield bg and we not have it..
-    /*
-    if(no_space > 0 && bg_mark)
-    {
-        if(BattleGround* bg = sBattleGroundMgr.GetBattleGroundTemplate(BattleGroundTypeId(bgType)))
-            bg->SendRewardMarkByMail(player, newitemid, no_space);
-    }
-    */
 }
 
 void Spell::EffectCreateItem(SpellEffectIndex eff_idx)
