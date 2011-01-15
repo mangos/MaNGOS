@@ -82,16 +82,16 @@ void MassMailMgr::Update(bool sendall /*= false*/)
     {
         MassMail& task = m_massMails.front();
 
-        while (!task.m_recivers.empty() && (sendall || maxcount > 0))
+        while (!task.m_receivers.empty() && (sendall || maxcount > 0))
         {
-            uint32 receiver_lowguid = *task.m_recivers.begin();
-            task.m_recivers.erase(task.m_recivers.begin());
+            uint32 receiver_lowguid = *task.m_receivers.begin();
+            task.m_receivers.erase(task.m_receivers.begin());
 
             ObjectGuid receiver_guid = ObjectGuid(HIGHGUID_PLAYER, receiver_lowguid);
             Player *receiver = sObjectMgr.GetPlayer(receiver_guid);
 
             // last case. can be just send
-            if (task.m_recivers.empty())
+            if (task.m_receivers.empty())
             {
                 // prevent mail return
                 task.m_protoMail->SendMailTo(MailReceiver(receiver, receiver_guid), task.m_sender, MAIL_CHECK_MASK_RETURNED);
@@ -112,7 +112,7 @@ void MassMailMgr::Update(bool sendall /*= false*/)
                 --maxcount;
         }
 
-        if (task.m_recivers.empty())
+        if (task.m_receivers.empty())
             m_massMails.pop_front();
     }
     while(!m_massMails.empty() && (sendall || maxcount > 0));
@@ -124,7 +124,7 @@ void MassMailMgr::GetStatistic(uint32& tasks, uint32& mails, uint32& needTime) c
 
     uint32 mailsCount = 0;
     for (MassMailList::const_iterator mailItr = m_massMails.begin(); mailItr != m_massMails.end(); ++mailItr)
-        mailsCount += mailItr->m_recivers.size();
+        mailsCount += mailItr->m_receivers.size();
 
     mails = mailsCount;
 
