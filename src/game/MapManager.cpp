@@ -159,12 +159,14 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
 bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
 {
     const MapEntry *entry = sMapStore.LookupEntry(mapid);
-    if(!entry) return false;
+    if(!entry)
+        return false;
+
     const char *mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if(entry->map_type == MAP_INSTANCE || entry->map_type == MAP_RAID)
+    if(entry->IsDungeon())
     {
-        if (entry->map_type == MAP_RAID)
+        if (entry->IsRaid())
         {
             // GMs can avoid raid limitations
             if(!player->isGameMaster() && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_RAID))
@@ -233,10 +235,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
             player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
             return(false);
         }*/
-        return true;
     }
-    else
-        return true;
+
+    return true;
 }
 
 void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
