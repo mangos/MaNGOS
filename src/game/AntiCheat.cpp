@@ -394,6 +394,8 @@ bool AntiCheat::CheckNeeded(AntiCheatCheck checktype)
     switch( checktype)
     {
         case CHECK_MOVEMENT_SPEED:
+            if  (GetMover()->HasAura(56266))
+                return false;
             break;
         case CHECK_MOVEMENT_FLY:
             if (isCanFly() || !GetMover())
@@ -682,6 +684,9 @@ bool AntiCheat::CheckTp2Plane()
 // Transport checks
 bool AntiCheat::CheckOnTransport()
 {
+
+    if  (GetMover()->HasAura(56266))
+        return true;
 
     float trans_rad = sqrt(m_currentmovementInfo->GetTransportPos()->x * m_currentmovementInfo->GetTransportPos()->x + m_currentmovementInfo->GetTransportPos()->y * m_currentmovementInfo->GetTransportPos()->y + m_currentmovementInfo->GetTransportPos()->z * m_currentmovementInfo->GetTransportPos()->z);
     if (trans_rad < + m_currentConfig->checkFloatParam[0])
