@@ -24,6 +24,7 @@
 #include "Corpse.h"
 #include "Player.h"
 #include "Vehicle.h"
+#include "Totem.h"
 #include "SpellAuras.h"
 #include "MapManager.h"
 #include "Transports.h"
@@ -46,6 +47,30 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
     if (_player->GetVehicleKit())
         _player->GetVehicleKit()->RemoveAllPassengers();
+
+    GetPlayer()->InterruptSpell(CURRENT_CHANNELED_SPELL);
+
+    if (GetPlayer()->HasAuraType(SPELL_AURA_MOD_CHARM))
+        GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+
+    if (GetPlayer()->HasAuraType(SPELL_AURA_FAR_SIGHT))
+        GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FAR_SIGHT);
+
+    if (GetPlayer()->HasAuraType(SPELL_AURA_MOD_POSSESS))
+        GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+
+    if (GetPlayer()->HasAuraType(SPELL_AURA_BIND_SIGHT))
+        GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_BIND_SIGHT);
+
+    if (GetPlayer()->HasAura(6495))
+    {
+        if (Totem* totem = GetPlayer()->GetTotem(TOTEM_SLOT_AIR))
+            totem->UnSummon();
+        GetPlayer()->RemoveAurasDueToSpell(6495);
+    }
+
+    GetPlayer()->GetCamera().ResetView();
+    GetPlayer()->GetViewPoint().Event_ViewPointVisibilityChanged();
 
     // get start teleport coordinates (will used later in fail case)
     WorldLocation old_loc;
