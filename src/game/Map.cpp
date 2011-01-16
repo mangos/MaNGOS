@@ -182,14 +182,6 @@ void Map::RemoveFromGrid(Creature* obj, NGridType *grid, Cell const& cell)
     }
 }
 
-template<class T>
-void Map::DeleteFromWorld(T* obj)
-{
-    // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
-    delete obj;
-}
-
-template<>
 void Map::DeleteFromWorld(Player* pl)
 {
     sObjectAccessor.RemoveObject(pl);
@@ -660,7 +652,9 @@ Map::Remove(T *obj, bool remove)
         // if option set then object already saved at this moment
         if(!sWorld.getConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATLY))
             obj->SaveRespawnTime();
-        DeleteFromWorld(obj);
+
+        // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
+        delete obj;
     }
 }
 

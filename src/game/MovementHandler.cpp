@@ -81,6 +81,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
                 " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
                 GetPlayer()->GetGuidStr().c_str(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
 
+            GetPlayer()->SetSemaphoreTeleportFar(false);
+
             // Teleport to previous place, if cannot be ported back TP to homebind place
             if (!GetPlayer()->TeleportTo(old_loc))
             {
