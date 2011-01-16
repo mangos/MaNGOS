@@ -35,7 +35,7 @@ void MemberSlot::SetMemberStats(Player* player)
     Name   = player->GetName();
     Level  = player->getLevel();
     Class  = player->getClass();
-    ZoneId = player->GetZoneId();
+    ZoneId = player->IsInWorld() ? player->GetZoneId() : player->GetCachedZoneId();
 }
 
 void MemberSlot::UpdateLogoutTime()
