@@ -6260,6 +6260,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 50725:                                 // Vigilance - remove cooldown on Taunt
+                {
+                    Unit* caster = GetAffectiveCaster();
+                    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    ((Player*)caster)->RemoveSpellCategoryCooldown(82, true);
+                    return;
+                }
                 case 51770:                                 // Emblazon Runeblade
                 {
                     Unit* caster = GetAffectiveCaster();
