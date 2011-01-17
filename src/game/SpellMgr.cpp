@@ -1166,7 +1166,7 @@ struct DoSpellProcEvent
         }
         return true;
     }
-    bool AddEntry(SpellProcEventEntry const &spe, SpellEntry const *spell)
+    void AddEntry(SpellProcEventEntry const &spe, SpellEntry const *spell)
     {
         spe_map[spell->Id] = spe;
 
