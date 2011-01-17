@@ -626,9 +626,16 @@ typedef UNORDERED_MAP<uint32, SpellBonusEntry>     SpellBonusMap;
 #define ELIXIR_SHATTRATH_MASK 0x08
 #define ELIXIR_WELL_FED       0x10                          // Some foods have SPELLFAMILY_POTION
 
+struct SpellThreatEntry
+{
+    uint16 threat;
+    float multiplier;
+    float ap_bonus;
+};
+
 typedef std::map<uint32, uint8> SpellElixirMap;
 typedef std::map<uint32, float> SpellProcItemEnchantMap;
-typedef std::map<uint32, uint16> SpellThreatMap;
+typedef std::map<uint32, SpellThreatEntry> SpellThreatMap;
 
 // Spell script target related declarations (accessed using SpellMgr functions)
 enum SpellTargetType
@@ -852,13 +859,24 @@ class SpellMgr
                 return SPELL_NORMAL;
         }
 
-        uint16 GetSpellThreat(uint32 spellid) const
+        SpellThreatEntry const* GetSpellThreatEntry(uint32 spellid) const
         {
             SpellThreatMap::const_iterator itr = mSpellThreatMap.find(spellid);
-            if(itr==mSpellThreatMap.end())
-                return 0;
+            if (itr != mSpellThreatMap.end())
+                return &itr->second;
 
-            return itr->second;
+            return NULL;
+        }
+
+        float GetSpellThreatMultiplier(SpellEntry const *spellInfo) const
+        {
+            if (!spellInfo)
+                return 1.0f;
+
+            if (SpellThreatEntry const *entry = GetSpellThreatEntry(spellInfo->Id))
+                return entry->multiplier;
+
+            return 1.0f;
         }
 
         // Spell proc events
