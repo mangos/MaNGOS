@@ -1636,25 +1636,76 @@ void SpellMgr::LoadSpellElixirs()
     sLog.outString( ">> Loaded %u spell elixir definitions", count );
 }
 
+struct DoSpellThreat
+{
+    DoSpellThreat(SpellThreatMap& _threatMap) : threatMap(_threatMap), count(0) {}
+    void operator() (uint32 spell_id)
+    {
+        SpellThreatEntry const &ste = state->second;
+        // add ranks only for not filled data (spells adding flat threat are usually different for ranks)
+        SpellThreatMap::const_iterator spellItr = threatMap.find(spell_id);
+        if (spellItr == threatMap.end())
+            threatMap[spell_id] = ste;
+
+        // just assert that entry is not redundant
+        else
+        {
+            SpellThreatEntry const& r_ste = spellItr->second;
+            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.ap_bonus == r_ste.ap_bonus)
+                sLog.outErrorDb("Spell %u listed in `spell_threat` as custom rank has same data as Rank 1, so redundant", spell_id);
+        }
+    }
+    const char* TableName() { return "spell_threat"; }
+    bool IsValidCustomRank(SpellThreatEntry const &ste, uint32 entry, uint32 first_id)
+    {
+        if (!ste.threat)
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_threat` is not first rank (%u) in chain and has no threat", entry, first_id);
+            // prevent loading unexpected data
+            return false;
+        }
+        return true;
+    }
+    void AddEntry(SpellThreatEntry const &ste, SpellEntry const *spell)
+    {
+        threatMap[spell->Id] = ste;
+
+        // flat threat bonus and attack power bonus currently only work properly when all
+        // effects have same targets, otherwise, we'd need to seperate it by effect index
+        if (ste.threat || ste.ap_bonus != 0.f)
+        {
+            const uint32 *targetA = spell->EffectImplicitTargetA;
+            const uint32 *targetB = spell->EffectImplicitTargetB;
+            if ((targetA[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_0]) ||
+                (targetA[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_2] != targetA[EFFECT_INDEX_0]))
+                sLog.outErrorDb("Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly", spell->Id);
+        }
+        ++count;
+    }
+    bool HasEntry(uint32 spellId) { return threatMap.count(spellId) > 0; }
+    bool SetStateToEntry(uint32 spellId) { return (state = threatMap.find(spellId)) != threatMap.end(); }
+
+    SpellThreatMap& threatMap;
+    SpellThreatMap::const_iterator state;
+    uint32 count;
+};
+
 void SpellMgr::LoadSpellThreats()
 {
     mSpellThreatMap.clear();                                // need for reload case
 
-    uint32 count = 0;
-
-    //                                                0      1
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat FROM spell_threat");
+    //                                                0      1       2           3
+    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat");
     if( !result )
     {
-
         barGoLink bar( 1 );
-
         bar.step();
-
         sLog.outString();
-        sLog.outString( ">> Loaded %u aggro generating spells", count );
+        sLog.outString( ">> No spell threat entries loaded.");
         return;
     }
+
+    SpellRankHelper<SpellThreatEntry, DoSpellThreat, SpellThreatMap> rankHelper(*this, mSpellThreatMap);
 
     barGoLink bar( (int)result->GetRowCount() );
 
@@ -1665,23 +1716,22 @@ void SpellMgr::LoadSpellThreats()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
-        uint16 Threat = fields[1].GetUInt16();
 
-        if (!sSpellStore.LookupEntry(entry))
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_threat` does not exist", entry);
-            continue;
-        }
+        SpellThreatEntry ste;
+        ste.threat = fields[1].GetUInt16();
+        ste.multiplier = fields[2].GetFloat();
+        ste.ap_bonus = fields[3].GetFloat();
 
-        mSpellThreatMap[entry] = Threat;
+        rankHelper.RecordRank(ste, entry);
 
-        ++count;
     } while( result->NextRow() );
+
+    rankHelper.FillHigherRanks();
 
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u aggro generating spells", count );
+    sLog.outString( ">> Loaded %u spell threat entries", rankHelper.worker.count );
 }
 
 bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const

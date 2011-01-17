@@ -1023,7 +1023,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         int32 gain = caster->DealHeal(unitTarget, addhealth, m_spellInfo, crit, absorb);
 
         if (real_caster)
-            unitTarget->getHostileRefManager().threatAssist(real_caster, float(gain) * 0.5f, m_spellInfo);
+            unitTarget->getHostileRefManager().threatAssist(real_caster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(m_spellInfo), m_spellInfo);
     }
     // Do damage and triggers
     else if (m_damage)
@@ -4225,14 +4225,18 @@ void Spell::HandleThreatSpells(uint32 spellId)
     if(!m_targets.getUnitTarget()->CanHaveThreatList())
         return;
 
-    uint16 threat = sSpellMgr.GetSpellThreat(spellId);
+    SpellThreatEntry const* threatEntry = sSpellMgr.GetSpellThreatEntry(spellId);
 
-    if(!threat)
+    if(!threatEntry || (!threatEntry->threat && threatEntry->ap_bonus == 0.0f))
         return;
 
-    m_targets.getUnitTarget()->AddThreat(m_caster, float(threat), false, GetSpellSchoolMask(m_spellInfo), m_spellInfo);
+    float threat = threatEntry->threat;
+    if (threatEntry->ap_bonus != 0.0f)
+        threat += threatEntry->ap_bonus * m_caster->GetTotalAttackPowerValue(GetWeaponAttackType(m_spellInfo));
 
-    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u, rank %u, added an additional %i threat", spellId, sSpellMgr.GetSpellRank(spellId), threat);
+    m_targets.getUnitTarget()->AddThreat(m_caster, threat, false, GetSpellSchoolMask(m_spellInfo), m_spellInfo);
+
+    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u, rank %u, added an additional %f threat", spellId, sSpellMgr.GetSpellRank(spellId), threat);
 }
 
 void Spell::HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTarget,SpellEffectIndex i, float DamageMultiplier)
