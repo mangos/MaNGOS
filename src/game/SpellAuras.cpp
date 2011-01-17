@@ -8541,7 +8541,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                 }
                 case 58914:                                     // Kill Command, pet aura
                 {
-                    // need remove here becase dummy aura hamdler apply/unapply at stack changes
+                    // Removal is needed here because the dummy aura handler is applied / removed at stacks change
                     if (!apply)
                         if(Unit* caster = GetCaster())
                             caster->RemoveAurasDueToSpell(34027);
