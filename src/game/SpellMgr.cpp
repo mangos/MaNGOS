@@ -1865,6 +1865,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if (spellInfo_1->SpellIconID == 3559 && spellInfo_2->SpellIconID == 3559)
                         return false;
 
+                    // Vigilance and Damage Reduction (Vigilance triggered spell)
+                    if (spellInfo_1->SpellIconID == 2834 && spellInfo_2->SpellIconID == 2834)
+                        return false;
+
                     break;
                 }
                 case SPELLFAMILY_MAGE:
