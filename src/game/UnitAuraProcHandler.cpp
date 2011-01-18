@@ -2940,6 +2940,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             // Mark of Blood
             if (dummySpell->Id == 49005)
             {
+                if (target->GetTypeId() != TYPEID_PLAYER)
+                    return SPELL_AURA_PROC_FAILED;
                 // TODO: need more info (cooldowns/PPM)
                 target->CastSpell(target, 61607, true, NULL, triggeredByAura);
                 return SPELL_AURA_PROC_OK;
