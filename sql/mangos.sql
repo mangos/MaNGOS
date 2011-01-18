@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11036_01_mangos_spell_threat` bit(1) default NULL
+  `required_11040_02_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14536,7 +14536,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (8026,  0.1,    0,       0,     0,     'Shaman - Flametongue Weapon Proc'),
 (8056,  0.3858, 0,       0,     0,     'Shaman - Frost Shock'),
 (8034,  0.1,    0,       0,     0,     'Shaman - Frostbrand Attack Rank 1'),
-(52042, 0.045,  0,       0,     0,     'Shaman - Healing Stream Totem Triggered Heal'),
+(5672,  0.08272,0,       0,     0,     'Shaman - Healing Stream Totem Aura'),
 (331,   1.6106, 0,       0,     0,     'Shaman - Healing Wave'),
 (403,   0.7143, 0,       0,     0,     'Shaman - Lightning Bolt'),
 (26364, 0.33,   0,       0,     0,     'Shaman - Lightning Shield Proc'),
@@ -14636,6 +14636,16 @@ INSERT INTO spell_chain VALUES
 (58797,25501,8034,7,0),
 (58798,58797,8034,8,0),
 (58799,58798,8034,9,0),
+/* Healing Stream Totem Aura */
+(5672,0,5672,1,0),
+(6371,5672,5672,2,0),
+(6372,6371,5672,3,0),
+(10460,6372,5672,4,0),
+(10461,10460,5672,5,0),
+(25566,10461,5672,6,0),
+(58763,25566,5672,7,0),
+(58764,58763,5672,8,0),
+(58765,58764,5672,9,0),
 /* Instant Poison */
 (8680,0,8680,1,0),
 (8685,8680,8680,2,0),
