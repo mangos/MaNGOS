@@ -1710,7 +1710,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if(!target->IsFriendlyTo(this))
                         return SPELL_AURA_PROC_FAILED;
 
-                    basepoints[0] = int32(target->GetMaxHealth() * triggerAmount / 100);
+                    if (target->GetTypeId() == TYPEID_PLAYER)
+                        basepoints[0] = int32(target->GetMaxHealth() * triggerAmount / 100);
+                    else if (Unit* caster = triggeredByAura->GetCaster())
+                        basepoints[0] = int32(caster->GetMaxHealth() * triggerAmount / 100);
                     // triggered_spell_id in spell data
                     break;
                 }
