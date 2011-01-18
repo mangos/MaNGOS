@@ -2966,6 +2966,14 @@ void Map::SendObjectUpdates()
 {
     UpdateDataMapType update_players;
 
+    while(!i_objectsToClientUpdateQueue.empty())
+    {
+        if (i_objectsToClientNotUpdate.find(i_objectsToClientUpdateQueue.front()) == i_objectsToClientNotUpdate.end())
+            i_objectsToClientUpdate.insert(i_objectsToClientUpdateQueue.front());
+        i_objectsToClientUpdateQueue.pop();
+    }
+    i_objectsToClientNotUpdate.clear();
+
     while(!i_objectsToClientUpdate.empty())
     {
         Object* obj = *i_objectsToClientUpdate.begin();
