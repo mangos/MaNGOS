@@ -7711,11 +7711,17 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         if (getStandState() == UNIT_STAND_STATE_CUSTOM)
             SetStandState(UNIT_STAND_STATE_STAND);
 
-        if (((Creature*)this)->AI())
-            ((Creature*)this)->AI()->EnterCombat(enemy);
+        Creature* pCreature = (Creature*)this;
+
+        if (pCreature->AI())
+            pCreature->AI()->EnterCombat(enemy);
+
+        // Some bosses are set into combat with zone
+        if (GetMap()->IsDungeon() && (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE))
+            pCreature->SetInCombatWithZone();
 
         if (InstanceData* mapInstance = GetInstanceData())
-            mapInstance->OnCreatureEnterCombat((Creature*)this);
+            mapInstance->OnCreatureEnterCombat(pCreature);
     }
 }
 
