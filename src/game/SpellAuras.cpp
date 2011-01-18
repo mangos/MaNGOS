@@ -4972,6 +4972,12 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
             holy = int32(holy * 377 / 1000);
             m_modifier.m_amount += ap > holy ? ap : holy;
         }
+        // Lifeblood
+        else if (GetSpellProto()->SpellIconID == 3088 && GetSpellProto()->SpellVisual[0] == 8145)
+        {
+            int32 healthBonus = int32 (0.0032f * caster->GetMaxHealth());
+            m_modifier.m_amount += healthBonus;
+        }
 
         m_modifier.m_amount = caster->SpellHealingBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
     }
