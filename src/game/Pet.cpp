@@ -385,7 +385,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         _SaveSpells();
         _SaveSpellCooldowns();
         _SaveAuras();
-        CharacterDatabase.CommitTransaction;
+        CharacterDatabase.CommitTransaction();
 
         uint32 ownerLow = GetOwnerGuid().GetCounter();
         std::string name = m_name;

@@ -186,7 +186,7 @@ class MANGOS_DLL_SPEC Database
         //factory method to create SqlDelayThread objects
         virtual SqlDelayThread * CreateDelayThread();
 
-        class TransHelper
+        class MANGOS_DLL_SPEC TransHelper
         {
             public:
                 TransHelper() : m_pTrans(NULL) {}
