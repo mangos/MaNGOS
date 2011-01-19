@@ -1874,8 +1874,10 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         if (!factionEntry)
                             return;
 
-                        // set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
-                        pPlayer->GetReputationMgr().SetReputation(factionEntry, rep_change);
+                        // Set rep to baserep + basepoints (expecting spillover for oposite faction -> become hated)
+                        // Not when player already has equal or higher rep with this faction
+                        if (pPlayer->GetReputationMgr().GetBaseReputation(factionEntry) < rep_change)
+                            pPlayer->GetReputationMgr().SetReputation(factionEntry, rep_change);
 
                         // EFFECT_INDEX_2 most likely update at war state, we already handle this in SetReputation
                     }
