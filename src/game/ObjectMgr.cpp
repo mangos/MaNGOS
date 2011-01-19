@@ -7093,9 +7093,12 @@ void ObjectMgr::LoadWeatherZoneChances()
 void ObjectMgr::SaveCreatureRespawnTime(uint32 loguid, uint32 instance, time_t t)
 {
     mCreatureRespawnTimes[MAKE_PAIR64(loguid,instance)] = t;
+
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u' AND instance = '%u'", loguid, instance);
     if(t)
         CharacterDatabase.PExecute("INSERT INTO creature_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), instance);
+    CharacterDatabase.CommitTransaction();
 }
 
 void ObjectMgr::DeleteCreatureData(uint32 guid)
@@ -7111,9 +7114,12 @@ void ObjectMgr::DeleteCreatureData(uint32 guid)
 void ObjectMgr::SaveGORespawnTime(uint32 loguid, uint32 instance, time_t t)
 {
     mGORespawnTimes[MAKE_PAIR64(loguid,instance)] = t;
+
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE guid = '%u' AND instance = '%u'", loguid, instance);
     if(t)
         CharacterDatabase.PExecute("INSERT INTO gameobject_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), instance);
+    CharacterDatabase.CommitTransaction();
 }
 
 void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
@@ -7138,8 +7144,10 @@ void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
             mCreatureRespawnTimes.erase(itr);
     }
 
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", instance);
     CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", instance);
+    CharacterDatabase.CommitTransaction();
 }
 
 void ObjectMgr::DeleteGOData(uint32 guid)

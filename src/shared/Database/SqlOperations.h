@@ -29,13 +29,14 @@
 /// ---- BASE ---
 
 class Database;
+class SqlConnection;
 class SqlDelayThread;
 
 class SqlOperation
 {
     public:
         virtual void OnRemove() { delete this; }
-        virtual void Execute(Database *db) = 0;
+        virtual void Execute(SqlConnection *conn) = 0;
         virtual ~SqlOperation() {}
 };
 
@@ -48,26 +49,25 @@ class SqlStatement : public SqlOperation
     public:
         SqlStatement(const char *sql) : m_sql(mangos_strdup(sql)){}
         ~SqlStatement() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        void Execute(Database *db);
+        void Execute(SqlConnection *conn);
 };
 
 class SqlTransaction : public SqlOperation
 {
     private:
-        std::queue<const char *> m_queue;
-        ACE_Thread_Mutex m_Mutex;
+        std::vector<const char *> m_queue;
+
     public:
         SqlTransaction() {}
+        ~SqlTransaction();
+
         void DelayExecute(const char *sql)
         {
             char* _sql = mangos_strdup(sql);
-            if (_sql)
-            {
-                ACE_Guard<ACE_Thread_Mutex> _lock(m_Mutex);
-                m_queue.push(_sql);
-            }
+            m_queue.push_back(_sql);
         }
-        void Execute(Database *db);
+
+        void Execute(SqlConnection *conn);
 };
 
 /// ---- ASYNC QUERIES ----
@@ -95,7 +95,7 @@ class SqlQuery : public SqlOperation
         SqlQuery(const char *sql, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue)
             : m_sql(mangos_strdup(sql)), m_callback(callback), m_queue(queue) {}
         ~SqlQuery() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        void Execute(Database *db);
+        void Execute(SqlConnection *conn);
 };
 
 class SqlQueryHolder
@@ -124,6 +124,6 @@ class SqlQueryHolderEx : public SqlOperation
     public:
         SqlQueryHolderEx(SqlQueryHolder *holder, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue)
             : m_holder(holder), m_callback(callback), m_queue(queue) {}
-        void Execute(Database *db);
+        void Execute(SqlConnection *conn);
 };
 #endif                                                      //__SQLOPERATIONS_H

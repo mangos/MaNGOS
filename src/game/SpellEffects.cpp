@@ -4935,26 +4935,17 @@ void Spell::EffectDistract(SpellEffectIndex /*eff_idx*/)
         return;
 
     // target must be OK to do this
-    if( unitTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT) )
+    if (unitTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
         return;
 
     float angle = unitTarget->GetAngle(m_targets.m_destX, m_targets.m_destY);
 
-    if ( unitTarget->GetTypeId() == TYPEID_PLAYER )
-    {
-        // For players just turn them
-        WorldPacket data;
-        ((Player*)unitTarget)->BuildTeleportAckMsg(&data, unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), angle);
-        ((Player*)unitTarget)->GetSession()->SendPacket( &data );
-        ((Player*)unitTarget)->SetPosition(unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), angle, false);
-    }
-    else
-    {
-        // Set creature Distracted, Stop it, And turn it
-        unitTarget->SetOrientation(angle);
-        unitTarget->StopMoving();
+    unitTarget->clearUnitState(UNIT_STAT_MOVING);
+    unitTarget->SetOrientation(angle);
+    unitTarget->SendMonsterMove(unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), SPLINETYPE_FACINGANGLE, SPLINEFLAG_WALKMODE, 0, NULL, angle);
+
+    if (unitTarget->GetTypeId() == TYPEID_UNIT)
         unitTarget->GetMotionMaster()->MoveDistract(damage * IN_MILLISECONDS);
-    }
 }
 
 void Spell::EffectPickPocket(SpellEffectIndex /*eff_idx*/)

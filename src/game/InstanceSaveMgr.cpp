@@ -484,7 +484,7 @@ void InstanceSaveManager::_DelHelper(DatabaseType &db, const char *fields, const
                 db.escape_string(fieldValue);
                 ss << (i != 0 ? " AND " : "") << fieldTokens[i] << " = '" << fieldValue << "'";
             }
-            db.DirectPExecute("DELETE FROM %s WHERE %s", table, ss.str().c_str());
+            db.PExecute("DELETE FROM %s WHERE %s", table, ss.str().c_str());
         } while (result->NextRow());
         delete result;
     }
@@ -498,6 +498,7 @@ void InstanceSaveManager::CleanupInstances()
     // load reset times and clean expired instances
     m_Scheduler.LoadResetTimes();
 
+    CharacterDatabase.BeginTransaction();
     // clean character/group - instance binds with invalid group/characters
     _DelHelper(CharacterDatabase, "character_instance.guid, instance", "character_instance", "LEFT JOIN characters ON character_instance.guid = characters.guid WHERE characters.guid IS NULL");
     _DelHelper(CharacterDatabase, "group_instance.leaderGuid, instance", "group_instance", "LEFT JOIN characters ON group_instance.leaderGuid = characters.guid LEFT JOIN groups ON group_instance.leaderGuid = groups.leaderGuid WHERE characters.guid IS NULL OR groups.leaderGuid IS NULL");
@@ -510,8 +511,10 @@ void InstanceSaveManager::CleanupInstances()
     _DelHelper(CharacterDatabase, "group_instance.leaderGuid, instance", "group_instance", "LEFT JOIN instance ON group_instance.instance = instance.id WHERE instance.id IS NULL");
 
     // clean unused respawn data
-    CharacterDatabase.DirectExecute("DELETE FROM creature_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
-    CharacterDatabase.DirectExecute("DELETE FROM gameobject_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
+    CharacterDatabase.Execute("DELETE FROM creature_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
+    CharacterDatabase.Execute("DELETE FROM gameobject_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
+    //execute transaction directly
+    CharacterDatabase.CommitTransactionDirect();
 
     bar.step();
     sLog.outString();
@@ -550,6 +553,7 @@ void InstanceSaveManager::PackInstances()
     {
         if (*i != InstanceNumber)
         {
+            CharacterDatabase.BeginTransaction();
             // remap instance id
             CharacterDatabase.PExecute("UPDATE creature_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
             CharacterDatabase.PExecute("UPDATE gameobject_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
@@ -557,6 +561,8 @@ void InstanceSaveManager::PackInstances()
             CharacterDatabase.PExecute("UPDATE character_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
             CharacterDatabase.PExecute("UPDATE instance SET id = '%u' WHERE id = '%u'", InstanceNumber, *i);
             CharacterDatabase.PExecute("UPDATE group_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
+            //execute transaction synchronously
+            CharacterDatabase.CommitTransactionDirect();
         }
 
         ++InstanceNumber;

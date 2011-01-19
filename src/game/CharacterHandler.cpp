@@ -950,8 +950,10 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uin
 
     delete result;
 
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("UPDATE characters set name = '%s', at_login = at_login & ~ %u WHERE guid ='%u'", newname.c_str(), uint32(AT_LOGIN_RENAME), guidLow);
     CharacterDatabase.PExecute("DELETE FROM character_declinedname WHERE guid ='%u'", guidLow);
+    CharacterDatabase.CommitTransaction();
 
     sLog.outChar("Account: %d (IP: %s) Character:[%s] (guid:%u) Changed name to: %s", session->GetAccountId(), session->GetRemoteAddress().c_str(), oldname.c_str(), guidLow, newname.c_str());
 
