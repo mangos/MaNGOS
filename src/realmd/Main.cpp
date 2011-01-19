@@ -302,7 +302,7 @@ extern int main(int argc, char **argv)
         {
             loopCounter = 0;
             DETAIL_LOG("Ping MySQL to keep connection alive");
-            delete LoginDatabase.Query("SELECT 1 FROM realmlist LIMIT 1");
+            LoginDatabase.Ping();
         }
 #ifdef WIN32
         if (m_ServiceStatus == 0) stopEvent = true;
