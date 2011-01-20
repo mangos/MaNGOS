@@ -346,7 +346,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS]=
     &Aura::HandleAuraAddMechanicAbilities,                  //293 SPELL_AURA_ADD_MECHANIC_ABILITIES  replaces target's action bars with a predefined spellset
     &Aura::HandleNULL,                                      //294 2 spells, possible prevent mana regen
     &Aura::HandleUnused,                                    //295 unused (3.2.2a)
-    &Aura::HandleNULL,                                      //296 2 spells
+    &Aura::HandleAuraSetVehicle,                            //296 SPELL_AURA_SET_VEHICLE_ID sets vehicle on target
     &Aura::HandleNULL,                                      //297 1 spell (counter spell school?)
     &Aura::HandleUnused,                                    //298 unused (3.2.2a)
     &Aura::HandleUnused,                                    //299 unused (3.2.2a)
@@ -9966,5 +9966,41 @@ void Aura::HandleAuraModReflectSpells(bool Apply, bool Real)
             default:
                 break;
         }
+    }
+}
+
+void Aura::HandleAuraSetVehicle(bool apply, bool real)
+{
+    if (!real)
+        return;
+
+    Unit* target = GetTarget();
+
+    if (target->GetTypeId() != TYPEID_PLAYER || !target->IsInWorld())
+        return;
+
+    uint32 vehicleId = GetMiscValue();
+
+    if (vehicleId == 0)
+        return;
+
+    if (apply)
+    {
+        if (!target->CreateVehicleKit(vehicleId))
+            return;
+    }
+    else
+        if (target->GetVehicleKit())
+            target->RemoveVehicleKit();
+
+    WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, target->GetPackGUID().size()+4);
+    data.appendPackGUID(target->GetObjectGuid());
+    data << uint32(apply ? vehicleId : 0);
+    target->SendMessageToSet(&data, true);
+
+    if (apply)
+    {
+        data.Initialize(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA, 0);
+        ((Player*)target)->GetSession()->SendPacket(&data);
     }
 }
