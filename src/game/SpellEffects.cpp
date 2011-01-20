@@ -5814,7 +5814,7 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
             // Rend and Tear ( on Maul / Shred )
             if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000008800))
             {
-                if(unitTarget && unitTarget->HasAuraState(AURA_STATE_MECHANIC_BLEED))
+                if(unitTarget && unitTarget->HasAuraState(AURA_STATE_BLEEDING))
                 {
                     Unit::AuraList const& aura = m_caster->GetAurasByType(SPELL_AURA_DUMMY);
                     for(Unit::AuraList::const_iterator itr = aura.begin(); itr != aura.end(); ++itr)

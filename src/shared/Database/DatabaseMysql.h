@@ -38,7 +38,7 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
 {
     public:
         MySQLConnection() : mMysql(NULL) {}
-        ~MySQLConnection() { mysql_close(mMysql); }
+        ~MySQLConnection();
 
         bool Initialize(const char *infoString);
 

@@ -7265,7 +7265,7 @@ bool Unit::IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
             {
                 if(spellProto->SpellFamilyFlags & UI64LIT(0x0000000000800000))
                 {
-                    if(pVictim->HasAuraState(AURA_STATE_MECHANIC_BLEED))
+                    if(pVictim->HasAuraState(AURA_STATE_BLEEDING))
                     {
                         Unit::AuraList const& aura = GetAurasByType(SPELL_AURA_DUMMY);
                         for(Unit::AuraList::const_iterator itr = aura.begin(); itr != aura.end(); ++itr)

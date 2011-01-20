@@ -84,6 +84,11 @@ SqlConnection * DatabaseMysql::CreateConnection()
     return new MySQLConnection();
 }
 
+MySQLConnection::~MySQLConnection()
+{
+    mysql_close(mMysql);
+}
+
 bool MySQLConnection::Initialize(const char *infoString)
 {
     MYSQL * mysqlInit = mysql_init(NULL);
