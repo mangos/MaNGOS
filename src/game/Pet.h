@@ -154,7 +154,7 @@ class Pet : public Creature
         bool LoadPetFromDB( Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false );
         void SavePetToDB(PetSaveMode mode);
         void Unsummon(PetSaveMode mode, Unit* owner = NULL);
-        static void DeleteFromDB(uint32 guidlow);
+        static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
         void Update(uint32 update_diff, uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
