@@ -131,6 +131,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called at text emote receive from player
         virtual void ReceiveEmote(Player* /*pPlayer*/, uint32 /*text_emote*/) {}
 
+        // Called at vehicle enter
+        virtual void PassengerBoarded(Unit * /*who*/, int8 /*seatId*/, bool /*apply*/) {}
+
         ///== Triggered Actions Requested ==================
 
         // Called when creature attack expected (if creature can and no have current victim)
