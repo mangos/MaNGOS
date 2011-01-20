@@ -197,6 +197,12 @@ int Master::Run()
     ///- Initialize the World
     sWorld.SetInitialWorldSettings();
 
+    //server loaded successfully => enable async DB requests
+    //this is done to forbid any async transactions during server startup!
+    CharacterDatabase.InitDelayThread();
+    WorldDatabase.InitDelayThread();
+    LoginDatabase.InitDelayThread();
+
     ///- Catch termination signals
     _HookSignals();
 
@@ -208,7 +214,7 @@ int Master::Run()
     {
         std::string builds = AcceptableClientBuildsListStr();
         LoginDatabase.escape_string(builds);
-        LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
+        LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
     ACE_Based::Thread* cliThread = NULL;
@@ -328,7 +334,7 @@ int Master::Run()
     }
 
     ///- Set server offline in realmlist
-    LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
+    LoginDatabase.DirectPExecute("UPDATE realmlist SET realmflags = realmflags | %u WHERE id = '%u'", REALM_FLAG_OFFLINE, realmID);
 
     ///- Remove signal handling before leaving
     _UnhookSignals();

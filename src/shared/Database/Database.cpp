@@ -29,13 +29,7 @@
 
 Database::~Database()
 {
-    HaltDelayThread();
-    /*Delete objects*/
-    delete m_pResultQueue;
-    delete m_pAsyncConn;
-
-    for (int i = 0; i < m_pQueryConnections.size(); ++i)
-        delete m_pQueryConnections[i];
+    StopServer();
 }
 
 bool Database::Initialize(const char * infoString, int nConns /*= 1*/)
@@ -80,8 +74,31 @@ bool Database::Initialize(const char * infoString, int nConns /*= 1*/)
     if(!m_pAsyncConn->Initialize(infoString))
         return false;
 
-    InitDelayThread();
+    m_pResultQueue = new SqlResultQueue;
     return true;
+}
+
+void Database::StopServer()
+{
+    HaltDelayThread();
+    /*Delete objects*/
+    if(m_pResultQueue)
+    {
+        delete m_pResultQueue;
+        m_pResultQueue = NULL;
+    }
+
+    if(m_pAsyncConn)
+    {
+        delete m_pAsyncConn;
+        m_pAsyncConn = NULL;
+    }
+
+    for (size_t i = 0; i < m_pQueryConnections.size(); ++i)
+        delete m_pQueryConnections[i];
+
+    m_pQueryConnections.clear();
+
 }
 
 SqlDelayThread * Database::CreateDelayThread()
@@ -94,7 +111,6 @@ void Database::InitDelayThread()
 {
     assert(!m_delayThread);
 
-    m_pResultQueue = new SqlResultQueue;
     //New delay thread for delay execute
     m_threadBody = CreateDelayThread();              // will deleted at m_delayThread delete
     m_delayThread = new ACE_Based::Thread(m_threadBody);
@@ -109,14 +125,6 @@ void Database::HaltDelayThread()
     delete m_delayThread;                                   //This also deletes m_threadBody
     m_delayThread = NULL;
     m_threadBody = NULL;
-
-    //stop async result queue
-    if(m_pResultQueue)
-    {
-        m_pResultQueue->Update();
-        delete m_pResultQueue;
-        m_pResultQueue = NULL;
-    }
 }
 
 void Database::ThreadStart()
@@ -268,6 +276,10 @@ bool Database::Execute(const char *sql)
     }
     else
     {
+        //if async execution is not available
+        if(!m_threadBody)
+            return DirectExecute(sql);
+
         // Simple sql statement
         pTrans = new SqlTransaction;
         pTrans->DelayExecute(sql);
@@ -349,6 +361,10 @@ bool Database::CommitTransaction()
     //check if we have pending transaction
     if(!m_TransStorage->get())
         return false;
+
+    //if async execution is not available
+    if(!m_delayThread)
+        return CommitTransactionDirect();
 
     //add SqlTransaction to the async queue
     m_threadBody->Delay(m_TransStorage->detach());

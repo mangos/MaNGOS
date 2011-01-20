@@ -5598,7 +5598,7 @@ void ObjectMgr::PackGroupIds()
                 CharacterDatabase.BeginTransaction();
                 CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId = '%u'", id);
                 CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId = '%u'", id);
-                CharacterDatabase.CommitTransactionDirect();
+                CharacterDatabase.CommitTransaction();
                 continue;
             }
 
@@ -5621,7 +5621,7 @@ void ObjectMgr::PackGroupIds()
             CharacterDatabase.BeginTransaction();
             CharacterDatabase.PExecute("UPDATE groups SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
             CharacterDatabase.PExecute("UPDATE group_member SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
-            CharacterDatabase.CommitTransactionDirect();
+            CharacterDatabase.CommitTransaction();
         }
 
         ++groupId;
@@ -5670,7 +5670,7 @@ void ObjectMgr::SetHighestGuids()
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.PExecute("DELETE FROM auction WHERE itemguid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.CommitTransactionDirect();
+    CharacterDatabase.CommitTransaction();
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject" );
     if( result )
