@@ -472,3 +472,7 @@ UPDATE `creature_template` SET `VehicleId` = 265 WHERE  `entry` = 31225;
 UPDATE `creature_template` SET `VehicleId` = 224 WHERE  `entry` = 31748;
 UPDATE `creature_template` SET `VehicleId` = 223 WHERE  `entry` = 31749;
 UPDATE `creature_template` SET `VehicleId` = 220 WHERE  `entry` = 31752;
+
+-- Ymirjar Skycaller true fix (delete hack from YTDB)
+DELETE FROM `creature_template_addon` WHERE `entry` = 31260;
+INSERT INTO `vehicle_accessory` VALUES (36891, 31260, 0, 0, 'Ymirjar Skycaller');
