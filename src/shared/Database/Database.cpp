@@ -283,10 +283,7 @@ bool Database::Execute(const char *sql)
             return DirectExecute(sql);
 
         // Simple sql statement
-        pTrans = new SqlTransaction;
-        pTrans->DelayExecute(sql);
-
-        m_threadBody->Delay(pTrans);
+        m_threadBody->Delay(new SqlStatement(sql));
     }
 
     return true;

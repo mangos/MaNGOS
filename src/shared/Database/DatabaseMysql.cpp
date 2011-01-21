@@ -152,12 +152,12 @@ bool MySQLConnection::Initialize(const char *infoString)
         // autocommit is turned of during it.
         // Setting it to on makes atomic updates work
         // ---
-        // if you want atomic updates to work - USE TRANSACTIONS!!!
-        // no need to mess up with autocommit mode which might degrade server performance!
-        if (!mysql_autocommit(mMysql, 0))
-            DETAIL_LOG("AUTOCOMMIT SUCCESSFULLY SET TO 0");
+        // LEAVE 'AUTOCOMMIT' MODE ALWAYS ENABLED!!!
+        // W/O IT EVEN 'SELECT' QUERIES WOULD REQUIRE TO BE WRAPPED INTO 'START TRANSACTION'<>'COMMIT' CLAUSES!!!
+        if (!mysql_autocommit(mMysql, 1))
+            DETAIL_LOG("AUTOCOMMIT SUCCESSFULLY SET TO 1");
         else
-            DETAIL_LOG("AUTOCOMMIT NOT SET TO 0");
+            DETAIL_LOG("AUTOCOMMIT NOT SET TO 1");
         /*-------------------------------------*/
 
         // set connection properties to UTF8 to properly handle locales for different
