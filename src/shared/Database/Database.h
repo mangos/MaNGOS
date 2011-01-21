@@ -81,7 +81,11 @@ class MANGOS_DLL_SPEC Database
         virtual ~Database();
 
         virtual bool Initialize(const char *infoString, int nConns = 1);
+        //start worker thread for async DB request execution
+        //you should call it explicitly after your server successfully started up
+        //NO ASYNC TRANSACTIONS DURING SERVER STARTUP - ONLY DURING RUNTIME!!!
         virtual void InitDelayThread();
+        //stop worker thread
         virtual void HaltDelayThread();
 
         /// Synchronous DB queries
@@ -180,6 +184,8 @@ class MANGOS_DLL_SPEC Database
         {
             m_nQueryCounter = -1;
         }
+
+        void StopServer();
 
         //factory method to create SqlConnection objects
         virtual SqlConnection * CreateConnection() = 0;

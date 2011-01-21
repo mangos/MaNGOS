@@ -26,10 +26,8 @@ SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn) : m_dbEngine(d
 
 SqlDelayThread::~SqlDelayThread()
 {
-    //empty SQL queue before exiting
-    SqlOperation* s = NULL;
-    while (m_sqlQueue.next(s))
-        delete s;
+    //process all requests which might have been queued while thread was stopping
+    ProcessRequests();
 }
 
 void SqlDelayThread::run()
@@ -49,12 +47,7 @@ void SqlDelayThread::run()
         // empty the queue before exiting
         ACE_Based::Thread::Sleep(loopSleepms);
 
-        SqlOperation* s = NULL;
-        while (m_sqlQueue.next(s))
-        {
-            s->Execute(m_dbConnection);
-            delete s;
-        }
+        ProcessRequests();
 
         if((loopCounter++) >= pingEveryLoop)
         {
@@ -71,4 +64,14 @@ void SqlDelayThread::run()
 void SqlDelayThread::Stop()
 {
     m_running = false;
+}
+
+void SqlDelayThread::ProcessRequests()
+{
+    SqlOperation* s = NULL;
+    while (m_sqlQueue.next(s))
+    {
+        s->Execute(m_dbConnection);
+        delete s;
+    }
 }

@@ -514,7 +514,7 @@ void InstanceSaveManager::CleanupInstances()
     CharacterDatabase.Execute("DELETE FROM creature_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
     CharacterDatabase.Execute("DELETE FROM gameobject_respawn WHERE instance <> 0 AND instance NOT IN (SELECT id FROM instance)");
     //execute transaction directly
-    CharacterDatabase.CommitTransactionDirect();
+    CharacterDatabase.CommitTransaction();
 
     bar.step();
     sLog.outString();
@@ -562,7 +562,7 @@ void InstanceSaveManager::PackInstances()
             CharacterDatabase.PExecute("UPDATE instance SET id = '%u' WHERE id = '%u'", InstanceNumber, *i);
             CharacterDatabase.PExecute("UPDATE group_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
             //execute transaction synchronously
-            CharacterDatabase.CommitTransactionDirect();
+            CharacterDatabase.CommitTransaction();
         }
 
         ++InstanceNumber;

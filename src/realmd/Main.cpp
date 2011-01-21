@@ -221,8 +221,10 @@ extern int main(int argc, char **argv)
 
     // cleanup query
     // set expired bans to inactive
+    LoginDatabase.BeginTransaction();
     LoginDatabase.Execute("UPDATE account_banned SET active = 0 WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
     LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    LoginDatabase.CommitTransaction();
 
     ///- Launch the listening network socket
     ACE_Acceptor<AuthSocket, ACE_SOCK_Acceptor> acceptor;
@@ -284,6 +286,9 @@ extern int main(int argc, char **argv)
         }
     }
     #endif
+
+    //server has started up successfully => enable async DB requests
+    LoginDatabase.InitDelayThread();
 
     // maximum counter for next ping
     uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000));
