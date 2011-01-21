@@ -199,9 +199,9 @@ int Master::Run()
 
     //server loaded successfully => enable async DB requests
     //this is done to forbid any async transactions during server startup!
-    CharacterDatabase.InitDelayThread();
-    WorldDatabase.InitDelayThread();
-    LoginDatabase.InitDelayThread();
+    CharacterDatabase.AllowAsyncTransactions();
+    WorldDatabase.AllowAsyncTransactions();
+    LoginDatabase.AllowAsyncTransactions();
 
     ///- Catch termination signals
     _HookSignals();

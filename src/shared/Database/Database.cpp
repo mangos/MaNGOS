@@ -75,6 +75,8 @@ bool Database::Initialize(const char * infoString, int nConns /*= 1*/)
         return false;
 
     m_pResultQueue = new SqlResultQueue;
+
+    InitDelayThread();
     return true;
 }
 
@@ -277,7 +279,7 @@ bool Database::Execute(const char *sql)
     else
     {
         //if async execution is not available
-        if(!m_threadBody)
+        if(!m_bAllowAsyncTransactions)
             return DirectExecute(sql);
 
         // Simple sql statement
@@ -363,7 +365,7 @@ bool Database::CommitTransaction()
         return false;
 
     //if async execution is not available
-    if(!m_delayThread)
+    if(!m_bAllowAsyncTransactions)
         return CommitTransactionDirect();
 
     //add SqlTransaction to the async queue
