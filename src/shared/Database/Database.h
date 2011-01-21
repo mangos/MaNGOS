@@ -82,8 +82,6 @@ class MANGOS_DLL_SPEC Database
 
         virtual bool Initialize(const char *infoString, int nConns = 1);
         //start worker thread for async DB request execution
-        //you should call it explicitly after your server successfully started up
-        //NO ASYNC TRANSACTIONS DURING SERVER STARTUP - ONLY DURING RUNTIME!!!
         virtual void InitDelayThread();
         //stop worker thread
         virtual void HaltDelayThread();
@@ -178,9 +176,14 @@ class MANGOS_DLL_SPEC Database
         //function to ping database connections
         void Ping();
 
+        //set this to allow async transactions
+        //you should call it explicitly after your server successfully started up
+        //NO ASYNC TRANSACTIONS DURING SERVER STARTUP - ONLY DURING RUNTIME!!!
+        void AllowAsyncTransactions() { m_bAllowAsyncTransactions = true; }
+
     protected:
         Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadBody(NULL), m_delayThread(NULL), 
-            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1)
+            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false)
         {
             m_nQueryCounter = -1;
         }
@@ -238,6 +241,8 @@ class MANGOS_DLL_SPEC Database
         SqlResultQueue *    m_pResultQueue;                  ///< Transaction queues from diff. threads
         SqlDelayThread *    m_threadBody;                    ///< Pointer to delay sql executer (owned by m_delayThread)
         ACE_Based::Thread * m_delayThread;                   ///< Pointer to executer thread
+
+        bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
 
     private:
 
