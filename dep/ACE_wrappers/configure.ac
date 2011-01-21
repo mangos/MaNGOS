@@ -6472,7 +6472,7 @@ dnl FIXME!!!
 dnl The following is a kludge until the netdb reentrant function
 dnl number of arguments is handled.
 case "$host" in
-  *linux*) AC_DEFINE([ACE_LACKS_NETDB_REENTRANT_FUNCTIONS]);;
+  *linux* | *freebsd*) AC_DEFINE([ACE_LACKS_NETDB_REENTRANT_FUNCTIONS]);;
   *) ;;
 esac
 
