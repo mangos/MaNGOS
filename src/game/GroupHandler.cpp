@@ -813,7 +813,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
     ObjectGuid guid;
     recv_data >> guid;
 
-    Player *player = sObjectMgr.GetPlayer(guid);
+    Player * player = HashMapHolder<Player>::Find(guid);
     if(!player)
     {
         WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3+4+2);
@@ -846,9 +846,33 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode( WorldPacket &recv_data )
     data << uint16(player->GetPower(powerType));            // GROUP_UPDATE_FLAG_CUR_POWER
     data << uint16(player->GetMaxPower(powerType));         // GROUP_UPDATE_FLAG_MAX_POWER
     data << uint16(player->getLevel());                     // GROUP_UPDATE_FLAG_LEVEL
-    data << uint16(player->GetZoneId());                    // GROUP_UPDATE_FLAG_ZONE
-    data << uint16(player->GetPositionX());                 // GROUP_UPDATE_FLAG_POSITION
-    data << uint16(player->GetPositionY());                 // GROUP_UPDATE_FLAG_POSITION
+
+    //verify player coordinates and zoneid to send to teammates
+    uint16 iZoneId = 0;
+    uint16 iCoordX = 0;
+    uint16 iCoordY = 0;
+
+    if (player->IsInWorld())
+    {
+        iZoneId = player->GetZoneId();
+        iCoordX = player->GetPositionX();
+        iCoordY = player->GetPositionY();
+    }
+    else if (player->IsBeingTeleported())               // Player is in teleportation
+    {
+        WorldLocation& loc = player->GetTeleportDest(); // So take teleportation destination
+        iZoneId = sTerrainMgr.GetZoneId(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+        iCoordX = loc.coord_x;
+        iCoordY = loc.coord_y;
+    }
+    else
+    {
+        //unknown player status.
+    }
+
+    data << uint16(iZoneId);                              // GROUP_UPDATE_FLAG_ZONE
+    data << uint16(iCoordX);                              // GROUP_UPDATE_FLAG_POSITION
+    data << uint16(iCoordY);                              // GROUP_UPDATE_FLAG_POSITION
 
     uint64 auramask = 0;
     size_t maskPos = data.wpos();

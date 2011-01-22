@@ -283,10 +283,7 @@ bool Database::Execute(const char *sql)
             return DirectExecute(sql);
 
         // Simple sql statement
-        pTrans = new SqlTransaction;
-        pTrans->DelayExecute(sql);
-
-        m_threadBody->Delay(pTrans);
+        m_threadBody->Delay(new SqlStatement(sql));
     }
 
     return true;
@@ -310,18 +307,6 @@ bool Database::PExecute(const char * format,...)
     }
 
     return Execute(szQuery);
-}
-
-bool Database::DirectExecute(const char* sql)
-{
-    if(!m_pAsyncConn)
-        return false;
-
-    SqlTransaction trans;
-    trans.DelayExecute(sql);
-
-    trans.Execute(m_pAsyncConn);
-    return true;
 }
 
 bool Database::DirectPExecute(const char * format,...)
