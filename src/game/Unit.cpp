@@ -2336,6 +2336,14 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
                         RemainingDamage -= RemainingDamage * currentAbsorb / 100;
                     continue;
                 }
+                // Moonkin Form passive
+                if (spellProto->Id == 69366)
+                {
+                    //reduces all damage taken while Stunned
+                    if (unitflag & UNIT_FLAG_STUNNED)
+                        RemainingDamage -= RemainingDamage * currentAbsorb / 100;
+                    continue;
+                }
                 break;
             }
             case SPELLFAMILY_ROGUE:
