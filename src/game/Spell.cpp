@@ -1088,6 +1088,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             DoSpellHitOnUnit(m_caster, mask);
     }
 
+    if(missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
+    {
+        Unit* realCaster = GetAffectiveCaster();
+        if(realCaster && realCaster != unit)
+        {
+            if (!unit->isInCombat() && unit->GetTypeId() != TYPEID_PLAYER && ((Creature*)unit)->AI())
+                ((Creature*)unit)->AI()->AttackedBy(realCaster);
+
+            unit->AddThreat(realCaster);
+            unit->SetInCombatWith(realCaster);
+            realCaster->SetInCombatWith(unit);
+        }
+    }
+
     // All calculated do it!
     // Do healing and triggers
     if (m_healing)
