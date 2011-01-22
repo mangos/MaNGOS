@@ -102,7 +102,15 @@ class MANGOS_DLL_SPEC Database
         QueryResult* PQuery(const char *format,...) ATTR_PRINTF(2,3);
         QueryNamedResult* PQueryNamed(const char *format,...) ATTR_PRINTF(2,3);
 
-        bool DirectExecute(const char* sql);
+        inline bool DirectExecute(const char* sql)
+        {
+            if(!m_pAsyncConn)
+                return false;
+
+            SqlConnection::Lock guard(m_pAsyncConn);
+            return guard->Execute(sql);
+        }
+
         bool DirectPExecute(const char *format,...) ATTR_PRINTF(2,3);
 
         /// Async queries and query holders, implemented in DatabaseImpl.h

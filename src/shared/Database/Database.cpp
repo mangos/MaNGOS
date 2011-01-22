@@ -309,18 +309,6 @@ bool Database::PExecute(const char * format,...)
     return Execute(szQuery);
 }
 
-bool Database::DirectExecute(const char* sql)
-{
-    if(!m_pAsyncConn)
-        return false;
-
-    SqlTransaction trans;
-    trans.DelayExecute(sql);
-
-    trans.Execute(m_pAsyncConn);
-    return true;
-}
-
 bool Database::DirectPExecute(const char * format,...)
 {
     if (!format)
