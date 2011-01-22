@@ -821,6 +821,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Creature*)unitTarget)->SetDeathState(JUST_ALIVED);
                     return;
                 }
+                case 9976:                                  // Polly Eats the E.C.A.C.
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    // Summon Polly Jr.
+                    unitTarget->CastSpell(unitTarget, 9998, true);
+
+                    ((Creature*)unitTarget)->ForcedDespawn(100);
+                    return;
+                }
                 case 10254:                                 // Stone Dwarf Awaken Visual
                 {
                     if (m_caster->GetTypeId() != TYPEID_UNIT)
