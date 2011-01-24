@@ -122,7 +122,7 @@ bool find_path()
     getcwd(cur_path, MAX_PATH);
     size_t len = strlen(cur_path);
     strncpy(base_path, cur_path, len+1);
-    
+
     if(cur_path[len-1] == '/' || cur_path[len-1] == '\\')
     {
         // we're in root, don't bother

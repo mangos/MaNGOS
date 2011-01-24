@@ -732,7 +732,7 @@ struct CreatureDisplayInfoExtraEntry
     //uint32    SkinColor;                                  // 3
     //uint32    FaceType;                                   // 4
     //uint32    HairType;                                   // 5        CharHairGeosets.dbc
-    //uint32    HairStyle;                                  // 6        CharSections.dbc, where GeneralType=3 
+    //uint32    HairStyle;                                  // 6        CharSections.dbc, where GeneralType=3
     //uint32    BeardStyle;                                 // 7
     //uint32    Equipment[11];                              // 8-18     equipped static items EQUIPMENT_SLOT_HEAD..EQUIPMENT_SLOT_HANDS, client show its by self
     //uint32    CanEquip;                                   // 19       0..1 Can equip additional things when used for players

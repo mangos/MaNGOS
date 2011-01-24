@@ -245,7 +245,7 @@ public:
 
 protected:
     friend class Map;
-    //load/unload terrain data 
+    //load/unload terrain data
     GridMap * Load(const uint32 x, const uint32 y);
     void Unload(const uint32 x, const uint32 y);
 

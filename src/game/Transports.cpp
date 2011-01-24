@@ -420,7 +420,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
 
     m_next = m_WayPoints.begin();                           // will used in MoveToNextWayPoint for init m_curr
     MoveToNextWayPoint();                                   // m_curr -> first point
-    MoveToNextWayPoint();                                   // skip first point 
+    MoveToNextWayPoint();                                   // skip first point
 
     m_pathTime = timer;
 

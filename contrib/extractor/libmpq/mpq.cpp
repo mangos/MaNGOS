@@ -601,7 +601,7 @@ int libmpq_file_getdata(mpq_archive *mpq_a, mpq_hash mpq_h, const int number, un
 
     if (mpq_f->mpq_b->flags & LIBMPQ_FILE_COMPRESSED) {
         // Free buffer for block positions
-		
+
 	       free(mpq_f->blockpos);
 	}
 	/* freeing the file structure */

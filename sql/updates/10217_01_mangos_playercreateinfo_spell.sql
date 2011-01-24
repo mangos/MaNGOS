@@ -3,7 +3,7 @@ ALTER TABLE db_version CHANGE COLUMN required_10208_01_mangos_playercreateinfo r
 DELETE FROM playercreateinfo_spell WHERE spell=1843 ;
 DELETE FROM playercreateinfo_spell WHERE spell=21084;
 -- humans
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (1, 1, 68398, 'Opening'),
 (1, 2, 20154, 'Seal of Righteousness'),
 (1, 2, 68398, 'Opening'),
@@ -16,7 +16,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (1, 9, 75445, 'Demonic Immolate');
 
 -- dwarf
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (3, 1, 68398, 'Opening'),
 (3, 2, 20154, 'Seal of Righteousness'),
 (3, 2, 68398, 'Opening'),
@@ -25,7 +25,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (3, 5, 68398, 'Opening');
 
 -- night elfs
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (4, 1, 21009, 'Elusiveness'),
 (4, 1, 68398, 'Opening'),
 (4, 3, 21009, 'Elusiveness'),
@@ -38,7 +38,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (4, 11, 68398, 'Opening');
 
 -- gnome
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (7, 1, 68398, 'Opening'),
 (7, 4, 68398, 'Opening'),
 (7, 8, 68398, 'Opening'),
@@ -48,7 +48,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (7, 9, 75445, 'Demonic Immolate');
 
 -- orc
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (2, 1, 68398, 'Opening'),
 (2, 3, 68398, 'Opening'),
 (2, 4, 68398, 'Opening'),
@@ -60,7 +60,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (2, 9, 75445, 'Demonic Immolate');
 
 -- undead
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (5, 1, 68398, 'Opening'),
 (5, 4, 68398, 'Opening'),
 (5, 5, 68398, 'Opening'),
@@ -70,8 +70,8 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (5, 9, 68398, 'Opening'),
 (5, 9, 75445, 'Demonic Immolate');
 
--- tauren 
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+-- tauren
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (6, 1, 68398, 'Opening'),
 (6, 3, 68398, 'Opening'),
 (6, 7, 68398, 'Opening'),
@@ -80,7 +80,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (6, 11, 68398, 'Opening');
 
 -- troll
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (8, 1, 68398, 'Opening'),
 (8, 3, 68398, 'Opening'),
 (8, 4, 68398, 'Opening'),
@@ -91,7 +91,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (8, 8, 71761, 'Deep Freeze Immunity State');
 
 -- bloodelf
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (10, 2, 20154, 'Seal of Righteousness'),
 (10, 2, 68398, 'Opening'),
 (10, 3, 68398, 'Opening'),
@@ -103,7 +103,7 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (10, 9, 75445, 'Demonic Immolate');
 
 -- drarenei
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (11, 1, 68398, 'Opening'),
 (11, 2, 20154, 'Seal of Righteousness'),
 (11, 2, 68398, 'Opening'),
@@ -114,8 +114,8 @@ INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (11, 8, 68398, 'Opening'),
 (11, 8, 71761, 'Deep Freeze Immunity State');
 
--- dk 
-INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES 
+-- dk
+INSERT IGNORE INTO playercreateinfo_spell (race, class, Spell, Note) VALUES
 (1, 6, 68398, 'Opening'),
 (2, 6, 68398, 'Opening'),
 (3, 6, 68398, 'Opening'),

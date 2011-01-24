@@ -109,7 +109,7 @@ int libmpq_decrypt_blocktable(mpq_archive *mpq_a, unsigned char *pbKey) {
 		ch = toupper(*pbKey++);
 		seed1 = mpq_a->buf[0x300 + ch] ^ (seed1 + seed2);
 		seed2 = ch + seed1 + seed2 + (seed2 << 5) + 3;
-	}         
+	}
 
 	/* Decrypt it */
 	seed2 = 0xEEEEEEEE;
@@ -704,7 +704,7 @@ int libmpq_file_read_file(mpq_archive *mpq_a, mpq_file *mpq_f, unsigned int file
 		unsigned int loaded = mpq_a->blocksize;
 
 		/* Check if data are loaded in the cache */
-		if (mpq_f->accessed == FALSE || blockpos != mpq_a->blockpos) {   
+		if (mpq_f->accessed == FALSE || blockpos != mpq_a->blockpos) {
 
 			/* Load one MPQ block into archive buffer */
 			loaded = libmpq_file_read_block(mpq_a, mpq_f, blockpos, (char *)mpq_a->blockbuf, mpq_a->blocksize);

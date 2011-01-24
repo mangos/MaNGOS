@@ -158,7 +158,7 @@ bool PoolGroup<T>::CheckPool() const
     return true;
 }
 
-// Method to check event linking 
+// Method to check event linking
 template <class T>
 void PoolGroup<T>::CheckEventLinkAndReport(int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const
 {

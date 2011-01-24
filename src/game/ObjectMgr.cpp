@@ -8925,7 +8925,7 @@ bool FindCreatureData::operator()( CreatureDataPair const& dataPair )
         i_mapDist = new_dist;
     }
 
-    // skip not spawned (in any state), 
+    // skip not spawned (in any state),
     uint16 pool_id = sPoolMgr.IsPartOfAPool<Creature>(dataPair.first);
     if (pool_id && !sPoolMgr.IsSpawnedObject<Creature>(dataPair.first))
         return false;
