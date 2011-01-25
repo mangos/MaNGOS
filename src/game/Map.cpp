@@ -1383,7 +1383,6 @@ bool InstanceMap::Add(Player *player)
                     if (groupBind->perm)
                     {
                         uint32 m_completed = ((InstanceMap*)this)->GetInstanceData()->GetCompletedEncounters(true);
-                        sLog.outError("InstanceBind::Completed %u",m_completed);
                         WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
                         data << uint32(60000);
                         data << m_completed;
