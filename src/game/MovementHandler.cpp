@@ -222,10 +222,10 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
 
     recv_data >> guid.ReadAsPacked();
 
-    uint32 flags, time;
-    recv_data >> flags >> time;
+    uint32 counter, time;
+    recv_data >> counter >> time;
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
-    DEBUG_LOG("Flags %u, time %u", flags, time/IN_MILLISECONDS);
+    DEBUG_LOG("Counter %u, time %u", counter, time/IN_MILLISECONDS);
 
     Unit *mover = _player->GetMover();
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
