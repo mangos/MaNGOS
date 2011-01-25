@@ -43,7 +43,7 @@ class WorldTimer
             return newMSTime - oldMSTime;
         }
 
-        //get last world tick time 
+        //get last world tick time
         static MANGOS_DLL_SPEC uint32 tickTime();
         //get previous world tick time
         static MANGOS_DLL_SPEC uint32 tickPrevTime();

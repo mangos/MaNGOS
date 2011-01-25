@@ -61,7 +61,7 @@ void TFrmMain::SaveToFile(const char * pszFileName)
      char szFileName[255];
      FILE *stream;
 
-     
+
 
 
       fnsplit(pszFileName, 0, 0, szFileName, 0);
@@ -132,7 +132,7 @@ void TFrmMain::SaveToFile(const char * pszFileName)
         }
         FileClose(iFileHandle);
         fclose(stream);
-        
+
         delete ini;
         ShowMessage("Save To File:"+NewFileName);
 }
@@ -445,7 +445,7 @@ void __fastcall TFrmMain::Timer1Timer(TObject *Sender)
 void __fastcall TFrmMain::N4Click(TObject *Sender)
 {
    if(!thOpen) return;
-   
+
         int iFileHandle; //нд╪Ч╬Д╠З
         char buf[4];
         int iVal;

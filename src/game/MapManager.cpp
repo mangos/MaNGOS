@@ -97,7 +97,7 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
     MANGOS_ASSERT(obj);
     //if(!obj->IsInWorld()) sLog.outError("GetMap: called for map %d with object (typeid %d, guid %d, mapid %d, instanceid %d) who is not in world!", id, obj->GetTypeId(), obj->GetGUIDLow(), obj->GetMapId(), obj->GetInstanceId());
     Guard _guard(*this);
-    
+
     Map * m = NULL;
 
     const MapEntry* entry = sMapStore.LookupEntry(id);
@@ -141,7 +141,7 @@ Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
     MapMapType::const_iterator iter = i_maps.find(MapID(mapid, instanceId));
     if(iter == i_maps.end())
         return NULL;
-    
+
     //this is a small workaround for transports
     if(instanceId == 0 && iter->second->Instanceable())
     {

@@ -14,11 +14,11 @@ project (MANGOS_MAP_EXTRACTOR)
 add_subdirectory (libmpq)
 add_subdirectory (loadlib)
 
-include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq) 
-include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib) 
+include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
+include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
-link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq) 
-link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib) 
+link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
+link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
 add_executable (ad dbcfile.cpp mpq_libmpq.cpp System.cpp)
 

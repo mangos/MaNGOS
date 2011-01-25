@@ -6,7 +6,7 @@
 #include <Classes.hpp>
 //---------------------------------------------------------------------------
 class thOpenFile : public TThread
-{            
+{
 private:
 protected:
         void __fastcall Execute();
@@ -14,7 +14,7 @@ protected:
 public:
          bool       thEnd;
          int   ColType[10000];
-         
+
         __fastcall thOpenFile(bool CreateSuspended);
         void LoadAndModify(const char * pszFileName);
         void ReadAndModifyFromBuff(char *pBuff, DWORD dwSize, const char* pszFileName);

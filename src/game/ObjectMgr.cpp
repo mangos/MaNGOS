@@ -591,14 +591,14 @@ void ObjectMgr::LoadCreatureTemplates()
             if (difficultyInfo->AIName && *difficultyInfo->AIName)
             {
                 sLog.outErrorDb("Difficulty %u mode creature (Entry: %u) has `AIName`, but in any case will used difficulty 0 mode creature (Entry: %u) AIName.",
-                    diff, cInfo->DifficultyEntry[diff], i);
+                    diff + 1, cInfo->DifficultyEntry[diff], i);
                 continue;
             }
 
             if (difficultyInfo->ScriptID)
             {
                 sLog.outErrorDb("Difficulty %u mode creature (Entry: %u) has `ScriptName`, but in any case will used difficulty 0 mode creature (Entry: %u) ScriptName.",
-                    diff, cInfo->DifficultyEntry[diff], i);
+                    diff + 1, cInfo->DifficultyEntry[diff], i);
                 continue;
             }
 
@@ -9270,7 +9270,7 @@ bool FindCreatureData::operator()( CreatureDataPair const& dataPair )
         i_mapDist = new_dist;
     }
 
-    // skip not spawned (in any state), 
+    // skip not spawned (in any state),
     uint16 pool_id = sPoolMgr.IsPartOfAPool<Creature>(dataPair.first);
     if (pool_id && !sPoolMgr.IsSpawnedObject<Creature>(dataPair.first))
         return false;

@@ -309,7 +309,7 @@ static void libmpq_huff_build_tree(struct huffman_tree *ht, unsigned int cmp_typ
 	/* Loop while pointer has a negative value. */
 	while (PTR_INT(ht->last) > 0) {			/* ESI - Last entry */
 		struct huffman_tree_item *temp;		/* EAX */
-        
+
 		if (ht->last->next != NULL) {		/* ESI->next */
 			libmpq_huff_remove_item(ht->last);
 		}

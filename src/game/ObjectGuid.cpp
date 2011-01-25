@@ -47,7 +47,7 @@ std::string ObjectGuid::GetString() const
 {
     std::ostringstream str;
     str << GetTypeName();
-    
+
     if (IsPlayer())
     {
         std::string name;

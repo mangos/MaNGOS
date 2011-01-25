@@ -41,7 +41,7 @@
 // |color|Hachievement_criteria:criteria_id|h[name]|h|r
 // |color|Harea:area_id|h[name]|h|r
 // |color|Hareatrigger:id|h[name]|h|r
-// |color|Hareatrigger_target:id|h[name]|h|r                
+// |color|Hareatrigger_target:id|h[name]|h|r
 // |color|Hcreature:creature_guid|h[name]|h|r
 // |color|Hcreature_entry:creature_id|h[name]|h|r
 // |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r          - client, at shift click in recipes list dialog
@@ -2233,7 +2233,7 @@ bool  ChatHandler::ExtractOptFloat(char** args, float& val, float defVal)
  * Function extract name-like string (from non-numeric or special symbol until whitespace)
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
- * @param lit  optional explicit literal requirement. function fail if literal is not starting substring of lit. 
+ * @param lit  optional explicit literal requirement. function fail if literal is not starting substring of lit.
  *             Note: function in same way fail if no any literal or literal not fit in this case. Need additional check for select specific fail case
  * @return     name/number-like string without whitespaces, or NULL if args empty or not appropriate content.
  */
@@ -2364,7 +2364,7 @@ char* ChatHandler::ExtractQuotedOrLiteralArg(char** args, bool asis /*= false*/)
 }
 
 /**
- * Function extract on/off literals as boolean values 
+ * Function extract on/off literals as boolean values
  *
  * @param args variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)
  * @param val  return extracted value if function success, in fail case original value unmodified
@@ -2428,7 +2428,7 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
 
     if (*tail != 'H')                                       // skip color part, some links can not have color part
     {
-        while (*tail && *tail != '|')                           
+        while (*tail && *tail != '|')
             ++tail;
 
         if (!*tail)
@@ -2568,7 +2568,7 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
         somethingPair[1] = somethingEnd;
     }
 
-    *args = tail;                   
+    *args = tail;
 
     SkipWhiteSpaces(args);
 
@@ -2641,7 +2641,7 @@ char* ChatHandler::ExtractKeyFromLink(char** text, char const* linkType, char** 
 }
 
 /**
- * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if LINKTYPE in linkTypes array 
+ * Function extract data from shift-link "|color|LINKTYPE:RETURN:SOMETHING1|h[name]|h|r if LINKTYPE in linkTypes array
  * It also extract literal/quote if not shift-link in args
  *
  * @param args       variable pointer to non parsed args string, updated at function call to new position (with skipped white spaces)

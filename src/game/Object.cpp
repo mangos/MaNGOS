@@ -1130,7 +1130,7 @@ void WorldObject::Relocate(float x, float y, float z)
 }
 
 void WorldObject::SetOrientation(float orientation)
-{ 
+{
     m_orientation = orientation;
 
     if(isType(TYPEMASK_UNIT))

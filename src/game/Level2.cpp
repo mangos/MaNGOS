@@ -2623,7 +2623,7 @@ bool ChatHandler::HandleTicketCommand(char* args)
             if (num == 0)
                 return false;
 
-            // mgr numbering tickets start from 0 
+            // mgr numbering tickets start from 0
             ticket = sTicketMgr.GetGMTicketByOrderPos(num-1);
 
             if (!ticket)
@@ -2670,7 +2670,7 @@ bool ChatHandler::HandleTicketCommand(char* args)
         if (num == 0)
             return false;
 
-        // mgr numbering tickets start from 0 
+        // mgr numbering tickets start from 0
         GMTicket* ticket = sTicketMgr.GetGMTicketByOrderPos(num-1);
         if (!ticket)
         {
@@ -2725,7 +2725,7 @@ bool ChatHandler::HandleDelTicketCommand(char *args)
         if (num ==0)
             return false;
 
-        // mgr numbering tickets start from 0 
+        // mgr numbering tickets start from 0
         GMTicket* ticket = sTicketMgr.GetGMTicketByOrderPos(num-1);
 
         if (!ticket)

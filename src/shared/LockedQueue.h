@@ -124,7 +124,7 @@ namespace ACE_Based
             {
                 this->_lock.release();
             }
-            
+
             ///! Checks if we're empty or not with locks held
             bool empty()
             {

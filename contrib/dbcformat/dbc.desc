@@ -43,7 +43,7 @@ ENDENTRY
 
 ENTRY SpellEntry
 
-    INDEX Id                                    
+    INDEX Id
     UINT School
     UNKNOWN [2]
     UINT Category
@@ -51,17 +51,17 @@ ENTRY SpellEntry
     UINT Attributes
     UINT AttributesEx
     UNKNOWN [3]
-    UINT Targets                               
-    UINT TargetCreatureType                    
-    UINT RequiresSpellFocus     
+    UINT Targets
+    UINT TargetCreatureType
+    UINT RequiresSpellFocus
 	  UNKNOWN
-    UINT CasterAuraState                       
-    UINT CastingTimeIndex                  
+    UINT CasterAuraState
+    UINT CastingTimeIndex
     UINT RecoveryTime
     UINT CategoryRecoveryTime
     UINT InterruptFlags
     UINT AuraInterruptFlags
-    UINT ChannelInterruptFlags                 
+    UINT ChannelInterruptFlags
     UINT procFlags
     UINT procChance
     UINT procCharges
@@ -71,41 +71,41 @@ ENTRY SpellEntry
     UINT DurationIndex
     UINT powerType
     UINT manaCost
-    UINT manaCostPerlevel                      
+    UINT manaCostPerlevel
     UINT manaPerSecond
     UINT manaPerSecondPerLevel
     UINT rangeIndex
     FLOAT speed
     UINT modalNextSpell
-    UNKNOWN                              
-    UINT Totem[2]                              
-    UINT Reagent[8]                            
-    UINT ReagentCount[8]                       
-    UINT EquippedItemClass                     
-    UINT EquippedItemSubClass                  
-    UINT Effect[3] // 59 - 61                           
-    UINT EffectDieSides[3]                     
-    UINT EffectBaseDice[3]                     
-    FLOAT EffectDicePerLevel[3]                
-    FLOAT EffectRealPointsPerLevel[3]            
+    UNKNOWN
+    UINT Totem[2]
+    UINT Reagent[8]
+    UINT ReagentCount[8]
+    UINT EquippedItemClass
+    UINT EquippedItemSubClass
+    UINT Effect[3] // 59 - 61
+    UINT EffectDieSides[3]
+    UINT EffectBaseDice[3]
+    FLOAT EffectDicePerLevel[3]
+    FLOAT EffectRealPointsPerLevel[3]
     INT EffectBasePoints[3] // 74 - 76
 	  UNKNOWN [3]
 	  UINT EffectImplicitTargetA[3] // 80 - 82
     UINT EffectImplicitTargetB[3] // 83 - 85
-    UINT EffectRadiusIndex[3]                  
-    UINT EffectApplyAuraName[3] // 89 - 91               
-    UINT EffectAmplitude[3]                    
-    UINT Effectunknown[3]                      
-    UINT EffectChainTarget[3]                  
-    UINT EffectItemType[3]                     
-    UINT EffectMiscValue[3] // 104 - 106                 
-    UINT EffectTriggerSpell[3]                 
-    FLOAT EffectPointsPerComboPoint[3]           
-    UINT SpellVisual                           
-    UNKNOWN                             
-    UINT SpellIconID                          
+    UINT EffectRadiusIndex[3]
+    UINT EffectApplyAuraName[3] // 89 - 91
+    UINT EffectAmplitude[3]
+    UINT Effectunknown[3]
+    UINT EffectChainTarget[3]
+    UINT EffectItemType[3]
+    UINT EffectMiscValue[3] // 104 - 106
+    UINT EffectTriggerSpell[3]
+    FLOAT EffectPointsPerComboPoint[3]
+    UINT SpellVisual
+    UNKNOWN
+    UINT SpellIconID
     UINT activeIconID
-	  UINT spellPriority                         
+	  UINT spellPriority
     UNUSED STR Name
     UNUSED STR NameAlt1
     UNUSED STR NameAlt2
@@ -198,7 +198,7 @@ ENTRY FactionEntry
 
 	UNKNOWN[7]
 	UINT something1
-	UINT something2 
+	UINT something2
 	UINT something3
 	UINT something4
 	UINT something5
@@ -208,7 +208,7 @@ ENTRY FactionEntry
 	UINT something9
 	UINT faction
 
-	UNUSED STR name 
+	UNUSED STR name
 	UNKNOWN[17]
 
 ENDENTRY
@@ -236,6 +236,6 @@ ENTRY ItemDisplayTemplateEntry
 	UNKNOWN[5]
 	UINT seed
 	UNKNOWN [10]
-	UINT randomPropertyID 
+	UINT randomPropertyID
 
 ENDENTRY

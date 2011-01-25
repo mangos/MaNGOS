@@ -41,13 +41,13 @@ MaNGOS 0.16   (2 July 2010)
 
  ==== Server Features ====
 
- * Added: Implemented SOAP in MaNGOS 
- * Added: Camera framework for proper mind vision like spells use and grid code cleanups including remove unused cell-level thread locking. 
+ * Added: Implemented SOAP in MaNGOS
+ * Added: Camera framework for proper mind vision like spells use and grid code cleanups including remove unused cell-level thread locking.
  * Added: New table character_stats for external tools.
  * Added: More user friendly output at DB version check fail.
  * Improved: Update used utf8 cpp library version up to 2.2.4
  * Improved: Character `data` field values finally replaced by normal table fields.
- * Improved: Increase reserved stack size for mangosd up to 4Mb at Windows 
+ * Improved: Increase reserved stack size for mangosd up to 4Mb at Windows
  * Improved: Rewritten realmd and mangosd RA code use ACE network classes and drop Sockets lib.
  * Improved: OpenSSL lib upgrade to OpenSSL 1.0.0.
  * Improved: Use ACE config library instead dropped dotconfpp.

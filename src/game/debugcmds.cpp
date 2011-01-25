@@ -566,7 +566,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                     if (container != bag)
                     {
                         PSendSysMessage("%s in bag %u at slot %u has a different container %s from slot %u!",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), 
+                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(),
                             container->GetGuidStr().c_str(), container->GetSlot());
                         error = true; continue;
                     }
@@ -1065,7 +1065,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     if (!typeStr)
         return false;
 
-    uint16 opcode; 
+    uint16 opcode;
     if (strncmp(typeStr, "flat", strlen(typeStr)) == 0)
         opcode = SMSG_SET_FLAT_SPELL_MODIFIER;
     else if (strncmp(typeStr, "pct", strlen(typeStr)) == 0)

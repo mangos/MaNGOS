@@ -1480,10 +1480,11 @@ bool Creature::FallGround()
     // use larger distance for vmap height search than in most other cases
     float tz = GetTerrain()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
 
-    if (tz < INVALID_HEIGHT)
+    if (tz <= INVALID_HEIGHT)
     {
         DEBUG_LOG("FallGround: creature %u at map %u (x: %f, y: %f, z: %f), not able to retrive a proper GetHeight (z: %f).",
             GetEntry(), GetMap()->GetId(), GetPositionX(), GetPositionX(), GetPositionZ(), tz);
+        return false;
     }
 
     // Abort too if the ground is very near

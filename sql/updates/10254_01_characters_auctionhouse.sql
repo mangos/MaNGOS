@@ -4,7 +4,7 @@ ALTER TABLE auctionhouse
   ADD COLUMN houseid int(11) unsigned NOT NULL default '0' AFTER id;
 
 UPDATE auctionhouse, mangos.creature AS c, mangos.creature_template AS ct
-  SET houseid = 
+  SET houseid =
     CASE ct.faction_A
       WHEN   12 THEN 1 /* human                                  */
       WHEN   29 THEN 6 /* orc, and generic for horde             */

@@ -90,7 +90,7 @@ struct WorldLocation
 
 
 //use this class to measure time between world update ticks
-//essential for units updating their spells after cells become active 
+//essential for units updating their spells after cells become active
 class WorldUpdateCounter
 {
     public:
@@ -417,7 +417,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 ~UpdateHelper() { }
 
                 void Update( uint32 time_diff )
-                { 
+                {
                     m_obj->Update( m_obj->m_updateTracker.timeElapsed(), time_diff);
                     m_obj->m_updateTracker.Reset();
                 }
