@@ -1382,9 +1382,11 @@ bool InstanceMap::Add(Player *player)
                     // players also become permanently bound when they enter
                     if (groupBind->perm)
                     {
+                        uint32 m_completed = ((InstanceMap*)this)->GetInstanceData()->GetCompletedEncounters(true);
+                        sLog.outError("InstanceBind::Completed %u",m_completed);
                         WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
                         data << uint32(60000);
-                        data << uint32(0); // Completed Encounter Mask (Feanor: TODO)
+                        data << m_completed;
                         data << uint8(0);
                         player->GetSession()->SendPacket(&data);
                         player->SetPendingBind(GetInstanceSave(), 60000);
