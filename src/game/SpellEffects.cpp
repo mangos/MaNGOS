@@ -4328,8 +4328,9 @@ void Spell::DoSummon(SpellEffectIndex eff_idx)
     Pet* spawnCreature = new Pet(SUMMON_PET);
 
     int32 duration = GetSpellDuration(m_spellInfo);
-    if(Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+    if (duration > 0)
+        if (Player* modOwner = m_caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     if (m_caster->GetTypeId()==TYPEID_PLAYER && spawnCreature->LoadPetFromDB((Player*)m_caster,pet_entry))
     {
@@ -4801,12 +4802,13 @@ void Spell::DoSummonGuardian(SpellEffectIndex eff_idx, uint32 forceFaction)
 
     float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[eff_idx]));
     int32 duration = GetSpellDuration(m_spellInfo);
-    if(Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+    if (duration > 0)
+        if (Player* modOwner = m_caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
     int32 amount = damage > 0 ? damage : 1;
 
-    for(int32 count = 0; count < amount; ++count)
+    for (int32 count = 0; count < amount; ++count)
     {
         Pet* spawnCreature = new Pet(petType);
 
@@ -7276,7 +7278,7 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
     int slot = slot_dbc ? slot_dbc - 1 : TOTEM_SLOT_NONE;
 
     // unsummon old totem
-    if(slot < MAX_TOTEM_SLOT)
+    if (slot < MAX_TOTEM_SLOT)
         if (Totem *OldTotem = m_caster->GetTotem(TotemSlot(slot)))
             OldTotem->UnSummon();
 
@@ -7286,8 +7288,8 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
 
     Totem* pTotem = new Totem;
 
-    if(!pTotem->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), m_caster->GetMap(), m_caster->GetPhaseMask(),
-        m_spellInfo->EffectMiscValue[eff_idx], team ))
+    if (!pTotem->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT), m_caster->GetMap(), m_caster->GetPhaseMask(),
+        m_spellInfo->EffectMiscValue[eff_idx], team))
     {
         delete pTotem;
         return;
@@ -7306,7 +7308,7 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
     m_caster->GetClosePoint(x, y, z, pTotem->GetObjectBoundingRadius(), 2.0f, angle);
 
     // totem must be at same Z in case swimming caster and etc.
-    if( fabs( z - m_caster->GetPositionZ() ) > 5 )
+    if (fabs( z - m_caster->GetPositionZ() ) > 5)
         z = m_caster->GetPositionZ();
 
     pTotem->Relocate(x, y, z, m_caster->GetOrientation());
@@ -7320,8 +7322,9 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
     pTotem->SetTypeBySummonSpell(m_spellInfo);              // must be after Create call where m_spells initialized
 
     int32 duration=GetSpellDuration(m_spellInfo);
-    if (Player* modOwner = m_caster->GetSpellModOwner())
-        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
+    if (duration > 0)
+        if (Player* modOwner = m_caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
     pTotem->SetDuration(duration);
 
     if (damage)                                             // if not spell info, DB values used
@@ -7332,13 +7335,13 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
 
     pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
-    if(m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
         pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
-    if(m_caster->IsPvP())
+    if (m_caster->IsPvP())
         pTotem->SetPvP(true);
 
-    if(m_caster->IsFFAPvP())
+    if (m_caster->IsFFAPvP())
         pTotem->SetFFAPvP(true);
 
     pTotem->Summon(m_caster);
