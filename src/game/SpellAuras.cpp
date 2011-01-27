@@ -7831,6 +7831,13 @@ void Aura::PeriodicDummyTick()
                         case 2: target->CastSpell(target, 55739, true); break;
                     }
                     return;
+                case 69008:                                 // Soulstorm (OOC aura)
+                case 68870:                                 // Soulstorm
+                {
+                    uint32 triggerSpells[8] = {68898, 68904, 68886, 68905, 68896, 68906, 68897, 68907};
+                    target->CastSpell(target, triggerSpells[GetAuraTicks() % 8], true);
+                    return;
+                }
                 case 66118:                                 // Leeching Swarm 10 man
                 case 68646:
                 {
