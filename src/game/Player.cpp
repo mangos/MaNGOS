@@ -1284,11 +1284,13 @@ void Player::Update( uint32 update_diff, uint32 p_time )
             // default combat reach 10
             // TODO add weapon,skill check
 
-            float pldistance = ATTACK_DISTANCE;
+            float dist = pVictim->GetTypeId() == TYPEID_PLAYER ? ATTACK_DISTANCE : (GetFloatValue(UNIT_FIELD_COMBATREACH) + pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH));
+            // Check for creatures that somehow have lower combat-reach than minimal attack distance
+            if (dist < ATTACK_DISTANCE) dist = ATTACK_DISTANCE;
 
             if (isAttackReady(BASE_ATTACK))
             {
-                if(!IsWithinDistInMap(pVictim, pldistance))
+                if(!IsWithinDistInMap(pVictim, dist))
                 {
                     setAttackTimer(BASE_ATTACK,100);
                     if(m_swingErrorMsg != 1)                // send single time (client auto repeat)
@@ -1325,7 +1327,7 @@ void Player::Update( uint32 update_diff, uint32 p_time )
 
             if ( haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
             {
-                if(!IsWithinDistInMap(pVictim, pldistance))
+                if(!IsWithinDistInMap(pVictim, dist))
                 {
                     setAttackTimer(OFF_ATTACK,100);
                 }
