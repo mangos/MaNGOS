@@ -6037,8 +6037,16 @@ void Unit::AttackedBy(Unit *attacker)
         ((Creature*)this)->AI()->AttackedBy(attacker);
 
     // trigger pet AI reaction
-    if (Pet *pet = GetPet())
-        pet->AttackedBy(attacker);
+    if (attacker->IsHostileTo(this))
+    {
+        GroupPetList m_groupPets = GetPets();
+        if (!m_groupPets.empty())
+        {
+            for (GroupPetList::const_iterator itr = m_groupPets.begin(); itr != m_groupPets.end(); ++itr)
+                if (Pet* _pet = GetMap()->GetPet(*itr))
+                    _pet->AttackedBy(attacker);
+        }
+    }
 }
 
 bool Unit::AttackStop(bool targetSwitch /*=false*/)
