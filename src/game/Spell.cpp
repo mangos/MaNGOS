@@ -2710,6 +2710,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
             {
+                // General override, we don't want to use max spell range here.
+                // Note: 0.0 radius is also for index 36. It is possible that 36 must be defined as
+                // "at the base of", in difference to 0 which appear to be "directly in front of".
+                // TODO: some summoned will make caster be half inside summoned object. Need to fix
+                // that in the below code (nearpoint vs closepoint, etc).
+                if (m_spellInfo->EffectRadiusIndex[effIndex] == 0)
+                    radius = 0.0f;
+
                 if (m_spellInfo->Id == 50019)               // Hawk Hunting, problematic 50K radius
                     radius = 10.0f;
 
