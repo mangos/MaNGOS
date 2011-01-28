@@ -1382,7 +1382,9 @@ bool InstanceMap::Add(Player *player)
                     // players also become permanently bound when they enter
                     if (groupBind->perm)
                     {
-                        uint32 m_completed = ((InstanceMap*)this)->GetInstanceData()->GetCompletedEncounters(true);
+                        uint32 m_completed = 0;
+                        if (((InstanceMap*)this)->GetInstanceData())
+                            m_completed = ((InstanceMap*)this)->GetInstanceData()->GetCompletedEncounters(true);
                         WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
                         data << uint32(60000);
                         data << m_completed;
