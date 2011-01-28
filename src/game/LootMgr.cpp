@@ -125,6 +125,12 @@ void LootStore::LoadLootTable()
                 continue;                                   // error already printed to log/console.
             }
 
+            if (mincountOrRef < 0 && condition != CONDITION_NONE)
+            {
+                sLog.outErrorDb("Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped",
+                    GetName(), entry, mincountOrRef);
+                continue;
+            }
 
             if(!PlayerCondition::IsValid(condition,cond_value1, cond_value2))
             {
