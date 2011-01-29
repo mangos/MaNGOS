@@ -1695,7 +1695,7 @@ bool ChatHandler::HandleNpcAddMoveCommand(char* args)
     sWaypointMgr.AddLastNode(lowguid, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), wait, 0);
 
     // update movement type
-    WorldDatabase.PExecuteLog("UPDATE creature SET MovementType = '%u' WHERE guid = '%u'", WAYPOINT_MOTION_TYPE,lowguid);
+    WorldDatabase.PExecuteLog("UPDATE creature SET MovementType=%u WHERE guid=%u", WAYPOINT_MOTION_TYPE,lowguid);
     if (pCreature)
     {
         pCreature->SetDefaultMovementType(WAYPOINT_MOTION_TYPE);
@@ -2965,7 +2965,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         target->SaveToDB();
     }
     else
-        WorldDatabase.PExecuteLog("UPDATE creature SET MovementType = '%u' WHERE guid = '%u'", WAYPOINT_MOTION_TYPE,lowguid);
+        WorldDatabase.PExecuteLog("UPDATE creature SET MovementType=%u WHERE guid=%u", WAYPOINT_MOTION_TYPE,lowguid);
 
     PSendSysMessage(LANG_WAYPOINT_ADDED, point, lowguid);
 
@@ -3574,7 +3574,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
                 {
                     PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpGuid);
                     hasError = true;
-                    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid = '%u'", wpGuid);
+                    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
                 }
                 else
                 {
@@ -3628,7 +3628,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             wpCreature->SetVisibility(VISIBILITY_OFF);
             DEBUG_LOG("DEBUG: UPDATE creature_movement SET wpguid = '%u", wpCreature->GetGUIDLow());
             // set "wpguid" column to the visual waypoint
-            WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid = '%u' WHERE id = '%u' and point = '%u'", wpCreature->GetGUIDLow(), lowguid, point);
+            WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid=%u WHERE id=%u and point=%u", wpCreature->GetGUIDLow(), lowguid, point);
 
             wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
             // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
@@ -3754,7 +3754,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
 
     if (show == "off")
     {
-        QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id = '%u'", VISUAL_WAYPOINT);
+        QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u", VISUAL_WAYPOINT);
         if (!result)
         {
             SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);
@@ -3771,7 +3771,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             {
                 PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpGuid);
                 hasError = true;
-                WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid = '%u'", wpGuid);
+                WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
             }
             else
             {
@@ -3780,7 +3780,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             }
         }while(result->NextRow());
         // set "wpguid" column to "empty" - no visual waypoint spawned
-        WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid = '0' WHERE wpguid <> '0'");
+        WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid=0 WHERE wpguid <> 0");
 
         if (hasError)
         {
