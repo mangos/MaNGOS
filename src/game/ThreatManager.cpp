@@ -30,22 +30,25 @@
 //==============================================================
 
 // The pHatingUnit is not used yet
-float ThreatCalcHelper::calcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *pThreatSpell)
+float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *pThreatSpell)
 {
     // all flat mods applied early
-    if(!pThreat)
+    if (!threat)
         return 0.0f;
 
     if (pThreatSpell)
     {
-        if (Player* modOwner = pHatedUnit->GetSpellModOwner())
-            modOwner->ApplySpellMod(pThreatSpell->Id, SPELLMOD_THREAT, pThreat);
+        if (pThreatSpell->AttributesEx & SPELL_ATTR_EX_NO_THREAT)
+            return 0.0f;
 
-        if(crit)
-            pThreat *= pHatedUnit->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRITICAL_THREAT,schoolMask);
+        if (Player* modOwner = pHatedUnit->GetSpellModOwner())
+            modOwner->ApplySpellMod(pThreatSpell->Id, SPELLMOD_THREAT, threat);
+
+        if (crit)
+            threat *= pHatedUnit->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_CRITICAL_THREAT, schoolMask);
     }
 
-    float threat = pHatedUnit->ApplyTotalThreatModifier(pThreat, schoolMask);
+    threat = pHatedUnit->ApplyTotalThreatModifier(threat, schoolMask);
     return threat;
 }
 
@@ -390,7 +393,7 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
 
     MANGOS_ASSERT(getOwner()->GetTypeId()== TYPEID_UNIT);
 
-    float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
+    float threat = ThreatCalcHelper::CalcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
 
     if (threat > 0.0f)
     {
