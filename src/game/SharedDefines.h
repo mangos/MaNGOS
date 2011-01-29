@@ -285,7 +285,7 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_EX_NEGATIVE                    0x00000080            // 7
 #define SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET        0x00000100            // 8 Spell req target not to be in combat state
 #define SPELL_ATTR_EX_UNK9                        0x00000200            // 9
-#define SPELL_ATTR_EX_NO_INITIAL_AGGRO            0x00000400            // 10 no generates threat on cast 100%
+#define SPELL_ATTR_EX_NO_THREAT                   0x00000400            // 10 no generates threat on cast 100%
 #define SPELL_ATTR_EX_UNK11                       0x00000800            // 11
 #define SPELL_ATTR_EX_UNK12                       0x00001000            // 12
 #define SPELL_ATTR_EX_UNK13                       0x00002000            // 13
@@ -358,7 +358,7 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_EX3_UNK14                      0x00004000            // 14 "Honorless Target" only this spells have this flag
 #define SPELL_ATTR_EX3_UNK15                      0x00008000            // 15 Auto Shoot, Shoot, Throw,  - this is autoshot flag
 #define SPELL_ATTR_EX3_UNK16                      0x00010000            // 16 no triggers effects that trigger on casting a spell??
-#define SPELL_ATTR_EX3_UNK17                      0x00020000            // 17 no triggers effects that trigger on casting a spell??
+#define SPELL_ATTR_EX3_NO_INITIAL_AGGRO           0x00020000            // 17 Causes no aggro if not missed
 #define SPELL_ATTR_EX3_UNK18                      0x00040000            // 18
 #define SPELL_ATTR_EX3_UNK19                      0x00080000            // 19
 #define SPELL_ATTR_EX3_DEATH_PERSISTENT           0x00100000            // 20 Death persistent spells

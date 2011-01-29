@@ -1526,7 +1526,7 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
             if (wrank.substr(0, wrankStr.size()) == wrankStr)
             {
                 int32 delta;
-                if (!ExtractInt32(&args, delta) || (delta < 0) || (delta > ReputationMgr::PointsInRank[r] -1))
+                if (!ExtractOptInt32(&args, delta, 0) || (delta < 0) || (delta > ReputationMgr::PointsInRank[r] -1))
                 {
                     PSendSysMessage(LANG_COMMAND_FACTION_DELTA, (ReputationMgr::PointsInRank[r]-1));
                     SetSentErrorMessage(true);
@@ -1722,7 +1722,7 @@ bool ChatHandler::HandleNpcAddMoveCommand(char* args)
     sWaypointMgr.AddLastNode(lowguid, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), wait, 0);
 
     // update movement type
-    WorldDatabase.PExecuteLog("UPDATE creature SET MovementType = '%u' WHERE guid = '%u'", WAYPOINT_MOTION_TYPE,lowguid);
+    WorldDatabase.PExecuteLog("UPDATE creature SET MovementType=%u WHERE guid=%u", WAYPOINT_MOTION_TYPE,lowguid);
     if (pCreature)
     {
         pCreature->SetDefaultMovementType(WAYPOINT_MOTION_TYPE);
@@ -2927,7 +2927,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         target->SaveToDB();
     }
     else
-        WorldDatabase.PExecuteLog("UPDATE creature SET MovementType = '%u' WHERE guid = '%u'", WAYPOINT_MOTION_TYPE,lowguid);
+        WorldDatabase.PExecuteLog("UPDATE creature SET MovementType=%u WHERE guid=%u", WAYPOINT_MOTION_TYPE,lowguid);
 
     PSendSysMessage(LANG_WAYPOINT_ADDED, point, lowguid);
 
@@ -3536,7 +3536,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
                 {
                     PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpGuid);
                     hasError = true;
-                    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid = '%u'", wpGuid);
+                    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
                 }
                 else
                 {
@@ -3590,7 +3590,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             wpCreature->SetVisibility(VISIBILITY_OFF);
             DEBUG_LOG("DEBUG: UPDATE creature_movement SET wpguid = '%u", wpCreature->GetGUIDLow());
             // set "wpguid" column to the visual waypoint
-            WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid = '%u' WHERE id = '%u' and point = '%u'", wpCreature->GetGUIDLow(), lowguid, point);
+            WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid=%u WHERE id=%u and point=%u", wpCreature->GetGUIDLow(), lowguid, point);
 
             wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
             // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
@@ -3716,7 +3716,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
 
     if (show == "off")
     {
-        QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id = '%u'", VISUAL_WAYPOINT);
+        QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u", VISUAL_WAYPOINT);
         if (!result)
         {
             SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);
@@ -3733,7 +3733,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             {
                 PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpGuid);
                 hasError = true;
-                WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid = '%u'", wpGuid);
+                WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
             }
             else
             {
@@ -3742,7 +3742,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             }
         }while(result->NextRow());
         // set "wpguid" column to "empty" - no visual waypoint spawned
-        WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid = '0' WHERE wpguid <> '0'");
+        WorldDatabase.PExecuteLog("UPDATE creature_movement SET wpguid=0 WHERE wpguid <> 0");
 
         if (hasError)
         {
@@ -4076,10 +4076,12 @@ bool ChatHandler::HandleLookupEventCommand(char* args)
     uint32 counter = 0;
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
 
-    for(uint32 id = 0; id < events.size(); ++id)
+    for(uint32 id = 1; id < events.size(); ++id)
     {
+        if (!sGameEventMgr.IsValidEvent(id))
+            continue;
+
         GameEventData const& eventData = events[id];
 
         std::string descr = eventData.description;
@@ -4088,7 +4090,7 @@ bool ChatHandler::HandleLookupEventCommand(char* args)
 
         if (Utf8FitTo(descr, wnamepart))
         {
-            char const* active = activeEvents.find(id) != activeEvents.end() ? GetMangosString(LANG_ACTIVE) : "";
+            char const* active = sGameEventMgr.IsActiveEvent(id) ? GetMangosString(LANG_ACTIVE) : "";
 
             if (m_session)
                 PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description.c_str(), active);
@@ -4114,7 +4116,6 @@ bool ChatHandler::HandleEventListCommand(char* args)
         all = true;
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
 
     char const* active = GetMangosString(LANG_ACTIVE);
     char const* inactive = GetMangosString(LANG_FACTION_INACTIVE);
@@ -4122,7 +4123,10 @@ bool ChatHandler::HandleEventListCommand(char* args)
 
     for (uint32 event_id = 0; event_id < events.size(); ++event_id)
     {
-        if (activeEvents.find(event_id) == activeEvents.end())
+        if (!sGameEventMgr.IsValidEvent(event_id))
+            continue;
+
+        if (!sGameEventMgr.IsActiveEvent(event_id))
         {
             if (!all)
                 continue;
@@ -4159,7 +4163,7 @@ bool ChatHandler::HandleEventInfoCommand(char* args)
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
-    if (event_id >=events.size())
+    if (!sGameEventMgr.IsValidEvent(event_id))
     {
         SendSysMessage(LANG_EVENT_NOT_EXIST);
         SetSentErrorMessage(true);
@@ -4167,16 +4171,8 @@ bool ChatHandler::HandleEventInfoCommand(char* args)
     }
 
     GameEventData const& eventData = events[event_id];
-    if (!eventData.isValid())
-    {
-        SendSysMessage(LANG_EVENT_NOT_EXIST);
-        SetSentErrorMessage(true);
-        return false;
-    }
 
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
-    bool active = activeEvents.find(event_id) != activeEvents.end();
-    char const* activeStr = active ? GetMangosString(LANG_ACTIVE) : "";
+    char const* activeStr = sGameEventMgr.IsActiveEvent(event_id) ? GetMangosString(LANG_ACTIVE) : "";
 
     std::string startTimeStr = TimeToTimestampStr(eventData.start);
     std::string endTimeStr = TimeToTimestampStr(eventData.end);
@@ -4206,7 +4202,7 @@ bool ChatHandler::HandleEventStartCommand(char* args)
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
-    if (event_id < 1 || event_id >= events.size())
+    if (!sGameEventMgr.IsValidEvent(event_id))
     {
         SendSysMessage(LANG_EVENT_NOT_EXIST);
         SetSentErrorMessage(true);
@@ -4221,8 +4217,7 @@ bool ChatHandler::HandleEventStartCommand(char* args)
         return false;
     }
 
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
-    if (activeEvents.find(event_id) != activeEvents.end())
+    if (sGameEventMgr.IsActiveEvent(event_id))
     {
         PSendSysMessage(LANG_EVENT_ALREADY_ACTIVE,event_id);
         SetSentErrorMessage(true);
@@ -4246,7 +4241,7 @@ bool ChatHandler::HandleEventStopCommand(char* args)
 
     GameEventMgr::GameEventDataMap const& events = sGameEventMgr.GetEventMap();
 
-    if (event_id < 1 || event_id >= events.size())
+    if (!sGameEventMgr.IsValidEvent(event_id))
     {
         SendSysMessage(LANG_EVENT_NOT_EXIST);
         SetSentErrorMessage(true);
@@ -4261,9 +4256,7 @@ bool ChatHandler::HandleEventStopCommand(char* args)
         return false;
     }
 
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr.GetActiveEventList();
-
-    if (activeEvents.find(event_id) == activeEvents.end())
+    if (!sGameEventMgr.IsActiveEvent(event_id))
     {
         PSendSysMessage(LANG_EVENT_NOT_ACTIVE,event_id);
         SetSentErrorMessage(true);

@@ -414,7 +414,7 @@ enum ConditionType
     CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,      for condition true while quest active.
     CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD commission aura active
     CONDITION_NO_AURA               = 11,                   // spell_id     effindex
-    CONDITION_ACTIVE_EVENT          = 12,                   // event_id     0
+    CONDITION_ACTIVE_GAME_EVENT     = 12,                   // event_id     0
     CONDITION_AREA_FLAG             = 13,                   // area_flag    area_flag_not
     CONDITION_RACE_CLASS            = 14,                   // race_mask    class_mask
     CONDITION_LEVEL                 = 15,                   // player_level 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
@@ -427,9 +427,12 @@ enum ConditionType
     CONDITION_QUEST_NONE            = 22,                   // quest_id     0 (quest did not take and not rewarded)
     CONDITION_ITEM_WITH_BANK        = 23,                   // item_id      count   check present req. amount items in inventory or bank
     CONDITION_NOITEM_WITH_BANK      = 24,                   // item_id      count   check not present req. amount items in inventory or bank
+    CONDITION_NOT_ACTIVE_GAME_EVENT = 25,                   // event_id     0
+    CONDITION_ACTIVE_HOLIDAY        = 26,                   // holiday_id   0       preferred use instead CONDITION_ACTIVE_GAME_EVENT when possible
+    CONDITION_NOT_ACTIVE_HOLIDAY    = 27,                   // holiday_id   0       preferred use instead CONDITION_NOT_ACTIVE_GAME_EVENT when possible
 };
 
-#define MAX_CONDITION                 25                    // maximum value in ConditionType enum
+#define MAX_CONDITION                 28                    // maximum value in ConditionType enum
 
 struct PlayerCondition
 {

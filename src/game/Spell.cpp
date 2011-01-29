@@ -1284,7 +1284,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
                 unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 
             // can cause back attack (if detected), stealth removed at Spell::cast if spell break it
-            if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO) && !IsPositiveSpell(m_spellInfo->Id) &&
+            if (!(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && !IsPositiveSpell(m_spellInfo->Id) &&
                 m_caster->isVisibleForOrDetect(unit, unit, false))
             {
                 // use speedup check to avoid re-remove after above lines
@@ -1322,7 +1322,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask)
             if (unit->hasUnitState(UNIT_STAT_ATTACK_PLAYER))
                 realCaster->SetContestedPvP();
 
-            if (unit->isInCombat() && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_INITIAL_AGGRO))
+            if (unit->isInCombat() && !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO))
             {
                 realCaster->SetInCombatState(unit->GetCombatTimer() > 0);
                 unit->getHostileRefManager().threatAssist(realCaster, 0.0f, m_spellInfo);

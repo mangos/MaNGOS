@@ -1581,21 +1581,20 @@ namespace MaNGOS
 
 void WorldObject::MonsterSay(int32 textId, uint32 language, Unit* target)
 {
+    float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, textId, language, target);
     MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
-    MaNGOS::CameraDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> > say_worker(this,sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY),say_do);
-    Cell::VisitWorldObjects(this, say_worker, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY));
+    MaNGOS::CameraDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> > say_worker(this, range, say_do);
+    Cell::VisitWorldObjects(this, say_worker, range);
 }
 
 void WorldObject::MonsterYell(int32 textId, uint32 language, Unit* target)
 {
-
     float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL);
-
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, target);
     MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
     MaNGOS::CameraDistWorker<MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> > say_worker(this,range,say_do);
-    Cell::VisitWorldObjects(this, say_worker, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL));
+    Cell::VisitWorldObjects(this, say_worker, range);
 }
 
 void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit* target)
