@@ -2472,6 +2472,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     caster->SetThreatRedirectionTarget(0, 0);
                 return;
             }
+            case 52098:                                     // Charge Up
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 52092, true, NULL, this);
+
+                return;
+            }
             case 56511:                                     // Towers of Certain Doom: Tower Bunny Smoke Flare Effect
             {
                 // Towers of Certain Doom: Skorn Cannonfire
