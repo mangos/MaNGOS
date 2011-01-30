@@ -12,7 +12,9 @@ CREATE TABLE `vehicle_accessory` (
   PRIMARY KEY (`entry`,`seat_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Vehicle Accessory System';
 
-INSERT INTO `vehicle_accessory`(`entry`,`accessory_entry`,`seat_id`,`minion`,`description`) values
+INSERT INTO `vehicle_accessory`(`entry`,`accessory_entry`,`seat_id`,`minion`,`description`) VALUES
+(36891,31260,0,0,'Ymirjar Skycaller'),
+(27626,27627,0,1,'Tatjana\'s Horse'),
 (28312,28319,7,1,'Wintergrasp Siege Engine'),
 (32627,32629,7,1,'Wintergrasp Siege Engine'),
 (32930,32933,0,1,'Kologarn'),
