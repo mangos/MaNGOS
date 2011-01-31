@@ -2120,10 +2120,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         // Defensive Aura
                         target->CastSpell(target, 41105, true, NULL, this);
 
-                        // equipment (unknown, but should be axe+shield)
-                        //target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 0);
-                        //target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
-                        //target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        // equipment
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 32604);
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 31467);
+                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
                         return;
                     }
                     case 53790:                             // Defensive Stance
