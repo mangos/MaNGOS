@@ -9,5 +9,6 @@ enum ModelFlags
 };
 
 extern const char * szWorkDirWmo;
+extern const char * szWMAPMAGIC;
 
 #endif
