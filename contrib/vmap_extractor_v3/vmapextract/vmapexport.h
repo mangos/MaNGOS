@@ -9,6 +9,6 @@ enum ModelFlags
 };
 
 extern const char * szWorkDirWmo;
-extern const char * szWMAPMAGIC;
+extern const char * szRawVMAPMagic;                         // vmap magic string for extracted raw vmap data
 
 #endif
