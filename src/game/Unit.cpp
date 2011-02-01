@@ -9808,14 +9808,14 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
         return;
 
     // Handle effects proceed this time
-    for(ProcTriggeredList::const_iterator i = procTriggered.begin(); i != procTriggered.end(); ++i)
+    for(ProcTriggeredList::const_iterator itr = procTriggered.begin(); itr != procTriggered.end(); ++itr)
     {
         // Some auras can be deleted in function called in this loop (except first, ofc)
-        SpellAuraHolder *triggeredByHolder = i->triggeredByHolder;
+        SpellAuraHolder *triggeredByHolder = itr->triggeredByHolder;
         if(triggeredByHolder->IsDeleted())
             continue;
 
-        SpellProcEventEntry const *spellProcEvent = i->spellProcEvent;
+        SpellProcEventEntry const *spellProcEvent = itr->spellProcEvent;
         bool useCharges = triggeredByHolder->GetAuraCharges() > 0;
         bool procSuccess = true;
         bool anyAuraProc = false;
