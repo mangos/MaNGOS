@@ -1854,6 +1854,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         (spellInfo_2->Id == 57055 && spellInfo_1->Id == 56648))
                         return true;
 
+                    // Cologne Immune and Perfume Immune
+                    if ((spellInfo_1->Id == 68529 && spellInfo_2->Id == 68530) ||
+                        (spellInfo_2->Id == 68529 && spellInfo_1->Id == 68530))
+                        return true;
+
                     // Thunderfury
                     if ((spellInfo_1->Id == 21992 && spellInfo_2->Id == 27648) ||
                         (spellInfo_2->Id == 21992 && spellInfo_1->Id == 27648))
