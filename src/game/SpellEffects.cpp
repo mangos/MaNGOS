@@ -5938,6 +5938,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                     unitTarget->RemoveAuraHolderFromStack(24575);
                     return;
+                case 24719:                                 // Leper Gnome Costume
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Leper Gnome Costume (male or female)
+                    m_caster->CastSpell(unitTarget, unitTarget->getGender() == GENDER_MALE ? 24712 : 24713, true);
+                    return;
+                }
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP
                 {
                     uint32 spells[4] = { 26272, 26157, 26273, 26274 };
