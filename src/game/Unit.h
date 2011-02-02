@@ -1306,7 +1306,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsMounted() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT ); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
         void Mount(uint32 mount, uint32 spellId = 0);
-        void Unmount();
+        void Unmount(bool from_aura = false);
 
         uint16 GetMaxSkillValueForLevel(Unit const* target = NULL) const { return (target ? GetLevelForTarget(target) : getLevel()) * 5; }
         void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);

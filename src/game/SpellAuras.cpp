@@ -2985,7 +2985,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
     }
     else
     {
-        target->Unmount();
+        target->Unmount(true);
     }
 }
 
