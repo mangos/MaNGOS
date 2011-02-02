@@ -2642,8 +2642,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 return;
             }
             case 68839:                                     // Corrupt Soul
+            {
+                // Knockdown Stun
+                target->CastSpell(target, 68848, true, NULL, this);
+                // Draw Corrupted Soul
                 target->CastSpell(target, 68846, true, NULL, this);
                 return;
+            }
         }
 
         // Living Bomb
@@ -3103,7 +3108,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
     }
     else
     {
-        target->Unmount();
+        target->Unmount(true);
     }
 }
 
