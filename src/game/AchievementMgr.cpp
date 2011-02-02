@@ -848,9 +848,9 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         return;
 
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr.GetAchievementCriteriaByType(type);
-    for(AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
+    for(AchievementCriteriaEntryList::const_iterator itr = achievementCriteriaList.begin(); itr != achievementCriteriaList.end(); ++itr)
     {
-        AchievementCriteriaEntry const *achievementCriteria = (*i);
+        AchievementCriteriaEntry const *achievementCriteria = *itr;
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
         if (!achievement)

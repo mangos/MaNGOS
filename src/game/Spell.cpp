@@ -1606,7 +1606,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 38794:                                 // Murmur's Touch (h)
                 case 50988:                                 // Glare of the Tribunal (Halls of Stone)
                 case 59870:                                 // Glare of the Tribunal (h) (Halls of Stone)
-                case 68950:                                 // Fear (ICC: Forge of Souls)
                 case 66001:                                 // Touch of Darkness
                 case 67281:
                 case 67282:
@@ -1615,6 +1614,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 67296:
                 case 67297:
                 case 67298:
+                case 68950:                                 // Fear
                     unMaxTargets = 1;
                     break;
                 case 28542:                                 // Life Drain
