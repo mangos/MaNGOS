@@ -589,7 +589,8 @@ void Unit::resetAttackTimer(WeaponAttackType type)
 
 bool Unit::CanReachWithMeleeAttack(Unit* pVictim, float flat_mod /*= 0.0f*/) const
 {
-    MANGOS_ASSERT(pVictim);
+    if (!pVictim)
+        return false;
 
     // The measured values show BASE_MELEE_OFFSET in (1.3224, 1.342)
     float reach = GetFloatValue(UNIT_FIELD_COMBATREACH) + pVictim->GetFloatValue(UNIT_FIELD_COMBATREACH) +
