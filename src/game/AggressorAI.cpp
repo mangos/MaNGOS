@@ -128,7 +128,7 @@ AggressorAI::UpdateAI(const uint32 /*diff*/)
 
     if( m_creature->isAttackReady() )
     {
-        if( m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
         {
             m_creature->AttackerStateUpdate(m_creature->getVictim());
             m_creature->resetAttackTimer();

@@ -31,7 +31,7 @@
 #define BG_EVENT_DOOR 254
 // only arena event
 // cause this buff apears 90sec after start in every bg i implement it here
-#define ARENA_BUFF_EVENT 252
+#define ARENA_BUFF_EVENT 253
 
 
 class Creature;

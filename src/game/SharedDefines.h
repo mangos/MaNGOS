@@ -1179,6 +1179,13 @@ enum SpellPreventionType
     SPELL_PREVENTION_TYPE_PACIFY    = 2
 };
 
+// indexes from SpellRange.dbc, listed only special and used in code
+enum SpellRangeIndex
+{
+    SPELL_RANGE_IDX_SELF_ONLY = 1,                          // 0.0
+    SPELL_RANGE_IDX_COMBAT    = 2,                          // 5.5 (but dynamic)
+};
+
 enum DamageEffectType
 {
     DIRECT_DAMAGE           = 0,                            // used for normal weapon damage (not for class abilities or spells)

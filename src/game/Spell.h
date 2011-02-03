@@ -500,7 +500,7 @@ class Spell
         void CleanupTargetList();
         void ClearCastItem();
 
-        static void SelectMountByAreaAndSkill(Unit* target, uint32 spellId75, uint32 spellId150, uint32 spellId225, uint32 spellId300, uint32 spellIdSpecial);
+        static void SelectMountByAreaAndSkill(Unit* target, SpellEntry const* parentSpell, uint32 spellId75, uint32 spellId150, uint32 spellId225, uint32 spellId300, uint32 spellIdSpecial);
     protected:
         bool HasGlobalCooldown();
         void TriggerGlobalCooldown();

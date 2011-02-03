@@ -1284,24 +1284,22 @@ void Player::Update( uint32 update_diff, uint32 p_time )
             // default combat reach 10
             // TODO add weapon,skill check
 
-            float pldistance = ATTACK_DISTANCE;
-
             if (isAttackReady(BASE_ATTACK))
             {
-                if(!IsWithinDistInMap(pVictim, pldistance))
+                if (!CanReachWithMeleeAttack(pVictim))
                 {
                     setAttackTimer(BASE_ATTACK,100);
-                    if(m_swingErrorMsg != 1)                // send single time (client auto repeat)
+                    if (m_swingErrorMsg != 1)               // send single time (client auto repeat)
                     {
                         SendAttackSwingNotInRange();
                         m_swingErrorMsg = 1;
                     }
                 }
                 //120 degrees of radiant range
-                else if( !HasInArc( 2*M_PI_F/3, pVictim ))
+                else if (!HasInArc(2*M_PI_F/3, pVictim))
                 {
                     setAttackTimer(BASE_ATTACK,100);
-                    if(m_swingErrorMsg != 2)                // send single time (client auto repeat)
+                    if (m_swingErrorMsg != 2)               // send single time (client auto repeat)
                     {
                         SendAttackSwingBadFacingAttack();
                         m_swingErrorMsg = 2;
@@ -1312,7 +1310,7 @@ void Player::Update( uint32 update_diff, uint32 p_time )
                     m_swingErrorMsg = 0;                    // reset swing error state
 
                     // prevent base and off attack in same time, delay attack at 0.2 sec
-                    if(haveOffhandWeapon())
+                    if (haveOffhandWeapon())
                     {
                         uint32 off_att = getAttackTimer(OFF_ATTACK);
                         if(off_att < ATTACK_DISPLAY_DELAY)
@@ -1323,13 +1321,13 @@ void Player::Update( uint32 update_diff, uint32 p_time )
                 }
             }
 
-            if ( haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
+            if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
             {
-                if(!IsWithinDistInMap(pVictim, pldistance))
+                if (!CanReachWithMeleeAttack(pVictim))
                 {
                     setAttackTimer(OFF_ATTACK,100);
                 }
-                else if( !HasInArc( 2*M_PI_F/3, pVictim ))
+                else if (!HasInArc(2*M_PI_F/3, pVictim))
                 {
                     setAttackTimer(OFF_ATTACK,100);
                 }
@@ -1347,7 +1345,7 @@ void Player::Update( uint32 update_diff, uint32 p_time )
 
             Unit *owner = pVictim->GetOwner();
             Unit *u = owner ? owner : pVictim;
-            if(u->IsPvP() && (!duel || duel->opponent != u))
+            if (u->IsPvP() && (!duel || duel->opponent != u))
             {
                 UpdatePvP(true);
                 RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -1355,9 +1353,9 @@ void Player::Update( uint32 update_diff, uint32 p_time )
         }
     }
 
-    if(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if(roll_chance_i(3) && GetTimeInnEnter() > 0)       //freeze update
+        if (roll_chance_i(3) && GetTimeInnEnter() > 0)      //freeze update
         {
             time_t time_inn = time(NULL)-GetTimeInnEnter();
             if (time_inn >= 10)                             //freeze update

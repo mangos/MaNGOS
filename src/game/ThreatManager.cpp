@@ -316,9 +316,9 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
             }
         }
 
-        if(!pAttacker->IsOutOfThreatArea(target))           // skip non attackable currently targets
+        if (!pAttacker->IsOutOfThreatArea(target))          // skip non attackable currently targets
         {
-            if(pCurrentVictim)                              // select 1.3/1.1 better target in comparison current target
+            if (pCurrentVictim)                             // select 1.3/1.1 better target in comparison current target
             {
                 // list sorted and and we check current target, then this is best case
                 if(pCurrentVictim == currentRef || currentRef->getThreat() <= 1.1f * pCurrentVictim->getThreat() )
@@ -330,7 +330,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
 
                 if (currentRef->getThreat() > 1.3f * pCurrentVictim->getThreat() ||
                      (currentRef->getThreat() > 1.1f * pCurrentVictim->getThreat() &&
-                     pAttacker->IsWithinDistInMap(target, ATTACK_DISTANCE)) )
+                     pAttacker->CanReachWithMeleeAttack(target)) )
                 {                                           //implement 110% threat rule for targets in melee range
                     found = true;                           //and 130% rule for targets in ranged distances
                     break;                                  //for selecting alive targets
