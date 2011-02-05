@@ -1366,16 +1366,20 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
 
 void CreatureEventAI::DoMeleeAttackIfReady()
 {
-    //Make sure our attack is ready before checking distance
-    if (m_creature->isAttackReady())
-    {
-        //If we are within range melee the target
-        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
-        {
-            m_creature->AttackerStateUpdate(m_creature->getVictim());
-            m_creature->resetAttackTimer();
-        }
-    }
+    // Check target
+    if (!m_creature->getVictim())
+        return;
+    
+    // Make sure our attack is ready before checking distance
+    if (!m_creature->isAttackReady())
+        return;
+
+    // If we are within range melee the target
+    if (!m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        return;
+
+    m_creature->AttackerStateUpdate(m_creature->getVictim());
+    m_creature->resetAttackTimer();
 }
 
 bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered)
