@@ -290,10 +290,6 @@ int Master::Run()
         soap_thread = new ACE_Based::Thread(runnable);
     }
 
-
-    uint32 realCurrTime, realPrevTime;
-    realCurrTime = realPrevTime = WorldTimer::getMSTime();
-
     ///- Start up freeze catcher thread
     ACE_Based::Thread* freeze_thread = NULL;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
