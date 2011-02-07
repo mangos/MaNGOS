@@ -522,6 +522,7 @@ class ChatHandler
         bool HandleTaxiCheatCommand(char* args);
         bool HandleWhispersCommand(char* args);
         bool HandleModifyDrunkCommand(char* args);
+        bool HandleSetViewCommand(char* args);
 
         bool HandleLoadScriptsCommand(char* args);
 

@@ -2241,3 +2241,17 @@ bool ChatHandler::HandleModifyDrunkCommand(char* args)
 
     return true;
 }
+
+bool ChatHandler::HandleSetViewCommand(char* /*args*/)
+{
+    if (Unit* unit = getSelectedUnit())
+        m_session->GetPlayer()->GetCamera().SetView(unit);
+    else
+    {
+        PSendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    return true;
+}
