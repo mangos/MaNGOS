@@ -2037,6 +2037,9 @@ void Player::RemoveFromWorld()
     ///- Do not add/remove the player from the object storage
     ///- It will crash when updating the ObjectAccessor
     ///- The player should only be removed when logging out
+    if (IsInWorld())
+        GetCamera().ResetView();
+
     Unit::RemoveFromWorld();
 }
 
