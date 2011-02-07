@@ -201,33 +201,34 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
         InstanceResetScheduler& GetScheduler() { return m_Scheduler; }
 
         InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false);
-        void RemoveInstanceSave(uint32 InstanceId);
+        void RemoveInstanceSave(uint32 mapId, uint32 instanceId);
         static void DeleteInstanceFromDB(uint32 instanceid);
 
         /* statistics */
-        uint32 GetNumInstanceSaves() { return m_instanceSaveById.size(); }
+        uint32 GetNumInstanceSaves() { return m_instanceSaveByInstanceId.size() + m_instanceSaveByMapId.size(); }
         uint32 GetNumBoundPlayersTotal();
         uint32 GetNumBoundGroupsTotal();
 
         void Update() { m_Scheduler.Update(); }
     private:
-        typedef UNORDERED_MAP<uint32 /*InstanceId*/, InstanceSave*> InstanceSaveHashMap;
-        typedef UNORDERED_MAP<uint32 /*mapId*/, InstanceSaveHashMap> InstanceSaveMapMap;
+        typedef UNORDERED_MAP<uint32 /*InstanceId or MapId*/, InstanceSave*> InstanceSaveHashMap;
 
-        InstanceSave *GetInstanceSave(uint32 InstanceId);
+        InstanceSave *GetInstanceSave(uint32 mapId, uint32 InstanceId);
 
         //  called by scheduler
         void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 timeleft);
         void _ResetInstance(uint32 mapid, uint32 instanceId);
         void _CleanupExpiredInstancesAtTime(time_t t);
 
-        void _ResetSave(InstanceSaveHashMap::iterator &itr);
+        void _ResetSave(InstanceSaveHashMap& holder, InstanceSaveHashMap::iterator &itr);
         void _DelHelper(DatabaseType &db, const char *fields, const char *table, const char *queryTail,...);
 
         // used during global instance resets
         bool lock_instLists;
-        // fast lookup by instance id
-        InstanceSaveHashMap m_instanceSaveById;
+        // fast lookup by instance id for instanceable maps
+        InstanceSaveHashMap m_instanceSaveByInstanceId;
+        // fast lookup by map id for non-instanceable maps
+        InstanceSaveHashMap m_instanceSaveByMapId;
 
         InstanceResetScheduler m_Scheduler;
 };

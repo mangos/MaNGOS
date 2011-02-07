@@ -69,8 +69,7 @@ void InstanceSave::SaveToDB()
     // save instance data too
     std::string data;
 
-    Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
-    if(map)
+    if (Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid))
     {
         InstanceData *iData = map->GetInstanceData();
         if(iData && iData->Save())
@@ -80,7 +79,8 @@ void InstanceSave::SaveToDB()
         }
     }
 
-    CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '"UI64FMTD"', '%u', '%s')", m_instanceid, GetMapId(), (uint64)GetResetTimeForDB(), GetDifficulty(), data.c_str());
+    if (m_instanceid)
+        CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '"UI64FMTD"', '%u', '%s')", m_instanceid, GetMapId(), (uint64)GetResetTimeForDB(), GetDifficulty(), data.c_str());
 }
 
 time_t InstanceSave::GetResetTimeForDB() const
@@ -106,7 +106,8 @@ MapEntry const* InstanceSave::GetMapEntry() const
 
 void InstanceSave::DeleteFromDB()
 {
-    InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
+    if (GetInstanceId())
+        InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
 }
 
 /* true if the instance save is still valid */
@@ -114,7 +115,7 @@ bool InstanceSave::UnloadIfEmpty()
 {
     if (m_playerList.empty() && m_groupList.empty() && !m_usedByMap)
     {
-        sInstanceSaveMgr.RemoveInstanceSave(GetInstanceId());
+        sInstanceSaveMgr.RemoveInstanceSave(GetMapId(), GetInstanceId());
         return false;
     }
     else
@@ -372,7 +373,9 @@ InstanceSaveManager::~InstanceSaveManager()
     // it is undefined whether this or objectmgr will be unloaded first
     // so we must be prepared for both cases
     lock_instLists = true;
-    for (InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end(); ++itr)
+    for (InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end(); ++itr)
+        delete  itr->second;
+    for (InstanceSaveHashMap::iterator itr = m_instanceSaveByMapId.begin(); itr != m_instanceSaveByMapId.end(); ++itr)
         delete  itr->second;
 }
 
@@ -382,7 +385,7 @@ InstanceSaveManager::~InstanceSaveManager()
 */
 InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load)
 {
-    if(InstanceSave *old_save = GetInstanceSave(instanceId))
+    if(InstanceSave *old_save = GetInstanceSave(mapId, instanceId))
         return old_save;
 
     const MapEntry* entry = sMapStore.LookupEntry(mapId);
@@ -392,70 +395,124 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
         return NULL;
     }
 
-    if (instanceId == 0)
+    if (entry->Instanceable())
     {
-        sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
-        return NULL;
-    }
-
-    if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
-    {
-        sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
-        return NULL;
-    }
-
-    if(!resetTime)
-    {
-        // initialize reset time
-        // for normal instances if no creatures are killed the instance will reset in two hours
-        if(entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
-            resetTime = m_Scheduler.GetResetTimeFor(mapId,difficulty);
-        else
+        if (instanceId == 0)
         {
-            resetTime = time(NULL) + 2 * HOUR;
-            // normally this will be removed soon after in InstanceMap::Add, prevent error
-            m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DUNGEON, mapId, difficulty, instanceId));
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d for instanceable map!", mapId, instanceId);
+            return NULL;
+        }
+
+        if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+        {
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong difficulty %u!", mapId, instanceId, difficulty);
+            return NULL;
+        }
+
+        if (!resetTime)
+        {
+            // initialize reset time
+            // for normal instances if no creatures are killed the instance will reset in two hours
+            if (entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
+                resetTime = m_Scheduler.GetResetTimeFor(mapId,difficulty);
+            else
+            {
+                resetTime = time(NULL) + 2 * HOUR;
+                // normally this will be removed soon after in InstanceMap::Add, prevent error
+                m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DUNGEON, mapId, difficulty, instanceId));
+            }
+        }
+    }
+    else
+    {
+        if (instanceId != 0)
+        {
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d for non-instanceable map!", mapId, instanceId);
+            return NULL;
+        }
+
+        if (difficulty != REGULAR_DIFFICULTY)
+        {
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong difficulty %u  for non-instanceable map!", mapId, instanceId, difficulty);
+            return NULL;
+        }
+
+        if (resetTime)
+        {
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong reset time %u  for non-instanceable map!", mapId, instanceId, resetTime);
+            return NULL;
+        }
+
+        if (canReset)
+        {
+            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong canReset %u  for non-instanceable map!", mapId, instanceId, canReset ? 1 : 0);
+            return NULL;
         }
     }
 
-    DEBUG_LOG("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d", mapId, instanceId);
+    DEBUG_LOG("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, reset time = %u, canRset = %u", mapId, instanceId, resetTime, canReset ? 1 : 0);
 
     InstanceSave *save = new InstanceSave(mapId, instanceId, difficulty, resetTime, canReset);
-    if(!load) save->SaveToDB();
+    if (!load)
+        save->SaveToDB();
 
-    m_instanceSaveById[instanceId] = save;
+    if (entry->Instanceable())
+        m_instanceSaveByInstanceId[instanceId] = save;
+    else
+        m_instanceSaveByMapId[mapId] = save;
+
     return save;
 }
 
-InstanceSave *InstanceSaveManager::GetInstanceSave(uint32 InstanceId)
+InstanceSave *InstanceSaveManager::GetInstanceSave(uint32 mapId, uint32 instanceId)
 {
-    InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(InstanceId);
-    return itr != m_instanceSaveById.end() ? itr->second : NULL;
+    if (instanceId)
+    {
+        InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
+        return itr != m_instanceSaveByInstanceId.end() ? itr->second : NULL;
+    }
+    else
+    {
+        InstanceSaveHashMap::iterator itr = m_instanceSaveByMapId.find(mapId);
+        return itr != m_instanceSaveByMapId.end() ? itr->second : NULL;
+    }
 }
 
 void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
 {
-    CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'", instanceid);
-    CharacterDatabase.PExecute("DELETE FROM character_instance WHERE instance = '%u'", instanceid);
-    CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceid);
-    CharacterDatabase.CommitTransaction();
+    if (instanceid)
+    {
+        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceid);
+        CharacterDatabase.CommitTransaction();
+    }
     // respawn times should be deleted only when the map gets unloaded
 }
 
-void InstanceSaveManager::RemoveInstanceSave(uint32 InstanceId)
+void InstanceSaveManager::RemoveInstanceSave(uint32 mapId, uint32 instanceId)
 {
     if (lock_instLists)
         return;
 
-    InstanceSaveHashMap::iterator itr = m_instanceSaveById.find( InstanceId );
-    if(itr != m_instanceSaveById.end())
+    if (instanceId)
     {
-        // save the resettime for normal instances only when they get unloaded
-        if(time_t resettime = itr->second->GetResetTimeForDB())
-            CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, InstanceId);
+        InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
+        if (itr != m_instanceSaveByInstanceId.end())
+        {
+            // save the resettime for normal instances only when they get unloaded
+            if(time_t resettime = itr->second->GetResetTimeForDB())
+                CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, instanceId);
 
-        _ResetSave(itr);
+            _ResetSave(m_instanceSaveByInstanceId, itr);
+        }
+    }
+    else
+    {
+        InstanceSaveHashMap::iterator itr = m_instanceSaveByMapId.find(mapId);
+        if (itr != m_instanceSaveByMapId.end())
+            _ResetSave(m_instanceSaveByMapId, itr);
     }
 }
 
@@ -572,13 +629,13 @@ void InstanceSaveManager::PackInstances()
     sLog.outString();
 }
 
-void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator &itr)
+void InstanceSaveManager::_ResetSave(InstanceSaveHashMap& holder, InstanceSaveHashMap::iterator &itr)
 {
     // unbind all players bound to the instance
     // do not allow UnbindInstance to automatically unload the InstanceSaves
     lock_instLists = true;
     delete itr->second;
-    m_instanceSaveById.erase(itr++);
+    holder.erase(itr++);
     lock_instLists = false;
 }
 
@@ -589,9 +646,9 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
     if (!iMap || !iMap->Instanceable())
         return;
 
-    InstanceSaveHashMap::iterator itr = m_instanceSaveById.find(instanceId);
-    if (itr != m_instanceSaveById.end())
-        _ResetSave(itr);
+    InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
+    if (itr != m_instanceSaveByInstanceId.end())
+        _ResetSave(m_instanceSaveByInstanceId, itr);
 
     DeleteInstanceFromDB(instanceId);                       // even if save not loaded
 
@@ -620,10 +677,10 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         }
 
         // remove all binds to instances of the given map
-        for(InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end();)
+        for(InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end();)
         {
             if (itr->second->GetMapId() == mapid && itr->second->GetDifficulty() == difficulty)
-                _ResetSave(itr);
+                _ResetSave(m_instanceSaveByInstanceId, itr);
             else
                 ++itr;
         }
@@ -663,7 +720,8 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
 uint32 InstanceSaveManager::GetNumBoundPlayersTotal()
 {
     uint32 ret = 0;
-    for(InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end(); ++itr)
+    // only instanceable maps have bounds
+    for(InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end(); ++itr)
         ret += itr->second->GetPlayerCount();
     return ret;
 }
@@ -671,7 +729,8 @@ uint32 InstanceSaveManager::GetNumBoundPlayersTotal()
 uint32 InstanceSaveManager::GetNumBoundGroupsTotal()
 {
     uint32 ret = 0;
-    for(InstanceSaveHashMap::iterator itr = m_instanceSaveById.begin(); itr != m_instanceSaveById.end(); ++itr)
+    // only instanceable maps have bounds
+    for(InstanceSaveHashMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end(); ++itr)
         ret += itr->second->GetGroupCount();
     return ret;
 }
