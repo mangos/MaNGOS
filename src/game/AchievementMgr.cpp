@@ -331,21 +331,11 @@ bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* sou
         {
             if (!source->IsInWorld())
                 return false;
-            Map* map = source->GetMap();
-            // BattleGroundMap-class is instanceable, but no InstanceMap-class
-            if (map->IsBattleGroundOrArena())
-                return false;
-            if (!map->Instanceable())
-            {
-                sLog.outErrorDb("Achievement system call ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT (%u) for achievement criteria %u for non-instance map %u",
-                    ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT, criteria_id, map->GetId());
-                    return false;
-            }
-            InstanceData* data = ((InstanceMap*)map)->GetInstanceData();
+            InstanceData* data = source->GetInstanceData();
             if (!data)
             {
                 sLog.outErrorDb("Achievement system call ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT (%u) for achievement criteria %u for map %u but map not have instance script",
-                    ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT, criteria_id, map->GetId());
+                    ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT, criteria_id, source->GetMapId());
                 return false;
             }
             return data->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);

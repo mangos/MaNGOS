@@ -72,8 +72,7 @@ void InstanceSave::SaveToDB()
     Map *map = sMapMgr.FindMap(GetMapId(),m_instanceid);
     if(map)
     {
-        MANGOS_ASSERT(map->IsDungeon());
-        InstanceData *iData = ((InstanceMap *)map)->GetInstanceData();
+        InstanceData *iData = map->GetInstanceData();
         if(iData && iData->Save())
         {
             data = iData->Save();

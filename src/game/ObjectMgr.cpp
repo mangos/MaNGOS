@@ -4685,9 +4685,9 @@ void ObjectMgr::LoadInstanceTemplate()
             continue;
         }
 
-        if (mapEntry->IsContinent())
+        if (!mapEntry->Instanceable())
         {
-            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: continent mapid %d for template!", temp->map);
+            sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: non-instanceable mapid %d for template!", temp->map);
             sInstanceTemplate.EraseEntry(i);
             continue;
         }
@@ -4715,6 +4715,46 @@ void ObjectMgr::LoadInstanceTemplate()
     }
 
     sLog.outString( ">> Loaded %u Instance Template definitions", sInstanceTemplate.RecordCount );
+    sLog.outString();
+}
+
+struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader>
+{
+    template<class D>
+    void convert_from_str(uint32 /*field_pos*/, char const *src, D &dst)
+    {
+        dst = D(sScriptMgr.GetScriptId(src));
+    }
+};
+
+void ObjectMgr::LoadWorldTemplate()
+{
+    SQLWorldLoader loader;
+    loader.Load(sWorldTemplate);
+
+    for(uint32 i = 0; i < sWorldTemplate.MaxEntry; i++)
+    {
+        WorldTemplate const* temp = GetWorldTemplate(i);
+        if (!temp)
+            continue;
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(temp->map);
+        if (!mapEntry)
+        {
+            sLog.outErrorDb("ObjectMgr::LoadWorldTemplate: bad mapid %d for template!", temp->map);
+            sWorldTemplate.EraseEntry(i);
+            continue;
+        }
+
+        if (mapEntry->Instanceable())
+        {
+            sLog.outErrorDb("ObjectMgr::LoadWorldTemplate: instanceable mapid %d for template!", temp->map);
+            sWorldTemplate.EraseEntry(i);
+            continue;
+        }
+    }
+
+    sLog.outString( ">> Loaded %u World Template definitions", sWorldTemplate.RecordCount );
     sLog.outString();
 }
 

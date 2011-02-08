@@ -31,5 +31,6 @@ extern SQLStorage sGOStorage;
 extern SQLStorage sPageTextStore;
 extern SQLStorage sItemStorage;
 extern SQLStorage sInstanceTemplate;
+extern SQLStorage sWorldTemplate;
 
 #endif

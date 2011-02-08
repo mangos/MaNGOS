@@ -509,6 +509,11 @@ class ObjectMgr
             return sInstanceTemplate.LookupEntry<InstanceTemplate>(map);
         }
 
+        static WorldTemplate const* GetWorldTemplate(uint32 map)
+        {
+            return sWorldTemplate.LookupEntry<WorldTemplate>(map);
+        }
+
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 
         PlayerClassInfo const* GetPlayerClassInfo(uint32 class_) const
@@ -661,6 +666,7 @@ class ObjectMgr
         void LoadGossipMenuItemsLocales();
         void LoadPointOfInterestLocales();
         void LoadInstanceTemplate();
+        void LoadWorldTemplate();
         void LoadMailLevelRewards();
 
         void LoadGossipText();

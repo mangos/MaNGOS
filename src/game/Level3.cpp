@@ -6339,21 +6339,16 @@ bool ChatHandler::HandleInstanceSaveDataCommand(char* /*args*/)
     Player* pl = m_session->GetPlayer();
 
     Map* map = pl->GetMap();
-    if (!map->IsDungeon())
-    {
-        PSendSysMessage("Map is not a dungeon.");
-        SetSentErrorMessage(true);
-        return false;
-    }
 
-    if (!((InstanceMap*)map)->GetInstanceData())
+    InstanceData* iData = map->GetInstanceData();
+    if (!iData)
     {
         PSendSysMessage("Map has no instance data.");
         SetSentErrorMessage(true);
         return false;
     }
 
-    ((InstanceMap*)map)->GetInstanceData()->SaveToDB();
+    iData->SaveToDB();
     return true;
 }
 

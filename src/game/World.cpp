@@ -931,6 +931,9 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Script Names...");
     sScriptMgr.LoadScriptNames();
 
+    sLog.outString( "Loading WorldTemplate..." );
+    sObjectMgr.LoadWorldTemplate();
+
     sLog.outString( "Loading InstanceTemplate..." );
     sObjectMgr.LoadInstanceTemplate();
 
