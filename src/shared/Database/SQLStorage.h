@@ -94,7 +94,7 @@ template <class T>
 struct SQLStorageLoaderBase
 {
     public:
-        void Load(SQLStorage &storage);
+        void Load(SQLStorage &storage, bool error_at_empty = true);
 
         template<class S, class D>
             void convert(uint32 field_pos, S src, D &dst);

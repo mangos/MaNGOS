@@ -4730,7 +4730,7 @@ struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader>
 void ObjectMgr::LoadWorldTemplate()
 {
     SQLWorldLoader loader;
-    loader.Load(sWorldTemplate);
+    loader.Load(sWorldTemplate, false);
 
     for(uint32 i = 0; i < sWorldTemplate.MaxEntry; i++)
     {
