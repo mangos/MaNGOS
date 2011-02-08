@@ -1275,6 +1275,12 @@ void Map::CreateInstanceData(bool load)
             }
             delete result;
         }
+        else
+        {
+            // for non-instanceable map always add data to table if not found, later code expected that for map in `word` exist always after load
+            if (!Instanceable())
+                CharacterDatabase.PExecute("INSERT INTO world VALUES ('%u', '')", GetId());
+        }
     }
     else
     {
