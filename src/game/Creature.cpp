@@ -454,6 +454,9 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 lootForBody         = false;
                 lootForSkin         = false;
 
+                // Clear possible auras having IsDeathPersistent() attribute
+                RemoveAllAuras();
+
                 if(m_originalEntry != GetEntry())
                 {
                     // need preserver gameevent state
