@@ -1431,11 +1431,8 @@ bool InstanceMap::Add(Player *player)
                             pGroup->GetId(), groupBind->save->GetMapId(),
                             groupBind->save->GetInstanceId(), groupBind->save->GetDifficulty());
 
-                        if (GetInstanceSave())
-                            sLog.outError("MapSave players: %d, group count: %d",
+                        sLog.outError("MapSave players: %d, group count: %d",
                             GetInstanceSave()->GetPlayerCount(), GetInstanceSave()->GetGroupCount());
-                        else
-                            sLog.outError("MapSave NULL");
 
                         if (groupBind->save)
                             sLog.outError("GroupBind save players: %d, group count: %d", groupBind->save->GetPlayerCount(), groupBind->save->GetGroupCount());
@@ -1589,7 +1586,7 @@ void InstanceMap::UnloadAll(bool pForce)
     }
 
     if(m_resetAfterUnload == true)
-        sObjectMgr.DeleteRespawnTimeForInstance(GetInstanceId());
+        GetInstanceSave()->DeleteRespawnTimes();
 
     Map::UnloadAll(pForce);
 }

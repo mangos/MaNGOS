@@ -1042,13 +1042,13 @@ void World::SetInitialWorldSettings()
     sLog.outString();
 
     sLog.outString( "Loading Creature Respawn Data..." );   // must be after PackInstances()
-    sObjectMgr.LoadCreatureRespawnTimes();
+    sInstanceSaveMgr.LoadCreatureRespawnTimes();
 
     sLog.outString( "Loading Gameobject Data..." );
     sObjectMgr.LoadGameobjects();
 
     sLog.outString( "Loading Gameobject Respawn Data..." ); // must be after PackInstances()
-    sObjectMgr.LoadGameobjectRespawnTimes();
+    sInstanceSaveMgr.LoadGameobjectRespawnTimes();
 
     sLog.outString( "Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();

@@ -110,16 +110,78 @@ void InstanceSave::DeleteFromDB()
         InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
 }
 
+void InstanceSave::DeleteRespawnTimes()
+{
+    // possible reset for instanceable map only
+    if (!m_instanceid)
+        return;
+
+    m_goRespawnTimes.clear();
+    m_creatureRespawnTimes.clear();
+
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", m_instanceid);
+    CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", m_instanceid);
+    CharacterDatabase.CommitTransaction();
+}
+
 /* true if the instance save is still valid */
 bool InstanceSave::UnloadIfEmpty()
 {
-    if (m_playerList.empty() && m_groupList.empty() && !m_usedByMap)
+    // prevent unload if any bounded groups or online bounded player still exists
+    // also prevent unload if respawn data still exist (will not prevent reset by scheduler)
+    if (m_playerList.empty() && m_groupList.empty() && !m_usedByMap &&
+        m_creatureRespawnTimes.empty() && m_goRespawnTimes.empty())
     {
         sInstanceSaveMgr.RemoveInstanceSave(GetMapId(), GetInstanceId());
         return false;
     }
     else
         return true;
+}
+
+void InstanceSave::SaveCreatureRespawnTime(uint32 loguid, time_t t)
+{
+    SetCreatureRespawnTime(loguid, t);
+
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
+    if(t > sWorld.GetGameTime())
+        CharacterDatabase.PExecute("INSERT INTO creature_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), m_instanceid);
+    CharacterDatabase.CommitTransaction();
+}
+
+void InstanceSave::SaveGORespawnTime(uint32 loguid, time_t t)
+{
+    SetGORespawnTime(loguid, t);
+
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
+    if(t > sWorld.GetGameTime())
+        CharacterDatabase.PExecute("INSERT INTO gameobject_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), m_instanceid);
+    CharacterDatabase.CommitTransaction();
+}
+
+void InstanceSave::SetCreatureRespawnTime( uint32 loguid, time_t t )
+{
+    if (t > sWorld.GetGameTime())
+        m_creatureRespawnTimes[loguid] = t;
+    else
+    {
+        m_creatureRespawnTimes.erase(loguid);
+        UnloadIfEmpty();
+    }
+}
+
+void InstanceSave::SetGORespawnTime( uint32 loguid, time_t t )
+{
+    if (t > sWorld.GetGameTime())
+        m_goRespawnTimes[loguid] = t;
+    else
+    {
+        m_goRespawnTimes.erase(loguid);
+        UnloadIfEmpty();
+    }
 }
 
 //== InstanceResetScheduler functions ======================
@@ -486,9 +548,10 @@ void InstanceSaveManager::DeleteInstanceFromDB(uint32 instanceid)
         CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'", instanceid);
         CharacterDatabase.PExecute("DELETE FROM character_instance WHERE instance = '%u'", instanceid);
         CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", instanceid);
         CharacterDatabase.CommitTransaction();
     }
-    // respawn times should be deleted only when the map gets unloaded
 }
 
 void InstanceSaveManager::RemoveInstanceSave(uint32 mapId, uint32 instanceId)
@@ -654,8 +717,6 @@ void InstanceSaveManager::_ResetInstance(uint32 mapid, uint32 instanceId)
 
     if (iMap->IsDungeon())
         ((InstanceMap*)iMap)->Reset(INSTANCE_RESET_RESPAWN_DELAY);
-    else
-        sObjectMgr.DeleteRespawnTimeForInstance(instanceId);// even if map is not loaded
 }
 
 void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 timeLeft)
@@ -738,4 +799,123 @@ uint32 InstanceSaveManager::GetNumBoundGroupsTotal()
 void InstanceSaveManager::_CleanupExpiredInstancesAtTime( time_t t )
 {
     _DelHelper(CharacterDatabase, "id, map, instance.difficulty", "instance", "LEFT JOIN instance_reset ON mapid = map AND instance.difficulty =  instance_reset.difficulty WHERE (instance.resettime < '"UI64FMTD"' AND instance.resettime > '0') OR (NOT instance_reset.resettime IS NULL AND instance_reset.resettime < '"UI64FMTD"')",  (uint64)t, (uint64)t);
+}
+
+void InstanceSaveManager::LoadCreatureRespawnTimes()
+{
+    // remove outdated data
+    CharacterDatabase.DirectExecute("DELETE FROM creature_respawn WHERE respawntime <= UNIX_TIMESTAMP(NOW())");
+
+    uint32 count = 0;
+
+    QueryResult *result = CharacterDatabase.Query("SELECT guid, respawntime, instance FROM creature_respawn");
+
+    if(!result)
+    {
+        barGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded 0 creature respawn time.");
+        return;
+    }
+
+    barGoLink bar((int)result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 loguid       = fields[0].GetUInt32();
+        uint64 respawn_time = fields[1].GetUInt64();
+        uint32 instanceId   = fields[2].GetUInt32();
+
+        CreatureData const* data = sObjectMgr.GetCreatureData(loguid);
+        if (!data)
+            continue;
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+        if (!mapEntry || (mapEntry->Instanceable() != (instanceId != 0)))
+            continue;
+
+        // instances loaded early and respawn data must exist only for existed instances (save loaded) or non-instanced maps
+        InstanceSave* save = instanceId
+            ? GetInstanceSave(data->mapid, instanceId)
+            : AddInstanceSave(data->mapid, 0, REGULAR_DIFFICULTY, 0, false, true);
+
+        if (!save)
+            continue;
+
+        save->SetCreatureRespawnTime(loguid, time_t(respawn_time));
+
+        ++count;
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString(">> Loaded %u creature respawn times", count);
+    sLog.outString();
+}
+
+void InstanceSaveManager::LoadGameobjectRespawnTimes()
+{
+    // remove outdated data
+    CharacterDatabase.DirectExecute("DELETE FROM gameobject_respawn WHERE respawntime <= UNIX_TIMESTAMP(NOW())");
+
+    uint32 count = 0;
+
+    QueryResult *result = CharacterDatabase.Query("SELECT guid, respawntime, instance FROM gameobject_respawn");
+
+    if(!result)
+    {
+        barGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded 0 gameobject respawn time.");
+        return;
+    }
+
+    barGoLink bar((int)result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 loguid       = fields[0].GetUInt32();
+        uint64 respawn_time = fields[1].GetUInt64();
+        uint32 instanceId   = fields[2].GetUInt32();
+
+
+        GameObjectData const* data = sObjectMgr.GetGOData(loguid);
+        if (!data)
+            continue;
+
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+        if (!mapEntry || (mapEntry->Instanceable() != (instanceId != 0)))
+            continue;
+
+        // instances loaded early and respawn data must exist only for existed instances (save loaded) or non-instanced maps
+        InstanceSave* save = instanceId
+            ? GetInstanceSave(data->mapid, instanceId)
+            : AddInstanceSave(data->mapid, 0, REGULAR_DIFFICULTY, 0, false, true);
+
+        if (!save)
+            continue;
+
+        save->SetGORespawnTime(loguid, time_t(respawn_time));
+
+        ++count;
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString(">> Loaded %u gameobject respawn times", count);
+    sLog.outString();
 }

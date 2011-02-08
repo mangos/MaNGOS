@@ -187,6 +187,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
         bool IsBattleGroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattleGroundOrArena(); }
 
+        // can't be NULL for loaded map
         InstanceSave* GetInstanceSave() const { return m_instanceSave; }
 
         void AddObjectToRemoveList(WorldObject *obj);
