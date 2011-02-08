@@ -1258,7 +1258,7 @@ void Map::CreateInstanceData(bool load)
     {
         // TODO: make a global storage for this
         QueryResult* result;
-        
+
         if (Instanceable())
             result = CharacterDatabase.PQuery("SELECT data FROM instance WHERE id = '%u'", i_InstanceId);
         else
