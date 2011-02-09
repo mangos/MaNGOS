@@ -95,7 +95,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
     //add reference for TerrainData object
     m_TerrainData->AddRef();
 
-    m_instanceSave = sInstanceSaveMgr.AddInstanceSave(GetId(), GetInstanceId(), GetDifficulty(), 0, Instanceable());
+    m_instanceSave = sInstanceSaveMgr.AddInstanceSave(i_mapEntry, GetInstanceId(), GetDifficulty(), 0, IsDungeon());
     m_instanceSave->SetUsedByMapState(true);
 }
 

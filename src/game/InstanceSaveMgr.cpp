@@ -79,7 +79,7 @@ void InstanceSave::SaveToDB()
         }
     }
 
-    if (m_instanceid)
+    if (GetMapEntry()->IsDungeon())
         CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '"UI64FMTD"', '%u', '%s')", m_instanceid, GetMapId(), (uint64)GetResetTimeForDB(), GetDifficulty(), data.c_str());
 }
 
@@ -106,14 +106,14 @@ MapEntry const* InstanceSave::GetMapEntry() const
 
 void InstanceSave::DeleteFromDB()
 {
-    if (GetInstanceId())
+    if (GetMapEntry()->IsDungeon())
         InstanceSaveManager::DeleteInstanceFromDB(GetInstanceId());
 }
 
 void InstanceSave::DeleteRespawnTimes()
 {
     // possible reset for instanceable map only
-    if (!m_instanceid)
+    if (!GetMapEntry()->IsDungeon())
         return;
 
     m_goRespawnTimes.clear();
@@ -130,8 +130,9 @@ bool InstanceSave::UnloadIfEmpty()
 {
     // prevent unload if any bounded groups or online bounded player still exists
     // also prevent unload if respawn data still exist (will not prevent reset by scheduler)
+    // BGs/Arenas not locked by respawn data
     if (m_playerList.empty() && m_groupList.empty() && !m_usedByMap &&
-        m_creatureRespawnTimes.empty() && m_goRespawnTimes.empty())
+        (GetMapEntry()->IsBattleGroundOrArena() || m_creatureRespawnTimes.empty() && m_goRespawnTimes.empty()))
     {
         sInstanceSaveMgr.RemoveInstanceSave(GetMapId(), GetInstanceId());
         return false;
@@ -144,6 +145,10 @@ void InstanceSave::SaveCreatureRespawnTime(uint32 loguid, time_t t)
 {
     SetCreatureRespawnTime(loguid, t);
 
+    // BGs/Arenas always reset at server restart/unload, so no reason store in DB
+    if (GetMapEntry()->IsBattleGroundOrArena())
+        return;
+
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
     if(t > sWorld.GetGameTime())
@@ -154,6 +159,10 @@ void InstanceSave::SaveCreatureRespawnTime(uint32 loguid, time_t t)
 void InstanceSave::SaveGORespawnTime(uint32 loguid, time_t t)
 {
     SetGORespawnTime(loguid, t);
+
+    // BGs/Arenas always reset at server restart/unload, so no reason store in DB
+    if (GetMapEntry()->IsBattleGroundOrArena())
+        return;
 
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
@@ -445,83 +454,38 @@ InstanceSaveManager::~InstanceSaveManager()
 - adding instance into manager
 - called from InstanceMap::Add, _LoadBoundInstances, LoadGroups
 */
-InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load)
+InstanceSave* InstanceSaveManager::AddInstanceSave(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load)
 {
-    if(InstanceSave *old_save = GetInstanceSave(mapId, instanceId))
+    if (InstanceSave *old_save = GetInstanceSave(mapEntry->MapID, instanceId))
         return old_save;
 
-    const MapEntry* entry = sMapStore.LookupEntry(mapId);
-    if (!entry)
+    if (mapEntry->IsDungeon())
     {
-        sLog.outError("InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
-        return NULL;
-    }
-
-    if (entry->Instanceable())
-    {
-        if (instanceId == 0)
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d for instanceable map!", mapId, instanceId);
-            return NULL;
-        }
-
-        if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong difficulty %u!", mapId, instanceId, difficulty);
-            return NULL;
-        }
-
         if (!resetTime)
         {
             // initialize reset time
             // for normal instances if no creatures are killed the instance will reset in two hours
-            if (entry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
-                resetTime = m_Scheduler.GetResetTimeFor(mapId,difficulty);
+            if (mapEntry->map_type == MAP_RAID || difficulty > DUNGEON_DIFFICULTY_NORMAL)
+                resetTime = m_Scheduler.GetResetTimeFor(mapEntry->MapID, difficulty);
             else
             {
                 resetTime = time(NULL) + 2 * HOUR;
                 // normally this will be removed soon after in InstanceMap::Add, prevent error
-                m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DUNGEON, mapId, difficulty, instanceId));
+                m_Scheduler.ScheduleReset(true, resetTime, InstanceResetEvent(RESET_EVENT_DUNGEON, mapEntry->MapID, difficulty, instanceId));
             }
         }
     }
-    else
-    {
-        if (instanceId != 0)
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d for non-instanceable map!", mapId, instanceId);
-            return NULL;
-        }
 
-        if (difficulty != REGULAR_DIFFICULTY)
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong difficulty %u  for non-instanceable map!", mapId, instanceId, difficulty);
-            return NULL;
-        }
+    DEBUG_LOG("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, reset time = %u, canRset = %u", mapEntry->MapID, instanceId, resetTime, canReset ? 1 : 0);
 
-        if (resetTime)
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong reset time %u  for non-instanceable map!", mapId, instanceId, resetTime);
-            return NULL;
-        }
-
-        if (canReset)
-        {
-            sLog.outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong canReset %u  for non-instanceable map!", mapId, instanceId, canReset ? 1 : 0);
-            return NULL;
-        }
-    }
-
-    DEBUG_LOG("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, reset time = %u, canRset = %u", mapId, instanceId, resetTime, canReset ? 1 : 0);
-
-    InstanceSave *save = new InstanceSave(mapId, instanceId, difficulty, resetTime, canReset);
+    InstanceSave *save = new InstanceSave(mapEntry->MapID, instanceId, difficulty, resetTime, canReset);
     if (!load)
         save->SaveToDB();
 
-    if (entry->Instanceable())
+    if (mapEntry->Instanceable())
         m_instanceSaveByInstanceId[instanceId] = save;
     else
-        m_instanceSaveByMapId[mapId] = save;
+        m_instanceSaveByMapId[mapEntry->MapID] = save;
 
     return save;
 }
@@ -565,8 +529,9 @@ void InstanceSaveManager::RemoveInstanceSave(uint32 mapId, uint32 instanceId)
         if (itr != m_instanceSaveByInstanceId.end())
         {
             // save the resettime for normal instances only when they get unloaded
-            if(time_t resettime = itr->second->GetResetTimeForDB())
-                CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, instanceId);
+            if (itr->second->GetMapEntry()->IsDungeon())
+                if (time_t resettime = itr->second->GetResetTimeForDB())
+                    CharacterDatabase.PExecute("UPDATE instance SET resettime = '"UI64FMTD"' WHERE id = '%u'", (uint64)resettime, instanceId);
 
             _ResetSave(m_instanceSaveByInstanceId, itr);
         }
@@ -843,7 +808,7 @@ void InstanceSaveManager::LoadCreatureRespawnTimes()
         // instances loaded early and respawn data must exist only for existed instances (save loaded) or non-instanced maps
         InstanceSave* save = instanceId
             ? GetInstanceSave(data->mapid, instanceId)
-            : AddInstanceSave(data->mapid, 0, REGULAR_DIFFICULTY, 0, false, true);
+            : AddInstanceSave(mapEntry, 0, REGULAR_DIFFICULTY, 0, false, true);
 
         if (!save)
             continue;
@@ -903,7 +868,7 @@ void InstanceSaveManager::LoadGameobjectRespawnTimes()
         // instances loaded early and respawn data must exist only for existed instances (save loaded) or non-instanced maps
         InstanceSave* save = instanceId
             ? GetInstanceSave(data->mapid, instanceId)
-            : AddInstanceSave(data->mapid, 0, REGULAR_DIFFICULTY, 0, false, true);
+            : AddInstanceSave(mapEntry, 0, REGULAR_DIFFICULTY, 0, false, true);
 
         if (!save)
             continue;

@@ -227,7 +227,7 @@ class MANGOS_DLL_DECL InstanceSaveManager : public MaNGOS::Singleton<InstanceSav
 
         InstanceResetScheduler& GetScheduler() { return m_Scheduler; }
 
-        InstanceSave* AddInstanceSave(uint32 mapId, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false);
+        InstanceSave* AddInstanceSave(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false);
         InstanceSave *GetInstanceSave(uint32 mapId, uint32 InstanceId);
         void RemoveInstanceSave(uint32 mapId, uint32 instanceId);
         static void DeleteInstanceFromDB(uint32 instanceid);
