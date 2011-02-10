@@ -85,11 +85,7 @@ class MapPersistentState
         void SaveGORespawnTime(uint32 loguid, time_t t);
 
     protected:
-        virtual bool CanBeUnload() const =0
-        {
-            // prevent unload if used for loaded map
-            return !m_usedByMap;
-        }
+        virtual bool CanBeUnload() const =0;                // body provided for subclasses
 
         bool UnloadIfEmpty();
         void ClearRespawnTimes();
@@ -111,6 +107,12 @@ class MapPersistentState
         RespawnTimes m_creatureRespawnTimes;                // lock MapPersistentState from unload, for example for temporary bound dungeon unload delay
         RespawnTimes m_goRespawnTimes;                      // lock MapPersistentState from unload, for example for temporary bound dungeon unload delay
 };
+
+inline bool MapPersistentState::CanBeUnload() const
+{
+    // prevent unload if used for loaded map
+    return !m_usedByMap;
+}
 
 class WorldPersistentState : public MapPersistentState
 {
