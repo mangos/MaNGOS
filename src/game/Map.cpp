@@ -34,7 +34,7 @@
 #include "Group.h"
 #include "MapRefManager.h"
 #include "DBCEnums.h"
-#include "InstanceSaveMgr.h"
+#include "MapPersistentStateMgr.h"
 #include "VMapFactory.h"
 #include "BattleGroundMgr.h"
 

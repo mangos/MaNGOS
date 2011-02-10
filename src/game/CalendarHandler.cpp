@@ -22,7 +22,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "Opcodes.h"
-#include "InstanceSaveMgr.h"
+#include "MapPersistentStateMgr.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
 {

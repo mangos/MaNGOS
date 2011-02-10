@@ -21,7 +21,7 @@
 #include "ObjectGuid.h"
 #include "ProgressBar.h"
 #include "Log.h"
-#include "InstanceSaveMgr.h"
+#include "MapPersistentStateMgr.h"
 #include "MapManager.h"
 #include "World.h"
 #include "Policies/SingletonImp.h"

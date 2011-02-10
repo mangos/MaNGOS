@@ -40,7 +40,7 @@
 #include "Spell.h"
 #include "Chat.h"
 #include "AccountMgr.h"
-#include "InstanceSaveMgr.h"
+#include "MapPersistentStateMgr.h"
 #include "SpellAuras.h"
 #include "Util.h"
 #include "WaypointManager.h"

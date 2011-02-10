@@ -422,7 +422,6 @@
     <ClCompile Include="..\..\src\game\HostileRefManager.cpp" />
     <ClCompile Include="..\..\src\game\IdleMovementGenerator.cpp" />
     <ClCompile Include="..\..\src\game\InstanceData.cpp" />
-    <ClCompile Include="..\..\src\game\InstanceSaveMgr.cpp" />
     <ClCompile Include="..\..\src\game\Item.cpp" />
     <ClCompile Include="..\..\src\game\ItemEnchantmentMgr.cpp" />
     <ClCompile Include="..\..\src\game\ItemHandler.cpp" />
@@ -436,6 +435,7 @@
     <ClCompile Include="..\..\src\game\Mail.cpp" />
     <ClCompile Include="..\..\src\game\Map.cpp" />
     <ClCompile Include="..\..\src\game\MapManager.cpp" />
+    <ClCompile Include="..\..\src\game\MapPersistentStateMgr.cpp" />
     <ClCompile Include="..\..\src\game\MassMailMgr.cpp" />
     <ClCompile Include="..\..\src\game\MiscHandler.cpp" />
     <ClCompile Include="..\..\src\game\MotionMaster.cpp" />
@@ -582,7 +582,6 @@
     <ClInclude Include="..\..\src\game\HostileRefManager.h" />
     <ClInclude Include="..\..\src\game\IdleMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\InstanceData.h" />
-    <ClInclude Include="..\..\src\game\InstanceSaveMgr.h" />
     <ClInclude Include="..\..\src\game\Item.h" />
     <ClInclude Include="..\..\src\game\ItemEnchantmentMgr.h" />
     <ClInclude Include="..\..\src\game\ItemPrototype.h" />
@@ -591,6 +590,7 @@
     <ClInclude Include="..\..\src\game\Mail.h" />
     <ClInclude Include="..\..\src\game\Map.h" />
     <ClInclude Include="..\..\src\game\MapManager.h" />
+    <ClInclude Include="..\..\src\game\MapPersistentStateMgr.h" />
     <ClInclude Include="..\..\src\game\MapReference.h" />
     <ClInclude Include="..\..\src\game\MapRefManager.h" />
     <ClInclude Include="..\..\src\game\MassMailMgr.h" />

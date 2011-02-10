@@ -29,7 +29,7 @@
 #include "ObjectAccessor.h"
 #include "BattleGround.h"
 #include "MapManager.h"
-#include "InstanceSaveMgr.h"
+#include "MapPersistentStateMgr.h"
 #include "Util.h"
 #include "LootMgr.h"
 
