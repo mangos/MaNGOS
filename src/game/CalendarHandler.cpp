@@ -42,7 +42,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
 
     uint32 counter = 0;
     size_t p_counter = data.wpos();
-    data << uint32(counter);                                // instance save count
+    data << uint32(counter);                                // instance state count
 
     for(int i = 0; i < MAX_DIFFICULTY; ++i)
     {
@@ -50,11 +50,11 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
         {
             if(itr->second.perm)
             {
-                InstanceSave *save = itr->second.save;
-                data << uint32(save->GetMapId());
-                data << uint32(save->GetDifficulty());
-                data << uint32(save->GetResetTime() - cur_time);
-                data << ObjectGuid(save->GetInstanceGuid());
+                DungeonPersistentState *state = itr->second.state;
+                data << uint32(state->GetMapId());
+                data << uint32(state->GetDifficulty());
+                data << uint32(state->GetResetTime() - cur_time);
+                data << ObjectGuid(state->GetInstanceGuid());
                 ++counter;
             }
         }

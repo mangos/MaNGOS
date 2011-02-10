@@ -1270,7 +1270,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_isDeadByDefault = data->is_dead;
     m_deathState = m_isDeadByDefault ? DEAD : ALIVE;
 
-    m_respawnTime  = map->GetInstanceSave()->GetCreatureRespawnTime(m_DBTableGuid);
+    m_respawnTime  = map->GetPersistentState()->GetCreatureRespawnTime(m_DBTableGuid);
 
     if(m_respawnTime > time(NULL))                          // not ready to respawn
     {
@@ -1286,7 +1286,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     {
         m_respawnTime = 0;
 
-        GetMap()->GetInstanceSave()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
     }
 
     uint32 curhealth = data->curhealth;
@@ -1362,7 +1362,7 @@ void Creature::DeleteFromDB()
     }
 
     // FIXME: this not safe for another map copies can be
-    if (InstanceSave* save = sInstanceSaveMgr.GetInstanceSave(GetMapId(), GetInstanceId()))
+    if (MapPersistentState* save = sMapPersistentStateMgr.GetPersistentState(GetMapId(), GetInstanceId()))
         save->SaveCreatureRespawnTime(m_DBTableGuid, 0);
 
     sObjectMgr.DeleteCreatureData(m_DBTableGuid);
@@ -1522,7 +1522,7 @@ void Creature::Respawn()
     if (IsDespawned())
     {
         if (m_DBTableGuid)
-            GetMap()->GetInstanceSave()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
+            GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, 0);
         m_respawnTime = time(NULL);                         // respawn at next tick
     }
 }
@@ -1821,9 +1821,9 @@ void Creature::SaveRespawnTime()
         return;
 
     if(m_respawnTime > time(NULL))                          // dead (no corpse)
-        GetMap()->GetInstanceSave()->SaveCreatureRespawnTime(m_DBTableGuid, m_respawnTime);
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, m_respawnTime);
     else if (m_corpseDecayTimer > 0)                        // dead (corpse)
-        GetMap()->GetInstanceSave()->SaveCreatureRespawnTime(m_DBTableGuid, time(NULL) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
+        GetMap()->GetPersistentState()->SaveCreatureRespawnTime(m_DBTableGuid, time(NULL) + m_respawnDelay + m_corpseDecayTimer / IN_MILLISECONDS);
 }
 
 bool Creature::IsOutOfThreatArea(Unit* pVictim) const

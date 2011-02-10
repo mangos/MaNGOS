@@ -168,7 +168,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void DeleteStateMachine();
 
         Map* CreateInstance(uint32 id, Player * player);
-        InstanceMap* CreateInstanceMap(uint32 id, uint32 InstanceId, Difficulty difficulty, InstanceSave *save = NULL);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, Difficulty difficulty, DungeonPersistentState *save = NULL);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;
