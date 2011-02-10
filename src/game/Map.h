@@ -46,6 +46,7 @@ class WorldPacket;
 class InstanceData;
 class Group;
 class MapPersistentState;
+class WorldPersistentState;
 class DungeonPersistentState;
 class BattleGroundPersistentState;
 struct ScriptInfo;
@@ -93,8 +94,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
     friend class MapReference;
     friend class ObjectGridLoader;
     friend class ObjectWorldLoader;
-    public:
+    protected:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
+
+    public:
         virtual ~Map();
 
         // currently unused for normal maps
@@ -337,6 +340,18 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         template<class T>
             void RemoveFromGrid(T*, NGridType *, Cell const&);
+};
+
+class MANGOS_DLL_SPEC WorldMap : public Map
+{
+    private:
+        using Map::GetPersistentState;                      // hide in subclass for overwrite
+    public:
+        WorldMap(uint32 id, time_t expiry) : Map(id, expiry, 0, REGULAR_DIFFICULTY) {}
+        ~WorldMap() {}
+
+        // can't be NULL for loaded map
+        WorldPersistentState* GetPersistanceState() const;
 };
 
 class MANGOS_DLL_SPEC DungeonMap : public Map

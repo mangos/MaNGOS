@@ -1302,6 +1302,13 @@ template void Map::Remove(Creature *,bool);
 template void Map::Remove(GameObject *, bool);
 template void Map::Remove(DynamicObject *, bool);
 
+/* ******* World Maps ******* */
+
+WorldPersistentState* WorldMap::GetPersistanceState() const
+{
+    return (WorldPersistentState*)Map::GetPersistentState();
+}
+
 /* ******* Dungeon Instance Maps ******* */
 
 DungeonMap::DungeonMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
