@@ -600,7 +600,7 @@ void PoolManager::LoadFromDB()
     sLog.outString( ">> Loaded %u objects pools", count );
     delete result;
 
-    PoolMapChecker mapCheaker;
+    PoolMapChecker mapChecker;
 
     // Creatures
 
@@ -649,7 +649,7 @@ void PoolManager::LoadFromDB()
                 continue;
             }
 
-            if (!mapCheaker.CheckAndRemember(data->mapid, pool_id, "pool_creature", "creature guid"))
+            if (!mapChecker.CheckAndRemember(data->mapid, pool_id, "pool_creature", "creature guid"))
                 continue;
 
             PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
@@ -723,7 +723,7 @@ void PoolManager::LoadFromDB()
                 continue;
             }
 
-            if (!mapCheaker.CheckAndRemember(data->mapid, pool_id, "pool_gameobject", "gameobject guid"))
+            if (!mapChecker.CheckAndRemember(data->mapid, pool_id, "pool_gameobject", "gameobject guid"))
                 continue;
 
             PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
@@ -815,9 +815,9 @@ void PoolManager::LoadFromDB()
             for(SearchMap::iterator poolItr = mPoolSearchMap.find(i); poolItr != mPoolSearchMap.end(); poolItr = mPoolSearchMap.find(poolItr->second))
             {
                 // if child pool not have map data then it empty or have not checked child then will checked and all line later
-                if (MapEntry const* childMapEntry = mapCheaker.GetPoolMapEntry(poolItr->first))
+                if (MapEntry const* childMapEntry = mapChecker.GetPoolMapEntry(poolItr->first))
                 {
-                    if (!mapCheaker.CheckAndRemember(childMapEntry->MapID, poolItr->second, "pool_pool", "pool with creature/gameobject"))
+                    if (!mapChecker.CheckAndRemember(childMapEntry->MapID, poolItr->second, "pool_pool", "pool with creature/gameobject"))
                     {
                         mPoolPoolGroups[poolItr->second].RemoveOneRelation(poolItr->first);
                         mPoolSearchMap.erase(poolItr);
