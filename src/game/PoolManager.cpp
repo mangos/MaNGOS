@@ -498,6 +498,59 @@ PoolManager::PoolManager()
 {
 }
 
+// Check listing all pool spawns in single instanceable map or only in non-instanceable maps
+// This applied to all pools have common mother pool
+struct PoolMapChecker
+{
+    typedef std::map<uint32,MapEntry const*> Pool2Maps;
+    Pool2Maps m_pool2maps;
+
+    bool CheckAndRemember(uint32 mapid, uint32 pool_id, char const* tableName, char const* elementName)
+    {
+        MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
+        if (!mapEntry)
+            return false;
+
+        MapEntry const* poolMapEntry = GetPoolMapEntry(pool_id);
+
+        // if not listed then just remember
+        if (!poolMapEntry)
+        {
+            m_pool2maps[pool_id] = mapEntry;
+            return true;
+        }
+
+        // if at same map, then all ok
+        if (poolMapEntry == mapEntry)
+            return true;
+
+        // pool spawns must be at single instanceable map
+        if (mapEntry->Instanceable())
+        {
+            sLog.outErrorDb("`%s` has %s spawned at instanceable map %u when one or several other spawned at different map %u in pool id %i, skipped.",
+                tableName, elementName, mapid, poolMapEntry->MapID, pool_id);
+            return false;
+        }
+
+        // pool spawns must be at single instanceable map
+        if (poolMapEntry->Instanceable())
+        {
+            sLog.outErrorDb("`%s` has %s spawned at map %u when one or several other spawned at different instanceable map %u in pool id %i, skipped.",
+                tableName, elementName, mapid, poolMapEntry->MapID, pool_id);
+            return false;
+        }
+
+        // pool spawns can be at different non-instanceable maps
+        return true;
+    }
+
+    MapEntry const* GetPoolMapEntry(uint32 pool_id) const
+    {
+        Pool2Maps::const_iterator p2m_itr = m_pool2maps.find(pool_id);
+        return p2m_itr != m_pool2maps.end() ? p2m_itr->second : NULL;
+    }
+};
+
 void PoolManager::LoadFromDB()
 {
     QueryResult *result = WorldDatabase.Query("SELECT MAX(entry) FROM pool_template");
@@ -547,6 +600,8 @@ void PoolManager::LoadFromDB()
     sLog.outString( ">> Loaded %u objects pools", count );
     delete result;
 
+    PoolMapChecker mapCheaker;
+
     // Creatures
 
     mPoolCreatureGroups.resize(max_pool_id + 1);
@@ -593,6 +648,10 @@ void PoolManager::LoadFromDB()
                 sLog.outErrorDb("`pool_creature` has an invalid chance (%f) for creature guid (%u) in pool id (%i), skipped.", chance, guid, pool_id);
                 continue;
             }
+
+            if (!mapCheaker.CheckAndRemember(data->mapid, pool_id, "pool_creature", "creature guid"))
+                continue;
+
             PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
             ++count;
 
@@ -663,6 +722,10 @@ void PoolManager::LoadFromDB()
                 sLog.outErrorDb("`pool_gameobject` has an invalid chance (%f) for gameobject guid (%u) in pool id (%i), skipped.", chance, guid, pool_id);
                 continue;
             }
+
+            if (!mapCheaker.CheckAndRemember(data->mapid, pool_id, "pool_gameobject", "gameobject guid"))
+                continue;
+
             PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
 
             ++count;
@@ -728,6 +791,7 @@ void PoolManager::LoadFromDB()
                 sLog.outErrorDb("`pool_pool` has an invalid chance (%f) for pool id (%u) in mother pool id (%i), skipped.", chance, child_pool_id, mother_pool_id);
                 continue;
             }
+
             PoolTemplateData *pPoolTemplateMother = &mPoolTemplate[mother_pool_id];
 
             ++count;
@@ -750,6 +814,18 @@ void PoolManager::LoadFromDB()
             std::set<uint16> checkedPools;
             for(SearchMap::iterator poolItr = mPoolSearchMap.find(i); poolItr != mPoolSearchMap.end(); poolItr = mPoolSearchMap.find(poolItr->second))
             {
+                // if child pool not have map data then it empty or have not checked child then will checked and all line later
+                if (MapEntry const* childMapEntry = mapCheaker.GetPoolMapEntry(poolItr->first))
+                {
+                    if (!mapCheaker.CheckAndRemember(childMapEntry->MapID, poolItr->second, "pool_pool", "pool with creature/gameobject"))
+                    {
+                        mPoolPoolGroups[poolItr->second].RemoveOneRelation(poolItr->first);
+                        mPoolSearchMap.erase(poolItr);
+                        --count;
+                        break;
+                    }
+                }
+
                 checkedPools.insert(poolItr->first);
                 if(checkedPools.find(poolItr->second) != checkedPools.end())
                 {
@@ -767,6 +843,7 @@ void PoolManager::LoadFromDB()
                 }
             }
         }
+
         sLog.outString();
         sLog.outString( ">> Loaded %u pools in mother pools", count );
         delete result;
