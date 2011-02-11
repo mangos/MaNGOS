@@ -28,6 +28,7 @@
 #include "Utilities/UnorderedMapSet.h"
 #include "Database/DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "DBCStores.h"
 #include "ObjectGuid.h"
 
 struct InstanceTemplate;
