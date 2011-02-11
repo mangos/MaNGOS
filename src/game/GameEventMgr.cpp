@@ -710,24 +710,12 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
             sObjectMgr.AddCreatureToGrid(*itr, data);
 
-            // Spawn if necessary (loaded grids only)
-            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
-            {
-                // We use spawn coords to spawn
-                if (!map->Instanceable() && map->IsLoaded(data->posX,data->posY))
-                {
-                    Creature* pCreature = new Creature;
-                    //DEBUG_LOG("Spawning creature %u",*itr);
-                    if (!pCreature->LoadFromDB(*itr, map))
-                    {
-                        delete pCreature;
-                    }
-                    else
-                    {
-                        map->Add(pCreature);
-                    }
-                }
-            }
+            // FIXME: gameevent system can't work correctly in instanceable maps while object sin instances use dynamic guids
+            // Current code prevent wrong way work until switch to use static guids for instance objects
+            MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+            if (mapEntry && !mapEntry->Instanceable())
+                Creature::SpawnInMaps(*itr, data);
         }
     }
 
@@ -757,26 +745,12 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
             sObjectMgr.AddGameobjectToGrid(*itr, data);
 
-            // Spawn if necessary (loaded grids only)
-            // this base map checked as non-instanced and then only existing
-            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
-            {
-                // We use current coords to unspawn, not spawn coords since creature can have changed grid
-                if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
-                {
-                    GameObject* pGameobject = new GameObject;
-                    //DEBUG_LOG("Spawning gameobject %u", *itr);
-                    if (!pGameobject->LoadFromDB(*itr, map))
-                    {
-                        delete pGameobject;
-                    }
-                    else
-                    {
-                        if(pGameobject->isSpawnedByDefault())
-                            map->Add(pGameobject);
-                    }
-                }
-            }
+            // FIXME: gameevent system can't work correctly in instanceable maps while object sin instances use dynamic guids
+            // Current code prevent wrong way work until switch to use static guids for instance objects
+            MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+            if (mapEntry && !mapEntry->Instanceable())
+                GameObject::SpawnInMaps(*itr, data);
         }
     }
 
@@ -819,10 +793,11 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
                 }
             }
 
+            // Remove spawn data
             sObjectMgr.RemoveCreatureFromGrid(*itr, data);
 
-            if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, *itr)))
-                pCreature->AddObjectToRemoveList();
+            // Remove spawned cases
+            Creature::AddToRemoveListInMaps(*itr, data);
         }
     }
 
@@ -848,10 +823,11 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
                 }
             }
 
+            // Remove spawn data
             sObjectMgr.RemoveGameobjectFromGrid(*itr, data);
 
-            if( GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, *itr)) )
-                pGameobject->AddObjectToRemoveList();
+            // Remove spawned cases
+            GameObject::AddToRemoveListInMaps(*itr, data);
         }
     }
 
@@ -894,6 +870,29 @@ GameEventCreatureData const* GameEventMgr::GetCreatureUpdateDataForActiveEvent(u
     return NULL;
 }
 
+struct GameEventUpdateCreatureDataInMapsWorker
+{
+    GameEventUpdateCreatureDataInMapsWorker(ObjectGuid guid, CreatureData const* data, GameEventCreatureData* event_data, bool activate)
+        : i_guid(guid), i_data(data), i_event_data(event_data), i_activate(activate) {}
+
+    void operator() (Map* map)
+    {
+        if (Creature* pCreature = map->GetCreature(i_guid))
+        {
+            pCreature->UpdateEntry(i_data->id, TEAM_NONE, i_data, i_activate ? i_event_data : NULL);
+
+            // spells not casted for event remove case (sent NULL into update), do it
+            if (!i_activate)
+                pCreature->ApplyGameEventSpells(i_event_data, false);
+        }
+    }
+
+    ObjectGuid i_guid;
+    CreatureData const* i_data;
+    GameEventCreatureData* i_event_data;
+    bool i_activate;
+};
+
 void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
 {
     for(GameEventCreatureDataList::iterator itr = mGameEventCreatureData[event_id].begin();itr != mGameEventCreatureData[event_id].end();++itr)
@@ -904,14 +903,8 @@ void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, itr->first)))
-        {
-            pCreature->UpdateEntry(data->id, TEAM_NONE, data, activate ? &itr->second : NULL);
-
-            // spells not casted for event remove case (sent NULL into update), do it
-            if (!activate)
-                pCreature->ApplyGameEventSpells(&itr->second, false);
-        }
+        GameEventUpdateCreatureDataInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, itr->first), data, &itr->second, activate);
+        sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
     }
 }
 

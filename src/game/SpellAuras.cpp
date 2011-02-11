@@ -8607,10 +8607,12 @@ Unit* SpellAuraHolder::GetCaster() const
     if(GetCasterGuid() == m_target->GetObjectGuid())
         return m_target;
 
-    //return ObjectAccessor::GetUnit(*m_target,m_caster_guid);
     //must return caster even if it's in another grid/map
-    Unit *unit = ObjectAccessor::GetUnitInWorld(*m_target, m_casterGuid);
-    return unit && unit->IsInWorld() ? unit : NULL;
+    if (m_casterGuid.IsPlayer())
+        if (Player* caster = sObjectMgr.GetPlayer(m_casterGuid))
+            return caster->IsInWorld() ? caster : NULL;
+
+    return m_target->IsInWorld() ? m_target->GetMap()->GetCreature(m_casterGuid) : NULL;
 }
 
 bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder* ref)

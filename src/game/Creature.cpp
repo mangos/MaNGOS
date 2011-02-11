@@ -2407,3 +2407,56 @@ void Creature::FillGuidsListFromThreatList( std::vector<ObjectGuid>& guids, uint
     for (ThreatList::const_iterator itr = threats.begin(); maxamount && itr != threats.end(); ++itr, --maxamount)
         guids.push_back((*itr)->getUnitGuid());
 }
+
+struct AddCaretureToRemoveListInMapsWorker
+{
+    AddCaretureToRemoveListInMapsWorker(ObjectGuid guid) : i_guid(guid) {}
+
+    void operator() (Map* map)
+    {
+        if (Creature* pCreature = map->GetCreature(i_guid))
+            pCreature->AddObjectToRemoveList();
+    }
+
+    ObjectGuid i_guid;
+};
+
+void Creature::AddToRemoveListInMaps(uint32 db_guid, CreatureData const* data)
+{
+    AddCaretureToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, db_guid));
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+}
+
+struct SpawnCreatureInMapsWorker
+{
+    SpawnCreatureInMapsWorker(uint32 guid, CreatureData const* data)
+        : i_guid(guid), i_data(data) {}
+
+    void operator() (Map* map)
+    {
+        // We use spawn coords to spawn
+        if (map->IsLoaded(i_data->posX, i_data->posY))
+        {
+            Creature* pCreature = new Creature;
+            //DEBUG_LOG("Spawning creature %u",*itr);
+            if (!pCreature->LoadFromDB(i_guid, map))
+            {
+                delete pCreature;
+            }
+            else
+            {
+                map->Add(pCreature);
+            }
+        }
+    }
+
+    uint32 i_guid;
+    CreatureData const* i_data;
+};
+
+void Creature::SpawnInMaps(uint32 db_guid, CreatureData const* data)
+{
+    SpawnCreatureInMapsWorker worker(db_guid, data);
+    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+}
+

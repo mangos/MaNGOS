@@ -265,8 +265,20 @@ void PoolGroup<Creature>::Despawn1Object(uint32 guid)
     {
         sObjectMgr.RemoveCreatureFromGrid(guid, data);
 
-        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, guid)))
-            pCreature->AddObjectToRemoveList();
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
+        // specially because pool system not spawn object in instanceable maps
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
+        {
+            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
+            {
+                if (Creature* pCreature = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, guid)))
+                    pCreature->AddObjectToRemoveList();
+            }
+        }
     }
 }
 
@@ -278,8 +290,20 @@ void PoolGroup<GameObject>::Despawn1Object(uint32 guid)
     {
         sObjectMgr.RemoveGameobjectFromGrid(guid, data);
 
-        if (GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, guid)))
-            pGameobject->AddObjectToRemoveList();
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
+        // specially because pool system not spawn object in instanceable maps
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
+        {
+            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
+            {
+                if (GameObject* pGameobject = map->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, guid)))
+                    pGameobject->AddObjectToRemoveList();
+            }
+        }
     }
 }
 
@@ -370,7 +394,8 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj, bool instantly)
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
 
-        // temporary limit pool system full power work to continents
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
         if (mapEntry && !mapEntry->Instanceable())
         {
             // Spawn if necessary (loaded grids only)
@@ -417,7 +442,8 @@ void PoolGroup<GameObject>::Spawn1Object(PoolObject* obj, bool instantly)
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
 
-        // temporary limit pool system full power work to continents
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
         if (mapEntry && !mapEntry->Instanceable())
         {
             // Spawn if necessary (loaded grids only)
@@ -471,8 +497,22 @@ template <>
 void PoolGroup<Creature>::ReSpawn1Object(PoolObject* obj)
 {
     if (CreatureData const* data = sObjectMgr.GetCreatureData(obj->guid))
-        if (Creature* pCreature = ObjectAccessor::GetCreatureInWorld(ObjectGuid(HIGHGUID_UNIT, data->id, obj->guid)))
-            pCreature->GetMap()->Add(pCreature);
+    {
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
+        // specially because pool system not spawn object in instanceable maps
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
+        {
+            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
+            {
+                if (Creature* pCreature = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, obj->guid)))
+                    pCreature->GetMap()->Add(pCreature);
+            }
+        }
+    }
 }
 
 // Method that does the respawn job on the specified gameobject
@@ -480,8 +520,22 @@ template <>
 void PoolGroup<GameObject>::ReSpawn1Object(PoolObject* obj)
 {
     if (GameObjectData const* data = sObjectMgr.GetGOData(obj->guid))
-        if (GameObject* pGameobject = ObjectAccessor::GetGameObjectInWorld(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, obj->guid)))
-            pGameobject->GetMap()->Add(pGameobject);
+    {
+        // FIXME: pool system must have local state for each instanced map copy
+        // Current code preserve existed single state for all instanced map copies way
+        // specially because pool system not spawn object in instanceable maps
+        MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
+
+        // temporary limit pool system full power work to continents
+        if (mapEntry && !mapEntry->Instanceable())
+        {
+            if (Map* map = const_cast<Map*>(sMapMgr.FindMap(data->mapid)))
+            {
+                if (GameObject* pGameobject = map->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, obj->guid)))
+                    pGameobject->GetMap()->Add(pGameobject);
+            }
+        }
+    }
 }
 
 // Nothing to do for a child Pool
