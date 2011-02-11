@@ -188,7 +188,6 @@ inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Do& _do)
         _do(itr->second);
 }
 
-
 #define sMapMgr MapManager::Instance()
 
 #endif
