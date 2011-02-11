@@ -297,6 +297,9 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
 
         void RemovePersistentState(uint32 mapId, uint32 instanceId);
 
+        template<typename Do>
+        void DoForAllStatesWithMapId(uint32 mapId, Do& _do);
+
     public:                                                 // DungeonPersistentState specific
         void CleanupInstances();
         void PackInstances();
@@ -328,6 +331,31 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
 
         DungeonResetScheduler m_Scheduler;
 };
+
+template<typename Do>
+inline void MapPersistentStateManager::DoForAllStatesWithMapId(uint32 mapId, Do& _do)
+{
+    MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+    if (!mapEntry)
+        return;
+
+    if (mapEntry->Instanceable())
+    {
+        for(PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end();)
+        {
+            if (itr->second->GetMapId() == mapId)
+                _do((itr++)->second);
+            else
+                ++itr;
+        }
+
+    }
+    else
+    {
+        if (MapPersistentState* state = GetPersistentState(mapId, 0))
+            _do(state);
+    }
+}
 
 #define sMapPersistentStateMgr MaNGOS::Singleton<MapPersistentStateManager>::Instance()
 #endif
