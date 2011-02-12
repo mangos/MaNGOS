@@ -462,6 +462,39 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
 #define SPELL_ATTR_EX6_UNK30                      0x40000000            // 30 not set in 3.0.3
 #define SPELL_ATTR_EX6_UNK31                      0x80000000            // 31 not set in 3.0.3
 
+#define SPELL_ATTR_EX7_UNK0                       0x00000001            // 0
+#define SPELL_ATTR_EX7_UNK1                       0x00000002            // 1
+#define SPELL_ATTR_EX7_PALADIN_AURA               0x00000004            // 2
+#define SPELL_ATTR_EX7_UNK3                       0x00000008            // 3
+#define SPELL_ATTR_EX7_UNK4                       0x00000010            // 4
+#define SPELL_ATTR_EX7_TOTEM_SPELL                0x00000020            // 5  shaman summon totem spells
+#define SPELL_ATTR_EX7_UNK6                       0x00000040            // 6
+#define SPELL_ATTR_EX7_UNK7                       0x00000080            // 7
+#define SPELL_ATTR_EX7_UNK8                       0x00000100            // 8
+#define SPELL_ATTR_EX7_UNK9                       0x00000200            // 9
+#define SPELL_ATTR_EX7_UNK10                      0x00000400            // 10
+#define SPELL_ATTR_EX7_UNK11                      0x00000800            // 11
+#define SPELL_ATTR_EX7_UNK12                      0x00001000            // 12
+#define SPELL_ATTR_EX7_UNK13                      0x00002000            // 13
+#define SPELL_ATTR_EX7_UNK14                      0x00004000            // 14
+#define SPELL_ATTR_EX7_UNK15                      0x00008000            // 15
+#define SPELL_ATTR_EX7_UNK16                      0x00010000            // 16
+#define SPELL_ATTR_EX7_UNK17                      0x00020000            // 17
+#define SPELL_ATTR_EX7_UNK18                      0x00040000            // 18
+#define SPELL_ATTR_EX7_UNK19                      0x00080000            // 19
+#define SPELL_ATTR_EX7_UNK20                      0x00100000            // 20
+#define SPELL_ATTR_EX7_UNK21                      0x00200000            // 21
+#define SPELL_ATTR_EX7_UNK22                      0x00400000            // 22
+#define SPELL_ATTR_EX7_UNK23                      0x00800000            // 23
+#define SPELL_ATTR_EX7_UNK24                      0x01000000            // 24
+#define SPELL_ATTR_EX7_UNK25                      0x02000000            // 25
+#define SPELL_ATTR_EX7_UNK26                      0x04000000            // 26
+#define SPELL_ATTR_EX7_UNK27                      0x08000000            // 27
+#define SPELL_ATTR_EX7_UNK28                      0x10000000            // 28
+#define SPELL_ATTR_EX7_UNK29                      0x20000000            // 29
+#define SPELL_ATTR_EX7_UNK30                      0x40000000            // 30
+#define SPELL_ATTR_EX7_UNK31                      0x80000000            // 31
+
 #define MAX_TALENT_SPEC_COUNT   2
 #define MAX_GLYPH_SLOT_INDEX    6
 
