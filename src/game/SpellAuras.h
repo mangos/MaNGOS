@@ -436,6 +436,8 @@ class MANGOS_DLL_SPEC Aura
         SpellAuraHolder* const GetHolder() const { return m_spellAuraHolder; }
 
         bool IsLastAuraOnHolder();
+
+        bool HasMechanic(uint32 mechanic) const;
     protected:
         Aura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder *holder, Unit *target, Unit *caster = NULL, Item* castItem = NULL);
 
