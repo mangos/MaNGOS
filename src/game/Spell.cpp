@@ -5618,7 +5618,7 @@ SpellCastResult Spell::CheckCasterAuras() const
     uint32 unitflag = m_caster->GetUInt32Value(UNIT_FIELD_FLAGS);     // Get unit state
     if (unitflag & UNIT_FLAG_STUNNED)
     {
-        // spell is usable while stunned, check if aura has mechanic stun
+        // spell is usable while stunned, check if caster has only mechanic stun auras, another stun types must prevent cast spell
         if (m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_STUNNED)
         {
             bool is_stun_mechanic = true;
