@@ -1,0 +1,6 @@
+/var/log/tao/tao-cosevent.log {
+    copytruncate
+    missingok
+    size 1M
+    endscript
+}

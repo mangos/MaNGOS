@@ -1,0 +1,33 @@
+### BENCHMARK PARAMETERS -- EDIT THESE AS REQUIRED
+ITERATIONS="1"
+MINCLIENTS="15"
+MAXCLIENTS="15"
+CLIENTINCR="3"
+### this is actually the number of loops:
+TIMEPERRUN="1000"
+
+
+### SERVER PARAMETERS -- EDIT AS REQUIRED
+PROXYSERVER=
+SERVER="tango-cip"
+PORTNO=6666
+SERVERINFO=uname
+#OSTUNINGFILES="/var/sysgen/master.d/bsd"
+#OSTUNINGFILES="/dev/null"
+#WEBSERVERDIR="/usr/ns-home"
+#WEBDOCDIR="$WEBSERVERDIR/docs"
+#WEBSERVERTUNINGFILES="$WEBSERVERDIR/httpd-80/config/magnus.conf $WEBSERVERDIR/httpd-80/config/obj.conf"
+
+# WE NEED AN ACCOUNT WITH A FIXED PASSWORD, SO WE CAN REXEC
+# THE WEBSTONE CLIENTS
+CLIENTS="mambo merengue lambada"
+#CLIENTS="lindy cumbia"
+CLIENTACCOUNT=sumedh
+CLIENTPASSWORD=yourpasswd
+CLIENTINFO=uname
+TMPDIR=/tmp
+
+# Possibly system-specific
+RCP="rcp"
+RSH="rsh"
+

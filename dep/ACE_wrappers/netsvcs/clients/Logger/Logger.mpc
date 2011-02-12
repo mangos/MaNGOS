@@ -1,0 +1,22 @@
+// -*- MPC -*-
+// $Id: Logger.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(direct logging) : aceexe {
+  avoids  += ace_for_tao
+  exename  = direct_logging
+  libs    += netsvcs
+  after   += netsvcs
+  Source_Files {
+    direct_logging.cpp
+  }
+}
+
+project(indirect logging) : aceexe {
+  avoids  += ace_for_tao
+  exename  = indirect_logging
+  libs    += netsvcs
+  after   += netsvcs
+  Source_Files {
+    indirect_logging.cpp
+  }
+}

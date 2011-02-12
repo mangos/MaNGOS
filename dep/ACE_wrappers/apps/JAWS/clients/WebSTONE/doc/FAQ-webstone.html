@@ -1,0 +1,403 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML VERSION="2.0">
+<HEAD>
+<!-- $Id: FAQ-webstone.html 80826 2008-03-04 14:51:23Z wotte $ -->
+<!-- WEBMAGIC VERSION NUMBER="2.0.1" -->
+<!-- WEBMAGIC TRANSLATION NAME="ServerRoot" SRC="/var/www/htdocs/" DST="/" -->
+<!-- WEBMAGIC TRANSLATION NAME="ProjectRoot" SRC="./" DST="" -->
+<TITLE>WebStone FAQ</TITLE>
+</HEAD>
+<BODY>
+<P><!-- Changed by: Michael Blakeley,  9-Nov-1995 --></P>
+<H1><IMG SRC="webstone.gif" WIDTH="534" HEIGHT="174" SGI_SETWIDTH SGI_SETHEIGHT SGI_FULLPATH="/disk6/WebStone-2.0/doc/webstone.gif"></H1>
+<CENTER><H1 ALIGN="CENTER">WebStone</H1>
+</CENTER><CENTER><H2 ALIGN="CENTER">Frequently Asked Questions, with Answers</H2>
+</CENTER><CENTER><ADDRESS ALIGN="CENTER"><A HREF="mailto:schan@engr.sgi.com">Stephen Chan, schan@engr.sgi.com</A></ADDRESS>
+</CENTER><CENTER><ADDRESS ALIGN="CENTER"><A HREF="http://www.sgi.com/Products/WebFORCE/">WebFORCE</A> Technical Marketing, <A HREF="http://www.sgi.com">Silicon Graphics</A></ADDRESS>
+</CENTER><CENTER><ADDRESS ALIGN="CENTER">Last revised: 9 November 1995</ADDRESS>
+</CENTER><HR>
+<P><STRONG>This document answers frequently-asked questions about WebStone.</STRONG> </P>
+<UL>
+<LI><A HREF="#meta-FAQ">Meta-FAQ</A>: What is this document? Where can I get a copy? 
+<LI><A HREF="#diff">What is the difference between WebStone 1.1 and WebStone 2.0?</A>
+<LI><A HREF="#compare1.1&amp;2">Can I compare WebStone 1.1 and WebStone 2.0 numbers against each other?</A>
+<LI><A HREF="#what-is">What is WebStone?</A> 
+<LI><A HREF="#webperf">What about Webperf?</A> 
+<LI><A HREF="#what-does">What does WebStone do?</A> 
+<LI><STRONG><A HREF="#_wmh2_815967937">Feature Enhancements in WebStone 2.0</STRONG></A> 
+<LI><A HREF="#does-not">What doesn't WebStone do?</A> 
+<LI><A HREF="#obtaining">Where can I get WebStone?</A> 
+<LI><A HREF="#running">How do I run WebStone?</A> 
+<UL>
+<LI>Experimental GUI 
+</UL>
+<LI><A HREF="#common-problems">Common problems when running WebStone</A> 
+<UL>
+<LI><A HREF="#swap-space">Out of swap space</A> 
+<LI><A HREF="#timing-info">Error reading timing info</A> 
+</UL>
+<LI><A HREF="#interpreting">What do the results mean?</A> 
+<LI><A HREF="#majordomo">I'm still having problems. Where can I get help?</A> 
+<LI><A HREF="#legal">Legal issues</A> 
+</UL>
+<P>If you have comments about this document, please forward them to the <A HREF="mailto:mblakele@engr.sgi.com">author</A>. </P>
+<HR>
+<H2><A NAME="meta-FAQ">Meta-FAQ: What is this document? Where can I get a copy?</A></H2>
+<P>This is a list of answers to Frequently Asked Questions (FAQ) about WebStone.
+The latest copy is always available at <A HREF="http://www.sgi.com/Products/WebFORCE/WebStone">http://www.sgi.com/Products/WebFORCE/WebStone/</A> and via the WebStone mailing list. The FAQ is periodically posted to the <A HREF="#majordomo">WebStone mailing list</A>, and to the USENET newsgroup <A HREF="news:comp.benchmarks">comp.benchmarks</A>. </P>
+<HR>
+<H2><A NAME="diff">What is the difference between WebStone 1.1 and WebStone 2.0?</A></H2>
+<P>WebStone 2.0 is a rewrite of the WebStone 1.1 code. Significant changes
+have been made both in the code and in the fileset and run rules. Many bugs
+were eliminated, support for other platforms has been included and many
+new features have been added. The WebStone 1.1 and WebStone 2.0 numbers
+cannot be compared, since so much has changed. In general, WebStone 1.1
+will give higher connections/second values, but lower throughput numbers
+than WebStone 2.0.</P>
+<HR>
+<H2><A NAME="compare1.1&amp;2">Can I compare WebStone 1.1 and WebStone 2.0 numbers against each other?</A></H2>
+<P>Absolutely NOT! WebStone 1.1 numbers are based on a different fileset, as
+well as an older version of the benchmarking software. The WebStone 1.1
+fileset was based on a fileset with a smaller average filesize, so that
+the number of connections per second will tend to be higher (all things
+being equal). The WebStone 2.0 fileset is based on observations of several
+real world sites, and the distribution of the filesizes found there. This
+fileset is also similar to the fileset chosen by the SPEC committee for
+their benchmark.</P>
+<P>While it is possible to convert the 1.1 fileset to a 2.0 format and then
+test it, the resulting numbers will not be the same, because the underlying
+software used to perform the testing has changed. WebStone 1.1 was also
+heavily abused because of the lack of run rules, and reporting rules. It
+is recommended that everyone move to WebStone 2.0.</P>
+<HR>
+<P></P>
+<H2><A NAME="what-is">What is WebStone?</A></H2>
+<P>WebStone is a highly-configurable client-server benchmark for HTTP servers. </P>
+<P>The original WebStone benchmark was released in March, 1995. The original
+white paper describing this benchmark is available from <A HREF="http://www.sgi.com/Products/WebFORCE/WebStone">http://www.sgi.com/Products/WebFORCE/WebStone/.</A> </P>
+<P>WebStone is not a proprietary benchmark - it is an open benchmark. The source
+code is freely available, and anyone can examine it. By design, WebStone
+does not unfairly favor SGI, Netscape, or any other company - it is simply
+a performance measurement tool. </P>
+<HR>
+<H2><A NAME="webperf">What about Webperf?</A></H2>
+<P>A SPEC SFS working group is presently adapting SPEC SFS to Web server benchmarking.
+SGI's WebStone team is part of this working group, and we support fully
+the effort. WebStone is available to fulfill the immediate Web benchmarking
+needs - not to confuse the public.</P>
+<P>Basically, if you like WebStone, use it. When SPEC releases Webperf, check
+it out.</P>
+<HR>
+<H2><A NAME="what-does">What does WebStone do?</A></H2>
+<P>WebStone makes a user-configurable number of HTTP 1.0 GET requests for specific
+pages on a Web server. Any Web server can be tested, and any HTML content
+can be used. </P>
+<P>WebStone measures the throughput and latency of each HTTP transfer. By default,
+only statistical data are returned, but the user may optionally request
+data for each and every transaction. WebStone also reports transaction failures,
+which translate into those little &quot;Connection Refused&quot; alerts in the real
+world.</P>
+<HR>
+<H2><A NAME="_wmh2_815967937">Feature Enhancements in WebStone 2.0</A></H2>
+<P>WebStone 2.0 includes support for testing proxy servers, as well as more
+flexible handling of URL's that enable WebStone to test a wide variety of
+content types. The code has also been significantly rewritten so that it
+is more robust and portable.</P>
+<HR>
+<H2><A NAME="does-not">What doesn't WebStone do?</A></H2>
+<P>WebStone does not yet do any of the following (listed roughly in order of
+planned implementation): </P>
+<UL>
+<LI>POST transactions, widely used for CGI-bin scripts 
+</UL>
+<P>If you have additional requests for WebStone functionality, contact the <A HREF="#majordomo">WebStone mailing list</A>. </P>
+<HR>
+<H2><A NAME="obtaining">Where can I get WebStone?</A></H2>
+<P>The latest copy of WebStone, and of this FAQ, is available at <A HREF="http://www.sgi.com/Products/WebFORCE/WebStone">http://www.sgi.com/Products/WebFORCE/WebStone</A> </P>
+<HR>
+<H2><A NAME="running">How do I run WebStone?</A></H2>
+<P>WebStone includes a README file which may answer some of your questions.
+However, here's a brief overview. </P>
+<OL>
+<LI><A HREF="#test-bed">Set up your test-bed</A> 
+<LI><A HREF="#loading-webstone">Load WebStone onto your webmaster </A>
+<LI><A HREF="#edit-runbench">Edit <CODE>testbed</CODE></A> 
+<LI><A HREF="#file-list">Write a file list</A> 
+<LI><A HREF="#start-benchmark">Start the benchmark</A> 
+<LI><A HREF="#collect-results">Collect the results</A> 
+</OL>
+<H3>WebStone now has an experimental GUI!</H3>
+<P>To try the GUI, make sure you have a Web browser, and run <CODE>./webstone -gui</CODE> from the WebStone base directory. You don't need to hand-edit the <CODE>testbed</CODE> file anymore, but you still need to edit <CODE>filelist</CODE> if you want to change the workload. This may not be necessary, since we've
+distributed two real-world workload models with WebStone. </P>
+<P>These are the stepts to follow to run the GUI </P>
+<OL>
+<LI><A HREF="#test-bed">Set up your test-bed</A> 
+<LI><A HREF="#loading-webstone">Load WebStone onto your webmaster </A>
+<LI><CODE>./configure</CODE> 
+<LI><CODE>./webstone -gui</CODE> 
+</OL>
+<P>If the GUI appears to hang, you can kill stray WebStone processes with <CODE>./webstone -kill</CODE> </P>
+<H3><A NAME="test-bed">Setting up your test bed</A></H3>
+<P>Your test bed should include, at minimum, two machines and a network. The
+first machine is your Web server - it can be any HTTP 1.0-compliant server.
+As far as WebStone is concerned, it's a black box. </P>
+<P>You'll also need a webmaster and one or more webclients. These should be
+Unix hosts, since WebStone hasn't been tested on any non-Unix operating
+systems (feel free to port it, if you like). The webmaster and the webclient
+may be the same machine, if desired: we've run up to 120 webclients and
+the webmaster on a single 32MB Indy. </P>
+<P>You must establish a trust relationship between your webmaster and webclients.
+Each webclient must be set up so that the webmaster can use <CODE>rexec</CODE> to execute the WebStone on the client. This can be done with a guest account.
+It's also helpful if root can <CODE>rexec</CODE> and <CODE>rcp</CODE> to the webclients, and even to the web server. This requires editing the <CODE>/.rhosts</CODE> and <CODE>/etc/host.equiv</CODE> files. Here's an example: </P>
+<P><CODE>/.rhosts</CODE> (on each webclient) </P>
+<PRE>
+webmaster root
+</PRE>
+<P><CODE>/etc/hosts/equiv</CODE> (on each webclient) </P>
+<PRE>
+webmaster
+</PRE>
+<P>To make best use of WebStone, your webmaster should be equipped with a C
+compiler, Perl, awk, and a Web browser. A data analysis program such as
+GnuPlot may also come in handy. </P>
+<P>Connect the webclients, the webmaster, and the web server to a common network.
+To check your setup, load a browser on one of the webclients, and make sure
+it can connect to the Web server. </P>
+<H3><A NAME="loading-webstone">Loading WebStone</A></H3>
+<P>Copy the WebStone distribution onto your webmaster. If your webmaster isn't
+an SGI IRIX 5.3 machine, you'll have to make the binaries. Type <KBD>make</KBD> from the WebStone directory - this creates the following binaries: </P>
+<PRE>
+webmaster
+webclient
+</PRE>
+<P>Common porting errors </P>
+<UL>
+<LI>If you want to use gcc instead of cc, change the CC variable in <CODE>src/Makefile</CODE>. 
+<LI>Many System V-based Unix implementations (such as Solaris 2.x) will need<CODE> LIBS = -lsocket -lnsl</CODE> in <CODE>src/Makefile</CODE>. 
+<LI>Some users may also need to comment out the definition of <CODE>rexec</CODE> in <CODE>webmaster.c</CODE> 
+</UL>
+<P>If you encounter other errors, please contact the <A HREF="#majordomo">WebStone mailing list</A>. </P>
+<P>Type <CODE>make install</CODE> to put the binaries in the <CODE>bin</CODE> directory. </P>
+<P>When you run WebStone, the <CODE>distribute</CODE> script automatically copies the <CODE>webclient</CODE> binary to the other client systems. If you're running diverse clients (e.g.,
+a couple Suns, a couple BSD hosts), you'll want to comment the <CODE>distribute</CODE> script out of <CODE>bin/runbench</CODE>, and distribute host-specific versions of <CODE>webclient</CODE> by hand. </P>
+<H3><A NAME="edit-runbench">Edit <CODE></A>testbed</CODE></H3>
+<P>If you use the <CODE>webstone</CODE> script to automate WebStone, you'll want to edit the <CODE>conf/testbed</CODE> script. The <CODE>testbed</CODE> script contains several configurable parameters that WebStone relies on.
+Here is an example: </P>
+<PRE>
+### BENCHMARK PARAMETERS -- EDIT THESE AS REQUIRED
+ITERATIONS=&quot;3&quot;
+MINCLIENTS=&quot;8&quot;
+MAXCLIENTS=&quot;128&quot;
+CLIENTINCR=&quot;8&quot;
+TIMEPERRUN=&quot;30&quot;
+
+### SERVER PARAMETERS -- EDIT AS REQUIRED
+#PROXY=
+SERVER=&quot;www&quot;
+PORTNO=80
+SERVERINFO=hinv
+OSTUNINGFILES=&quot;/var/sysgen/master.d/bsd&quot;
+WEBSERVERDIR=&quot;/usr/ns-home&quot;
+WEBDOCDIR=&quot;$WEBSERVERDIR/docs&quot;
+WEBSERVERTUNINGFILES=&quot;$WEBSERVERDIR/httpd-80/config/magnus.conf $WEBSERVERDIR/httpd-80/config/obj.conf&quot;
+
+# WE NEED AN ACCOUNT WITH A FIXED PASSWORD, SO WE CAN REXEC
+# THE WEBSTONE CLIENTS
+CLIENTS=&quot;webstone1 webstone2 webstone3 webstone4 webstone5&quot;
+CLIENTACCOUNT=guest
+CLIENTPASSWORD=guest
+CLIENTINFO=hinv
+TMPDIR=/tmp
+</PRE>
+<P>Briefly, the first set of parameters means that the WebStone benchmark will
+run from 8 clients to 128 clients, in increments of 8. Each increment will
+run for 30 minutes, and the whole test will be repeated three times. This
+test suite would take roughly 24 hours to complete. </P>
+<P>Why multiple iterations? The WebStone benchmark is a stochastic process
+so there will be variation from run to run, especially if your test file
+sets have large files or if you approach overloading the server. 3 iterations
+is about the minimum you should run just to see if there is variation and
+to gauge the amount of variation. the <TT>TIMEPERRUN</TT> needs to be long enough to establish a steady state and allow it to dominate
+the run. 30 minutes seems to be enough if the sizes of the files are small.
+You may want to run the benchmark longer per run to minimize variation if
+the files are large. </P>
+<P>The second set of parameters means that we will test a server called &quot;www&quot;
+at port 80 (note that the port number may be changed to accomodate proxy
+servers or multiple servers on the same host). We will use four clients.
+Also, we specify the location of a system tuning file (on Sun Solaris, one
+could use /etc/system), and web server tuning files (specified for Netscape).
+These files will be copied into the <CODE>runs</CODE> subdirectories for later reference. </P>
+<P>Finally, we specify the WebStone account on the clients. Here, we use the
+guest account, with a fixed password: guest. </P>
+<H3><A NAME="file-list">Write a file list</A></H3>
+<P>The basic WebStone tests expect a set of files to reside on the server to
+be retrieved by the <TT>webstone</TT> client programs. The file list tells WebStone which files to retrieve. </P>
+<P>It's possible to use an arbitrary set of fixed-length files for WebStone.
+Although these files have the <TT>.html</TT> extension, they are used to represent files of many types. Basically we
+treat &quot;bits-as-bits&quot;. You can use the programs in the <TT>genfileset</TT> subdirectory to create the needed set of files, and copy them onto your
+server: </P>
+<PRE>
+    ./webstone -genfiles
+</PRE>
+<P>The sample file list shipped with WebStone uses the files created by genfiles: </P>
+<P># Sample filelist, abstracted from access logs<BR>
+/file500.html 350 #500<BR>
+/file5k.html 500 #5125<BR>
+/file50k.html 140 #51250<BR>
+/file500k.html 9 #512500<BR>
+/file5m.html 1 #5248000<BR>
+</P>
+<P>This filelist consists of 5 different files. The number following the filename
+is the weight of this file in the distribution. All the weights are summed
+together and the frequency of each file is the weight of that file over
+the total weights.</P>
+<P>For example, in this fileset the weights add up to 1000. So the the file500k.html
+page will occur 350 out of 1000 times, and the file5m.html will occur once
+every 1000 pages. </P>
+<P>Note that the URI should be changed to a full URI when testing proxy servers,
+for example, if the proxy server is called proxy, but the actual server
+which stores the file is called seltzer1, you could use the following filelist:</P>
+<P> #Sample filelist, abstracted from access logs<BR>
+http://seltzer1.sgi.com/file500.html 350 #500<BR>
+http://seltzer1.sgi.com/file5k.html 500 #5125<BR>
+http://seltzer1.sgi.com/file50k.html 140 #51250<BR>
+http://seltzer1.sgi.com/file500k.html 9 #512500<BR>
+http://seltzer1.sgi.com/file5m.html 1 #5248000</P>
+<P>This URI is the one which is passed to the proxy server, which in turn uses
+it to fetch the file from seltzer1.sgi.com. Notice that the particular files
+and the distribution are identical to the previous filelist. The other change
+which would need to be made for testing proxy servers is to have an entry
+&quot;PROXY=proxy&quot; in the testbed file and to specify the port where the proxy
+server listens for requests.</P>
+<P>Wherever possible, use the same pages for WebStone that you will use in
+the real world. This means that you'll have a harder time comparing your
+results with published results, but your results will more accurately reflect <STRONG>your</STRONG> situation. </P>
+<H3><A NAME="start-benchmark">Start the benchmark</A></H3>
+<P>type <CODE>./webstone</CODE> </P>
+<P>The results of each run will be saved in a directory called <TT>runs</TT>. Note that the runbench script attempts to collect configuration information
+about your client and server configurations such as netstat results. You
+may see some error messages if your clients don't have netstat or other
+utilities. </P>
+<H3><A NAME="collect-results">Collect the results</A></H3>
+<P>The WebStone summary statistics generated by <TT>webmaster</TT> are saved by <TT>runbench</TT> in a date stamped subdirectory of the <TT>runs</TT> directory in the current directory similar to: </P>
+<PRE>
+    runs/950804_2304/run
+</PRE>
+<P>The script wscollect is provided as a tool for collected the results of
+all of the runs and generating a tab delimited file with all of the results.
+This file can be read into a spreadsheet or read by other analysis programs. </P>
+<PRE>
+    wscollect runs &gt; runs.tabs
+</PRE>
+<P>An additional script called <TT>tabs2html</TT> will take a tab delimited file and produce an HTML 3.0 style table of the
+results: </P>
+<PRE>
+    tabs2html runs.tabs &gt; runs.html
+</PRE>
+<HR>
+<H2><A NAME="common-problems">Common problems when running WebStone</A></H2>
+<H3><A NAME="swap-space">Out of swap space</A></H3>
+<P>It's fairly common for the Web server under test to run out of swap space.
+As a rule of thumb, make sure that you have swap space equal to the number
+of server processes times the size of the largest test file. </P>
+<P>For instance, if you're testing a 10MB file on a Netscape server with 64
+processes, you'll need to have at least 640MB of swap space. <CITE>N.B.</CITE>: On SGI IRIX 5.x, you can substitute large amounts of <EM>virtual swap space</EM>, since Netscape doesn't actually use all the space it asks for. </P>
+<P>See your operating system-specific administration guide for details on adding
+and configuring swap space. </P>
+<H3><A NAME="timing-info">Error reading timing info</A></H3>
+<P><STRONG>Question</STRONG>: </P>
+<P>Running: </P>
+<PRE>
+webmaster -w webmaster -p 9990 -u flist -f config 
+</PRE>
+<P>on jan.near.net </P>
+<P>outputs: </P>
+<PRE>
+Waiting for READY from 6 clients
+All READYs received
+Sending GO to all clients
+All clients started at Tue Aug 8 11:57:30 1995
+Waiting for clients completion
+Reading results
+.Error second reading timing info from one of the clients: 
+Interrupted system call
+web child 1 did not respond. 3456 bytes read
+.Error second reading timing info from one of the clients: 
+Interrupted system call
+web child 0 did not respond. 3456 bytes read
+</PRE>
+<P>What does the second reading timing info contain? What might cause the second
+read to fail while the first passes? </P>
+<P><STRONG>Answer</STRONG>: </P>
+<P>It's most likely that one of the WebStone clients died before it could report
+results to the webmaster. We've squashed many circumstances in which this
+happens, but bugs continue to appear, especially on systems we haven't tested. </P>
+<P>We can't do much for this kind of problem without debugging traces. Edit <CODE>testbed</CODE>, and set the <CODE>DEBUG</CODE> parameter to <CODE>DEBUG=-d</CODE>, so that debugging info will be written to files named /tmp/webstone-debug.&lt;PID&gt;. </P>
+<P>If you can replicate this problem with debugging turned on, please let us
+know. We'd love to examine the traces. </P>
+<P>Another possible source of problems with reading timing info is when a page
+in the filelist did not get read by a client, but the webmaster was expecting
+to find it. This can happen when the test time, number of clients and filelist
+distribution are set up so that a file which gets read infrequently does
+not get read _yet_ before the test period ends.This will get ironed out
+in a later release of WebStone.</P>
+<HR>
+<H2><A NAME="interpreting">What do the results mean?</A></H2>
+<P>WebStone primarily measures throughput (bytes/second) and latency (time
+to complete a request). WebStone also reports pages/minute, connection rate
+averages, and other numbers. Some of these may help you to sanity-check
+the throughput measurements. </P>
+<P>Two types of throughput are measured: aggregate and per-client. Both are
+averaged over the entire test time and the entire client base. Aggregate
+throughput is simply total bytes (body + header) transferred throughout
+the test, divided by the total test time. Per-client throughput divides
+aggregate throughput by the number of clients. </P>
+<P>Two types of latency are reported: connection latency and request latency.
+For each metric, the mean time is provided, as well as the standard deviation
+of all data, plus the minimum and maximum times. Connection latency reflects
+the time taken to establish a connection, while request latency reflects
+the time to complete the data transfer once the connection has been established. </P>
+<P>User-perceived latency will include the sum of connection and request latencies,
+plus any network latency due to WAN connections, routers, modems, etc. </P>
+<P>WebStone also reports a metric called <EM>Little's Ls</EM>. <EM>Ls</EM> is derived from Little's Law, and reflects how much time is spent by the
+server on request processing, rather than overhead and errors. Ls. is also an indirect indicator of the average number of connections which
+the web server has open at any particular instant. This number should stay
+very close to the number of clients, or else some clients are being denied
+access to the server at any given time.</P>
+<P>If you load your Web servers high enough, you'll begin to see errors in
+the results. That's fine (at least as far as WebStone is concerned). It
+just means that your server is heavily loaded, and some clients aren't being
+serviced before they time out. In fact, the number of errors at a given
+load can be an excellent indicator of how your server will perform under
+extremely heavy loads. </P>
+<HR>
+<H2><A NAME="majordomo">I'm still having problems. Where can I get help?</A></H2>
+<P>Subscribe to the WebStone mailing list! Send a message to <A HREF="mailto:majordomo@engr.sgi.com">majordomo@engr.sgi.com</A> - the subject doesn't matter, but the content should be: </P>
+<PRE>
+subscribe webstone
+</PRE>
+<P>You should receive a message shortly, confirming that you've been added
+to the mailing list. You can send to the whole list at <A HREF="mailto:webstone@engr.sgi.com">webstone@engr.sgi.com</A> - the authors of WebStone read the list, and they'll do their best to help.
+Other list members may also be able to help. </P>
+<P>If you have access to USENET News, you can also read and post to <A HREF="news:comp.benchmarks">comp.benchmarks</A>. As with any newsgroup, read the FAQ before posting! </P>
+<P>There's also a mailing list devoted to the performance limits of the HTTP
+protocol. You can subscribe by sending e-mail to <A HREF="mailto:www-speed-request@tipper.oit.unc.edu">www-speed-request@tipper.oit.unc.edu</A> with the text </P>
+<PRE>
+subscribe &lt;your-email-address&gt;
+</PRE>
+<HR>
+<H2><A NAME="legal">Legal Stuff</A></H2>
+<P>This file and all files contained in the WebStone distribution are copyright
+&#169; 1995, 1996 Silicon Graphics, Inc. </P>
+<P>This software is provided without support and without any obligation on
+the part of Silicon Graphics, Inc. to assist in its use, correction, modification
+or enhancement. There is no guarantee that this software will be included
+in future software releases, and it probably will not be included. </P>
+<P>THIS SOFTWARE IS PROVIDED &quot;AS IS&quot; WITH NO WARRANTIES OF ANY KIND INCLUDING
+THE WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE,
+OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE. </P>
+<P>In no event will Silicon Graphics, Inc. be liable for any lost revenue or
+profits or other special, indirect and consequential damages, even if Silicon
+Graphics, Inc. has been advised of the possibility of such damages. </P>
+</BODY>
+</HTML>

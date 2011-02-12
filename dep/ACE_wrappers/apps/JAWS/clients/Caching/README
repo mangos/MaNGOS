@@ -1,0 +1,83 @@
+# -*- text -*-
+# Hey, Emacs!  This is a TEXT file.
+
+----------------------------------
+README for the caching http_client
+----------------------------------
+
+This is the README file for the simple caching http_client.
+
+------------
+1. Compiling
+------------
+
+1a. Compiling on UNIX.
+
+        On UNIX, with a properly configured ACE distribution, just
+type make (using GNU make, of course).
+
+1b. Compiling on NT.
+
+        Thus far, this code has only been tested under UNIX.  A
+Windows NT version will be out soon.
+
+------------
+2. Executing
+------------
+
+2a. Command line parameters.
+
+        The program does not support any command line parameters.
+
+2b. General information.
+
+        When the program runs, the client offers a ``*'' as a prompt.
+At the prompt, you may enter a URL.  The client will check to see if
+the filename portion of the URL has already been cached.  If so, a
+message appears saying so.  If not, the client will fetch the file
+from the HTTP server and then cache it.
+
+        Furthermore, the client supports the ``!'' shell escape
+command.  The content after the ``!'' will be executed by a shell.
+
+        To exit the session, send the end-of-file character
+(typically, ^D in UNIX).
+
+        unix$ ./http_client
+        * http://www.cs.wustl.edu/cs/Art/brookings.gif
+        [1] sending request --
+        GET /cs/Art/brookings.gif HTTP/1.0
+        Accept: HTTP/1.0
+
+          ``brookings.gif'' is now cached.
+        * http://www.cs.wustl.edu/cs/Art/brookings.gif
+          ``brookings.gif'' is already cached.
+        * !ls
+        Makefile          http_client       http_handler.cpp  zJAWSAAAa000Yg
+        brookings.gif     http_client.cpp   http_handler.h
+        * ^D
+        Bye!
+        unix$ ls
+        Makefile          http_client       http_handler.cpp
+        brookings.gif     http_client.cpp   http_handler.h
+        unix$
+
+--------------
+3. Limitations
+--------------
+
+        The caching mechanism as currently implemented requires a
+``Content-length:'' to appear in the response header of the HTTP
+response.  This is because the caching utilizes mmap () to allocate
+space for the file to be cached before the file is received.  Unitl
+the caching mecahnism is extended, you are limited to using servers
+which will report the size of the file being transmitted.
+
+        Currently, the cache creates temporary files (see the above
+sample execution).
+
+        The cache is not persistent between executions.
+
+        Suggestions and other correspondence should be sent to me:
+
+James Hu <jxh@cs.wustl.edu>

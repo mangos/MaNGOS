@@ -1,0 +1,9 @@
+// -*- MPC -*-
+// $Id: ace_gperf.mpc 82161 2008-06-25 07:00:24Z johnnyw $
+
+project (gperf_docs) : man {
+  Man_Files {
+    ace_gperf.1
+  }
+  custom_only=1
+}

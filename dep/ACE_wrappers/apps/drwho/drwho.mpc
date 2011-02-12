@@ -1,0 +1,96 @@
+// -*- MPC -*-
+// $Id: drwho.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(*-client) : aceexe {
+  requires += rwho
+  avoids += uses_wchar ace_for_tao
+  exename = client
+  Source_Files {
+    Comm_Manager.cpp
+    Select_Manager.cpp
+    Protocol_Manager.cpp
+    Drwho_Node.cpp
+    Rwho_DB_Manager.cpp
+    Multicast_Manager.cpp
+    Protocol_Record.cpp
+    Options.cpp
+    File_Manager.cpp
+    Hash_Table.cpp
+    Binary_Search.cpp
+    Search_Struct.cpp
+    Single_Lookup.cpp
+    SML_Server.cpp
+    SM_Server.cpp
+    PMS_Usr.cpp
+    SL_Server.cpp
+    PMS_Flo.cpp
+    PM_Server.cpp
+    HT_Server.cpp
+    BS_Server.cpp
+    PMS_All.cpp
+    PMS_Ruser.cpp
+    SMR_Server.cpp
+    CM_Client.cpp
+    SM_Client.cpp
+    SMR_Client.cpp
+    PM_Client.cpp
+    HT_Client.cpp
+    BS_Client.cpp
+    PMC_All.cpp
+    PMC_Flo.cpp
+    PMC_Usr.cpp
+    SL_Client.cpp
+    PMC_Ruser.cpp
+    SMR_Client.cpp
+    SML_Client.cpp
+    CM_Server.cpp
+    client.cpp
+  }
+}
+
+project(*-server) : aceexe {
+  requires += rwho
+  avoids += uses_wchar ace_for_tao
+  exename = server
+  Source_Files {
+    Comm_Manager.cpp
+    Select_Manager.cpp
+    Protocol_Manager.cpp
+    Drwho_Node.cpp
+    Rwho_DB_Manager.cpp
+    Multicast_Manager.cpp
+    Protocol_Record.cpp
+    Options.cpp
+    File_Manager.cpp
+    Hash_Table.cpp
+    Binary_Search.cpp
+    Search_Struct.cpp
+    Single_Lookup.cpp
+    SML_Server.cpp
+    SM_Server.cpp
+    PMS_Usr.cpp
+    SL_Server.cpp
+    PMS_Flo.cpp
+    PM_Server.cpp
+    HT_Server.cpp
+    BS_Server.cpp
+    PMS_All.cpp
+    PMS_Ruser.cpp
+    SMR_Server.cpp
+    CM_Client.cpp
+    SM_Client.cpp
+    SMR_Client.cpp
+    PM_Client.cpp
+    HT_Client.cpp
+    BS_Client.cpp
+    PMC_All.cpp
+    PMC_Flo.cpp
+    PMC_Usr.cpp
+    SL_Client.cpp
+    PMC_Ruser.cpp
+    SMR_Client.cpp
+    SML_Client.cpp
+    CM_Server.cpp
+    server.cpp
+  }
+}

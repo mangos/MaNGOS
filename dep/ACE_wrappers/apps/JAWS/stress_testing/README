@@ -1,0 +1,54 @@
+http_tester
+-----------
+
+This is the http_tester suite, an ACE based HTTP benchmarking tool,
+used to evaluate the performance of JAWS and other HTTP servers.
+
+Usage
+-----
+
+To use the http_tester, you need to use a config file "infile", which
+consists of a list of experiments, one on each line. http_tester logs
+output data in the "outfile".
+
+Usage: http_tester infile outfile
+
+Experiments
+-----------
+
+Each experiment consists of several space-delimited compulsory
+fields, as follows:
+
+experiment_id (string)
+total_number_of_requests (integer)
+request_rate (float)
+url1 (first URL)
+p1 (probability of requesting the first URL)
+url2 (second URL)
+p2 (probability of requesting the second URL)
+url3 (third URL)
+p3 (probability of requesting the third URL)
+TCP_NODELAY (boolean, 1 == TCP_NODELAY is set)
+SOCKET_RECV_BUFSIZ (usually 65536)
+
+URLS must be of the form:
+
+http://www.cs.wustl.edu:8888/~sumedh/index.html
+
+(the port number is required, im making it optional in the next version).
+
+Please see the sample file "config", for an example.
+
+Output file
+-----------
+
+The output file consists of the following space delimited fields:
+
+Experiment Id (string)
+Average throughput of connection (float)
+Average latency of connection (float) 
+Maximum number of active connections at any given time (int)
+
+
+Sumedh Mungee
+<sumedh@cs.wustl.edu>

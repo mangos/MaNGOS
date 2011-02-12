@@ -1,0 +1,40 @@
+// -*- MPC -*-
+// $Id: server.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+
+project(JAWS) : install, ace_output, acelib {
+  sharedname   = JAWS
+  dynamicflags += ACE_BUILD_SVC_DLL
+  requires    += ace_filecache
+  avoids      += uses_wchar
+  avoids      += ace_for_tao
+
+  specific {
+    install_dir = JAWS/server
+  }
+
+  Source_Files {
+    HTTP_Server.cpp
+    HTTP_Config.cpp
+    HTTP_Handler.cpp
+    HTTP_Helpers.cpp
+    JAWS_Pipeline.cpp
+    JAWS_Concurrency.cpp
+    HTTP_Request.cpp
+    HTTP_Response.cpp
+    Parse_Headers.cpp
+    JAWS_IO.cpp
+  }
+}
+
+project(JAWS_server) : aceexe {
+  exename = main
+  after += JAWS
+  libs  += JAWS
+  requires += ace_filecache
+  avoids += uses_wchar
+  avoids += ace_for_tao
+
+  Source_Files {
+    main.cpp
+  }
+}

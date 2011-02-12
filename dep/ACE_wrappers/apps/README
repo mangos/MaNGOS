@@ -1,0 +1,28 @@
+The subdirectories in this directory provide a number of complete
+applications that utilize the ACE features.
+
+        . drwho - This provides a "Distributed RWHO (drwho)" utility
+          that gets around certain rwho limitations, adds
+          functionality, and also prints a much prettier listing of
+          who's logged in around a network. 
+
+	. Gateway -- Implements a connection-oriented application-level
+	  gateway that uses source-based and destination-based routing
+	  of messages between peers connected via TCP/IP networks.
+	
+	. gperf -- The GNU perfect hash function generator.  This
+          has now been integrated into the TAO IDL compiler, where
+          it is used for generating the lookup function for operation
+          names associated with IDL interfaces.
+
+	. JAWS -- This is a high-performance HTTP 1.0 web server
+          written with ACE.  It illustrates a number of sophisticated ACE 
+	  concurrency and event demultiplexing strategies.
+
+        . JAWS2 is an implementation of HTTP/1.0 similar to JAWS.  It has
+          no HTTP/1.1 features.  It extends JAWS to add a more
+          flexible I/O and concurrency framework utilizing strategies. 
+
+        . JAWS3 is a framework that provides a state-machine interface
+          to developing a server, but it does not implement HTTP.
+

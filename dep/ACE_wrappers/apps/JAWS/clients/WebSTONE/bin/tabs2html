@@ -1,0 +1,13 @@
+#! /bin/sh
+
+nawk '
+BEGIN { FS=" " ; print "<BODY><TABLE>" }
+{
+	print "<TR ALIGN=RIGHT VALIGN=BOTTOM>"
+	for (i=1; i <= NF; i++) {
+		print "<TD>" $i "</TD>"
+	}
+	print "</TR>"
+}
+END { print "</TABLE></BODY>" }
+' $*

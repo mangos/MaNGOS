@@ -1,0 +1,6 @@
+/var/log/tao/tao-rtevent.log {
+    copytruncate
+    missingok
+    size 1M
+    endscript
+}

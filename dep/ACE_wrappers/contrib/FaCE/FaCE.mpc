@@ -1,0 +1,16 @@
+// -*- MPC -*-
+// $Id: FaCE.mpc 85401 2009-05-19 13:14:39Z johnnyw $
+
+project: aceexe {
+  exename   = FaCE
+  // This is just a dummy_label to prevent the example from being compiled
+  // in MPC builds
+  requires += dummy_label
+  requires += wince
+  lit_libs += aygshell commctrl
+
+  Source_Files {
+    FaCE.cpp
+    Main.cpp
+  }
+}

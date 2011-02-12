@@ -1,0 +1,117 @@
+ACKNOWLEDGEMENTS
+
+The design of the JAWS Framework has received inspiration
+from various collaborators I have had the distinct honor
+of working with while pursuing my degree at Washington
+University in St. Louis.
+
+Darrell Brunsch <brunsch@cs.wustl.edu>
+Chris Cleeland <chris@cs.wustl.edu>
+Chris Gill <cdgill@cs.wustl.edu>
+Tim Harrison <harrison@cs.wustl.edu>
+Del Hart <hart@cs.wustl.edu>
+Michael Kircher <mlkirche@trick.informatik.uni-stuttgart.de>
+David Levine <levine@cs.wustl.edu>
+Peter McCann <mccap@petoni.org>
+Sumedh Mungee <sumedh@cs.wustl.edu>
+Amy Murphy <alm@cs.wustl.edu>
+Carlos O'Ryan <coryan@cs.wustl.edu>
+Irfan Pyarali <irfan@cs.wustl.edu>
+Catalin Roman <roman@cs.wustl.edu>
+Douglas Schmidt <schmidt@ece.uci.edu>
+Seth Widoff <sbw1@cs.wustl.edu>
+
+In addition, I am indebted to Entera, Inc., for adopting
+early versions of the JAWS architecture and for permitting
+me to continue to develop JAWS while I am under their employ.
+
+Steven West <swest@entera.com>
+John Scharber <john@entera.com>
+Doug Robertson <dmrobertson@entera.com>
+Venkat Prasad <venkat@entera.com>
+
+The engineering team at Entera has been particular helpful
+with their insight into where JAWS functionality could use
+much needed improvement.
+
+J Geagan <j@entera.com>
+Mike Grupenhoff <kashmir@entera.com>
+Stephen Head <smh@entera.com>
+Chris Healey <chealey@entera.com>
+Mike Kellner <m@entera.com>
+Michael Morgan <myke@entera.com>
+Alagu Periyannan <alagu@entera.com>
+Cathy White <cathy@entera.com>
+David Zink <david@entera.com>
+
+I would also like to thank all the following people who
+have also contributed to JAWS significantly during its
+developmental stages and continued development.  I am
+sorry if I have left anyone out from this list.  If you
+feel you are one I have neglected, please let me know!
+If you feel are have been included by mistake, let me know
+about that too!
+
+A Vijay Srinivas <avs@lotus.iitm.ernet.in>
+Benoit Boulat <benoit.boulat@netconstruct.com>
+Bill Landi <landi@scr.siemens.com>
+Bill Rizzi <rizzi@softserv.com>
+Bill Trudell <billtrudell@yahoo.com>
+Chris Hafey <chris@stentorsoft.com>
+Craig Perras <craig.perras@CyberSafe.COM>
+Dann Corbit <DCorbit@SolutionsIQ.com>
+Darrin Edelman <darrin@aetherworks.com>
+David Armstrong <david.armstrong@dtn.ntl.com>
+David Dyke <davidd@wired.com>
+Dean Gaudet <dgaudet@arctic.org>
+Detlef Becker <detlef.becker@med.siemens.de>
+Dominic Williams <dom@connected-place.co.uk>
+Erich Nahum <nahum@watson.ibm.com>
+Farnam Jahanian <farnam@eecs.umich.edu>
+Girish P. Chandranmenon <girish@dworkin.wustl.edu>
+Greg Gallant <gcg@intercap.com>
+Hans Rohnert <rohnert@scr.siemens.com>
+Hussayn Dabbous <dabbous@saxess.com>
+Jam Hamidi <jxh1@osi.com>
+James Dabbs <JDabbs@TGA.com>
+Jan Perman <uabjjpp@osd.ericsson.se>
+Jayasimha Nagaraja <jay@stentorsoft.com>
+Joey Zhu <joey.zhu@wcom.com>
+John Aughey <jha@FreeBSD.ORG>
+John Mills <Jmills@TGA.com>
+John Studarus <jstudarus@intervu.net>
+Joo C. Chung <jchung@balink.com>
+Karen M Amestoy <kamestoy@msmail2.hac.com>
+Karlheinz Dorn <karlheinz.dorn@med.siemens.de>
+Loren J. Rittle <rittle@supra.rsch.comm.mot.com>
+Malte Muenke <malte@cs.ucsb.edu>
+Mark D. Wood <mwood@itc.kodak.com>
+Michael Quigley <michael@goingv.com>
+Neil Gunther <ngunther@ricochet.net>
+Nnamdi Anunini <Nanunini@ctv.com>
+Ofer Rosenberg <ORosenberg@adwise.net>
+Pat Niemeyer <pat@pat.net>
+Patrick J. McNerthney <pat@thememedia.com>
+Peter Sommerlad <sommerlad@strozzi.ifa.ch>
+Rick H. Wesson <wessorh@ar.com>
+Sridhara R. Sabbella <ssabbella@cemax.com>
+Stephen Shaffer <SShaffer@kodak.com>
+Steve Huston <shuston@riverace.com>
+Steven Wu <Steven_Wu-P27745@email.mot.com>
+Supriya Sharma <supriya@us.ibm.com>
+Tan Wee Hong <tanwh@netisdream.com>
+Thomas Dunbar <tdunbar@vt.edu>
+Todd L. Montgomery <tmont@cs.wvu.edu>
+Torsten Kuepper <kuepper2@uni-wuppertal.de>
+Xianfeng Gu <gu@yellowstone.hrl.harvard.edu>
+XuYifeng <xuyf@pop.zg169.net>
+Yigong Liu <yigongliu@lucent.com>
+Yoo In_Seon <isyoo@plsun.sogang.ac.kr>
+Yuval Yosef <yuvi@isdn.net.il>
+Zed A. Shaw <zedshaw@us.ibm.com>
+
+
+Thank you all very much!
+
+James Hu
+jxh@entera.com  

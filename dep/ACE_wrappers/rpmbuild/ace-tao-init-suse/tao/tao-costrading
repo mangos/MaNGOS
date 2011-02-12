@@ -1,0 +1,23 @@
+## Path:           Network/tao-costrading
+## Description:    TAO Trading service settings
+#
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809"
+## ServiceRestart: tao-costrading
+#
+# Specify desired endpoint arguments
+TAO_COSTRADING_INITREF="-ORBDefaultInitRef corbaloc::localhost:2809"
+
+## Type            string
+## Default:        ""
+## ServiceRestart: tao-costrading
+#
+# Debug logging, set to "-ORBDebugLevel 10" to enable.
+TAO_COSTRADING_DEBUGLEVEL=""
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-costrading.log"
+## ServiceRestart: tao-costrading
+#
+# Configure log file
+TAO_COSTRADING_LOGFILE="-ORBLogFile /var/log/tao/tao-costrading.log"

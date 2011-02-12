@@ -1,0 +1,37 @@
+## Path:           Network/tao-cosnaming
+## Description:    TAO Naming service settings
+#
+## Type            string
+## Default:        "-ORBListenEndpoints iiop://:2809"
+## ServiceRestart: tao-cosnaming
+#
+# Specify desired endpoint arguments
+TAO_COSNAMING_ENDPOINT="-ORBListenEndpoints iiop://:2809"
+
+## Type            string
+## Default:        "-f /var/cache/tao/tao-cosnaming.dat"
+## ServiceRestart: tao-cosnaming
+#
+# Location of persistance data file, comment out to disable persistance.
+TAO_COSNAMING_PERSISTFILE="-f /var/cache/tao/tao-cosnaming.dat"
+
+## Type            string
+## Default:        ""
+## ServiceRestart: tao-cosnaming
+#
+# Enable multicast discovery, set to "-m 1" to enable
+TAO_COSNAMING_MULTICAST=""
+
+## Type            string
+## Default:        ""
+## ServiceRestart: tao-cosnaming
+#
+# Enable debug logging, set to "-ORBDebugLevel 10" to enable.
+TAO_COSNAMING_DEBUG=""
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-cosnaming.log"
+## ServiceRestart: tao-cosnaming
+#
+# Configure log file
+TAO_COSNAMING_LOGFILE="-ORBLogFile /var/log/tao/tao-cosnaming.log"

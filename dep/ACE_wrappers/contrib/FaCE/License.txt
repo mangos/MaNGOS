@@ -1,0 +1,27 @@
+==
+== Copyright and Licensing Information
+==
+
+ACE(tm) and TAO(tm) are copyrighted by Dr. Douglas C. Schmidt and the Center for Distributed
+Object Computing ('DOC' group) at Washington University, Copyright (C) 1993 - 2002, all rights
+reserved.  Since ACE and TAO are open source, free software, you are free to use, modify, and
+distribute the ACE and TAO source code and object code produced from the source, as long as
+you include this copyright statement along with code built using ACE and TAO.  Please refer to
+ACE and TAO documentations for detailed copyright and license information on ACE and TAO.
+
+FaCE is an additional front-end shell package designed for ACE and TAO testing work for Pocket
+PC 2002 platform, created and released by Object Computing, Inc. (OCI) and distributed with ACE
+and TAO under the same licensing terms. You can modify and change the source of FaCE for your
+own use as long as you provide attribution to OCI by including its copyright statement in your
+distributions of source and object code. OCI welcomes submissions of improvements to the FaCE
+code base.
+
+FaCE is copyrighted by Object Computing, Inc., St. Louis Missouri, Copyright (C) 2002,
+all rights reserved.
+
+
+==
+== Warranty Information
+==
+
+FaCE is provided 'as is' without warranties of any kind.

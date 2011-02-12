@@ -1,0 +1,24 @@
+// -*- MPC -*-
+// $Id: gperf.mpc 91273 2010-08-04 16:24:59Z johnnyw $
+
+project(gperf) : aceexe, install, crosscompile {
+  install = $(ACE_ROOT)/bin
+  exename = ace_gperf
+  Source_Files {
+    gperf.cpp
+    Options.cpp
+    Iterator.cpp
+    Gen_Perf.cpp
+    Key_List.cpp
+    List_Node.cpp
+    Hash_Table.cpp
+    Bool_Array.cpp
+    Vectors.cpp
+    Version.cpp
+  }
+
+  verbatim(gnuace, postinstall) {
+"	@$(MKDIR) $(INSTALL_PREFIX)/share/ace/bin"
+"	ln -sf $(INSTALL_PREFIX)/bin/ace_gperf $(INSTALL_PREFIX)/share/ace/bin"
+  }
+}

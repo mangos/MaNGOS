@@ -1,0 +1,66 @@
+This file describes the usage of the Dump-Restore utility for the ACE
+Name Server.
+
+Similar to the test application provided in the ../Client/ directory,
+a simple ASCII menu-driven interface is provided to the user:
+
+         Name Service Main Menu
+         ----------------------
+  *** Using Process Local Database ***
+ 
+** No Input File Specified **
+<P> Use Process Local Database
+<N> Use Node Local Database
+<H> Set Remote Name server <host> and <port>
+<F> Set Input File <file name>
+ 
+<B> Bind
+<U> Unbind
+<R> Rebind
+<D> Dump <file name>
+<Q> or ^C (exit) 
+
+Initially, the user can select the type of database from the menu:
+
+<P> uses the process local database (i.e., the
+    database is called the same name as the process
+    and stored in /tmp).
+<N> uses the node local database (which defaults
+    to /tmp/localnames).
+<H> uses the net local database by specifying host and port
+    number (by default this is stored in a file called
+    /tmp/globalnames on the server). 
+<F> Sets the name of the input file that will be used by the
+    test application to populate the database.  The format of
+    the file should be:
+
+    	name=<name1>
+	value=<value1>
+	type=[<type1>]
+	name=<name2>
+	value=<value2>
+	type=[<type2>]
+	.
+	.
+	.
+	
+    Note that the type field is optional. However, if no type
+    information is associated with a name binding, a null entry still
+    needs to be present (i.e., type=).
+
+Once the input file has been specified, the user can then do one of
+the following:
+
+<B> Bind             -- bind all the bindings in the file to the database.
+                        This can be used to "restore" the state of the
+                        Name Server.
+<U> Unbind           -- unbind all the bindings in the file from the database.
+<R> Rebind           -- rebind all the bindings in the file to the database.
+<D> Dump <file name> -- dump the state of the database to <filename>.
+<Q> or ^C (exit)     -- exit gracefully, saving the contents of the
+                        Name Server in persistent shared memory.
+ 
+Note that the dump file is stored in ASCII with exactly the same
+format as the input file.  Also, one can easily change the test
+application so that a call to Dump results in the state of the
+database dumped to standard output instead of a file.

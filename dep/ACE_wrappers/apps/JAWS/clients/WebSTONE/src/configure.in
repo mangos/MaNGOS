@@ -1,0 +1,99 @@
+# configure.in
+# Configure template for WebStone
+# Process this file with autoconf to produce a configure script.
+#
+# This file and all files contained in this directory are 
+# copyright 1995, Silicon Graphics, Inc.
+# 
+# This software is provided without support and without any obligation on the 
+# part of Silicon Graphics, Inc. to assist in its use, correction, modification
+# or enhancement. There is no guarantee that this software will be included in 
+# future software releases, and it probably will not be included.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS" WITH NO WARRANTIES OF ANY KIND INCLUDING  
+# THE WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR  
+# PURPOSE, OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE. 
+#
+# In no event will Silicon Graphics, Inc. be liable for any lost revenue or 
+# profits or other special, indirect and consequential damages, even if 
+# Silicon Graphics, Inc. has been advised of the possibility of such damages. 
+
+AC_INIT(webclient.c)
+AC_CONFIG_HEADER(config.h)
+PRODUCT=webstone
+VERSION=2.0b6
+AC_DEFINE_UNQUOTED(PRODUCT, "$PRODUCT")
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_SUBST(PRODUCT)
+AC_SUBST(VERSION)
+AC_PREFIX_DEFAULT(bin)
+
+# set system type
+AC_CANONICAL_SYSTEM
+
+#
+# checks for programs
+#
+AC_PROG_CC
+AC_PROG_MAKE_SET
+AC_PROG_AWK
+
+
+# We use a path for perl so the #! line in bin/wscollect.pl will work.
+AC_PATH_PROG(PERL, perl, no)
+AC_SUBST(PERL)
+AC_SUBST(PERL_SCRIPTS)
+if test "$PERL" != no; then
+  PERL_SCRIPTS="bin/wscollect.pl"
+else
+  AC_MSG_WARN(Some functions may work correctly, since perl was not found)
+fi
+
+#
+# checks for libraries
+#
+# Replace `main' with a function in -lm:
+AC_CHECK_LIB(m, floor)
+AC_CHECK_LIB(compat, rexec)
+AC_CHECK_LIB(ucb, wait3)
+AC_CHECK_LIB(socket, connect, AC_SUBST(LIBS), , -lnsl)
+
+#
+# checks for header files
+#
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(fcntl.h limits.h sgtty.h sys/time.h unistd.h)
+
+#
+# checks for typedefs, structures, and compiler characteristics
+#
+AC_C_CONST
+AC_TYPE_SIZE_T
+AC_TYPE_SIGNAL
+AC_HEADER_TIME
+AC_STRUCT_TIMEZONE
+AC_TRY_COMPILE([#include <sys/time.h>], 
+	[struct timeval thetime; struct timezone thezone; 
+	gettimeofday(&thetime, &thezone); ],
+	AC_DEFINE(USE_TIMEZONE), )
+
+#
+# checks for library functions
+#
+AC_FUNC_MEMCMP
+AC_TYPE_SIGNAL
+AC_FUNC_VPRINTF
+AC_FUNC_WAIT3
+AC_CHECK_FUNCS(gethostname gettimeofday select socket strerror)
+
+#
+# checks for system services
+#
+
+#
+# all done
+#
+AC_OUTPUT(Makefile)
+#
+# end

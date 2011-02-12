@@ -1,0 +1,17 @@
+To build JAWS3:
+
+  (1) Obtain ACE, configure and build it.
+  (2) Build the JAWS3 framework (in the subdirectory jaws3).
+  (3) Build the Small Server (in the subdirectory small).
+
+To run the Small Server, go to the small subdirectory, and
+execute ../jaws3/main.
+
+JAWS3 is known to build using the latest ACE beta on:
+
+Solaris 2.7 (sparc) with SunCC 4.2
+Solaris 2.7 (x86) with SunCC 4.2
+Solaris 2.7 (x86) with gcc-2.95.2
+FreeBSD 3.4 (x86) with gcc-2.7.2
+RedHat Linux 6.1 (x86) with gcc-2.95.2
+

@@ -1,0 +1,11 @@
+// -*- MPC -*-
+// $Id: lib.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(websvcs): ace_output, acelib {
+  sharedname    = websvcs
+  dynamicflags += ACE_WEBSVCS_BUILD_DLL
+  Source_Files {
+    URL_Addr.cpp
+  }
+
+}

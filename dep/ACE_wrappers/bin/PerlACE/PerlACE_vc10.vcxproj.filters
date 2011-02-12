@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Script Files">
+      <UniqueIdentifier>{7197AE6D-FECA-1BAD-A757-FC47A624E189}</UniqueIdentifier>
+      <Extensions>sh</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ConfigList.pm">
+      <Filter>Script Files</Filter>
+    </None>
+    <None Include="Process.pm">
+      <Filter>Script Files</Filter>
+    </None>
+    <None Include="Process_Unix.pm">
+      <Filter>Script Files</Filter>
+    </None>
+    <None Include="Process_Win32.pm">
+      <Filter>Script Files</Filter>
+    </None>
+    <None Include="Run_Test.pm">
+      <Filter>Script Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

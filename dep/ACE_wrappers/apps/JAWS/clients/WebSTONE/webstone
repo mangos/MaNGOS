@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+#
+WEBSTONEROOT=`pwd` ; export WEBSTONEROOT
+[ -z "$EDITOR" ] && EDITOR="vi"
+
+case $1 in
+  '-gui')
+	  bin/webstone-gui.pl 
+	  ;;
+  '-help')
+	  echo
+	  more README.FIRST
+	  ;;
+  '-setup')
+	  if (sh bin/gui-configure)
+	  then
+		:
+	  else
+		echo
+		echo "Some problems were found."
+		echo "Press RETURN to continue, or CTRL-C to abort."
+		read junk
+	  fi
+	  if (cd src ; ./configure ; make install)
+	  then
+		echo
+		echo
+		echo "Press RETURN to continue"
+		read junk
+		$EDITOR conf/testbed
+		echo
+		echo "WebStone make complete."
+		echo "Type './webstone -genfiles' to create the fileset."
+		echo
+	  else
+		echo
+		echo "WebStone make FAILED"
+	  	echo "Consult the file doc/FAQ-webstone.html for porting hints."
+		echo
+	  fi
+	  ;;
+  '-kill')
+	   cd bin
+	   ./killbench
+	   ;;
+  '-nogui')
+	    cd bin
+	    ./runbench
+	    ;;
+  '-genfiles')
+	       cd bin
+	       ./genfiles
+		echo
+		echo "If no errors occurred, type './webstone' to run the benchmark."
+		echo
+	       ;;
+  '-silent')
+	     cd bin
+	     ./runbench > /dev/null 2>&1 &
+	     ;;
+  '-tail')
+	   LATEST=$WEBSTONEROOT/bin/runs/`ls -1 $WEBSTONEROOT/bin/runs | tail -1`/run
+	   tail -f $LATEST
+	   ;;
+  '-results')
+	      bin/wscollect.pl $2 bin/runs
+	      ;;
+	     
+  *)
+     $WEBSTONEROOT/webstone -nogui
+     ;;
+esac
+
+# end

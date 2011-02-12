@@ -1,0 +1,4 @@
+# This line is mandatory to access the configuration functions from Config import *
+
+addFilter("tao.* devel-file-in-non-devel-package")
+addFilter("ace-kokyu.* shlib-policy-name-error")

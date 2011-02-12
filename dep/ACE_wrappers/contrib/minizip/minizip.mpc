@@ -1,0 +1,23 @@
+// -*- MPC -*-
+// $Id: minizip.mpc 90163 2010-05-18 21:42:20Z mitza $
+
+project (minizip) : install, zlib, vc_warnings {
+  sharedname = minizip
+  libout = $(ACE_ROOT)/lib
+  dynamicflags += MINIZIP_BUILD_DLL
+  requires += zlib
+
+  Source_Files {
+     zip.c
+     unzip.c
+     ioapi.c
+  }
+
+  Header_Files {
+    minizip_export.h
+    ioapi.h
+    unzip.h
+    zip.h
+  }
+}
+

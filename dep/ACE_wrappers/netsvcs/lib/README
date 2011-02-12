@@ -1,0 +1,267 @@
+This directory provides a number of network services that utilize the
+ACE wrapper features.
+
+	. Logging_Strategy -- Controls the output of all services that are
+	  invoked along with the Logging_Strategy service. Please see below for
+	  details on how to control the output.
+
+	. [Thr_]Server_Logging_Handler.* -- Implements server portion
+	  of the ACE distributed logging service.  Both multi-threaded
+	  and single-threaded implementations are provided.
+
+	. Client_Logging_Handler.* -- Implements the client portion
+	  of the ACE distributed logging service.
+
+	. Name_Handler.* -- Implements a distributed name service that
+	  allows applications to bind, find, and unbind names in
+	  a distributed system.
+
+	. Token_Handler.* -- Implements a distributed token 
+	  service that allows applications to acquire and release 
+	  locks in a distributed system.
+
+	. Time_Handler.* -- Implements a distributed time service that
+	  allows distributed applications to synchronize their
+	  time.
+
+The remainder of this README file explains how these services work.
+
+==================== Logging_Strategy Service ====================
+The Logging_Strategy Service can be used to control the output of all the
+network services. It can be invoked with certain flags that determine
+where the output of all the services should go.
+
+The Logging_Strategy Service sets the flags in ACE_Log_Msg which in turn
+controls all the streams through macros such as ACE_DEBUG, ACE_ERROR,
+and ACE_ERROR_RETURN.
+
+If default behavior is required, the Logging_Strategy Service need not be
+invoked or it can be invoked with no paramaters. Here are the command
+line arguments that can be given to the Logging_Strategy Service:
+<CODE>
+
+    -f <flag1>|<flag2>|<flag3>    (etc...)
+</CODE>
+    where a flag can be any of the following:
+
+    STDERR  	-- Write messages to stderr.
+    LOGGER      -- Write messages to the local client logger deamon.
+    OSTREAM     -- Write messages to the ostream that gets created by
+		   specifying a filename (see below)
+    VERBOSE	-- Display messages in a verbose manner 
+    SILENT      -- Do not print messages at all
+
+Note: If more than one flag is specified, the flags need to be 'OR'ed
+as above syntax shows. Make sure there is no space in between the flag
+and '|'.
+
+    -s filename
+
+    If the OSTREAM flag is set, this can be used to specify the
+filename where the output should be directed. Note that if the OSTREAM
+flag is set and no filename is specified, ACE_DEFAULT_LOGFILE will be
+used to write the output to.
+
+Examples:
+
+To direct output only to STDERR, specify command line arguments as:
+	"-f STDERR"
+
+To direct output to both STDERR and a file called "mylog", specify
+command line arguments as: 
+	"-f STDERR|OSTREAM -s mylog"
+
+==================== Name Service ====================
+
+This file describes the principles of the Name_Server server test
+application.
+
+1. Startup configuration
+   ---------------------
+
+To communicate with the server process, a client needs to know the
+INET_Addr, where the server offers its service. Class Name_Options
+holds all the configuration information of the Name Service. This
+consists of :
+
+ - nameserver_port : Port number where the server process expects requests
+ - nameserver_host : hostname where the server process resides
+ - namespace_dir   : directory that holds the NameBinding databases
+ - process_name    : name of the client process (argv[0]), NameBindings of
+		     a ProcessLocal namespace are stored in file 
+		     "namespace_dir/process_name". NameBindings of NodeGlobal
+		     namespace are stored in "namespace_dir/localnames".
+		     NameBindings of Net_Local namespace are stored in file
+		     "namespace_dir/globalnames" on the server host.
+ These configuration parameters are passed to the process as commandline
+ arguments to main:
+		-p nameserver port
+		-h nameserver host
+		-l namespace directory
+
+ The main program _must_ initialize an instance of Name_Options with name
+ name_options (since the shared libraries depend on this). Main should
+ look like :
+
+   #include "ace/Name_Options.h"
+
+   Name_Options name_options;
+
+   int main(int argc, char **argv)
+   {
+     name_options.process_name(argv[0]);
+     name_options.parse_args (argc, argv);
+     ......
+   }
+
+See the examples in the tests subdirectory of
+...Name_Server/Client-Server/client and
+...Name_Server/Client-Server/server
+
+
+2. Class Naming_Context
+   -------------------
+
+This is the main workhorse of the Name Service. It is used by client
+processes as well as by the server process. It manages all accesses to
+the appropriate NameBinding database (that is the file where
+NameBindings are stored) and it also manages the communication between
+a client process and the server (by using class Name_Proxy, which is a
+private member of Naming_Context).  (Note: no IPC is necessary, if a
+client process runs on the same host as the server).
+
+The strategy for all public methods of Naming_Context is common :
+
+1. Transform the format of the arguments to ACE_SString (which is
+   internally used) if necessary.
+
+2. check if work can be done locally : -> call the appropriate local_* method 
+   otherwise call the appropriate global_* method.
+
+Removing Name_Bindings from the database (either with unbind or
+rebind) uses the ACE_Malloc class configured with the
+ACE_MMAP_Memory_Pool.  This allows memory to be reclaimed when
+name/value tuples are unbound.
+
+3. Class Name_Server
+   ----------------
+
+The Name_Server registers in its run method its Name_Acceptor
+(instantiated with the INET_Addr) at the Reactor, to receive incoming
+requests.
+
+4. Class Name_Acceptor
+   ------------------
+
+The Name_Acceptor allocates in its handle_input routine a new instance
+of class Name_Handler on the heap, and accepts connections into this
+Name_Handler.
+
+5. Class Name_Handler
+   -----------------
+
+The Name_Handler represents the server side of communication between
+client and server. It interprets incoming requests to the Net_Local
+namespace and dele- gates the requests to its own Naming_Context
+(which is the Net_Local namespace on the current host). For
+communication it uses the helper classes Name_Request (which up to now
+needs not only contain the request from the client, but also the
+appropriate reply from the server) and Name_Reply.  Note that I want
+to change the usage of these classes to make the structure of the
+software clearer.
+
+6. Dependencies
+   ------------
+
+As the Name service must be able to handle wide character strings, it
+uses ACE_WString String classes.
+
+
+==================== Time Service ====================
+
+The following is a description of the Time Server clerk and server
+services:
+
+1. Startup configuration
+   ---------------------
+
+Configuring a server requires specifying the port number of the
+server. This can be specified as a command line argument as follows:
+
+	-p <port number>
+
+A clerk communicates with one or more server processes. To communicate
+with the server process, a client needs to know the INET_Addr, where
+the server offers its service. The configuration parameters namely the
+server port and server host are passed as command line arguments when
+starting up the clerk service as follows:
+
+    -h <server host1>:<server port1> -h <server host2>:<server port2> ...
+
+Note that multiple servers can be specified in this manner for the
+clerk to connect to when it starts up. The server name and the port
+number need to be concatenated and separated by a ":". In addition,
+the timeout value can also be specified as a command line argument as
+follows: 
+
+	-t timeout
+
+The timeout value specifies the time interval at which the clerk
+should query the servers for time updates.
+
+By default a Clerk does a non-blocking connect to a server. This can
+be overridden and a Clerk can be made to do a blocking connect by
+using the -b flag.
+
+Here is what a config file would look like for starting up a server at
+port 20202:
+
+dynamic Time_Service Service_Object * ../lib/netsvcs:_make_ACE_TS_Server_Acceptor() "-p 20202"
+
+Here is what a config file would look like for starting up a clerk
+that needs to connect to two servers, one at tango and one at lambada:
+
+dynamic Time_Server_test Service_Object *../lib/netsvcs:_make_ACE_TS_Clerk_Processor () "-h tango:20202 -h lambada:20202 -t 4"
+
+2. Class TS_Server_Handler
+   -----------------------
+
+TS_Server_Handler represents the server side of communication between
+clerk and server. It interprets incoming requests for time updates,
+gets the system time, creates a reply in response to the request and
+then sends the reply to the clerk from which it received the request.
+For communication it uses the helper class Time_Request.
+
+3. Class TS_Server_Acceptor
+   ------------------------
+
+TS_Server_Acceptor allocates in its handle_input routine a new instance
+of class TS_Server_Handler on the heap, and accepts connections into this
+TS_Server_Handler.
+
+4. Class TS_Clerk_Handler
+   ----------------------
+
+TS_Clerk_Handler represents the clerk side of communication between
+clerk and server. It generates requests for time updates every timeout
+period and then sends these requests to all the servers it is
+connected to asynchronously. It receives the replies to these requests
+from the servers through its handle_input method and then adjusts the
+time using the roundtrip estimate. It caches this time which is later
+retrieved by TS_Clerk_Processor.
+
+5. Class TS_Clerk_Processor
+   ------------------------
+
+TS_Clerk_Processor creates a new instance of TS_Clerk_Handler for
+every server connection it needs to create. It periodically calls
+send_request() of every TS_Clerk_Handler to send a request for time
+update to all the servers. In the process, it retrieves the latest
+time cached by each TS_Clerk_Handler and then uses it to compute its
+notion of the local system time.
+
+6. Algorithms
+   ----------
+
+Currently, updating the system time involves taking the average of all
+the times received from the servers.

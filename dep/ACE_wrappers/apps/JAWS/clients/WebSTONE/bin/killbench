@@ -1,0 +1,13 @@
+#!/bin/sh -x
+#
+# get configuration
+. $WEBSTONEROOT/conf/testbed
+
+for i in $CLIENTS
+do
+	$RSH -l root $i /etc/killall $1 webclient
+done
+#
+sleep 1 
+/etc/killall $1 webmaster
+/etc/killall $1 runbench

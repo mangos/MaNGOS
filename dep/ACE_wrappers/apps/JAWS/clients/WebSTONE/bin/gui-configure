@@ -1,0 +1,174 @@
+#!/bin/sh -- because we're not sure where perl is yet
+#
+
+'true' || eval 'exec perl -S $0 $argv:q';
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}'
+& eval 'exec /usr/local/bin/perl -S $0 $argv:q'
+        if 0;
+
+#  Usage: [perl] configure [file]
+#
+#   This replaces the program paths (e.g. /bin/awk) with an
+# alternate path that is found in the file "file.paths".  It also finds
+# perl5 and changes the path in all the stand-alone perl programs.
+#
+	  
+$debug = 0;
+	  
+#
+#  Target shell scripts in question:
+@shell_scripts=("conf/paths.pl", "conf/paths.sh");
+@perl5_src = < bin/webstone-gui.pl bin/WebStone-common.pl bin/killbench.pl bin/view-results.pl bin/WebStone-manage.pl bin/move-filelist.pl bin/write-testbed.pl bin/WebStone-run.pl bin/move-runs.pl bin/WebStone-setup.pl bin/runbench.pl >;
+@perl_src = < bin/wscollect.pl bin/mine-logs.pl >;
+@benchmark_dir_src = < webstone bin/killbench bin/runbench >;
+
+# all the HTML browsers we know about, IN ORDER OF PREFERENCE!
+@all_www= ("netscape", "Mosaic", "xmosaic", "lynx");
+
+#
+#  Potential directories to find commands; first, find the user's path...
+$PATH = $ENV{"PATH"};
+
+# additional dirs; *COLON* separated!
+$other_dirs="/usr/ccs/bin:/bin:/usr/bin:/usr/ucb:/usr/bsd:/usr/ucb/bin:/usr/sbin:/usr/etc:/usr/local/bin:/usr/bin/X11:/usr/X11/bin:/usr/openwin/bin";
+
+#
+# split into a more reasonable format. Personal aliases come last.
+@all_dirs = split(/:/, $other_dirs . ":" . $PATH);
+
+print "checking to make sure all the target(s) are here...\n";
+
+for (@shell_scripts) {
+        die "ERROR -- $_ not found!\n" unless -f $_;
+        }
+
+# find perl
+print "Trying to find perl...\n";
+for $dir (@all_dirs) {
+        # first, find where it might be
+        next if (! -d $dir);
+        while (<$dir/perl*>) {
+                if (-x $_) {
+                        $perl_version=`($_ -v 2> /dev/null) |
+                                awk '/This is perl/ { print $NF }'`;
+                        if ($perl_version) {
+                                $PERL=$_;
+                                $pflag="1";
+                                last;
+                                }
+                        }
+                        last if $pflag;
+                }
+        last if $pflag;
+        }
+
+if ($PERL) {
+    print "\nPerl is in $PERL\n";
+    for (@perl_src) { $perl_src .= "$_ "; }
+    print "\nchanging the source in: $perl_src\n";
+    system "$PERL -pi -e \"s@^#!.*/perl.*@#!$PERL@;\" $perl_src";
+    
+    # make sure things are executable...
+    system("chmod u+x $perl_src");
+}
+else
+{
+    printf "\nSome WebStone functions require Perl\n" unless $PERL;
+}
+# end if $PERL
+
+# find perl5
+$pflag = 0;
+print "Trying to find perl5...\n";
+for $dir (@all_dirs) {
+    # first, find where it might be; oftentimes you'll see perl,
+    # perl4, perl5, etc. in the same dir
+    next if (! -d $dir);
+    while (<$dir/perl5* $dir/perl*>) {
+	if (-x $_) {
+	    $perl_version=`($_ -v 2> /dev/null) |
+                                awk '/This is perl, version 5/ { print $NF }'`;
+	    if ($perl_version) {
+		$PERL5=$_;
+		$pflag="1";
+		last;
+	    }
+	}
+	last if $pflag;
+    }        
+    last if $pflag;
+}
+
+if ($PERL5) {
+    print "\nPerl5 is in $PERL5\n";
+    
+    for (@perl5_src) { $perl5_src .= "$_ "; }
+    print "\nchanging the source in: $perl5_src\n";
+    system "$PERL5 -pi -e \"s@^#!.*/perl.*@#!$PERL5@;\" $perl5_src"; 
+    system("chmod u+x $perl5_src");
+}
+else
+{
+    printf "\nThe WebStone GUI requires Perl5\n" unless $PERL5;
+}
+#end if $PERL5
+
+# find the most preferred www viewer first.
+for $www (@all_www) {
+        for $dir (@all_dirs) {
+                if (!$MOSAIC) {
+                        if (-x "$dir/$www") {
+                                $MOSAIC="$dir/$www";
+                                next;
+                                }
+                        }
+                }
+        }
+if ($MOSAIC) {
+        print "\nHTML/WWW Browser is $MOSAIC\n";
+
+        $upper{"MOSAIC"} = $MOSAIC;
+        }
+else { print "Cannot find a web browser!  WebStone cannot be run except in CLI"; }
+ 
+print "\nOk, now doing substitutions on the shell scripts...\n";
+for $shell (@shell_scripts) {
+        print "Changing paths in $shell...\n";
+        die "Can't open $shell\n" unless open(SCRIPT, $shell);
+        rename($shell, $shell . '.old');
+        die "Can't open $shell\n" unless open(OUT, ">$shell");
+ 
+        #
+        #  Open up the script, search for lines beginning with
+        # stuff like "TEST", "AWK", etc.  If the file ends in "pl",
+        # assume it's a perl script and change it accordingly
+        while (<SCRIPT>) {
+                $found = 0;
+                for $command (keys %upper) {
+                        if(/^\$?$command=/) {
+                                # shell script
+                                if ($shell !~ /.pl$/) {
+                                        print OUT "$command=$upper{$command}\n";                                        }
+                                # perl script
+                                else {
+                                        print OUT "\$" . "$command=\"$upper{$command}\";\n";
+                                        }
+                                $found = 1;
+                                }
+                        }
+                print OUT $_ if !$found;
+
+                }
+        close(SCRIPT);
+        close(OUT);
+        }
+ 
+
+for (@benchmark_dir_src) { $benchmark_dir_src .= "$_ "; }
+print "\nchanging the source in: $benchmark_dir_src\n";
+$BENCHMARK_DIR=`pwd`;
+chop $BENCHMARK_DIR;
+$BENCHMARK_DIR =~ s/\//\\\//g;
+system "$PERL -pi -e \"s/<BENCHMARK_DIR>/$BENCHMARK_DIR/\" $benchmark_dir_src";
+
+# done...

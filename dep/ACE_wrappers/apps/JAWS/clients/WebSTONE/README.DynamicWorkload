@@ -1,0 +1,37 @@
+WebStone Dynamic Workload
+
+	WebStone now includes a workload that tests dynamically generated
+Web pages.
+
+	To use the dynamic workload models, you must install a dynamic module
+on the Web server to be tested. The Web server must also be configured such
+that a request for "/file.dyn-send?size=1024" (for example) will cause the
+module to be run, and will return 1024 bytes of data.
+
+Example configuration (Netscape server, executable is "nsapi-send"):
+	cd src
+	make nsapi
+	cp nsapi-send.so /usr/lib
+	cd /usr/ns-home/httpd-80/config
+	in magnus.conf, add the line:
+		Init fn=load-modules shlib=nsapi.so funcs=nsapi-send
+	in obj.conf, add the line:
+		Service method=(GET|HEAD) fn=nsapi-send \
+			type=magnus-internal/dyn-send
+	in mime.types, add the line:
+		type=magnus-internal/dyn-send        exts=dyn-send
+	restart the Web server
+
+	Example code for CGI and NS-API is included as src/cgi-send.c 
+and src/nsapi-send.c - if you implement other APIs, please forward a copy
+of your code to the WebStone mailing list or to the WebStone authors.
+
+Included workloads:
+	conf/workload.dynamic-heavy: All content is dynamically generated.
+	conf/filelist.dynamic-medium: About 50% of content is dynamically
+		generated.
+	conf/filelist.dynamic-light: About 25% of content is dynamically
+		generated.
+
+As always, we encourage you to design your own workloads, tailored for your
+environment.

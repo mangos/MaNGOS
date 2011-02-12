@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML VERSION="2.0">
+<HEAD>
+<!-- $Id: webstone2.html 80826 2008-03-04 14:51:23Z wotte $ -->
+<!-- WEBMAGIC VERSION NUMBER="2.0.1" -->
+<!-- WEBMAGIC TRANSLATION NAME="ServerRoot" SRC="/var/www/htdocs/" DST="/" -->
+<!-- WEBMAGIC TRANSLATION NAME="ProjectRoot" SRC="./" DST="" -->
+<TITLE>What is Webstone 2.0</TITLE>
+</HEAD>
+<BODY>
+<CENTER><H1 ALIGN="CENTER"><IMG SRC="webstone.gif" WIDTH="534" HEIGHT="174" SGI_FULLPATH="/disk6/WebStone-2.0/doc/webstone.gif"></H1>
+</CENTER><H1>Introducing WebStone 2.0</H1>
+<P>WebStone 2.0 is the second generation Webstone web server benchmark. It
+incorporates numerous bug fixes, modifications for compatibility with other
+platforms and adds the new functionality of benchmark proxy servers, cgi
+and NSAPI programs as well as introducing run rules which should make Webstone
+numbers significantly more meaningful for comparison.</P>
+<H2>New Features</H2>
+<P>Webstone 2.0 provides facilities for benchmarking proxy servers. This is
+accomplished by putting in a value for the the PROXYSERVER entry in the
+conf/testbed file, and changing the filelist to include URL's that have
+the hostname for the actual web server.</P>
+<P>Dynamic content benchmarking is now explicitly supported in Webstone 2.0.
+The file README.DynamicWorkload has directions for testing of NSAPI. The
+included filelist.dynamic-{light,medium,heavy} serve as sample loads, with
+the filelist.dynamic-heavy being the load that should be reported for NSAPI
+performance. The cgi-send numbers should be quored for the filelist.cgi-heavy
+fileset.</P>
+<P>A port of the WebStone 2.0 benchmark to Windows NT is also included in this
+release. This port is still in progress, so full functionality is not assured.
+Specifically only the benchmark code has been ported - the supporting scripts
+have not.</P>
+<H2>Run Rules</H2>
+<P>As of Webstone 2.0, there are now run rules which must be adhered to for
+published Webstone numbers. These are fairly basic, but they provide important
+constraints on the benchmarking which make Webstone numbers more meaningful.</P>
+<P><B>Fileset: </B>Included in the Webstone distribution is filelist.standard, which was previously
+called filelist.sample. This filelist has a distribution of fileset sizes
+that matches the kind of distributions seen in live web sites. The largest
+file in the distribution is a 5 MB in length, which simulates the occasional
+MPEG or other animation file which is downloaded. This filelist should be
+used for all published Webstone numbers. Note that running WebStone 2.0
+with the sort of fileset given in WebStone 1.1 will not yield a comparable
+benchmark. In general, the WebStone 2.0 filelist will yield lower rates
+for connections/second, but higher rates for throughput - the two sets of
+numbers cannot be compared.</P>
+<P>When reporting NSAPI numbers, the filelist.dynamic-heavy filelist should
+be used. For CGI numbers, the filelist.cgi-heavy filelist should be used.</P>
+<P><B>Benchmark Run Configuration:</B> For a reported WebStone run, the runtime must be set at least 10 minutes.
+This provides adequate time for the server and client configuration to reach
+a steady state, and then provides a length of time long enough to cancel
+out the high variations seen in the first few minutes of the run. The number
+of clients should also vary from 20 to 100 in increments of 10 so that performance
+of the server under a wide variety of loads can be observed.</P>
+<P><B>Server Configuration:</B> The number of threads/processes is open to the discretion of the benchmarkers.
+However, whether server side logging is on must be explicitly reported.
+When logging is turned on, it must be in the common logfile format, and
+only IP addresses should be logged. Parsed HTML is recommended to be turned
+off.</P>
+<P>Proxy Configuration: The configuration of how often the proxy server polls
+the actual server for refreshes of it's cache should be described, as well
+as any information</P>
+<P><B>Server Machine Configuration:</B> When reporting runs, it is necessary that the operating system, memory
+configuration and any special operating system modifications be reported,
+especially changes to the TCP/IP stack.</P>
+<P><B>Testbed configuration: </B>Reported runs must include information about the network topology being
+used, as well as the number and type of machines generating load.</P>
+<P>All reported runs must include the information summarized by webstone -results,
+excluding the timestamp. This includes: number of clients, connections per
+second, little's law number, latency, error level and throughput. Preferably
+in a table format.</P>
+</BODY>
+</HTML>

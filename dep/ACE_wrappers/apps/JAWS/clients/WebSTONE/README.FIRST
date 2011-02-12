@@ -1,0 +1,21 @@
+QUICK AND DIRTY README FOR WEBSTONE 2.0
+
+For more details, consult the README* files and the doc/FAQ-webstone.html
+
+First, run:
+
+	./webstone -setup
+
+	This script uses GNU autoconf, makes the binaries, and then
+puts you into the vi editor with the conf/testbed file. For details on
+how to edit conf/testbed, consult the FAQ.
+
+Next, if you have a Web broswer available, and you'd like to try the GUI
+
+	./webstone -gui
+
+Otherwise, run the benchmark by typing
+
+	./webstone
+
+

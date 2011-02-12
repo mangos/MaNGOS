@@ -1,0 +1,7 @@
+start
+description        	ISO 8859-1:1987; Latin Alphabet No. 1
+loc_name        ASCII
+rgy_value        	0x00010001
+char_values        	0x0011
+max_bytes        1
+end

@@ -1,0 +1,399 @@
+Thu Jan  5 00:43:30 UTC 2006  J.T. Conklin  <jtc@acorntoolworks.com>
+
+        * ChangeLog:
+
+          Untabify.
+          Delete-trailing-whitespace.
+
+Wed Jan  4 22:57:37 UTC 2006  J.T. Conklin  <jtc@acorntoolworks.com>
+
+        * ChangeLog:
+
+          Added "Local Variables" section defining "add-log-time-format"
+          to a really ugly lambda expression that formats changelog
+          timestamps in UTC and works with both GNU Emacs and XEmacs.
+
+Mon Nov 28 07:24:01 2005  Ossama Othman  <ossama@dre.vanderbilt.edu>
+
+        * drwho.mpc:
+
+          Added missing "avoid += ace_for_tao" for "server" project.
+
+Sat Nov 26 06:58:23 2005  Ossama Othman  <ossama@dre.vanderbilt.edu>
+
+        * drwho.mpc:
+
+          Added "avoids += ace_for_tao" since this project requires
+          features of ACE not found in the ace_for_tao subset.  Addresses
+          build errors.
+
+Sat Apr 30 08:16:42 2005  Ossama Othman  <ossama@dre.vanderbilt.edu>
+
+        * Select_Manager.cpp:
+
+          Fixed syntax error due to missing ACE_RCSID macro definition.
+
+Fri Apr 29 23:54:07 2005  Ossama Othman  <ossama@dre.vanderbilt.edu>
+
+        * Comm_Manager.h:
+        * Select_Manager.h:
+
+          Added virtual destructor to silence g++ 4.0 warnings.
+
+        * Comm_Manager.cpp:
+        * Select_Manager.cpp:
+
+          New files containing virtual destructor definition.
+
+        * Makefile.am:
+        * drwho.mpc:
+
+          Added new Comm_Manager.cpp and Select_Manager.cpp files to the
+          source file list.
+
+Sat Feb 17 08:33:06 2001  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * File_Manager.cpp: Fixed several unreachable statements.
+
+Thu Feb 15 06:00:12 2001  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * server.cpp: Renamed tstamp to time_stamp to avoid conflicts with
+          the pre-processor on the Forte 5.2 compiler.  Thanks to Mike
+          Curtis for reporting this.
+
+        * File_Manager.cpp: Fixed "unreachable code" errors reported by
+          Compaq C++.
+
+Thu Nov 16 17:58:10 2000  Carlos O'Ryan  <coryan@uci.edu>
+
+        * Options.h:
+          Fixed small syntax error.
+
+Sat Nov  4 18:18:06 2000  Carlos O'Ryan  <coryan@uci.edu>
+
+        * Rwho_DB_Manager.cpp:
+          Add missing #include
+
+Fri Jul 14 14:44:43 2000  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * CM_Server.cpp (receive): Added a cast to (int *) so that
+          certain C++ compilers are happy.  Thanks to John Mills
+          <jmills@tga.com> for reporting this.
+
+Tue May 23 20:52:29 2000  David L. Levine  <levine@cs.wustl.edu>
+
+        * CM_Server.cpp (receive): one last time.  Use
+          ACE_OS::recvfrom instead of the direct system call,
+          so it hides the native socklen_t or whatever the OS
+          uses.
+
+Tue May 23 07:11:53 2000  David L. Levine  <levine@cs.wustl.edu>
+
+        * CM_Server.cpp (receive): changed type of local sin_len
+          to be dependent on ACE_HAS_SOCKLEN_T or ACE_HAS_SIZET_SOCKET_LEN.
+          See Mon May 22 21:10:24 2000  David L. Levine  <levine@cs.wustl.edu>
+
+Mon May 22 21:10:24 2000  David L. Levine  <levine@cs.wustl.edu>
+
+        * CM_Server.cpp (receive): changed type of local sin_len
+          from int to size_t, to avoid warning from g++ on Linux
+          about "change of signedness".  Note that it would be
+          better to use ACE_SOCKET_LEN, but that's defined in
+          ace/OS.i.  So, it wouldn't be visible with inlining
+          disabled.
+
+Mon May 22 21:07:57 2000  David L. Levine  <levine@cs.wustl.edu>
+
+        * BS_Server.cpp (insert): initialize local cmp to 0, to
+          prevent warning from g++ 2.91.66 (on Linux) about possible
+          use without initialization.
+
+Fri May  5 10:40:46 2000  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * Fixed a coule of errors due to mismatches between int and size_t.
+          Thanks to David Levine and Darrell Brunsch for reporting these.
+
+Thu Apr 20 09:20:28 2000  Carlos O'Ryan  <coryan@uci.edu>
+
+        * Drwho_Node.cpp:
+        * File_Manager.cpp:
+        * HT_Client.cpp:
+        * HT_Server.cpp:
+        * Hash_Table.cpp:
+        * Makefile:
+        * PMC_All.cpp:
+        * PMC_Flo.cpp:
+        * PMC_Ruser.cpp:
+        * PMC_Usr.cpp:
+        * PMS_All.cpp:
+        * PMS_Flo.cpp:
+        * PMS_Ruser.cpp:
+        * PMS_Usr.cpp:
+        * PM_Client.cpp:
+        * PM_Server.cpp:
+        * Protocol_Manager.cpp:
+        * Protocol_Record.cpp:
+        * Rwho_DB_Manager.cpp:
+        * Single_Lookup.cpp:
+        * server.cpp:
+          Fixed many warnings wrt order of fields in the initialization
+          section.
+          Add missing template instantiation.
+          Add missing includes.
+          Fixed problems with the scope of variables declared inside a
+          for() loop.
+
+Wed Sep 30 13:00:52 1998  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * Fixed a bunch of warnings related to char * and const char *.
+          Thanks to Sandro Doro <doros@aureus.sublink.org> for reporting
+          this.
+
+Sat Sep 12 21:21:01 1998  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * Made zillions of changes to "ACE"ify all of the code.  Drwho is
+          now officially working again!
+
+Sun Sep  6 22:48:52 1998  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * Replaced all Str::*() methods with the new ACE::*() methods,
+          which are more "standard".
+
+        * Began to work on drwho after a 5 year absence...
+
+Sun Feb 14 16:13:10 1993  Douglas C. Schmidt  (schmidt at net1.ics.uci.edu)
+
+        * Yow. Once again back at work...  This time I fixed things up so
+          that the release compiles properly with Solaris 2.1 C++, g++
+          2.3.3, and the Sun C++ compiler on Sun OS 4.1.x.  To do this I
+          had to change the user-defined memory allocator somewhat, since
+          the Sun C++ compiler was using the global NEW operator to
+          allocate pools of memory behind my back...  Naturally, this
+          reaked havoc with the existing version in the server, which
+          returns all the allocated memory to the free list once a request
+          is satisfied.  In addition, g++ had a weird multiple
+          inheritance/pure virtual function bug that I fixed by reordering
+          certain pure virtual functions.  Oh what fun... ;-) Anyhow,
+          everything is now back in running order!
+
+Sun Dec  6 16:13:21 1992  Douglas C. Schmidt  (schmidt at net1.ics.uci.edu)
+
+        * Yow, well, after about 8 months of total neglect I'm finally
+          back at work on this program!  The current changes I did today
+          involved getting drwho to compile with g++ 2.3.2.  This required
+          a couple of small work arounds in the source code due to bugs,
+          but hey, I guess it is better than nothing right?!
+
+          Also, I had to fix a couple of places where I didn't correctly
+          initialize static variables (the compiler implementations have
+          changed since last year obviously).  Also, I've changed a couple
+          of the default server hosts to reflect the fascist policies of
+          our support group ;-) (I've no longer got access to certain
+          servers...)
+
+          Anyhow, I think drwho is once again running with g++, so now I
+          can hand the release over to Ericka... ;-)
+
+Wed May  6 23:12:02 1992  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * There is something horribly wrong with g++ 2.1.  Therefore, I
+          had to make a couple of changes in the pmc-rusers.C and
+          pm-client.C files in order to make the blasted thing compile
+          when I had pointers to member functions...  Make sure to change
+          this back when g++ is fixed...
+
+Tue Feb  4 11:23:12 1992  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * The blasted program was crashing when there were consecutive
+          newlines in the input file.  I fixed
+          File_Manager::get_login_and_real_name and
+          File_Manager::open_friends_file so that they detect and skip
+          over these consecutive newlines.
+
+Thu Nov 21 21:55:00 1991  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * Make the time that drwho uses to consider a host idle be a
+          command-line parameter.
+
+Wed Nov 13 14:24:40 1991  Douglas C. Schmidt  (schmidt at bastille.ics.uci.edu)
+
+        * Something else that ought to be done:
+
+          Add a flag to the -R option that allows the hostname to be
+          printed using the internet address and/or the hostname...
+
+Sat Nov  9 13:45:30 1991  Douglas C. Schmidt  (schmidt at bastille.ics.uci.edu)
+
+        * Added zillions more changes yet again.  We now have an rusers
+          compatibility mode (-R), to go along with the -a, -w, and
+          default (flo) options.
+
+        * Changed the -w option so that it only returns the name of the
+          host machine where the user is logged in.  This way, I can say:
+
+          % talk schmidt@`drwho -w schmidt`
+          % rsh `drwho -w schmidt` w
+
+          etc... ;-)
+
+        * Added support for the -L option (print using login name rather
+          than real name).  Also added support for the -l option (print
+          out verbosely, a la ls -l!).
+
+Sun Oct 27 21:32:15 1991  Douglas C. Schmidt  (schmidt at bastille.ics.uci.edu)
+
+        * Need to complete the -s and -S options to support sorting the
+          output by login name and real name, respectively...  In order to
+          support the '*' indication with this scheme we probably need to
+          lists, one for active and one for inactive users!
+
+Tue Oct 22 00:13:21 1991  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * Make another zillion changes...
+
+Sun Oct 20 21:35:24 1991  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * Added support for the -p option to allow setting the client and
+          server port number from the command-line.
+
+        * Things done so far:
+
+          * Owen also wants an new rflo feature (done)
+
+            I also want a version that given a command like:
+
+              whereis omalley
+
+            would return the login where that login is active if there is
+            one (ie. omalley@zola). Then you could have commands like:
+
+              talk `whereis omalley`
+
+            that would find where I am and try to talk to me there.
+
+          * Another neat addition would be: have an option (e.g., `-a') so
+            that rflo would return *all* the users logged in and then look
+            up their names using the yp passwd stuff! (partially done, but
+            not very elegantly yet...). (done)
+
+          * Make the port number a command-line option... (done)
+
+          * we also need think about how to incorporate inheritance and
+            dynamic binding into this thang (probably it can be used for
+            the local/remote split, and also perhaps for the
+            friends/everyone split (see below)). (done)
+
+          * Fix up the options stuff wrt the -F option etc... (done)
+
+          * Have I fixed the is_active shit? (done)
+
+          * we need a "message abstraction" that abstracts away from the
+            details of packets protocols and remote operations protocols.
+            (done).
+
+          * Note, should make an option so we could read the names of the
+            hosts to query from a file... (done)
+
+Fri Oct 18 16:17:39 1991  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * I've made countless changes...
+
+Wed Oct 16 17:42:40 1991  Douglas C. Schmidt  (schmidt at net6.ics.uci.edu)
+
+        * Undid the message manager abstraction and merged it in with the
+          Friend_Manager client and server.  This really cleans up the
+          interface!
+
+        * Yow, make zillions of important changes to make the
+          client/server split more explicit...  Now the Friend_Manager is
+          split into client and server, the message manager is split, and
+          the communications manager is also split.  Each file is much
+          smaller and easier to understand!
+
+Mon Oct 14 18:36:55 1991  Douglas C. Schmidt  (schmidt at net1.ics.uci.edu)
+
+        * Added support for the -h and -? options, that print out a long
+          and short usage message, respectively.
+
+Tue Oct  1 09:28:29 1991  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * The -a option works a great deal better too...  I added a check
+          in the File_Manager::open_passwd_file routine to strip off the
+          extra subfields in the pw_gecos field, since this info isn't
+          really very useful and makes the "real name" field too long!
+
+        * Added some extra stuff to the Comm_Manager so that I could
+          change the max size of the UDP datagrams that are passed around.
+          As it turns out, I don't really need to do this, but it is more
+          robust this way...
+
+Thu Sep 26 14:00:45 1991  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * Make sun3 and sun4 subdirectories to help the build process!
+
+        * Changed the UDP port number from 12346 to 12344 so I wouldn't
+          collide with Owen!
+
+        * There is a weird bus error problem on the sun 4s...  Hum...
+
+        * Yow, got everything working again...
+
+        * Still to do:
+
+          * Think about fixing the -f option to work correctly for
+            *relative* filenames...
+
+          * Make UDP_BUFFER_SIZE a command-line option...
+
+          * Modify server.C to be started by inetd.
+
+          * For -a option... if they are a friend, use the name from
+            .friend.dta otherwise use the name from the passwd file.
+
+          * Don't forget about:
+
+            delete Friend_Manager::friend_record;
+            delete Friend_Manager::sorted_record;
+
+            Need to figure out a good way to deal with this!
+
+Mon Sep 23 16:09:46 1991  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * Added a neat feature that now allows the user to specify which
+          hosts to examine by specifying an option ('-F') on the
+          command-line that reads the contents of that file and inserts it
+          into the list of files.
+
+Wed Sep 18 10:46:41 1991  Douglas C. Schmidt  (schmidt at bastille.ics.uci.edu)
+
+        * We need to make all the interfaces throughout rflo much more
+          object-oriented, e.g.:
+
+        * Made a host-manager abstraction to handle all the host
+          machine related operations.  This makes the options stuff
+          *much* cleaner!
+
+        * Make rflo compile with g++ 1.37.2!  Now it compiles with cfront
+          2.0, Saber C++ 1.0.1 and g++-1.39.0 and g++-1.37.2.
+
+Tue Sep 17 19:02:47 1991  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * Started merging in the stuff Owen did.  I'm trying to maintain a
+          consistent programming style...  The Owen stuff adds support for
+          timeouts and fixes problems with returning a count of the number
+          of friends!
+
+Wed Sep  4 10:14:51 1991  Douglas C. Schmidt  (schmidt at net4.ics.uci.edu)
+
+        * Things to do:
+
+          * Add comprehensive daemon support for server.C.
+          * Add timeout stuff in case hosts are down!
+          * Talk to support about making a standard daemon.
+          * Fix the problem with returning the number of friends.
+
+Local Variables:
+mode: change-log
+add-log-time-format: (lambda () (progn (setq tz (getenv "TZ")) (set-time-zone-rule "UTC") (setq time (format-time-string "%a %b %e %H:%M:%S %Z %Y" (current-time))) (set-time-zone-rule tz) time))
+indent-tabs-mode: nil
+End:

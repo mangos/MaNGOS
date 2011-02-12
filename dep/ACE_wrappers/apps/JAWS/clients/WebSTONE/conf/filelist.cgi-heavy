@@ -1,0 +1,6 @@
+# Modified sample model; fully dynamic content
+/file.cgi-send?size=500		350
+/file.cgi-send?size=5125	500
+/file.cgi-send?size=51250	140
+/file.cgi-send?size=512500	9
+/file.cgi-send?size=5248000	1

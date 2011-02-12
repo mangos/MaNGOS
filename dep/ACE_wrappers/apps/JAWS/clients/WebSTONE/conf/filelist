@@ -1,0 +1,6 @@
+# Sample filelist, abstracted from access logs
+/file500.html	350	#500
+/file5k.html	500	#5125
+/file50k.html	140	#51250
+/file500k.html	9	#512500
+/file5m.html	1	#5248000

@@ -1,0 +1,35 @@
+#! /bin/sh
+
+#
+# NAME
+#	checkfilelist - try retrieving files from server
+#
+# SYNOPSIS
+#	checkfilelist servername portno filelist
+#
+#
+
+if test "$#" -lt 3 ; then
+   echo "usage: $0 servername portno filelist"
+   exit 2
+fi
+
+HOSTNAME=$1 ; export HOSTNAME
+PORTNO=$2   ; export PORTNO
+FILELIST=$3 ; export FILELIST
+
+grep '^/' $FILELIST | cut -f1 |
+(
+while read URL
+do
+    export URL
+    echo ">>>>> $URL"
+    (
+	telnet $HOSTNAME $PORTNO << _EOF_
+GET $URL HTTP/1.0
+
+_EOF_
+    ) 2> /dev/null | head -5 | grep 'HTTP/1.0'
+    killall telnet
+done
+)

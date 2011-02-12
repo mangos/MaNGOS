@@ -1,0 +1,15 @@
+// $Id: soreduce.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(soreduce) : aceexe {
+  avoids += uses_wchar ace_for_tao
+  exename = soreduce
+  Source_Files {
+    Signature.cpp
+    Sig_List.cpp
+    Obj_Module.cpp
+    Library.cpp
+    SO_Group.cpp
+    soreduce.cpp
+  }
+}
+

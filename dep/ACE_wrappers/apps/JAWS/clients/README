@@ -1,0 +1,13 @@
+This directory contains the source code for various clients related to
+JAWS, which is a high-performance HTTP Web server written with ACE. For
+more information on JAWS, please see
+
+http://www.cs.wustl.edu/~jxh/research/
+
+The subdirectories in this directory contain the following components
+
+	. Blobby - a Blobby client
+
+	. Caching - a Web client which caches
+
+	. WebSTONE - modified to be multi-threaded

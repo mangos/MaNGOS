@@ -1,0 +1,20 @@
+This directory contains the ACE network service implementations and
+sample driver programs for dynamically configuring them into client
+and server processes.  The subdirectories include the following:
+
+	. lib -- contains implementations of the ACE network services.
+	  These services include a logging service, a name service,
+	  a distributed locking service, and a distributed time service.
+	  These can be built as shared libraries (i.e., DLLs), which
+	  are then linked into applications either statically or
+	  dynamically.
+	
+	. servers -- contains the driver program that links the various
+	  services together, either statically or dynamically, to 
+	  form complete server programs.
+
+	. clients -- contains a number of test programs that illustrate
+	  how to write clients for the various ACE network services.
+
+Please see the ACE-netsvcs.html file for an overview of the various
+services.

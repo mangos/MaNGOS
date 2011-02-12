@@ -1,0 +1,36 @@
+FAQ List for JAWS
+
+Q1: Is JAWS an acronym?
+A1: Yes.  It expands to JAWS Adaptive Web System.
+
+Q2: Does JAWS support SSL?
+A2: No.  When ACE finishes its wrappers, it will be an
+    easy matter to add support to JAWS.
+
+Q3: Is JAWS faster than Apache?
+A3: Yes.
+
+Q4: Why does everyone use Apache instead of JAWS?
+A4: JAWS is not a feature complete server.  JAWS is not
+    a drop in replacement for the NCSA HTTP server like
+    Apache.  Apache has tens if not hundreds of developers
+    working on it, while JAWS has just me.  Help me!
+
+Q5: Who else uses JAWS?
+A5: I have seen hints of many different people using
+    JAWS.  I have acknowledged all those I am aware of
+    in the file labeled zTHANKS.
+
+Q6: Does JAWS compile on my platform?
+A6: In principle, JAWS should compile on all platforms
+    that ACE compiles on.  JAWS only works on platforms
+    that support threads, however.
+
+Q7: What is the development platform of JAWS?
+A7: JAWS is developed on a FreeBSD box at my home,
+    Solaris x86 at my work, and Solaris Sparcs at
+    school.  Periodically, it will get some attention
+    on WinNT to see if it compiles.
+
+Q8: What's with JAWS, JAWS2, and JAWS3?
+A8:

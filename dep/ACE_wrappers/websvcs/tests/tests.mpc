@@ -1,0 +1,13 @@
+// -*- MPC -*-
+// $Id: tests.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(Websvcs Test) : aceexe {
+  exename = Test_Url_Addr
+  libs    += websvcs
+  after   += websvcs
+  Source_Files {
+    Test_URL_Addr.cpp
+  }
+  Header_Files {
+  }
+}

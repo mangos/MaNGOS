@@ -1,0 +1,11 @@
+// -*- MPC -*-
+// $Id: Client.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(Netsvcs_Client_Test) : aceexe {
+  avoids += ace_for_tao
+  exename = client_test
+  Source_Files {
+    main.cpp
+    Client_Test.cpp
+  }
+}

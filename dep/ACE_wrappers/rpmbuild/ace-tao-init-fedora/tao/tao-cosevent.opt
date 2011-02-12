@@ -1,0 +1,11 @@
+# Specify desired default initial references arguments
+INITREF="-ORBDefaultInitRef corbaloc::localhost:2809"
+
+# Enable debug logging, comment out to disable.
+#DEBUGLEVEL="-ORBDebugLevel 10"
+
+# Configure log file
+LOGFILE="-ORBLogFile /var/log/tao/tao-cosevent.log"
+
+# Concatenate all options
+OPTIONS="$INITREF $DEBUGLEVEL $LOGFILE"

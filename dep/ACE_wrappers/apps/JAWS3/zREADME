@@ -1,0 +1,99 @@
+The framework is organized roughly around these high level component
+categories.  The sublevels indicate the JAWS components that
+participate in the category.
+
+       Event Framework
+          JAWS_Event_Dispatcher
+          JAWS_Event_Completer
+          JAWS_Event_Result
+
+       Input/Output Events
+          JAWS_IO
+          JAWS_IO_Impl
+          JAWS_Asynch_IO
+          JAWS_Synch_IO
+          JAWS_Reactive_IO
+
+       Timing Events
+          JAWS_Timer
+          JAWS_Timer_Impl
+          JAWS_Task_Timer
+
+       Protocol Framework
+          JAWS_Protocol_Handler
+          JAWS_Protocol_State
+
+       Concurrency Framework
+          JAWS_Concurrency
+          JAWS_Concurrency_Impl
+          JAWS_THYBRID_Concurrency
+          JAWS_TPOOL_Concurrency
+          JAWS_TPR_Concurrency
+
+
+The Event Framework:
+
+   The JAWS_Event_Dispatcher remains hidden to the application
+   developer.  It is initialized from the main program which is built
+   within the jaws3 subdirectory, and uses ACE_Reactor and
+   ACE_Proactor.
+
+   The JAWS_Event_Completer is a callback helper class that is used by
+   the JAWS_Event_Dispatcher.  A completer is passed into the Event
+   Framework whenever an application developer wants to initiate an
+   event.  When the event completes, the completer is called for
+   notification.
+
+   The JAWS_Event_Result is a class that describes the result of the
+   event for the completer when the completer gets called back.
+
+Input/Output Events
+
+   The JAWS_IO class bridges IO event dispatching methods to the
+   JAWS_IO_Impl abstraction.  It delegates its IO interfaces to
+   corresponding methods in JAWS_IO_Impl.
+
+   JAWS_Asynch_IO, JAWS_Synch_IO, and JAWS_Reactive_IO all derive from
+   JAWS_IO_Impl.  The usage API for these classes follows an
+   asynchronous usage interface.  This enables an application to
+   experiment with different underlying IO implementations to see how
+   it impacts performance without redesigning/rewriting the entire
+   application.
+
+Timer Events
+
+   The JAWS_Timer class bridges timer dispatching methods to the
+   JAWS_Timer_Impl abstraction.
+
+   JAWS_Task_Timer derives from JAWS_Timer_Impl, and uses a task
+   coupled with an ACE_Timer_Wheel to implement timers.
+
+Protocol Framework
+
+  The JAWS_Protocol_Handler plays the role of Context in the State
+  pattern, while the JAWS_Protocol_State plays the role of State.  The
+  JAWS_Protocol_Handler's service() method delegates to the service()
+  method of an associated JAWS_Protocol_State.  In addition, the
+  JAWS_Protocol_Handler also derives from JAWS_Event_Completer.
+
+  The idea is that the application developer will derive from
+  JAWS_Protocol_State to fill out the programmatical details of their
+  protocol.  At the end of the state, an asynchronous event will be
+  initiated, and the state returns the control of the thread back to
+  the framework.  When the event completes, the associated
+  JAWS_Protocol_Handler is called back, and it then triggers a call
+  into the JAWS_Protocol_State's transition() method.  This method
+  is to return the next state or the protocol.  The event completion
+  callback then enqueues itself with one of the concurrency
+  implementations of the Concurrency Framework.
+
+Concurrency Framework
+
+  The JAWS_Concurrency class bridges concurrency mechanisms to the
+  JAWS_Concurrency_Impl abstraction.
+
+  JAWS_THYBRID_Concurrency, JAWS_TPOOL_Concurrency and
+  JAWS_TPR_Concurrency derive from JAWS_Concurrency_Impl.  They are
+  active objects that dequeue JAWS_Protocol_Handlers and call into
+  their service() methods.
+

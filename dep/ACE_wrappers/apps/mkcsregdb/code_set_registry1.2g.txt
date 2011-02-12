@@ -1,0 +1,1528 @@
+start
+description        	ISO 8859-1:1987; Latin Alphabet No. 1
+loc_name        NONE
+rgy_value        	0x00010001
+char_values        	0x0011
+max_bytes        1
+end
+
+start
+description        	ISO 8859-2:1987; Latin Alphabet No. 2
+loc_name        NONE
+rgy_value        	0x00010002
+char_values        	0x0012
+max_bytes        	1
+end
+
+start
+description        	ISO 8859-3:1988; Latin Alphabet No. 3
+loc_name        NONE
+rgy_value        	0x00010003
+char_values        	0x0013
+max_bytes        	1
+end
+
+start
+description        	ISO 8859-4:1988; Latin Alphabet No. 4
+loc_name        NONE
+rgy_value        	0x00010004
+char_values        	0x0014
+max_bytes        	1
+end
+
+start
+description        	ISO/IEC 8859-5:1988; Latin-Cyrillic Alphabet
+loc_name        NONE
+rgy_value        	0x00010005
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	ISO 8859-6:1987; Latin-Arabic Alphabet
+loc_name        NONE
+rgy_value        	0x00010006
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	ISO 8859-7:1987; Latin-Greek Alphabet
+loc_name        NONE
+rgy_value        	0x00010007
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	ISO 8859-8:1988; Latin-Hebrew Alphabet
+loc_name        NONE
+rgy_value        	0x00010008
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	ISO/IEC 8859-9:1989; Latin Alphabet No. 5
+loc_name        NONE
+rgy_value        	0x00010009
+char_values        	0x0019
+max_bytes        	1
+end
+
+start
+description        	ISO/IEC 8859-10:1992; Latin Alphabet No. 6
+loc_name        NONE
+rgy_value        	0x0001000a
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	ISO 646:1991 IRV (International Reference Version)
+loc_name        NONE
+rgy_value        	0x00010020
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-2, Level 1
+loc_name        NONE
+rgy_value        	0x00010100
+char_values        	0x1000
+max_bytes        	2
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-2, Level 2
+loc_name        NONE
+rgy_value        	0x00010101
+char_values        	0x1000
+max_bytes        	2
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-2, Level 3
+loc_name        NONE
+rgy_value        	0x00010102
+char_values        	0x1000
+max_bytes        	2
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-4, Level 1
+loc_name        NONE
+rgy_value        	0x00010104
+char_values        	0x1000
+max_bytes        	4
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-4, Level 2
+loc_name        NONE
+rgy_value        	0x00010105
+char_values        	0x1000
+max_bytes        	4
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UCS-4, Level 3
+loc_name        NONE
+rgy_value        	0x00010106
+char_values        	0x1000
+max_bytes        	4
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UTF-1, UCS Transformation Format 1
+loc_name        NONE
+rgy_value        	0x00010108
+char_values        	0x1000
+max_bytes        	5
+end
+
+start
+description        	ISO/IEC 10646-1:1993; UTF-16, UCS Transformation Format 16-bit form
+loc_name        NONE
+rgy_value        	0x00010109
+char_values        	0x1000
+max_bytes        	2
+end
+
+start
+description        	JIS X0201:1976; Japanese phonetic characters
+loc_name        NONE
+rgy_value        	0x00030001
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	JIS X0208:1978 Japanese Kanji Graphic Characters
+loc_name        NONE
+rgy_value        	0x00030004
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	JIS X0208:1983 Japanese Kanji Graphic Characters
+loc_name        NONE
+rgy_value        	0x00030005
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	JIS X0208:1990 Japanese Kanji Graphic Characters
+loc_name        NONE
+rgy_value        	0x00030006
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	JIS X0212:1990; Supplementary Japanese Kanji Graphic Chars
+loc_name        NONE
+rgy_value        	0x0003000a
+char_values        	0x0082
+max_bytes        	2
+end
+
+start
+description        	JIS eucJP:1993; Japanese EUC
+loc_name        NONE
+rgy_value        	0x00030010
+char_values        	0x0011:0x0080:0x0081:0x0082
+max_bytes        	3
+end
+
+start
+description        	KS C5601:1987; Korean Hangul and Hanja Graphic Characters
+loc_name        NONE
+rgy_value        	0x00040001
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	KS C5657:1991; Supplementary Korean Graphic Characters
+loc_name        NONE
+rgy_value        	0x00040002
+char_values        	0x0101
+max_bytes        	2
+end
+
+start
+description        	KS eucKR:1991; Korean EUC
+loc_name        NONE
+rgy_value        	0x0004000a
+char_values        	0x0011:0x0100:0x0101
+max_bytes        	2
+end
+
+start
+description        	CNS 11643:1986; Taiwanese Hanzi Graphic Characters
+loc_name        NONE
+rgy_value        	0x00050001
+char_values        	0x0180
+max_bytes        	2
+end
+
+start
+description        	CNS 11643:1992; Taiwanese Extended Hanzi Graphic Chars
+loc_name        NONE
+rgy_value        	0x00050002
+char_values        	0x0181
+max_bytes        	4
+end
+
+start
+description        	CNS eucTW:1991; Taiwanese EUC
+loc_name        NONE
+rgy_value        	0x0005000a
+char_values        	0x0001:0x0180
+max_bytes        	4
+end
+
+start
+description        	CNS eucTW:1993; Taiwanese EUC
+loc_name        NONE
+rgy_value        	0x00050010
+char_values        	0x0001:0x0181
+max_bytes        	4
+end
+
+start
+description        	TIS 620-2529, Thai characters
+loc_name        NONE
+rgy_value        	0x000b0001
+char_values        	0x0200
+max_bytes        	1
+end
+
+start
+description        	TTB CCDC:1984; Chinese Code for Data Communications
+loc_name        NONE
+rgy_value        	0x000d0001
+char_values        	0x0180
+max_bytes        	2
+end
+
+start
+description        	OSF Japanese UJIS
+loc_name        NONE
+rgy_value        	0x05000010
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	OSF Japanese SJIS-1
+loc_name        NONE
+rgy_value        	0x05000011
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	OSF Japanese SJIS-2
+loc_name        NONE
+rgy_value        	0x05000012
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	X/Open UTF-8; UCS Transformation Format 8 (UTF-8)
+loc_name        NONE
+rgy_value        	0x05010001
+char_values        	0x1000
+max_bytes        	6
+end
+
+start
+description        	JVC_eucJP
+loc_name        NONE
+rgy_value        	0x05020001
+char_values        	0x0001:0x0080:0x0081:0x0082
+max_bytes        	3
+end
+
+start
+description        	JVC_SJIS
+loc_name        NONE
+rgy_value        	0x05020002
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	DEC Kanji
+loc_name        NONE
+rgy_value        	0x10000001
+char_values        	0x0011:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	Super DEC Kanji
+loc_name        NONE
+rgy_value        	0x10000002
+char_values        	0x0011:0x0080:0x0081:0x0082
+max_bytes        	3
+end
+
+start
+description        	DEC Shift JIS
+loc_name        NONE
+rgy_value        	0x10000003
+char_values        	0x0011:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	HP roman8; English and Western European languages
+loc_name        NONE
+rgy_value        	0x10010001
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	HP kana8; Japanese katakana (incl JIS X0201:1976)
+loc_name        NONE
+rgy_value        	0x10010002
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	HP arabic8; Arabic
+loc_name        NONE
+rgy_value        	0x10010003
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	HP greek8; Greek
+loc_name        NONE
+rgy_value        	0x10010004
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	HP hebrew8; Hebrew
+loc_name        NONE
+rgy_value        	0x10010005
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	HP turkish8; Turkish
+loc_name        NONE
+rgy_value        	0x10010006
+char_values        	0x0013:0x0019
+max_bytes        	1
+end
+
+start
+description        	HP15CN; encoding method for Simplified Chinese
+loc_name        NONE
+rgy_value        	0x10010007
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	HP big5; encoding method for Traditional Chinese
+loc_name        NONE
+rgy_value        	0x10010008
+char_values        	0x0001:0x0180
+max_bytes        	2
+end
+
+start
+description        	HP japanese15 (sjis); Shift-JIS for mainframe (incl JIS X0208:1990)
+loc_name        NONE
+rgy_value        	0x10010009
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	HP sjishi; Shift-JIS for HP user (incl JIS X0208:1990)
+loc_name        NONE
+rgy_value        	0x1001000a
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	HP sjispc; Shift-JIS for PC (incl JIS X0208:1990)
+loc_name        NONE
+rgy_value        	0x1001000b
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	HP ujis; EUC (incl JIS X0208:1990)
+loc_name        NONE
+rgy_value        	0x1001000c
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-037 (CCSID 00037); CECP for USA, Canada, NL, Ptgl, Brazil, Australia, NZ
+loc_name        NONE
+rgy_value        	0x10020025
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-273 (CCSID 00273); CECP for Austria, Germany
+loc_name        NONE
+rgy_value        	0x10020111
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-277 (CCSID 00277); CECP for Denmark, Norway
+loc_name        NONE
+rgy_value        	0x10020115
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-278 (CCSID 00278); CECP for Finland, Sweden
+loc_name        NONE
+rgy_value        	0x10020116
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-280 (CCSID 00280); CECP for Italy
+loc_name        NONE
+rgy_value        	0x10020118
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-282 (CCSID 00282); CECP for Portugal
+loc_name        NONE
+rgy_value        	0x1002011a
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-284 (CCSID 00284); CECP for Spain, Latin America (Spanish)
+loc_name        NONE
+rgy_value        	0x1002011c
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-285 (CCSID 00285); CECP for United Kingdom
+loc_name        NONE
+rgy_value        	0x1002011d
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-290 (CCSID 00290); Japanese Katakana Host Ext SBCS
+loc_name        NONE
+rgy_value        	0x10020122
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	IBM-297 (CCSID 00297); CECP for France
+loc_name        NONE
+rgy_value        	0x10020129
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-300 (CCSID 00300); Japanese Host DBCS incl 4370 UDC
+loc_name        NONE
+rgy_value        	0x1002012c
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-301 (CCSID 00301); Japanese PC Data DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x1002012d
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-420 (CCSID 00420); Arabic (presentation shapes)
+loc_name        NONE
+rgy_value        	0x100201a4
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-424 (CCSID 00424); Hebrew
+loc_name        NONE
+rgy_value        	0x100201a8
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-437 (CCSID 00437); PC USA
+loc_name        NONE
+rgy_value        	0x100201b5
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-500 (CCSID 00500); CECP for Belgium, Switzerland
+loc_name        NONE
+rgy_value        	0x100201f4
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-833 (CCSID 00833); Korean Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020341
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-834 (CCSID 00834); Korean Host DBCS incl 1227 UDC
+loc_name        NONE
+rgy_value        	0x10020342
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-835 (CCSID 00835); T-Ch Host DBCS incl 6204 UDC
+loc_name        NONE
+rgy_value        	0x10020343
+char_values        	0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-836 (CCSID 00836); S-Ch Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020344
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-837 (CCSID 00837); S-Ch Host DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x10020345
+char_values        	0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-838 (CCSID 00838); Thai Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020346
+char_values        	0x0200
+max_bytes        	1
+end
+
+start
+description        	IBM-839 (CCSID 00839); Thai Host DBCS incl 374 UDC
+loc_name        NONE
+rgy_value        	0x10020347
+char_values        	0x0200
+max_bytes        	2
+end
+
+start
+description        	IBM-850 (CCSID 00850); Multilingual IBM PC Data-MLP 222
+loc_name        NONE
+rgy_value        	0x10020352
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-852 (CCSID 00852); Multilingual Latin-2
+loc_name        NONE
+rgy_value        	0x10020354
+char_values        	0x0012
+max_bytes        	1
+end
+
+start
+description        	IBM-855 (CCSID 00855); Cyrillic PC Data
+loc_name        NONE
+rgy_value        	0x10020357
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-856 (CCSID 00856); Hebrew PC Data (extensions)
+loc_name        NONE
+rgy_value        	0x10020358
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-857 (CCSID 00857); Turkish Latin-5 PC Data
+loc_name        NONE
+rgy_value        	0x10020359
+char_values        	0x0019
+max_bytes        	1
+end
+
+start
+description        	IBM-861 (CCSID 00861); PC Data Iceland
+loc_name        NONE
+rgy_value        	0x1002035d
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-862 (CCSID 00862); PC Data Hebrew
+loc_name        NONE
+rgy_value        	0x1002035e
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-863 (CCSID 00863); PC Data Canadian French
+loc_name        NONE
+rgy_value        	0x1002035f
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-864 (CCSID 00864); Arabic PC Data
+loc_name        NONE
+rgy_value        	0x10020360
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-866 (CCSID 00866); PC Data Cyrillic 2
+loc_name        NONE
+rgy_value        	0x10020362
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-868 (CCSID 00868); Urdu PC Data
+loc_name        NONE
+rgy_value        	0x10020364
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-869 (CCSID 00869); Greek PC Data
+loc_name        NONE
+rgy_value        	0x10020365
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	IBM-870 (CCSID 00870); Multilingual Latin-2 EBCDIC
+loc_name        NONE
+rgy_value        	0x10020366
+char_values        	0x0012
+max_bytes        	1
+end
+
+start
+description        	IBM-871 (CCSID 00871); CECP for Iceland
+loc_name        NONE
+rgy_value        	0x10020367
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-874 (CCSID 00874); Thai PC Display Extended SBCS
+loc_name        NONE
+rgy_value        	0x1002036a
+char_values        	0x0200
+max_bytes        	1
+end
+
+start
+description        	IBM-875 (CCSID 00875); Greek
+loc_name        NONE
+rgy_value        	0x1002036b
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	IBM-880 (CCSID 00880); Multilingual Cyrillic
+loc_name        NONE
+rgy_value        	0x10020370
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-891 (CCSID 00891); Korean PC Data SBCS
+loc_name        NONE
+rgy_value        	0x1002037b
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-896 (CCSID 00896); Japanese Katakana characters; superset of JIS X0201:1976
+loc_name        NONE
+rgy_value        	0x10020380
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	IBM-897 (CCSID 00897); PC Data Japanese SBCS (use with CP 00301)
+loc_name        NONE
+rgy_value        	0x10020381
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	IBM-903 (CCSID 00903); PC Data Simplified Chinese SBCS (use with  DBCS)
+loc_name        NONE
+rgy_value        	0x10020387
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-904 (CCSID 00904); PC Data Traditional Chinese SBCS (use with  DBCS)
+loc_name        NONE
+rgy_value        	0x10020388
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-918 (CCSID 00918); Urdu
+loc_name        NONE
+rgy_value        	0x10020396
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-921 (CCSID 00921); Baltic 8-Bit
+loc_name        NONE
+rgy_value        	0x10020399
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	IBM-922 (CCSID 00922); Estonia 8-Bit
+loc_name        NONE
+rgy_value        	0x1002039a
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	IBM-926 (CCSID 00926); Korean PC Data DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x1002039e
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-927 (CCSID 00927); T-Ch PC Data DBCS incl 6204 UDC
+loc_name        NONE
+rgy_value        	0x1002039f
+char_values        	0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-928 (CCSID 00928); S-Ch PC Data DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x100203a0
+char_values        	0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-929 (CCSID 00929); Thai PC Data DBCS incl 374 UDC
+loc_name        NONE
+rgy_value        	0x100203a1
+char_values        	0x0200
+max_bytes        	2
+end
+
+start
+description        	IBM-930 (CCSID 00930); Kat-Kanji Host MBCS Ext-SBCS
+loc_name        NONE
+rgy_value        	0x100203a2
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-932 (CCSID 00932); Japanese PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203a4
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-933 (CCSID 00933); Korean Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x100203a5
+char_values        	0x0001:0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-934 (CCSID 00934); Korean PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203a6
+char_values        	0x0001:0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-935 (CCSID 00935); S-Ch Host Mixed
+loc_name        NONE
+rgy_value        	0x100203a7
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-936 (CCSID 00936); PC Data S-Ch MBCS
+loc_name        NONE
+rgy_value        	0x100203a8
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-937 (CCSID 00937); T-Ch Host Mixed
+loc_name        NONE
+rgy_value        	0x100203a9
+char_values        	0x0001:0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-938 (CCSID 00938); PC Data T-Ch MBCS
+loc_name        NONE
+rgy_value        	0x100203aa
+char_values        	0x0001:0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-939 (CCSID 00939); Latin-Kanji Host MBCS
+loc_name        NONE
+rgy_value        	0x100203ab
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-941 (CCSID 00941); Japanese PC DBCS for Open
+loc_name        NONE
+rgy_value        	0x100203ad
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-942 (CCSID 00942); Japanese PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203ae
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-943 (CCSID 00943); Japanese PC MBCS for Open
+loc_name        NONE
+rgy_value        	0x100203af
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-946 (CCSID 00946); S-Ch PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203b2
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-947 (CCSID 00947); T-Ch PC Data DBCS incl 6204 UDC
+loc_name        NONE
+rgy_value        	0x100203b3
+char_values        	0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-948 (CCSID 00948); T-Ch PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203b4
+char_values        	0x0001:0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-949 (CCSID 00949); IBM KS PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203b5
+char_values        	0x0001:0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-950 (CCSID 00950); T-Ch PC Data Mixed
+loc_name        NONE
+rgy_value        	0x100203b6
+char_values        	0x0001:0x0180
+max_bytes        	2
+end
+
+start
+description        	IBM-951 (CCSID 00951); IBM KS PC Data DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x100203b7
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-955 (CCSID 00955); Japan Kanji characters; superset of JIS X0208:1978
+loc_name        NONE
+rgy_value        	0x100203bb
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-964 (CCSID 00964); T-Chinese EUC CNS1163 plane 1,2
+loc_name        NONE
+rgy_value        	0x100203c4
+char_values        	0x0001:0x0180
+max_bytes        	4
+end
+
+start
+description        	IBM-970 (CCSID 00970); Korean EUC
+loc_name        NONE
+rgy_value        	0x100203ca
+char_values        	0x0011:0x0100:0x0101
+max_bytes        	2
+end
+
+start
+description        	IBM-1006 (CCSID 01006); Urdu 8-bit
+loc_name        NONE
+rgy_value        	0x100203ee
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-1025 (CCSID 01025); Cyrillic Multilingual
+loc_name        NONE
+rgy_value        	0x10020401
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-1026 (CCSID 01026); Turkish Latin-5
+loc_name        NONE
+rgy_value        	0x10020402
+char_values        	0x0019
+max_bytes        	1
+end
+
+start
+description        	IBM-1027 (CCSID 01027); Japanese Latin Host Ext SBCS
+loc_name        NONE
+rgy_value        	0x10020403
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	IBM-1040 (CCSID 01040); Korean PC Data Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020410
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-1041 (CCSID 01041); Japanese PC Data Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020411
+char_values        	0x0080
+max_bytes        	1
+end
+
+start
+description        	IBM-1043 (CCSID 01043); T-Ch PC Data Extended SBCS
+loc_name        NONE
+rgy_value        	0x10020413
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-1046 (CCSID 01046); Arabic PC Data
+loc_name        NONE
+rgy_value        	0x10020416
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-1047 (CCSID 01047); Latin-1 Open System
+loc_name        NONE
+rgy_value        	0x10020417
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-1088 (CCSID 01088); IBM KS Code PC Data SBCS
+loc_name        NONE
+rgy_value        	0x10020440
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-1097 (CCSID 01097); Farsi
+loc_name        NONE
+rgy_value        	0x10020449
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-1098 (CCSID 01098); Farsi PC Data
+loc_name        NONE
+rgy_value        	0x1002044a
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-1112 (CCSID 01112); Baltic Multilingual
+loc_name        NONE
+rgy_value        	0x10020458
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	IBM-1114 (CCSID 01114); T-Ch PC Data SBCS (IBM BIG-5)
+loc_name        NONE
+rgy_value        	0x1002045a
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-1115 (CCSID 01115); S-Ch PC Data SBCS (IBM GB)
+loc_name        NONE
+rgy_value        	0x1002045b
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-1122 (CCSID 01122); Estonia
+loc_name        NONE
+rgy_value        	0x10020462
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	IBM-1250 (CCSID 01250); MS Windows Latin-2
+loc_name        NONE
+rgy_value        	0x100204e2
+char_values        	0x0012
+max_bytes        	1
+end
+
+start
+description        	IBM-1251 (CCSID 01251); MS Windows Cyrillic
+loc_name        NONE
+rgy_value        	0x100204e3
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-1252 (CCSID 01252); MS Windows Latin-1
+loc_name        NONE
+rgy_value        	0x100204e4
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-1253 (CCSID 01253); MS Windows Greek
+loc_name        NONE
+rgy_value        	0x100204e5
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	IBM-1254 (CCSID 01254); MS Windows Turkey
+loc_name        NONE
+rgy_value        	0x100204e6
+char_values        	0x0019
+max_bytes        	1
+end
+
+start
+description        	IBM-1255 (CCSID 01255); MS Windows Hebrew
+loc_name        NONE
+rgy_value        	0x100204e7
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-1256 (CCSID 01256); MS Windows Arabic
+loc_name        NONE
+rgy_value        	0x100204e8
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-1257 (CCSID 01257); MS Windows Baltic
+loc_name        NONE
+rgy_value        	0x100204e9
+char_values        	0x001a
+max_bytes        	1
+end
+
+start
+description        	IBM-1380 (CCSID 01380); S-Ch PC Data DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x10020564
+char_values        	0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-1381 (CCSID 01381); S-Ch PC Data Mixed incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x10020565
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-1383 (CCSID 01383); S-Ch EUC GB 2312-80 set (1382)
+loc_name        NONE
+rgy_value        	0x10020567
+char_values        	0x0001:0x0300
+max_bytes        	3
+end
+
+start
+description        	IBM-300 (CCSID 04396); Japanese Host DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x1002112c
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-850 (CCSID 04946); Multilingual IBM PC Data-190
+loc_name        NONE
+rgy_value        	0x10021352
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-852 (CCSID 04948); Latin-2 Personal Computer
+loc_name        NONE
+rgy_value        	0x10021354
+char_values        	0x0012
+max_bytes        	1
+end
+
+start
+description        	IBM-855 (CCSID 04951); Cyrillic Personal Computer
+loc_name        NONE
+rgy_value        	0x10021357
+char_values        	0x0015
+max_bytes        	1
+end
+
+start
+description        	IBM-856 (CCSID 04952); Hebrew PC Data
+loc_name        NONE
+rgy_value        	0x10021358
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-857 (CCSID 04953); Turkish Latin-5 PC Data
+loc_name        NONE
+rgy_value        	0x10021359
+char_values        	0x0019
+max_bytes        	1
+end
+
+start
+description        	IBM-864 (CCSID 04960); Arabic PC Data (all shapes)
+loc_name        NONE
+rgy_value        	0x10021360
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-868 (CCSID 04964); PC Data for Urdu
+loc_name        NONE
+rgy_value        	0x10021364
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-869 (CCSID 04965); Greek PC Data
+loc_name        NONE
+rgy_value        	0x10021365
+char_values        	0x0017
+max_bytes        	1
+end
+
+start
+description        	IBM-5026 (CCSID 05026); Japanese Katakana-Kanji Host Mixed
+loc_name        NONE
+rgy_value        	0x100213a2
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-5031 (CCSID 05031); S-Ch Host MBCS
+loc_name        NONE
+rgy_value        	0x100213a7
+char_values        	0x0001:0x0300
+max_bytes        	2
+end
+
+start
+description        	IBM-1027 and -300 (CCSID 05035); Japanese Latin-Kanji Host Mixed
+loc_name        NONE
+rgy_value        	0x100213ab
+char_values        	0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-5048 (CCSID 05048); Japanese Kanji characters; superset of JIS X0208:1990 (and 1983)
+loc_name        NONE
+rgy_value        	0x100213b8
+char_values        	0x0081
+max_bytes        	2
+end
+
+start
+description        	IBM-5049 (CCSID 05049); Japanese Kanji characters; superset of JIS X0212:1990
+loc_name        NONE
+rgy_value        	0x100213b9
+char_values        	0x0082
+max_bytes        	2
+end
+
+start
+description        	IBM-5067 (CCSID 05067); Korean Hangul and Hanja; superset of KS C5601:1987
+loc_name        NONE
+rgy_value        	0x100213cb
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-420 (CCSID 08612); Arabic (base shapes only)
+loc_name        NONE
+rgy_value        	0x100221a4
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-833 (CCSID 09025); Korean Host SBCS
+loc_name        NONE
+rgy_value        	0x10022341
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-834 (CCSID 09026); Korean Host DBCS incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x10022342
+char_values        	0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-838 (CCSID 09030); Thai Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x10022346
+char_values        	0x0200
+max_bytes        	1
+end
+
+start
+description        	IBM-864 (CCSID 09056); Arabic PC Data (unshaped)
+loc_name        NONE
+rgy_value        	0x10022360
+char_values        	0x0016
+max_bytes        	1
+end
+
+start
+description        	IBM-874 (CCSID 09066); Thai PC Display Extended SBCS
+loc_name        NONE
+rgy_value        	0x1002236a
+char_values        	0x0200
+max_bytes        	1
+end
+
+start
+description        	IBM-9125 (CCSID 09125); Korean Host Mixed incl 1880 UDC
+loc_name        NONE
+rgy_value        	0x100223a5
+char_values        	0x0001:0x0100
+max_bytes        	2
+end
+
+start
+description        	IBM-850 (CCSID 25426); Multilingual IBM PC Display-MLP
+loc_name        NONE
+rgy_value        	0x10026352
+char_values        	0x0011
+max_bytes        	1
+end
+
+start
+description        	IBM-856 (CCSID 25432); Hebrew PC Display (extensions)
+loc_name        NONE
+rgy_value        	0x10026358
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM-1042 (CCSID 25618); S-Ch PC Display Ext SBCS
+loc_name        NONE
+rgy_value        	0x10026412
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-037 (CCSID 28709); T-Ch Host Extended SBCS
+loc_name        NONE
+rgy_value        	0x10027025
+char_values        	0x0001
+max_bytes        	1
+end
+
+start
+description        	IBM-856 (CCSID 33624); Hebrew PC Display
+loc_name        NONE
+rgy_value        	0x10028358
+char_values        	0x0018
+max_bytes        	1
+end
+
+start
+description        	IBM33722 (CCSID 33722); Japanese EUC JISx201,208,212
+loc_name        NONE
+rgy_value        	0x100283ba
+char_values        	0x0080:0x0081:0x0082
+max_bytes        	3
+end
+
+start
+description        	HTCsjis; Hitachi SJIS 90-1
+loc_name        NONE
+rgy_value        	0x10030001
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	HTCujis; Hitachi eucJP 90-1
+loc_name        NONE
+rgy_value        	0x10030002
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	Fujitsu U90; Japanese EUC
+loc_name        NONE
+rgy_value        	0x10040001
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	3
+end
+
+start
+description        	Fujitsu S90; Japanese EUC
+loc_name        NONE
+rgy_value        	0x10040002
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	3
+end
+
+start
+description        	Fujitsu R90; Fujitsu Shift JIS
+loc_name        NONE
+rgy_value        	0x10040003
+char_values        	0x0001:0x0080:0x0081
+max_bytes        	2
+end
+
+start
+description        	EBCDIC(ASCII) and JEF; Japanese encoding method for mainframe
+loc_name        NONE
+rgy_value        	0x10040004
+char_values        	0x0001:0x0081
+max_bytes        	3
+end
+
+start
+description        	EBCDIC(Katakana) and JEF; Japanese encoding method for mainframe
+loc_name        NONE
+rgy_value        	0x10040005
+max_bytes        	3
+char_values        	0x0001:0x0080:0x0081
+end
+
+start
+description        	EBCDIC(Japanese English) and JEF; Japanese encoding method for mainframe
+loc_name        NONE
+rgy_value        	0x10040006
+max_bytes        	3
+char_values        	0x0001:0x0081
+end
+

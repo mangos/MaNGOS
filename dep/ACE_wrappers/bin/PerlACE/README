@@ -1,0 +1,65 @@
+HOW TO USE THE DOC TEST FRAMEWORK
+---------------------------------
+
+The test framework is driven by a Perl script. Run_Test.pm contains some
+useful, miscellaneous functions. The main classes that control test runs
+are TestTarget and Process, and the platform-specific derivations of these.
+
+The test framework runs scripted tests, examines the output, and writes
+results to an output file that's parsed for scoreboard generation. It's very
+important to get the output; from ACE, it's test log files, for TAO, it's
+stderr output from the test procedures. Either way, it has to get back to
+somewhere the locally running script can process it.
+
+By default, all test procedures run on the local host. It is possible to
+redirect the execution to other machines. This is necessary for testing
+environments such as VxWorks and LabVIEW RT, which do not support the
+local execution of these build and testing scripts. Thus, the build is done
+on a host system and executed on the target. For multi-component tests, such
+as TAO server and client, the components can (and most often do) run on
+different machines. For example, a test may run the server component on the
+embedded target and the client component on the local build host.
+
+To redirect execution of a test's component, you must do three things:
+
+   1. Assign a number to the component in the test script. By convention,
+      1 is the component that runs on a target. In TAO, this is generally
+      the server; in the case of ACE tests, it is the only part. Number 2
+      is, by convention, the TAO client, or the piece to run on the build
+      host.
+   2. Set an environment variable, DOC_TEST_<component-number>. For example,
+      DOC_TEST_1, DOC_TEST_2. The value of the environment variable is a
+      configuration name.
+   3. Set environment variables for the configuration name. These environment
+      variables hold the information used to run the test component on the
+      configuration. The environment variables are named
+      <configuration-name>_<configuration-item>. Different types of
+      configurations may require different configuration items, depending on
+      their capabilities and needs. However, the following must be set:
+         <configuration-name>_OS: The OS type, e.g., vxworks or labview_rt.
+                                  If this is "local", the component runs on
+                                  the local host but with an alternate set
+                                  of settings, such as ACE_ROOT, TAO_ROOT.
+         <configuration-name>_IPNAME: The machine's IP hostname or address
+         <configuration-name>_ACE_ROOT: ACE_ROOT for the configuration's files
+         <configuration-name>_TAO_ROOT: TAO_ROOT for the configuration's files
+         <configuration-name>_EXE_SUBDIR: Subdirectory for the executable
+         <configuration-name>_PROCESS_START_WAIT_INTERVAL: Time waited for the
+                                  process to start. Default 15 seconds.
+         <configuration-name>_PROCESS_STOP_WAIT_INTERVAL: Time waited for the
+                                  process to stop. Default 10 seconds.
+         <configuration-name>_HOSTNAME: Hostname that has to be used
+         <configuration-name>_IBOOT: iBoot for this target
+         <configuration-name>_REBOOT_TIME: How long does it take to reboot
+                                           this target
+         <configuration-name>_REBOOT: Do we need to reboot this target
+         <configuration-name>_STARTUP_COMMAND: Command to be executed after
+                                               target has been booted
+         <configuration-name>_TELNET_HOST: Host name where we have to connect
+                                           to with telnet
+         <configuration-name>_TELNET_PORT: Port number where we have to connect
+                                           to with telnet
+
+If there is no DOC_TEST_<component-number> environment variable when the
+component runs, that component is executed on the local machine. This is
+the case for most builds.

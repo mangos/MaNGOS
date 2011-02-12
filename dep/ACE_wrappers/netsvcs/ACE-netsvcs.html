@@ -1,0 +1,879 @@
+<!-- $Id: ACE-netsvcs.html 80826 2008-03-04 14:51:23Z wotte $ -->
+<HTML>
+
+<HEAD>
+<TITLE>Overview of the ACE Network Services</TITLE>
+
+<BODY text = "#000000"
+link="#000fff"
+vlink="#ff0f0f"
+bgcolor="#ffffff">
+
+<HR>
+<H3>Overview of the ACE Network Services</H3>
+
+ACE provides a <A HREF=".">
+standard library</A> of network services:<P>
+
+<TABLE>
+<TD>
+<UL>
+<LI><A HREF="#name-overview">Naming Service</A>
+<LI><A HREF="#time-overview">Time Service</A>
+<LI><A HREF="#token-overview">Token Service</A>
+</UL>
+</TD>
+
+<TD>
+<UL>
+<LI><A HREF="#server-logging-overview">Server Logging Service</A>
+<LI><A HREF="#client-logging-overview">Client Logging Service</A>
+<LI><A HREF="#logging-strategy-overview">Logging Strategy Service</A>
+</UL> 
+</TD>
+</TABLE>
+
+These services play two roles in ACE:<P>
+
+<UL>
+<LI> They provide reusable components for common distributed system
+     tasks such as logging, naming, locking, and time synchronization.<P>
+<LI> They illustrate how to utilize ACE features such as the <A
+     HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#ipc">IPC
+wrappers</A>, <A HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#reactor">Reactor</A>,
+     <A HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#config">Service Configurator</A>, <A
+     HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#initialize">Service
+Initialization</A>, and <A
+HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#concurrency">Concurrency</A>
+components. <P> </UL>
+
+The heart of the ACE network services is the <A
+HREF="http://www.cs.wustl.edu/~schmidt/ACE-papers.html#config">Service
+Configurator</A>, which is an object-oriented framework that automates
+the configuration and reconfiguration of multi-service daemons.  All
+the ACE network services are configured using the Service
+Configurator.  Please refer to the <A HREF="../ACE-INSTALL.html">online
+documentation</a> for more information on installing and testing the
+ACE network services.<P>
+
+<P><HR>
+<A NAME="name-overview">
+<H3> Overview of Naming Service</H3>
+
+A Naming Service associates names with values in a distributed
+system. Clients can query these values using these names as keys. Such
+a name-to-value association is called a <I> Name Binding </I>. Name
+bindings are defined relative to a <I> Naming Context </I>. A naming
+context is a collection that contains a set of name bindings in which
+each name is unique. Different names can be bound to the same value in
+the same or different naming contexts at the same time. There are
+three types of naming contexts: <P>
+
+<OL>
+<LI> Process Local Naming Context: Name bindings are accessible from
+processes with the same name running on the same host. <P>
+<LI> Node Local Naming Context: Name bindings are accessible from all
+processes running on the same host. <P>
+<LI> Network Local Naming Context: Name bindings are accessible from
+all processes running on any machine within a (sub)network. <P>
+</OL>
+
+<P>
+To bind a name is to create a name binding in a given context.
+Querying a value using a name determines the value associated with the
+name in a given context. Note that a name is always bound relative to
+a context. Thus, there are no absolute names. <P>
+
+The following are the key classes in the ACE Naming Service: <P>
+
+<UL>
+<LI> <B><TT> Class Naming_Context </TT></B> <P>
+
+This is the main class ``entry point'' into the Naming Service. It is
+used both by client processes and by server process. It manages access
+to the appropriate Name/Binding database (that is the file where
+Name/Bindings are stored) and it also manages the communication
+between a client process and the server (by using class Name_Proxy,
+which is a private member of Naming_Context).  If a client process
+runs on the same host as the server no IPC is necessary because the
+Naming_Context uses shared memory. <P>
+
+<LI> <B><TT> Class Name_Acceptor </TT></B> <P>
+
+The Name_Acceptor allocates in its handle_input() routine a new
+instance of class Name_Handler on the heap, and accepts connections
+into this Name_Handler. <P>
+
+<LI> <B><TT> Class Name_Handler </TT></B> <P>
+
+The class Name_Handler represents the server side of communication
+between client and server. It interprets incoming requests to the
+Net_Local namespace and delegates the requests to its own
+Naming_Context (which is the Net_Local namespace on the current
+host). For communication it uses the helper classes Name_Request and
+Name_Reply.<P>
+
+<LI> <B> Dependencies </B> <P>
+
+The ACE Naming Service uses ACE_WString String classes since it must
+handle wide character strings in order to support
+internationalization. <P>
+</UL>
+
+The following describes how to configure the Name_Server server and
+client test applications. <P>
+
+<UL>
+<LI> <B> Startup configuration </B> <P>
+Configuring a Name_Server server or client requires specifying all or
+some of the following parameters. These parameters can be passed in to
+main through command line as follows:<P>
+
+<TABLE cellpadding = 10 cellspacing = 0 border = 5>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Option </B>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Description </B>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Default value </B>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-c &lt;naming context&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Naming Context to use. Can be either "PROC_LOCAL" or "NODE_LOCAL" or
+"NET_LOCAL" <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+PROC_LOCAL
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-h &lt;hostname&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Specify the server hostname (needed by Name Server clients for
+PROC_LOCAL naming context)
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_SERVER_HOST
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-p &lt;nameserver port&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Port number where the server process expects requests <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_SERVER_PORT
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-l &lt;namespace dir&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Directory that holds the NameBinding databases <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_NAMESPACE_DIR
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-P &lt;process name&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Name of the client process
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+argv[0]
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-s &lt;database name&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Name of the database. NameBindings for the appropriate naming context
+are stored in file &lt;namespace_dir&gt;/&lt;database name&gt;.
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+<I> null </I>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-d &lt;debug&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Turn debugging on/off
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+0 (off)
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-T &lt;trace&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Turn tracing on/off
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+0 (off)
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-v &lt;verbose&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Turn verbose on/off
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+0 (off)
+</TD>
+
+</TABLE>
+<P>
+
+<LI><B>Examples</B><P>
+<OL>
+<LI> Here is what a config file would look like for starting up a
+server at port 20222 using NET_LOCAL naming context with database
+called MYDATABSE located in directory /tmp:
+
+<PRE> <CODE>
+dynamic Naming_Service Service_Object * 
+  ../lib/netsvcs:_make_ACE_Name_Acceptor() 
+  "-p 20222 -c NET_LOCAL -l /tmp -s MYDATABASE"
+</PRE> </CODE>
+
+<LI> Here is what a config file would look like for starting up a
+client that connects to a Name Server running on host
+tango.cs.wustl.edu at port 20222:
+
+<PRE> <CODE>
+dynamic Naming_Service_Client Service_Object * 
+  ../lib/netsvcs:_make_Client_Test() 
+  "-h tango.cs.wustl.edu -p 20222"
+</PRE> </CODE>
+</OL>
+
+Note:<P>
+
+<UL>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the name of the
+shared object or dll would suffice. That is, the Service Configurator
+makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32) to look for
+the shared object files or dlls.
+
+</UL>
+
+</UL>
+
+<P><HR><P>
+<A NAME="time-overview">
+<H3> Overview of Time Service</H3>
+
+Time Service provides accurate, fault-tolerant clock synchronization
+for computers collaborating in local area networks and wide area
+networks.  Synchronized time services are important in distributed
+systems that require multiple hosts to maintain accurate global
+time. The architecture of the distributed time service contains the 
+following Time Server, Clerk, and Client components: <P>
+
+<UL>
+<LI> <I> Time Server </I> answers queries about the time made by
+Clerks. <P>
+
+<LI> <I> Clerk </I> queries one or more Time Servers to determine 
+the correct time, calculates the approximate correct time using one of
+several distributed time algorithms and updates its own local system
+time. <P>
+
+<LI> <I> Client </I> uses the global time information maintained by
+a Clerk to provide consistency with the notion of time used by clients
+on other hosts. <P>
+</UL>
+<P>
+The following are the key classes in the ACE Time Service: <P>
+
+<UL>
+<LI> <B><TT> Class TS_Server_Handler </TT></B> <P>
+
+TS_Server_Handler represents the server side of communication between
+clerk and server. It interprets incoming requests for time updates,
+gets the system time, creates a reply in response to the request and
+then sends the reply to the clerk from which it received the request.
+For communication it uses the helper class Time_Request.<P>
+
+<LI> <B><TT> Class TS_Server_Acceptor </TT></B> <P>
+
+TS_Server_Acceptor allocates in its handle_input routine a new instance
+of class TS_Server_Handler on the heap, and accepts connections into this
+TS_Server_Handler.<P>
+
+<LI> <B><TT> Class TS_Clerk_Handler </TT></B> <P>
+
+TS_Clerk_Handler represents the clerk side of communication between
+clerk and server. It generates requests for time updates every timeout
+period and then sends these requests to all the servers it is
+connected to asynchronously. It receives the replies to these requests
+from the servers through its handle_input method and then adjusts the
+time using the roundtrip estimate. It caches this time, which is
+subsequently retrieved by TS_Clerk_Processor.<P>
+
+<LI> <B><TT> Class TS_Clerk_Processor </TT></B> <P>
+
+TS_Clerk_Processor creates a new instance of TS_Clerk_Handler for
+every server connection it needs to create. It periodically calls
+send_request() of every TS_Clerk_Handler to send a request for time
+update to all the servers. In the process, it retrieves the latest
+time cached by each TS_Clerk_Handler and then uses it to compute its
+notion of the local system time.<P>
+
+<LI> <B> Algorithms </B> <P>
+
+Currently, updating the system time involves taking the average of all
+the times received from the servers.<P>
+</UL>
+
+The following is a description of how to configure the Time Server
+clerk and server services: <P>
+
+<UL>
+
+<LI> <B> Startup configuration </B> <P>
+
+Configuring a server requires specifying the port number of the
+server. This can be specified as a command line argument as follows: <P>
+
+	-p &lt;port number&gt;
+
+<P>
+A clerk communicates with one or more server processes. To communicate
+with the server process, a client needs to know the INET_Addr, where
+the server offers its service. The configuration parameters namely the
+server port and server host are passed as command line arguments when
+starting up the clerk service as follows: <P>
+
+    -h &lt;server host1&gt;:&lt;server port1&gt; -h &lt;server host2&gt;:&lt;server port2&gt; ...
+<P>
+Note that multiple servers can be specified in this manner for the
+clerk to connect to when it starts up. The server name and the port
+number need to be concatenated and separated by a ":". In addition,
+the timeout value can also be specified as a command line argument as
+follows:
+<P>
+
+	-t timeout
+
+<P>
+The timeout value specifies the time interval at which the clerk
+should query the servers for time updates.
+<P>
+By default a Clerk does a non-blocking connect to a server. This can
+be overridden and a Clerk can be made to do a blocking connect by
+using the -b flag.
+<P>
+
+<LI> <B>Examples</B> <P>
+<OL>
+<LI> Here is what a config file would look like for starting up a
+server at port 20202:
+
+<PRE> <CODE>
+dynamic Time_Service Service_Object * 
+  ../lib/netsvcs:_make_ACE_TS_Server_Acceptor() 
+  "-p 20202"
+</PRE> </CODE>
+
+<LI> Here is what a config file would look like for starting up a
+clerk that needs to connect to two servers, one at tango and one at
+lambada: 
+
+<PRE> <CODE>
+dynamic Time_Server_test Service_Object *
+  ../lib/netsvcs:_make_ACE_TS_Clerk_Connector () 
+  "-h tango:20202 -h lambada:20202 -t 4"
+</PRE> </CODE>
+</OL>
+
+Note:<P>
+<UL>
+<LI> These files would vary if the services are run on NT. For
+example, instead of using *.so, we would have to use *.dll.<P>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the
+name of the shared object or dll would suffice. That is, the Service
+Configurator makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32)
+to look for the shared object files or dlls.
+</UL>
+<P>
+
+</UL>
+
+<P><HR><P>
+<H3><A NAME="token-overview">Token Service</A></H3>
+
+The ACE Token Service provides local and remote mutexes and
+readers/writer locks.  For information regarding the deadlock
+detection algorithm, check out ACE_Token_Manager.h.  For information
+about an implementation of the Composite Pattern for Tokens, check out
+Token_Collection.h.  The classes which implement the local and remote
+synchronization primitives are listed below:<P>
+
+<UL>
+  <LI> <B><TT>ACE_Local_Mutex</TT></B><P>
+
+       This class is a more general-purpose synchronization mechanism
+       than SunOS 5.x mutexes.  For example, it implements "recursive
+       mutex" semantics, where a thread that owns the token can
+       reacquire it without deadlocking.  In addition, threads that
+       are blocked awaiting the token are serviced in strict FIFO
+       order as other threads release the token (SunOS 5.x mutexes
+       don't strictly enforce an acquisition order).  Lastly,
+       ACE_Local_Mutex performs deadlock detection on acquire
+       calls.<p>
+
+  <LI> <B><TT>ACE_Remote_Mutex</TT></B><P>
+
+       This is the remote equivalent to ACE_Local_Mutex.  The
+       Remote_Mutex class offers methods for acquiring, renewing, and
+       releasing a distributed synchronization mutex.  Similar to
+       ACE_Local_Mutex, ACE_Remote_Token_Proxy offers recursive
+       acquisition, FIFO waiter ordering, and deadlock detection.  It
+       depends on the Token Server for its distributed synchronization
+       semantics.<p>
+       
+  <LI> <B><TT>ACE_Local_RLock</TT></B><P>
+
+       This class implements the reader interface to canonical
+       readers/writer locks.  Multiple readers can hold the lock
+       simultaneously when no writers have the lock.  Alternatively,
+       when a writer holds the lock, no other participants (readers or
+       writers) may hold the lock.  This class is a more
+       general-purpose synchronization mechanism than SunOS 5.x
+       RLocks.  For example, it implements "recursive RLock"
+       semantics, where a thread that owns the token can reacquire it
+       without deadlocking.  In addition, threads that are blocked
+       awaiting the token are serviced in strict FIFO order as other
+       threads release the token (SunOS 5.x RLockes don't strictly
+       enforce an acquisition order).<P>
+
+  <LI> <B><TT>ACE_Local_WLock</TT></B><P>
+
+       This class implements the writer interface to canonical
+       readers/writer locks. Multiple readers can hold the lock
+       simultaneously when no writers have the lock.  Alternatively,
+       when a writer holds the lock, no other participants (readers or
+       writers) may hold the lock.  This class is a more
+       general-purpose synchronization mechanism than SunOS 5.x WLock.
+       For example, it implements "recursive WLock" semantics, where a
+       thread that owns the token can reacquire it without
+       deadlocking.  In addition, threads that are blocked awaiting
+       the token are serviced in strict FIFO order as other threads
+       release the token (SunOS 5.x WLocks don't strictly enforce an
+       acquisition order).<P>
+
+  <LI> <B><TT>ACE_Remote_RLock</TT></B><P>
+
+       This is the remote equivalent to ACE_Local_RLock. Multiple
+       readers can hold the lock simultaneously when no writers have
+       the lock.  Alternatively, when a writer holds the lock, no
+       other participants (readers or writers) may hold the lock.
+       ACE_Remote_RLock depends on the ACE Token Server for its
+       distributed synchronization semantics.<P>
+       
+  <LI> <B><TT>ACE_Remote_RLock</TT></B><P>
+
+       This is the remote equivalent to ACE_Local_WLock.<P>
+</UL>
+
+The Token Server provides distributed mutex and readers/writer lock
+semantics to the ACE Token library.  ACE_Remote_Mutex,
+ACE_Remote_RLock, and ACE_Remote_WLock, are proxies to the Token
+Server.  The following are the key classes in the ACE Token
+Server:<P>
+
+<UL>
+  <LI> <B><TT>class Token_Acceptor</TT></B><P>
+
+       The Token_Acceptor is a Token_Handler factory.  It accepts
+       connections and passes the service responsibilities off to a
+       new Token_Handler.<p>
+
+  <LI> <B><TT>class Token_Handler</TT></B><P>
+
+       This class is the main class ``entry point'' of the ACE Token service.  It
+       receives token operation requests from remote clients and turns
+       them into calls on local tokens (acquire, release, renew, and
+       remove).  In OMG CORBA terminology, it is an ``Object Adapter.'' It also
+       schedules and handles timeouts that are used to support "timed
+       waits."  Clients used timed waits to bound the amount of time
+       they block trying to get a token.<P>
+</UL>
+
+The following describes how to configure the Token Server:<P>
+<UL>
+  <LI> <b>Startup configuration</B><P>
+
+       The only parameter that the Token Server takes is a listen port
+       number.  You can specify a port number by passing a "-p
+       <port_number>" to the application.  This can be done via the
+       svc.conf file.<P>
+
+ <LI> <B>Examples </B><P>
+
+      Here is an example svc.conf entry that dynamically loads the
+      Token Server specifying port number to listen on for client
+      connections:<P> 
+
+       <code><pre>
+        dynamic Token_Service Service_Object * 
+          ../lib/netsvcs:_make_ACE_Token_Acceptor() 
+          "-p 10202"
+       </code></pre>
+       <P>
+
+</UL>
+Note:<P>
+<UL>
+<LI> These files would vary if the services are run on NT. For
+example, instead of using *.so, we would have to use *.dll.<P>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the
+name of the shared object or dll would suffice. That is, the Service
+Configurator makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32)
+to look for the shared object files or dlls.
+</UL>
+
+
+<P><HR><P>
+<A NAME="server-logging-overview">
+<H3>Overview of Server Logging Service</H3>
+
+The Server Logging Service provides a concurrent, multi-service daemon
+that processes logging records received from one or more client hosts
+simultaneously.  The object-oriented design of the Server Logging
+Service is decomposed into several modular components that perform
+well-defined tasks. <P>
+
+The following are the key classes in the Server Logging Service: <P>
+<UL>
+<LI> <B> <TT> Server_Logging_Handler </TT> </B> <P>
+The Server_Logging_Handler class is a parameterized type that is
+responsible for processing logging records sent to the Server from
+participating client hosts. When logging records arrive from the
+client host associated with a particular Logging Handler object, the
+handle_input() method of the Server_Logging_Handler class is called
+which in turn formats and displays the records on one or more output
+devices (such as the printer, persistent storage, and/or console
+devices. <P>
+
+<LI> <B> <TT> Server_Logging_Acceptor </TT> </B> <P>
+The class Server_Logging_Acceptor allocates in its handle_input()
+routine a new instance of class Server_Logging_Handler on the heap,
+and accepts connections into this Server_Logging_Handler. <P>
+</UL>
+
+The following describes how to configure the Logging Server:<P>
+<UL>
+  <LI> <b>Startup configuration</B><P>
+
+       The only parameter that the Logging Server takes is a listen
+       port number.  You can specify a port number by passing a "-p
+       <port_number>" to the application.  This can be done via the
+       svc.conf file.<P>
+
+ <LI> <B>Examples </B><P>
+
+      Here is an example svc.conf entry that dynamically loads the
+      Logging Server specifying port number to listen on for client
+      connections:<P> 
+
+      <PRE> <CODE>
+      dynamic Server_Logging_Service Service_Object * 
+        ../lib/netsvcs:_make_ACE_Server_Logging_Acceptor() 
+        "-p 10202"
+      </PRE></CODE>
+      <P>
+</UL>
+Note:<P>
+<UL>
+<LI> These files would vary if the services are run on NT. For
+example, instead of using *.so, we would have to use *.dll.<P>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the
+name of the shared object or dll would suffice. That is, the Service
+Configurator makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32)
+to look for the shared object files or dlls.
+</UL>
+
+<P><HR><P>
+<A NAME="client-logging-overview">
+<H3>Overview of Client Logging Service</H3>
+
+The Client Logging Service multiplexes messages received from
+different applications to the Server Logging Daemon running on a
+designated host in a network/internetwork.
+
+
+The following are the key classes in the Client Logging Service: <P>
+<UL>
+<LI> <B> <TT> Client_Logging_Handler </TT> </B> <P>
+The Client_Logging_Handler class is a parameterized type that is
+responsible for setting up a named pipe and using it to communicate
+with different user processes on the same host. Once logging records
+arrive from these processes, the handler reads these records in
+priority order, performs network-byte order conversions on
+multiple-header fields, and then transmits these records to the Server
+Logging daemon across the network. <P>
+
+<LI> <B> <TT> Client_Logging_Connector </TT> </B> <P>
+The class Client_Logging_Connector connects to the Server Logging
+daemon and then in its handle_input() routine it allocates a new
+instance of the Client_Logging_Handler on the heap. <P>
+</UL>
+
+The following describes how to configure the Logging Client:<P>
+<UL>
+  <LI> <b>Startup configuration</B><P>
+
+Configuring a Logging Client requires specifying all or some of the
+following parameters. These parameters can be passed in to main
+through command line as follows:<P> 
+
+<TABLE cellpadding = 10 cellspacing = 0 border = 5>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Option </B>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Description </B>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+<B> Default value </B>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-h &lt;hostname&gt; <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Hostname of the Server Logging Daemon <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_SERVER_HOST
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-p &lt;port number&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Port number of the Server Logging Daemon <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_LOGGING_SERVER_PORT
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+-p &lt;rendezvous key&gt;
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+Rendezvous key used to create named pipe
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+ACE_DEFAULT_RENDEZVOUS
+</TD>
+</TABLE>
+<P>
+
+ <LI> <B>Examples </B><P>
+
+      Here is an example svc.conf entry that dynamically loads the
+      Logging Client specifying host name and port number of the
+      Logging Server: <P>
+
+      <PRE> <CODE>
+      dynamic Client_Logging_Service Service_Object * 
+        ../lib/netsvcs:_make_ACE_Client_Logging_Connector() 
+        "-h tango.cs.wustl.edu -p 10202"
+      </PRE></CODE>
+      <P>
+</UL>
+Note:<P>
+<UL>
+<LI> These files would vary if the services are run on NT. For
+example, instead of using *.so, we would have to use *.dll.<P>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the
+name of the shared object or dll would suffice. That is, the Service
+Configurator makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32)
+to look for the shared object files or dlls.
+</UL>
+
+<P><HR><P>
+<A NAME="logging-strategy-overview">
+<H3> Overview of Logging Strategy Service</H3>
+
+The Logging Strategy Service can be used to control the output of all the
+network services. It can be invoked with certain flags that determine
+where the output of all the services should go. The Logging Strategy
+Service sets the flags in ACE_Log_Msg, which controls all the streams
+through macros such as ACE_DEBUG, ACE_ERROR, and ACE_ERROR_RETURN. If
+default behavior is required, the Logging Strategy Service need not be
+invoked or it can be invoked with no parameters. <P>
+
+The following describes how to configure the Logging Strategy
+Service:<p> 
+
+<UL>
+<LI> <b>Startup configuration</B><P>
+
+Here are the command line arguments that can be given to the Logging
+Strategy Service: <P>
+
+    -f &lt;flag1&gt;|&lt;flag2&gt;|&lt;flag3&gt;    (etc...) <P>
+
+    where a flag can be any of the following: <P>
+
+<TABLE cellpadding = 10 cellspacing = 0 border = 5>
+<TD VALIGN = TOP ALIGN = LEFT>
+    <B> Flags </B>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    <B> Description </B>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+    STDERR <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    Write messages to stderr. <BR>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+    LOGGER <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    Write messages to the local client logger deamon. <BR>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+    OSTREAM <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    Write messages to the ostream that gets created by specifying a
+    filename (see below) <BR> 
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+    VERBOSE <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    Display messages in a verbose manner  <BR>
+</TD>
+<TR>
+<TD VALIGN = TOP ALIGN = LEFT>
+    SILENT <BR>
+</TD>
+<TD VALIGN = TOP ALIGN = LEFT>
+    Do not print messages at all <BR>
+</TD>
+
+</TABLE>
+<P>
+
+Note: If more than one flag is specified, the flags need to be 'OR'ed
+as above syntax shows. Make sure there is no space in between the flag
+and '|'. <P>
+
+    -s filename
+ <P>
+
+If the OSTREAM flag is set, this can be used to specify the filename
+where the output should be directed. Note that if the OSTREAM flag is
+set and no filename is specified, ACE_DEFAULT_LOGFILE will be used to
+write the output to. <P>
+
+<LI> <B> Examples: </B> <P>
+      Here is an example svc.conf entry that dynamically loads the
+      Logging Strategy Service specifying that the output be sent 
+      to STDERR: <P>
+
+      <PRE> <CODE>
+      dynamic Logging_Strategy_Service Service_Object * 
+        ../lib/netsvcs:_make_ACE_Logging_Strategy() 
+        "-f STDERR"
+      </PRE></CODE>
+      <P>
+<OL>
+<LI> To direct output only to STDERR, specify command line arguments as: <P>
+	"-f STDERR"
+<P>
+
+<LI> To direct output to both STDERR and a file called "mylog", specify
+command line arguments as: <P>
+	"-f STDERR|OSTREAM -s mylog"
+</OL>
+Note:<P>
+<UL>
+<LI> These files would vary if the services are run on NT. For
+example, instead of using *.so, we would have to use *.dll.<P>
+<LI> Values for parameters can also be passed in using environment
+variables. For example, instead of specifying absolute hostname or
+port numbers in the config file, we can use $HOST and $PORT,
+respectively, in the file (assuming that these environment variables
+have been set). <P>
+<LI> If the environment variable LD_LIBRARY_PATH (in the case of UNIX)
+or PATH (in the case of Win32) contains the path to the shared object
+files or dll, then the config file can be further simplified. Instead
+of specifying a path to the shared object or dll, only the
+name of the shared object or dll would suffice. That is, the Service
+Configurator makes use of LD_LIBRARY_PATH (on UNIX) or PATH (on Win32)
+to look for the shared object files or dlls.
+</UL>
+</UL>
+
+<P><HR><P>
+Back to the <A HREF="http://www.cs.wustl.edu/~schmidt/ACE.html">
+ACE</A> home page.
+<!--#include virtual="/~schmidt/cgi-sig.html" -->
+</BODY> 
+</HTML>

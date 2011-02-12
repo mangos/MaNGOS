@@ -1,0 +1,513 @@
+#!/bin/sh
+
+# $Id: ace-install 80826 2008-03-04 14:51:23Z wotte $
+
+
+#####################################################################
+# install_ace: distill the minimal stuff out of the ACE+TAO distribution
+# alias cpio 'xargs -i echo {}'; # just for testing the script
+#
+# according to David Levine <levine@cs.wustl.edu> on 1999/01/09:
+#
+#     An even better way would be to only build what you need.
+#     These directories are probably a good start:
+#
+#     ace
+#     apps/gperf/src
+#     TAO/tao
+#     TAO/TAO_IDL
+#     TAO/orbsvcs
+#
+#     netsvcs ? - not built in here, probably useful
+#
+#####################################################################
+
+# actions
+unpack=0
+config=0
+compile=0
+install=0
+force=0
+
+# can we do it?
+die=0
+
+
+#####################################################################
+# check for install_ace options
+#####################################################################
+
+while [ $# -gt 0 ]; do
+
+    case $1 in
+
+        ##########################################
+        # help output
+
+        -h | --help*)
+            echo " "
+            echo "`basename $0` [options]"
+            echo " "
+            echo "options:"
+            echo "  -h, --help                show brief help"
+            echo " "
+            echo "required options:"
+            echo "  -r, --aceroot=ACE_ROOT    use ACE_ROOT directory for build/install"
+            echo " "
+            echo "extracting and configuring options:"
+            echo "  -z, --archive=FILE        unpack specified source archive"
+            echo "  -p, --platform=HEADER,MAKE  use HEADER,MAKE as config.h, platform_macros"
+            echo " "
+            echo "compiling options:"
+            echo "  -c, --compile=ACE_OPTS    compile with make options (e.g. debug=0)"
+            echo " "
+            echo "installing options:"
+            echo "  -i, --install=ACE_DEST    install into ACE_DEST directory"
+            echo "  -a, --arch=ACE_ARCH       use ACE_ARCH subdirs for arch-dependent files"
+            echo " "
+            echo "miscellaneous options:"
+            echo "  -f, --force               don't ask for confirmation before proceeding"
+            echo " "
+            exit 0
+            ;;
+
+        ##########################################
+        # required options
+
+        -r)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_ROOT=$1; export ACE_ROOT
+            else
+                echo "no ACE_ROOT specified"
+                exit 1
+            fi
+            shift
+            ;;
+
+        --aceroot*)
+            ACE_ROOT=`echo $1 | sed -e 's/^[^=]*=//g'`; export ACE_ROOT
+            shift
+            ;;
+
+        ##########################################
+        # extracting and configuring options
+
+        -z)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_ARCHIVE=$1; export ACE_ARCHIVE
+                unpack=1
+            else
+                echo "no archive specified"
+                exit 1
+            fi
+            shift
+            ;;
+
+        --archive*)
+            ACE_ARCHIVE=`echo $1 | sed -e 's/^[^=]*=//g'`; export ACE_ARCHIVE
+            unpack=1
+            shift
+            ;;
+
+        -p)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_HEADER=`echo $1 | cut -f 1 -d ,`; export ACE_HEADER
+                ACE_MAKE=`echo $1 | cut -f 2 -d ,`; export ACE_MAKE
+            else
+                echo "no header,make files specified"
+                exit 1
+            fi
+            config=1
+            shift
+            ;;
+
+        --platform*)
+            stuff=`echo $1 | sed -e 's/^[^=]*=//g'`
+            ACE_HEADER=`echo $stuff | cut -f 1 -d ,`; export ACE_HEADER
+            ACE_MAKE=`echo $stuff | cut -f 2 -d ,`; export ACE_MAKE
+            config=1
+            shift
+            ;;
+
+        ##########################################
+        # compiling options
+
+        -c)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_OPTS="$1"; export ACE_OPTS
+                compile=1
+            else
+                echo "no compilation options specified (e.g. debug=0)"
+                exit 1
+            fi
+            shift
+            ;;
+
+        --compile*)
+            ACE_OPTS=`echo $1 | sed -e 's/^[^=]*=//g'`; export ACE_OPTS
+            compile=1
+            shift
+            ;;
+
+        ##########################################
+        # installing options
+
+        -i)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_DEST=$1; export ACE_DEST
+                install=1
+            else
+                echo "no installation target directory specified (e.g. /tools/ace)"
+                exit 1
+            fi
+            shift
+            ;;
+
+        --install*)
+            ACE_DEST=`echo $1 | sed -e 's/^[^=]*=//g'`; export ACE_DEST
+            install=1
+            shift
+            ;;
+
+        -a)
+            shift
+            if [ $# -gt 0 ]; then
+                ACE_ARCH=$1; export ACE_ARCH
+            else
+                echo "no installation target architecture specified"
+                exit 1
+            fi
+            shift
+            ;;
+
+        --arch*)
+            ACE_ARCH=`echo $1 | sed -e 's/^[^=]*=//g'`; export ACE_ARCH
+            shift
+            ;;
+
+        ##########################################
+        # miscellaneous options
+
+        -f)
+            shift
+            force=1
+            ;;
+
+        *)
+            # no more options, get on with life
+            if [ $# -gt 0 ]; then
+                echo "unrecognized option: $1"
+                exit 1
+            fi
+            ;;
+    esac
+done
+
+
+#####################################################################
+# sanity checks for required variables
+#####################################################################
+
+if [ $install -ne 0 -a $compile -ne 0 -a $unpack -eq 0 ]; then
+    echo "- No actions specified."
+    die=1
+fi
+
+if [ $unpack -ne 0 -a $compile -ne 0 -a $config -eq 0 ] \
+        || [ $unpack -ne 0 -a $install -ne 0 -a $config -eq 0 ]; then
+    echo "- Must set platform config options with --platform option"
+    echo "  (`basename $0` -h for help) to unpack and compile/install"
+    die=1
+fi
+
+if [ -z "$ACE_ROOT" ]; then
+    echo "- Must set ACE_ROOT directory before proceeding..."
+    echo "  The directory may be set with the ACE_ROOT environment"
+    echo "  variable or the --aceroot option (`basename $0` -h for help)"
+    die=1
+fi
+
+if [ $install -eq 1 -a -z "$ACE_ARCH" ]; then
+	# just set it to blank if we want to flatten this level of subdirectory
+	ACE_ARCH=""
+fi
+
+if [ $die -ne 0 ]; then
+    echo "- terminating `basename $0` script"
+    exit 2
+fi
+
+
+#####################################################################
+# announce intentions
+#####################################################################
+
+echo "This script will perform the following actions:"
+
+echo "using ACE_ROOT directory: $ACE_ROOT"
+
+if [ $unpack -ne 0 ]; then
+    echo " "
+    echo "Extracting:"
+    echo "- unpack source archive:    $ACE_ARCHIVE"
+fi
+
+if [ $config -ne 0 ]; then
+    echo " "
+    echo "Configuring:"
+    echo "- platform config.h header: $ACE_HEADER"
+    echo "- platform makefile macros: $ACE_MAKE"
+fi
+
+if [ $compile -ne 0 ]; then
+    echo " "
+    echo "Compiling:"
+    echo "- ACE/TAO compile options:  $ACE_OPTS"
+fi
+
+if [ $install -ne 0 ]; then
+    echo " "
+    echo "Installing:"
+    echo "- install target directory: $ACE_DEST"
+    echo "- install target arch:      $ACE_ARCH"
+fi
+
+echo ""
+
+
+#####################################################################
+# confirm desire to proceed
+#####################################################################
+
+if [ $force -eq 0 ]; then
+    echo " "
+    echo "Type 'yes' to proceed, anything else to exit"
+
+    read ready
+    if [ "$ready" != "yes" ]; then
+        echo "Terminating install script.  Thank you for playing."
+        echo "We have some lovely parting gifts for you. =)"
+        exit 1
+    fi
+fi
+
+
+#####################################################################
+# extract ACE and TAO
+#####################################################################
+
+if [ $unpack -ne 0 ]; then
+
+    echo "Unpacking $ACE_ARCHIVE..."
+
+    cd `dirname $ACE_ROOT`
+    gzip -dc $ACE_ARCHIVE | tar xvf -
+
+fi
+
+
+#####################################################################
+# configure ACE and TAO
+#####################################################################
+
+if [ $config -ne 0 ]; then
+
+    echo "Configuring: $ACE_HEADER,$ACE_MAKE..."
+
+    # copy the files if they exist
+    test -f $ACE_ROOT/ace/$ACE_HEADER \
+        && cp $ACE_ROOT/ace/$ACE_HEADER $ACE_ROOT/ace/config.h
+    test -f $ACE_ROOT/include/makeinclude/$ACE_MAKE \
+        && cp $ACE_ROOT/include/makeinclude/$ACE_MAKE \
+            $ACE_ROOT/include/makeinclude/platform_macros.GNU
+
+    # print error message and die if they don't
+    if [ ! -f $ACE_ROOT/ace/$ACE_HEADER ]; then
+      echo "error: $ACE_HEADER doesn't exist"
+      die=1
+    fi
+    if [ ! -f $ACE_ROOT/include/makeinclude/$ACE_MAKE ]; then
+      echo "error: $ACE_MAKE doesn't exist"
+      die=1
+    fi
+
+    if [ $die -ne 0 ]; then
+        exit $die
+    fi
+
+fi
+
+
+#####################################################################
+# compile ACE and TAO
+#####################################################################
+
+if [ $compile -ne 0 ]; then
+
+    echo "Compiling: $ACE_OPTS..."
+
+    ##########################################
+    # add ACE_ROOT/ace to LD_LIBRARY_PATH so tao_idl can find libACE.so
+    if [ "`uname -s`" = "HP-UX" ]; then
+      if [ ! -z "$SHLIB_PATH" ]; then
+          SHLIB_PATH=$ACE_ROOT/ace:$SHLIB_PATH
+      else
+          SHLIB_PATH=$ACE_ROOT/ace; export SHLIB_PATH
+      fi
+    else
+      if [ ! -z "$LD_LIBRARY_PATH" ]; then
+          LD_LIBRARY_PATH=$ACE_ROOT/ace:$LD_LIBRARY_PATH
+      else
+          LD_LIBRARY_PATH=$ACE_ROOT/ace; export LD_LIBRARY_PATH
+      fi
+    fi
+
+    ##########################################
+    # compile a few select directories
+    for d in ace apps/gperf/src TAO/tao TAO/TAO_IDL TAO/orbsvcs TAO/utils; do
+        echo --- Building in $d.
+        cd "$ACE_ROOT/$d"
+        make $ACE_OPTS
+        if [ $? -ne 0 ]; then
+            echo --- Error during build: $?
+            exit $?
+        fi
+    done
+fi
+
+
+#####################################################################
+# install ACE and  TAO
+#####################################################################
+
+if [ $install -ne 0 ]; then
+
+    echo "Installing: $ACE_DEST..."
+
+    ##########################################
+    # determine final target directories
+
+    ACE_VER=`head -n 1 $ACE_ROOT/VERSION | sed -e 's/^[^0-9]*//' -e 's/[, ].*//'`
+    ACE_DIR="$ACE_DEST/ACE-$ACE_VER"; export ACE_DIR
+
+    TAO_VER=`head -n 1 $ACE_ROOT/TAO/VERSION | sed -e 's/^[^0-9]*//' -e 's/[, ].*//'`
+    TAO_DIR="$ACE_DEST/TAO-$TAO_VER"; export ACE_DIR
+
+    ##########################################
+    # create target directories as needed
+    echo "creating target directories..."
+
+    ace_dirs="$ACE_DIR $ACE_DIR/include $ACE_DIR/man"
+    ace_arch_dirs="$ACE_DIR/$ACE_ARCH/include/ace \
+                            $ACE_DIR/$ACE_ARCH/bin $ACE_DIR/$ACE_ARCH/lib"
+    tao_dirs="$TAO_DIR $TAO_DIR/include $TAO_DIR/include/orbsvcs"
+    tao_arch_dirs="$TAO_DIR/$ACE_ARCH/include \
+                            $TAO_DIR/$ACE_ARCH/bin $TAO_DIR/$ACE_ARCH/lib"
+
+    for dir in $ace_dirs $ace_arch_dirs $tao_dirs $tao_arch_dirs; do
+        if [ ! -d $dir ]; then
+          echo $dir
+          mkdir -p $dir
+        fi
+    done
+
+    ##########################################
+    # copy TAO stuff
+
+    cd $ACE_ROOT/TAO
+    cp VERSION $TAO_DIR/$ACE_ARCH/TAO-VERSION
+
+    # copy TAO includes
+    echo "Copying include files..."
+    find tao -type f -name "*.idl" -print | cpio -p -d -V $TAO_DIR/include
+    find tao -type f -name "*.pidl" -print | cpio -p -d -V $TAO_DIR/include
+    find tao -type f -name "*.h" -print | grep -v "^config\.h" | cpio -p -d -V $TAO_DIR/include
+    find tao -type f \( -name  "*.i" -o -name "*.inl" \) -print | cpio -p -d -V $TAO_DIR/include
+    find tao -type f -name "*.cpp" -print | cpio -p -d -V $TAO_DIR/include
+
+    # NOTE: may need all .h, .i and .cpp under TAO/orbsvcs, instead of just TAO/orbsvcs/orbsvcs
+    cd orbsvcs
+    find orbsvcs -type f -name "*.idl" -print | cpio -p -d -V $TAO_DIR/include
+    find orbsvcs -type f -name "*.pidl" -print | cpio -p -d -V $TAO_DIR/include
+    find orbsvcs -type f -name "*.h" -print | grep -v "^config\.h" | cpio -p -d -V $TAO_DIR/include
+    find orbsvcs -type f \( -name "*.i" -o -name "*.inl" \) -print | cpio -p -d -V $TAO_DIR/include
+    find orbsvcs -type f -name "*.cpp" -print | cpio -p -d -V $TAO_DIR/include
+    cd ..
+
+    # copy TAO libs
+    echo "Copying libraries..."
+    for f in `find . -type f -name "lib?*" -not -name "*\.dsw" -not -name "*Test*" -print`; do
+        echo $f
+        cp $f $TAO_DIR/$ACE_ARCH/lib
+    done
+
+    # copy TAO executables
+    echo "Copying executables..."
+
+    ALL_PROGS=`find orbsvcs -type f -perm +a+x -print | grep -v ".*lib.*" | grep -v ".\.pl" | grep -v test | grep -v example`
+    ALL_PROGS="`find utils  -type f -perm +a+x -print` $ALL_PROGS"
+    PROGS=`echo $ALL_PROGS | tr " " "\n" | grep -v test | grep -v default.bld | grep -v README | grep -v GNUmakefile`
+
+    for f in TAO_IDL/tao_idl $PROGS; do
+        echo $f
+        cp $f $TAO_DIR/$ACE_ARCH/bin
+    done
+
+    ##########################################
+    # copy ACE stuff
+
+    cd $ACE_ROOT
+    cp VERSION $ACE_DIR/$ACE_ARCH/ACE-VERSION
+
+    # copy ACE includes
+    echo "Copying include files..."
+    find ace -type f -name "*.h" -print | grep -v "^config\.h" | cpio -p -d -V $ACE_DIR/include
+    find ace -type f \( -name "*.i" -o -name "*.inl" \) -print | cpio -p -d -V $ACE_DIR/include
+    find ace -type f -name "*.cpp" -print | cpio -p -d -V $ACE_DIR/include
+    cp ace/config.h $ACE_DIR/$ACE_ARCH/include/ace/config.h
+    chmod -R a+r $ACE_DIR/$ACE_ARCH/include
+
+    # copy ACE libs
+    echo "Copying libraries..."
+    for f in `find . -type f -name "lib?*" -not -name "*\.dsw" -not -name "*Test*" -print`; do
+        # only copy libs if they're not already in $TAO_DIR/$ACE_ARCH/lib
+        maybe_tao_lib=$TAO_DIR/$ACE_ARCH/lib/`basename $f`
+        if [ ! -f $maybe_tao_lib ]; then
+          echo $f
+          cp $f $ACE_DIR/$ACE_ARCH/lib
+        fi
+        test -f $maybe_tao_lib && echo "library $f already installed with TAO"
+    done
+
+    # copy ACE executables
+    echo "Copying executables..."
+    ACE_PROGS=apps/gperf/src/gperf
+
+    for f in $ACE_PROGS; do
+        echo $f
+        cp $f $ACE_DIR/$ACE_ARCH/bin
+    done
+
+    # copy ACE man pages
+    echo "Copying man pages..."
+    find man -type f -print | cpio -p -d -V $ACE_DIR
+
+
+   # PERMISSIONS
+   chmod -R a+r $ACE_DEST
+   find $ACE_DEST -type d -exec chmod a+x {} \;
+   find $ACE_DEST -type f -perm +a+x -exec chmod a+x {} \;
+
+fi   # if [ $install -ne 0 ]
+
+
+#####################################################################
+# that's all, folks
+#####################################################################
+
+echo "`basename $0`: done."

@@ -1,0 +1,29 @@
+// -*- MPC -*-
+// $Id: gateway.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(Gateway) : acelib, ace_output {
+  sharedname = Gateway
+  Source_Files {
+    Concrete_Connection_Handlers.cpp
+    Config_Files.cpp
+    File_Parser.cpp
+    Gateway.cpp
+    Event_Channel.cpp
+    Event_Forwarding_Discriminator.cpp
+    Options.cpp
+    Connection_Handler.cpp
+    Connection_Handler_Acceptor.cpp
+    Connection_Handler_Connector.cpp
+  }
+}
+
+project(gatewayd) : aceexe {
+  exename = gatewayd
+  after += Gateway
+  libs  += Gateway
+
+  Source_Files {
+    gatewayd.cpp
+  }
+}
+

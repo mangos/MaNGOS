@@ -1,0 +1,244 @@
+// -*- MPC -*-
+// $Id: tests.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(cinset): gperf_test {
+  exename = cout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: cout$(EXEEXT)
+    "	@echo "Testing cout"
+    "	./cout -v < c.gperf > cout.out
+    "	-diff -b c.exp cout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -p -c -l -S1 -o
+    c.gperf
+  }
+
+  Source_Files {
+    c.cpp
+  }
+}
+
+project(adainset): gperf_test {
+  exename = aout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: aout$(EXEEXT)
+    "	@echo "Testing aout"
+    "	./aout -v < ada.gperf > aout.out
+    "	-diff -b ada-res.exp aout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -k1,4,$$
+    ada.gperf
+  }
+
+  Source_Files {
+    ada.cpp
+  }
+}
+
+project(cppinset): gperf_test {
+  exename = cppout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: cppout$(EXEEXT)
+    "	@echo "Testing cppout"
+    "	./cppout -v < cpp.gperf > cppout.out
+    "	-diff -b cpp-res.exp cppout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -D
+    cpp.gperf
+  }
+
+  Source_Files {
+    cpp.cpp
+  }
+}
+
+project(preinset): gperf_test {
+  exename = preout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: preout$(EXEEXT)
+    "	@echo "Testing preout"
+    "	./preout -v < adadefs.gperf > preout.out
+    "	-diff -b ada-pred.exp preout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -p -D -k1,$$ -s 2 -o
+    adadefs.gperf
+  }
+
+  Source_Files {
+    adadefs.cpp
+  }
+}
+
+project(m3inset): gperf_test {
+  exename = m3out
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: m3out$(EXEEXT)
+    "	@echo "Testing m3out"
+    "	./m3out -v < modula3.gperf > m3out.out
+    "	-diff -b modula.exp m3out.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -k1,2,$$
+    modula3.gperf
+  }
+
+  Source_Files {
+    modula3.cpp
+  }
+}
+
+project(pinset): gperf_test {
+  exename = pout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: pout$(EXEEXT)
+    "	@echo "Testing pout"
+    "	./pout -v < pascal.gperf > pout.out
+    "	-diff -b pascal.exp pout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -o -S2 -p
+    pascal.gperf
+  }
+
+  Source_Files {
+    pascal.cpp
+  }
+}
+
+project(iinset): gperf_test {
+  exename = iout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: iout$(EXEEXT)
+    "	@echo "Testing iout"
+    "	./iout -v < idl.gperf > iout.out
+    "	-diff -b idl.exp iout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -m -M -c -C -D -S1 -E -T -a -o -p
+    idl.gperf
+  }
+
+  Source_Files {
+    idl.cpp
+  }
+}
+
+project(iinset2): gperf_test {
+  exename = iout2
+  after  += iinset
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: iout2$(EXEEXT)
+    "	@echo "Testing iout2"
+    "	./iout2 -v < idl.gperf > iout2.out
+    "	-diff -b idl.exp iout2.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    gendir = iout2_gen
+    commandflags += -m -M -c -C -D -E -T -a -o -p
+    idl.gperf
+  }
+
+  Source_Files {
+    iout2_gen/idl.cpp
+  }
+}
+
+project(tinset): gperf_test {
+  exename = tout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: tout$(EXEEXT)
+    "	@echo "Testing tout"
+    "	./tout -v < corba.gperf > tout.out
+    "	-diff -b corba.exp tout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -a -o
+    corba.gperf
+  }
+
+  Source_Files {
+    corba.cpp
+  }
+}
+
+project(taoinset): gperf_test {
+  exename = taoout
+
+  verbatim(gnuace, bottom) {
+    all: runtests
+
+    runtests: taoout$(EXEEXT)
+    "	@echo "Testing taoout"
+    "	./taoout -v < tao.gperf > taoout.out
+    "	-diff -b tao.exp taoout.out"
+
+    endif # CROSS-COMPILE
+  }
+
+  GPERF_Files {
+    commandflags += -c -C -D -E -f 0 -a -o
+    tao.gperf
+  }
+
+  Source_Files {
+    tao.cpp
+  }
+}

@@ -1,0 +1,11 @@
+# $Id: README 80826 2008-03-04 14:51:23Z wotte $
+
+	This directory contains utility classes to build web clients
+and servers.  At this point we have only implemented simple classes to 
+manipulate and parse URL addresses, but hopefully the library will
+grow over time.
+
+Point of Contact: Carlos O'Ryan <coryan@cs.wustl.edu>
+
+
+

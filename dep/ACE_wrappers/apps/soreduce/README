@@ -1,0 +1,163 @@
+Shared Library Reduction Tool
+-----------------------------
+
+The motivation for this tool was the understanding that the ACE & TAO
+libraries were to be linked with the VxWorks kernel to allow multiple
+applications to be run simultaniously with a minimum of footprint
+consumed. Ordinarily a choice is made between static linking
+applications, where each application gets only the object modules
+needed, and shared object linkage, where multiple applications share
+access to full libraries.  Frequently a shared library will contain
+code and data which is not used by any of the applications in a
+particular configuration. The Shared Library Reduction Tool builds
+libraries that include only the modules needed to support a specified
+set of applications.
+
+The analysis is performed very late in the application implementation,
+allowing the system implementors the freedom to use whatever TAO & ACE
+components are needed. Once an application is built and running, its
+shared object need may be evaluated.  The evaluation is straight
+forward. Run the soreduce program, passing the path to all of the
+applications that will share the libraries. The soreduce program uses
+the following steps to generate its results.
+
+1. A list of undefined symbols and shared libraries is built by
+   invoking the ldd and nm commands on each application. For now,
+   soreduce assumes the GNU variant of these tools.
+
+2. For each shared library, soreduce tries to invoke nm on each of the
+   intermediate object files used to build the library. It is
+   important that target library directory has a current .shobj
+   subdirectory.
+
+3. The list of undefined symbols is traversed. For each entry in the list, the 
+   modules loaded from step 2 are examined to look for a matching
+   symbol. When one is found, the target symbol, and any others
+   satisfied by the module are removed from the list, and any
+   undefined symbols in the module are added to the list.  This
+   process is repeated until the entire list of undefined symbols is
+   traversed without change.
+
+4. MPC files are generated. Rather than invoking the linker directly, an mpc
+   file is generated that may be used to build the libs. With these
+   mpc files, the actual library will be named (orig)_subset.
+
+Analysis Artifacts
+------------------
+   
+Development of the shared library reduction tool also provided a
+secondary benefit. It is able to output usage metrics for the various
+modules, which may be useful for directing further hand-crafted
+reduction efforts. Using the GNU nm with more verbose output, it is
+possible to determine the first function using a given undefined
+symbol. While it is not (yet) possible to automate the refactoring of
+code based on this analysis, this information can provide a road map
+for breaking a single module into two or a few that will result in
+fewer incidental dependancies overall.  However this speculation has
+not been tested.
+
+Test results
+------------
+
+Running soreduce providing itself as the sole client. The soreduce
+application is built on top of ACE, using just a few of ACE's
+features. Here is the output:
+
+bash$ ./soreduce soreduce
+discovering libraries
+loading object modules
+Libs subject to analysis:
+  ACE
+Starting analysis
+pass 0, undef count = 69
+pass 1, undef count = 207
+pass 2, undef count = 278
+pass 3, undef count = 271
+pass 4, undef count = 245
+pass 5, undef count = 235
+Writing results
+Making directory /opt/wustl/ACE_wrappers/build/native/ace/usage_metrics
+ACE: 61 out of 210 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/ace/ACE_subset.mpc
+Done.
+
+The size of libACE.so before rebuilding:
+
+bash$ size libACE.so
+   text	   data	    bss	    dec	    hex	filename
+2361958	 498760	  12516	2873234	 2bd792	libACE.so
+
+and after:
+
+bash$ size libACE_subset.so
+   text	   data	    bss	    dec	    hex	filename
+ 987167	 207452	   7580	1202199	 125817	libACE_subset.so
+
+
+2873234 - 1202199 = 1671035 bytes eliminated, a 58.2% reduction
+
+Here is another example, using the Naming Service, and its simple test
+client.  Note that the orbsvcs results are bogus, the libraries are
+already fairly well factored so that the additional subsetting by
+soreduce is not effective. Also, due to the layout of the orbsvcs
+library source directory, the tool may not generate valid mpc files.
+
+bash$ $ACE_ROOT/apps/soreduce/soreduce Naming_Service/Naming_Service tests/Simple_Naming/client                    
+discovering libraries
+loading object modules
+Libs subject to analysis:
+  TAO_CosNaming
+  TAO_Svc_Utils
+  TAO_IORTable
+  TAO_PortableServer
+  TAO
+  ACE
+Starting analysis
+pass 0, undef count = 339
+pass 1, undef count = 580
+pass 2, undef count = 438
+pass 3, undef count = 278
+pass 4, undef count = 244
+pass 5, undef count = 246
+pass 6, undef count = 242
+Writing results
+Making directory /opt/wustl/ACE_wrappers/build/native/TAO/orbsvcs/orbsvcs/usage_metrics
+TAO_CosNaming: 11 out of 256 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/TAO/orbsvcs/orbsvcs/TAO_CosNaming_subset.mpc
+Making directory /opt/wustl/ACE_wrappers/build/native/TAO/orbsvcs/orbsvcs/usage_metrics
+TAO_Svc_Utils: 8 out of 256 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/TAO/orbsvcs/orbsvcs/TAO_Svc_Utils_subset.mpc
+Making directory /opt/wustl/ACE_wrappers/build/native/TAO/tao/IORTable/usage_metrics
+TAO_IORTable: 4 out of 4 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/TAO/tao/IORTable/TAO_IORTable_subset.mpc
+Making directory /opt/wustl/ACE_wrappers/build/native/TAO/tao/PortableServer/usage_metrics
+TAO_PortableServer: 26 out of 29 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/TAO/tao/PortableServer/TAO_PortableServer_subset.mpc
+Making directory /opt/wustl/ACE_wrappers/build/native/TAO/tao/usage_metrics
+TAO: 160 out of 191 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/TAO/tao/TAO_subset.mpc
+Making directory /opt/wustl/ACE_wrappers/build/native/ace/usage_metrics
+ACE: 75 out of 210 modules required
+writing file /opt/wustl/ACE_wrappers/build/native/ace/ACE_subset.mpc
+Done.
+
+Size before & after:
+   text	   data	    bss	    dec	    hex	filename
+2361958	 498760	  12516	2873234	 2bd792	libACE.so
+3432206	 704188	  30992	4167386	 3f96da	libTAO.so
+1931145	 326632	   7528	2265305	 2290d9	libTAO_PortableServer.so
+  76561	  12504	    364	  89429	  15d55	libTAO_IORTable.so
+
+
+Sum: 9395354
+
+
+   text	   data	    bss	    dec	    hex	filename
+1340017	 275440	   8140	1623597	 18c62d	libACE_subset.so
+3131226	 643816	  27984	3803026	 3a0792	libTAO_subset.so
+1845515	 308812	   6896	2161223	 20fa47	libTAO_PortableServer_subset.so
+  76603	  12508	    364	  89475	  15d83	libTAO_IORTable_subset.so
+
+Sum: 7677321
+
+Savings: 1718033 or 18.3%

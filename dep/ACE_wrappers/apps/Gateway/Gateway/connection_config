@@ -1,0 +1,55 @@
+# Configuration file that the gatewayd process uses to determine
+# connection information about proxies.
+#
+# The following provides an explanation for the fields in this file,
+# and how they relate to fields in the corresponding "consumer_config"
+# file.
+#
+# 1. Connection ID -- Each Connection Handler is given a unique ID
+#    that is used in the "consumer_config" file to specify to which
+#    Consumers the Event Channel will forward incoming events from
+#    Suppliers using that connection.  The Connection ID field is the
+#    "key" that is used to match up connections in this file with the
+#    Consumer subscription requests in the "consumer_config" file.
+#    The connection ids should start at 1 and monotonically increase
+#    by increments of 1.  This makes it possible for the Gateway to
+#    properly allocate connection ids for Peers that connect to it.
+#
+# 2. Host -- The host name where the Supplier/Consumer peerd
+#    process is running.
+#
+# 3. Remote Port -- The port number where the remote
+#    Supplier/Consumer peerd process is listening on.
+#    If this is a '*' character it is an indication to the
+#    Gateway to use the "default value," e.g., which can be provided
+#    on the command-line, etc.
+#
+# 4. Handler Role -- i.e., Consumer ('C') or Supplier ('S')
+#
+# 5. Max Retry Timeout -- The maximum amount of time that we'll
+#    wait between retry attempts (these start at 1 second and
+#    double until they reach the Max Retry Timeout).
+#    If this is a '*' character it is an indication to the
+#    Gateway to use the "default value," e.g., which can be provided
+#    on the command-line, etc.
+#
+# 6. Local Port -- The port number that we want to use for
+#    our local Proxy connection.  If this is the value 0 or the '*'
+#    character, then we'll let the socket implementation pick this
+#    value for us.
+#
+# 7. Priority -- Each Consumer/Supplier can be given a priority
+#    that will determine its importance relative to other
+#    Consumers/Suppliers (this feature isn't implemented yet).
+#
+# Connection  Host         Remote  Handler  Max Retry   Local  Priority
+# ID		           Port    Role     Timeout     Port
+# ----------  --------     ------  ------   ----------  -----  --------
+   1          localhost    *       S	    *	        *      1
+   2          localhost    *       C	    *	        *      1
+#  3          mambo.cs     *       C	    *	        *      1
+#  4          lambada.cs   *       C	    *	        *      1
+#  5          lambada.cs   *       C	    *	        *      1
+#  6          tango.cs     *       C	    *	        *      1
+#  7          tango.cs     *       S	    *	        *      1
+#  8          tango.cs     *       C	    *	        *      1

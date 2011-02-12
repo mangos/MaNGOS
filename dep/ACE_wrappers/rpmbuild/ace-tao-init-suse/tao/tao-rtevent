@@ -1,0 +1,24 @@
+## Path:           Network/tao-rtevent
+## Description:    TAO Event service settings
+#
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809"
+## ServiceRestart: tao-rtevent
+#
+# Specify desired default initial references arguments
+TAO_RTEVENT_INITREF="-ORBDefaultInitRef corbaloc::localhost:2809"
+
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809"
+## ServiceRestart: tao-rtevent
+#
+# Enable debug logging, set to "-ORBDebugLevel 10" to enable.
+TAO_RTEVENT_DEBUGLEVEL=""
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-rtevent.log"
+## ServiceRestart: tao-rtevent
+#
+# Configure log file
+TAO_RTEVENT_LOGFILE="-ORBLogFile /var/log/tao/tao-rtevent.log"
+

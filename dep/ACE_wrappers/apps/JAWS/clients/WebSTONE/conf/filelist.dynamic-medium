@@ -1,0 +1,6 @@
+# Modified sample model; added medium dynamic content use
+/file.dyn-send?size=500	350
+/file5k.html    500     #5125
+/file.dyn-send?size=51250	140
+/file500k.html  9       #512500
+/file5m.html    1       #5248000

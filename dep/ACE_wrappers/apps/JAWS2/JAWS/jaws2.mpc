@@ -1,0 +1,53 @@
+// -*- MPC -*-
+// $Id: jaws2.mpc 85415 2009-05-22 07:26:32Z johnnyw $
+
+project(JAWS2) : ace_output, acelib {
+    sharedname = JAWS2
+    dynamicflags += JAWS_BUILD_DLL
+    avoids += uses_wchar ace_for_tao
+
+    specific (automake) {
+      includes += $(srcdir)/..
+    } else {
+      includes += ..
+    }
+
+    Source_Files {
+        Assoc_Array.cpp
+        Cache_Manager.cpp
+        Cache_Object.cpp
+        Concurrency.cpp
+        Data_Block.cpp
+        FILE.cpp
+        Filecache.cpp
+        Headers.cpp
+        Jaws_IO.cpp
+        IO_Acceptor.cpp
+        IO_Handler.cpp
+        Parse_Headers.cpp
+        Pipeline.cpp
+        Pipeline_Tasks.cpp
+        Policy.cpp
+        Reaper.cpp
+        Server.cpp
+        Waiter.cpp
+    }
+
+
+    Template_Files{
+        Cache_Hash_T.cpp
+        Cache_Heap_T.cpp
+        Cache_List_T.cpp
+        Pipeline_Handler_T.cpp
+        Hash_Bucket_T.cpp
+        Cache_Manager_T.cpp
+    }
+
+    Header_Files{
+        *.h
+    }
+
+    Inline_Files{
+    }
+}
+

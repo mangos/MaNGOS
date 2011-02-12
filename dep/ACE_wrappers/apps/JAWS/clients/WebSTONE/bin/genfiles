@@ -1,0 +1,41 @@
+#! /bin/sh
+#
+
+# get configuration
+. $WEBSTONEROOT/conf/testbed
+
+cat $WEBSTONEROOT/conf/fileset |
+nawk '
+($1 ~ /^[0-9][0-9]*[kK][bB]*$/) {
+	sub(/[kK][bB]*/, "", $1);
+	cmd = "$WEBSTONEROOT/bin/genrand " $1*1024 " " $2
+	print cmd;
+	system(cmd);
+	next
+}
+
+($1 ~ /^[0-9][0-9]*[mM][bB]*$/) {
+	sub(/[kK][bB]*/, "", $1);
+	cmd = "$WEBSTONEROOT/bin/genrand " $1*1024*1024 " " $2
+	print cmd;
+	system(cmd);
+	next
+}
+
+($1 ~ /^[0-9][0-9]*$/) {
+	sub(/[kK][bB]*/, "", $1);
+	cmd = "$WEBSTONEROOT/bin/genrand " $1 " " $2
+	print cmd;
+	system(cmd);
+	next
+} '  $*
+
+# copy files
+files=`cat $WEBSTONEROOT/conf/fileset | cut -f2 -d' '`
+for f in $files
+do
+  $RCP $f $SERVER:$WEBDOCDIR
+  rm -f $f
+done
+
+#end

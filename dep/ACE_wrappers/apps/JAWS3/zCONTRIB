@@ -1,0 +1,23 @@
+If you have comments, bug reports, bug fixes, or improvements,
+please feel free to send them to me, and I will gladly review
+them for inclusion into the main JAWS3 release.
+
+Thanks,
+
+James Hu
+jxh@entera.com
+
+
+Codes: X -> applied
+       R -> under review
+       ? -> don't understand patch
+
+date:          Wed May  3 16:02:30 GMT 2000
+contributor:   John M. Mills <jmills@tga.com>
+bugfix  (X):   Timer.cpp: implementation of a function should not
+               override the default value given in the interface
+               definition.
+contrib ( ):   jaws3.dep: MSVC++ 6.0 dependencies generated
+contrib ( ):   jaws3.dsp: MSVC++ 6.0 project file generated
+contrib ( ):   jaws3.dsw: MSVC++ 6.0 workspace file generated
+contrib ( ):   jaws3.dsw: MSVC++ 6.0 NMAKE file generated

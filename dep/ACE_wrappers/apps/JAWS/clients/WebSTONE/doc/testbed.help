@@ -1,0 +1,21 @@
+ITERATIONS: Total Number of times to run test suite.
+MINCLIENTS: Start the test suite by running this number of clients.
+MAXCLIENTS: End the test suite when this number of clients have run.
+CLIENTINCR: Increment the number of clients by this number after each run.
+TIMEPERRUN: Minutes to run each test.
+PORTNO: TCP/IP port to test on the Web server.
+SERVER: Name or IP number of Web server to be tested.
+PROXYSERVER: Name or IP number of a proxy server through which to test.
+CLIENTS: Name(s) or IP address(es) of machine(s) to use as WebStone clients.
+OSTUNINGFILES: Full pathname(s) of OS tuning files to copy into the bin/runs directory.
+WEBSERVERDIR: Base directory name for Web server.
+WEBDOCDIR: Base directory name for Web server document root.
+WEBSERVERTUNINGFILES: Full pathname(s) of Web server tuning files to copy into bin/runs.
+CLIENTINFO: Name of an informational binary to run on each client.
+SERVERINFO: Name of an informational binary to run on each server.
+TMPDIR: Full pathname of a directory where temporary files may be stored.
+CLIENTACCOUNT: Run WebStone on CLIENTS as this username, via rsh.
+CLIENTPASSWORD: Password for CLIENTACCOUNT. This cannot be blank.
+DEBUG: Leave blank, or set to -d to activate debugging mode. Debug files are written to TMPDIR.
+RCP: Command to use for remote copying. Default: rcp.
+RSH: Command to use for remote execution of a command. Default: rsh.

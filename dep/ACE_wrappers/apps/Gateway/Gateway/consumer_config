@@ -1,0 +1,35 @@
+# Configuration file that the gatewayd process uses to determine which
+# Consumers will receive events from which Suppliers.  For now, the
+# Gateway only allows Consumers to "subscribe" to receive events from
+# particular Suppliers.  A more flexible implementation will allow
+# Consumers to subscribe to particular types of events, as well.
+#
+# The following provides an explanation for the fields in this file,
+# and how they relate to fields in the corresponding "connection_config"
+# file. 
+#
+# 1. Connection ID -- Each Connection Handler is given a unique ID
+#    that is used in the "consumer_config" file to specify to which
+#    Consumers the Event Channel will forward incoming events from
+#    Suppliers.  The Connection ID field is the "key" that is used to
+#    match up Consumer subscription requests in this file with 
+#    connections in the "connection_config" file.
+#
+# 2. Event Type -- Indicates the type of the event.  Consumers
+#    can use this to only subscribe to certain types of events.  
+#    This feature is currently not implemented.
+#
+# 3. Consumers -- Indicates which Consumers will receive events sent
+#    from this Proxy/Supplier ID, i.e., Consumers can subscribe to
+#    receive events from particular Suppliers.  Note that more than
+#    one Consumer can subscribe to the same Supplier event, i.e.,
+#    we support logical "multicast" (which is currently implemented
+#    using multi-point unicast via TCP/IP).
+#
+# Connection  Event  Consumers
+# ID          Type
+# ----------  ----   ---------
+  1           0	     2
+# 2           0	     3,4
+# 3           0	     4
+# 4	      0	     5

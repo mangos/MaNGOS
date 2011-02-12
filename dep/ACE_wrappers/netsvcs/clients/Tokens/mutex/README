@@ -1,0 +1,23 @@
+
+test_mutex
+
+test_mutex tests ACE_Local_Mutex and ACE_Remote_Mutex with both local
+and global proxies.  "Local proxies" mean that each thread uses its
+own proxy (but same logical token.)  "Global proxy" means that all
+threads access the same proxy (and, of course, the same logical
+token.)
+
+test_mutex can take the number of threads to run from the
+command-line.  Thus, to run the test with one thread and local
+mutexes, type:
+
+% ./test_mutex
+
+To run the test with 10 threads and local mutexes, type:
+
+% ./test_mutex -t 10
+
+To run the test with 10 threads and remote mutexes, type:
+
+% ./test_mutex -t 10 -r
+

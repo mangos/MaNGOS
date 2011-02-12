@@ -1,0 +1,13 @@
+// -*- MPC -*-
+// $Id: caching.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(http_client) : aceexe {
+  avoids   += ace_for_tao
+  requires += ace_filecache
+
+  exename = http_client
+  Source_Files {
+    http_handler.cpp
+    http_client.cpp
+  }
+}

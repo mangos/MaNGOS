@@ -1,0 +1,6 @@
+# Modified sample model; fully dynamic content
+/file.dyn-send?size=500		350
+/file.dyn-send?size=5125	500
+/file.dyn-send?size=51250	140
+/file.dyn-send?size=512500	9
+/file.dyn-send?size=5248000	1

@@ -1,0 +1,23 @@
+## Path:           Network/tao-cosconcurrency
+## Description:    TAO Concurrency service settings
+#
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809"
+## ServiceRestart: tao-cosconcurrency
+#
+# Specify desired default initial references arguments
+TAO_COSCONCUR_INITREF="-ORBDefaultInitRef corbaloc::localhost:2809"
+
+## Type            string
+## Default:        "-d -ORBDebugLevel 10"
+## ServiceRestart: tao-cosconcurrency
+#
+# Enable debug logging, set to "" to disable
+TAO_COSCONCUR_DEBUGLEVEL="-d -ORBDebugLevel 10"
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-cosconcurrency.log"
+## ServiceRestart: tao-cosconcurrency
+#
+# Configure log file
+TAO_COSCONCUR_LOGFILE="-ORBLogFile /var/log/tao/tao-cosconcurrency.log"

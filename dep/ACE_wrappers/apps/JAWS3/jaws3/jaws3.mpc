@@ -1,0 +1,94 @@
+// -*- MPC -*-
+// $Id: jaws3.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+
+project(JAWS3) : ace_output, acelib {
+    sharedname = JAWS3
+    dynamicflags += JAWS_BUILD_DLL
+    avoids += uses_wchar
+    avoids += ace_for_tao
+
+    specific(automake) {
+      includes += $(srcdir)/..
+    } else {
+      includes += ..
+    }
+
+    Source_Files {
+        Asynch_IO.cpp
+        Concurrency.cpp
+        Config_File.cpp
+        Datagram.cpp
+        Event_Completer.cpp
+        Event_Dispatcher.cpp
+        FILE.cpp
+        Jaws_IO.cpp
+        Options.cpp
+        Protocol_Handler.cpp
+        Reactive_IO.cpp
+        Signal_Task.cpp
+        Symbol_Table.cpp
+        Synch_IO.cpp
+        THYBRID_Concurrency.cpp
+        TPOOL_Concurrency.cpp
+        TPR_Concurrency.cpp
+        Task_Timer.cpp
+        Templates.cpp
+        Timer.cpp
+        Timer_Helpers.cpp
+    }
+
+    Template_Files{
+        Cached_Allocator_T.cpp
+        Concurrency_T.cpp
+    }
+
+    Header_Files{
+        Asynch_IO.h
+        Asynch_IO_Helpers.h
+        Cached_Allocator_T.h
+        Concurrency.h
+        Concurrency_T.h
+        Config_File.h
+        Datagram.h
+        Event_Completer.h
+        Event_Dispatcher.h
+        Event_Result.h
+        Export.h
+        FILE.h
+        Jaws_IO.h
+        Options.h
+        Protocol_Handler.h
+        Reactive_IO.h
+        Reactive_IO_Helpers.h
+        Signal_Task.h
+        Symbol_Table.h
+        Synch_IO.h
+        Task_Timer.h
+        THYBRID_Concurrency.h
+        Timer.h
+        Timer_Helpers.h
+        TPOOL_Concurrency.h
+        TPR_Concurrency.h
+    }
+
+    Inline_Files{
+    }
+}
+
+project(JAWS3_server) : aceexe {
+    avoids += uses_wchar
+    avoids += ace_for_tao
+
+    specific(automake) {
+      includes += $(srcdir)/..
+    } else {
+      includes += ..
+    }
+
+    exename = main
+    after += JAWS3
+    libs  += JAWS3
+    Source_Files {
+      main.cpp
+  }
+}

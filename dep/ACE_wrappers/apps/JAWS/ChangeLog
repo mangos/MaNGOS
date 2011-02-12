@@ -1,0 +1,1053 @@
+Tue Feb 17 16:15:16 UTC 2009  William R. Otte  <wotte@dre.vanderbilt.edu>
+
+        * server/HTTP_Server.h:
+
+          Updated to reflect movement of the svc_export.h file. 
+        
+Fri Dec  7 22:00:18 UTC 2007  Will Otte  <wotte@dre.Vanderbilt.Edu>
+
+        * server/HTTP_Helpers.cpp:
+          Replaced format strings passed sscanf as char arrays to be
+          string literals instead, to address a gcc warning.
+
+Wed Jul 17 14:40:28 UTC 2007  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * clients/Caching/http_handler.cpp:
+          Fixed gcc warning
+
+Fri Jul 13 20:21:08 UTC 2007  Ossama Othman  <ossama_othman at symantec dot com>
+
+        * clients/Blobby/Blob_Handler.cpp (receive_reply):
+
+          Instead of casting an unsigned value to a signed one, check if
+          the signed value is less than zero, and then cast the signed
+          value to unsigned.  Prevents wrap-around errors caused by
+          casting a negative value to an unsigned type from occuring.
+
+Thu Jul 12 15:54:28 UTC 2007  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * clients/Blobby/Blob_Handler.cpp:
+        * clients/Caching/http_handler.h:
+          Fixed 64bit warnings
+
+        * stress_testing/benchd.cpp:
+          Use ACE_DEBUG instead of cout
+
+Tue Jul  3 10:56:28 UTC 2007  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * clients/Blobby/Blob_Handler.cpp (ACE_Blob_Writer::receive_reply):
+          Don't use the return value of recv_n to set the last byte to zero, but
+          use the optional argument num_recvd
+
+        * server/HTTP_Response.cpp:
+          Fixed typo in error message
+
+        * server/IO.cpp (ACE_Blob_Writer::receive_reply):
+          Close the file handle after we have send the file
+
+Mon Jul  2 12:24:28 UTC 2007  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * server/HTTP_Handler.cpp:
+          Layout changes and initialise some pointers with 0
+
+        * server/HTTP_Server.cpp:
+        * server/IO.h
+          Layout changes
+
+        * server/IO.cpp:
+          Layout changes, fixed memory leak
+
+        * server/JAWS_Concurrency.cpp:
+          Initialiser pointer with 0
+
+Mon Jul  2 10:48:28 UTC 2007  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * server/*.{h,cpp}:
+          Converted to doxygen format and replaced NULL with 0
+
+Fri Oct 28 03:23:18 UTC 2006  Ossama Othman  <ossama_othman at symantec dot com>
+
+        * server/IO.cpp:
+
+          Addressed 64-bit conversion warnings.
+
+Mon Feb  6 01:00:55 UTC 2006  William Otte  <wotte@dre.vanderbilt.edu>
+
+        * server/HTTP_Server.h
+
+          Surrounded a proactor forward declaration with versioned
+          namespace macros.
+
+Thu Jan  5 00:42:28 UTC 2006  J.T. Conklin  <jtc@acorntoolworks.com>
+
+        * ChangeLog:
+
+          Untabify.
+          Delete-trailing-whitespace.
+
+Wed Jan  4 22:57:37 UTC 2006  J.T. Conklin  <jtc@acorntoolworks.com>
+
+        * ChangeLog:
+
+          Added "Local Variables" section defining "add-log-time-format"
+          to a really ugly lambda expression that formats changelog
+          timestamps in UTC and works with both GNU Emacs and XEmacs.
+
+Fri Apr 22 21:42:30 2005  Ossama Othman  <ossama@dre.vanderbilt.edu>
+
+        * server/HTTP_Helpers.cpp (HTTP_mktime):
+
+          Made rfc1123_date, rfc850_date and asctime_date strings into
+          string literals.  Allows g++ format specifier argument checking
+          to work, and addresses a related g++ 4.0 warning.
+
+        * server/IO.h (~JAWS_IO_Handler):
+        * server/IO.cpp (~JAWS_IO_Handler):
+
+          Added virtual destructor to silence g++ 4.0 warnings.
+
+Thu Aug 26 08:13:12 UTC 2004  Johnny Willemsen  <jwillemsen@remedy.nl>
+
+        * clients/Caching/http_client.cpp:
+        * server/HTTP_Response.cpp:
+          Added include of ace/os_include/os_ctype.h to fix compile problems
+          in our daily builds.
+
+Tue Feb 25 18:58:26 2003  Carlos O'Ryan  <coryan@atdesk.com>
+
+        * clients/WebSTONE/src/cgi-send:
+          Removed pre-compiled binary for MIPS (R3000 of all things!)
+
+Wed Dec 26 09:35:35 2001  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * clients/Blobby/Options.cpp
+          server/HTTP_Server.cpp
+          stress_testing/benchd.cpp
+          JAWS2/JAWS/Server.cpp: Replaced all uses of getopt.optarg
+          with getopt.opt_arg().
+
+Thu Dec  6 09:00:31 2001  Douglas C. Schmidt  <schmidt@macarena.cs.wustl.edu>
+
+        * clients/Caching/http_client.cpp (main): Make sure to remove the
+          trailing '\n' so the example works properly.  Thanks to Andrey
+          Shkinev <andreyshkinev@rogers.com> for reporting this.
+
+Wed Nov 14 16:21:46 2001  Douglas C. Schmidt  <schmidt@macarena.cs.wustl.edu>
+
+        * clients/Blobby/Blob.{h,cpp},
+        * clients/Blobby/Blob_Handler.{h,cpp},
+        * clients/Blobby/blobby.{h,cpp},
+        * clients/Blobby/Options.{h,cpp}:
+          Fixed the code to be Unicode-compliant.  Thanks to Johnny
+          Willemsen for contributing this.
+
+Fri Aug 24 18:39:39 2001  Douglas C. Schmidt  <schmidt@macarena.cs.wustl.edu>
+
+        * server/HTTP_Response.cpp (normal_response),
+        * server/HTTP_Helpers.cpp (HTTP_decode_base64): Use delete [] buf
+          rather than delete buf.  Thanks to Don Hinton for reporting
+          this.
+
+Thu Aug 16 09:57:15 2001  Balachandran Natarajan  <bala@cs.wustl.edu>
+
+        * */Makefile: Updated dependencies.
+
+Mon Aug 13 14:04:44 2001  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * Applied the following fixes courtesy of Blair Zajac
+          <blair@gps.caltech.edu>:
+
+          1) Allow a static libHTTPU.a to be built when
+             "make static_libs_only=1" is used.
+
+          2) When I try to build both JAWS and JAWS2 with the same
+             ACE_ROOT, the libJAWS.* that is built and installed first
+             prevents the other JAWS from properly compiling.  This
+             resolves this problem by renaming the JAWS2 library to
+             libJAWS2.*.
+
+          3) The JAWS2 subdirectory is now descended into by
+             apps/Makefile.
+
+          4) The Makefile in JAWS2 now descends into HTTPU and JAWS to
+             build those libraries.
+
+Tue Jun 12 20:35:26 2001  Krishnakumar B  <kitty@cs.wustl.edu>
+
+        * clients/Blobby/Blob_Handler.cpp:
+
+          Fixed a size_t printf to make gcc happy on IA-64 Linux.
+
+Sun Feb 18 09:33:33 2001  Douglas C. Schmidt  <schmidt@ace.cs.wustl.edu>
+
+        * server/IO.cpp (handle): Added a const to the handle() method
+          to make compilers happy.  Thanks to Kitty for reporting this.
+
+Mon Jun 12 14:22:35 PDT 2000 James Hu <jxh@entera.com>
+
+        * server/HTTP_Response.cpp: Added content length support.
+          Thanks to Greg Gallant (gcg@micrografx.com) for the fixes!
+
+        * server/HTTP_Helpers.cpp: Fix date handling for NT.
+          Thanks to Greg Gallant (gcg@micrografx.com) for the fixes!
+
+Sun Jun  4 14:57:04 2000  Darrell Brunsch <brunsch@uci.edu>
+
+        * clients/WebSTONE/bin/WebStone-common.pl:
+        * clients/WebSTONE/bin/WebStone-manage.pl:
+        * clients/WebSTONE/bin/WebStone-run.pl:
+        * clients/WebSTONE/bin/WebStone-setup.pl:
+        * clients/WebSTONE/bin/killbench.pl:
+        * clients/WebSTONE/bin/mine-logs.pl:
+        * clients/WebSTONE/bin/move-filelist.pl:
+        * clients/WebSTONE/bin/move-runs.pl:
+        * clients/WebSTONE/bin/runbench.pl:
+        * clients/WebSTONE/bin/view-results.pl:
+        * clients/WebSTONE/bin/webstone-gui.pl:
+        * clients/WebSTONE/bin/write-testbed.pl:
+        * clients/WebSTONE/bin/wscollect.pl:
+        * clients/WebSTONE/conf/paths.pl:
+        * clients/WebSTONE/doc/FAQ-webstone.html:
+        * clients/WebSTONE/doc/LICENSE.html:
+        * clients/WebSTONE/doc/WebStone.html:
+        * clients/WebSTONE/doc/webstone2.html:
+        * clients/WebSTONE/src/acconfig.h:
+        * clients/WebSTONE/src/bench.c:
+        * clients/WebSTONE/src/bench.h:
+        * clients/WebSTONE/src/cgi-send.c:
+        * clients/WebSTONE/src/config.h:
+        * clients/WebSTONE/src/debug.h:
+        * clients/WebSTONE/src/errexit.c:
+        * clients/WebSTONE/src/genrand.c:
+        * clients/WebSTONE/src/get.c:
+        * clients/WebSTONE/src/get.h:
+        * clients/WebSTONE/src/getopt.c:
+        * clients/WebSTONE/src/gettimeofday.c:
+        * clients/WebSTONE/src/nsapi-send.c:
+        * clients/WebSTONE/src/parse_file_list.c:
+        * clients/WebSTONE/src/parse_file_list.h:
+        * clients/WebSTONE/src/rexec.c:
+        * clients/WebSTONE/src/statistics.c:
+        * clients/WebSTONE/src/statistics.h:
+        * clients/WebSTONE/src/sysdep.c:
+        * clients/WebSTONE/src/sysdep.h:
+        * clients/WebSTONE/src/timefunc.c:
+        * clients/WebSTONE/src/timefunc.h:
+        * clients/WebSTONE/src/webclient.c:
+        * clients/WebSTONE/src/webmaster.c:
+        * clients/WebSTONE/src/nsapi-includes/netsite.h:
+        * clients/WebSTONE/src/nsapi-includes/base/buffer.h:
+        * clients/WebSTONE/src/nsapi-includes/base/cinfo.h:
+        * clients/WebSTONE/src/nsapi-includes/base/crit.h:
+        * clients/WebSTONE/src/nsapi-includes/base/daemon.h:
+        * clients/WebSTONE/src/nsapi-includes/base/dll.h:
+        * clients/WebSTONE/src/nsapi-includes/base/ereport.h:
+        * clients/WebSTONE/src/nsapi-includes/base/eventlog.h:
+        * clients/WebSTONE/src/nsapi-includes/base/file.h:
+        * clients/WebSTONE/src/nsapi-includes/base/minissl.h:
+        * clients/WebSTONE/src/nsapi-includes/base/net.h:
+        * clients/WebSTONE/src/nsapi-includes/base/nodelock.h:
+        * clients/WebSTONE/src/nsapi-includes/base/nterrors.h:
+        * clients/WebSTONE/src/nsapi-includes/base/objndx.h:
+        * clients/WebSTONE/src/nsapi-includes/base/pblock.h:
+        * clients/WebSTONE/src/nsapi-includes/base/sem.h:
+        * clients/WebSTONE/src/nsapi-includes/base/session.h:
+        * clients/WebSTONE/src/nsapi-includes/base/shexp.h:
+        * clients/WebSTONE/src/nsapi-includes/base/shmem.h:
+        * clients/WebSTONE/src/nsapi-includes/base/systems.h:
+        * clients/WebSTONE/src/nsapi-includes/base/systhr.h:
+        * clients/WebSTONE/src/nsapi-includes/base/util.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/conf.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/dnfilter.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/func.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/http.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/httpact.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/ipfilter.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/log.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/object.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/objset.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/protocol.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/req.h:
+        * clients/WebSTONE/src/nsapi-includes/frame/servact.h:
+
+          Added missing CVS Id strings.
+
+Wed Mar 22 12:36:00 2000  James Hu  <jxh@cs.wustl.edu>
+
+        * stress_testing/connection.h:
+
+          Fixes to class declaration.  Method return types should never
+          be implicit.  Thanks to Craig Rodrigues (rodrigc@mediaone.net)
+          for the heads up.
+
+        * stress_testing/Makefile:
+
+          Fixed it so that the programs actually link.  Thanks to Craig
+          Rodrigues (rodrigc@mediaone.net) for the heads up.
+
+Tue Sep 21 11:47:00 1999  Ossama Othman  <othman@cs.wustl.edu>
+
+        * server/HTTP_Server.cpp (init):
+
+          Changed cast style to make gcc 2.95.1 happy.  Thanks to Jeffrey
+          Franks <Jeffrey_Franks@i-o.com> for reporting the problems.
+
+Tue Aug 31 05:10:32 1999  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/HTTP_Handler.cpp (destroy_http_handler): Switched
+          the order in which handler and io were deleted since the current
+          order seems to destroy handler first, which is problematic since
+          io is contained within handler!  Thanks to Yosi Sarusi
+          <yosi@appstream.com> for reporting this.
+
+Wed Aug 18 16:00:46 1999  David L. Levine  <levine@cs.wustl.edu>
+
+        * server/Makefile,client/Caching/Makefile: don't build if
+          ACE_COMPONENTS is FOR_TAO, because we now exclude Filecache
+          from the ACE library in that case.
+
+Thu Jul 29 16:05:59 1999  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * PROTOTYPE/JAWS/IO.cpp (transmit_file): Added some fixes so this
+          code will compile on NT.  Thanks to Brian Jones
+          <bjones@edgemail.com> for reporting this problem and to James Hu
+          for fixing it.
+
+Tue Jun 22 13:42:51 1999  David L. Levine  <levine@cs.wustl.edu>
+
+        * remora/app/Makefile: replaced rm -f with $(RM).
+
+Tue Mar 16 01:08:05 1999  Nanbor Wang  <nanbor@cs.wustl.edu>
+
+        * server/Makefile:
+        * server/jaws.dsp: Updated makefiles to build shared library.
+
+        * server/svc.conf: Added example settings for using HTTP_Server as
+          a dynamic service.
+
+        * server/HTTP_Server.{h,cpp}: Added macros to build dynamic
+          HTTP_Server service.
+
+        * server/main.cpp (main): Since we use static service in JAWS, we
+          must open the service configure without ignoring the static
+          svcs.  Thanks to Bill Rizzi <rizzi@softserv.com> for pointing
+          this out.
+
+Mon Feb 01 17:04:39 1999  David L. Levine  <levine@cs.wustl.edu>
+
+        * clients/WebSTONE/conf/paths.{pl,sh}.old:
+          removed these apparently useless files.
+
+Sat Jan 02 08:44:48 1999  David L. Levine  <levine@cs.wustl.edu>
+
+        * server/HTTP_Request.cpp,Parse_Headers.cpp: initialized
+          third param to strtok_r with 0.  DU 4.0 cxx was complaining
+          about it, with ACE_NDEBUG.  According to the strtok_r
+          man page on DU 4.0, it must be initialized to 0 on the
+          first call to strtok_r.
+
+Fri Sep 25 23:29:14 1998  David L. Levine  <levine@cs.wustl.edu>
+
+        * server/IO.cpp (receive_file,transmit_file): changed
+          NOMAP to ACE_NOMAP.  Thanks to Dann Corbit
+          <DCorbit@SolutionsIQ.com> for reporting this.
+
+Thu Sep 17 18:53:05 1998  Carlos O'Ryan  <coryan@cs.wustl.edu>
+
+        * server/IO.cpp:
+        * PROTOTYPE/JAWS/IO.cpp:
+          Revert back to iovec. Also added some missing casts.
+
+Wed Sep 16 22:53:06 1998  Carlos O'Ryan  <coryan@cs.wustl.edu>
+
+        * server/IO.cpp:
+        * PROTOTYPE/JAWS/IO.cpp:
+          Use ACE_IO_Vector instead of iovec, because it is more
+          protable.
+
+Tue Aug 25 10:18:16 1998  David L. Levine  <levine@cs.wustl.edu>
+
+        * clients/Caching/URL_Properties.cpp: removed explicit
+          ACE_Auto_Basic_Array_Ptr <char> instantiation because it's
+          now in libACE.  This file doesn't compile with g++/Solaris,
+          but the Makefile doesn't build it anyways.
+
+Fri Jul 31 18:31:32 1998  Gonzalo Diethelm  <gonzo@tango.cs.wustl.edu>
+
+        * PROTOTYPE/HTTP_10.cpp
+        * PROTOTYPE/HTTP_10_Parse.cpp
+        * PROTOTYPE/HTTP_10_Read.cpp
+        * PROTOTYPE/HTTP_10_Request.cpp
+        * PROTOTYPE/HTTP_10_Write.cpp
+        * PROTOTYPE/HTTP_Policy.cpp
+        * PROTOTYPE/main.cpp
+        * PROTOTYPE/JAWS/Assoc_Array.cpp
+        * PROTOTYPE/JAWS/Concurrency.cpp
+        * PROTOTYPE/JAWS/Data_Block.cpp
+        * PROTOTYPE/JAWS/IO.cpp
+        * PROTOTYPE/JAWS/IO_Acceptor.cpp
+        * PROTOTYPE/JAWS/IO_Handler.cpp
+        * PROTOTYPE/JAWS/Pipeline.cpp
+        * PROTOTYPE/JAWS/Pipeline_Handler.cpp
+        * PROTOTYPE/JAWS/Pipeline_Tasks.cpp
+        * PROTOTYPE/JAWS/Policy.cpp
+        * PROTOTYPE/JAWS/Reaper.cpp
+        * PROTOTYPE/JAWS/Server.cpp
+        * PROTOTYPE/JAWS/Waiter.cpp
+        * clients/Blobby/Blob.cpp
+        * clients/Blobby/Blob_Handler.cpp
+        * clients/Blobby/Options.cpp
+        * clients/Blobby/blobby.cpp
+        * clients/Caching/ID_Generator.cpp
+        * clients/Caching/Local_Locator.cpp
+        * clients/Caching/Locator_Request_Reply.cpp
+        * clients/Caching/URL_Array_Helper.cpp
+        * clients/Caching/URL_Locator.cpp
+        * clients/Caching/URL_Properties.cpp
+        * clients/Caching/http_client.cpp
+        * clients/Caching/http_handler.cpp
+        * clients/Caching/test_URL.cpp
+        * server/HTTP_Config.cpp
+        * server/HTTP_Handler.cpp
+        * server/HTTP_Helpers.cpp
+        * server/HTTP_Request.cpp
+        * server/HTTP_Response.cpp
+        * server/HTTP_Server.cpp
+        * server/IO.cpp
+        * server/JAWS_Concurrency.cpp
+        * server/JAWS_Pipeline.cpp
+        * server/JAWS_Pipeline_Handler.cpp
+        * server/Parse_Headers.cpp
+        * server/main.cpp
+        * stress_testing/benchd.cpp
+        * stress_testing/connection.cpp
+        * stress_testing/cp.cpp
+        * stress_testing/http_tester.cpp
+        * stress_testing/stats.cpp
+        * stress_testing/util.cpp
+        Added ACE_RCSID to these files.
+
+Thu Feb 19 22:14:09 1998  Alexander Babu Arulanthu  <alex@merengue.cs.wustl.edu>
+
+        * server/JAWS_Concurrency.cpp (put): Modified line number 11 to
+        get away with a compilation error.
+
+Wed Feb 18 12:31:28 1998  Carlos O'Ryan  <coryan@cs.wustl.edu>
+
+        * server/JAWS_Pipeline.cpp:
+          Removed extra definitions for default arguments.
+
+Sun Feb 15 08:05:28 1998  David L. Levine  <levine@cs.wustl.edu>
+
+        * server/JAWS_Pipeline.h: added missing ; at end of constructor
+          declaration.
+
+Wed Jan  7 17:26:43 1998  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/Pipeline.cpp: Put base class initialization of
+          JAWS_Protocol_Filter ahead of data members.
+
+Fri Jan  2 16:28:00 1998  Nanbor Wang  <nw1@cs.wustl.edu>
+
+        * clients/Caching/http_handler.cpp:
+        * clients/Blobby/Blob.cpp: Added missing explicit template
+          instantiations.
+
+Mon Dec 29 20:20:36 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * clients/Caching/http_handler.cpp: Idem to previous change.
+
+Mon Dec 29 18:50:02 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/IO.cpp: Idem to previous change, but fixes to improve
+          compatibility and portability to Windows NT.
+
+Thu Dec 18 15:37:36 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/IO.cpp: Modified to account for changes in ACE_Filecache
+          to not map file on NT.
+
+Tue Dec 16 09:29:11 1997  David L. Levine  <levine@cs.wustl.edu>
+
+        * server/Makefile: expanded rules.bin.GNU, but without
+          $(VOBJS), to avoid make warnings.
+
+        * client/WebSTONE/src/nsapi-includes/base/systems.h:
+          #ifdef linux, not LINUX.
+
+Fri Dec 12 03:06:16 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/Parse_Headers.cpp:  Many things have been touched, but
+          only a few things have significantly changed.  I originally
+          attempted to change the implementation entirely to use
+          Hash_Map_Manager instead, but it was getting more complicated
+          than I wanted, so I went back to debugging.
+
+          - Trailing whitespace has been removed.
+          - A couple of debug messages have been added the
+            Headers::parse_header_line ().
+          - Method declarations had to be changed to account for the
+            fact that the Map_Item class (which had previously
+            been declared inside of Headers_Map) is now in global
+            scope and has been renamed to Headers_Map_Item.
+          - The no_value_ data member and the char* cast operator of
+            Map_Item have been removed.
+          - The assignment operator for Map_Item has been made a bit
+            tidier in its memory management (say no to memory
+            leaks!).
+          - Debugged the Headers_Map data structure.  This involved
+            the following:
+            . Re-implementation of strcasecmp (red-herring).
+            . Re-implementation of Headers::compare ().  This is
+              needed because empty table entries need to compare as
+              infinity against real strings, so that real strings get
+              inserted correctly.
+            . Debugging the Headers_Map::find () method by
+              implementing first a linear search, and then my own binary
+              search.  It turns out the C library ::bsearch() does work,
+              but I will leave in my implementation for now, since
+              ::bsearch () is not in ACE_OS yet.
+            . Re-implementation of Headers::place ().  The old one
+              was badly written.  The new one is more efficient, and
+              less error prone.  This method turned out to be the main
+              problem.  It was the reason that binary search was
+              previously failing (but linear search worked).  The
+              reason?  It was corrupting memory, believe it or not.
+              No longer!
+
+          In addition, Headers::place () had a serious bug in which a call
+          to ACE_OS::free () was added, but included the ++ operator on
+          the pointer from the previous line.  Ug.
+
+        * server/Parse_Headers.h: See comments for HTTP_Request.cpp.
+
+        * server/HTTP_Request.cpp: Removed extraneous whitespace.  It's
+          not what you think Doug!  Just trailing whitespace at the end of
+          lines that somehow get added on when people use LoseNT editors.
+          Also, changes were made to Parse_Headers which made it necessary
+          to explicitly use the value () accessor method when examining
+          parsed headers.  There use to be a operator char* () method.
+
+        * server/HTTP_Response.cpp: See comments for HTTP_Request.cpp.
+
+        * server/HTTP_Helpers.cpp: Added a comment to
+          HTTP_Helper::fixyear ().
+
+Tue Dec  9 01:19:09 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * stress_testing/util.cpp: Off by one errors when parsing a URL.
+          Did I write this code?  I don't think so.  Thanks to Valik
+          Solorzano Barboza <valik@geodan.nl> for pointing this out.
+
+Thu Nov 20 00:36:34 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/Pipeline.h: Added methods and members so that the
+          pipeline can be both push and pull driven.
+
+        * server/Pipeline.cpp: Made the pipeline a doubly linked list of
+          components, so that it can be operated as push-driven or
+          pull-driven pipelines.
+
+Wed Nov 19 05:10:38 1997  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/HTTP_Handler.h: Added the keyword "virtual" on the open()
+          method which is inherited from ACE_Sevice_Handler.  Perhaps this
+          will fix a bug with BORLANDC reported by Valik Solorzano Barboza
+          <valik@xs4all.nl>.
+
+Mon Nov 17 07:34:09 1997  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/Parse_Headers.cpp (end_of_line): Replaced a const char *
+          with a char * to work with the new ACE_OS::strchr() signature.
+          Thanks to James for finding this.
+
+Tue Nov 11 19:52:38 1997  James C Hu  <jxh@cs.wustl.edu>
+
+        * server/Pipeline.{h,cpp}: The beginning of a new Pipeline
+          framework has been added.
+
+Sun Oct 12 16:21:32 1997  Carlos O'Ryan  <coryan@macarena.cs.wustl.edu>
+
+        * clients/Caching/Makefile:
+        * stress_testing/Makefile:
+          There is no need to set LDLIBS to add local object files
+          anymore, using FILES is enough.
+
+Fri Oct 10 18:41:47 1997  Carlos O'Ryan  <coryan@macarena.cs.wustl.edu>
+
+        * clients/Blobby/Makefile:
+          Fixed problem that made compilation fail.
+
+Thu Sep 11 10:40:38 1997  Carlos O'Ryan  <coryan@polka.cs.wustl.edu>
+
+        * server/HTTP_Request.cpp:
+          I checked the use of MAXNAMELEN vs. MAXPATHLEN; all buffers
+          intended to keep full filenames should have at least
+          MAXPATHLEN+1 chars.
+          Only buffers that will keep basenames (without any directories)
+          should have MAXNAMELEN+1 bytes.
+          I also added a new macro ACE_MAX_FULLY_QUALIFIED_NAME_LEN which
+          is the maximum number of characters for a fully qualified
+          internet hostname.
+          There remain one obscure usage of these macros in ace/Malloc.h
+          and Local_Naming_Space_T.{h,cpp}, but a quick fix broke
+          something, I will try again soon.
+
+Tue Sep  9 22:08:36 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/HTTP_Server.{cpp,h}:  Changes which answer questions
+          brought up in design review.  Mostly additional comments.  Also
+          changes to have a task spawn a number of threads rather than
+          iterating through calls to the activate method.
+
+Fri Aug 29 11:07:43 1997 James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/*.{cpp,h}:  Changes to make JAWS comply with ACE
+          coding standards.  In particular, broke up CGI method in
+          HTTP_Request, remove dependency on static object in
+          HTTP_Config, and answered all questions from Doug.
+
+Tue Aug 26 21:34:11 1997  Douglas C. Schmidt  <schmidt@flamenco.cs.wustl.edu>
+
+        * clients/Caching/ID_Generator.h: Made some minor changes to
+          the programming style.
+
+Sun Aug 10 13:44:14 1997  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/HTTP_Helpers.cpp (HTTP_date): We can't use
+          ACE_Thread_Mutex directly in the code since that breaks
+          platforms that lack threads.
+
+Wed Aug  6 16:45:48 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/main.cpp: Added another signal handler so I can kill JAWS
+          when purifying.
+
+Mon Aug  4 00:07:24 1997  Nanbor Wang  <nw1@cumbia.cs.wustl.edu>
+
+        * server/main.cpp (main): Service configurator now doesn't return
+          -1 when errors occur.  Therefore, we check for not success
+          instread of fail when opening the service contifurator.
+
+Mon Jul 28 04:54:01 1997  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/Parse_Headers.cpp (place): Reformatted the same
+          stuff again...
+
+Mon Jul 28 01:48:40 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/README: Updated the README file to reflect new features
+          and server flags.
+
+        * server/Parse_Headers.cpp (place): Fixed a compile error found by
+          David Levine.  I don't know why this was compiling for me.
+
+Sun Jul 27 21:56:12 1997  Douglas C. Schmidt  <schmidt@tango.cs.wustl.edu>
+
+        * server/Parse_Headers.cpp (place): Reformatted a few things
+          to make them easier to read.
+
+Fri Jul 25 02:05:20 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/HTTP_Server.cpp: Changes to allow the thread creation
+          flags to be specified from the command line.  Removed some code
+          that was used to track down memory leaks.
+
+        * server/HTTP_Helpers.{h,cpp}: Added another method
+          HTTP_date (char *), so that a buffer to which the date will be
+          written to can be passed into the HTTP_date routine.
+
+        * server/HTTP_Response.cpp: Changed some code so that the baseline
+          implementation can be created at compile time.
+
+        * server/IO.cpp: Changed some code so that the baseline
+          implementation can be created at compile time.
+
+        * server/main.cpp: Changed the signal handler to wait for threads
+          to die.  However, this code will remain dormant for now, until
+          we design a nice way to shut down a thread pool.
+
+        * server/svc.conf: Changes to add some other entries people can
+          try.
+
+        * server/Makefile: Changes to allow JAWS to be built with static
+          linking only, to ease the process of using Purify and Quantify.
+          Dynamic linking will be re-configured in the future when we have
+          all the memory leaks worked out.
+
+Mon Jul 22 16:55:00 1997  Chris Cleeland <cleeland@cs.wustl.edu>
+
+        * Changed references to WRAPPER_ROOT to ACE_ROOT in every
+          place except ChangeLog entries.
+
+Mon Jul 21 15:09:03 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/HTTP_Server.{h,cpp}: Got rid of Solaris specific
+          debugging code (thr_create, thr_join).
+
+Fri Jul 11 02:15:12 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/HTTP_Response.cpp: Changes so that the HEADER is not
+          rebuilt all the time.
+
+        * server/IO.cpp (JAWS_Synch_IO::transmit_file): Changed to use
+          writev () instead of multiple send ()s.
+
+Thu Jul 10 01:53:48 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * server/HTTP_Helpers.{h,cpp}: Changed so that creating the date
+          header is less expensive.
+
+        * server/HTTP_Response.cpp: Changes to match above.
+
+        * clients/Caching/README: Added to the repository.
+
+        * clients/Caching/http_handler.{h,cpp}: Added some comments to the
+          code.  Also, moved the code to check to see if the file is in
+          cache already into the connector, so that a connect is not
+          done if the file is cached.  This required a filename ()
+          accessor method to be added to the handler.
+
+Wed Jul  9 13:08:00 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * clients/Caching/http_handler.cpp (svc): Added code to check to
+          see if the file is already cached before trying to cache it.
+
+        * clients/Caching/http_client.cpp (main): Added a comment block at
+          the top of the file.
+
+        * server/HTTP_Handler.cpp and IO.cpp: Changes that were needed
+          since JAWS_File is now integrated into ACE (as ACE_Filecache).
+
+        * server/HTTP_Server.*: Attempting to track down memory leak.
+          This code may be in a state a flux for the next week or so.
+
+Mon Jul  7 23:40:13 1997  Nanbor Wang  <nw1@cumbia.cs.wustl.edu>
+
+        * clients/WebSTONE/src/webclient.c: Removed a bunch of THREAD
+          storage class decorators from function makeload() because auto
+          variables can't be declared as TSS.  Also #ifdef random number
+          generation code so it uses rand_r on Solaris() and rand() on NT.
+
+        * clients/WebSTONE/src/rexec.c: Modified prototypes for
+          PassOutputThread() and PassErrorThread() to avoid warnings from
+          MSVC.  Still need more refinement on this one. ;(
+
+        * clients/WebSTONE/src/webmaster.c: Added prototype for
+          HostEntCpy() and a null statement to avoid warning from MSVC.
+
+        * clients/WebSTONE/src/gendata/genrand.mak:
+        * clients/WebSTONE/src/master/webmaster.mak:
+        * clients/WebSTONE/src/client/webclient.mak: Updated file paths
+          and dependencies.
+
+Sat Jul  5 14:19:20 1997  Douglas C. Schmidt  <schmidt@flamenco.cs.wustl.edu>
+
+        * Renamed the client directory "clients" to reflect the fact that
+          we've got multiple client tests now.  Also, moved the original
+          contents of the client directory into a new clients/Blobby
+          directory and added Caching and WebSTONE.
+
+        * Moved the ChangeLog from the ./server directory into the ./JAWS
+          directory since we want to apply ChangeLog entries to all
+          aspects of JAWS, not just the server.
+
+        * HTTP_Server.cpp (open): Added THR_DETACHED as a flag to
+          activate().  This should prevent a memory leak that was
+          occurring since no thread was ever "joining" the threads that
+          were spawned.
+
+Thu Jul  3 23:33:47 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * HTTP_Response.cpp (~HTTP_Response): changed delete to delete [],
+          removing a major memory leak from JAWS.  Still to find is a
+          memory lead associated with thread per request.  Nanbor's fix is
+          about what I did to EMPTY_HEADER too.
+
+        * JAWS_File.cpp: David points out I need to add specializations
+          for the GNU C++ compiler.
+
+Thu Jul  3 22:38:04 1997  Nanbor Wang  <nw1@cumbia.cs.wustl.edu>
+
+        * HTTP_Response.cpp (build_headers): Added explicit cast for
+          EMPTY_HEADER from (const char *) to (char *) in order to make
+          MSVC happy.  This is probably very badly styled.  But
+          HTTP_HEADER is only used in places that require (const char *),
+          so I think it's safe to do so.
+
+Thu Jul  3 15:34:30 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * HTTP_Response.cpp (HTTP_Response): Moved a call to delete out of
+          constructor into the destructor where it belongs.
+
+Thu Jul  3 12:28:44 1997  Sumedh Mungee  <sumedh@lindy.cs.wustl.edu>
+
+        * Parse_Headers.cpp: Line 137, Changed pt to ptr (it was a typo)
+
+Wed Jul  2 22:33:52 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * JAWS_File.{h,cpp}: Fixed deadlock bug, since RW_MUTEX's are not
+          recursive (drat!).
+
+Wed Jul  2 21:03:12 1997  Douglas C. Schmidt  <schmidt@flamenco.cs.wustl.edu>
+
+        * Made a major pass through all the code and made the style
+          consistent with that found in ACE.
+
+Wed Jul  2 14:33:27 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * JAWS_File.cpp: Added double check locking pattern to the fetch
+          routine of the virtual filesystem.  This slows things down
+          considerably for files which change frequently and for cache
+          misses in general, but it should be correct.
+
+Wed Jul  2 14:59:29 1997  Nanbor Wang  <nw1@cumbia.cs.wustl.edu>
+
+        * HTTP_Helpers.cpp (HTTP_decode_string): Added cast from strtol to
+          char explicitly to prevent NT from complaining.
+
+Wed Jul  2 14:33:27 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * JAWS_File.{h.cpp}: Modifications to support RW_MUTEX for both
+          the virtual filesystem and the low level ACE_File.  Next major
+          change will be to re-implement the virtual filesystem to use a
+          hash table ala ACE_Hash_Map_Manager.
+
+Wed Jul  2 00:23:22 1997  James C Hu  <jxh@polka.cs.wustl.edu>
+
+        * HTTP_Server.{h,cpp}: Changed parsing of options to use
+          mnemonic names rather than numbers.  Added a new thread
+          strategy, THROTTLE.  This is thread-per-request until some
+          maximum number.  Unfortunately, it does not become thread-pool
+          at this point... yet :-).  Added a new option to pass in a
+          backlog value.
+
+        * svc.conf: adjusted to account for the changed options.
+
+        * README: changed to explain new svc.conf options.
+
+        * JAWS_File.cpp: Changed it so that when the file is added to the
+          cache, it is also acquired.  When it is removed from the cache,
+          it is released.  This is so that the reference count is at least
+          one while the file is in the cache.  Also, fixed the virtual
+          filesystem by giving it a simple replacement strategy if the
+          table is full.  For now, it will replace the largest file in the
+          cache with the request for the current file.
+
+Tue Jul  1 19:13:44 1997  Nanbor Wang  <nw1@cumbia.cs.wustl.edu>
+
+        * JAWS_File.cpp (JAWS_File): Changes the creation method of a
+          cached copy from using plain file copy to using mmap and memcpy.
+          This avoid the extra complexity caused by FILE_FLAG_OVERLAPPED.
+
+Sat Jun 28 11:55:38 1997  James C Hu <jxh@tango.cs.wustl.edu>
+
+        * HTTP_Handler.cpp (open): fixed a typo
+
+        * HTTP_Handler.cpp (cgi): fixed a bug, strdup fails on NULL
+
+Sat Jun 28 16:14:38 1997  Sumedh Mungee  <sumedh@cumbia.cs.wustl.edu>
+
+        * HTTP_Handler.cpp (open): Changed socket send-buffer to 64k
+
+Wed Jun 25 01:11:50 1997  Nanbor Wang  <nw1@dingo.wolfpack.cs.wustl.edu>
+
+        * JAWS_File.cpp: Removed initialization of vfs_ (see below) and
+          changed all references of vfs_ to
+          JAWS_Virtual_Filesystem::instance ().  Thanks to Detlef Becker
+          <detlef.becker@med.siemens.de> for pointing this out.
+          (init): Added initialization of reference_count_ to 0.
+
+        * JAWS_File.h: Removed private member JAWS_Virtual_Filesystem vfs_
+          since JAWS_Virtual_Filesystem is a singleton already.  Caching
+          it doesn't seem to win much and depends on the order of static
+          variables initialization, which is non-portable.
+
+Fri Jun 13 02:42:39 1997  Nanbor Wang  <nw1@dingo.wolfpack.cs.wustl.edu>
+
+        * jaws.{mdp,mak}: Updated to incoporate latest changes.
+
+Thu Jun  5 14:13:22 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * HTTP_Server.cpp: Added more informative comments to the
+          asynch_thread_pool() method due to comments posed by Mehul
+          (MehulM@spa-marketing.com).
+
+Wed Jun  4 23:00:47 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * JAWS_File.cpp (JAWS_File): Fixed a bug where JAWS_File wanted
+          the file to have write permissions before openning it.  This is
+          now only true if the file is to be written to.
+
+Wed Jun  4 22:30:41 1997  Nanbor Wang  <nw1@dingo.wolfpack.cs.wustl.edu>
+
+        * main.cpp (main): Changed SIGCLD to SIGCHLD for better
+          portability.
+
+        * IO.cpp (transmit_file): The third argument passed
+          ACE_Asynch_Transmit_File::Header_And_Trailer() should be an
+          address (&).
+
+Mon Jun  2 16:35:18 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * HTTP_Helpers.cpp: Serious bug in base64 decoder routine
+          squashed.  Didn't initialize an array with 0's.  The original
+          source had them declared static.  Also, changed sizeof alphabet_
+          to strlen (alphabet_), because original code had alphabet_ as an
+          array, but my translation has alphabet_ as a pointer.
+
+        * HTTP_Response.cpp: Added some code to check to see if the
+          decoder returns 0.  If it does, flag this as a failed
+          authorization attempt.
+
+        * HTTP_Handler.cpp: Added a "\r\n" to the confirmation message in
+          receive_file_complete () method.
+
+        * HTTP_Request.cpp: In parse_request_line (), created conditional
+          expressions in the debugging print statement so that a null
+          string will not cause the server to crash.
+
+        * HTTP_Response.cpp:
+          (1) cgi_resposnse () no longer has to wait for the process to
+          die.  The fix to ACE_Process of closing down child handles was
+          enough to get the connection to die on its own.
+          (2) Mike (mrm@cisco.com) pointed out that the output for CGI
+          responses was not create.  The fix was to output a small header
+          before execing the CGI program.
+
+        * test.cgi: a sample cgi program to use when testing the JAWS
+          server.
+
+Sat May 31 13:34:14 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * *.h, *.cpp: Changed include lines from "apps/JAWS/server/..." to
+          "..." to avoid dependencies on the WRAPPER_ROOT tree.
+
+        * jaws.auth:  This file is added to be a sample authorization
+          file.  This is the file which JAWS is currently hardcoded to use
+          to verify authenticated PUT requests.
+
+        * HTTP_Response.cpp:  Added code to normal_response () and to
+          error_response () to better handle authentication.  Now, all PUT
+          methods are required to be authenticated.  The strategy now is
+          very simple, there is only one authorization file and only one
+          realm of authorization.  This will be easy to bring up to spec
+          later, though.
+
+        * HTTP_Helpers.h:  Added alphabet_ data member for the
+          decode/encode base64 methods.
+
+        * HTTP_Helpers.cpp:  Added HTTP_decode_base64 and
+          HTTP_encode_base64 methods.  HTTP_encode_base64 is currently not
+          used, but HTTP_decode_base64 is being used for Basic
+          authentication.
+
+        * *.h, *.cpp: Changed include lines from "JAWS/server/..." to
+          "apps/JAWS/server/..." to fix an error reported by Rob Payne
+          <repayne@jeeves.net>.  This was really due to a bug in the
+          platform_macros.GNU file not adding INCLDIRS to the CCFLAGS
+          during compilation, but in the case other platforms have the
+          same problem, changing the source is a better fix.
+
+Fri May 30 23:19:03 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * README: updated to better reflect the status of JAWS.
+
+        * main.cpp (handler): Added a signal handler for SIGINT, and also
+          set SIG_IGN for SIGCLD.  The first handler calls exit (0) if
+          SIGINT is received, so that static destructors are called.  The
+          second is so that zombies are not formed.
+
+        * HTTP_Response.cpp (cgi_response): Debugging.  (1) The CGI
+          program spewed output on the server side instead of the client.
+          (2) The CGI program had environment variable being set even
+          though there was no associated value.  (3) The client connection
+          was not being closed after the CGI program executed.  Problem
+          (1) was fixed by using set_handles () in cgi_options.  Problem
+          (2) was fixed by testing to see if the header had an associated
+          value before assigning it to the environment.  Problem (3) was
+          fixed by sending an empty confirmation message after waiting for
+          the CGI process to exit.
+
+        * HTTP_Request.cpp (cgi): Debugging.  It was not looking for a
+          ".cgi" extension during the stage of determining if a URI is a
+          CGI script.  This will later be fixed when a full mime-type
+          facility is implemented.
+
+Fri May 23 00:45:24 1997  James C Hu  <jxh@lambada.cs.wustl.edu>
+
+        * JAWS/server: Debugged HTTP/0.9 GET requests, and HTTP/1.0 PUT
+          requests.  Both work now, with minor problems: e.g. the
+          Content-type header doesn't really work (always sends text/html
+          as the content type).  What it should do is see if the request
+          included a content type header, and use it, otherwise, resort to
+          some file suffix and mimetype matching algorithm.
+
+        * Parse_Headers.h (complete_header_line): Added comments
+          explaining the new return values of -1, 0 and 1 (see comments
+          for Parse_Headers.cpp below).
+
+        * Parse_Headers.cpp (complete_header_line): modified so that it
+          returns three values instead of two.  -1 means that an end of
+          line was encountered, but nothing after it yet to verify if it
+          is really a complete header line.  0 means the read cut off in
+          the middle of a line (no end of line character found).  1 means
+          the line is verified to be a complete header line.
+
+        * HTTP_Request.cpp (parse_request): Changed the test so that an
+          HTTP/0.9 request would be sent immediately after being issued.
+          This involved changes to Parse_Headers.
+
+        * JAWS_File.cpp (acquire): Changes involved adding some debugging
+          statements to understand why PUT was not working.  Discovered a
+          bug in how ACE_Mem_Map was being used.
+
+        * HTTP_Request.cpp (content_length): Changed to extract value from
+          the headers, if available.
+
+Thu May 22 16:22:03 1997  James C. Hu  <jxh@pride.cs.wustl.edu>
+
+        * HTTP_Request.cpp (cgi_env): Added a cast so that a warning
+          generated by SGI C++ compiler goes away.
+
+        * Makefile: Reordered the way the files are compiled/linked so
+          that useless warnings about object files not resolving any
+          symbols go away.
+
+Wed May 21 15:33:33 1997  James C Hu  <jxh@polka.cs.wustl.edu>
+
+        * JAWS_File.{h,cpp}: Added some comments.  Will add a copy ()
+          method soon, after I move my workspace over to lambada.
+
+        * JAWS_Tilde.{h,cpp}: This class is being implemented but has not
+          been added to the repository yet, since JAWS as yet does not use
+          it, and it is still being developed.  This will be a cache of
+          the expansions from ~foo to the home directory of foo.
+
+Tue May 20 22:49:24 1997  James C Hu  <jxh@polka.cs.wustl.edu>
+
+        * JAWS_File.{h,cpp}: New class created to replace the old kludgy
+          VFS thingy.  This new cached virtual filesystem is way cool: a
+          file which is being retrieved can be simultaneously replaced
+          without causing either reader or writer to wait.  Reference
+          counts are maintained now, which was missing in VFS.  Also,
+          there is no longer a dependency on the JXH_List template now,
+          which is a plus.
+
+        * IO.cpp: Changes to adapt to the new virtual filesystem.  The
+          changes all involved simplifications to the programming
+          interface.
+
+        * HTTP_Handler.cpp: Changes required to deal with the more
+          generic error responses returned from the JAWS_File/JAWS_IO
+          interface.  This generality will make it easier to adapt
+          JAWS_File and JAWS_IO into ACE.
+
+        * test_JAWS_File.cpp: A test program written to see if the new
+          virtual filesystem works the way I expect it to.
+
+Local Variables:
+mode: change-log
+add-log-time-format: (lambda () (progn (setq tz (getenv "TZ")) (set-time-zone-rule "UTC") (setq time (format-time-string "%a %b %e %H:%M:%S %Z %Y" (current-time))) (set-time-zone-rule tz) time))
+indent-tabs-mode: nil
+End:

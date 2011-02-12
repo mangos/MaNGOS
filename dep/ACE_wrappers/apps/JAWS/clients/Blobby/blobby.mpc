@@ -1,0 +1,13 @@
+// -*- MPC -*-
+// $Id: blobby.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(blobby) : aceexe {
+  exename = blobby
+  Source_Files {
+    blobby.cpp
+    Blob.cpp
+    Blob_Handler.cpp
+    Options.cpp
+  }
+}
+

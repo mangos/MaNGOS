@@ -1,0 +1,245 @@
+README WebStone 2.0.1 bug fix release
+	Proxy server bug fixed (now correctly handles proxy server)
+	Error reading page_stats error fixed
+	More Windows NT integration
+	Correctly handles URL's to different hostnames in the filelist
+	Improved Solaris compatibility
+
+	NOTE: If you intend to run webstone with more than 100 URL
+entries in the filelist, please edit src/bench.h and change the
+MAXNUMOFPAGES value to reflect the higher number, and then recompile
+everything. Copy the new binaries into the bin directory and then
+run webstone.
+
+README WebStone 2.0 Release version
+
+WARNING: WebStone 2.0 results should not be compared with WebStone 1.1
+	results. Even under the same fileset performance will not be
+	equivalent.
+
+Please see the notes for 2.0beta6 for quick and dirty install
+	This version includes a port of the webstone source code to Windows
+NT. This port is still in progress, so it is not possible to guarantee
+that everything is working correctly - however in our test configurations
+it has performed correctly. Note that the supporting scripts and report
+generating code has not been ported to NT yet.
+
+	This version also institutes some basic run rules to eliminate the
+lack of conformity in Webstone performance quotes.
+	To report Webstone numbers, some basic rules should be followed:
+
+	1) The fileset used for the test must be the fileset.standard fileset
+	included in the distribution. Tests of CGI performance must be
+	with the file filelist.cgi-heavy, and tests of NSAPI performance
+	must be carried out with filelist.dynamic-heavy
+
+	2) The run time should be set for 10 minutes, and the number of
+	clients should vary from 20 clients to 100 clients in increments
+	of 10. When a connections/second time is quoted, it must include
+	information about the number of clients involved.
+
+	3) Any special TCP/IP tuning which the server has recieved should
+	be documented, as well as HTTPD server version and configuration
+	information such as logging, DNS lookups and number of threads.
+
+	
+README - WebStone 2.0beta6
+
+WARNING: Do not compare WebStone 2.0 results with WebStone 1.0 results.
+	WebStone 2.0 introduces significant changes in testing methodology
+	and reporting.
+
+This is the WebStone benchmark. Quick and dirty install:
+	- set up a Web server
+	- put this directory (WebStone) on a seperate machine (the "controller")
+	- "./webstone -setup", which does the following:
+		- gui-configure
+		  This script may fail if you don't have a Web browser or
+		  Perl5. Don't worry, unless you want to use the GUI.
+	  	- autoconf
+		  If the GNU autoconf fails for your OS, please forward the
+		  error messages, and any porting hints, to the author.
+		- make install
+		  This may not be necessary, since IRIX binaries are included.
+		- edit conf/testbed to reflect your site
+		  See the doc/FAQ-webstone.html for details.
+	- ./webstone -genfiles will put the files in conf/fileset 
+		onto your Web server.
+	- ./webstone
+	- to display a table of results: ./webstone -results
+
+If you'd like to try out the GUI for WebStone:
+	- run "./webstone -setup", as above.
+	- make sure you have a Web browser installed
+	- ./configure
+	- ./webstone -gui
+
+Files of interest:
+	README: This document.
+	README.FIRST: Quick and dirty directions.
+	README.DynamicWorkload: Information on the CGI and NSAPI workloads.
+	webstone: wrapper shell script for everything. 
+		Takes options:
+		-gui: start the GUI mode
+		-kill: kill stray WebStone processes
+		-genfiles: build files (from conf/fileset)
+			and rcp onto the server $SERVER
+		- results: print table of results
+		-setup: initial make and setup
+		-silent: runs in the background
+		-tail: tail -f of most recent run
+
+Files of interest (./src):
+	Makefile, *.c, *.h: The Webstone source code
+
+Files of interest (./bin):
+	checkfilelist: uses rsh to check web server for files in filelist.
+	genfiles, genrand: generates files of arbitrary length.
+	getstats: Collects network statistics from Web server, clients.
+	killbench: terminates stray WebStone processes.
+	rebootall: reboots all WebStone webclients.
+	runbench: wrapper script for WebStone.
+	webmaster: WebStone controller executable.
+	webstone: WebStone client executable.
+	wscollect: reports results in tabular format.
+
+Files of interest (./conf):
+	filelist: default list of files on the Web server,
+		with workload description.
+	filelist.photo: Model of a popular Web site 
+		containing photographic images.
+	filelist.ss: Model of SGI's Silicon Surf WWW site.
+	fileset: list of files for genfiles to create.
+	testbed: config file describing Web server, client, and network setup.
+
+Documentation (./doc):
+	FAQ.html: The FAQ, current as of this distribution.
+	LICENSE: Legal status of WebStone.
+	testbed.help: Explains the parameters in conf/testbed.
+	webstone-white-paper.ps: The original WebStone white paper.
+	webstone.gif: The WebStone logo.
+
+Additional documentation:
+	FAQ.html: Frequently Asked Questions, with answers
+	webstone.ps: PostScript white paper on WebStone
+
+Problems, etc. may be addressed to the WebStone mailing list.
+Read the FAQ for details.
+
+Release Notes (2.0 beta6):
+	* fixed a bug for Web servers not on port 80
+	* further changes to bin/wscollect.pl
+
+Release Notes (2.0 beta5):
+        * numerous minor fixes suggested by gcc -Wall -pedantic
+	* updated FAQ
+	* changed bin/wscollect.pl to use Perl formats
+
+Release Notes (2.0 beta4):
+	* added #include <sys/time.h> to bench.h
+	* changed webclient located to $TMPDIR - this should help people
+	who don't want to run WebStone as root
+	* changed check for libm to floor() instead of sqrt(). Apparently
+	some systems implement sqrt() in libc - let's hope no one implement
+	floor() in libc and sqrt() in libm!
+
+Release Notes (2.0 beta3):
+	* more portability fixes
+	* successfully compiled on FreeBSD 2.2, IRIX without any source
+	changes
+
+Release Notes (2.0 beta2):
+	* additional timezone fixes for SunOS
+
+Release Notes (2.0 beta1):
+	* fixed a bug in the rexec portion of webmaster.c
+	* fixed a bug in the usage() routine of webmaster.c
+	* added bin/genfiles-from-filelist.sh
+		- bin/genfiles-from-filelist.sh <filename>
+		- generates appropriate-length files from <filename>
+		- <filename> must contain three fields:
+			<relative URL>	<weight>	#<size in bytes>
+			example: /file.html	1	#1024
+	* added bin/mine-logs.pl
+		- usage: mine-logs.pl <filename>
+		  where <filename> is an http server log file
+		- writes a WebStone workload to standard output
+
+Release Notes (2.0 alpha5):
+	* revised default testbed file
+	* changed wscollect to wscollect.pl for consistency
+	* changed webstone-gui to webstone-gui.pl for consistency
+	* added some NT porting hints
+	* added autoconf, which should help Linux and SunOS porting
+
+Release Notes (2.0 alpha4):
+	* added SunOS and Linux portability elements
+	* new scheme for random access to pages
+	* converted several static arrays to dynamic pointers
+
+Release Notes (2.0 alpha2):
+	* fixed per-page statistics
+	* new, client-independent data-passing scheme
+	* added support for proxy servers
+
+Release Notes (2.0 alpha1):
+	* new filelist scheme - however, this breaks per-page statistics
+	* minor fixes
+
+Release Notes (1.1):
+	* Improved webclient performance by combining GET and ACCEPT
+		HTTP headers in one write() call.
+	* Improved webclient performance on systems that always attempt
+		to map protocol names to numbers using YP.
+	* WARNING: since the old code introduced a significant latency
+		in some systems, DO NOT compare WebStone 1.1 results
+		with results generated by any previous versions.
+
+Release Notes (1.0.3):
+        * Netscape Server 1.1.2 exposed a couple bugs, which I've now fixed.
+
+Release Notes (1.0.2):
+        * Fixed runbench so that ITERATIONS, MINCLIENTS, and MAXCLIENTS don't
+                have to have a common denominator any more.
+        * Fixed a few cosmetic bugs.
+
+Release Notes (1.0.1):
+        * Fixed select() bug in webmaster
+
+Release Notes (1.0 final):
+	* Fixed the "Error reading 2nd timing info" bug
+	* Fixed numerous bugs in the GUI
+	* Froze feature set. Work can now begin on WebStone 1.1
+
+Release Notes (1.0b3):
+	* New Web browser GUI
+		NOTE: most Web browsers take up substantial CPU time.
+		If you run the GUI, we recommend that you make the controller 
+		a separate machine, and don't run any WebStone clients on it.
+	* Minor bug fixes
+		Squashed some dubious error messages, fixed some client-
+		controller communications problems.
+	* Reporting changes
+		Changes the units and order of the final summary statistics.
+		Basically, this is for my own convenience, so I don't have to
+		massage the data quite so much before using it. wscollect
+		now reports only the metrics I regard as important - but all
+		metrics are still reported in the runs/*/run files.
+
+LEGAL STUFF:
+
+This file and all files contained in this directory are 
+copyright 1995, Silicon Graphics, Inc.
+
+This software is provided without support and without any obligation on the 
+part of Silicon Graphics, Inc. to assist in its use, correction, modification 
+or enhancement. There is no guarantee that this software will be included in 
+future software releases, and it probably will not be included.
+
+THIS SOFTWARE IS PROVIDED "AS IS" WITH NO WARRANTIES OF ANY KIND INCLUDING THE 
+WARRANTIES OF DESIGN, MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE, 
+OR ARISING FROM A COURSE OF DEALING, USAGE OR TRADE PRACTICE. 
+
+In no event will Silicon Graphics, Inc. be liable for any lost revenue or 
+profits or other special, indirect and consequential damages, even if 
+Silicon Graphics, Inc. has been advised of the possibility of such damages. 

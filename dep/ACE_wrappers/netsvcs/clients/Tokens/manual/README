@@ -1,0 +1,67 @@
+
+./manual gives users a text-based interactive interface to local or
+remote tokens.  This is extremely useful for manually testing the
+token server and setting up deadlock scenarios.
+
+Run it as follows
+
+% ./manual -u
+./manual:
+[-h <remote host>]
+[-p <remote port>]
+[-i ignore deadlock]
+[-d debug]
+
+./manual gives you the following prompt.
+<tid> <token> <type> <operation>
+
+<tid>  This is the client id of the current operation.  This is set
+       manually by ./manual for every operation.  Be careful when
+       using multiple <tid>'s during a remote session (see BUGS
+       below).
+
+<token> This is the name of the token for the operation.
+
+<type> This is the type of the token.  This can be:
+       M - Corresponds to a Mutex lock.
+       R - Corresponds to Readers/Writer lock.
+       W - Corresponds to Readers/Writer lock.
+       Obviously, a single <token> can be M or it can R and/or W.  If
+       you perform and operation like this "tid1 tokenA M A" then
+       don't do this "tid1 tokenA R A".  This doesn't make sense.
+
+<operation> This is the operation to perform on the
+       <tid>-<token>-<type> proxy.  These include:
+       A - acquire.
+       N - renew.
+       R - release.
+       T - tryacquire.
+
+BUGS!!!!
+
+When performing remote tests, be careful when using a single running
+./manual to impersonate two <tid>'s.  The Token Server client
+connection policy is currently, one per thread.  The Token Server
+assumes that the same <tid> is always on the other end of a
+connection.  If you do something like the following, you will break
+it:
+
+lambada:Tokens/manual> ./manual -h tango -p 20202
+<tid> <token> <type> <operation>
+tid1 tokenA M A
+ACE_TSS_Connection new connection
+(1) acquired tokenA remotely.
+Succeeded.
+<tid> <token> <type> <operation>
+tid2 tokenA M A
+(1) acquired tokenA remotely.   <------  This is remote BADness!!!
+Succeeded.
+Violated invariant.             <------  Locally detected badness.
+<tid> <token> <type> <operation>
+
+
+Notice that the local side discovered that this was incorrect.
+However, the Token Server thinks it was a recursive acquisition for
+tid1.  Keep in mind that this is not a problem with the Token library.
+It is just a problem with how this primitive ./manual application maps
+STDIN to the ACE Token API.

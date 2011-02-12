@@ -1,0 +1,59 @@
+--- ACE_wrappers/include/makeinclude/wrapper_macros.GNU.ORIG	2008-11-18 16:12:14.000000000 -0800
++++ ACE_wrappers/include/makeinclude/wrapper_macros.GNU	2008-11-23 10:16:32.000000000 -0800
+@@ -299,13 +299,13 @@
+ 
+ #### Set up the build ACE version in case the platform_macros.GNU wants it.
+ ifeq (cmd,$(findstring cmd,$(SHELL)))
+-ACE_MAJOR_VERSION := $(shell awk "/ACE_MAJOR_VERSION/ { print $$3}" ${ACE_ROOT}/ace/Version.h)
+-ACE_MINOR_VERSION := $(shell awk "/ACE_MINOR_VERSION/ { print $$3}" ${ACE_ROOT}/ace/Version.h)
+-ACE_BETA_VERSION := $(shell awk "/ACE_BETA_VERSION/ { print $$3}" ${ACE_ROOT}/ace/Version.h)
+-else
+-ACE_MAJOR_VERSION := $(shell awk '/ACE_MAJOR_VERSION/ { print $$3}' ${ACE_ROOT}/ace/Version.h)
+-ACE_MINOR_VERSION := $(shell awk '/ACE_MINOR_VERSION/ { print $$3}' ${ACE_ROOT}/ace/Version.h)
+-ACE_BETA_VERSION := $(shell awk '/ACE_BETA_VERSION/ { print $$3}' ${ACE_ROOT}/ace/Version.h)
++ACE_MAJOR_VERSION := $(shell awk "/ACE_MAJOR_VERSION/ { print $$3}" ${ACE_ROOT}/include/ace/Version.h)
++ACE_MINOR_VERSION := $(shell awk "/ACE_MINOR_VERSION/ { print $$3}" ${ACE_ROOT}/include/ace/Version.h)
++ACE_BETA_VERSION := $(shell awk "/ACE_BETA_VERSION/ { print $$3}" ${ACE_ROOT}/include/ace/Version.h)
++else
++ACE_MAJOR_VERSION := $(shell awk '/ACE_MAJOR_VERSION/ { print $$3}' ${ACE_ROOT}/include/ace/Version.h)
++ACE_MINOR_VERSION := $(shell awk '/ACE_MINOR_VERSION/ { print $$3}' ${ACE_ROOT}/include/ace/Version.h)
++ACE_BETA_VERSION := $(shell awk '/ACE_BETA_VERSION/ { print $$3}' ${ACE_ROOT}/include/ace/Version.h)
+ endif
+ 
+ # Define some variables to silence warnings
+@@ -381,9 +381,11 @@
+ IDL_SERVER_TSRC_EXT ?= S_T.cpp
+ 
+ ifeq (,$(findstring -I$(ACE_ROOT),$(INCLDIRS)))
+-  INCLDIRS        += -I$(ACE_ROOT)
++ifneq ("$(ACE_ROOT)","/usr")
++  INCLDIRS        += -I$(ACE_ROOT)/include
+ endif
+-INSINC          ?= $(ACE_ROOT)/ace
++endif
++INSINC          ?= $(ACE_ROOT)/include/ace
+ INSLIB          ?= $(ACE_ROOT)/lib
+ INSMAN          ?= $(ACE_ROOT)/man
+ ifeq (,$(findstring -L$(INSLIB),$(LDFLAGS)))
+--- ACE_wrappers/TAO/rules.tao.GNU.ORIG	2008-11-23 10:13:02.000000000 -0800
++++ ACE_wrappers/TAO/rules.tao.GNU	2008-11-22 20:43:49.000000000 -0800
+@@ -138,13 +138,13 @@
+ # with different minor or major or beta versions to fail.
+ #
+ ifeq (cmd,$(findstring cmd,$(SHELL)))
+-TAO_MAJOR_VERSION := $(shell awk "/TAO_MAJOR_VERSION/ { print $$3}" ${TAO_ROOT}/tao/Version.h)
+-TAO_MINOR_VERSION := $(shell awk "/TAO_MINOR_VERSION/ { print $$3}" ${TAO_ROOT}/tao/Version.h)
+-TAO_BETA_VERSION := $(shell awk "/TAO_BETA_VERSION/ { print $$3}" ${TAO_ROOT}/tao/Version.h)
++TAO_MAJOR_VERSION := $(shell awk "/TAO_MAJOR_VERSION/ { print $$3}" ${TAO_ROOT}/include/tao/Version.h)
++TAO_MINOR_VERSION := $(shell awk "/TAO_MINOR_VERSION/ { print $$3}" ${TAO_ROOT}/include/tao/Version.h)
++TAO_BETA_VERSION := $(shell awk "/TAO_BETA_VERSION/ { print $$3}" ${TAO_ROOT}/include/tao/Version.h)
+ else
+-TAO_MAJOR_VERSION := $(shell awk '/TAO_MAJOR_VERSION/ { print $$3}' ${TAO_ROOT}/tao/Version.h)
+-TAO_MINOR_VERSION := $(shell awk '/TAO_MINOR_VERSION/ { print $$3}' ${TAO_ROOT}/tao/Version.h)
+-TAO_BETA_VERSION := $(shell awk '/TAO_BETA_VERSION/ { print $$3}' ${TAO_ROOT}/tao/Version.h)
++TAO_MAJOR_VERSION := $(shell awk '/TAO_MAJOR_VERSION/ { print $$3}' ${TAO_ROOT}/include/tao/Version.h)
++TAO_MINOR_VERSION := $(shell awk '/TAO_MINOR_VERSION/ { print $$3}' ${TAO_ROOT}/include/tao/Version.h)
++TAO_BETA_VERSION := $(shell awk '/TAO_BETA_VERSION/ { print $$3}' ${TAO_ROOT}/include/tao/Version.h)
+ endif
+ # Version number of the libraries
+ #

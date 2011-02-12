@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# chkconfig: - 81 14
+# description: Starts and stops the TAO Concurrency Service.
+# processname: tao-cosconcurrency
+# config: /etc/tao/tao-cosconcurrency.opt
+# config: /etc/tao/tao-cosconcurrency.conf
+# pidfile: /var/run/tao-cosconcurrency.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+# Source configuration options
+. /etc/tao/tao-cosconcurrency.opt
+
+RETVAL=0
+
+prog="tao-cosconcurrency"
+progpath="/usr/sbin/$prog"
+svcconf="/etc/tao/${prog}.conf"
+lockpath="/var/lock/subsys/$prog"
+pidpath="/var/run/${prog}.pid"
+
+start()
+{
+    echo -n $"Starting $prog: "
+    daemon --user tao $progpath -p $pidpath $OPTIONS -ORBSvcConf $svcconf -ORBDaemon
+    RETVAL=$?
+    [ "$RETVAL" = 0 ] && touch $lockpath
+    echo
+}
+
+stop()
+{
+    echo -n $"Stopping $prog: "
+    killproc $progpath -TERM
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+	rm -f $lockpath
+	rm -f $pidpath
+    fi
+    echo
+}
+
+# See how we were called.
+case "$1" in
+    start)
+	start
+	;;
+    stop)
+	stop
+	;;
+    status)
+	status $prog
+	RETVAL=$?
+        ;;
+    restart)
+	stop
+	start
+	RETVAL=$?
+	;;
+    condrestart)
+	if [ -f $lockpath ]; then
+	    stop
+	    start
+	    RETVAL=$?
+	fi
+	;;
+    reload)
+        ;;
+    *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+	exit 1
+	;;
+esac
+exit $RETVAL

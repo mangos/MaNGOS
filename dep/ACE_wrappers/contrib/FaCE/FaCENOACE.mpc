@@ -1,0 +1,16 @@
+// -*- MPC -*-
+// $Id: FaCENOACE.mpc 85401 2009-05-19 13:14:39Z johnnyw $
+
+project: vc_warnings {
+  exename   = FaCENOACE
+  requires += wince
+  macros   += NO_ACE
+  lit_libs += aygshell commctrl
+
+  Source_Files {
+    FaCE.cpp
+    Main.cpp
+    CE_ARGV.cpp
+    CE_Screen_Output.cpp
+  }
+}

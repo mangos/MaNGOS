@@ -1,0 +1,193 @@
+#!/bin/sh
+# $Header$
+# set -x
+set +x
+[ -n "$WEBSTONEROOT" ] || WEBSTONEROOT=`pwd`/../
+
+case $# in
+  1)
+     FILELIST=$1
+     ;;
+  *)
+     FILELIST=$WEBSTONEROOT/conf/filelist
+     ;;
+esac
+
+# load configurations
+. $WEBSTONEROOT/conf/testbed
+
+[ -n "$DEBUG" ] && set +x
+
+# check variables
+[ -n "$ITERATIONS" ] || ITERATIONS="1"
+[ -n "$MINCLIENTS" ] || MINCLIENTS="1"
+[ -n "$MAXCLIENTS" ] || MAXCLIENTS="1"
+[ -n "$CLIENTINCR" ] || CLIENTINCR="1"
+[ -n "$TIMEPERRUN" ] || TIMEPERRUN="1"
+# don't care about PROXYSERVER
+[ -n "$SERVER" ] || SERVER="www"
+[ -n "$PORTNO" ] || PORTNO="80"
+# [ -n "$SERVERINFO" ] || SERVERINFO="uname -a"
+# OSTUNINGFILES
+# WEBSERVERDIR
+# WEBDOCDIR
+# WEBSERVERTUNINGFILES
+[ -n "$CLIENTS" ] || CLIENTS="localhost"
+[ -n "$CLIENTACCOUNT" ] || CLIENTACCOUNT=$USER
+[ -n "$CLIENTPASSWORD" ] || CLIENTPASSWORD=$CLIENTACCOUNT
+# [ -n "$CLIENTINFO" ] || CLIENTINFO="uname -a"
+[ -n "$TMPDIR" ] || TMPDIR="/tmp"
+[ -n "$RCP" ] || RCP="rcp"
+[ -n "$RSH" ] || RSH="rsh"
+
+export ITERATIONS MINCLIENTS MAXCLIENTS CLIENTINCR TIMEPERRUN 
+export SERVER PORTNO SERVERINFO 
+export CLIENTS CLIENTACCOUNT CLIENTPASSWORD CLIENTINFO
+export TMPDIR RCP RSH
+
+echo "Clients: " $CLIENTS
+
+#
+# Estimate run time
+#
+NUMCLIENTHOSTS=`echo $CLIENTS | wc -w`
+TRIALS=`expr 1 + \( $MAXCLIENTS - $MINCLIENTS \) / $CLIENTINCR`
+RUNTIME=`expr 60 \* $ITERATIONS \* $TRIALS \* $TIMEPERRUN`
+RUNTIME=`expr $RUNTIME + $TRIALS \* \( $MAXCLIENTS + $MINCLIENTS \) \
+ / \( 2 \* $NUMCLIENTHOSTS \)`
+
+echo "Estimated run time:" `expr $RUNTIME / 3600` "hours" \
+ `expr $RUNTIME % 3600 / 60` "minutes" 
+
+#
+# Checking for valid set of benchmark files to retrieve
+#
+#if [ -z "$PROXYSERVER" ]
+#then
+#  echo "Checking for a valid set of benchmark files"
+#  CHECKLISTTMP=$TMPDIR/webstone-checkfilelist.$$
+#  rm -f $CHECKFILELISTTMP
+#  $WEBSTONEROOT/bin/checkfilelist $SERVER $PORTNO $FILELIST > $CHECKLISTTMP 2>&1
+#  if [ `grep -c ' 4[0-9][0-9] '< $CHECKLISTTMP` -gt 0 ]
+#  then
+#    echo "ERROR: not all files in filelist are on server:"
+#    echo "----- checkfilelist results -----"
+#    cat $CHECKLISTTMP
+#    echo "----- checkfilelist results -----"
+#    rm  -f $CHECKLISTTMP
+#    exit 1
+#  else
+#    echo "OK: All files found"
+#  fi
+#  rm -f $CHECKLISTTMP
+#fi
+# end if $PROXYSERVER
+
+#
+# distribute webclient binary
+#
+for i in $CLIENTS
+do
+	$RCP $WEBSTONEROOT/bin/webclient $i:$TMPDIR #/usr/local/bin
+done
+
+# BEGIN iterations
+J=1
+while [ $J -le $ITERATIONS ]
+do
+  NUMCLIENTS=$MINCLIENTS
+  while [ $NUMCLIENTS -le $MAXCLIENTS ]
+  do
+    echo "***** Iteration $J, Total clients "`expr $NUMCLIENTS`" **********"
+    date
+    TIMESTAMP=`date +"%y%m%d_%H%M"`
+    LOGDIR=$WEBSTONEROOT/bin/runs/$TIMESTAMP
+    
+    #
+    # nuke debug files
+    #
+    for client in $CLIENTS
+    do
+      $RSH $client "rm /tmp/webstone-debug*" > /dev/null 2>&1
+    done
+    
+    mkdir -p $LOGDIR
+    rm -f $LOGDIR/config
+    touch $LOGDIR/config
+    CLIENTSPERHOST=`expr $NUMCLIENTS / $NUMCLIENTHOSTS`
+    EXTRACLIENTS=`expr $NUMCLIENTS % $NUMCLIENTHOSTS`
+    
+    for i in $CLIENTS
+    do
+      if [ $EXTRACLIENTS -gt 0 ]
+      then
+	echo "$i $CLIENTACCOUNT $CLIENTPASSWORD `expr $CLIENTSPERHOST + 1`" \
+	 >> $LOGDIR/config
+	EXTRACLIENTS=`expr $EXTRACLIENTS - 1`
+      else
+	echo "$i $CLIENTACCOUNT $CLIENTPASSWORD $CLIENTSPERHOST" \
+	 >> $LOGDIR/config
+      fi
+    done
+    cp $FILELIST $LOGDIR/`basename $FILELIST`
+    
+    #
+    # Put test configuration files on clients
+    #
+    for i in $CLIENTS localhost
+    do
+      $RSH $i "rm -f $TMPDIR/config $TMPDIR/`basename $FILELIST`"
+      $RCP $LOGDIR/config $i:$TMPDIR/config
+      $RCP $LOGDIR/`basename $FILELIST` $i:$TMPDIR/filelist
+    done
+    
+    #
+    # Get starting configuration and stats from each participant
+    #
+    $RSH $SERVER "$SERVERINFO" > $LOGDIR/hardware.$SERVER 2>&1
+    for i in $CLIENTS
+    do
+      $RSH $i "$CLIENTINFO" > $LOGDIR/hardware.$i 2>&1
+    done
+    
+    # set -x
+    for i in $OSTUNINGFILES $WEBSERVERTUNINGFILES
+    do
+      $RCP $SERVER:$i $LOGDIR
+    done
+    set +x
+    
+    #
+    # Run benchmark
+    #
+    date
+    CMD="$WEBSTONEROOT/bin/webmaster -v -u  $TMPDIR/filelist"
+    CMD=$CMD" -f $TMPDIR/config -l $TIMEPERRUN"
+    [ -n "$SERVER" ] && CMD=$CMD" -w $SERVER"
+    [ -n "$PORTNO" ] && CMD=$CMD" -p $PORTNO"
+    [ -n "$PROXYSERVER" ] && CMD=$CMD" -P $PROXYSERVER"
+    [ -n "$DEBUG" ] && CMD=$CMD" -d"
+    echo $CMD
+
+    # dump environment into $LOGDIR
+    rm -rf $LOGDIR/controller.env
+    env > $LOGDIR/controller.env
+    
+    $CMD | tee $LOGDIR/run
+    
+    #
+    # Get ending configuration and stats from each participant
+    #
+    date
+    #for i in $SERVER $CLIENTS
+    #do
+    #$WEBSTONEROOT/bin/getstats $i > $LOGDIR/end.$i 2>&1
+    #done
+    #date
+    NUMCLIENTS=`expr $NUMCLIENTS + $CLIENTINCR`
+  done
+  # while NUMCLIENTS
+  J=`expr $J + 1`
+done
+# while J
+# end

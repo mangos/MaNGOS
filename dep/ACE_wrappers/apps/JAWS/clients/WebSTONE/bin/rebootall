@@ -1,0 +1,9 @@
+#! /bin/sh -x
+
+# get configuration
+. $WEBSTONEROOT/conf/testbed
+
+for i in $CLIENTS
+do
+	$RSH -l root $i "sleep 5 ; init 6" &
+done

@@ -1,0 +1,23 @@
+// -*- MPC -*-
+// $Id: gperf_test.mpb 83089 2008-10-10 16:01:38Z johnnyw $
+
+project: aceexe, crosscompile {
+  after += gperf
+  avoids += uses_wchar
+  Define_Custom(GPERF) {
+    command           = $(ACE_ROOT)/bin/ace_gperf
+    libpath          += $(ACE_ROOT)/lib
+    output_option     = >
+    inputext          = .gperf
+    source_outputext  = .cpp
+    keyword gperf_cmd = command
+  }
+
+  specific(automake) {
+    gperf_cmd = ../src/ace_gperf
+  }
+
+  Source_Files {
+    test.cpp
+  }
+}

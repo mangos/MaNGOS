@@ -1,0 +1,23 @@
+## Path:           Network/tao-cosevent
+## Description:    TAO Event service settings
+#
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809"
+## ServiceRestart: tao-cosnaming
+#
+# Specify desired default initial references arguments
+TAO_COSEVENT_INITREF="-ORBDefaultInitRef corbaloc::localhost:2809"
+
+## Type            string
+## Default:        ""
+## ServiceRestart: tao-cosnaming
+#
+# Enable debug logging, set to "-ORBDebugLevel 10" to enable.
+TAO_COSEVENT_DEBUGLEVEL=""
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-cosevent.log"
+## ServiceRestart: tao-cosnaming
+#
+# Configure log file
+TAO_COSEVENT_LOGFILE="-ORBLogFile /var/log/tao/tao-cosevent.log"

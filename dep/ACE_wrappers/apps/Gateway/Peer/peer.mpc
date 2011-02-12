@@ -1,0 +1,23 @@
+// -*- MPC -*-
+// $Id: peer.mpc 80826 2008-03-04 14:51:23Z wotte $
+
+project(Gateway_Peer) :  ace_output, acelib {
+  sharedname = Gateway_Peer
+  Source_Files {
+    Options.cpp
+    Peer.cpp
+  }
+  Documentation_Files {
+    svc.conf
+  }
+}
+
+project(gateway_peerd) : aceexe {
+  exename = peerd
+  after += Gateway_Peer
+  libs += Gateway_Peer
+
+  Source_Files {
+    peerd.cpp
+  }
+}

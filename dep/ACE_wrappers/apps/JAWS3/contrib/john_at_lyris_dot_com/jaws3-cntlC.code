@@ -1,0 +1,92 @@
+
+bool PlatformSpecificInitialize() {
+
+     LYRIS_PROFILE("PlatformSpecificInitialize");
+
+     bool retval;
+     retval = SetConsoleCtrlHandler(handler_routine, TRUE);
+     if (retval != TRUE) {
+          trace("Note: SetConsoleCtrlHandler() did not succeed.");
+     }
+
+     retval = SetConsoleTitle(APPLICATION_NAME.c_str());
+     if (retval != TRUE) {
+          trace("Note: setConsoleTitle() did not succeed.");
+     }
+
+     return lyris_success;
+};
+
+BOOL WINAPI handler_routine(DWORD signal) {
+
+     LYRIS_PROFILE("handler_routine");
+
+     static unsigned char handles_to_use = 3;
+     static bool handled_already = false;
+     if ((signal == CTRL_CLOSE_EVENT) || (signal == CTRL_SHUTDOWN_EVENT)) {
+          // if we receive a Windows signal to shutdown, we should exit
+          // immediately, and cleanly
+          if (handled_already == false) {
+               handled_already = true;
+               //lyris_Thread::ExitApplicationNow();
+               DisplayMessage("Shutting down as requested");
+               // create shutdown thread so that signal handler can return
+               // immediately
+               lyris_Thread aShutDown(ShutDownNow, NULL, "Shut Down Thread");
+
+               return TRUE;
+          }
+          else {
+               return FALSE;
+          }
+     }
+     else if (signal == CTRL_C_EVENT) {
+          // if we receive a Windows signal to shutdown, we should exit
+          // immediately, and cleanly
+          if (handles_to_use == 3) {
+               handles_to_use--;
+               //lyris_Thread::ExitApplicationNow();
+               DisplayMessage("Shutting down as requested");
+               // create shutdown thread so that signal handler can return
+               // immediately
+               lyris_Thread aShutDown(ShutDownNow, NULL, "Shut Down Thread");
+
+               return TRUE;
+          }
+          else if (handles_to_use > 0) {
+               DisplayMessage("Currently shutting down: press Ctrl-C " +
+                              ULong2String(handles_to_use) +
+                              " more times to shut down immediately.");
+               handles_to_use--;
+               return TRUE;
+          }
+          else {
+               return FALSE;
+          }
+     }
+     else if (signal == CTRL_BREAK_EVENT) {
+          if (APPLICATION_NAME == "Lyris") {
+               if (ShouldDisplayDebugMessages() == 0) {
+                    SetShouldDisplayDebugMessages(1);
+               }
+               else {
+                    SetShouldDisplayDebugMessages(0);
+               }
+               DisplayMessage("Debug mode is now: " +
+                              Bool2String(ShouldDisplayDebugMessages()));
+          }
+          else if (APPLICATION_NAME == "MailShield") {
+               specific::setReloadConfig(lyris_yes);
+          }
+          else {
+               lyr_fatal;
+          }
+          return TRUE;
+     }
+     else {
+          lyr_notify("Unknown Windows signal passed to handler: " +
+                     ULong2String(signal));
+     };
+     return FALSE;
+};
+

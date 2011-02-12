@@ -1,0 +1,23 @@
+## Path:           Network/tao-cosnotification
+## Description:    TAO Notification service settings
+#
+## Type            string
+## Default:        "-ORBDefaultInitRef corbaloc::localhost:2809 -NameSvc"
+## ServiceRestart: tao-cosnotification
+#
+# Specify desired default initial references arguments
+TAO_COSNOTE_INITREF="-ORBDefaultInitRef corbaloc::localhost:2809 -NameSvc"
+
+## Type            string
+## Default:        ""
+## ServiceRestart: tao-cosnotification
+#
+# Enable debug logging, set to "-ORBDebugLevel 10" to enable.
+TAO_COSNOTE_DEBUGLEVEL=""
+
+## Type            string
+## Default:        "-ORBLogFile /var/log/tao/tao-cosnotification.log"
+## ServiceRestart: tao-cosnotification
+#
+# Configure log file
+TAO_COSNOTE_LOGFILE="-ORBLogFile /var/log/tao/tao-cosnotification.log"

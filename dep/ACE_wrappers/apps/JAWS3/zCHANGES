@@ -1,0 +1,73 @@
+$Id: zCHANGES 80826 2008-03-04 14:51:23Z wotte $
+
+$Log$
+Revision 1.1  2003/08/25 07:40:34  kobica
+Added JAWS3 to ACE_wrappers repo
+
+Revision 1.11  2000/09/29 23:31:20  jxh
+* jaws3/Cached_Allocator_T.cpp:
+* jaws3/Cached_Allocator_T.h:
+  New template class for faster allocation.
+
+Revision 1.10  2000/09/29 23:16:41  jxh
+* jaws3/Config_File.cpp:
+* jaws3/Config_File.h:
+* jaws3/Symbol_Table.h:
+* jaws3/main.cpp:
+  Changes to make JAWS3 comply with new ACE_TEXT macro.
+
+* jaws3/Makefile:
+  New dependencies.
+
+Revision 1.9  2000/08/10 05:18:17  jxh
+* contrib/john_at_lyris_dot_com/README
+* contrib/john_at_lyris_dot_com/jaws3-cntlC.code
+  Contibutions from John Buckman to capture Control-C
+  and Control-BREAK on the console.
+
+Revision 1.8  2000/08/04 18:03:10  jxh
+* jaws3/Protocol_Handler.h
+  Redo some changes I inadvertently undid, regarding
+  lambda events and default_complete.
+
+Revision 1.7  2000/08/04 00:07:53  jxh
+* docs/web/overview.html:
+  Minor update.
+
+* jaws3/Event_Dispatcher.cpp:
+  Use the default proactor instead of one of my invention.
+
+* jaws3/Protocol_Handler.h:
+  jaws3/Protocol_Handler.cpp:
+  Make the creation of the message block more efficient.
+
+* jaws3-todo/Makefile:
+  jaws3-todo/Reactive_Socket.cpp:
+  jaws3-todo/Reactive_Socket_Helpers.cpp:
+  jaws3-todo/Reactive_Socket_Helpers.h:
+  Flushing this out some more.
+
+Revision 1.6  2000/07/25 05:08:01  jxh
+* jaws3/THYBRID_Concurrency.cpp:
+  jaws3/TPOOL_Concurrency.cpp:
+  Changes made to make all the threads die eventually.
+
+Revision 1.5  2000/07/17 08:18:36  jxh
+* bench/rqfiles.cpp:
+  Wait until the last request is actually finished.
+
+Revision 1.4  2000/07/16 18:39:25  jxh
+* bench/rqfiles.cpp:
+  Added a missing explicit template instantiation.
+
+Revision 1.3  2000/07/06 22:30:12  jxh
+Complete the "lambda" event callbacks.  Added a new "default_complete"
+callback which the other callback methods call by default.  This
+simplifies the Protocol_Handler header file.
+
+Revision 1.2  2000/06/19 01:57:00  jxh
+Testing out the use of the change log file.
+
+Revision 1.1  2000/06/19 01:51:36  jxh
+Add a change log file and a Makefile.
+

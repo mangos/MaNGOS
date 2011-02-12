@@ -1,0 +1,34 @@
+This directory contains a set of tests for the ACE Tokens library.
+
+	. mutex
+
+		Runs a few tests on ACE_Local_Mutex and
+		ACE_Remote_Mutex.  Tests recursive acquisition and
+		global vs local proxies.
+
+	. rw_locks
+
+		App for testing ACE_Local_RLock, ACE_Local_WLock,
+		ACE_Remote_RLock, and ACE_Remote_WLock.
+
+	. deadlock
+
+		Tests the deadlock detection algorithm of the token
+		manager using ACE_Local_Mutex and ACE_Remote_Mutex.
+
+	. collection
+
+		Tests the ACE_Token_Collection utility.  Uses local
+		and remote tokens and readers/writer locks.
+
+	. invariant
+
+		Tests the token Invariant testing utilities.  Yes,
+		this tests a testing utility.
+
+	. manual
+
+		Gives users a text-based interactive interface to
+		local or remote tokens.  This is extremely useful for
+		manually testing the token server and setting up
+		deadlock scenarios.
