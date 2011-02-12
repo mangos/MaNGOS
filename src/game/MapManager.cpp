@@ -129,7 +129,7 @@ Map* MapManager::CreateBgMap(uint32 mapid, BattleGround* bg)
     TerrainInfo * pData = sTerrainMgr.LoadTerrain(mapid);
 
     Guard _guard(*this);
-    return CreateBattleGroundMap(mapid, sObjectMgr.GenerateLowGuid(HIGHGUID_INSTANCE), bg);
+    return CreateBattleGroundMap(mapid, sObjectMgr.GenerateInstanceLowGuid(), bg);
 }
 
 Map* MapManager::FindMap(uint32 mapid, uint32 instanceId) const
@@ -383,7 +383,7 @@ Map* MapManager::CreateInstance(uint32 id, Player * player)
     {
         // if no instanceId via group members or instance saves is found
         // the instance will be created for the first time
-        NewInstanceId = sObjectMgr.GenerateLowGuid(HIGHGUID_INSTANCE);
+        NewInstanceId = sObjectMgr.GenerateInstanceLowGuid();
 
         Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(entry->IsRaid()) : player->GetDifficulty(entry->IsRaid());
         pNewMap = CreateDungeonMap(id, NewInstanceId, diff);

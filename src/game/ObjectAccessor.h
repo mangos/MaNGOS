@@ -37,9 +37,7 @@
 #include <set>
 #include <list>
 
-class Creature;
 class Unit;
-class GameObject;
 class WorldObject;
 class Map;
 
@@ -97,13 +95,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
     public:
         typedef UNORDERED_MAP<ObjectGuid, Corpse*> Player2CorpsesMapType;
 
-        // global (obj used for map only location local guid objects (pets currently)
-        static Unit*   GetUnitInWorld(WorldObject const& obj, ObjectGuid guid);
-
-        // FIXME: map local object with global search
-        static Creature*   GetCreatureInWorld(ObjectGuid guid)   { return FindHelper<Creature>(guid); }
-        static GameObject* GetGameObjectInWorld(ObjectGuid guid) { return FindHelper<GameObject>(guid); }
-
         // Search player at any map in world and other objects at same map with `obj`
         // Note: recommended use Map::GetUnit version if player also expected at same map only
         static Unit* GetUnit(WorldObject const& obj, ObjectGuid guid);
@@ -135,25 +126,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void RemoveObject(Corpse *object) { HashMapHolder<Corpse>::Remove(object); }
         void RemoveObject(Player *object) { HashMapHolder<Player>::Remove(object); }
 
-        // TODO: This methods will need lock in MT environment
-        static void LinkMap(Map* map)   { i_mapList.push_back(map); }
-        static void DelinkMap(Map* map) { i_mapList.remove(map); }
     private:
-        // TODO: This methods will need lock in MT environment
-        // Theoreticaly multiple threads can enter and search in this method but
-        // in that case linking/delinking other map should be guarded
-        template <class OBJECT> static OBJECT* FindHelper(ObjectGuid guid)
-        {
-            for (std::list<Map*>::const_iterator i = i_mapList.begin() ; i != i_mapList.end(); ++i)
-            {
-                if (OBJECT* ret = (*i)->GetObjectsStore().find(guid.GetRawValue(), (OBJECT*)NULL))
-                    return ret;
-            }
-
-            return NULL;
-        }
-
-        static std::list<Map*> i_mapList;
 
         Player2CorpsesMapType   i_player2corpse;
 
@@ -163,20 +136,6 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         LockType i_playerGuard;
         LockType i_corpseGuard;
 };
-
-inline Unit* ObjectAccessor::GetUnitInWorld(WorldObject const& obj, ObjectGuid guid)
-{
-    if(guid.IsEmpty())
-        return NULL;
-
-    if (guid.IsPlayer())
-        return FindPlayer(guid);
-
-    if (guid.IsPet())
-        return obj.IsInWorld() ? obj.GetMap()->GetPet(guid) : NULL;
-
-    return GetCreatureInWorld(guid);
-}
 
 #define sObjectAccessor ObjectAccessor::Instance()
 

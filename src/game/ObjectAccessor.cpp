@@ -20,10 +20,6 @@
 #include "ObjectMgr.h"
 #include "Policies/SingletonImp.h"
 #include "Player.h"
-#include "Creature.h"
-#include "GameObject.h"
-#include "DynamicObject.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "Item.h"
 #include "Corpse.h"
@@ -32,7 +28,6 @@
 #include "Map.h"
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
-#include "Opcodes.h"
 #include "ObjectGuid.h"
 #include "World.h"
 
@@ -282,6 +277,3 @@ template <class T> ACE_RW_Thread_Mutex HashMapHolder<T>::i_lock;
 
 template class HashMapHolder<Player>;
 template class HashMapHolder<Corpse>;
-
-/// Define the static member of ObjectAccessor
-std::list<Map*> ObjectAccessor::i_mapList;

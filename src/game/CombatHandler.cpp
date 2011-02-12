@@ -20,9 +20,9 @@
 #include "Log.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
+#include "Player.h"
 
 void WorldSession::HandleAttackSwingOpcode( WorldPacket & recv_data )
 {

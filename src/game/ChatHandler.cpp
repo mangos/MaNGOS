@@ -28,7 +28,6 @@
 #include "ChannelMgr.h"
 #include "Group.h"
 #include "Guild.h"
-#include "ObjectAccessor.h"
 #include "Player.h"
 #include "SpellAuras.h"
 #include "Language.h"

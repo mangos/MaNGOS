@@ -24,7 +24,6 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Spell.h"
-#include "ObjectAccessor.h"
 #include "CreatureAI.h"
 #include "Util.h"
 #include "Pet.h"

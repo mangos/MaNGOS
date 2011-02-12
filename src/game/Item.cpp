@@ -1019,19 +1019,18 @@ void Item::SendTimeUpdate(Player* owner)
 
 Item* Item::CreateItem( uint32 item, uint32 count, Player const* player )
 {
-    if ( count < 1 )
+    if (count < 1)
         return NULL;                                        //don't create item at zero count
 
-    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype( item );
-    if( pProto )
+    if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(item))
     {
-        if ( count > pProto->GetMaxStackSize())
+        if (count > pProto->GetMaxStackSize())
             count = pProto->GetMaxStackSize();
 
         MANGOS_ASSERT(count !=0 && "pProto->Stackable==0 but checked at loading already");
 
         Item *pItem = NewItemOrBag( pProto );
-        if( pItem->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_ITEM), item, player) )
+        if (pItem->Create(sObjectMgr.GenerateItemLowGuid(), item, player) )
         {
             pItem->SetCount( count );
             return pItem;

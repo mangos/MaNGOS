@@ -29,7 +29,6 @@
 #include "GossipDef.h"
 #include "UpdateMask.h"
 #include "ScriptMgr.h"
-#include "ObjectAccessor.h"
 #include "Creature.h"
 #include "Pet.h"
 #include "Guild.h"

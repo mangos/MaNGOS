@@ -327,6 +327,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         uint32 i_script_id;
 
         // Map local low guid counters
+        ObjectGuidGenerator<HIGHGUID_UNIT> m_CreatureGuids;
+        ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameObjectGuids;
         ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
         ObjectGuidGenerator<HIGHGUID_PET> m_PetGuids;
         ObjectGuidGenerator<HIGHGUID_VEHICLE> m_VehicleGuids;
