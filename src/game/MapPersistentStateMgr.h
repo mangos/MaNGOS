@@ -65,10 +65,11 @@ class MapPersistentState
         Difficulty GetDifficulty() const { return m_difficulty; }
 
         bool IsUsedByMap() const { return m_usedByMap; }
-        void SetUsedByMapState(bool state)
+        Map* GetMap() const { return m_usedByMap; }         // Can be NULL if map not loaded for persistent state
+        void SetUsedByMapState(Map* map)
         {
-            m_usedByMap = state;
-            if (!state)
+            m_usedByMap = map;
+            if (!map)
                 UnloadIfEmpty();
         }
 
@@ -90,7 +91,7 @@ class MapPersistentState
 
         bool UnloadIfEmpty();
         void ClearRespawnTimes();
-        bool HasRespawnTimes() const { return m_creatureRespawnTimes.empty() && m_goRespawnTimes.empty(); }
+        bool HasRespawnTimes() const { return !m_creatureRespawnTimes.empty() || !m_goRespawnTimes.empty(); }
 
     private:
         void SetCreatureRespawnTime(uint32 loguid, time_t t);
@@ -102,7 +103,7 @@ class MapPersistentState
         uint32 m_instanceid;
         uint32 m_mapid;
         Difficulty m_difficulty;
-        bool m_usedByMap;                                   // true when instance map loaded, lock MapPersistentState from unload
+        Map* m_usedByMap;                                   // NULL if map not loaded, non-NULL lock MapPersistentState from unload
 
         // persistent data
         RespawnTimes m_creatureRespawnTimes;                // lock MapPersistentState from unload, for example for temporary bound dungeon unload delay
@@ -184,7 +185,7 @@ class DungeonPersistentState : public MapPersistentState
 
     protected:
         bool CanBeUnload() const;                           // overwrite MapPersistentState::CanBeUnload
-        bool HasBounds() const { return m_playerList.empty() && m_groupList.empty(); }
+        bool HasBounds() const { return !m_playerList.empty() || !m_groupList.empty(); }
 
     private:
         typedef std::list<Player*> PlayerListType;
@@ -315,7 +316,7 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
     private:
         typedef UNORDERED_MAP<uint32 /*InstanceId or MapId*/, MapPersistentState*> PersistentStateMap;
 
-        //  called by scheduler
+        //  called by scheduler for DungeonPersistentStates
         void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, uint32 timeleft);
         void _ResetInstance(uint32 mapid, uint32 instanceId);
         void _CleanupExpiredInstancesAtTime(time_t t);

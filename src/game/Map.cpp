@@ -47,7 +47,7 @@ Map::~Map()
         sWorld.DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
     if (m_persistentState)
-        m_persistentState->SetUsedByMapState(false);        // field pointer can be deleted after this
+        m_persistentState->SetUsedByMapState(NULL);         // field pointer can be deleted after this
 
     if(i_data)
     {
@@ -96,7 +96,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
     m_TerrainData->AddRef();
 
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), GetDifficulty(), 0, IsDungeon());
-    m_persistentState->SetUsedByMapState(true);
+    m_persistentState->SetUsedByMapState(this);
 }
 
 void Map::InitVisibilityDistance()
