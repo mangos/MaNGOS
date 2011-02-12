@@ -6576,7 +6576,9 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
             // Get GO cast coordinates if original caster -> GO
             if (target != m_caster)
                 if (WorldObject *caster = GetCastingObject())
-                    if (!target->IsWithinLOSInMap(caster))
+                    if (m_targets.m_targetMask != (TARGET_FLAG_UNIT | TARGET_FLAG_DEST_LOCATION) && 
+                        m_spellInfo->EffectImplicitTargetB[eff] != TARGET_ALL_ENEMY_IN_AREA_INSTANT && 
+                        !target->IsWithinLOSInMap(caster))
                         return false;
             break;
     }
