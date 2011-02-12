@@ -8337,52 +8337,51 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         rate = 0.0f;
 
     // Update speed only on change
-    if (m_speed_rate[mtype] == rate)
-        return;
-
-    m_speed_rate[mtype] = rate;
-
-    propagateSpeedChange();
-
-    static const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2]=
+    if (m_speed_rate[mtype] != rate)
     {
-        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
-        {MSG_MOVE_SET_FLIGHT_SPEED,     SMSG_FORCE_FLIGHT_SPEED_CHANGE},
-        {MSG_MOVE_SET_FLIGHT_BACK_SPEED,SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_PITCH_RATE,       SMSG_FORCE_PITCH_RATE_CHANGE},
-    };
+        m_speed_rate[mtype] = rate;
+        propagateSpeedChange();
 
-    if (forced)
-    {
-        if (GetTypeId() == TYPEID_PLAYER)
+        const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2]=
         {
-            // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-            // and do it only for real sent packets and use run for run/mounted as client expected
-            ++((Player*)this)->m_forced_speed_changes[mtype];
+            {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
+            {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
+            {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
+            {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
+            {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
+            {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
+            {MSG_MOVE_SET_FLIGHT_SPEED,     SMSG_FORCE_FLIGHT_SPEED_CHANGE},
+            {MSG_MOVE_SET_FLIGHT_BACK_SPEED,SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE},
+            {MSG_MOVE_SET_PITCH_RATE,       SMSG_FORCE_PITCH_RATE_CHANGE},
+        };
+
+        if (forced)
+        {
+            if (GetTypeId() == TYPEID_PLAYER)
+            {
+                // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
+                // and do it only for real sent packets and use run for run/mounted as client expected
+                ++((Player*)this)->m_forced_speed_changes[mtype];
+            }
+
+            WorldPacket data(SetSpeed2Opc_table[mtype][1], 18);
+            data << GetPackGUID();
+            data << (uint32)0;                                  // moveEvent, NUM_PMOVE_EVTS = 0x39
+            if (mtype == MOVE_RUN)
+                data << uint8(0);                               // new 2.1.0
+            data << float(GetSpeed(mtype));
+            SendMessageToSet(&data, true);
         }
+        else
+        {
+            m_movementInfo.UpdateTime(WorldTimer::getMSTime());
 
-        WorldPacket data(SetSpeed2Opc_table[mtype][1], 18);
-        data << GetPackGUID();
-        data << (uint32)0;                                  // moveEvent, NUM_PMOVE_EVTS = 0x39
-        if (mtype == MOVE_RUN)
-            data << uint8(0);                               // new 2.1.0
-        data << float(GetSpeed(mtype));
-        SendMessageToSet(&data, true);
-    }
-    else
-    {
-        m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-
-        WorldPacket data(SetSpeed2Opc_table[mtype][0], 64);
-        data << GetPackGUID();
-        data << m_movementInfo;
-        data << float(GetSpeed(mtype));
-        SendMessageToSet(&data, true);
+            WorldPacket data(SetSpeed2Opc_table[mtype][0], 64);
+            data << GetPackGUID();
+            data << m_movementInfo;
+            data << float(GetSpeed(mtype));
+            SendMessageToSet(&data, true);
+        }
     }
 
     CallForAllControlledUnits(SetSpeedRateHelper(mtype,forced), CONTROLLED_PET|CONTROLLED_GUARDIANS|CONTROLLED_CHARM|CONTROLLED_MINIPET);
