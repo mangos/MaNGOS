@@ -2401,9 +2401,9 @@ void Creature::FillGuidsListFromThreatList( std::vector<ObjectGuid>& guids, uint
         guids.push_back((*itr)->getUnitGuid());
 }
 
-struct AddCaretureToRemoveListInMapsWorker
+struct AddCreatureToRemoveListInMapsWorker
 {
-    AddCaretureToRemoveListInMapsWorker(ObjectGuid guid) : i_guid(guid) {}
+    AddCreatureToRemoveListInMapsWorker(ObjectGuid guid) : i_guid(guid) {}
 
     void operator() (Map* map)
     {
@@ -2416,7 +2416,7 @@ struct AddCaretureToRemoveListInMapsWorker
 
 void Creature::AddToRemoveListInMaps(uint32 db_guid, CreatureData const* data)
 {
-    AddCaretureToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, db_guid));
+    AddCreatureToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, db_guid));
     sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
 }
 
