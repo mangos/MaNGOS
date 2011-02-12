@@ -312,39 +312,6 @@ def update_version_files (component):
     return retval
 
 
-def update_spec_file ():
-
-    global comp_versions, opts
-
-    with open (doc_root + "/ACE/rpmbuild/ace-tao.spec", 'r+') as spec_file:
-        new_spec = ""
-        for line in spec_file.readlines ():
-            if line.find ("define ACEVER ") is not -1:
-                line = "%define ACEVER  " + comp_versions["ACE_version"] + "\n"
-            if line.find ("define TAOVER ") is not -1:
-                line = "%define TAOVER  " + comp_versions["TAO_version"] + "\n"
-            if line.find ("define CIAOVER ") is not -1:
-                line = "%define CIAOVER " + comp_versions["CIAO_version"] + "\n"
-            if line.find ("define DANCEVER ") is not -1:
-                line = "%define DANCEVER " + comp_versions["DAnCE_version"] + "\n"
-            if line.find ("define is_major_ver") is not -1:
-                if opts.release_type == "beta":
-                    line = "%define is_major_ver 0\n"
-                else:
-                    line = "%define is_major_ver 1\n"
-
-            new_spec += line
-
-        if opts.take_action:
-            spec_file.seek (0)
-            spec_file.truncate (0)
-            spec_file.writelines (new_spec)
-        else:
-            print "New spec file:"
-            print "".join (new_spec)
-
-    return [doc_root + "/ACE/rpmbuild/ace-tao.spec"]
-
 def update_debianbuild ():
     """ Updates ACE_ROOT/debian directory.
     - renames all files with version nrs in name to new scheme.
@@ -470,7 +437,6 @@ def get_and_update_versions ():
         files += create_changelog ("TAO")
         files += create_changelog ("CIAO")
         files += create_changelog ("DAnCE")
-        files += update_spec_file ()
         files += update_debianbuild ()
         
         print "Committing " + str(files)

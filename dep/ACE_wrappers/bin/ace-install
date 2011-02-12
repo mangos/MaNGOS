@@ -366,18 +366,6 @@ if [ $compile -ne 0 ]; then
           LD_LIBRARY_PATH=$ACE_ROOT/ace; export LD_LIBRARY_PATH
       fi
     fi
-
-    ##########################################
-    # compile a few select directories
-    for d in ace apps/gperf/src TAO/tao TAO/TAO_IDL TAO/orbsvcs TAO/utils; do
-        echo --- Building in $d.
-        cd "$ACE_ROOT/$d"
-        make $ACE_OPTS
-        if [ $? -ne 0 ]; then
-            echo --- Error during build: $?
-            exit $?
-        fi
-    done
 fi
 
 
@@ -482,15 +470,6 @@ if [ $install -ne 0 ]; then
           cp $f $ACE_DIR/$ACE_ARCH/lib
         fi
         test -f $maybe_tao_lib && echo "library $f already installed with TAO"
-    done
-
-    # copy ACE executables
-    echo "Copying executables..."
-    ACE_PROGS=apps/gperf/src/gperf
-
-    for f in $ACE_PROGS; do
-        echo $f
-        cp $f $ACE_DIR/$ACE_ARCH/bin
     done
 
     # copy ACE man pages

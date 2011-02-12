@@ -10,11 +10,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # /tmp/DOC_ROOT/stage-1367/ACE_wrappers/bin/mwc.pl -type vc9 -recurse -hierarchy -relative ACE_ROOT=/tmp/DOC_ROOT/stage-1367/ACE_wrappers -relative TAO_ROOT=/tmp/DOC_ROOT/stage-1367/ACE_wrappers/TAO -relative CIAO_ROOT=/tmp/DOC_ROOT/stage-1367/ACE_wrappers/TAO/CIAO -relative DANCE_ROOT=/tmp/DOC_ROOT/stage-1367/ACE_wrappers/TAO/DAnCE -name_modifier "*_vc9"
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ACE", "ace\ACE_vc9.vcproj", "{BD537C9A-FECA-1BAD-6757-8A6300006755}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gperf", "apps\gperf\src\gperf_vc9.vcproj", "{BF204C9C-FECA-1BAD-6244-8A036423F5D3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{BD537C9A-FECA-1BAD-6757-8A6300006755} = {BD537C9A-FECA-1BAD-6757-8A6300006755}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

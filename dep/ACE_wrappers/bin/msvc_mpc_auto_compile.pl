@@ -26,11 +26,6 @@ else {
                   "$ACE_ROOT\\tests",
                   "$ACE_ROOT\\protocols");
 
-@tao_core_dirs = ("$ACE_ROOT\\apps",
-                  "$ACE_ROOT\\TAO\\TAO_IDL",
-                  "$ACE_ROOT\\TAO\\tao",
-                  "$ACE_ROOT\\TAO\\tests");
-
 @orbsvcs_core_dirs = ("$ACE_ROOT\\TAO\\orbsvcs\\orbsvcs");
 
 @dance_core_dirs = ("$ACE_ROOT\\TAO\\DAnCE");
@@ -158,7 +153,6 @@ sub Build_Custom ()
 sub Build_All ()
 {
     push @directories, @ace_core_dirs;
-    push @directories, @tao_core_dirs;
     push @directories, @orbsvcs_core_dirs;
     push @directories, @dance_core_dirs;
     push @directories, @ciao_core_dirs;
@@ -220,7 +214,6 @@ sub Build_Custom_VC7 ()
 sub Build_All_VC7 ()
 {
     push @directories, @ace_core_dirs;
-    push @directories, @tao_core_dirs;
     push @directories, @orbsvcs_core_dirs;
     push @directories, @dance_core_dirs;
     push @directories, @ciao_core_dirs;
@@ -291,13 +284,11 @@ while ( $#ARGV >= 0  &&  $ARGV[0] =~ /^(-|\/)/ )
         print "Building TAO\n" if ( $verbose );
         $use_custom_dir = 1;
         push @directories, @ace_core_dirs;
-        push @directories, @tao_core_dirs;
     }
     elsif ($ARGV[0] =~ '-ORBSVCS') {# Build TAO/ORBSVCS and its tests
         print "Building ACE+TAO+orbsvcs\n" if ( $verbose );
         $use_custom_dir = 1;
         push @directories, @ace_core_dirs;
-        push @directories, @tao_core_dirs;
         push @directories, @orbsvcs_core_dirs;
     }
     elsif ($ARGV[0] =~ '-CIAO') {# Build the CIAO and related
@@ -305,7 +296,6 @@ while ( $#ARGV >= 0  &&  $ARGV[0] =~ /^(-|\/)/ )
         print "Building only CIAO\n" if ( $verbose );
         $use_custom_dir = 1;
         push @directories, @ace_core_dirs;
-        push @directories, @tao_core_dirs;
         push @directories, @orbsvcs_core_dirs;
         push @directories, @dance_core_dirs;
         push @directories, @ciao_core_dirs;

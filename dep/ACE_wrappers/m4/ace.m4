@@ -638,46 +638,6 @@ AC_DEFUN([ACE_CONFIGURATION_OPTIONS],
    ace_user_enable_reentrant_funcs=yes
   ])
 
- AC_ARG_ENABLE([ace-examples],
-  AS_HELP_STRING(--enable-ace-examples,build ACE examples [[[yes]]]),
-  [
-   case "${enableval}" in
-    yes)
-      ace_build_examples=yes
-      ;;
-    no)
-      ace_build_examples=no
-      ;;
-    *)
-      AC_MSG_ERROR([bad value ${enableval} for --enable-ace-examples])
-      ;;
-   esac
-  ],
-  [
-   ace_build_examples=yes
-  ])
-  AM_CONDITIONAL([BUILD_EXAMPLES], [test X$ace_build_examples = Xyes])
-
- AC_ARG_ENABLE([ace-tests],
-  AS_HELP_STRING(--enable-ace-tests,build ACE tests [[[yes]]]),
-  [
-   case "${enableval}" in
-    yes)
-      ace_build_tests=yes
-      ;;
-    no)
-      ace_build_tests=no
-      ;;
-    *)
-      AC_MSG_ERROR([bad value ${enableval} for --enable-ace-tests])
-      ;;
-   esac
-  ],
-  [
-   ace_build_tests=yes
-  ])
- AM_CONDITIONAL([BUILD_TESTS], [test X$ace_build_tests = Xyes])
-
  ACE_ENABLE_CDR_SWAP_ON_READ
  ACE_ENABLE_CDR_SWAP_ON_WRITE
  ACE_ENABLE_CDR_ALIGNMENT

@@ -770,7 +770,6 @@ protocols
 KOKYU
 ASNMP
 ACEXML
-ACE_TESTS_DIR
 ACE_XLIBS
 ACE_ON_PENTIUM_FALSE
 ACE_ON_PENTIUM_TRUE
@@ -807,10 +806,6 @@ QUANTIFY
 PURIFY
 BUILD_EXCEPTIONS_FALSE
 BUILD_EXCEPTIONS_TRUE
-BUILD_TESTS_FALSE
-BUILD_TESTS_TRUE
-BUILD_EXAMPLES_FALSE
-BUILD_EXAMPLES_TRUE
 BUILD_ACEXML_FALSE
 BUILD_ACEXML_TRUE
 BUILD_SSL_FALSE
@@ -1151,8 +1146,6 @@ enable_acexml
 with_tao
 with_tli_device
 enable_reentrant
-enable_ace_examples
-enable_ace_tests
 enable_ace_cdr_swap_on_read
 enable_ace_cdr_swap_on_write
 enable_ace_cdr_alignment
@@ -1883,8 +1876,6 @@ Optional Features:
   --enable-ssl            compile/use the ACE_SSL library [[yes]]
   --enable-acexml         compile/use the ACEXML library [[yes]]
   --enable-reentrant      enable reentrant functions [[yes]]
-  --enable-ace-examples   build ACE examples [[yes]]
-  --enable-ace-tests      build ACE tests [[yes]]
   --enable-ace-cdr-swap-on-read
                           configure CDR to support swap on read [[yes]]
   --enable-ace-cdr-swap-on-write
@@ -9942,66 +9933,6 @@ else
 
    ace_user_enable_reentrant_funcs=yes
 
-fi
-
-
- # Check whether --enable-ace-examples was given.
-if test "${enable_ace_examples+set}" = set; then :
-  enableval=$enable_ace_examples;
-   case "${enableval}" in
-    yes)
-      ace_build_examples=yes
-      ;;
-    no)
-      ace_build_examples=no
-      ;;
-    *)
-      as_fn_error "bad value ${enableval} for --enable-ace-examples" "$LINENO" 5
-      ;;
-   esac
-
-else
-
-   ace_build_examples=yes
-
-fi
-
-   if test X$ace_build_examples = Xyes; then
-  BUILD_EXAMPLES_TRUE=
-  BUILD_EXAMPLES_FALSE='#'
-else
-  BUILD_EXAMPLES_TRUE='#'
-  BUILD_EXAMPLES_FALSE=
-fi
-
-
- # Check whether --enable-ace-tests was given.
-if test "${enable_ace_tests+set}" = set; then :
-  enableval=$enable_ace_tests;
-   case "${enableval}" in
-    yes)
-      ace_build_tests=yes
-      ;;
-    no)
-      ace_build_tests=no
-      ;;
-    *)
-      as_fn_error "bad value ${enableval} for --enable-ace-tests" "$LINENO" 5
-      ;;
-   esac
-
-else
-
-   ace_build_tests=yes
-
-fi
-
-  if test X$ace_build_tests = Xyes; then
-  BUILD_TESTS_TRUE=
-  BUILD_TESTS_FALSE='#'
-else
-  BUILD_TESTS_TRUE='#'
-  BUILD_TESTS_FALSE=
 fi
 
 
@@ -40371,70 +40302,8 @@ LD="$PURELINK $PRELINK $LD"
 
 
 
-ACE_TESTS_DIR=`pwd`/tests
+ac_config_files="$ac_config_files Makefile ace/Makefile ace/ETCL/Makefile ace/Monitor_Control/Makefile ace/QoS/Makefile ace/SSL/Makefile bin/Makefile bin/PerlACE/Makefile"
 
-
-
-
-ac_config_files="$ac_config_files Makefile ace/Makefile ace/ETCL/Makefile ace/Monitor_Control/Makefile ace/QoS/Makefile ace/SSL/Makefile apps/Makefile apps/Gateway/Makefile apps/Gateway/Gateway/Makefile apps/Gateway/Peer/Makefile apps/JAWS/Makefile apps/JAWS/clients/Makefile apps/JAWS/clients/Blobby/Makefile apps/JAWS/clients/Caching/Makefile apps/JAWS/server/Makefile apps/JAWS2/Makefile apps/JAWS2/HTTPU/Makefile apps/JAWS2/JAWS/Makefile apps/JAWS3/Makefile apps/JAWS3/jaws3/Makefile apps/drwho/Makefile apps/gperf/Makefile apps/gperf/src/Makefile apps/gperf/tests/Makefile apps/mkcsregdb/Makefile apps/soreduce/Makefile bin/Makefile bin/PerlACE/Makefile netsvcs/Makefile netsvcs/lib/Makefile netsvcs/clients/Makefile netsvcs/clients/Logger/Makefile netsvcs/clients/Naming/Makefile netsvcs/clients/Naming/Client/Makefile netsvcs/clients/Naming/Dump_Restore/Makefile netsvcs/servers/Makefile websvcs/Makefile websvcs/lib/Makefile websvcs/tests/Makefile"
-
-
-if test "$ace_build_examples" = yes; then
-  ac_config_files="$ac_config_files examples/Makefile examples/APG/Makefile examples/APG/Active_Objects/Makefile examples/APG/Config/Makefile examples/APG/Containers/Makefile examples/APG/Logging/Makefile examples/APG/Misc_IPC/Makefile examples/APG/Naming/Makefile examples/APG/Proactor/Makefile examples/APG/Processes/Makefile examples/APG/Reactor/Makefile examples/APG/Shared_Memory/Makefile examples/APG/Signals/Makefile examples/APG/Sockets/Makefile examples/APG/Streams/Makefile examples/APG/Svc_Config/Makefile examples/APG/ThreadManagement/Makefile examples/APG/ThreadPools/Makefile examples/APG/ThreadSafety/Makefile examples/APG/Threads/Makefile examples/APG/Timers/Makefile examples/ASX/Makefile examples/ASX/CCM_App/Makefile examples/ASX/Event_Server/Makefile examples/ASX/Event_Server/Event_Server/Makefile examples/ASX/Event_Server/Transceiver/Makefile examples/ASX/Message_Queue/Makefile examples/ASX/UPIPE_Event_Server/Makefile examples/Bounded_Packet_Relay/Makefile examples/C++NPv1/Makefile examples/C++NPv2/Makefile examples/ConfigViewer/Makefile examples/Connection/Makefile examples/Connection/blocking/Makefile examples/Connection/misc/Makefile examples/Connection/non_blocking/Makefile examples/DLL/Makefile examples/Export/Makefile examples/IOStream/Makefile examples/IOStream/client/Makefile examples/IOStream/server/Makefile examples/IPC_SAP/Makefile examples/IPC_SAP/ATM_SAP/Makefile examples/IPC_SAP/DEV_SAP/Makefile examples/IPC_SAP/DEV_SAP/reader/Makefile examples/IPC_SAP/DEV_SAP/writer/Makefile examples/IPC_SAP/FIFO_SAP/Makefile examples/IPC_SAP/FILE_SAP/Makefile examples/IPC_SAP/SOCK_SAP/Makefile examples/IPC_SAP/SPIPE_SAP/Makefile examples/IPC_SAP/SSL_SAP/Makefile examples/IPC_SAP/TLI_SAP/Makefile examples/IPC_SAP/UPIPE_SAP/Makefile examples/Log_Msg/Makefile examples/Logger/Makefile examples/Logger/Acceptor-server/Makefile examples/Logger/client/Makefile examples/Logger/simple-server/Makefile examples/Map_Manager/Makefile examples/Mem_Map/Makefile examples/Mem_Map/IO-tests/Makefile examples/Mem_Map/file-reverse/Makefile examples/Misc/Makefile examples/Monitor/Makefile examples/Monitor/Bytes_Sent/Makefile examples/Monitor/Message_Queue_Size/Makefile examples/Monitor/Constraint/Makefile examples/Monitor/CPU_Load/Makefile examples/Monitor/Num_Threads/Makefile examples/Monitor/Group/Makefile examples/Monitor/Memory_Usage/Makefile examples/NT_Service/Makefile examples/Naming/Makefile examples/OS/Makefile examples/OS/Process/Makefile examples/QOS/Makefile examples/QOS/Change_Receiver_FlowSpec/Makefile examples/QOS/Change_Sender_TSpec/Makefile examples/QOS/Diffserv/Makefile examples/QOS/Simple/Makefile examples/Reactor/Makefile examples/Reactor/Dgram/Makefile examples/Reactor/FIFO/Makefile examples/Reactor/Misc/Makefile examples/Reactor/Multicast/Makefile examples/Reactor/Ntalker/Makefile examples/Reactor/Proactor/Makefile examples/Reactor/TP_Reactor/Makefile examples/Reactor/WFMO_Reactor/Makefile examples/Registry/Makefile examples/Semaphores/Makefile examples/Service_Configurator/Makefile examples/Service_Configurator/IPC-tests/Makefile examples/Service_Configurator/IPC-tests/client/Makefile examples/Service_Configurator/IPC-tests/server/Makefile examples/Service_Configurator/Misc/Makefile examples/Shared_Malloc/Makefile examples/Shared_Memory/Makefile examples/Smart_Pointers/Makefile examples/Synch/Makefile examples/System_V_IPC/Makefile examples/System_V_IPC/SV_Message_Queues/Makefile examples/System_V_IPC/SV_Semaphores/Makefile examples/Threads/Makefile examples/Timer_Queue/Makefile examples/Web_Crawler/Makefile"
-
-fi
-
-if test "$ace_build_tests" = yes; then
-  ac_config_files="$ac_config_files performance-tests/Makefile performance-tests/Misc/Makefile performance-tests/SCTP/Makefile performance-tests/Server_Concurrency/Leader_Follower/Makefile performance-tests/Server_Concurrency/Makefile performance-tests/Server_Concurrency/Queue_Based_Workers/Makefile performance-tests/Synch-Benchmarks/Base_Test/Makefile performance-tests/Synch-Benchmarks/Makefile performance-tests/Synch-Benchmarks/Perf_Test/Makefile performance-tests/Synch-Benchmarks/Synch_Lib/Makefile performance-tests/TCP/Makefile performance-tests/UDP/Makefile tests/Makefile tests/SSL/Makefile"
-
-fi
-
-if test -d $srcdir/ACEXML; then
-  ac_config_files="$ac_config_files ACEXML/Makefile ACEXML/common/Makefile ACEXML/parser/Makefile ACEXML/parser/parser/Makefile ACEXML/apps/Makefile ACEXML/apps/svcconf/Makefile ACEXML/examples/Makefile ACEXML/examples/SAXPrint/Makefile ACEXML/tests/Makefile ACEXML/tests/util/Makefile"
-
-  ACEXML=ACEXML
-
-fi
-
-if test -d $srcdir/ASNMP; then
-  ac_config_files="$ac_config_files ASNMP/Makefile ASNMP/asnmp/Makefile ASNMP/agent/Makefile ASNMP/examples/Makefile ASNMP/examples/get/Makefile ASNMP/examples/next/Makefile ASNMP/examples/set/Makefile ASNMP/examples/trap/Makefile ASNMP/examples/walk/Makefile ASNMP/tests/Makefile"
-
-  ASNMP=ASNMP
-
-fi
-
-if test -d $srcdir/Kokyu; then
-  ac_config_files="$ac_config_files Kokyu/Makefile Kokyu/tests/Makefile Kokyu/tests/DSRT_MIF/Makefile Kokyu/tests/EDF/Makefile Kokyu/tests/FIFO/Makefile"
-
-  KOKYU=Kokyu
-
-fi
-
-if test -d $srcdir/protocols; then
-  ac_config_files="$ac_config_files protocols/Makefile protocols/ace/Makefile protocols/ace/HTBP/Makefile protocols/ace/RMCast/Makefile protocols/ace/TMCast/Makefile"
-
-
-    if test "$ace_build_examples" = yes; then
-    ac_config_files="$ac_config_files protocols/examples/Makefile protocols/examples/RMCast/Makefile protocols/examples/RMCast/Send_Msg/Makefile protocols/examples/TMCast/Makefile protocols/examples/TMCast/Member/Makefile"
-
-  fi
-
-    if test "$ace_build_tests" = yes; then
-    ac_config_files="$ac_config_files protocols/tests/HTBP/Makefile protocols/tests/HTBP/Reactor_Tests/Makefile protocols/tests/HTBP/Send_Large_Msg/Makefile protocols/tests/HTBP/Send_Recv_Tests/Makefile protocols/tests/HTBP/ping/Makefile protocols/tests/Makefile protocols/tests/RMCast/Makefile"
-
-  fi
-  protocols=protocols
-
-fi
-
-if test -d $srcdir/TAO -a X$ace_user_with_tao = Xyes; then
-
-
-subdirs="$subdirs TAO"
-
-  TAO=TAO
-
-fi
 
 ac_config_commands="$ac_config_commands default"
 
@@ -40793,14 +40662,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_ACEXML_TRUE}" && test -z "${BUILD_ACEXML_FALSE}"; then
   as_fn_error "conditional \"BUILD_ACEXML\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${BUILD_EXAMPLES_TRUE}" && test -z "${BUILD_EXAMPLES_FALSE}"; then
-  as_fn_error "conditional \"BUILD_EXAMPLES\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${BUILD_TESTS_TRUE}" && test -z "${BUILD_TESTS_FALSE}"; then
-  as_fn_error "conditional \"BUILD_TESTS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BUILD_EXCEPTIONS_TRUE}" && test -z "${BUILD_EXCEPTIONS_FALSE}"; then
@@ -41785,202 +41646,8 @@ do
     "ace/Monitor_Control/Makefile") CONFIG_FILES="$CONFIG_FILES ace/Monitor_Control/Makefile" ;;
     "ace/QoS/Makefile") CONFIG_FILES="$CONFIG_FILES ace/QoS/Makefile" ;;
     "ace/SSL/Makefile") CONFIG_FILES="$CONFIG_FILES ace/SSL/Makefile" ;;
-    "apps/Makefile") CONFIG_FILES="$CONFIG_FILES apps/Makefile" ;;
-    "apps/Gateway/Makefile") CONFIG_FILES="$CONFIG_FILES apps/Gateway/Makefile" ;;
-    "apps/Gateway/Gateway/Makefile") CONFIG_FILES="$CONFIG_FILES apps/Gateway/Gateway/Makefile" ;;
-    "apps/Gateway/Peer/Makefile") CONFIG_FILES="$CONFIG_FILES apps/Gateway/Peer/Makefile" ;;
-    "apps/JAWS/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS/Makefile" ;;
-    "apps/JAWS/clients/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS/clients/Makefile" ;;
-    "apps/JAWS/clients/Blobby/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS/clients/Blobby/Makefile" ;;
-    "apps/JAWS/clients/Caching/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS/clients/Caching/Makefile" ;;
-    "apps/JAWS/server/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS/server/Makefile" ;;
-    "apps/JAWS2/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS2/Makefile" ;;
-    "apps/JAWS2/HTTPU/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS2/HTTPU/Makefile" ;;
-    "apps/JAWS2/JAWS/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS2/JAWS/Makefile" ;;
-    "apps/JAWS3/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS3/Makefile" ;;
-    "apps/JAWS3/jaws3/Makefile") CONFIG_FILES="$CONFIG_FILES apps/JAWS3/jaws3/Makefile" ;;
-    "apps/drwho/Makefile") CONFIG_FILES="$CONFIG_FILES apps/drwho/Makefile" ;;
-    "apps/gperf/Makefile") CONFIG_FILES="$CONFIG_FILES apps/gperf/Makefile" ;;
-    "apps/gperf/src/Makefile") CONFIG_FILES="$CONFIG_FILES apps/gperf/src/Makefile" ;;
-    "apps/gperf/tests/Makefile") CONFIG_FILES="$CONFIG_FILES apps/gperf/tests/Makefile" ;;
-    "apps/mkcsregdb/Makefile") CONFIG_FILES="$CONFIG_FILES apps/mkcsregdb/Makefile" ;;
-    "apps/soreduce/Makefile") CONFIG_FILES="$CONFIG_FILES apps/soreduce/Makefile" ;;
     "bin/Makefile") CONFIG_FILES="$CONFIG_FILES bin/Makefile" ;;
     "bin/PerlACE/Makefile") CONFIG_FILES="$CONFIG_FILES bin/PerlACE/Makefile" ;;
-    "netsvcs/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/Makefile" ;;
-    "netsvcs/lib/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/lib/Makefile" ;;
-    "netsvcs/clients/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/clients/Makefile" ;;
-    "netsvcs/clients/Logger/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/clients/Logger/Makefile" ;;
-    "netsvcs/clients/Naming/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/clients/Naming/Makefile" ;;
-    "netsvcs/clients/Naming/Client/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/clients/Naming/Client/Makefile" ;;
-    "netsvcs/clients/Naming/Dump_Restore/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/clients/Naming/Dump_Restore/Makefile" ;;
-    "netsvcs/servers/Makefile") CONFIG_FILES="$CONFIG_FILES netsvcs/servers/Makefile" ;;
-    "websvcs/Makefile") CONFIG_FILES="$CONFIG_FILES websvcs/Makefile" ;;
-    "websvcs/lib/Makefile") CONFIG_FILES="$CONFIG_FILES websvcs/lib/Makefile" ;;
-    "websvcs/tests/Makefile") CONFIG_FILES="$CONFIG_FILES websvcs/tests/Makefile" ;;
-    "examples/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Makefile" ;;
-    "examples/APG/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Makefile" ;;
-    "examples/APG/Active_Objects/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Active_Objects/Makefile" ;;
-    "examples/APG/Config/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Config/Makefile" ;;
-    "examples/APG/Containers/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Containers/Makefile" ;;
-    "examples/APG/Logging/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Logging/Makefile" ;;
-    "examples/APG/Misc_IPC/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Misc_IPC/Makefile" ;;
-    "examples/APG/Naming/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Naming/Makefile" ;;
-    "examples/APG/Proactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Proactor/Makefile" ;;
-    "examples/APG/Processes/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Processes/Makefile" ;;
-    "examples/APG/Reactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Reactor/Makefile" ;;
-    "examples/APG/Shared_Memory/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Shared_Memory/Makefile" ;;
-    "examples/APG/Signals/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Signals/Makefile" ;;
-    "examples/APG/Sockets/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Sockets/Makefile" ;;
-    "examples/APG/Streams/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Streams/Makefile" ;;
-    "examples/APG/Svc_Config/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Svc_Config/Makefile" ;;
-    "examples/APG/ThreadManagement/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/ThreadManagement/Makefile" ;;
-    "examples/APG/ThreadPools/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/ThreadPools/Makefile" ;;
-    "examples/APG/ThreadSafety/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/ThreadSafety/Makefile" ;;
-    "examples/APG/Threads/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Threads/Makefile" ;;
-    "examples/APG/Timers/Makefile") CONFIG_FILES="$CONFIG_FILES examples/APG/Timers/Makefile" ;;
-    "examples/ASX/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/Makefile" ;;
-    "examples/ASX/CCM_App/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/CCM_App/Makefile" ;;
-    "examples/ASX/Event_Server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/Event_Server/Makefile" ;;
-    "examples/ASX/Event_Server/Event_Server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/Event_Server/Event_Server/Makefile" ;;
-    "examples/ASX/Event_Server/Transceiver/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/Event_Server/Transceiver/Makefile" ;;
-    "examples/ASX/Message_Queue/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/Message_Queue/Makefile" ;;
-    "examples/ASX/UPIPE_Event_Server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ASX/UPIPE_Event_Server/Makefile" ;;
-    "examples/Bounded_Packet_Relay/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Bounded_Packet_Relay/Makefile" ;;
-    "examples/C++NPv1/Makefile") CONFIG_FILES="$CONFIG_FILES examples/C++NPv1/Makefile" ;;
-    "examples/C++NPv2/Makefile") CONFIG_FILES="$CONFIG_FILES examples/C++NPv2/Makefile" ;;
-    "examples/ConfigViewer/Makefile") CONFIG_FILES="$CONFIG_FILES examples/ConfigViewer/Makefile" ;;
-    "examples/Connection/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Connection/Makefile" ;;
-    "examples/Connection/blocking/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Connection/blocking/Makefile" ;;
-    "examples/Connection/misc/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Connection/misc/Makefile" ;;
-    "examples/Connection/non_blocking/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Connection/non_blocking/Makefile" ;;
-    "examples/DLL/Makefile") CONFIG_FILES="$CONFIG_FILES examples/DLL/Makefile" ;;
-    "examples/Export/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Export/Makefile" ;;
-    "examples/IOStream/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IOStream/Makefile" ;;
-    "examples/IOStream/client/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IOStream/client/Makefile" ;;
-    "examples/IOStream/server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IOStream/server/Makefile" ;;
-    "examples/IPC_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/Makefile" ;;
-    "examples/IPC_SAP/ATM_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/ATM_SAP/Makefile" ;;
-    "examples/IPC_SAP/DEV_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/DEV_SAP/Makefile" ;;
-    "examples/IPC_SAP/DEV_SAP/reader/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/DEV_SAP/reader/Makefile" ;;
-    "examples/IPC_SAP/DEV_SAP/writer/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/DEV_SAP/writer/Makefile" ;;
-    "examples/IPC_SAP/FIFO_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/FIFO_SAP/Makefile" ;;
-    "examples/IPC_SAP/FILE_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/FILE_SAP/Makefile" ;;
-    "examples/IPC_SAP/SOCK_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/SOCK_SAP/Makefile" ;;
-    "examples/IPC_SAP/SPIPE_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/SPIPE_SAP/Makefile" ;;
-    "examples/IPC_SAP/SSL_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/SSL_SAP/Makefile" ;;
-    "examples/IPC_SAP/TLI_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/TLI_SAP/Makefile" ;;
-    "examples/IPC_SAP/UPIPE_SAP/Makefile") CONFIG_FILES="$CONFIG_FILES examples/IPC_SAP/UPIPE_SAP/Makefile" ;;
-    "examples/Log_Msg/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Log_Msg/Makefile" ;;
-    "examples/Logger/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Logger/Makefile" ;;
-    "examples/Logger/Acceptor-server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Logger/Acceptor-server/Makefile" ;;
-    "examples/Logger/client/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Logger/client/Makefile" ;;
-    "examples/Logger/simple-server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Logger/simple-server/Makefile" ;;
-    "examples/Map_Manager/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Map_Manager/Makefile" ;;
-    "examples/Mem_Map/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Mem_Map/Makefile" ;;
-    "examples/Mem_Map/IO-tests/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Mem_Map/IO-tests/Makefile" ;;
-    "examples/Mem_Map/file-reverse/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Mem_Map/file-reverse/Makefile" ;;
-    "examples/Misc/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Misc/Makefile" ;;
-    "examples/Monitor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Makefile" ;;
-    "examples/Monitor/Bytes_Sent/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Bytes_Sent/Makefile" ;;
-    "examples/Monitor/Message_Queue_Size/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Message_Queue_Size/Makefile" ;;
-    "examples/Monitor/Constraint/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Constraint/Makefile" ;;
-    "examples/Monitor/CPU_Load/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/CPU_Load/Makefile" ;;
-    "examples/Monitor/Num_Threads/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Num_Threads/Makefile" ;;
-    "examples/Monitor/Group/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Group/Makefile" ;;
-    "examples/Monitor/Memory_Usage/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Monitor/Memory_Usage/Makefile" ;;
-    "examples/NT_Service/Makefile") CONFIG_FILES="$CONFIG_FILES examples/NT_Service/Makefile" ;;
-    "examples/Naming/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Naming/Makefile" ;;
-    "examples/OS/Makefile") CONFIG_FILES="$CONFIG_FILES examples/OS/Makefile" ;;
-    "examples/OS/Process/Makefile") CONFIG_FILES="$CONFIG_FILES examples/OS/Process/Makefile" ;;
-    "examples/QOS/Makefile") CONFIG_FILES="$CONFIG_FILES examples/QOS/Makefile" ;;
-    "examples/QOS/Change_Receiver_FlowSpec/Makefile") CONFIG_FILES="$CONFIG_FILES examples/QOS/Change_Receiver_FlowSpec/Makefile" ;;
-    "examples/QOS/Change_Sender_TSpec/Makefile") CONFIG_FILES="$CONFIG_FILES examples/QOS/Change_Sender_TSpec/Makefile" ;;
-    "examples/QOS/Diffserv/Makefile") CONFIG_FILES="$CONFIG_FILES examples/QOS/Diffserv/Makefile" ;;
-    "examples/QOS/Simple/Makefile") CONFIG_FILES="$CONFIG_FILES examples/QOS/Simple/Makefile" ;;
-    "examples/Reactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Makefile" ;;
-    "examples/Reactor/Dgram/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Dgram/Makefile" ;;
-    "examples/Reactor/FIFO/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/FIFO/Makefile" ;;
-    "examples/Reactor/Misc/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Misc/Makefile" ;;
-    "examples/Reactor/Multicast/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Multicast/Makefile" ;;
-    "examples/Reactor/Ntalker/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Ntalker/Makefile" ;;
-    "examples/Reactor/Proactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/Proactor/Makefile" ;;
-    "examples/Reactor/TP_Reactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/TP_Reactor/Makefile" ;;
-    "examples/Reactor/WFMO_Reactor/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Reactor/WFMO_Reactor/Makefile" ;;
-    "examples/Registry/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Registry/Makefile" ;;
-    "examples/Semaphores/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Semaphores/Makefile" ;;
-    "examples/Service_Configurator/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Service_Configurator/Makefile" ;;
-    "examples/Service_Configurator/IPC-tests/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Service_Configurator/IPC-tests/Makefile" ;;
-    "examples/Service_Configurator/IPC-tests/client/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Service_Configurator/IPC-tests/client/Makefile" ;;
-    "examples/Service_Configurator/IPC-tests/server/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Service_Configurator/IPC-tests/server/Makefile" ;;
-    "examples/Service_Configurator/Misc/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Service_Configurator/Misc/Makefile" ;;
-    "examples/Shared_Malloc/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Shared_Malloc/Makefile" ;;
-    "examples/Shared_Memory/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Shared_Memory/Makefile" ;;
-    "examples/Smart_Pointers/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Smart_Pointers/Makefile" ;;
-    "examples/Synch/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Synch/Makefile" ;;
-    "examples/System_V_IPC/Makefile") CONFIG_FILES="$CONFIG_FILES examples/System_V_IPC/Makefile" ;;
-    "examples/System_V_IPC/SV_Message_Queues/Makefile") CONFIG_FILES="$CONFIG_FILES examples/System_V_IPC/SV_Message_Queues/Makefile" ;;
-    "examples/System_V_IPC/SV_Semaphores/Makefile") CONFIG_FILES="$CONFIG_FILES examples/System_V_IPC/SV_Semaphores/Makefile" ;;
-    "examples/Threads/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Threads/Makefile" ;;
-    "examples/Timer_Queue/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Timer_Queue/Makefile" ;;
-    "examples/Web_Crawler/Makefile") CONFIG_FILES="$CONFIG_FILES examples/Web_Crawler/Makefile" ;;
-    "performance-tests/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Makefile" ;;
-    "performance-tests/Misc/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Misc/Makefile" ;;
-    "performance-tests/SCTP/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/SCTP/Makefile" ;;
-    "performance-tests/Server_Concurrency/Leader_Follower/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Server_Concurrency/Leader_Follower/Makefile" ;;
-    "performance-tests/Server_Concurrency/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Server_Concurrency/Makefile" ;;
-    "performance-tests/Server_Concurrency/Queue_Based_Workers/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Server_Concurrency/Queue_Based_Workers/Makefile" ;;
-    "performance-tests/Synch-Benchmarks/Base_Test/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Synch-Benchmarks/Base_Test/Makefile" ;;
-    "performance-tests/Synch-Benchmarks/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Synch-Benchmarks/Makefile" ;;
-    "performance-tests/Synch-Benchmarks/Perf_Test/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Synch-Benchmarks/Perf_Test/Makefile" ;;
-    "performance-tests/Synch-Benchmarks/Synch_Lib/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/Synch-Benchmarks/Synch_Lib/Makefile" ;;
-    "performance-tests/TCP/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/TCP/Makefile" ;;
-    "performance-tests/UDP/Makefile") CONFIG_FILES="$CONFIG_FILES performance-tests/UDP/Makefile" ;;
-    "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
-    "tests/SSL/Makefile") CONFIG_FILES="$CONFIG_FILES tests/SSL/Makefile" ;;
-    "ACEXML/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/Makefile" ;;
-    "ACEXML/common/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/common/Makefile" ;;
-    "ACEXML/parser/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/parser/Makefile" ;;
-    "ACEXML/parser/parser/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/parser/parser/Makefile" ;;
-    "ACEXML/apps/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/apps/Makefile" ;;
-    "ACEXML/apps/svcconf/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/apps/svcconf/Makefile" ;;
-    "ACEXML/examples/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/examples/Makefile" ;;
-    "ACEXML/examples/SAXPrint/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/examples/SAXPrint/Makefile" ;;
-    "ACEXML/tests/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/tests/Makefile" ;;
-    "ACEXML/tests/util/Makefile") CONFIG_FILES="$CONFIG_FILES ACEXML/tests/util/Makefile" ;;
-    "ASNMP/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/Makefile" ;;
-    "ASNMP/asnmp/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/asnmp/Makefile" ;;
-    "ASNMP/agent/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/agent/Makefile" ;;
-    "ASNMP/examples/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/Makefile" ;;
-    "ASNMP/examples/get/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/get/Makefile" ;;
-    "ASNMP/examples/next/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/next/Makefile" ;;
-    "ASNMP/examples/set/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/set/Makefile" ;;
-    "ASNMP/examples/trap/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/trap/Makefile" ;;
-    "ASNMP/examples/walk/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/examples/walk/Makefile" ;;
-    "ASNMP/tests/Makefile") CONFIG_FILES="$CONFIG_FILES ASNMP/tests/Makefile" ;;
-    "Kokyu/Makefile") CONFIG_FILES="$CONFIG_FILES Kokyu/Makefile" ;;
-    "Kokyu/tests/Makefile") CONFIG_FILES="$CONFIG_FILES Kokyu/tests/Makefile" ;;
-    "Kokyu/tests/DSRT_MIF/Makefile") CONFIG_FILES="$CONFIG_FILES Kokyu/tests/DSRT_MIF/Makefile" ;;
-    "Kokyu/tests/EDF/Makefile") CONFIG_FILES="$CONFIG_FILES Kokyu/tests/EDF/Makefile" ;;
-    "Kokyu/tests/FIFO/Makefile") CONFIG_FILES="$CONFIG_FILES Kokyu/tests/FIFO/Makefile" ;;
-    "protocols/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/Makefile" ;;
-    "protocols/ace/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/ace/Makefile" ;;
-    "protocols/ace/HTBP/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/ace/HTBP/Makefile" ;;
-    "protocols/ace/RMCast/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/ace/RMCast/Makefile" ;;
-    "protocols/ace/TMCast/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/ace/TMCast/Makefile" ;;
-    "protocols/examples/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/examples/Makefile" ;;
-    "protocols/examples/RMCast/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/examples/RMCast/Makefile" ;;
-    "protocols/examples/RMCast/Send_Msg/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/examples/RMCast/Send_Msg/Makefile" ;;
-    "protocols/examples/TMCast/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/examples/TMCast/Makefile" ;;
-    "protocols/examples/TMCast/Member/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/examples/TMCast/Member/Makefile" ;;
-    "protocols/tests/HTBP/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/HTBP/Makefile" ;;
-    "protocols/tests/HTBP/Reactor_Tests/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/HTBP/Reactor_Tests/Makefile" ;;
-    "protocols/tests/HTBP/Send_Large_Msg/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/HTBP/Send_Large_Msg/Makefile" ;;
-    "protocols/tests/HTBP/Send_Recv_Tests/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/HTBP/Send_Recv_Tests/Makefile" ;;
-    "protocols/tests/HTBP/ping/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/HTBP/ping/Makefile" ;;
-    "protocols/tests/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/Makefile" ;;
-    "protocols/tests/RMCast/Makefile") CONFIG_FILES="$CONFIG_FILES protocols/tests/RMCast/Makefile" ;;
-    "default") CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
 
   *) as_fn_error "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -180,7 +180,7 @@ $config_list->my_config_list (@CONFIGURATION_OPTIONS);
 
 if ($#BUILD_LIST == -1) {
   if ($dont_build_tao) {
-    @BUILD_LIST=('ace', 'netsvcs', 'tests');
+    @BUILD_LIST=('ace');
   }
   else {
     @BUILD_LIST=('.', 'TAO');

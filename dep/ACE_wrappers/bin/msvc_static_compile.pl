@@ -16,20 +16,7 @@ use Cwd;
 
 @directories = ();
 
-@ace_dirs = ("$ACE_ROOT\\ace",
-             "$ACE_ROOT\\ACEXML\\common",
-             "$ACE_ROOT\\ACEXML\\parser",
-             "$ACE_ROOT\\ACEXML\\apps",
-             "$ACE_ROOT\\ACEXML\\tests",
-             "$ACE_ROOT\\ACEXML\\examples",
-             "$ACE_ROOT\\apps",
-             "$ACE_ROOT\\ASNMP",
-             "$ACE_ROOT\\examples",
-             "$ACE_ROOT\\netsvcs",
-             "$ACE_ROOT\\performance-tests",
-             "$ACE_ROOT\\protocols",
-             "$ACE_ROOT\\tests",
-             "$ACE_ROOT\\websvcs");
+@ace_dirs = ("$ACE_ROOT\\ace");
 
 $debug = 0;
 $verbose = 0;

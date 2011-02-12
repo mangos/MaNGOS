@@ -130,10 +130,7 @@ push @INC, $CHECKOUT . '/' . $MODULE . '/bin';
 
 if ($#BUILD_LIST == -1) {
   @BUILD_LIST=
-    ('ace',
-     'netsvcs',
-     'tests',
-     'apps/gperf');
+    ('ace');
 }
 if ($debug) {
 

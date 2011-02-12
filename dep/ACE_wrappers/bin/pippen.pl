@@ -211,11 +211,7 @@ ProjectSearch (0, @roots);
 if ($aceroot == 1) {
     my $oldrecurse = $recurse;
     $recurse = 1;
-    my @aceroots = ($ENV{ACE_ROOT}."\\ace",
-                    $ENV{ACE_ROOT}."\\apps\\gperf\\src",
-                    $ENV{ACE_ROOT}."\\TAO\\TAO_IDL",
-                    $ENV{ACE_ROOT}."\\TAO\\tao",
-                    $ENV{ACE_ROOT}."\\TAO\\orbsvcs\\orbsvcs");
+    my @aceroots = ($ENV{ACE_ROOT}."\\ace");
     ProjectSearch (0, @aceroots);
     $recurse = $oldrecurse;
 }
