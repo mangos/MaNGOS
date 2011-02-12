@@ -710,12 +710,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
             sObjectMgr.AddCreatureToGrid(*itr, data);
 
-            // FIXME: gameevent system can't work correctly in instanceable maps while object sin instances use dynamic guids
-            // Current code prevent wrong way work until switch to use static guids for instance objects
-            MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
-
-            if (mapEntry && !mapEntry->Instanceable())
-                Creature::SpawnInMaps(*itr, data);
+            Creature::SpawnInMaps(*itr, data);
         }
     }
 
@@ -745,12 +740,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
             sObjectMgr.AddGameobjectToGrid(*itr, data);
 
-            // FIXME: gameevent system can't work correctly in instanceable maps while object sin instances use dynamic guids
-            // Current code prevent wrong way work until switch to use static guids for instance objects
-            MapEntry const* mapEntry = sMapStore.LookupEntry(data->mapid);
-
-            if (mapEntry && !mapEntry->Instanceable())
-                GameObject::SpawnInMaps(*itr, data);
+            GameObject::SpawnInMaps(*itr, data);
         }
     }
 
