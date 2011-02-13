@@ -14,7 +14,7 @@ ConfVersion=2010100901
 #    DataDir
 #        Data directory setting.
 #        Important: DataDir needs to be quoted, as it is a string which may contain space characters.
-#        Example: "@prefix@/share/mangos"
+#        Example: "@CMAKE_INSTALL_PREFIX@/share/mangos"
 #
 #    LogsDir
 #        Logs directory setting.

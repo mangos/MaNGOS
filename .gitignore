@@ -80,8 +80,31 @@ cmake_install.cmake
 #
 # Special exceptions
 #
+
+# cmake generated files in sources
+dep/ACE_wrappers/ace/ACE_vc8.vcxproj*
+dep/ACE_wrappers/ace/Backup*
+dep/ACE_wrappers/ace/Debug*
+dep/ACE_wrappers/ace/ETCL/ACE_ETCL_Parser_vc8.vcxproj*
+dep/ACE_wrappers/ace/ETCL/ACE_ETCL_vc8.vcxproj*
+dep/ACE_wrappers/ace/ETCL/Debug*
+dep/ACE_wrappers/ace/ETCL/Release*
+dep/ACE_wrappers/ace/Monitor_Control/Debug*
+dep/ACE_wrappers/ace/Monitor_Control/Monitor_Control_vc8.vcxproj*
+dep/ACE_wrappers/ace/Monitor_Control/Release*
+dep/ACE_wrappers/ace/QoS/Debug*
+dep/ACE_wrappers/ace/QoS/QoS_vc8.vcxproj*
+dep/ACE_wrappers/ace/QoS/Release*
+dep/ACE_wrappers/ace/UpgradeLog*
+dep/ACE_wrappers/ace/Release*
+dep/ACE_wrappers/ace/_UpgradeReport_Files*
+dep/ACE_wrappers/lib/*
+dep/ACE_wrappers/ace/config.h
+
+# ned files from excluded dirs
 !dep/ACE_wrappers/ace/ace_message_table.bin
 !dep/ACE_wrappers/bin/GNUmakefile.bin
 !dep/ACE_wrappers/configure.ac~
 !dep/ACE_wrappers/lib/.empty
 !dep/tbb/src/Makefile
+
