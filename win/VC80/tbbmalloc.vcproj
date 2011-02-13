@@ -1048,6 +1048,54 @@
 			<File
 				RelativePath="..\..\dep\tbb\src\tbbmalloc\tbbmalloc.rc"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_NoPCH|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug_NoPCH|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build\vsproject"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>
