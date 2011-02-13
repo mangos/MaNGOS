@@ -21,32 +21,16 @@
 #
 # Top-level generic files
 #
+bin
+build
 tags
 TAGS
-INSTALL
 !.gitignore
 
 #
 # Build generated files
 #
-aclocal.m4
 autom4te.cache
-compile
-config.guess
-config.h.in
-config.log
-config.status
-config.sub
-configure
-depcomp
-libtool
-install-sh
-ltmain.sh
-missing
-stamp-h1
-
-Makefile.in
-Makefile
 
 #
 # Editors / debuggers / other output files
@@ -97,4 +81,7 @@ cmake_install.cmake
 # Special exceptions
 #
 !dep/ACE_wrappers/ace/ace_message_table.bin
+!dep/ACE_wrappers/bin/GNUmakefile.bin
+!dep/ACE_wrappers/configure.ac~
+!dep/ACE_wrappers/lib/.empty
 !dep/tbb/src/Makefile

@@ -47,11 +47,6 @@ sql/ subdirectory. In case you are upgrading from an older MaNGOS release,
 make sure you as well take a look at the SQL files in the sql/updates/ sub-
 directory.
 
-In order to build and install MaNGOS under Linux, follow the instructions
-described in the INSTALL file.
-
-In case you have checked out MaNGOS from the GIT repository, please run
-
-$ autoreconf --install --force
-
-prior to building, as you may otherwise not be able to run a build.
+In order to build and install MaNGOS under Windows, simply use the delivered
+project files under win/. If you use a different system use CMake to generate
+the appropriate build files for your system.
