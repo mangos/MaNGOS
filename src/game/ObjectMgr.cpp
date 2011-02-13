@@ -5634,7 +5634,7 @@ void ObjectMgr::SetHighestGuids()
     result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject" );
     if( result )
     {
-        m_CreatureFirstGuid = (*result)[0].GetUInt32()+1;
+        m_GameObjectFirstGuid = (*result)[0].GetUInt32()+1;
         delete result;
     }
 
