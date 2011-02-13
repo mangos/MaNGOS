@@ -27,13 +27,13 @@
 */
 
 // Please define version number in the file:
-#include "../../include/tbb/tbb_stddef.h"
+#include "tbb/tbb_stddef.h"
 
 // And don't touch anything below
 #ifndef ENDL
 #define ENDL "\n"
 #endif
-#include "../../build/vsproject/version_string.tmp"
+#include "version_string.tmp"
 
 #ifndef __TBB_VERSION_STRINGS
 #pragma message("Warning: version_string.tmp isn't generated properly by version_info.sh script!")
