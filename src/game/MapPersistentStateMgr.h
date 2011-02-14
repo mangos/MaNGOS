@@ -34,9 +34,22 @@
 struct InstanceTemplate;
 struct MapEntry;
 struct MapDifficulty;
+struct GameObjectData;
+struct CreatureData;
+
 class Player;
 class Group;
 class Map;
+
+typedef std::set<uint32> CellGuidSet;
+
+struct MapCellObjectGuids
+{
+    CellGuidSet creatures;
+    CellGuidSet gameobjects;
+};
+
+typedef UNORDERED_MAP<uint32/*cell_id*/,MapCellObjectGuids> MapCellObjectGuidsMap;
 
 class MapPersistentStateManager;
 
@@ -87,6 +100,12 @@ class MapPersistentState
         }
         void SaveGORespawnTime(uint32 loguid, time_t t);
 
+        // grid objects (Dynamic map/instance specific added/removed grid spawns from pool system/etc)
+        MapCellObjectGuids const& GetCellObjectGuids(uint32 cell_id) { return m_gridObjectGuids[cell_id]; }
+        void AddCreatureToGrid(uint32 guid, CreatureData const* data);
+        void RemoveCreatureFromGrid(uint32 guid, CreatureData const* data);
+        void AddGameobjectToGrid(uint32 guid, GameObjectData const* data);
+        void RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data);
     protected:
         virtual bool CanBeUnload() const =0;                // body provided for subclasses
 
@@ -109,6 +128,7 @@ class MapPersistentState
         // persistent data
         RespawnTimes m_creatureRespawnTimes;                // lock MapPersistentState from unload, for example for temporary bound dungeon unload delay
         RespawnTimes m_goRespawnTimes;                      // lock MapPersistentState from unload, for example for temporary bound dungeon unload delay
+        MapCellObjectGuidsMap m_gridObjectGuids;            // Single map copy specific grid spawn data, like pool spawns
 };
 
 inline bool MapPersistentState::CanBeUnload() const

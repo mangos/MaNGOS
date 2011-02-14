@@ -128,6 +128,38 @@ void MapPersistentState::ClearRespawnTimes()
     UnloadIfEmpty();
 }
 
+void MapPersistentState::AddCreatureToGrid( uint32 guid, CreatureData const* data )
+{
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+
+    m_gridObjectGuids[cell_id].creatures.insert(guid);
+}
+
+void MapPersistentState::RemoveCreatureFromGrid( uint32 guid, CreatureData const* data )
+{
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+
+    m_gridObjectGuids[cell_id].creatures.erase(guid);
+}
+
+void MapPersistentState::AddGameobjectToGrid( uint32 guid, GameObjectData const* data )
+{
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+
+    m_gridObjectGuids[cell_id].gameobjects.insert(guid);
+}
+
+void MapPersistentState::RemoveGameobjectFromGrid( uint32 guid, GameObjectData const* data )
+{
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+
+    m_gridObjectGuids[cell_id].gameobjects.erase(guid);
+}
+
 //== WorldPersistentState functions ========================
 
 bool WorldPersistentState::CanBeUnload() const
