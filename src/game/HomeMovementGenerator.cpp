@@ -73,7 +73,7 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
         if (owner.GetDefaultMovementType() == IDLE_MOTION_TYPE)
         {
             // such a mob might need very exact spawning point, hence relocate to spawn-position
-            if (CreatureData const* data = sObjectMgr.GetCreatureData(owner.GetDBTableGUIDLow()))
+            if (CreatureData const* data = sObjectMgr.GetCreatureData(owner.GetGUIDLow()))
             {
                 owner.Relocate(data->posX, data->posY, data->posZ, data->orientation);
                 owner.SendHeartBeat(false);

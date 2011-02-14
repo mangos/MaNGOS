@@ -216,7 +216,7 @@ void MaNGOS::RespawnDo::operator()( Creature* u ) const
     Map* map = u->GetMap();
     if (map->IsBattleGroundOrArena())
     {
-        BattleGroundEventIdx eventId = sBattleGroundMgr.GetCreatureEventIndex(u->GetDBTableGUIDLow());
+        BattleGroundEventIdx eventId = sBattleGroundMgr.GetCreatureEventIndex(u->GetGUIDLow());
         if (!((BattleGroundMap*)map)->GetBG()->IsActiveEvent(eventId.event1, eventId.event2))
             return;
     }
@@ -230,7 +230,7 @@ void MaNGOS::RespawnDo::operator()( GameObject* u ) const
     Map* map = u->GetMap();
     if (map->IsBattleGroundOrArena())
     {
-        BattleGroundEventIdx eventId = sBattleGroundMgr.GetGameObjectEventIndex(u->GetDBTableGUIDLow());
+        BattleGroundEventIdx eventId = sBattleGroundMgr.GetGameObjectEventIndex(u->GetGUIDLow());
         if (!((BattleGroundMap*)map)->GetBG()->IsActiveEvent(eventId.event1, eventId.event2))
             return;
     }

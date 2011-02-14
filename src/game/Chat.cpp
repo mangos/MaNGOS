@@ -2703,23 +2703,14 @@ bool ChatHandler::ExtractUint32KeyFromLink(char** text, char const* linkType, ui
     return ExtractUInt32(&arg, value);
 }
 
-GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry)
+GameObject* ChatHandler::GetGameObjectWithGuid(uint32 lowguid,uint32 entry)
 {
-    if(!m_session)
+    if (!m_session)
         return NULL;
 
     Player* pl = m_session->GetPlayer();
 
-    GameObject* obj = pl->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, entry, lowguid));
-
-    if(!obj && sObjectMgr.GetGOData(lowguid))                   // guid is DB guid of object
-    {
-        MaNGOS::GameObjectWithDbGUIDCheck go_check(*pl,lowguid);
-        MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(obj,go_check);
-        Cell::VisitGridObjects(pl,checker, pl->GetMap()->GetVisibilityDistance());
-    }
-
-    return obj;
+    return pl->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, entry, lowguid));
 }
 
 enum SpellLinkType

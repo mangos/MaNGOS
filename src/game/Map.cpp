@@ -1183,7 +1183,7 @@ void Map::AddToActive( WorldObject* obj )
     {
         Creature* c= (Creature*)obj;
 
-        if (!c->IsPet() && c->GetDBTableGUIDLow())
+        if (!c->IsPet() && c->HasStaticDBSpawnData())
         {
             float x,y,z;
             c->GetRespawnCoord(x,y,z);
@@ -1218,7 +1218,7 @@ void Map::RemoveFromActive( WorldObject* obj )
     {
         Creature* c= (Creature*)obj;
 
-        if(!c->IsPet() && c->GetDBTableGUIDLow())
+        if(!c->IsPet() && c->HasStaticDBSpawnData())
         {
             float x,y,z;
             c->GetRespawnCoord(x,y,z);
@@ -2140,11 +2140,8 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
             {
-                if (!step.script->respawnGo.goGuid)         // gameobject not specified
-                {
-                    sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) call for NULL gameobject.", step.script->id);
+                if (!step.script->respawnGo.goGuid)         // checked at load
                     break;
-                }
 
                 if (!source)
                 {
@@ -2159,17 +2156,23 @@ void Map::ScriptsProcess()
                 }
 
                 WorldObject* summoner = (WorldObject*)source;
+                if (!summoner->IsInWorld())
+                {
+                    sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) call for non-in-world WorldObject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
 
-                GameObject *go = NULL;
                 int32 time_to_despawn = step.script->respawnGo.despawnDelay < 5 ? 5 : step.script->respawnGo.despawnDelay;
 
-                MaNGOS::GameObjectWithDbGUIDCheck go_check(*summoner, step.script->respawnGo.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(go, go_check);
-                Cell::VisitGridObjects(summoner, checker, GetVisibilityDistance());
+                uint32 guidlow = step.script->respawnGo.goGuid;
+                GameObjectData const* goData = sObjectMgr.GetGOData(guidlow);
+                if (!goData)
+                    break;                                  // checked at load
 
+                GameObject *go = summoner->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, goData->id, guidlow));
                 if (!go)
                 {
-                    sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject(guid: %u).", step.script->id, step.script->respawnGo.goGuid);
+                    sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) failed for gameobject(guid: %u).", step.script->id, guidlow);
                     break;
                 }
 
@@ -2229,11 +2232,8 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_OPEN_DOOR:
             {
-                if (!step.script->openDoor.goGuid)          // door not specified
-                {
-                    sLog.outError("SCRIPT_COMMAND_OPEN_DOOR (script id %u) call for NULL door.", step.script->id);
+                if (!step.script->openDoor.goGuid)          // checked at load
                     break;
-                }
 
                 if (!source)
                 {
@@ -2248,14 +2248,20 @@ void Map::ScriptsProcess()
                 }
 
                 Unit* caster = (Unit*)source;
+                if (!caster->IsInWorld())
+                {
+                    sLog.outError("SCRIPT_COMMAND_OPEN_DOOR (script id %u) call for non-in-world unit (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
 
-                GameObject *door = NULL;
                 int32 time_to_close = step.script->openDoor.resetDelay < 15 ? 15 : step.script->openDoor.resetDelay;
 
-                MaNGOS::GameObjectWithDbGUIDCheck go_check(*caster, step.script->openDoor.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(door, go_check);
-                Cell::VisitGridObjects(caster, checker, GetVisibilityDistance());
+                uint32 guidlow = step.script->openDoor.goGuid;
+                GameObjectData const* goData = sObjectMgr.GetGOData(guidlow);
+                if (!goData)                                // checked at load
+                    break;
 
+                GameObject *door = caster->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, goData->id, guidlow));
                 if (!door)
                 {
                     sLog.outError("SCRIPT_COMMAND_OPEN_DOOR (script id %u) failed for gameobject(guid: %u).", step.script->id, step.script->openDoor.goGuid);
@@ -2280,11 +2286,8 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_CLOSE_DOOR:
             {
-                if (!step.script->closeDoor.goGuid)         // guid for door not specified
-                {
-                    sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) call for NULL door.", step.script->id);
+                if (!step.script->closeDoor.goGuid)         // checked at load
                     break;
-                }
 
                 if (!source)
                 {
@@ -2299,17 +2302,23 @@ void Map::ScriptsProcess()
                 }
 
                 Unit* caster = (Unit*)source;
+                if (!caster->IsInWorld())
+                {
+                    sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) call for non-in-world unit (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
 
-                GameObject *door = NULL;
                 int32 time_to_open = step.script->closeDoor.resetDelay < 15 ? 15 : step.script->closeDoor.resetDelay;
 
-                MaNGOS::GameObjectWithDbGUIDCheck go_check(*caster, step.script->closeDoor.goGuid);
-                MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(door, go_check);
-                Cell::VisitGridObjects(caster, checker, GetVisibilityDistance());
+                uint32 guidlow = step.script->closeDoor.goGuid;
+                GameObjectData const* goData = sObjectMgr.GetGOData(guidlow);
+                if (!goData)                                // checked at load
+                    break;
 
+                GameObject *door = caster->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, goData->id, guidlow));
                 if (!door)
                 {
-                    sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject(guid: %u).", step.script->id, step.script->closeDoor.goGuid);
+                    sLog.outError("SCRIPT_COMMAND_CLOSE_DOOR (script id %u) failed for gameobject(guid: %u).", step.script->id, guidlow);
                     break;
                 }
                 if (door->GetGoType() != GAMEOBJECT_TYPE_DOOR)

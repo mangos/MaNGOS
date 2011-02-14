@@ -51,7 +51,7 @@ void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
     DEBUG_LOG("BattleGroundAV: HandleKillUnit %i", creature->GetEntry());
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
-    uint8 event1 = (sBattleGroundMgr.GetCreatureEventIndex(creature->GetDBTableGUIDLow())).event1;
+    uint8 event1 = (sBattleGroundMgr.GetCreatureEventIndex(creature->GetGUIDLow())).event1;
     if (event1 == BG_EVENT_NONE)
         return;
     switch(event1)
@@ -514,11 +514,11 @@ void BattleGroundAV::EventPlayerClickedOnFlag(Player *source, GameObject* target
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
     DEBUG_LOG("BattleGroundAV: using gameobject %i", target_obj->GetEntry());
-    uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetDBTableGUIDLow())).event1;
+    uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event1;
     if (event >= BG_AV_NODES_MAX)                           // not a node
         return;
     BG_AV_Nodes node = BG_AV_Nodes(event);
-    switch ((sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetDBTableGUIDLow())).event2 % BG_AV_MAX_STATES)
+    switch ((sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event2 % BG_AV_MAX_STATES)
     {
         case POINT_CONTROLLED:
             EventPlayerAssaultsPoint(source, node);

@@ -405,7 +405,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
-        uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+        bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
+
         char const* GetSubName() const { return GetCreatureInfo()->SubName; }
 
         void Update(uint32 update_diff, uint32 time);                           // overwrite Unit::Update
@@ -684,7 +685,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void RegenerateHealth();
         MovementGeneratorType m_defaultMovementType;
         Cell m_currentCell;                                 // store current cell where creature listed
-        uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
         uint32 m_equipmentId;
 
         bool m_AlreadyCallAssistance;

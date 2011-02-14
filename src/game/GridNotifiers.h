@@ -749,20 +749,6 @@ namespace MaNGOS
             GameObjectEntryInPosRangeCheck(GameObjectEntryInPosRangeCheck const&);
     };
 
-    class GameObjectWithDbGUIDCheck
-    {
-        public:
-            GameObjectWithDbGUIDCheck(WorldObject const& obj,uint32 db_guid) : i_obj(obj), i_db_guid(db_guid) {}
-            WorldObject const& GetFocusObject() const { return i_obj; }
-            bool operator()(GameObject const* go) const
-            {
-                return go->GetDBTableGUIDLow() == i_db_guid;
-            }
-        private:
-            WorldObject const& i_obj;
-            uint32 i_db_guid;
-    };
-
     // Unit checks
 
     class MostHPMissingInRangeCheck
