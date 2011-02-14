@@ -497,7 +497,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             {
                 // since pool system can fail to roll unspawned object, this one can remain spawned, so must set respawn nevertheless
                 if (uint16 poolid = sPoolMgr.IsPartOfAPool<Creature>(GetGUIDLow()))
-                    sPoolMgr.UpdatePool<Creature>(poolid, GetGUIDLow());
+                    sPoolMgr.UpdatePool<Creature>(*GetMap()->GetPersistentState(), poolid, GetGUIDLow());
 
                 if (IsInWorld())                            // can be despawned by update pool
                 {
@@ -527,7 +527,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 {
                     // since pool system can fail to roll unspawned object, this one can remain spawned, so must set respawn nevertheless
                     if (uint16 poolid = sPoolMgr.IsPartOfAPool<Creature>(GetGUIDLow()))
-                        sPoolMgr.UpdatePool<Creature>(poolid, GetGUIDLow());
+                        sPoolMgr.UpdatePool<Creature>(*GetMap()->GetPersistentState(), poolid, GetGUIDLow());
 
                     if (IsInWorld())                        // can be despawned by update pool
                     {

@@ -658,7 +658,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void Delete();
 
         // Functions spawn/remove gameobject with DB guid in all loaded map copies (if point grid loaded in map)
-        // FIXME: it will work for for instanceable maps only after switch to use static guids)
         static void AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data);
         static void SpawnInMaps(uint32 db_guid, GameObjectData const* data);
 
