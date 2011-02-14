@@ -20,3 +20,7 @@ CREATE OR REPLACE FUNCTION unix_timestamp(timestamp) RETURNS bigint AS '
 CREATE OR REPLACE FUNCTION unix_timestamp(timestamp WITH time zone) RETURNS bigint AS '
 	SELECT EXTRACT(EPOCH FROM $1)::bigint AS result;
 ' LANGUAGE 'SQL';
+
+CREATE OR REPLACE FUNCTION from_unixtime(integer) RETURNS timestamp AS '
+	SELECT to_timestamp($1)::timestamp AS result
+' LANGUAGE 'SQL';
