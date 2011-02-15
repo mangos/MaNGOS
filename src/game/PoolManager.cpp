@@ -584,7 +584,7 @@ void PoolManager::LoadFromDB()
 
     mPoolTemplate.resize(max_pool_id + 1);
 
-    result = WorldDatabase.Query("SELECT entry,max_limit FROM pool_template");
+    result = WorldDatabase.Query("SELECT entry, max_limit, description FROM pool_template");
     if (!result)
     {
         mPoolTemplate.clear();
@@ -606,7 +606,8 @@ void PoolManager::LoadFromDB()
         uint16 pool_id = fields[0].GetUInt16();
 
         PoolTemplateData& pPoolTemplate = mPoolTemplate[pool_id];
-        pPoolTemplate.MaxLimit  = fields[1].GetUInt32();
+        pPoolTemplate.MaxLimit    = fields[1].GetUInt32();
+        pPoolTemplate.description = fields[2].GetCppString();
         pPoolTemplate.AutoSpawn = true;          // will update and later data loading
 
     } while (result->NextRow());

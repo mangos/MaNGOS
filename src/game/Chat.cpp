@@ -53,6 +53,7 @@
 //                                                                        - client, item icon shift click
 // |color|Hitemset:itemset_id|h[name]|h|r
 // |color|Hplayer:name|h[name]|h|r                                        - client, in some messages, at click copy only name instead link, so no way generate it in client string send to server
+// |color|Hpool:pool_id|h[name]|h|r
 // |color|Hquest:quest_id:quest_level|h[name]|h|r                         - client, quest list name shift-click
 // |color|Hskill:skill_id|h[name]|h|r
 // |color|Hspell:spell_id|h[name]|h|r                                     - client, spellbook spell icon shift-click
@@ -346,6 +347,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "object",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupObjectCommand,        "", NULL },
         { "quest",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupQuestCommand,         "", NULL },
         { "player",         SEC_GAMEMASTER,     true,  NULL,                                           "", lookupPlayerCommandTable },
+        { "pool",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupPoolCommand,          "", NULL },
         { "skill",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupSkillCommand,         "", NULL },
         { "spell",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupSpellCommand,         "", NULL },
         { "taxinode",       SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupTaxiNodeCommand,      "", NULL },
@@ -424,6 +426,14 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "load",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandlePDumpLoadCommand,           "", NULL },
         { "write",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandlePDumpWriteCommand,          "", NULL },
+        { NULL,             0,                  false, NULL,                                           "", NULL }
+    };
+
+    static ChatCommand poolCommandTable[] =
+    {
+        { "list",           SEC_GAMEMASTER,     false, &ChatHandler::HandlePoolListCommand,            "", NULL },
+        { "spawns",         SEC_GAMEMASTER,     false, &ChatHandler::HandlePoolSpawnsCommand,          "", NULL },
+        { "",               SEC_GAMEMASTER,     true,  &ChatHandler::HandlePoolInfoCommand,            "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
@@ -688,6 +698,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "lookup",         SEC_MODERATOR,      true,  NULL,                                           "", lookupCommandTable   },
         { "modify",         SEC_MODERATOR,      false, NULL,                                           "", modifyCommandTable   },
         { "npc",            SEC_MODERATOR,      false, NULL,                                           "", npcCommandTable      },
+        { "pool",           SEC_GAMEMASTER,     true,  NULL,                                           "", poolCommandTable     },
         { "pdump",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", pdumpCommandTable    },
         { "quest",          SEC_ADMINISTRATOR,  false, NULL,                                           "", questCommandTable    },
         { "reload",         SEC_ADMINISTRATOR,  true,  NULL,                                           "", reloadCommandTable   },
