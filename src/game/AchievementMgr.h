@@ -66,9 +66,11 @@ enum AchievementCriteriaRequirementType
     ACHIEVEMENT_CRITERIA_REQUIRE_BG_LOSS_TEAM_SCORE  = 17,  // min_score      max_score     player's team win bg and opposition team have team score in range
     ACHIEVEMENT_CRITERIA_REQUIRE_INSTANCE_SCRIPT     = 18,  // 0              0             maker instance script call for check current criteria requirements fit
     ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM_LVL = 19,  // item_level     item_quality  fir equipped item in slot `misc1` to item level and quality
+    ACHIEVEMENT_CRITERIA_REQUIRE_NTH_BIRTHDAY        = 20,  // N                            login on day of N-th Birthday
+    ACHIEVEMENT_CRITERIA_REQUIRE_KNOWN_TITLE         = 21,  // title_id                     known (pvp) title, values from dbc
 };
 
-#define MAX_ACHIEVEMENT_CRITERIA_REQUIREMENT_TYPE      20   // maximum value in AchievementCriteriaRequirementType enum
+#define MAX_ACHIEVEMENT_CRITERIA_REQUIREMENT_TYPE      22   // maximum value in AchievementCriteriaRequirementType enum
 
 class Player;
 class Unit;
@@ -166,6 +168,16 @@ struct AchievementCriteriaRequirement
             uint32 item_level;
             uint32 item_quality;
         } equipped_item;
+        // ACHIEVEMENT_CRITERIA_REQUIRE_NTH_BIRTHDAY      = 20
+        struct
+        {
+            uint32 nth_birthday;
+        } birthday_login;
+        // ACHIEVEMENT_CRITERIA_REQUIRE_KNOWN_TITLE       = 21
+        struct
+        {
+            uint32 title_id;
+        } known_title;
         // ...
         struct
         {
