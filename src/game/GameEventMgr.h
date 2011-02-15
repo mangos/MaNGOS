@@ -28,6 +28,7 @@
 
 class Creature;
 class GameObject;
+class MapPersistentState;
 
 struct GameEventData
 {
