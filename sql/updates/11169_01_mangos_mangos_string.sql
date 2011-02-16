@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_11117_01_mangos_world_template required_11169_01_mangos_mangos_string bit;
 
-DELETE FROM mangos_string WHERE entry IN (376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,1500,15001,1502);
+DELETE FROM mangos_string WHERE entry IN (376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,1500,1501,1502);
 
 INSERT INTO mangos_string VALUES
 (376,'%u - |cffffffff|Hpool:%u|h[%s]|h|r AutoSpawn: %u MaxLimit: %u Creatures: %u GameObjecs: %u Pools %u',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
