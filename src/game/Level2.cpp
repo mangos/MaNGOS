@@ -4699,7 +4699,11 @@ bool ChatHandler::HandleLookupPoolCommand(char * args)
     for(uint16 pool_id = 0; pool_id < sPoolMgr.GetMaxPoolId(); ++pool_id)
     {
         PoolTemplateData const& pool_template = sPoolMgr.GetPoolTemplate(pool_id);
-        if (pool_template.description.find(namepart) == std::wstring::npos)
+
+        std::string desc = pool_template.description;
+        strToLower(desc);
+
+        if (desc.find(namepart) == std::wstring::npos)
             continue;
 
         ShowPoolListHelper(pool_id);
