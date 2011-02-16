@@ -39,7 +39,7 @@ ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 
 MACRO(_PCH_GET_COMPILE_FLAGS _out_compile_flags)
 
-
+  STRING(TOUPPER ${CMAKE_BUILD_TYPE} _build_type)
   STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_var_name)
   SET(${_out_compile_flags} ${${_flags_var_name}} )
 
@@ -60,10 +60,13 @@ MACRO(_PCH_GET_COMPILE_FLAGS _out_compile_flags)
   ENDFOREACH(item)
 
   GET_DIRECTORY_PROPERTY(_directory_flags COMPILE_DEFINITIONS)
+  GET_DIRECTORY_PROPERTY(_directory_flags_type COMPILE_DEFINITIONS_${_build_type})
+  LIST(APPEND _directory_flags ${_directory_flags_type})
   # MESSAGE("_directory_flags ${_directory_flags}" )
 
   FOREACH(define ${_directory_flags})
-    LIST(APPEND ${_out_compile_flags} -D${define})
+    STRING(REPLACE "\"" "\\\"" escaped_define ${define})
+    LIST(APPEND ${_out_compile_flags} -D${escaped_define})
   ENDFOREACH(define)
   LIST(APPEND ${_out_compile_flags} ${CMAKE_CXX_FLAGS} )
 
