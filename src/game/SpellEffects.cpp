@@ -6554,9 +6554,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    if (Aura* pAura = unitTarget->GetAura(m_spellInfo->Id, EFFECT_INDEX_0))
+                    if (SpellAuraHolder* pHolder = unitTarget->GetSpellAuraHolder(m_spellInfo->Id))
                     {
-                        if (pAura->GetStackAmount() >= m_spellInfo->StackAmount - 1)
+                        if (pHolder->GetStackAmount() + 1 >= m_spellInfo->StackAmount)
                         {
                             // Gluttonous Lurkers: Summon Gorged Lurking Basilisk
                             unitTarget->CastSpell(m_caster, 50928, true);
