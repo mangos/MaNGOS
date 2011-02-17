@@ -2105,6 +2105,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true);
                     return;
                 }
+                case 69922:                                 // Temper Quel'Delar
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Return Tempered Quel'Delar
+                    unitTarget->CastSpell(m_caster, 69956, true);
+                    return;
+                }
             }
             break;
         }
