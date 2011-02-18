@@ -217,10 +217,15 @@ add_custom_target(uninstall
 # Find core revision
 if(GIT_EXECUTABLE)
   execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe
+    COMMAND ${GIT_EXECUTABLE} rev-parse HEAD
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE GIT_REVISION
+    RESULT_VARIABLE GIT_RESULT
+    ERROR_QUIET
   )
+  if(GIT_RESULT)
+    set(GIT_REVISION "Git repository not found")
+  endif()
 else()
   set(GIT_REVISION "Git not found")
 endif()
