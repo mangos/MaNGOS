@@ -102,6 +102,7 @@ class MapPersistentState
         void SaveGORespawnTime(uint32 loguid, time_t t);
 
         // pool system
+        void InitPools();
         virtual SpawnedPoolData& GetSpawnedPoolData() =0;
 
         template<typename T>
@@ -327,12 +328,15 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
         ~MapPersistentStateManager();
 
     public:                                                 // common for all MapPersistentState (sub)classes
+        // For proper work pool systems with shared pools state for non-instanceable maps need
+        // load persistent map states for any non-instanceable maps before init pool system
+        void InitWorldMaps();
         void LoadCreatureRespawnTimes();
         void LoadGameobjectRespawnTimes();
 
         // auto select appropriate MapPersistentState (sub)class by MapEntry, and autoselect appropriate way store (by instance/map id)
         // always return != NULL
-        MapPersistentState* AddPersistentState(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false);
+        MapPersistentState* AddPersistentState(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false, bool initPools = true);
 
         // search stored state, can be NULL in result
         MapPersistentState *GetPersistentState(uint32 mapId, uint32 InstanceId);
