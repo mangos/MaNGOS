@@ -618,7 +618,7 @@ void PoolManager::LoadFromDB()
 
     PoolMapChecker mapChecker(mPoolTemplate);
 
-    // Creatures
+    // Creatures (guids and entries)
 
     mPoolCreatureGroups.resize(max_pool_id + 1);
     mCreatureSearchMap.clear();
@@ -632,7 +632,7 @@ void PoolManager::LoadFromDB()
         bar2.step();
 
         sLog.outString();
-        sLog.outString(">> Loaded %u creatures in pools", count );
+        sLog.outString(">> Loaded %u creatures in pools from `pool_creature`", count );
     }
     else
     {
@@ -681,11 +681,83 @@ void PoolManager::LoadFromDB()
 
         } while (result->NextRow());
         sLog.outString();
-        sLog.outString( ">> Loaded %u creatures in pools", count );
+        sLog.outString( ">> Loaded %u creatures in pools from `pool_creature`", count );
         delete result;
     }
 
-    // Gameobjects
+    result = WorldDatabase.Query("SELECT guid, pool_entry, chance, pool_creature_template.id FROM pool_creature_template LEFT JOIN creature ON creature.id = pool_creature_template.id");
+
+    count = 0;
+    if (!result)
+    {
+        barGoLink bar2(1);
+        bar2.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u creatures in pools from `pool_creature_template`", count );
+    }
+    else
+    {
+        barGoLink bar2((int)result->GetRowCount());
+        do
+        {
+            Field *fields = result->Fetch();
+
+            bar2.step();
+
+            uint32 guid    = fields[0].GetUInt32();
+            uint16 pool_id = fields[1].GetUInt16();
+            float chance   = fields[2].GetFloat();
+            uint16 entry_id = fields[3].GetUInt32();        // for errors output only
+
+            CreatureData const* data = sObjectMgr.GetCreatureData(guid);
+            if (!data)
+            {
+                sLog.outErrorDb("`pool_creature_template` has a non existing creature spawn (GUID: %u Entry: %u) defined for pool id (%u), skipped.", guid, entry_id, pool_id );
+                continue;
+            }
+            if (pool_id > max_pool_id)
+            {
+                sLog.outErrorDb("`pool_creature_template` pool id (%i) is out of range compared to max pool id in `pool_template`, skipped.",pool_id);
+                continue;
+            }
+            if (chance < 0 || chance > 100)
+            {
+                sLog.outErrorDb("`pool_creature_template` has an invalid chance (%f) for creature (Guid %u Entry %u) in pool id (%i), skipped.", chance, guid, entry_id, pool_id);
+                continue;
+            }
+
+            // `pool_creature` and `pool_creature_template` can't have guids duplicates (in second case because entries also unique)
+            // So if guid already listed in pools then this duplicate from alt.table
+            // Also note: for added guid not important what case we skip from 2 tables
+            if (uint16 alt_pool_id = IsPartOfAPool<Creature>(guid))
+            {
+                sLog.outErrorDb("`pool_creature` has guid %u for pool %u that already added to pool %u from `pool_creature_template` for creature entry %u, skipped.",
+                    guid, pool_id, alt_pool_id, entry_id);
+                continue;
+            }
+
+            if (!mapChecker.CheckAndRemember(data->mapid, pool_id, "pool_creature_template", "creature guid"))
+                continue;
+
+            PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
+
+            ++count;
+
+            PoolObject plObject = PoolObject(guid, chance);
+            PoolGroup<Creature>& cregroup = mPoolCreatureGroups[pool_id];
+            cregroup.SetPoolId(pool_id);
+            cregroup.AddEntry(plObject, pPoolTemplate->MaxLimit);
+            SearchPair p(guid, pool_id);
+            mCreatureSearchMap.insert(p);
+
+        } while (result->NextRow());
+        sLog.outString();
+        sLog.outString(">> Loaded %u creatures in pools from `pool_creature_template`", count );
+        delete result;
+    }
+
+    // Gameobjects (guids and entries)
 
     mPoolGameobjectGroups.resize(max_pool_id + 1);
     mGameobjectSearchMap.clear();
@@ -699,7 +771,7 @@ void PoolManager::LoadFromDB()
         bar2.step();
 
         sLog.outString();
-        sLog.outString(">> Loaded %u gameobject in pools", count );
+        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject`", count );
     }
     else
     {
@@ -756,7 +828,89 @@ void PoolManager::LoadFromDB()
 
         } while( result->NextRow() );
         sLog.outString();
-        sLog.outString( ">> Loaded %u gameobject in pools", count );
+        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject`", count );
+        delete result;
+    }
+
+    //                                   1     2           3
+    result = WorldDatabase.Query("SELECT guid, pool_entry, chance, pool_gameobject_template.id FROM pool_gameobject_template LEFT JOIN gameobject ON gameobject.id = pool_gameobject_template.id");
+
+    count = 0;
+    if (!result)
+    {
+        barGoLink bar2(1);
+        bar2.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject_template`", count );
+    }
+    else
+    {
+
+        barGoLink bar2((int)result->GetRowCount());
+        do
+        {
+            Field *fields = result->Fetch();
+
+            bar2.step();
+
+            uint32 guid    = fields[0].GetUInt32();
+            uint16 pool_id = fields[1].GetUInt16();
+            float chance   = fields[2].GetFloat();
+            uint16 entry_id = fields[3].GetUInt32();        // for errors output only
+
+            GameObjectData const* data = sObjectMgr.GetGOData(guid);
+            if (!data)
+            {
+                sLog.outErrorDb("`pool_gameobject_template` has a non existing gameobject spawn (GUID: %u Entry %u) defined for pool id (%u), skipped.", guid, entry_id, pool_id);
+                continue;
+            }
+            GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(data->id);
+            if (goinfo->type != GAMEOBJECT_TYPE_CHEST &&
+                goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
+                goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)
+            {
+                sLog.outErrorDb("`pool_gameobject_template` has a not lootable gameobject spawn (GUID: %u Entry % Type: %u) defined for pool id (%u), skipped.", guid, entry_id, goinfo->type, pool_id );
+                continue;
+            }
+            if (pool_id > max_pool_id)
+            {
+                sLog.outErrorDb("`pool_gameobject_template` pool id (%i) is out of range compared to max pool id in `pool_template`, skipped.",pool_id);
+                continue;
+            }
+            if (chance < 0 || chance > 100)
+            {
+                sLog.outErrorDb("`pool_gameobject_template` has an invalid chance (%f) for gameobject (Guid %u Entry %u) in pool id (%i), skipped.", chance, guid, entry_id, pool_id);
+                continue;
+            }
+
+            // `pool_gameobject` and `pool_gameobject_template` can't have guids duplicates (in second case because entries also unique)
+            // So if guid already listed in pools then this duplicate from alt.table
+            // Also note: for added guid not important what case we skip from 2 tables
+            if (uint16 alt_pool_id = IsPartOfAPool<GameObject>(guid))
+            {
+                sLog.outErrorDb("`pool_gameobject` has guid %u for pool %u that already added to pool %u from `pool_gameobject_template` for gameobject entry %u, skipped.",
+                    guid, pool_id, alt_pool_id, entry_id);
+                continue;
+            }
+
+            if (!mapChecker.CheckAndRemember(data->mapid, pool_id, "pool_gameobject_template", "gameobject guid"))
+                continue;
+
+            PoolTemplateData *pPoolTemplate = &mPoolTemplate[pool_id];
+
+            ++count;
+
+            PoolObject plObject = PoolObject(guid, chance);
+            PoolGroup<GameObject>& gogroup = mPoolGameobjectGroups[pool_id];
+            gogroup.SetPoolId(pool_id);
+            gogroup.AddEntry(plObject, pPoolTemplate->MaxLimit);
+            SearchPair p(guid, pool_id);
+            mGameobjectSearchMap.insert(p);
+
+        } while( result->NextRow() );
+        sLog.outString();
+        sLog.outString(">> Loaded %u gameobject in pools from `pool_gameobject_template`", count );
         delete result;
     }
 
