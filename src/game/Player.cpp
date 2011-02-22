@@ -21374,16 +21374,10 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
 
 uint32 Player::CalculateTalentsPoints() const
 {
-    uint32 base_talent = getLevel() < 10 ? 0 : getLevel()-9;
+    uint32 base_level = getClass() == CLASS_DEATH_KNIGHT ? 55 : 9;
+    uint32 base_talent = getLevel() <= base_level ? 0 : getLevel() - base_level;
 
-    if(getClass() != CLASS_DEATH_KNIGHT)
-        return uint32(base_talent * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
-
-    uint32 talentPointsForLevel = getLevel() < 56 ? 0 : getLevel() - 55;
-    talentPointsForLevel += m_questRewardTalentCount;
-
-    if(talentPointsForLevel > base_talent)
-        talentPointsForLevel = base_talent;
+    uint32 talentPointsForLevel = base_talent + m_questRewardTalentCount;
 
     return uint32(talentPointsForLevel * sWorld.getConfig(CONFIG_FLOAT_RATE_TALENT));
 }
