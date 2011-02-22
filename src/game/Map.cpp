@@ -207,13 +207,13 @@ void Map::AddNotifier(T* , Cell const& , CellPair const& )
 template<>
 void Map::AddNotifier(Player* obj, Cell const& cell, CellPair const& cellpair)
 {
-    obj->SheduleAINotify(0);
+    obj->ScheduleAINotify(0);
 }
 
 template<>
 void Map::AddNotifier(Creature* obj, Cell const&, CellPair const&)
 {
-    obj->SheduleAINotify(0);
+    obj->ScheduleAINotify(0);
 }
 
 void

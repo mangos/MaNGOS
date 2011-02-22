@@ -8092,7 +8092,7 @@ void Unit::SetVisibility(UnitVisibility x)
 
         GetViewPoint().Call_UpdateVisibilityForOwner();
         UpdateObjectVisibility();
-        SheduleAINotify(0);
+        ScheduleAINotify(0);
 
         GetViewPoint().Event_ViewPointVisibilityChanged();
     }
@@ -10860,7 +10860,7 @@ private:
     Unit& m_owner;
 };
 
-void Unit::SheduleAINotify(uint32 delay)
+void Unit::ScheduleAINotify(uint32 delay)
 {
     if (!IsAINotifySheduled())
         m_Events.AddEvent(new RelocationNotifyEvent(*this), m_Events.CalculateTime(delay));
@@ -10882,5 +10882,5 @@ void Unit::OnRelocated()
         GetViewPoint().Call_UpdateVisibilityForOwner();
         UpdateObjectVisibility();
     }
-    SheduleAINotify(World::GetRelocationAINotifyDelay());
+    ScheduleAINotify(World::GetRelocationAINotifyDelay());
 }
