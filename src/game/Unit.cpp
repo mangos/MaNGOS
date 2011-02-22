@@ -218,6 +218,7 @@ Unit::Unit()
     m_AuraFlags = 0;
 
     m_Visibility = VISIBILITY_ON;
+    m_AINotifySheduled = false;
 
     m_detectInvisibilityMask = 0;
     m_invisibilityMask = 0;
@@ -8089,12 +8090,9 @@ void Unit::SetVisibility(UnitVisibility x)
             }
         }
 
-        Map *m = GetMap();
-
-        if(GetTypeId()==TYPEID_PLAYER)
-            m->PlayerRelocation((Player*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
-        else
-            m->CreatureRelocation((Creature*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
+        GetViewPoint().Call_UpdateVisibilityForOwner();
+        UpdateObjectVisibility();
+        SheduleAINotify(0);
 
         GetViewPoint().Event_ViewPointVisibilityChanged();
     }
@@ -10826,4 +10824,63 @@ bool Unit::IsAllowedDamageInArea(Unit* pVictim) const
         return false;
 
     return true;
+}
+
+class RelocationNotifyEvent : public BasicEvent
+{
+public:
+    RelocationNotifyEvent(Unit& owner) : BasicEvent(), m_owner(owner)
+    {
+        m_owner._SetAINotifySheduled(true);
+    }
+
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+    {
+        float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+        if (m_owner.GetTypeId() == TYPEID_PLAYER)
+        {
+            MaNGOS::PlayerRelocationNotifier notify((Player&)m_owner);
+            Cell::VisitAllObjects(&m_owner,notify,radius);
+        } 
+        else //if(m_owner.GetTypeId() == TYPEID_UNIT)
+        {
+            MaNGOS::CreatureRelocationNotifier notify((Creature&)m_owner);
+            Cell::VisitAllObjects(&m_owner,notify,radius);
+        }
+        m_owner._SetAINotifySheduled(false);
+        return true;
+    }
+
+    void Abort(uint64)
+    {
+        m_owner._SetAINotifySheduled(false);
+    }
+
+private:
+    Unit& m_owner;
+};
+
+void Unit::SheduleAINotify(uint32 delay)
+{
+    if (!IsAINotifySheduled())
+        m_Events.AddEvent(new RelocationNotifyEvent(*this), m_Events.CalculateTime(delay));
+}
+
+void Unit::OnRelocated()
+{
+    // switch to use G3D::Vector3 is good idea, maybe
+    float dx = m_last_notified_position.x - GetPositionX();
+    float dy = m_last_notified_position.y - GetPositionY();
+    float dz = m_last_notified_position.z - GetPositionZ();
+    float distsq = dx*dx+dy*dy+dz*dz;
+    if (distsq > World::GetRelocationLowerLimitSq())
+    {
+        m_last_notified_position.x = GetPositionX();
+        m_last_notified_position.y = GetPositionY();
+        m_last_notified_position.z = GetPositionZ();
+
+        GetViewPoint().Call_UpdateVisibilityForOwner();
+        UpdateObjectVisibility();
+    }
+    SheduleAINotify(World::GetRelocationAINotifyDelay());
 }
