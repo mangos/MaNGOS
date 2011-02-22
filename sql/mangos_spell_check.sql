@@ -636,6 +636,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 9,0x0008000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Counterattack',                      'Spell::EffectSchoolDMG'),
 (    0, 5,                -1,        -1,  -1,  -1,1179, -1, -1,-1,'Curse of Doom',                      'Spell::CheckTargetCreatureType'),
 (    0, 8,0x0000000000010000,0x00000000,  -1,  -1,  -1, -1,  3,-1,'Deadly poison',                      'Spell::EffectSchoolDMG'),
+(    0, 8,0x0000000000010000,0x00000000,  -1,  -1,  -1,  6, -1,-1,'Deadly Poison',                      'Player::CastItemCombatSpell'),
 (    0,15,0x0000000000002000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Death Coil',                         'Spell::EffectDummy'),
 (    0,15,0x0000000000000010,0x00000000,  -1,  -1,  -1, 31, -1, 1,'Death Strike',                       'Spell::EffectWeaponDmg'),
 (    0,15,0x0000000000000010,0x00000000,  -1,  -1,  -1,  3, -1, 2,'Death Strike',                       'Spell::EffectDummy'),
