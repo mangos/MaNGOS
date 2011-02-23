@@ -199,23 +199,6 @@ void Map::DeleteFromWorld(Player* pl)
     delete pl;
 }
 
-template<class T>
-void Map::AddNotifier(T* , Cell const& , CellPair const& )
-{
-}
-
-template<>
-void Map::AddNotifier(Player* obj, Cell const& cell, CellPair const& cellpair)
-{
-    obj->ScheduleAINotify(0);
-}
-
-template<>
-void Map::AddNotifier(Creature* obj, Cell const&, CellPair const&)
-{
-    obj->ScheduleAINotify(0);
-}
-
 void
 Map::EnsureGridCreated(const GridPair &p)
 {
@@ -317,8 +300,6 @@ bool Map::Add(Player *player)
     player->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(player,cell,p);
 
-    AddNotifier(player,cell,p);
-
     if (i_data)
         i_data->OnPlayerEnter(player);
 
@@ -359,8 +340,6 @@ Map::Add(T *obj)
 
     obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(obj,cell,p);
-
-    AddNotifier(obj,cell,p);
 }
 
 void Map::MessageBroadcast(Player *player, WorldPacket *msg, bool to_self)
@@ -951,19 +930,6 @@ void Map::UpdateObjectVisibility( WorldObject* obj, Cell cell, CellPair cellpair
     MaNGOS::VisibleChangesNotifier notifier(*obj);
     TypeContainerVisitor<MaNGOS::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
     cell.Visit(cellpair, player_notifier, *this, *obj, GetVisibilityDistance());
-}
-
-void Map::PlayerRelocationNotify( Player* player, Cell cell, CellPair cellpair )
-{
-    MaNGOS::PlayerRelocationNotifier relocationNotifier(*player);
-
-    TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, GridTypeMapContainer >  p2grid_relocation(relocationNotifier);
-    TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, WorldTypeMapContainer > p2world_relocation(relocationNotifier);
-
-    float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
-
-    cell.Visit(cellpair, p2grid_relocation, *this, *player, radius);
-    cell.Visit(cellpair, p2world_relocation, *this, *player, radius);
 }
 
 void Map::SendInitSelf( Player * player )
