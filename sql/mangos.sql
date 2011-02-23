@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11190_01_mangos_pool_gameobject_template` bit(1) default NULL
+  `required_11200_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14603,6 +14603,9 @@ INSERT INTO `spell_bonus_data` VALUES
 /* Rogue */
 (2818,  0,      0,       0,     0.03,  'Rogue - Deadly Poison'),
 (703,   0,      0,       0,     0.07,  'Rogue - Garrote'),
+(1776,  0,      0,       0.21,  0,     'Rogue - Gouge'),
+(8680,  0,      0,       0.10,  0,     'Rogue - Instant Poison'),
+(13218, 0,      0,       0.04,  0,     'Rogue - Wound Poison'),
 /* Shaman */
 (974,   0.4762, 0,       0,     0,     'Shaman - Earth Shield'),
 (379,   0,      0,       0,     0,     'Shaman - Earth Shield Triggered'),
