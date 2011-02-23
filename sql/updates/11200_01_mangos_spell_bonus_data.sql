@@ -1,4 +1,4 @@
-ALTER TABLE db_version CHANGE COLUMN required_11190_01_mangos_pool_creature_template required_11200_01_mangos_spell_bonus_data bit;
+ALTER TABLE db_version CHANGE COLUMN required_11190_01_mangos_pool_gameobject_template required_11200_01_mangos_spell_bonus_data bit;
 
 DELETE FROM spell_bonus_data WHERE entry IN (1776, 8680, 13218);
 INSERT INTO spell_bonus_data VALUES
