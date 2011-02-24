@@ -731,5 +731,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000004000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Totem of Wrath',                     'Spell::cast'),
 (    0, 4,0x0000010000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Victory Rush',                       'Spell::EffectSchoolDMG'),
-(    0, 7,                -1,        -1,2864,  -1,  -1,  0, -1, 2,'Wild Growth',                        'Spell::SetTargetMap'),
+(    0, 7,                -1,        -1,2864,  -1,  -1,  0, -1, 2,'Wild Growth',                        'Spell::SetTargetMap')
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
+;
