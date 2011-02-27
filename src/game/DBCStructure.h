@@ -1072,14 +1072,16 @@ struct ItemDisplayInfoEntry
 //    uint32      arenaseason;                              // arena season number(1-4)
 //};
 
+#define MAX_EXTENDED_COST_ITEMS 5
+
 struct ItemExtendedCostEntry
 {
     uint32      ID;                                         // 0 extended-cost entry id
     uint32      reqhonorpoints;                             // 1 required honor points
     uint32      reqarenapoints;                             // 2 required arena points
-    uint32      reqarenaslot;                               // 4 arena slot restrctions (min slot value)
-    uint32      reqitem[5];                                 // 5-8 required item id
-    uint32      reqitemcount[5];                            // 9-13 required count of 1st item
+    uint32      reqarenaslot;                               // 4 arena slot restrictions (min slot value)
+    uint32      reqitem[MAX_EXTENDED_COST_ITEMS];           // 5-8 required item id
+    uint32      reqitemcount[MAX_EXTENDED_COST_ITEMS];      // 9-13 required count of 1st item
     uint32      reqpersonalarenarating;                     // 14 required personal arena rating
 };
 

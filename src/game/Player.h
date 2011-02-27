@@ -1330,6 +1330,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddItemToBuyBackSlot( Item *pItem );
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
+
+        void TakeExtendedCost(uint32 extendedCostId, uint32 count);
+
         uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
         void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 ) const;
         void SendBuyError( uint8 msg, Creature* pCreature, uint32 item, uint32 param );
