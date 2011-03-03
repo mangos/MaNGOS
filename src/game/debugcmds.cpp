@@ -1085,6 +1085,57 @@ bool ChatHandler::HandleDebugModValueCommand(char* args)
     return HandlerDebugModValueHelper(target, field, typeStr, valStr);
 }
 
+bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
+{
+    uint32 spellid = ExtractSpellIdFromLink(&args);
+    if (!spellid)
+        return false;
+
+    SpellEntry const * spellEntry = sSpellStore.LookupEntry(spellid);
+    if (!spellEntry)
+        return false;
+
+    SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellid);
+
+    float direct_calc = CalculateDefaultCoefficient(spellEntry, SPELL_DIRECT_DAMAGE);
+    float dot_calc = CalculateDefaultCoefficient(spellEntry, DOT);
+
+    bool isDirectHeal = false;
+    for(int i = 0; i < 3; ++i)
+    {
+        // Heals (Also count Mana Shield and Absorb effects as heals)
+        if (spellEntry->Effect[i] == SPELL_EFFECT_HEAL || spellEntry->Effect[i] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+            (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spellEntry->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)) )
+        {
+            isDirectHeal = true;
+            break;
+        }
+    }
+
+    bool isDotHeal = false;
+    for(int i = 0; i < 3; ++i)
+    {
+        // Periodic Heals
+        if (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+        {
+            isDotHeal = true;
+            break;
+        }
+    }
+
+    char const* directHealStr = GetMangosString(LANG_DIRECT_HEAL);
+    char const* directDamageStr = GetMangosString(LANG_DIRECT_DAMAGE);
+    char const* dotHealStr = GetMangosString(LANG_DOT_HEAL);
+    char const* dotDamageStr = GetMangosString(LANG_DOT_DAMAGE);
+
+    PSendSysMessage(LANG_SPELLCOEFS, spellid, isDirectHeal ? directHealStr : directDamageStr,
+        direct_calc, direct_calc * 1.88f, bonus ? bonus->direct_damage : 0.0f, bonus ? bonus->ap_bonus : 0.0f);
+    PSendSysMessage(LANG_SPELLCOEFS, spellid, isDotHeal ? dotHealStr : dotDamageStr,
+        dot_calc, dot_calc * 1.88f, bonus ? bonus->dot_damage : 0.0f, bonus ? bonus->ap_dot_bonus : 0.0f);
+
+    return true;
+}
+
 bool ChatHandler::HandleDebugSpellModsCommand(char* args)
 {
     char* typeStr = ExtractLiteralArg(&args);
