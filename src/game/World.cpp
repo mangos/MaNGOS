@@ -839,19 +839,24 @@ void World::LoadConfigSettings(bool reload)
     setConfigPos(CONFIG_UINT32_CHARDELETE_KEEP_DAYS, "CharDelete.KeepDays", 30);
 
     ///- Read the "Data" directory from the config file
-    std::string dataPath = sConfig.GetStringDefault("DataDir","./");
-    if( dataPath.at(dataPath.length()-1)!='/' && dataPath.at(dataPath.length()-1)!='\\' )
+    std::string dataPath = sConfig.GetStringDefault("DataDir", "./");
+
+    // for empty string use current dir as for absent case
+    if (dataPath.empty())
+        dataPath = "./";
+    // normalize dir path to path/ or path\ form
+    else if (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\')
         dataPath.append("/");
 
-    if(reload)
+    if (reload)
     {
-        if(dataPath!=m_dataPath)
-            sLog.outError("DataDir option can't be changed at mangosd.conf reload, using current value (%s).",m_dataPath.c_str());
+        if (dataPath != m_dataPath)
+            sLog.outError("DataDir option can't be changed at mangosd.conf reload, using current value (%s).", m_dataPath.c_str());
     }
     else
     {
         m_dataPath = dataPath;
-        sLog.outString("Using DataDir %s",m_dataPath.c_str());
+        sLog.outString("Using DataDir %s", m_dataPath.c_str());
     }
 
     setConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
