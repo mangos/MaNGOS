@@ -1908,36 +1908,31 @@ bool Creature::LoadCreatureAddon(bool reload)
             }
 
             // skip already applied aura
-            if(HasAura(cAura->spell_id,cAura->effect_idx))
+            if (HasAura(cAura->spell_id))
             {
                 if(!reload)
-                    sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u ) has duplicate aura (spell %u effect %u) in `auras` field.",GetGUIDLow(),GetEntry(),cAura->spell_id,cAura->effect_idx);
+                    sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u) has duplicate spell %u in `auras` field.", GetGUIDLow(), GetEntry(), cAura->spell_id);
 
                 continue;
             }
 
-            SpellAuraHolder *holder = GetSpellAuraHolder(cAura->spell_id, GetGUID());
+            SpellAuraHolder *holder = CreateSpellAuraHolder(AdditionalSpellInfo, this, this);
 
-            bool addedToExisting = true;
-            if (!holder)
+            for(uint32 eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
             {
-                holder = CreateSpellAuraHolder(AdditionalSpellInfo, this, this);
-                addedToExisting = false;
-            }
-            Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, cAura->effect_idx, NULL, holder, this, this, 0);
-            holder->AddAura(AdditionalAura, cAura->effect_idx);
+                if (IsSpellAppliesAura(AdditionalSpellInfo, 1 << eff))
+                {
+                    Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, SpellEffectIndex(eff), NULL, holder, this, this);
+                    holder->AddAura(AdditionalAura, SpellEffectIndex(eff));
 
-            if (addedToExisting)
-            {
-                AddAuraToModList(AdditionalAura);
-                holder->SetInUse(true);
-                AdditionalAura->ApplyModifier(true,true);
-                holder->SetInUse(false);
+                    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u)", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[eff], GetGUIDLow(), GetEntry());
+                }
             }
-            else
+
+            if (!holder->IsEmptyHolder())
                 AddSpellAuraHolder(holder);
-
-            DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u )", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[EFFECT_INDEX_0],GetGUIDLow(),GetEntry());
+            else
+                delete holder;
         }
     }
     return true;
