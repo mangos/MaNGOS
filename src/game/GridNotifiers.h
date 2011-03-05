@@ -148,7 +148,8 @@ namespace MaNGOS
     {
         DynamicObject &i_dynobject;
         Unit* i_check;
-        DynamicObjectUpdater(DynamicObject &dynobject, Unit* caster) : i_dynobject(dynobject)
+        bool i_positive;
+        DynamicObjectUpdater(DynamicObject &dynobject, Unit* caster, bool positive) : i_dynobject(dynobject), i_positive(positive)
         {
             i_check = caster;
             Unit* owner = i_check->GetOwner();
