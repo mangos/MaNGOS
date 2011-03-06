@@ -1230,16 +1230,17 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     if (map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, guidlow)))
         return false;
 
-    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data, eventData))
-        return false;
-
+    // set coordinates before call Create because some code can be depend from correct coordinates values.
     Relocate(data->posX, data->posY, data->posZ, data->orientation);
 
-    if(!IsPositionValid())
+    if (!IsPositionValid())
     {
         sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
         return false;
     }
+
+    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data, eventData))
+        return false;
 
     m_respawnradius = data->spawndist;
 

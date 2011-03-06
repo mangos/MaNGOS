@@ -1653,6 +1653,13 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 
+    // FIXME: Setup near to finish point because GetObjectBoundingRadius set in Create but some Create calls can be dependent from proper position
+    // if creature have creature_template_addon.auras with persistent point for example or script call
+    if (x == 0.0f && y == 0.0f && z == 0.0f)
+        GetClosePoint(x, y, z, 0);
+
+    pCreature->Relocate(x, y, z, ang);
+
     if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), GetMap(), GetPhaseMask(), id, team))
     {
         delete pCreature;
@@ -1660,9 +1667,11 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     }
 
     if (x == 0.0f && y == 0.0f && z == 0.0f)
+    {
         GetClosePoint(x, y, z, pCreature->GetObjectBoundingRadius());
+        pCreature->Relocate(x, y, z, ang);
+    }
 
-    pCreature->Relocate(x, y, z, ang);
     pCreature->SetSummonPoint(x, y, z, ang);
 
     if(!pCreature->IsPositionValid())
