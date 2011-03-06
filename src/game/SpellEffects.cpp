@@ -5326,10 +5326,10 @@ void Spell::EffectTameCreature(SpellEffectIndex /*eff_idx*/)
     pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
     pet->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
-    if (pet->IsPvP())
+    if (plr->IsPvP())
         pet->SetPvP(true);
 
-    if (pet->IsFFAPvP())
+    if (plr->IsFFAPvP())
         pet->SetFFAPvP(true);
 
     // level of hunter pet can't be less owner level at 5 levels
