@@ -1512,6 +1512,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 {
                     uint32 spellId = 0;
 
+                    // Spell 47117,47149,47316,47405,50439 exist, are these used to check area/meet requirement
+                    // and to cast correct spell in correct area?
+
                     switch(m_caster->GetAreaId())
                     {
                         case 4255: spellId = 47381; break;  // Reagent Check (Frozen Mojo)
