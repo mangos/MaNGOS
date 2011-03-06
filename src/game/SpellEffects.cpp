@@ -6209,6 +6209,29 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, unitTarget->getGender() == GENDER_MALE ? 24735 : 24736, true);
                     return;
                 }
+                case 24751:                                 // Trick or Treat
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Tricked or Treated
+                    unitTarget->CastSpell(unitTarget, 24755, true);
+
+                    if (roll_chance_i(50))
+                    {
+                        // Treat
+                        unitTarget->CastSpell(unitTarget, 24715, true);
+                    }
+                    else
+                    {
+                        if (roll_chance_i(14))              // Trick (can be different critter models). 14% since below can have 1 of 6
+                            unitTarget->CastSpell(unitTarget, 24753, true);
+                        else                                // Random Costume, 6 different (plus add. for gender)
+                            unitTarget->CastSpell(unitTarget, 24720, true);
+                    }
+
+                    return;
+                }
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP
                 {
                     uint32 spells[4] = { 26272, 26157, 26273, 26274 };
