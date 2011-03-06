@@ -1908,7 +1908,6 @@ bool Creature::LoadCreatureAddon(bool reload)
                 continue;
             }
 
-            // skip already applied aura
             if (HasAura(cAura->spell_id))
             {
                 if(!reload)
@@ -1917,23 +1916,7 @@ bool Creature::LoadCreatureAddon(bool reload)
                 continue;
             }
 
-            SpellAuraHolder *holder = CreateSpellAuraHolder(AdditionalSpellInfo, this, this);
-
-            for(uint32 eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-            {
-                if (IsSpellAppliesAura(AdditionalSpellInfo, 1 << eff))
-                {
-                    Aura* AdditionalAura = CreateAura(AdditionalSpellInfo, SpellEffectIndex(eff), NULL, holder, this, this);
-                    holder->AddAura(AdditionalAura, SpellEffectIndex(eff));
-
-                    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell: %u - Aura %u added to creature (GUIDLow: %u Entry: %u)", cAura->spell_id, AdditionalSpellInfo->EffectApplyAuraName[eff], GetGUIDLow(), GetEntry());
-                }
-            }
-
-            if (!holder->IsEmptyHolder())
-                AddSpellAuraHolder(holder);
-            else
-                delete holder;
+            CastSpell(this, AdditionalSpellInfo, true);
         }
     }
     return true;
