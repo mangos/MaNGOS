@@ -152,7 +152,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     // FIXME: Setup near to finish point because GetObjectBoundingRadius set in Create but some Create calls can be dependent from proper position
     // if pet have creature_template_addon.auras with persistent point for example or script call
     float px, py, pz;
-    owner->GetClosePoint(px, py, pz, 0, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE, this);
+    owner->GetClosePoint(px, py, pz, 0, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     Relocate(px, py, pz, owner->GetOrientation());
 
