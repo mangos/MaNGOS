@@ -160,7 +160,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     // Apply PersistentAreaAura on target
     // in case 2 dynobject overlap areas for same spell, same holder is selected, so dynobjects share holder
-    SpellAuraHolder *holder = target->GetSpellAuraHolder(spellInfo->Id, i_dynobject.GetCaster()->GetGUID());
+    SpellAuraHolder *holder = target->GetSpellAuraHolder(spellInfo->Id, i_dynobject.GetCasterGuid().GetRawValue());
 
     if (holder)
     {
