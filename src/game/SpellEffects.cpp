@@ -1300,6 +1300,27 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 42793:                                 // Burn Body
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    Creature* pCreature = (Creature*)unitTarget;
+
+                    // Spell can be used in combat and may affect different target than the expected.
+                    // If target is not the expected we need to prevent this effect.
+                    if (!pCreature->GetLootRecipientGuid().IsEmpty() || pCreature->isInCombat())
+                        return;
+
+                    // set loot recipient, prevent re-use same target
+                    pCreature->SetLootRecipient(m_caster);
+
+                    pCreature->ForcedDespawn(GetSpellDuration(m_spellInfo));
+
+                    // EFFECT_INDEX_2 has 0 miscvalue for effect 134, doing the killcredit here instead (only one known case exist where 0)
+                    ((Player*)m_caster)->KilledMonster(pCreature->GetCreatureInfo(), pCreature->GetObjectGuid());
+                    return;
+                }
                 case 43036:                                 // Dismembering Corpse
                 {
                     if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
