@@ -1309,7 +1309,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Spell can be used in combat and may affect different target than the expected.
                     // If target is not the expected we need to prevent this effect.
-                    if (!pCreature->GetLootRecipientGuid().IsEmpty() || pCreature->isInCombat())
+                    if (pCreature->HasLootRecipient() || pCreature->isInCombat())
                         return;
 
                     // set loot recipient, prevent re-use same target
