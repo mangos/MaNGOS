@@ -140,7 +140,7 @@ BindIP = "0.0.0.0"
 #
 #    vmap.enableLOS
 #    vmap.enableHeight
-#        Enable/Disable VMmap support for line of sight and height calculation
+#        Enable/Disable VMaps support for line of sight and height calculation
 #        Default: 0 (disable)
 #                 1 (enable)
 #
