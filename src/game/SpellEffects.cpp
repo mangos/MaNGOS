@@ -8047,14 +8047,17 @@ void Spell::EffectQuestComplete(SpellEffectIndex eff_idx)
     switch(m_spellInfo->Id)
     {
         case 43458:                                         // Secrets of Nifflevar
-        case 72155:                                         // Harvest Blight Specimen
-        case 72162:                                         // Harvest Blight Specimen
         {
             if (!unitTarget->HasAura(m_spellInfo->CalculateSimpleValue(eff_idx)))
                 return;
 
             break;
         }
+        // TODO: implement these!
+        // "this spell awards credit for the entire raid (all spell targets as this is area target) if just ONE member has both auras (yes, both effect's basepoints)"
+        //case 72155:                                         // Harvest Blight Specimen
+        //case 72162:                                         // Harvest Blight Specimen
+            //break;
         default:
             break;
     }
