@@ -48,9 +48,6 @@
     <ClCompile Include="..\..\src\shared\Log.cpp">
       <Filter>Log</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\shared\MemoryLeaks.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\shared\ProgressBar.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -129,9 +126,6 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\shared\Errors.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\shared\MemoryLeaks.h">
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dep\include\mersennetwister\MersenneTwister.h">

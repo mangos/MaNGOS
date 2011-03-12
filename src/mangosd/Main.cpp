@@ -72,11 +72,6 @@ void usage(const char *prog)
 /// Launch the mangos server
 extern int main(int argc, char **argv)
 {
-    // - Construct Memory Manager Instance
-    MaNGOS::Singleton<MemoryManager>::Instance();
-
-    //char *leak = new char[1000];                          // test leak detection
-
     ///- Command line parsing
     char const* cfg_file = _MANGOSD_CONFIG;
 
