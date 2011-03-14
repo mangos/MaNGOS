@@ -16328,8 +16328,8 @@ void Player::_LoadMailedItems(QueryResult *result)
 void Player::_LoadMails(QueryResult *result)
 {
     m_mail.clear();
-    //        0  1           2      3        4       5    6           7            8     9   10      11         12
-    //"SELECT id,messageType,sender,receiver,subject,body,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow()
+    //        0  1           2      3        4       5    6           7            8     9   10      11         12             13
+    //"SELECT id,messageType,sender,receiver,subject,body,expire_time,deliver_time,money,cod,checked,stationery,mailTemplateId,has_items FROM mail WHERE receiver = '%u' ORDER BY id DESC", GetGUIDLow()
     if(!result)
         return;
 
@@ -16350,8 +16350,9 @@ void Player::_LoadMails(QueryResult *result)
         m->checked = fields[10].GetUInt32();
         m->stationery = fields[11].GetUInt8();
         m->mailTemplateId = fields[12].GetInt16();
+        m->has_items = fields[13].GetBool();                // true, if mail have items or mail have template and items generated (maybe none)
 
-        if(m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
+        if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
         {
             sLog.outError( "Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
             m->mailTemplateId = 0;
@@ -16360,6 +16361,10 @@ void Player::_LoadMails(QueryResult *result)
         m->state = MAIL_STATE_UNCHANGED;
 
         m_mail.push_back(m);
+
+        if (m->mailTemplateId && !m->has_items)
+            m->prepareTemplateItems(this);
+
     } while( result->NextRow() );
     delete result;
 }

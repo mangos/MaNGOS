@@ -249,7 +249,7 @@ class MailDraft
         MailDraft& operator=(MailDraft const&);             // trap decl, no body, ...because items clone is high price operation
 
         void deleteIncludedItems(bool inDB = false);
-        void prepareItems(Player* receiver);                ///< called from SendMailTo for generate mailTemplateBase items
+        bool prepareItems(Player* receiver);                ///< called from SendMailTo for generate mailTemplateBase items
 
         /// The ID of the template associated with this MailDraft.
         uint16      m_mailTemplateId;
@@ -298,6 +298,8 @@ struct Mail
     std::string subject;
     /// the body of the mail
     std::string body;
+    /// flag mark mail that already has items, or already generate none items for template
+    bool has_items;
     /// A vector containing Information about the items in this mail.
     MailItemInfoVec items;
     /// A vector containing Information about the items that where already take from this mail.
@@ -331,6 +333,7 @@ struct Mail
         mii.item_guid = itemGuidLow;
         mii.item_template = item_template;
         items.push_back(mii);
+        has_items = true;
     }
 
     /**
@@ -357,13 +360,19 @@ struct Mail
     }
 
     /*
-     * Checks whether a mail contains items or not.
+     * Checks whether a mail contains items (including case none items generated from template already) or not.
      * HasItems() checks whether the mail contains items or not.
      *
-     * @returns true if the mail contains items, false otherwise.
+     * @returns true if the mail contains items or template items already generated possible none, false otherwise.
      *
      */
-    bool HasItems() const { return !items.empty(); }
+    bool HasItems() const { return has_items; }
+
+    /*
+     * Generate items for template if items not genereated before (receiver has been offline, has_items == false)
+     *
+     */
+    void prepareTemplateItems(Player* receiver);            ///< called from _LoadMails for generate mailTemplateBase items not generated for offline player
 };
 
 #endif
