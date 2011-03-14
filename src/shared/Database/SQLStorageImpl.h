@@ -88,6 +88,16 @@ void SQLStorageLoaderBase<T>::storeValue(V value, SQLStorage &store, char *p, ui
             subclass->convert_to_str(x, value, *((char**)(&p[offset])) );
             offset+=sizeof(char*);
             break;
+        case FT_NA:
+        case FT_NA_BYTE:
+            break;
+        case FT_IND:
+        case FT_SORT:
+            assert(false && "SQL storage not have sort field types");
+            break;
+        default:
+            assert(false && "unknown format character");
+            break;
     }
 }
 
@@ -116,6 +126,16 @@ void SQLStorageLoaderBase<T>::storeValue(char const* value, SQLStorage &store, c
         case FT_STRING:
             subclass->convert_str_to_str(x, value, *((char**)(&p[offset])) );
             offset+=sizeof(char*);
+            break;
+        case FT_NA:
+        case FT_NA_BYTE:
+            break;
+        case FT_IND:
+        case FT_SORT:
+            assert(false && "SQL storage not have sort field types");
+            break;
+        default:
+            assert(false && "unknown format character");
             break;
     }
 }
@@ -172,17 +192,32 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store, bool error_at_empty /*= tr
     }
 
     //get struct size
-    uint32 sc=0;
-    uint32 bo=0;
-    uint32 bb=0;
-    for(uint32 x=0; x< store.iNumFields; x++)
-        if(store.dst_format[x]==FT_STRING)
-            ++sc;
-        else if (store.dst_format[x]==FT_LOGIC)
-            ++bo;
-        else if (store.dst_format[x]==FT_BYTE)
-            ++bb;
-    recordsize=(store.iNumFields-sc-bo-bb)*4+sc*sizeof(char*)+bo*sizeof(bool)+bb*sizeof(char);
+    for(uint32 x = 0; x < store.iNumFields; ++x)
+    {
+        switch(store.dst_format[x])
+        {
+            case FT_LOGIC:
+                recordsize += sizeof(bool);   break;
+            case FT_BYTE:
+                recordsize += sizeof(char);   break;
+            case FT_INT:
+                recordsize += sizeof(uint32); break;
+            case FT_FLOAT:
+                recordsize += sizeof(float);  break;
+            case FT_STRING:
+                recordsize += sizeof(char*);  break;
+            case FT_NA:
+            case FT_NA_BYTE:
+                break;
+            case FT_IND:
+            case FT_SORT:
+                assert(false && "SQL storage not have sort field types");
+                break;
+            default:
+                assert(false && "unknown format character");
+                break;
+        }
+    }
 
     char** newIndex=new char*[maxi];
     memset(newIndex,0,maxi*sizeof(char*));
@@ -211,6 +246,15 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store, bool error_at_empty /*= tr
                     storeValue((float)fields[x].GetFloat(), store, p, x, offset); break;
                 case FT_STRING:
                     storeValue((char const*)fields[x].GetString(), store, p, x, offset); break;
+                case FT_NA:
+                case FT_NA_BYTE:
+                    break;
+                case FT_IND:
+                case FT_SORT:
+                    assert(false && "SQL storage not have sort field types");
+                    break;
+                default:
+                    assert(false && "unknown format character");
             }
         ++count;
     }while( result->NextRow() );

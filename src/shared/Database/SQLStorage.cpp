@@ -21,43 +21,79 @@
 
 void SQLStorage::EraseEntry(uint32 id)
 {
-    uint32 offset=0;
-    for(uint32 x=0;x<iNumFields;x++)
-        if (dst_format[x]==FT_STRING)
+    uint32 offset = 0;
+    for(uint32 x = 0; x < iNumFields; ++x)
+    {
+        switch(dst_format[x])
         {
-            if(pIndex[id])
-                delete [] *(char**)((char*)(pIndex[id])+offset);
+            case FT_LOGIC:
+                offset += sizeof(bool);   break;
+            case FT_BYTE:
+                offset += sizeof(char);   break;
+            case FT_INT:
+                offset += sizeof(uint32); break;
+            case FT_FLOAT:
+                offset += sizeof(float);  break;
+            case FT_STRING:
+            {
+                if(pIndex[id])
+                    delete [] *(char**)((char*)(pIndex[id])+offset);
 
-            offset += sizeof(char*);
+                offset += sizeof(char*);
+                break;
+            }
+            case FT_NA:
+            case FT_NA_BYTE:
+                break;
+            case FT_IND:
+            case FT_SORT:
+                assert(false && "SQL storage not have sort field types");
+                break;
+            default:
+                assert(false && "unknown format character");
+                break;
         }
-        else if (dst_format[x]==FT_LOGIC)
-            offset += sizeof(bool);
-        else if (dst_format[x]==FT_BYTE)
-            offset += sizeof(char);
-        else
-            offset += 4;
+    }
 
     pIndex[id] = NULL;
 }
 
 void SQLStorage::Free ()
 {
-    uint32 offset=0;
-    for(uint32 x=0;x<iNumFields;x++)
-        if (dst_format[x]==FT_STRING)
+    uint32 offset = 0;
+    for(uint32 x = 0; x < iNumFields; ++x)
+    {
+        switch(dst_format[x])
         {
-            for(uint32 y=0;y<MaxEntry;y++)
-                if(pIndex[y])
-                    delete [] *(char**)((char*)(pIndex[y])+offset);
+            case FT_LOGIC:
+                offset += sizeof(bool);   break;
+            case FT_BYTE:
+                offset += sizeof(char);   break;
+            case FT_INT:
+                offset += sizeof(uint32); break;
+            case FT_FLOAT:
+                offset += sizeof(float);  break;
+            case FT_STRING:
+            {
+                for(uint32 y = 0; y < MaxEntry; ++y)
+                    if(pIndex[y])
+                        delete [] *(char**)((char*)(pIndex[y])+offset);
 
-            offset += sizeof(char*);
+                offset += sizeof(char*);
+                break;
+            }
+            case FT_NA:
+            case FT_NA_BYTE:
+                break;
+            case FT_IND:
+            case FT_SORT:
+                assert(false && "SQL storage not have sort field types");
+                break;
+            default:
+                assert(false && "unknown format character");
+                break;
         }
-        else if (dst_format[x]==FT_LOGIC)
-            offset += sizeof(bool);
-        else if (dst_format[x]==FT_BYTE)
-            offset += sizeof(char);
-        else
-            offset += 4;
+    }
 
     delete [] pIndex;
     delete [] data;
