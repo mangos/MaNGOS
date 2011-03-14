@@ -118,6 +118,35 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
+void CreatureCreatePos::SelectFinalPoint(Creature* cr)
+{
+    // if object provided then selected point at specific dist/angle from object forward look
+    if (m_closeObject)
+    {
+        if (m_dist == 0.0f)
+        {
+            m_pos.x = m_closeObject->GetPositionX();
+            m_pos.y = m_closeObject->GetPositionY();
+            m_pos.z = m_closeObject->GetPositionZ();
+        }
+        else
+            m_closeObject->GetClosePoint(m_pos.x, m_pos.y, m_pos.z, cr->GetObjectBoundingRadius(), m_dist, m_angle);
+    }
+}
+
+bool CreatureCreatePos::Relocate(Creature* cr) const
+{
+    cr->Relocate(m_pos.x, m_pos.y, m_pos.z, m_pos.o);
+
+    if (!cr->IsPositionValid())
+    {
+        sLog.outError("%s not created. Suggested coordinates isn't valid (X: %f Y: %f)", cr->GetGuidStr().c_str(), cr->GetPositionX(), cr->GetPositionY());
+        return false;
+    }
+
+    return true;
+}
+
 Creature::Creature(CreatureSubtype subtype) :
 Unit(), i_AI(NULL),
 lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
@@ -699,45 +728,47 @@ bool Creature::AIM_Initialize()
     return true;
 }
 
-bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team /*= TEAM_NONE*/, const CreatureData *data /*= NULL*/, GameEventCreatureData const* eventData /*= NULL*/)
+bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, uint32 Entry, Team team /*= TEAM_NONE*/, const CreatureData *data /*= NULL*/, GameEventCreatureData const* eventData /*= NULL*/)
 {
-    MANGOS_ASSERT(map);
-    SetMap(map);
-    SetPhaseMask(phaseMask,false);
+    SetMap(cPos.GetMap());
+    SetPhaseMask(cPos.GetPhaseMask(), false);
 
-    //oX = x;     oY = y;    dX = x;    dY = y;    m_moveTime = 0;    m_startMove = 0;
-    const bool bResult = CreateFromProto(guidlow, Entry, team, data, eventData);
+    if (!CreateFromProto(guidlow, Entry, team, data, eventData))
+        return false;
 
-    if (bResult)
+    cPos.SelectFinalPoint(this);
+
+    if (!cPos.Relocate(this))
+        return false;
+
+    //Notify the map's instance data.
+    //Only works if you create the object in it, not if it is moves to that map.
+    //Normally non-players do not teleport to other maps.
+    if (InstanceData* iData = GetMap()->GetInstanceData())
+        iData->OnCreatureCreate(this);
+
+    switch (GetCreatureInfo()->rank)
     {
-        //Notify the map's instance data.
-        //Only works if you create the object in it, not if it is moves to that map.
-        //Normally non-players do not teleport to other maps.
-        if (InstanceData* iData = map->GetInstanceData())
-            iData->OnCreatureCreate(this);
-
-        switch (GetCreatureInfo()->rank)
-        {
-            case CREATURE_ELITE_RARE:
-                m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_RARE);
-                break;
-            case CREATURE_ELITE_ELITE:
-                m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_ELITE);
-                break;
-            case CREATURE_ELITE_RAREELITE:
-                m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_RAREELITE);
-                break;
-            case CREATURE_ELITE_WORLDBOSS:
-                m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_WORLDBOSS);
-                break;
-            default:
-                m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_NORMAL);
-                break;
-        }
-        LoadCreatureAddon();
+        case CREATURE_ELITE_RARE:
+            m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_RARE);
+            break;
+        case CREATURE_ELITE_ELITE:
+            m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_ELITE);
+            break;
+        case CREATURE_ELITE_RAREELITE:
+            m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_RAREELITE);
+            break;
+        case CREATURE_ELITE_WORLDBOSS:
+            m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_WORLDBOSS);
+            break;
+        default:
+            m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_NORMAL);
+            break;
     }
 
-    return bResult;
+    LoadCreatureAddon();
+
+    return true;
 }
 
 bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
@@ -1237,16 +1268,9 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     if (map->GetCreature(ObjectGuid(HIGHGUID_UNIT, data->id, guidlow)))
         return false;
 
-    // set coordinates before call Create because some code can be depend from correct coordinates values.
-    Relocate(data->posX, data->posY, data->posZ, data->orientation);
+    CreatureCreatePos pos(map, data->posX, data->posY, data->posZ, data->orientation, data->phaseMask);
 
-    if (!IsPositionValid())
-    {
-        sLog.outError("Creature (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
-        return false;
-    }
-
-    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data, eventData))
+    if (!Create(guidlow, pos, data->id, TEAM_NONE, data, eventData))
         return false;
 
     m_respawnradius = data->spawndist;

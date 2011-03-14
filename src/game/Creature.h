@@ -378,6 +378,32 @@ typedef std::map<uint32,time_t> CreatureSpellCooldowns;
 
 #define MAX_VENDOR_ITEMS 150                                // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
 
+struct CreatureCreatePos
+{
+    public:
+        // exactly coordinates used
+        CreatureCreatePos(Map* map, float x, float y, float z, float o, uint32 phaseMask)
+            : m_map(map), m_phaseMask(phaseMask), m_closeObject(NULL), m_angle(0.0f), m_dist(0.0f) { m_pos.x = x; m_pos.y = y; m_pos.z = z; m_pos.o = o; }
+        // if dist == 0.0f -> exactly object coordinates used, in other case close point to object (CONTACT_DIST can be used as minimal distances)
+        CreatureCreatePos(WorldObject* closeObject, float ori, float dist = 0.0f, float angle = 0.0f)
+            : m_map(closeObject->GetMap()), m_phaseMask(closeObject->GetPhaseMask()),
+            m_closeObject(closeObject), m_angle(angle), m_dist(dist) { m_pos.o = ori; }
+    public:
+        Map* GetMap() const { return m_map; }
+        uint32 GetPhaseMask() const { return m_phaseMask; }
+        void SelectFinalPoint(Creature* cr);
+        bool Relocate(Creature* cr) const;
+
+        // read only after SelectFinalPoint
+        Position m_pos;
+    private:
+        Map* m_map;
+        uint32 m_phaseMask;
+        WorldObject* m_closeObject;
+        float m_angle;
+        float m_dist;
+};
+
 enum CreatureSubtype
 {
     CREATURE_SUBTYPE_GENERIC,                               // new Creature
@@ -399,7 +425,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team = TEAM_NONE, const CreatureData *data = NULL, GameEventCreatureData const* eventData = NULL);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, uint32 Entry, Team team = TEAM_NONE, const CreatureData *data = NULL, GameEventCreatureData const* eventData = NULL);
         bool LoadCreatureAddon(bool reload = false);
         void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
@@ -639,7 +665,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetCombatStartPosition(float x, float y, float z) { CombatStartX = x; CombatStartY = y; CombatStartZ = z; }
         void GetCombatStartPosition(float &x, float &y, float &z) { x = CombatStartX; y = CombatStartY; z = CombatStartZ; }
 
-        void SetSummonPoint(float fX, float fY, float fZ, float fOrient) { m_summonXpoint = fX; m_summonYpoint = fY; m_summonZpoint = fZ; m_summonOrientation = fOrient; }
+        void SetSummonPoint(CreatureCreatePos const& pos) { m_summonXpoint = pos.m_pos.x; m_summonYpoint = pos.m_pos.y; m_summonZpoint = pos.m_pos.z; m_summonOrientation = pos.m_pos.o; }
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonXpoint; fY = m_summonYpoint; fZ = m_summonZpoint; fOrient = m_summonOrientation; }
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }

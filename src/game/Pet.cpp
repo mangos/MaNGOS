@@ -149,29 +149,13 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
         return false;
     }
 
-    // FIXME: Setup near to finish point because GetObjectBoundingRadius set in Create but some Create calls can be dependent from proper position
-    // if pet have creature_template_addon.auras with persistent point for example or script call
-    float px, py, pz;
-    owner->GetClosePoint(px, py, pz, 0, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
-
-    Relocate(px, py, pz, owner->GetOrientation());
-
     Map *map = owner->GetMap();
-    uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
-    if (!Create(guid, map, owner->GetPhaseMask(), petentry, pet_number))
+
+    CreatureCreatePos pos(owner, owner->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+
+    uint32 guid = pos.GetMap()->GenerateLocalLowGuid(HIGHGUID_PET);
+    if (!Create(guid, pos, petentry, pet_number))
     {
-        delete result;
-        return false;
-    }
-
-    owner->GetClosePoint(px, py, pz, GetObjectBoundingRadius(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE, this);
-
-    Relocate(px, py, pz, owner->GetOrientation());
-
-    if (!IsPositionValid())
-    {
-        sLog.outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
-            GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
         delete result;
         return false;
     }
@@ -184,7 +168,7 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     if (cinfo->type == CREATURE_TYPE_CRITTER)
     {
         AIM_Initialize();
-        map->Add((Creature*)this);
+        pos.GetMap()->Add((Creature*)this);
         delete result;
         return true;
     }
@@ -813,20 +797,13 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         return false;
     }
 
-    Relocate(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetOrientation());
-
-    if(!IsPositionValid())
-    {
-        sLog.outError("Pet (guidlow %d, entry %d) not created base at creature. Suggested coordinates isn't valid (X: %f Y: %f)",
-            GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
-        return false;
-    }
+    CreatureCreatePos pos(creature, creature->GetOrientation());
 
     uint32 guid = creature->GetMap()->GenerateLocalLowGuid(HIGHGUID_PET);
 
     BASIC_LOG("Create pet");
     uint32 pet_number = sObjectMgr.GeneratePetNumber();
-    if(!Create(guid, creature->GetMap(), creature->GetPhaseMask(), creature->GetEntry(), pet_number))
+    if (!Create(guid, pos, creature->GetEntry(), pet_number))
         return false;
 
     CreatureInfo const *cinfo = GetCreatureInfo();
@@ -1930,16 +1907,21 @@ bool Pet::IsPermanentPetFor(Player* owner)
     }
 }
 
-bool Pet::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
+bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, uint32 Entry, uint32 pet_number)
 {
-    SetMap(map);
-    SetPhaseMask(phaseMask,false);
+    SetMap(cPos.GetMap());
+    SetPhaseMask(cPos.GetPhaseMask(), false);
 
     Object::_Create(guidlow, pet_number, HIGHGUID_PET);
 
     m_originalEntry = Entry;
 
-    if(!InitEntry(Entry))
+    if (!InitEntry(Entry))
+        return false;
+
+    cPos.SelectFinalPoint(this);
+
+    if (!cPos.Relocate(this))
         return false;
 
     SetSheath(SHEATH_STATE_MELEE);
