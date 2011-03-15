@@ -1730,7 +1730,9 @@ bool ChatHandler::HandleNpcChangeLevelCommand(char* args)
         pCreature->SetMaxHealth(100 + 30*lvl);
         pCreature->SetHealth(100 + 30*lvl);
         pCreature->SetLevel(lvl);
-        pCreature->SaveToDB();
+
+        if (pCreature->HasStaticDBSpawnData())
+            pCreature->SaveToDB();
     }
 
     return true;
