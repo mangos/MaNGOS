@@ -389,6 +389,8 @@ bool Item::LoadFromDB(uint32 guidLow, Field *fields, ObjectGuid ownerGuid)
         return false;
     }
 
+    SetText(fields[1].GetCppString());
+
     bool need_save = false;                                 // need explicit save data at load fixes
 
     // overwrite possible wrong/corrupted guid
