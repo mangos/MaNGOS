@@ -260,7 +260,7 @@ class Pet : public Creature
     private:
         PetModeFlags m_petModeFlags;
 
-        void SaveToDB(uint32, uint8)                        // overwrited of Creature::SaveToDB     - don't must be called
+        void SaveToDB(uint32, uint8, uint32)                // overwrited of Creature::SaveToDB     - don't must be called
         {
             MANGOS_ASSERT(false);
         }
