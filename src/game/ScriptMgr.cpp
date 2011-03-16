@@ -66,7 +66,9 @@ ScriptMgr::ScriptMgr() :
     m_pOnEffectDummyCreature(NULL),
     m_pOnEffectDummyGO(NULL),
     m_pOnEffectDummyItem(NULL),
-    m_pOnAuraDummy(NULL)
+    m_pOnAuraDummy(NULL),
+
+    m_scheduledScripts(0)
 {
 }
 
@@ -77,7 +79,7 @@ ScriptMgr::~ScriptMgr()
 
 void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
 {
-    if (sWorld.IsScriptScheduled())                         // function don't must be called in time scripts use.
+    if (IsScriptScheduled())                                // function don't must be called in time scripts use.
         return;
 
     sLog.outString("%s :", tablename);
