@@ -4083,7 +4083,8 @@ void ObjectMgr::LoadQuests()
             }
         }
 
-        for(int j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j )
+        bool choice_found = false;
+        for(int j = QUEST_REWARD_CHOICES_COUNT-1; j >=0; --j )
         {
             if (uint32 id = qinfo->RewChoiceItemId[j])
             {
@@ -4093,6 +4094,8 @@ void ObjectMgr::LoadQuests()
                         qinfo->GetQuestId(),j+1,id,id);
                     qinfo->RewChoiceItemId[j] = 0;          // no changes, quest will not reward this
                 }
+                else
+                    choice_found = true;
 
                 if (!qinfo->RewChoiceItemCount[j])
                 {
@@ -4100,6 +4103,14 @@ void ObjectMgr::LoadQuests()
                         qinfo->GetQuestId(),j+1,id,j+1);
                     // no changes, quest can't be done
                 }
+            }
+            else if (choice_found)                          // client crash if have gap in item reward choices
+            {
+                sLog.outErrorDb("Quest %u has `RewChoiceItemId%d` = 0 but `RewChoiceItemId%d` = %u, client can crash at like data.",
+                    qinfo->GetQuestId(),j+1,j+2,qinfo->RewChoiceItemId[j+1]);
+                // fill gap by clone later filled choice
+                qinfo->RewChoiceItemId[j] = qinfo->RewChoiceItemId[j+1];
+                qinfo->RewChoiceItemCount[j] = qinfo->RewChoiceItemCount[j+1];
             }
             else if (qinfo->RewChoiceItemCount[j]>0)
             {
