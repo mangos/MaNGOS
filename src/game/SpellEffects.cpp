@@ -6343,7 +6343,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // Are there anything special with this, a random chance or condition?
                     // Feeding Rock Falcon
-                    unitTarget->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true);
+                    unitTarget->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true, NULL, NULL, unitTarget->GetObjectGuid(), m_spellInfo);
                     return;
                 }
                 case 44455:                                 // Character Script Effect Reverse Cast
