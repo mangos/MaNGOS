@@ -1321,6 +1321,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Player*)m_caster)->KilledMonster(pCreature->GetCreatureInfo(), pCreature->GetObjectGuid());
                     return;
                 }
+                case 43014:                                 // Despawn Self
+                {
+                    if (m_caster->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    ((Creature*)m_caster)->ForcedDespawn();
+                    return;
+                }
                 case 43036:                                 // Dismembering Corpse
                 {
                     if (!unitTarget || m_caster->GetTypeId() != TYPEID_PLAYER)
