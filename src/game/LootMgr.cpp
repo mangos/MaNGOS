@@ -392,6 +392,27 @@ bool LootItem::AllowedForPlayer(Player const * player) const
     return true;
 }
 
+LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, bool condition_ok /*= false*/) const
+{
+    // ignore looted, FFA (each player get own copy) and not allowed items
+    if (is_looted || freeforall || conditionId && !condition_ok || !AllowedForPlayer(viewer))
+        return MAX_LOOT_SLOT_TYPE;
+
+    switch (permission)
+    {
+        case GROUP_PERMISSION:
+            return (is_blocked || is_underthreshold) ? LOOT_SLOT_NORMAL : LOOT_SLOT_VIEW;
+        case ALL_PERMISSION:
+            return LOOT_SLOT_NORMAL;
+        case OWNER_PERMISSION:
+            return LOOT_SLOT_OWNER;
+        case MASTER_PERMISSION:
+            return !is_underthreshold ? LOOT_SLOT_MASTER : LOOT_SLOT_NORMAL;
+    }
+
+    return MAX_LOOT_SLOT_TYPE;
+}
+
 //
 // --------- Loot ---------
 //
@@ -737,55 +758,38 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     size_t count_pos = b.wpos();                            // pos of item count byte
     b << uint8(0);                                          // item count placeholder
 
-    switch (lv.permission)
+    if (lv.permission == NONE_PERMISSION)
+        return b;                                           // nothing output more
+
+
+    for (uint8 i = 0; i < l.items.size(); ++i)
     {
-        case GROUP_PERMISSION:
+        LootSlotType slot_type = l.items[i].GetSlotTypeForSharedLoot(lv.permission, lv.viewer);
+        if (slot_type >= MAX_LOOT_SLOT_TYPE)
+            continue;
+
+        b << uint8(i) << l.items[i];
+        b << uint8(slot_type);                              // 0 - get 1 - look only 2 - master selection
+        ++itemsShown;
+    }
+
+    QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
+    QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
+    if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
+    {
+        QuestItemList *conditional_list =  nn_itr->second;
+        for (QuestItemList::const_iterator ci = conditional_list->begin() ; ci != conditional_list->end(); ++ci)
         {
-            // You are not the items proprietary, so you can only see
-            // blocked rolled items and quest items, and !ffa items
-            for (uint8 i = 0; i < l.items.size(); ++i)
-            {
-                if (!l.items[i].is_looted && !l.items[i].freeforall && !l.items[i].conditionId && l.items[i].AllowedForPlayer(lv.viewer))
-                {
-                    LootSlotType slot_type = (l.items[i].is_blocked || l.items[i].is_underthreshold)
-                        ? LOOT_SLOT_NORMAL : LOOT_SLOT_VIEW;
+            LootItem &item = l.items[ci->index];
 
-                    b << uint8(i) << l.items[i];            //send the index and the item if it's not looted, and blocked or under threshold, free for all items will be sent later, only one-player loots here
-                    b << uint8(slot_type);                  // 0 - get 1 - look only
-                    ++itemsShown;
-                }
-            }
-            break;
+            LootSlotType slot_type = item.GetSlotTypeForSharedLoot(lv.permission, lv.viewer, !ci->is_looted);
+            if (slot_type >= MAX_LOOT_SLOT_TYPE)
+                continue;
+
+            b << uint8(ci->index) << item;
+            b << uint8(slot_type);                          // allow loot
+            ++itemsShown;
         }
-        case ALL_PERMISSION:
-        case OWNER_PERMISSION:
-        case MASTER_PERMISSION:
-        {
-            for (uint8 i = 0; i < l.items.size(); ++i)
-            {
-                if (!l.items[i].is_looted && !l.items[i].freeforall && !l.items[i].conditionId && l.items[i].AllowedForPlayer(lv.viewer))
-                {
-                    LootSlotType slot_type = LOOT_SLOT_NORMAL;
-
-                    switch(lv.permission)
-                    {
-                        case MASTER_PERMISSION:
-                            if (!l.items[i].is_underthreshold)
-                                slot_type = LOOT_SLOT_MASTER;
-                            break;
-                        case OWNER_PERMISSION:
-                            slot_type = LOOT_SLOT_OWNER;
-                    }
-
-                    b << uint8(i) << l.items[i];            //only send one-player loot items now, free for all will be sent later
-                    b << uint8(slot_type);                  // 0 - get 2 - master selection
-                    ++itemsShown;
-                }
-            }
-            break;
-        }
-        default:
-            return b;                                       // nothing output more
     }
 
     // in next cases used same slot type for all items
@@ -820,23 +824,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
             if (!fi->is_looted && !item.is_looted)
             {
                 b << uint8(fi->index) << item;
-                b << uint8(slot_type);                      // allow loot
-                ++itemsShown;
-            }
-        }
-    }
-
-    QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
-    QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
-    if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
-    {
-        QuestItemList *conditional_list =  nn_itr->second;
-        for (QuestItemList::const_iterator ci = conditional_list->begin() ; ci != conditional_list->end(); ++ci)
-        {
-            LootItem &item = l.items[ci->index];
-            if (!ci->is_looted && !item.is_looted)
-            {
-                b << uint8(ci->index) << item;
                 b << uint8(slot_type);                      // allow loot
                 ++itemsShown;
             }
