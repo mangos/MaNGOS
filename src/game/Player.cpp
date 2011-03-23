@@ -15957,23 +15957,27 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             uint32 effIndexMask = (int32)fields[14].GetUInt32();
 
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
-            if(!spellproto)
+            if (!spellproto)
             {
                 sLog.outError("Unknown spell (spellid %u), ignore.",spellid);
                 continue;
             }
 
             // prevent wrong values of remaincharges
-            if(spellproto->procCharges)
+            if (spellproto->procCharges)
             {
-                if(remaincharges <= 0 || remaincharges > (int32)spellproto->procCharges)
+                if (remaincharges <= 0 || remaincharges > (int32)spellproto->procCharges)
                     remaincharges = spellproto->procCharges;
             }
             else
                 remaincharges = 0;
 
-            if (spellproto->StackAmount < stackcount)
+            if (!spellproto->StackAmount)
+                stackcount = 1;
+            else if (spellproto->StackAmount < stackcount)
                 stackcount = spellproto->StackAmount;
+            else if (!stackcount)
+                stackcount = 1;
 
             SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, NULL);
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)

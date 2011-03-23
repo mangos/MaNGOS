@@ -1220,7 +1220,7 @@ void Pet::_LoadAuras(uint32 timediff)
             uint32 effIndexMask = (int32)fields[14].GetUInt32();
 
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
-            if(!spellproto)
+            if (!spellproto)
             {
                 sLog.outError("Unknown spell (spellid %u), ignore.",spellid);
                 continue;
@@ -1232,16 +1232,21 @@ void Pet::_LoadAuras(uint32 timediff)
 
             // prevent wrong values of remaincharges
             uint32 procCharges = spellproto->procCharges;
-            if(procCharges)
+            if (procCharges)
             {
-                if(remaincharges <= 0 || remaincharges > (int32)procCharges)
+                if (remaincharges <= 0 || remaincharges > (int32)procCharges)
                     remaincharges = procCharges;
             }
             else
                 remaincharges = 0;
 
-            if (spellproto->StackAmount < stackcount)
+            if (!spellproto->StackAmount)
+                stackcount = 1;
+            else if (spellproto->StackAmount < stackcount)
                 stackcount = spellproto->StackAmount;
+            else if (!stackcount)
+                stackcount = 1;
+
 
             SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, NULL);
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
