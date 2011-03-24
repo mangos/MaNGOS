@@ -8239,12 +8239,6 @@ m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0)
     // some custom stack values at aura holder create
     switch (m_spellProto->Id)
     {
-        case 22959:                                         // Improved Scorch
-            if (caster && caster->GetObjectGuid().IsUnit())
-                // Glyph of Improved Scorch
-                if (Aura* glyph = ((Unit*)caster)->GetDummyAura(56371))
-                    m_stackAmount = glyph->GetModifier()->m_amount;
-            break;
         // some auras applied with max stack
         case 24575:                                         // Brittle Armor
         case 24659:                                         // Unstable Power
