@@ -7628,13 +7628,15 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
         if(!pEnchant) continue;
         for (int s = 0; s < 3; ++s)
         {
-            if (pEnchant->type[s]!=ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
+            uint32 proc_spell_id = pEnchant->spellid[s];
+
+            if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                 continue;
 
-            SpellEntry const *spellInfo = sSpellStore.LookupEntry(pEnchant->spellid[s]);
+            SpellEntry const *spellInfo = sSpellStore.LookupEntry(proc_spell_id);
             if (!spellInfo)
             {
-                sLog.outError("Player::CastItemCombatSpell Enchant %i, cast unknown spell %i", pEnchant->ID, pEnchant->spellid[s]);
+                sLog.outError("Player::CastItemCombatSpell Enchant %i, cast unknown spell %i", pEnchant->ID, proc_spell_id);
                 continue;
             }
 
@@ -7646,20 +7648,20 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
                 : pEnchant->amount[s] != 0 ? float(pEnchant->amount[s]) : GetWeaponProcChance();
 
 
-            ApplySpellMod(spellInfo->Id,SPELLMOD_CHANCE_OF_SUCCESS,chance);
-            ApplySpellMod(spellInfo->Id,SPELLMOD_FREQUENCY_OF_SUCCESS,chance);
+            ApplySpellMod(spellInfo->Id,SPELLMOD_CHANCE_OF_SUCCESS, chance);
+            ApplySpellMod(spellInfo->Id,SPELLMOD_FREQUENCY_OF_SUCCESS, chance);
 
             if (roll_chance_f(chance))
             {
-                if(IsPositiveSpell(pEnchant->spellid[s]))
-                    CastSpell(this, pEnchant->spellid[s], true, item);
+                if (IsPositiveSpell(spellInfo->Id))
+                    CastSpell(this, spellInfo->Id, true, item);
                 else
                 {
                     // Deadly Poison, unique effect needs to be handled before casting triggered spell
                     if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE && spellInfo->SpellFamilyFlags & UI64LIT(0x10000))
                         _HandleDeadlyPoison(Target, attType, spellInfo);
 
-                    CastSpell(Target, pEnchant->spellid[s], true, item);
+                    CastSpell(Target, spellInfo->Id, true, item);
                 }
             }
         }
