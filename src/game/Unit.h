@@ -1596,8 +1596,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveAllAurasOnDeath();
 
         // removing specific aura FROM stack by diff reasons and selections
-        void RemoveAuraHolderFromStack(uint32 spellId, int32 stackAmount = 1, uint64 casterGUID = 0, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
-        void RemoveAuraHolderDueToSpellByDispel(uint32 spellId, int32 stackAmount, uint64 casterGUID, Unit *dispeler);
+        void RemoveAuraHolderFromStack(uint32 spellId, uint32 stackAmount = 1, uint64 casterGUID = 0, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
+        void RemoveAuraHolderDueToSpellByDispel(uint32 spellId, uint32 stackAmount, uint64 casterGUID, Unit *dispeller);
 
         void DelaySpellAuraHolder(uint32 spellId, int32 delaytime, uint64 casterGUID);
 
@@ -1739,7 +1739,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostileReference* /*pHostileReference*/ ) { /* nothing to do yet */ }
         HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
 
-        uint32 GetVisibleAura(uint8 slot)
+        uint32 GetVisibleAura(uint8 slot) const
         {
             VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
             if(itr != m_visibleAuras.end())
@@ -1753,8 +1753,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             else
                 m_visibleAuras[slot] = spellid;
         }
-        VisibleAuraMap const *GetVisibleAuras() { return &m_visibleAuras; }
-        uint8 GetVisibleAurasCount() { return m_visibleAuras.size(); }
+        VisibleAuraMap const& GetVisibleAuras() const { return m_visibleAuras; }
+        uint8 GetVisibleAurasCount() const { return m_visibleAuras.size(); }
 
         Aura* GetAura(uint32 spellId, SpellEffectIndex effindex);
         Aura* GetAura(AuraType type, SpellFamily family, uint64 familyFlag, uint32 familyFlag2 = 0, ObjectGuid casterGuid = ObjectGuid());

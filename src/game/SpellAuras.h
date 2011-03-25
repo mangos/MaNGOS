@@ -52,6 +52,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void ApplyAuraModifiers(bool apply, bool real = false);
         void _AddSpellAuraHolder();
         void _RemoveSpellAuraHolder();
+        void BuildUpdatePacket(WorldPacket& data) const;
         void SendAuraUpdate(bool remove) const;
         void HandleSpellSpecificBoosts(bool apply);
         void CleanupTriggeredSpells();
@@ -117,8 +118,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void SetAuraFlags(uint8 flags) { m_auraFlags = flags; }
         uint8 GetAuraLevel() const { return m_auraLevel; }
         void SetAuraLevel(uint8 level) { m_auraLevel = level; }
-        uint8 GetAuraCharges() const { return m_procCharges; }
-        void SetAuraCharges(uint8 charges)
+        uint32 GetAuraCharges() const { return m_procCharges; }
+        void SetAuraCharges(uint32 charges)
         {
             if (m_procCharges == charges)
                 return;
@@ -139,7 +140,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         void SetVisibleAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
-        void SetLoadedState(ObjectGuid casterGUID, ObjectGuid itemGUID, int32 stackAmount, int32 charges)
+        void SetLoadedState(ObjectGuid const& casterGUID, ObjectGuid const& itemGUID, uint32 stackAmount, uint32 charges)
         {
             m_casterGuid = casterGUID;
             m_castItemGuid = itemGUID;
@@ -162,8 +163,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         uint8 m_auraSlot;                                   // Aura slot on unit (for show in client)
         uint8 m_auraFlags;                                  // Aura info flag (for send data to client)
         uint8 m_auraLevel;                                  // Aura level (store caster level for correct show level dep amount)
-        uint8 m_procCharges;                                // Aura charges (0 for infinite)
-        uint8 m_stackAmount;                                // Aura stack amount
+        uint32 m_procCharges;                               // Aura charges (0 for infinite)
+        uint32 m_stackAmount;                               // Aura stack amount
 
         AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
         DiminishingGroup m_AuraDRGroup:8;                   // Diminishing

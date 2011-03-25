@@ -8288,11 +8288,11 @@ void SpellAuraHolder::_AddSpellAuraHolder()
     // Lookup free slot
     if (m_target->GetVisibleAurasCount() < MAX_AURAS)
     {
-        Unit::VisibleAuraMap const *visibleAuras = m_target->GetVisibleAuras();
+        Unit::VisibleAuraMap const& visibleAuras = m_target->GetVisibleAuras();
         for(uint8 i = 0; i < MAX_AURAS; ++i)
         {
-            Unit::VisibleAuraMap::const_iterator itr = visibleAuras->find(i);
-            if(itr == visibleAuras->end())
+            Unit::VisibleAuraMap::const_iterator itr = visibleAuras.find(i);
+            if (itr == visibleAuras.end())
             {
                 slot = i;
                 // update for out of range group members (on 1 slot use)
@@ -8584,8 +8584,8 @@ void SpellAuraHolder::SetStackAmount(uint32 stackAmount)
     if (!target || !caster)
         return;
 
-    bool refresh = stackAmount >= uint32(m_stackAmount);
-    if (stackAmount != uint32(m_stackAmount))
+    bool refresh = stackAmount >= m_stackAmount;
+    if (stackAmount != m_stackAmount)
     {
         m_stackAmount = stackAmount;
 
@@ -8674,23 +8674,17 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
     return !m_isPassive || totemAura || HasAreaAuraEffect(m_spellProto);
 }
 
-void SpellAuraHolder::SendAuraUpdate(bool remove) const
+void SpellAuraHolder::BuildUpdatePacket(WorldPacket& data) const
 {
-    WorldPacket data(SMSG_AURA_UPDATE);
-    data << m_target->GetPackGUID();
     data << uint8(GetAuraSlot());
-    data << uint32(remove ? 0 : GetId());
-
-    if(remove)
-    {
-        m_target->SendMessageToSet(&data, true);
-        return;
-    }
+    data << uint32(GetId());
 
     uint8 auraFlags = GetAuraFlags();
     data << uint8(auraFlags);
     data << uint8(GetAuraLevel());
-    data << uint8(m_procCharges ? m_procCharges*m_stackAmount : m_stackAmount);
+
+    uint32 stackCount = m_procCharges ? m_procCharges*m_stackAmount : m_stackAmount;
+    data << uint8(stackCount <= 255 ? stackCount : 255);
 
     if(!(auraFlags & AFLAG_NOT_CASTER))
     {
@@ -8717,6 +8711,20 @@ void SpellAuraHolder::SendAuraUpdate(bool remove) const
         data << uint32(max_duration);
         data << uint32(duration);
     }
+}
+
+void SpellAuraHolder::SendAuraUpdate(bool remove) const
+{
+    WorldPacket data(SMSG_AURA_UPDATE);
+    data << m_target->GetPackGUID();
+
+    if(remove)
+    {
+        data << uint8(GetAuraSlot());
+        data << uint32(0);
+    }
+    else
+        BuildUpdatePacket(data);
 
     m_target->SendMessageToSet(&data, true);
 }
