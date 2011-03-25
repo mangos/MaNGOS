@@ -77,9 +77,19 @@ void MapPersistentState::SaveCreatureRespawnTime(uint32 loguid, time_t t)
         return;
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
+
+    static SqlStatementID delSpawnTime ;
+    static SqlStatementID insSpawnTime ;
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delSpawnTime, "DELETE FROM creature_respawn WHERE guid = ? AND instance = ?");
+    stmt.PExecute(loguid, m_instanceid);
+
     if(t > sWorld.GetGameTime())
-        CharacterDatabase.PExecute("INSERT INTO creature_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), m_instanceid);
+    {
+        stmt = CharacterDatabase.CreateStatement(insSpawnTime, "INSERT INTO creature_respawn VALUES ( ?, ?, ? )");
+        stmt.PExecute(loguid, uint64(t), m_instanceid);
+    }
+
     CharacterDatabase.CommitTransaction();
 }
 
@@ -92,9 +102,19 @@ void MapPersistentState::SaveGORespawnTime(uint32 loguid, time_t t)
         return;
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE guid = '%u' AND instance = '%u'", loguid, m_instanceid);
+
+    static SqlStatementID delSpawnTime ;
+    static SqlStatementID insSpawnTime ;
+    
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delSpawnTime, "DELETE FROM gameobject_respawn WHERE guid = ? AND instance = ?");
+    stmt.PExecute(loguid, m_instanceid);
+
     if(t > sWorld.GetGameTime())
-        CharacterDatabase.PExecute("INSERT INTO gameobject_respawn VALUES ( '%u', '" UI64FMTD "', '%u' )", loguid, uint64(t), m_instanceid);
+    {
+        stmt = CharacterDatabase.CreateStatement(insSpawnTime, "INSERT INTO gameobject_respawn VALUES ( ?, ?, ? )");
+        stmt.PExecute(loguid, uint64(t), m_instanceid);
+    }
+
     CharacterDatabase.CommitTransaction();
 }
 

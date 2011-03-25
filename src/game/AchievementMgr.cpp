@@ -478,77 +478,45 @@ void AchievementMgr::DeleteFromDB(ObjectGuid guid)
 
 void AchievementMgr::SaveToDB()
 {
+    static SqlStatementID delComplAchievements ;
+    static SqlStatementID insComplAchievements ;
+    static SqlStatementID delProgress ;
+    static SqlStatementID insProgress ;
+
     if(!m_completedAchievements.empty())
     {
-        bool need_execute = false;
-        std::ostringstream ssdel;
-        std::ostringstream ssins;
+        //delete existing achievements in the loop
         for(CompletedAchievementMap::iterator iter = m_completedAchievements.begin(); iter!=m_completedAchievements.end(); ++iter)
         {
             if(!iter->second.changed)
                 continue;
 
-            /// first new/changed record prefix
-            if(!need_execute)
-            {
-                ssdel << "DELETE FROM character_achievement WHERE guid = " << GetPlayer()->GetGUIDLow() << " AND achievement IN (";
-                ssins << "INSERT INTO character_achievement (guid, achievement, date) VALUES ";
-                need_execute = true;
-            }
-            /// next new/changed record prefix
-            else
-            {
-                ssdel << ", ";
-                ssins << ", ";
-            }
-
-            // new/changed record data
-            ssdel << iter->first;
-            ssins << "("<<GetPlayer()->GetGUIDLow() << ", " << iter->first << ", " << uint64(iter->second.date) << ")";
-
             /// mark as saved in db
             iter->second.changed = false;
-        }
 
-        if(need_execute)
-            ssdel << ")";
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delComplAchievements, "DELETE FROM character_achievement WHERE guid = ? AND achievement = ?");
+            stmt.PExecute(GetPlayer()->GetGUIDLow(), iter->first);
 
-        if(need_execute)
-        {
-            CharacterDatabase.Execute( ssdel.str().c_str() );
-            CharacterDatabase.Execute( ssins.str().c_str() );
+            stmt = CharacterDatabase.CreateStatement(insComplAchievements, "INSERT INTO character_achievement (guid, achievement, date) VALUES (?, ?, ?)");
+            stmt.PExecute(GetPlayer()->GetGUIDLow(), iter->first, uint64(iter->second.date));
         }
     }
 
     if(!m_criteriaProgress.empty())
     {
-        /// prepare deleting and insert
-        bool need_execute_del = false;
-        bool need_execute_ins = false;
-        std::ostringstream ssdel;
-        std::ostringstream ssins;
+        //insert achievements
         for(CriteriaProgressMap::iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
         {
             if(!iter->second.changed)
                 continue;
 
-            // deleted data (including 0 progress state)
-            {
-                /// first new/changed record prefix (for any counter value)
-                if(!need_execute_del)
-                {
-                    ssdel << "DELETE FROM character_achievement_progress WHERE guid = " << GetPlayer()->GetGUIDLow() << " AND criteria IN (";
-                    need_execute_del = true;
-                }
-                /// next new/changed record prefix
-                else
-                    ssdel << ", ";
+            /// mark as updated in db
+            iter->second.changed = false;
 
-                // new/changed record data
-                ssdel << iter->first;
-            }
+            // new/changed record data
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delProgress, "DELETE FROM character_achievement_progress WHERE guid = ? AND criteria = ?"); 
+            stmt.PExecute(GetPlayer()->GetGUIDLow(), iter->first);
 
-            // store data only for real progress, exceptions are timedCriterias, they are also stored for counter == 0
             bool needSave = iter->second.counter != 0;
             if (!needSave)
             {
@@ -558,33 +526,9 @@ void AchievementMgr::SaveToDB()
 
             if (needSave)
             {
-                /// first new/changed record prefix
-                if(!need_execute_ins)
-                {
-                    ssins << "INSERT INTO character_achievement_progress (guid, criteria, counter, date) VALUES ";
-                    need_execute_ins = true;
-                }
-                /// next new/changed record prefix
-                else
-                    ssins << ", ";
-
-                // new/changed record data
-                ssins << "(" << GetPlayer()->GetGUIDLow() << ", " << iter->first << ", " << iter->second.counter << ", " << iter->second.date << ")";
+                stmt = CharacterDatabase.CreateStatement(insProgress, "INSERT INTO character_achievement_progress (guid, criteria, counter, date) VALUES (?, ?, ?, ?)");
+                stmt.PExecute(GetPlayer()->GetGUIDLow(), iter->first, iter->second.counter, uint64(iter->second.date));
             }
-
-            /// mark as updated in db
-            iter->second.changed = false;
-        }
-
-        if(need_execute_del)                                // DELETE ... IN (.... _)_
-            ssdel << ")";
-
-        if(need_execute_del || need_execute_ins)
-        {
-            if(need_execute_del)
-                CharacterDatabase.Execute( ssdel.str().c_str() );
-            if(need_execute_ins)
-                CharacterDatabase.Execute( ssins.str().c_str() );
         }
     }
 }

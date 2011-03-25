@@ -23,10 +23,77 @@
 #include <ctime>
 #include <iostream>
 #include <fstream>
+#include <memory>
 
 #define MIN_CONNECTION_POOL_SIZE 1
 #define MAX_CONNECTION_POOL_SIZE 16
 
+//////////////////////////////////////////////////////////////////////////
+SqlPreparedStatement * SqlConnection::CreateStatement( const std::string& fmt )
+{
+    return new SqlPlainPreparedStatement(fmt, *this);
+}
+
+void SqlConnection::FreePreparedStatements()
+{
+    SqlConnection::Lock guard(this);
+
+    size_t nStmts = m_holder.size();
+    for (size_t i = 0; i < nStmts; ++i)
+        delete m_holder[i];
+
+    m_holder.clear();
+}
+
+SqlPreparedStatement * SqlConnection::GetStmt( int nIndex )
+{
+    if(nIndex < 0)
+        return NULL;
+
+    //resize stmt container
+    if(m_holder.size() <= nIndex)
+        m_holder.resize(nIndex + 1, NULL);
+
+    SqlPreparedStatement * pStmt = NULL;
+
+    //create stmt if needed
+    if(m_holder[nIndex] == NULL)
+    {
+        //obtain SQL request string
+        std::string fmt = m_db.GetStmtString(nIndex);
+        MANGOS_ASSERT(fmt.length());
+        //allocate SQlPreparedStatement object
+        pStmt = CreateStatement(fmt);
+        //prepare statement
+        if(!pStmt->prepare())
+        {
+            MANGOS_ASSERT(false && "Unable to prepare SQL statement");
+            return NULL;
+        }
+
+        //save statement in internal registry
+        m_holder[nIndex] = pStmt;
+    }
+    else
+        pStmt = m_holder[nIndex];
+
+    return pStmt;
+}
+
+bool SqlConnection::ExecuteStmt(int nIndex, const SqlStmtParameters& id )
+{
+    if(nIndex == -1)
+        return false;
+
+    //get prepared statement object
+    SqlPreparedStatement * pStmt = GetStmt(nIndex);
+    //bind parameters
+    pStmt->bind(id);
+    //execute statement
+    return pStmt->execute();
+}
+
+//////////////////////////////////////////////////////////////////////////
 Database::~Database()
 {
     StopServer();
@@ -274,7 +341,7 @@ bool Database::Execute(const char *sql)
     if(pTrans)
     {
         //add SQL request to trans queue
-        pTrans->DelayExecute(sql);
+        pTrans->DelayExecute(new SqlPlainRequest(sql));
     }
     else
     {
@@ -283,7 +350,7 @@ bool Database::Execute(const char *sql)
             return DirectExecute(sql);
 
         // Simple sql statement
-        m_threadBody->Delay(new SqlStatement(sql));
+        m_threadBody->Delay(new SqlPlainRequest(sql));
     }
 
     return true;
@@ -477,6 +544,85 @@ bool Database::CheckRequiredField( char const* table_name, char const* required_
     return false;
 }
 
+bool Database::ExecuteStmt( const SqlStatementID& id, SqlStmtParameters * params )
+{
+    if (!m_pAsyncConn)
+        return false;
+
+    SqlTransaction * pTrans = m_TransStorage->get();
+    if(pTrans)
+    {
+        //add SQL request to trans queue
+        pTrans->DelayExecute(new SqlPreparedRequest(id.ID(), params));
+    }
+    else
+    {
+        //if async execution is not available
+        if(!m_bAllowAsyncTransactions)
+            return DirectExecuteStmt(id, params);
+
+        // Simple sql statement
+        m_threadBody->Delay(new SqlPreparedRequest(id.ID(), params));
+    }
+
+    return true;
+}
+
+bool Database::DirectExecuteStmt( const SqlStatementID& id, SqlStmtParameters * params )
+{
+    MANGOS_ASSERT(params);
+    std::auto_ptr<SqlStmtParameters> p(params);
+    //execute statement
+    SqlConnection::Lock _guard(getAsyncConnection());
+    return _guard->ExecuteStmt(id.ID(), *params);
+}
+
+SqlStatement Database::CreateStatement(SqlStatementID& index, const char * fmt )
+{
+    int nId = -1;
+    //check if statement ID is initialized
+    if(!index.initialized())
+    {
+        //convert to lower register
+        std::string szFmt(fmt);
+        //count input parameters
+        int nParams = std::count(szFmt.begin(), szFmt.end(), '?');
+        //find existing or add a new record in registry
+        LOCK_GUARD _guard(m_stmtGuard);
+        PreparedStmtRegistry::const_iterator iter = m_stmtRegistry.find(szFmt);
+        if(iter == m_stmtRegistry.end())
+        {
+            nId = ++m_iStmtIndex;
+            m_stmtRegistry[szFmt] = nId;
+        }
+        else
+            nId = iter->second;
+
+        //save initialized statement index info
+        index.init(nId, nParams);
+    }
+
+    return SqlStatement(index, *this);
+}
+
+std::string Database::GetStmtString(const int stmtId) const
+{
+    LOCK_GUARD _guard(m_stmtGuard);
+    
+    if(stmtId == -1 || stmtId > m_iStmtIndex)
+        return std::string();
+
+    PreparedStmtRegistry::const_iterator iter_last = m_stmtRegistry.end();
+    for(PreparedStmtRegistry::const_iterator iter = m_stmtRegistry.begin(); iter != iter_last; ++iter)
+    {
+        if(iter->second == stmtId)
+            return iter->first;
+    }
+
+    return std::string();
+}
+
+//HELPER CLASSES AND FUNCTIONS
 Database::TransHelper::~TransHelper()
 {
     reset();

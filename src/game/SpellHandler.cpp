@@ -262,7 +262,11 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
             pUser->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
             return;
         }
-        CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
+
+        static SqlStatementID delGifts ;
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM character_gifts WHERE item_guid = ?");
+        stmt.PExecute(pItem->GetGUIDLow());
     }
     else
         pUser->SendLoot(pItem->GetObjectGuid(),LOOT_CORPSE);

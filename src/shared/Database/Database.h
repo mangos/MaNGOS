@@ -26,10 +26,14 @@
 #include "Policies/ThreadingModel.h"
 #include <ace/TSS_T.h>
 #include <ace/Atomic_Op.h>
+#include "SqlPreparedStatement.h"
 
 class SqlTransaction;
 class SqlResultQueue;
 class SqlQueryHolder;
+class SqlStmtParameters;
+class SqlParamBinder;
+class Database;
 
 #define MAX_QUERY_LEN   32*1024
 
@@ -57,6 +61,9 @@ class MANGOS_DLL_SPEC SqlConnection
         // can't rollback without transaction support
         virtual bool RollbackTransaction() { return true; }
 
+        //methods to work with prepared statements
+        bool ExecuteStmt(int nIndex, const SqlStmtParameters& id);
+
         //SqlConnection object lock
         class Lock
         {
@@ -70,9 +77,27 @@ class MANGOS_DLL_SPEC SqlConnection
                 SqlConnection * const m_pConn;
         };
 
+        //get DB object
+        Database& DB() { return m_db; }
+
+    protected:
+        SqlConnection(Database& db) : m_db(db) {}
+
+        virtual SqlPreparedStatement * CreateStatement(const std::string& fmt);
+        //allocate prepared statement and return statement ID
+        SqlPreparedStatement * GetStmt(int nIndex);
+
+        Database& m_db;
+
+        //free prepared statements objects
+        void FreePreparedStatements();
+
     private:
         typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
         LOCK_TYPE m_mutex;
+
+        typedef std::vector<SqlPreparedStatement * > StmtHolder;
+        StmtHolder m_holder;
 };
 
 class MANGOS_DLL_SPEC Database
@@ -165,6 +190,13 @@ class MANGOS_DLL_SPEC Database
         //for sync transaction execution
         bool CommitTransactionDirect();
 
+        //PREPARED STATEMENT API
+
+        //allocate index for prepared statement with SQL request 'fmt'
+        SqlStatement CreateStatement(SqlStatementID& index, const char * fmt);
+        //get prepared statement format string
+        std::string GetStmtString(const int stmtId) const;
+
         operator bool () const { return m_pQueryConnections.size() && m_pAsyncConn != 0; }
 
         //escape string generation
@@ -191,7 +223,7 @@ class MANGOS_DLL_SPEC Database
 
     protected:
         Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadBody(NULL), m_delayThread(NULL), 
-            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false)
+            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
         {
             m_nQueryCounter = -1;
         }
@@ -235,6 +267,12 @@ class MANGOS_DLL_SPEC Database
         //for now return one single connection for async requests
         SqlConnection * getAsyncConnection() const { return m_pAsyncConn; }
 
+        friend class SqlStatement;
+        //PREPARED STATEMENT API
+        //query function for prepared statements
+        bool ExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params);
+        bool DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params);
+
         //connection helper counters
         int m_nQueryConnPoolSize;                               //current size of query connection pool
         ACE_Atomic_Op<ACE_Thread_Mutex, long> m_nQueryCounter;  //counter for connection selection
@@ -251,6 +289,17 @@ class MANGOS_DLL_SPEC Database
         ACE_Based::Thread * m_delayThread;                   ///< Pointer to executer thread
 
         bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
+
+        //PREPARED STATEMENT REGISTRY
+        typedef ACE_Thread_Mutex LOCK_TYPE;
+        typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
+
+        mutable LOCK_TYPE m_stmtGuard;
+
+        typedef UNORDERED_MAP<std::string, int> PreparedStmtRegistry;
+        PreparedStmtRegistry m_stmtRegistry;                 ///< 
+
+        int m_iStmtIndex;
 
     private:
 

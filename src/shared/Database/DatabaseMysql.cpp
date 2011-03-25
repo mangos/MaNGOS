@@ -65,11 +65,12 @@ DatabaseMysql::~DatabaseMysql()
 
 SqlConnection * DatabaseMysql::CreateConnection()
 { 
-    return new MySQLConnection();
+    return new MySQLConnection(*this);
 }
 
 MySQLConnection::~MySQLConnection()
 {
+    FreePreparedStatements();
     mysql_close(mMysql);
 }
 
@@ -309,4 +310,194 @@ unsigned long MySQLConnection::escape_string(char *to, const char *from, unsigne
     return(mysql_real_escape_string(mMysql, to, from, length));
 }
 
+//////////////////////////////////////////////////////////////////////////
+SqlPreparedStatement * MySQLConnection::CreateStatement( const std::string& fmt )
+{
+    return new MySqlPreparedStatement(fmt, *this, mMysql);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+MySqlPreparedStatement::MySqlPreparedStatement( const std::string& fmt, SqlConnection& conn, MYSQL * mysql ) : SqlPreparedStatement(fmt, conn), 
+    m_pMySQLConn(mysql), m_stmt(NULL), m_pInputArgs(NULL), m_pResult(NULL), m_pResultMetadata(NULL)
+{
+}
+
+MySqlPreparedStatement::~MySqlPreparedStatement()
+{
+    RemoveBinds();
+}
+
+bool MySqlPreparedStatement::prepare()
+{
+    if(isPrepared())
+        return true;
+
+    //remove old binds
+    RemoveBinds();
+
+    //create statement object
+    m_stmt = mysql_stmt_init(m_pMySQLConn);
+    if (!m_stmt)
+    {
+        sLog.outError("SQL: mysql_stmt_init()() failed ");
+        return false;
+    }
+
+    //prepare statement
+    if (mysql_stmt_prepare(m_stmt, m_szFmt.c_str(), m_szFmt.length()))
+    {
+        sLog.outError("SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
+        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        return false;
+    }
+
+    /* Get the parameter count from the statement */
+    m_nParams = mysql_stmt_param_count(m_stmt);
+
+    /* Fetch result set meta information */
+    m_pResultMetadata = mysql_stmt_result_metadata(m_stmt);
+    //if we do not have result metadata
+    if (!m_pResultMetadata && strnicmp(m_szFmt.c_str(), "select", 6) == 0)
+    {
+        sLog.outError("SQL: no meta information for '%s'", m_szFmt.c_str());
+        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        return false;
+    }
+
+    //bind input buffers
+    if(m_nParams)
+    {
+        m_pInputArgs = new MYSQL_BIND[m_nParams];
+        memset(m_pInputArgs, 0, sizeof(MYSQL_BIND) * m_nParams);
+    }
+
+    //check if we have a statement which returns result sets
+    if(m_pResultMetadata)
+    {
+        //our statement is query
+        m_bIsQuery = true;
+        /* Get total columns in the query */
+        m_nColumns = mysql_num_fields(m_pResultMetadata);
+
+        //bind output buffers
+    }
+
+    m_bPrepared = true;
+    return true;
+}
+
+void MySqlPreparedStatement::bind( const SqlStmtParameters& holder )
+{
+    if(!isPrepared())
+    {
+        MANGOS_ASSERT(false);
+        return;
+    }
+
+    //finalize adding params
+    if(!m_pInputArgs)
+        return;
+
+    //verify if we bound all needed input parameters
+    if(m_nParams != holder.boundParams())
+    {
+        MANGOS_ASSERT(false);
+        return;
+    }
+
+    int nIndex = 0;
+    SqlStmtParameters::ParameterContainer const& _args = holder.params();
+
+    SqlStmtParameters::ParameterContainer::const_iterator iter_last = _args.end();
+    for (SqlStmtParameters::ParameterContainer::const_iterator iter = _args.begin(); iter != iter_last; ++iter)
+    {
+        //bind parameter
+        addParam(nIndex++, (*iter));
+    }
+
+    //bind input arguments
+    if(mysql_stmt_bind_param(m_stmt, m_pInputArgs))
+    {
+        sLog.outError("SQL ERROR: mysql_stmt_bind_param() failed\n");
+        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+    }
+}
+
+void MySqlPreparedStatement::addParam( int nIndex, const SqlStmtFieldData& data )
+{
+    MANGOS_ASSERT(m_pInputArgs);
+    MANGOS_ASSERT(nIndex < m_nParams);
+
+    MYSQL_BIND& pData = m_pInputArgs[nIndex];
+
+    my_bool bUnsigned = 0;
+    enum_field_types dataType = ToMySQLType(data, bUnsigned);
+
+    //setup MYSQL_BIND structure
+    pData.buffer_type = dataType;
+    pData.is_unsigned = bUnsigned;
+    pData.buffer = data.buff();
+    pData.length = 0;
+    pData.buffer_length = data.type() == FIELD_STRING ? data.size() : 0;
+}
+
+void MySqlPreparedStatement::RemoveBinds()
+{
+    if(!m_stmt)
+        return;
+
+    delete [] m_pInputArgs;
+    delete [] m_pResult;
+
+    mysql_free_result(m_pResultMetadata);
+    mysql_stmt_close(m_stmt);
+
+    m_stmt = NULL;
+    m_pResultMetadata = NULL;
+    m_pResult = NULL;
+    m_pInputArgs = NULL;
+
+    m_bPrepared = false;
+}
+
+bool MySqlPreparedStatement::execute()
+{
+    if(!isPrepared())
+        return false;
+
+    if(mysql_stmt_execute(m_stmt))
+    {
+        sLog.outError("SQL: cannot execute '%s'", m_szFmt.c_str());
+        sLog.outError("SQL ERROR: %s", mysql_stmt_error(m_stmt));
+        return false;
+    }
+
+    return true;
+}
+
+enum_field_types MySqlPreparedStatement::ToMySQLType( const SqlStmtFieldData &data, my_bool &bUnsigned )
+{
+    bUnsigned = 0;
+    enum_field_types dataType = MYSQL_TYPE_NULL;
+
+    switch (data.type())
+    {
+    case FIELD_NONE:    dataType = MYSQL_TYPE_NULL;                     break;
+    case FIELD_BOOL:    dataType = MYSQL_TYPE_BIT;      bUnsigned = 1;  break;
+    case FIELD_I8:      dataType = MYSQL_TYPE_TINY;                     break;
+    case FIELD_UI8:     dataType = MYSQL_TYPE_TINY;     bUnsigned = 1;  break;
+    case FIELD_I16:     dataType = MYSQL_TYPE_SHORT;                    break;
+    case FIELD_UI16:    dataType = MYSQL_TYPE_SHORT;    bUnsigned = 1;  break;
+    case FIELD_I32:     dataType = MYSQL_TYPE_LONG;                     break;
+    case FIELD_UI32:    dataType = MYSQL_TYPE_LONG;     bUnsigned = 1;  break;
+    case FIELD_I64:     dataType = MYSQL_TYPE_LONGLONG;                 break;
+    case FIELD_UI64:    dataType = MYSQL_TYPE_LONGLONG; bUnsigned = 1;  break;
+    case FIELD_FLOAT:   dataType = MYSQL_TYPE_FLOAT;                    break;
+    case FIELD_DOUBLE:  dataType = MYSQL_TYPE_DOUBLE;                   break;
+    case FIELD_STRING:  dataType = MYSQL_TYPE_STRING;                   break;
+    }
+
+    return dataType;
+}
 #endif
