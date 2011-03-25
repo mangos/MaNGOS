@@ -639,6 +639,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                     return false;
                 case 49634:                                 // Sergeant's Flare
                 case 54530:                                 // Opening
+                case 62105:                                 // To'kini's Blowgun
                     return true;
                 default:
                     break;

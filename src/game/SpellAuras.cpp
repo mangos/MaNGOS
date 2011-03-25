@@ -2708,6 +2708,16 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             target->PlayDirectSound(14972, (Player *)target);
                     }
                     return;
+                case 62248:                                 // Sleeping Sleep
+                {
+                    if (apply)
+                        target->setFaction(190);            // Ambient (neutral)
+                    else
+                        target->setFaction(1990);           // Ambient (hostile)
+
+                    target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE, apply);
+                    return;
+                }
                 case 40131:
                 case 27978:
                     if (apply)
