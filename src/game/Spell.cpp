@@ -783,7 +783,7 @@ void Spell::prepareDataForTriggerSystem()
     // avoid triggering negative hit for only positive targets
     m_negativeEffectMask = 0x0;
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-        if (!IsPositiveEffect(m_spellInfo->Id, SpellEffectIndex(i)))
+        if (!IsPositiveEffect(m_spellInfo, SpellEffectIndex(i)))
             m_negativeEffectMask |= (1<<i);
 
     // Hunter traps spells (for Entrapment trigger)
@@ -1832,7 +1832,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             SpellTargets targetB = SPELL_TARGETS_AOE_DAMAGE;
 
             // Select friendly targets for positive effect
-            if (IsPositiveEffect(m_spellInfo->Id, effIndex))
+            if (IsPositiveEffect(m_spellInfo, effIndex))
                 targetB = SPELL_TARGETS_FRIENDLY;
 
             UnitList tempTargetUnitMap;

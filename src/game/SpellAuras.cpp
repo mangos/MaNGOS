@@ -385,7 +385,7 @@ m_isPersistent(false), m_in_use(0), m_spellAuraHolder(holder)
 
     bool isPassive = IsPassiveSpell(GetSpellProto());
     bool isPermanent = false;
-    m_positive = IsPositiveEffect(spellproto->Id, m_effIndex);
+    m_positive = IsPositiveEffect(spellproto, m_effIndex);
 
     m_applyTime = time(NULL);
 

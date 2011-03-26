@@ -92,11 +92,18 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, SpellE
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, WorldTimer::getMSTime());    // new 2.4.0
 
+    SpellEntry const* spellProto = sSpellStore.LookupEntry(spellId);
+    if (!spellProto)
+    {
+        sLog.outError("DynamicObject (spell %u) not created. Spell not exist!", spellId, GetPositionX(), GetPositionY());
+        return false;
+    }
+
     m_aliveDuration = duration;
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-    m_positive = IsPositiveEffect(m_spellId, m_effIndex);
+    m_positive = IsPositiveEffect(spellProto, m_effIndex);
 
     return true;
 }
