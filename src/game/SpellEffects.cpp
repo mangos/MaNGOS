@@ -2149,7 +2149,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     // Sleeping Sleep
                     unitTarget->CastSpell(unitTarget, 62248, true);
 
-                    unitTarget->setFaction(190);                // Ambient (neutral)
+                    // Although not really correct, it's needed to have access to m_caster later,
+                    // to properly process spell 62110 (cast from gossip).
+                    // Can possibly be replaced with a similar function that doesn't set any dynamic flags.
+                    ((Creature*)unitTarget)->SetLootRecipient(m_caster);
+
+                    unitTarget->setFaction(190);            // Ambient (neutral)
                     unitTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
                     return;
                 }
