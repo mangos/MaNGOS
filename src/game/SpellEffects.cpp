@@ -2148,6 +2148,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Sleeping Sleep
                     unitTarget->CastSpell(unitTarget, 62248, true);
+
+                    unitTarget->setFaction(190);                // Ambient (neutral)
+                    unitTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
                     return;
                 }
                 case 64385:                                 // Spinning (from Unusual Compass)
