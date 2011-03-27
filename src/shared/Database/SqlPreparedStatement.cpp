@@ -135,7 +135,7 @@ bool SqlPlainPreparedStatement::execute()
 }
 
 void SqlPlainPreparedStatement::DataToString( const SqlStmtFieldData& data, std::ostringstream& fmt )
-{  
+{
     switch (data.type())
     {
         case FIELD_BOOL:    fmt << "'" << uint32(data.toBool()) << "'";     break;
@@ -153,7 +153,7 @@ void SqlPlainPreparedStatement::DataToString( const SqlStmtFieldData& data, std:
         {
             std::string tmp = data.toStr();
             m_pConn.DB().escape_string(tmp);
-            fmt << "'" << tmp << "'";   
+            fmt << "'" << tmp << "'";
         }
         break;
     }

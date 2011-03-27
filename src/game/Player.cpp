@@ -3714,7 +3714,7 @@ void Player::_SaveSpellCooldowns()
 {
     static SqlStatementID deleteSpellCooldown ;
     static SqlStatementID insertSpellCooldown ;
-    
+
     SqlStatement stmt = CharacterDatabase.CreateStatement(deleteSpellCooldown, "DELETE FROM character_spell_cooldown WHERE guid = ?");
     stmt.PExecute(GetGUIDLow());
 
@@ -11462,7 +11462,7 @@ void Player::DestroyItem( uint8 bag, uint8 slot, bool update )
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
         {
             static SqlStatementID delGifts ;
-            
+
             SqlStatement stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM character_gifts WHERE item_guid = ?");
             stmt.PExecute(pItem->GetGUIDLow());
         }
@@ -17086,7 +17086,7 @@ void Player::SaveToDB()
 
     static SqlStatementID delChar ;
     static SqlStatementID insChar ;
-    
+
     SqlStatement stmt = CharacterDatabase.CreateStatement(delChar, "DELETE FROM characters WHERE guid = ?");
     stmt.PExecute(GetGUIDLow());
 
@@ -17278,7 +17278,7 @@ void Player::SaveInventoryAndGoldToDB()
 void Player::SaveGoldToDB()
 {
     static SqlStatementID updateGold ;
-    
+
     SqlStatement stmt = CharacterDatabase.CreateStatement(updateGold, "UPDATE characters SET money = ? WHERE guid = ?");
     stmt.PExecute(GetMoney(), GetGUIDLow());
 }
@@ -17656,7 +17656,7 @@ void Player::_SaveQuestStatus()
                 {
                     SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,explored = ?,timer = ?,"
                         "mobcount1 = ?,mobcount2 = ?,mobcount3 = ?,mobcount4 = ?,itemcount1 = ?,itemcount2 = ?,itemcount3 = ?,itemcount4 = ?  WHERE guid = ? AND quest = ?");
-                    
+
                     stmt.addUInt8(i->second.m_status);
                     stmt.addUInt8(i->second.m_rewarded);
                     stmt.addUInt8(i->second.m_explored);
@@ -17872,7 +17872,7 @@ void Player::_SaveStats()
 
     SqlStatement stmt = CharacterDatabase.CreateStatement(delStats, "DELETE FROM character_stats WHERE guid = ?");
     stmt.PExecute(GetGUIDLow());
-    
+
     stmt = CharacterDatabase.CreateStatement(insertStats, "INSERT INTO character_stats (guid, maxhealth, maxpower1, maxpower2, maxpower3, maxpower4, maxpower5, maxpower6, maxpower7, "
         "strength, agility, stamina, intellect, spirit, armor, resHoly, resFire, resNature, resFrost, resShadow, resArcane, "
         "blockPct, dodgePct, parryPct, critPct, rangedCritPct, spellCritPct, attackPower, rangedAttackPower, spellPower) "

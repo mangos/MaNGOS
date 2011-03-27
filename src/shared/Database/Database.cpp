@@ -171,7 +171,7 @@ void Database::StopServer()
 }
 
 SqlDelayThread * Database::CreateDelayThread()
-{ 
+{
     assert(m_pAsyncConn);
     return new SqlDelayThread(this, m_pAsyncConn);
 }
@@ -608,7 +608,7 @@ SqlStatement Database::CreateStatement(SqlStatementID& index, const char * fmt )
 std::string Database::GetStmtString(const int stmtId) const
 {
     LOCK_GUARD _guard(m_stmtGuard);
-    
+
     if(stmtId == -1 || stmtId > m_iStmtIndex)
         return std::string();
 

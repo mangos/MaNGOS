@@ -105,7 +105,7 @@ void MapPersistentState::SaveGORespawnTime(uint32 loguid, time_t t)
 
     static SqlStatementID delSpawnTime ;
     static SqlStatementID insSpawnTime ;
-    
+
     SqlStatement stmt = CharacterDatabase.CreateStatement(delSpawnTime, "DELETE FROM gameobject_respawn WHERE guid = ? AND instance = ?");
     stmt.PExecute(loguid, m_instanceid);
 

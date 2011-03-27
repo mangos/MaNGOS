@@ -72,7 +72,7 @@ class SqlPreparedRequest : public SqlOperation
     public:
         SqlPreparedRequest(int nIndex, SqlStmtParameters * arg);
         ~SqlPreparedRequest();
-    
+
         bool Execute(SqlConnection *conn);
 
     private:

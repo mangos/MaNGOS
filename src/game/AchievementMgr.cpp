@@ -514,7 +514,7 @@ void AchievementMgr::SaveToDB()
             iter->second.changed = false;
 
             // new/changed record data
-            SqlStatement stmt = CharacterDatabase.CreateStatement(delProgress, "DELETE FROM character_achievement_progress WHERE guid = ? AND criteria = ?"); 
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delProgress, "DELETE FROM character_achievement_progress WHERE guid = ? AND criteria = ?");
             stmt.PExecute(GetPlayer()->GetGUIDLow(), iter->first);
 
             bool needSave = iter->second.counter != 0;

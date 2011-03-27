@@ -222,7 +222,7 @@ class MANGOS_DLL_SPEC Database
         void AllowAsyncTransactions() { m_bAllowAsyncTransactions = true; }
 
     protected:
-        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadBody(NULL), m_delayThread(NULL), 
+        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadBody(NULL), m_delayThread(NULL),
             m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
         {
             m_nQueryCounter = -1;
@@ -243,7 +243,7 @@ class MANGOS_DLL_SPEC Database
 
                 //initializes new SqlTransaction object
                 SqlTransaction * init();
-                //gets pointer on current transaction object. Returns NULL if transaction was not initiated 
+                //gets pointer on current transaction object. Returns NULL if transaction was not initiated
                 SqlTransaction * get() const { return m_pTrans; }
                 //detaches SqlTransaction object allocated by init() function
                 //next call to get() function will return NULL!
@@ -297,7 +297,7 @@ class MANGOS_DLL_SPEC Database
         mutable LOCK_TYPE m_stmtGuard;
 
         typedef UNORDERED_MAP<std::string, int> PreparedStmtRegistry;
-        PreparedStmtRegistry m_stmtRegistry;                 ///< 
+        PreparedStmtRegistry m_stmtRegistry;                 ///<
 
         int m_iStmtIndex;
 
