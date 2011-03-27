@@ -1269,7 +1269,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
             {
-                // miscvalue1=loot_type (note: 0 = LOOT_CORSPE and then it ignored)
+                // miscvalue1=loot_type (note: 0 = LOOT_CORPSE and then it ignored)
                 // miscvalue2=count of item loot
                 if (!miscvalue1 || !miscvalue2)
                     continue;

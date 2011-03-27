@@ -2876,7 +2876,7 @@ Pet* Map::GetPet(ObjectGuid guid)
 /**
  * Function return corpse that at CURRENT map
  *
- * Note: corpse can be NOT IN WORLD, so can't be used corspe->GetMap() without pre-check corpse->isInWorld()
+ * Note: corpse can be NOT IN WORLD, so can't be used corpse->GetMap() without pre-check corpse->isInWorld()
  *
  * @param guid must be corpse guid (HIGHGUID_CORPSE)
  */
