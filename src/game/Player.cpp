@@ -15321,6 +15321,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
 
+    // just load creteria/achievment data, safe call before any load, and need, because some spell/item/quest loading
+    // can triggering achievment creteria update that will be lost if this call will later
+    m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
+
     uint32 money = fields[8].GetUInt32();
     if(money > MAX_MONEY_AMOUNT)
         money = MAX_MONEY_AMOUNT;
@@ -15856,7 +15860,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
     _LoadDeclinedNames(holder->GetResult(PLAYER_LOGIN_QUERY_LOADDECLINEDNAMES));
 
-    m_achievementMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACHIEVEMENTS), holder->GetResult(PLAYER_LOGIN_QUERY_LOADCRITERIAPROGRESS));
     m_achievementMgr.CheckAllAchievementCriteria();
 
     _LoadEquipmentSets(holder->GetResult(PLAYER_LOGIN_QUERY_LOADEQUIPMENTSETS));

@@ -535,6 +535,9 @@ void AchievementMgr::SaveToDB()
 
 void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult)
 {
+    // Note: this code called before any character data loading so don't must triggering any events req. inventory/etc
+    // all like cases must be happens in CheckAllAchievementCriteria called after character data load
+
     if(achievementResult)
     {
         do
