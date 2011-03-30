@@ -4544,10 +4544,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
             if (SpellAuraHolder* holder = GetSpellAuraHolder(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS))
             {
-                for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                    if(Aura* Aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
-                        Aur->SetAuraDuration(delta*IN_MILLISECONDS);
-
+                holder->SetAuraDuration(delta*IN_MILLISECONDS);
                 holder->SendAuraUpdate(false);
             }
         }
@@ -15931,7 +15928,7 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
 {
     //RemoveAllAuras(); -- some spells casted before aura load, for example in LoadSkills, aura list explicitly cleaned early
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,maxduration0,maxduration1,maxduration2,remaintime0,remaintime1,remaintime2,effIndexMask FROM character_aura WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'",GetGUIDLow());
 
     if(result)
     {
@@ -15943,22 +15940,32 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
             uint32 spellid = fields[2].GetUInt32();
             uint32 stackcount = fields[3].GetUInt32();
             uint32 remaincharges = fields[4].GetUInt32();
-            int32 damage[MAX_EFFECT_INDEX];
-            int32 maxduration[MAX_EFFECT_INDEX];
-            int32 remaintime[MAX_EFFECT_INDEX];
+            int32  damage[MAX_EFFECT_INDEX];
+            uint32 periodicTime[MAX_EFFECT_INDEX];
+
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 damage[i] = fields[i+5].GetInt32();
-                maxduration[i] = fields[i+8].GetInt32();
-                remaintime[i] = fields[i+11].GetInt32();
+                periodicTime[i] = fields[i+8].GetUInt32();
             }
-            uint32 effIndexMask = fields[14].GetUInt32();
+
+            int32 maxduration = fields[11].GetInt32();
+            int32 remaintime = fields[12].GetInt32();
+            uint32 effIndexMask = fields[13].GetUInt32();
 
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
             if (!spellproto)
             {
                 sLog.outError("Unknown spell (spellid %u), ignore.",spellid);
                 continue;
+            }
+
+            if (remaintime != -1 && !IsPositiveSpell(spellproto))
+            {
+                if (remaintime/IN_MILLISECONDS <= int32(timediff))
+                    continue;
+
+                remaintime -= timediff*IN_MILLISECONDS;
             }
 
             // prevent wrong values of remaincharges
@@ -15978,24 +15985,18 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 stackcount = 1;
 
             SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, NULL);
+            holder->SetLoadedState(caster_guid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges, maxduration, remaintime);
+
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if ((effIndexMask & (1 << i)) == 0)
                     continue;
 
-                if (remaintime[i] != -1 && !IsPositiveEffect(spellproto, SpellEffectIndex(i)))
-                {
-                    if (remaintime[i]/IN_MILLISECONDS <= int32(timediff))
-                    continue;
-
-                    remaintime[i] -= timediff*IN_MILLISECONDS;
-                }
-
                 Aura* aura = CreateAura(spellproto, SpellEffectIndex(i), NULL, holder, this);
                 if (!damage[i])
                     damage[i] = aura->GetModifier()->m_amount;
 
-                aura->SetLoadedState(damage[i], maxduration[i], remaintime[i]);
+                aura->SetLoadedState(damage[i], periodicTime[i]);
                 holder->AddAura(aura, SpellEffectIndex(i));
             }
 
@@ -16005,7 +16006,6 @@ void Player::_LoadAuras(QueryResult *result, uint32 timediff)
                 if (caster_guid != GetObjectGuid() && holder->IsSingleTarget())
                     holder->SetIsSingleTarget(false);
 
-                holder->SetLoadedState(caster_guid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges);
                 AddSpellAuraHolder(holder);
                 DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
             }
@@ -17355,9 +17355,9 @@ void Player::_SaveAuras()
     if (auraHolders.empty())
         return;
 
-    stmt = CharacterDatabase.CreateStatement(insertAuras, "INSERT INTO character_aura (guid, caster_guid, item_guid, spell, stackcount, "
-        "remaincharges, basepoints0,basepoints1, basepoints2, maxduration0, maxduration1, maxduration2, remaintime0, remaintime1, remaintime2, effIndexMask) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    stmt = CharacterDatabase.CreateStatement(insertAuras, "INSERT INTO character_aura (guid, caster_guid, item_guid, spell, stackcount, remaincharges, "
+        "basepoints0, basepoints1, basepoints2, periodictime0, periodictime1, periodictime2, maxduration, remaintime, effIndexMask) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     for(SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
     {
@@ -17366,16 +17366,14 @@ void Player::_SaveAuras()
         //do not save single target holders (unless they were cast by the player)
         if (!holder->IsPassive() && !IsChanneledSpell(holder->GetSpellProto()) && (holder->GetCasterGUID() == GetGUID() || !holder->IsSingleTarget()))
         {
-            int32 damage[MAX_EFFECT_INDEX];
-            int32 remaintime[MAX_EFFECT_INDEX];
-            int32 maxduration[MAX_EFFECT_INDEX];
+            int32  damage[MAX_EFFECT_INDEX];
+            uint32 periodicTime[MAX_EFFECT_INDEX];
             uint32 effIndexMask = 0;
 
-            for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 damage[i] = 0;
-                remaintime[i] = 0;
-                maxduration[i] = 0;
+                periodicTime[i] = 0;
 
                 if (Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
                 {
@@ -17384,8 +17382,7 @@ void Player::_SaveAuras()
                         continue;
 
                     damage[i] = aur->GetModifier()->m_amount;
-                    remaintime[i] = aur->GetAuraDuration();
-                    maxduration[i] = aur->GetAuraMaxDuration();
+                    periodicTime[i] = aur->GetModifier()->periodictime;
                     effIndexMask |= (1 << i);
                 }
             }
@@ -17399,12 +17396,15 @@ void Player::_SaveAuras()
             stmt.addUInt32(holder->GetId());
             stmt.addUInt32(holder->GetStackAmount());
             stmt.addUInt8(holder->GetAuraCharges());
-            for (int k = 0; k < MAX_EFFECT_INDEX; ++k)
-                stmt.addInt32(damage[k]);
-            for (int k = 0; k < MAX_EFFECT_INDEX; ++k)
-                stmt.addInt32(maxduration[k]);
-            for (int k = 0; k < MAX_EFFECT_INDEX; ++k)
-                stmt.addInt32(remaintime[k]);
+
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                stmt.addInt32(damage[i]);
+
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                stmt.addUInt32(periodicTime[i]);
+
+            stmt.addInt32(holder->GetAuraMaxDuration());
+            stmt.addInt32(holder->GetAuraDuration());
             stmt.addUInt32(effIndexMask);
             stmt.Execute();
         }
