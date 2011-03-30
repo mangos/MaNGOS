@@ -35,6 +35,7 @@
 
 class Player;
 class Spell;
+class Unit;
 struct CreatureInfo;
 struct SpellModifier;
 
