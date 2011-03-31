@@ -223,8 +223,8 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
     &Spell::EffectNULL,                                     //160 SPELL_EFFECT_160                      single spell: Nerub'ar Web Random Unit
     &Spell::EffectSpecCount,                                //161 SPELL_EFFECT_TALENT_SPEC_COUNT        second talent spec (learn/revert)
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
-    &Spell::EffectNULL,                                     //163
-    &Spell::EffectNULL,                                     //164 cancel's some aura...
+    &Spell::EffectUnused,                                   //163 unused in 3.3.5a
+    &Spell::EffectCancelAura,                               //164 SPELL_EFFECT_CANCEL_AURA
 };
 
 void Spell::EffectEmpty(SpellEffectIndex /*eff_idx*/)
@@ -8804,4 +8804,20 @@ void Spell::EffectTeachTaxiNode( SpellEffectIndex eff_idx )
         data << uint8( 1 );
         player->SendDirectMessage( &data );
     }
+}
+
+void Spell::EffectCancelAura(SpellEffectIndex eff_idx)
+{
+    if (!unitTarget)
+        return;
+
+    uint32 spellId = m_spellInfo->EffectTriggerSpell[eff_idx];
+
+    if (!sSpellStore.LookupEntry(spellId))
+    {
+        sLog.outError("Spell::EffectCancelAura: spell %u doesn't exist", spellId);
+        return;
+    }
+
+    unitTarget->RemoveAurasDueToSpell(spellId);
 }

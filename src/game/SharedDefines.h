@@ -735,7 +735,7 @@ enum SpellEffects
     SPELL_EFFECT_TALENT_SPEC_COUNT         = 161,
     SPELL_EFFECT_TALENT_SPEC_SELECT        = 162,
     SPELL_EFFECT_163                       = 163,
-    SPELL_EFFECT_164                       = 164,
+    SPELL_EFFECT_CANCEL_AURA               = 164,
     TOTAL_SPELL_EFFECTS                    = 165
 };
 
