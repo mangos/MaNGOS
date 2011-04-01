@@ -248,11 +248,14 @@ void WorldSession::HandleTrainerBuySpellOpcode( WorldPacket & recv_data )
     if (!cSpells && !tSpells)
         return;
 
-    // not found, cheat?
-    TrainerSpell const* trainer_spell = cSpells->Find(spellId);
+    // Try find spell in npc_trainer
+    TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(spellId) : NULL;
+
+    // Not found, try find in npc_trainer_template
     if (!trainer_spell && tSpells)
         trainer_spell = tSpells->Find(spellId);
 
+    // Not found anywhere, cheating?
     if (!trainer_spell)
         return;
 
