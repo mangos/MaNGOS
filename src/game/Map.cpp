@@ -1912,20 +1912,56 @@ void Map::ScriptsProcess()
                 break;
             }
             case SCRIPT_COMMAND_EMOTE:
+            {
                 if (!source)
                 {
-                    sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for NULL creature.", step.script->id);
+                    sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for NULL source.", step.script->id);
                     break;
                 }
 
-                if (source->GetTypeId()!=TYPEID_UNIT)
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
                 {
-                    sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for non-creature (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) call for non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
                     break;
                 }
+                // When creatureEntry is not defined, GameObject can not be source
+                else if (!step.script->emote.creatureEntry)
+                {
+                    if (!source->isType(TYPEMASK_UNIT))
+                    {
+                        sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) are missing datalong2 (creature entry). Unsupported call for non-unit (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                        break;
+                    }
+                }
 
-                ((Creature*)source)->HandleEmote(step.script->emote.emoteId);
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pBuddy = NULL;
+
+                // flag_target_as_source            0x01
+
+                // If target is Unit* and should do the emote (or should be source of searcher below)
+                if (target && target->isType(TYPEMASK_UNIT) && step.script->emote.flags & 0x01)
+                    pSource = (WorldObject*)target;
+
+                // If step has a buddy entry defined, search for it.
+                if (step.script->emote.creatureEntry)
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->emote.creatureEntry, true, step.script->emote.searchRadius);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pBuddy, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->emote.searchRadius);
+
+                    // If buddy found, then use it or break (break since we must assume pBuddy was defined for a reason)
+                    if (pBuddy)
+                        pSource = (WorldObject*)pBuddy;
+                    else
+                        break;
+                }
+
+                // Must be safe cast to Unit*
+                ((Unit*)pSource)->HandleEmote(step.script->emote.emoteId);
                 break;
+            }
             case SCRIPT_COMMAND_FIELD_SET:
                 if (!source)
                 {

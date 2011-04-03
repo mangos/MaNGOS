@@ -175,6 +175,16 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                     sLog.outErrorDb("Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u", tablename, tmp.emote.emoteId, tmp.id);
                     continue;
                 }
+                if (tmp.emote.creatureEntry && !ObjectMgr::GetCreatureTemplate(tmp.emote.creatureEntry))
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_EMOTE for script id %u, but this creature_template does not exist.", tablename, tmp.emote.creatureEntry, tmp.id);
+                    continue;
+                }
+                if (tmp.emote.creatureEntry && !tmp.emote.searchRadius)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_EMOTE for script id %u, but search radius is too small (datalong3 = %u).", tablename, tmp.emote.creatureEntry, tmp.id, tmp.emote.searchRadius);
+                    continue;
+                }
                 break;
             }
             case SCRIPT_COMMAND_TELEPORT_TO:
