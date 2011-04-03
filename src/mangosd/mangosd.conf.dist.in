@@ -847,7 +847,7 @@ AllowTwoSide.AddFriend = 0
 TalentsInspecting = 1
 
 ###################################################################################################################
-# CREATURE SETTINGS
+# CREATURE AND GAMEOBJECT SETTINGS
 #
 #    ThreatRadius
 #        Radius for creature to evade after being pulled away from combat start point
@@ -935,6 +935,14 @@ TalentsInspecting = 1
 #        Distance from player to listen text that creature (or other world object) yell
 #        Default: 300
 #
+#    GuidReserveSize.Creature
+#    GuidReserveSize.Gameobject
+#        Amount guids reserved for .npc add/.gobject add directly after last used in DB static spawned creature/gameobject guid
+#        Commands .npc add/.gobject add can be used only for guids from this reserve and required server restart if all guids
+#        from reserve used before above commands can be used in like case. Less size increase amount guids for dynamic spawns
+#        in game from other side
+#        Default: 100
+#
 ###################################################################################################################
 
 ThreatRadius = 100
@@ -969,6 +977,9 @@ Rate.Creature.Elite.RARE.HP = 1
 ListenRange.Say = 40
 ListenRange.TextEmote = 40
 ListenRange.Yell = 300
+GuidReserveSize.Creature = 100
+GuidReserveSize.Gameobject = 100
+
 
 ###################################################################################################################
 # CHAT SETTINGS

@@ -1086,7 +1086,15 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     Map *map = chr->GetMap();
 
     GameObject* pGameObj = new GameObject;
-    uint32 db_lowGUID = map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT);
+
+    // used guids from specially reserved range (can be 0 if no free values)
+    uint32 db_lowGUID = sObjectMgr.GenerateStaticGameobjectLowGuid();
+    if (!db_lowGUID)
+    {
+        SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     if (!pGameObj->Create(db_lowGUID, gInfo->id, map, chr->GetPhaseMaskForSpawn(), x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
     {
@@ -1556,7 +1564,16 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
 
     Creature* pCreature = new Creature;
 
-    if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, id))
+    // used guids from specially reserved range (can be 0 if no free values)
+    uint32 lowguid = sObjectMgr.GenerateStaticCreatureLowGuid();
+    if (!lowguid)
+    {
+        SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!pCreature->Create(lowguid, pos, id))
     {
         delete pCreature;
         return false;

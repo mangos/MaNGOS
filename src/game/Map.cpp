@@ -77,8 +77,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
   i_gridExpiry(expiry), m_TerrainData(sTerrainMgr.LoadTerrain(id)),
   i_data(NULL), i_script_id(0)
 {
-    m_CreatureGuids.Set(sObjectMgr.GetFirstCreatureLowGuid());
-    m_GameObjectGuids.Set(sObjectMgr.GetFirstGameObjectLowGuid());
+    m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
+    m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
 
     for(unsigned int j=0; j < MAX_NUMBER_OF_GRIDS; ++j)
     {

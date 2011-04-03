@@ -719,8 +719,12 @@ class ObjectMgr
         void SetHighestGuids();
 
         // used for set initial guid counter for map local guids
-        uint32 GetFirstCreatureLowGuid() const { return m_CreatureFirstGuid; }
-        uint32 GetFirstGameObjectLowGuid() const { return m_GameObjectFirstGuid; }
+        uint32 GetFirstTemporaryCreatureLowGuid() const { return m_FirstTemporaryCreatureGuid; }
+        uint32 GetFirstTemporaryGameObjectLowGuid() const { return m_FirstTemporaryGameObjectGuid; }
+
+        // used in .npc add/.gobject add commands for adding static spawns
+        uint32 GenerateStaticCreatureLowGuid() { if (m_StaticCreatureGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryCreatureGuid) return 0; return m_StaticCreatureGuids.Generate(); }
+        uint32 GenerateStaticGameobjectLowGuid() { if (m_StaticGamebjectGuids.GetNextAfterMaxUsed() >= m_FirstTemporaryGameObjectGuid) return 0; return m_StaticGamebjectGuids.Generate(); }
 
         uint32 GeneratePlayerLowGuid() { return m_CharGuids.Generate(); }
         uint32 GenerateItemLowGuid() { return m_ItemGuids.Generate(); }
@@ -1045,8 +1049,12 @@ class ObjectMgr
         IdGenerator<uint32> m_GroupIds;
 
         // initial free low guid for selected guid type for map local guids
-        uint32 m_CreatureFirstGuid;
-        uint32 m_GameObjectFirstGuid;
+        uint32 m_FirstTemporaryCreatureGuid;
+        uint32 m_FirstTemporaryGameObjectGuid;
+
+        // guids from reserved range for use in .npc add/.gobject add commands for adding new static spawns (saved in DB) from client.
+        ObjectGuidGenerator<HIGHGUID_UNIT>        m_StaticCreatureGuids;
+        ObjectGuidGenerator<HIGHGUID_GAMEOBJECT>  m_StaticGamebjectGuids;
 
         // first free low guid for selected guid type
         ObjectGuidGenerator<HIGHGUID_PLAYER>     m_CharGuids;

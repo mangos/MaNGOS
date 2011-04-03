@@ -935,7 +935,8 @@ enum MangosStrings
     LANG_POOL_CHANCE_POOL_LIST_CONSOLE  = 1500,
     LANG_POOL_POOL_LIST_CHAT            = 1501,
     LANG_POOL_POOL_LIST_CONSOLE         = 1502,
-    // Room for more Level 2              1503-1599 not used
+    LANG_NO_FREE_STATIC_GUID_FOR_SPAWN  = 1503,
+    // Room for more Level 2              1504-1599 not used
 
     // FREE IDS                           1600-9999
 
