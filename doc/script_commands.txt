@@ -208,6 +208,11 @@ spell_scripts
                                             * datalong2=creature entry
                                             * datalong3=search radius
 
+26 SCRIPT_COMMAND_ATTACK_START              source = WorldObject (but Creature must be final source/attacker, set with datalong-fields where needed), target = Unit/none
+                                            * datalong2 = creature entry (searching for a buddy, closest to source)
+                                            * datalong3 = creature search radius
+                                            * data_flags =  flag_original_source_as_target  = 0x02
+                                                            flag_buddy_as_target            = 0x04 (When this flag is not set, buddy will be the attacker when buddy is defined)
 
 
 

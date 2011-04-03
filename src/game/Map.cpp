@@ -2853,6 +2853,77 @@ void Map::ScriptsProcess()
 
                 break;
             }
+            case SCRIPT_COMMAND_ATTACK_START:
+            {
+                if (!source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) call for NULL source.", step.script->id);
+                    break;
+                }
+
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
+                {
+                    sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
+
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pBuddy = NULL;
+
+                // flag_original_source_as_target   0x02
+                // flag_buddy_as_target             0x04
+
+                // If step has a buddy entry defined, search for it.
+                if (step.script->attack.creatureEntry)
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->attack.creatureEntry, true, step.script->attack.searchRadius);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pBuddy, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->attack.searchRadius);
+
+                    // If buddy found, then use it
+                    if (pBuddy)
+                    {
+                        if (step.script->attack.flags & 0x04)
+                        {
+                            // pBuddy is target of attack
+                            target = (Object*)pBuddy;
+                        }
+                        else
+                        {
+                            // If not target of attack, then set pBuddy as source, the attacker
+                            pSource = (WorldObject*)pBuddy;
+                        }
+                    }
+                    else
+                    {
+                        // No buddy found, so don't do anything                     
+                        break;
+                    }
+                }
+
+                // If we should attack the original source instead of target
+                if (step.script->attack.flags & 0x02)
+                    target = source;
+
+                Unit* unitTarget = target && target->isType(TYPEMASK_UNIT) ? static_cast<Unit*>(target) : NULL;
+                Creature* pAttacker = pSource && pSource->GetTypeId() == TYPEID_UNIT ? static_cast<Creature*>(pSource) : NULL;
+
+                if (pAttacker && unitTarget)
+                {
+                    if (pAttacker->IsFriendlyTo(unitTarget))
+                    {
+                        sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) attacker is friendly to target, can not attack.", step.script->id);
+                        break;
+                    }
+
+                    pAttacker->AI()->AttackStart(unitTarget);
+                    break;
+                }
+
+                sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) unexpected error, attacker or victim could not be found, no action.", step.script->id);
+                break;
+            }
             default:
                 sLog.outError("Unknown SCRIPT_COMMAND_ %u called for script id %u.",step.script->command, step.script->id);
                 break;
