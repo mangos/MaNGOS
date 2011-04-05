@@ -457,16 +457,10 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         case ACTION_T_SET_FACTION:
         {
             if (action.set_faction.factionId)
-                m_creature->setFaction(action.set_faction.factionId);
-            else
-            {
-                if (CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_creature->GetEntry()))
-                {
-                    //if no id provided, assume reset and then use default
-                    if (m_creature->getFaction() != ci->faction_A)
-                        m_creature->setFaction(ci->faction_A);
-                }
-            }
+                m_creature->SetFactionTemporary(action.set_faction.factionId, action.set_faction.factionFlags);
+            else                                            // no id provided, assume reset and then use default
+                m_creature->ClearTemporaryFaction();
+
             break;
         }
         case ACTION_T_MORPH_TO_ENTRY_OR_MODEL:

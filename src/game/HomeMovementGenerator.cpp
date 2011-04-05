@@ -80,6 +80,9 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
             }
         }
 
+        if (owner.GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_REACH_HOME)
+            owner.ClearTemporaryFaction();
+
         owner.LoadCreatureAddon(true);
         owner.AI()->JustReachedHome();
         return false;

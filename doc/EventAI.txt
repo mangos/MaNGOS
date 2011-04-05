@@ -105,7 +105,7 @@ For all ACTION_T_RANDOM, When a Particular Param is selected for the Event... Th
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 0    ACTION_T_NONE                          No Action                       Does nothing.
 1    ACTION_T_TEXT                          -TextId1, -TextId2, -TextId3    Simply displays the specified -TextId. When -TextId2 and -TextId3 are specified, the selection will be randomized. Text types are defined, along with other options for the text, in a table below. All values needs to be negative.
-2    ACTION_T_SET_FACTION                   FactionId                       Changes faction for a creature. When param1 is zero, creature will revert to it's default faction.
+2    ACTION_T_SET_FACTION                   FactionId, Flags                Changes faction for a creature. When param1 is zero, creature will revert to it's default faction. Flags will determine when faction is restored to default (evade, respawn etc)
 3    ACTION_T_MORPH_TO_ENTRY_OR_MODEL       CreatureEntry, ModelId          Set either model from creature_template.entry (Param1) OR explicit modelId (Param2). If (Param1) AND (Param2) are both 0, demorph and revert to the default model.
 4    ACTION_T_SOUND                         SoundId                         Plays a sound
 5    ACTION_T_EMOTE                         EmoteId                         Does an emote
@@ -430,6 +430,11 @@ Read at bottom for documentation of creature_ai_texts-table.
 2 = ACTION_T_SET_FACTION:
 ------------------
 Parameter 1: FactionId from Faction.dbc OR 0. Changes faction for creature. If 0, creature will revert to it's default faction if previously changed.
+Parameter 2: When Parameter 1 is not 0, flags can be used to restore default faction at certain events. Current supported, from enum TemporaryFactionFlags:
+                TEMPFACTION_NONE                    = 0x00,  // A persistent faction change and will require manual change to default/another faction when changed once
+                TEMPFACTION_RESTORE_RESPAWN         = 0x01,  // Default faction will be restored at respawn
+                TEMPFACTION_RESTORE_COMBAT_STOP     = 0x02,  // ... at CombatStop() (happens at creature death, at evade or custom scripte among others)
+                TEMPFACTION_RESTORE_REACH_HOME      = 0x04,  // ... at reaching home in home movement (evade), if not already done at CombatStop()
 
 -----------------------
 3 = ACTION_T_MORPH_TO_ENTRY_OR_MODEL:

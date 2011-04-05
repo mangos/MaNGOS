@@ -246,6 +246,8 @@ struct ScriptInfo
             uint32 factionId;                               // datalong
             uint32 creatureEntry;                           // datalong2
             uint32 searchRadius;                            // datalong3
+            uint32 empty1;                                  // datalong4
+            uint32 flags;                                   // data_flags
         } faction;
 
         struct                                              // SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (23)

@@ -190,6 +190,11 @@ spell_scripts
                                             * datalong=factionId OR 0 to restore original faction from creature_template
                                             * datalong2=creature entry
                                             * datalong3=search radius
+                                            * data_flags = enum TemporaryFactionFlags
+                                                    TEMPFACTION_NONE                    = 0x00,  // When no flag is used in temporary faction change, faction will be persistent. It will then require manual change back to default/another faction when changed once
+                                                    TEMPFACTION_RESTORE_RESPAWN         = 0x01,  // Default faction will be restored at respawn
+                                                    TEMPFACTION_RESTORE_COMBAT_STOP     = 0x02,  // ... at CombatStop() (happens at creature death, at evade or custom scripte among others)
+                                                    TEMPFACTION_RESTORE_REACH_HOME      = 0x04,  // ... at reaching home in home movement (evade), if not already done at CombatStop()
 
 23 SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL   source=worldobject, target=creature
                                             * datalong=creature entry/modelid (depend on data_flags) OR 0 to demorph
