@@ -1088,7 +1088,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     GameObject* pGameObj = new GameObject;
 
     // used guids from specially reserved range (can be 0 if no free values)
-    uint32 db_lowGUID = sObjectMgr.GenerateStaticGameobjectLowGuid();
+    uint32 db_lowGUID = sObjectMgr.GenerateStaticGameObjectLowGuid();
     if (!db_lowGUID)
     {
         SendSysMessage(LANG_NO_FREE_STATIC_GUID_FOR_SPAWN);

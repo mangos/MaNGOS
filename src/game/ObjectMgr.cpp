@@ -5692,7 +5692,7 @@ void ObjectMgr::SetHighestGuids()
     m_StaticCreatureGuids.Set(m_FirstTemporaryCreatureGuid);
     m_FirstTemporaryCreatureGuid += sWorld.getConfig(CONFIG_UINT32_GUID_RESERVE_SIZE_CREATURE);
 
-    m_StaticGamebjectGuids.Set(m_FirstTemporaryGameObjectGuid);
+    m_StaticGameObjectGuids.Set(m_FirstTemporaryGameObjectGuid);
     m_FirstTemporaryGameObjectGuid += sWorld.getConfig(CONFIG_UINT32_GUID_RESERVE_SIZE_GAMEOBJECT);
 }
 
