@@ -421,7 +421,10 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Reset the online field in the account table
         // no point resetting online in character table here as Player::SaveToDB() will set it to 1 since player has not been removed from world at this stage
         // No SQL injection as AccountID is uint32
-        LoginDatabase.PExecute("UPDATE account SET active_realm_id = 0 WHERE id = '%u'", GetAccountId());
+        static SqlStatementID id;
+
+        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE account SET active_realm_id = ? WHERE id = ?");
+        stmt.PExecute(uint32(0), GetAccountId());
 
         ///- If the player is in a guild, update the guild roster and broadcast a logout message to other guild members
         if (Guild *guild = sObjectMgr.GetGuildById(_player->GetGuildId()))
@@ -495,8 +498,12 @@ void WorldSession::LogoutPlayer(bool Save)
 
         ///- Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
         //No SQL injection as AccountId is uint32
-        CharacterDatabase.PExecute("UPDATE characters SET online = 0 WHERE account = '%u'",
-            GetAccountId());
+
+        static SqlStatementID updChars;
+
+        stmt = CharacterDatabase.CreateStatement(updChars, "UPDATE characters SET online = 0 WHERE account = ?");
+        stmt.PExecute(GetAccountId());
+
         DEBUG_LOG( "SESSION: Sent SMSG_LOGOUT_COMPLETE Message" );
     }
 
@@ -675,11 +682,17 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
     {
         uint32 acc = GetAccountId();
 
+        static SqlStatementID delId;
+        static SqlStatementID insId;
+
         CharacterDatabase.BeginTransaction ();
-        CharacterDatabase.PExecute("DELETE FROM account_data WHERE account='%u' AND type='%u'", acc, type);
-        std::string safe_data = data;
-        CharacterDatabase.escape_string(safe_data);
-        CharacterDatabase.PExecute("INSERT INTO account_data VALUES ('%u','%u','" UI64FMTD "','%s')", acc, type, uint64(time_), safe_data.c_str());
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM account_data WHERE account=? AND type=?");
+        stmt.PExecute(acc, uint32(type));
+
+        stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO account_data VALUES (?,?,?,?)");
+        stmt.PExecute(acc, uint32(type), uint64(time_), data.c_str());
+
         CharacterDatabase.CommitTransaction ();
     }
     else
@@ -688,11 +701,17 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
         if(!m_GUIDLow)
             return;
 
+        static SqlStatementID delId;
+        static SqlStatementID insId;
+
         CharacterDatabase.BeginTransaction ();
-        CharacterDatabase.PExecute("DELETE FROM character_account_data WHERE guid='%u' AND type='%u'", m_GUIDLow, type);
-        std::string safe_data = data;
-        CharacterDatabase.escape_string(safe_data);
-        CharacterDatabase.PExecute("INSERT INTO character_account_data VALUES ('%u','%u','" UI64FMTD "','%s')", m_GUIDLow, type, uint64(time_), safe_data.c_str());
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delId, "DELETE FROM character_account_data WHERE guid=? AND type=?");
+        stmt.PExecute(m_GUIDLow, uint32(type));
+
+        stmt = CharacterDatabase.CreateStatement(insId, "INSERT INTO character_account_data VALUES (?,?,?,?)");
+        stmt.PExecute(m_GUIDLow, uint32(type), uint64(time_), data.c_str());
+
         CharacterDatabase.CommitTransaction ();
     }
 

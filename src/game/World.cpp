@@ -266,7 +266,12 @@ World::AddSession_ (WorldSession* s)
         float popu = float(GetActiveSessionCount());        // updated number of users on the server
         popu /= pLimit;
         popu *= 2;
-        LoginDatabase.PExecute ("UPDATE realmlist SET population = '%f' WHERE id = '%u'", popu, realmID);
+
+        static SqlStatementID id;
+
+        SqlStatement stmt = LoginDatabase.CreateStatement(id, "UPDATE realmlist SET population = ? WHERE id = ?");
+        stmt.PExecute(popu, realmID);
+
         DETAIL_LOG("Server Population (%f).", popu);
     }
 }

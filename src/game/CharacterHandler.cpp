@@ -715,8 +715,15 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
-    CharacterDatabase.PExecute("UPDATE characters SET online = 1 WHERE guid = '%u'", pCurrChar->GetGUIDLow());
-    LoginDatabase.PExecute("UPDATE account SET active_realm_id = %u WHERE id = '%u'", realmID, GetAccountId());
+    static SqlStatementID updChars;
+    static SqlStatementID updAccount;
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(updChars, "UPDATE characters SET online = 1 WHERE guid = ?");
+    stmt.PExecute(pCurrChar->GetGUIDLow());
+
+    stmt = LoginDatabase.CreateStatement(updAccount, "UPDATE account SET active_realm_id = ? WHERE id = ?");
+    stmt.PExecute(realmID, GetAccountId());
+
     pCurrChar->SetInGameTime( WorldTimer::getMSTime() );
 
     // announce group about member online (must be after add to player list to receive announce to self)
