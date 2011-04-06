@@ -125,11 +125,13 @@ typedef off_t ACE_OFF_T;
 #  define snprintf _snprintf
 #  define vsnprintf _vsnprintf
 #  define finite(X) _finite(X)
+#  define isnan(x) _isnan(x)
 
 #else
 
 #  define stricmp strcasecmp
 #  define strnicmp strncasecmp
+#  define isnan(x) std::isnan(x)
 
 #  define I32FMT "%08X"
 #  if ACE_SIZEOF_LONG == 8

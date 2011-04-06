@@ -169,7 +169,7 @@ namespace MaNGOS
 
     inline bool IsValidMapCoord(float c)
     {
-        return finite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5);
+        return !isnan(c) && finite(c) && (std::fabs(c) <= MAP_HALFSIZE - 0.5);
     }
 
     inline bool IsValidMapCoord(float x, float y)
@@ -179,12 +179,12 @@ namespace MaNGOS
 
     inline bool IsValidMapCoord(float x, float y, float z)
     {
-        return IsValidMapCoord(x,y) && finite(z);
+        return IsValidMapCoord(x,y) && (!isnan(z) && finite(z));
     }
 
     inline bool IsValidMapCoord(float x, float y, float z, float o)
     {
-        return IsValidMapCoord(x,y,z) && finite(o);
+        return IsValidMapCoord(x,y,z) && (!isnan(0) && finite(o));
     }
 }
 #endif
