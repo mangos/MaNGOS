@@ -165,7 +165,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         bool CreatureRespawnRelocation(Creature *c);        // used only in CreatureRelocation and ObjectGridUnloader
 
-        // ASSERT print helper
         bool CheckGridIntegrity(Creature* c, bool moved) const;
 
         uint32 GetInstanceId() const { return i_InstanceId; }

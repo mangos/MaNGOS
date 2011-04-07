@@ -2142,11 +2142,7 @@ void Creature::GetRespawnCoord( float &x, float &y, float &z, float* ori, float*
     }
 
     //lets check if our creatures have valid spawn coordinates
-    if(!MaNGOS::IsValidMapCoord(x, y, z))
-    {
-        sLog.outError("Creature with invalid respawn coordinates: mapid = %u, guid = %u, x = %f, y = %f, z = %f", GetMapId(), GetGUIDLow(), x, y, z);
-        MANGOS_ASSERT(false);
-    }
+    MANGOS_ASSERT(MaNGOS::IsValidMapCoord(x, y, z) || PrintCoordinatesError(x, y, z, "respawn"));
 }
 
 void Creature::AllLootRemovedFromCorpse()

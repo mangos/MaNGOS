@@ -576,6 +576,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
 
         ViewPoint& GetViewPoint() { return m_viewPoint; }
+
+        // ASSERT print helper
+        bool PrintCoordinatesError(float x, float y, float z, char const* descr) const;
     protected:
         explicit WorldObject();
 
