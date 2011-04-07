@@ -2909,7 +2909,7 @@ ObjectGuid ChatHandler::ExtractGuidFromLink(char** text)
                 return ObjectGuid();
 
             if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
-                return ObjectGuid(HIGHGUID_UNIT, data->id, lowguid);
+                return data->GetObjectGuid(lowguid);
             else
                 return ObjectGuid();
         }

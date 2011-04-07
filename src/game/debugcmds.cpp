@@ -669,7 +669,7 @@ bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
 
     CreatureCreatePos pos(chr, chr->GetOrientation());
 
-    if (!v->Create(pos.GetMap()->GenerateLocalLowGuid(HIGHGUID_VEHICLE), pos, entry, id, chr->GetTeam()))
+    if (!v->Create(pos.GetMap()->GenerateLocalLowGuid(HIGHGUID_VEHICLE), pos, ci, id, chr->GetTeam()))
     {
         delete v;
         return false;
