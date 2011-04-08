@@ -6545,9 +6545,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    if (unitTarget->GetAreaId() == 4156)
+                    if (unitTarget->GetAreaId() == 4157)
                         unitTarget->CastSpell(unitTarget, 47324, true);
-                    else if (unitTarget->GetAreaId() == 4157)
+                    else if (unitTarget->GetAreaId() == 4156)
                         unitTarget->CastSpell(unitTarget, 47325, true);
 
                     break;
