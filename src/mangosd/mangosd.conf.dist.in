@@ -729,6 +729,11 @@ LogColors = ""
 #    Motd
 #        Message of the Day. Displayed at worldlogin for every user ('@' for a newline).
 #
+#    Raid.MinLevel
+#        Minimal player level to join raid groups (only affects existing raid groups, party->raid convert ignored)
+#        You can bypass this setting by typing "/script SetAllowLowLevelRaid(true/false)" command in chat
+#        Default: 10
+#
 ###################################################################################################################
 
 GameType = 1
@@ -797,6 +802,7 @@ BeepAtStart = 1
 ShowProgressBars = 1
 WaitAtStartupError = 0
 Motd = "Welcome to the Massive Network Game Object Server."
+Raid.MinLevel = 10
 
 ###################################################################################################################
 # PLAYER INTERACTION
