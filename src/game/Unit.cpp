@@ -207,9 +207,6 @@ Unit::Unit()
 
     m_addDmgOnce = 0;
 
-    for(int i = 0; i < MAX_TOTEM_SLOT; ++i)
-        m_TotemSlot[i] = 0;
-
     m_ObjectSlot[0] = m_ObjectSlot[1] = m_ObjectSlot[2] = m_ObjectSlot[3] = 0;
     //m_Aura = NULL;
     //m_AurasCheck = 2000;
@@ -6005,7 +6002,7 @@ Unit* Unit::_GetTotem(TotemSlot slot) const
 
 Totem* Unit::GetTotem(TotemSlot slot ) const
 {
-    if(slot >= MAX_TOTEM_SLOT || !IsInWorld())
+    if(slot >= MAX_TOTEM_SLOT || !IsInWorld() || m_TotemSlot[slot].IsEmpty())
         return NULL;
 
     Creature *totem = GetMap()->GetCreature(m_TotemSlot[slot]);
@@ -6015,23 +6012,23 @@ Totem* Unit::GetTotem(TotemSlot slot ) const
 bool Unit::IsAllTotemSlotsUsed() const
 {
     for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
-        if (!m_TotemSlot[i])
+        if (m_TotemSlot[i].IsEmpty())
             return false;
     return true;
 }
 
 void Unit::_AddTotem(TotemSlot slot, Totem* totem)
 {
-    m_TotemSlot[slot] = totem->GetGUID();
+    m_TotemSlot[slot] = totem->GetObjectGuid();
 }
 
 void Unit::_RemoveTotem(Totem* totem)
 {
     for(int i = 0; i < MAX_TOTEM_SLOT; ++i)
     {
-        if (m_TotemSlot[i] == totem->GetGUID())
+        if (m_TotemSlot[i] == totem->GetObjectGuid())
         {
-            m_TotemSlot[i] = 0;
+            m_TotemSlot[i].Clear();
             break;
         }
     }

@@ -102,9 +102,6 @@ class MANGOS_DLL_SPEC ObjectGuid
         void Set(uint64 const& guid) { m_guid = guid; }
         void Clear() { m_guid = 0; }
 
-        // Possible removed in future for more strict control type conversions
-        void operator= (uint64 const& guid) { m_guid = guid; }
-
         PackedGuid WriteAsPacked() const;
     public:                                                 // accessors
         uint64 const& GetRawValue() const { return m_guid; }
