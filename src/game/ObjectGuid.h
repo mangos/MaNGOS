@@ -201,14 +201,17 @@ class MANGOS_DLL_SPEC ObjectGuid
 
 typedef std::set<ObjectGuid> ObjectGuidSet;
 
+//minimum buffer size for packed guid is 9 bytes
+#define PACKED_GUID_MIN_BUFFER_SIZE 9
+
 class PackedGuid
 {
     friend ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid);
 
     public:                                                 // constructors
-        explicit PackedGuid() { m_packedGuid.appendPackGUID(0); }
-        explicit PackedGuid(uint64 const& guid) { m_packedGuid.appendPackGUID(guid); }
-        explicit PackedGuid(ObjectGuid const& guid) { m_packedGuid.appendPackGUID(guid.GetRawValue()); }
+        explicit PackedGuid() : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(0); }
+        explicit PackedGuid(uint64 const& guid) : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(guid); }
+        explicit PackedGuid(ObjectGuid const& guid) : m_packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGuid.appendPackGUID(guid.GetRawValue()); }
 
     public:                                                 // modifiers
         void Set(uint64 const& guid) { m_packedGuid.wpos(0); m_packedGuid.appendPackGUID(guid); }
