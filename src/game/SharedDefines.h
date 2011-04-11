@@ -1001,6 +1001,9 @@ enum Mechanics
     MECHANIC_ENRAGED          = 31
 };
 
+#define FIRST_MECHANIC          1
+#define MAX_MECHANIC            32
+
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967da6)
 #define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK ( \
     (1<<(MECHANIC_CHARM   -1))|(1<<(MECHANIC_DISORIENTED-1))|(1<<(MECHANIC_FEAR  -1))| \
