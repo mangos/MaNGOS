@@ -2897,7 +2897,7 @@ void Map::ScriptsProcess()
                     }
                     else
                     {
-                        // No buddy found, so don't do anything                     
+                        // No buddy found, so don't do anything
                         break;
                     }
                 }
