@@ -3693,7 +3693,14 @@ bool ChatHandler::HandleGetDistanceCommand(char* args)
         }
     }
 
-    PSendSysMessage(LANG_DISTANCE, m_session->GetPlayer()->GetDistance(obj), m_session->GetPlayer()->GetDistance2d(obj));
+    Player* player = m_session->GetPlayer();
+    // Calculate point-to-point distance
+    float dx, dy, dz;
+    dx = player->GetPositionX() - obj->GetPositionX();
+    dy = player->GetPositionY() - obj->GetPositionY();
+    dz = player->GetPositionZ() - obj->GetPositionZ();
+
+    PSendSysMessage(LANG_DISTANCE, player->GetDistance(obj), player->GetDistance2d(obj), sqrt(dx*dx + dy*dy + dz*dz));
 
     return true;
 }
@@ -4090,7 +4097,20 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
     std::string curRespawnDelayStr = secsToTimeString(curRespawnDelay,true);
     std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(),true);
 
-    PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetGUIDLow(), faction, npcflags, Entry, displayid, nativeid);
+    // Send information dependend on difficulty mode
+    CreatureInfo const* baseInfo = ObjectMgr::GetCreatureTemplate(Entry);
+    uint32 diff = 1;
+    for (; diff < MAX_DIFFICULTY; ++diff)
+        if (baseInfo->DifficultyEntry[diff-1] == target->GetCreatureInfo()->Entry)
+            break;
+
+    if (diff < MAX_DIFFICULTY)
+        PSendSysMessage(LANG_NPCINFO_CHAR_DIFFICULTY,  target->GetGUIDLow(), faction, npcflags,
+            Entry, target->GetCreatureInfo()->Entry, diff,
+            displayid, nativeid);
+    else
+        PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetGUIDLow(), faction, npcflags, Entry, displayid, nativeid);
+
     PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
     PSendSysMessage(LANG_NPCINFO_HEALTH,target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
     PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->getFaction());
