@@ -5473,6 +5473,8 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
         return;
     }
 
+    NewSummon->SetSummonPoint(pos);
+
     uint32 petlevel = m_caster->getLevel();
     NewSummon->setPetType(SUMMON_PET);
 
