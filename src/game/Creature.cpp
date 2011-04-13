@@ -1385,24 +1385,30 @@ struct CreatureRespawnDeleteWorker
 
 void Creature::DeleteFromDB()
 {
-    if (!HasStaticDBSpawnData())
+    CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow());
+    if (!data)
     {
         DEBUG_LOG("Trying to delete not saved creature!");
         return;
     }
 
-    CreatureRespawnDeleteWorker worker (GetGUIDLow());
-    sMapPersistentStateMgr.DoForAllStatesWithMapId(GetMapId(), worker);
+    DeleteFromDB(GetGUIDLow(), data);
+}
 
-    sObjectMgr.DeleteCreatureData(GetGUIDLow());
+void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
+{
+    CreatureRespawnDeleteWorker worker (lowguid);
+    sMapPersistentStateMgr.DoForAllStatesWithMapId(data->mapid, worker);
+
+    sObjectMgr.DeleteCreatureData(lowguid);
 
     WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", GetGUIDLow());
-    WorldDatabase.PExecuteLog("DELETE FROM creature_addon WHERE guid=%u", GetGUIDLow());
-    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u", GetGUIDLow());
-    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature WHERE guid=%u", GetGUIDLow());
-    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature_data WHERE guid=%u", GetGUIDLow());
-    WorldDatabase.PExecuteLog("DELETE FROM creature_battleground WHERE guid=%u", GetGUIDLow());
+    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_addon WHERE guid=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature WHERE guid=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM game_event_creature_data WHERE guid=%u", lowguid);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_battleground WHERE guid=%u", lowguid);
     WorldDatabase.CommitTransaction();
 }
 
