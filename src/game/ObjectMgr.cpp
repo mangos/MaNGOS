@@ -783,18 +783,24 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     }
 
     // replace by new structures array
-    const_cast<CreatureDataAddonAura*&>(addon->auras) = new CreatureDataAddonAura[val.size()+1];
+    const_cast<uint32*&>(addon->auras) = new uint32[val.size()+1];
 
     uint32 i = 0;
     for(uint32 j = 0; j < val.size(); ++j)
     {
-        CreatureDataAddonAura& cAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
-        cAura.spell_id = uint32(val[j]);
+        uint32& cAura = const_cast<uint32&>(addon->auras[i]);
+        cAura = uint32(val[j]);
 
-        SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(cAura.spell_id);
+        SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(cAura);
         if (!AdditionalSpellInfo)
         {
-            sLog.outErrorDb("Creature (%s: %u) has wrong spell %u defined in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.spell_id,table);
+            sLog.outErrorDb("Creature (%s: %u) has wrong spell %u defined in `auras` field in `%s`.", guidEntryStr, addon->guidOrEntry, cAura,table);
+            continue;
+        }
+
+        if (std::find(&addon->auras[0], &addon->auras[i], cAura) != &addon->auras[i])
+        {
+            sLog.outErrorDb("Creature (%s: %u) has duplicate spell %u defined in `auras` field in `%s`.", guidEntryStr, addon->guidOrEntry, cAura, table);
             continue;
         }
 
@@ -802,8 +808,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     }
 
     // fill terminator element (after last added)
-    CreatureDataAddonAura& endAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
-    endAura.spell_id = 0;
+    const_cast<uint32&>(addon->auras[i]) = 0;
 }
 
 void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment)
