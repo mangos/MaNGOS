@@ -1879,7 +1879,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
-                // send transfer packets
+                // send transfer packet to display load screen
                 WorldPacket data(SMSG_TRANSFER_PENDING, (4+4+4));
                 data << uint32(mapid);
                 if (m_transport)
@@ -1888,26 +1888,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                     data << uint32(GetMapId());
                 }
                 GetSession()->SendPacket(&data);
-
-                data.Initialize(SMSG_NEW_WORLD, (20));
-                if (m_transport)
-                {
-                    data << uint32(mapid);
-                    data << float(m_movementInfo.GetTransportPos()->x);
-                    data << float(m_movementInfo.GetTransportPos()->y);
-                    data << float(m_movementInfo.GetTransportPos()->z);
-                    data << float(m_movementInfo.GetTransportPos()->o);
-                }
-                else
-                {
-                    data << uint32(mapid);
-                    data << float(x);
-                    data << float(y);
-                    data << float(z);
-                    data << float(orientation);
-                }
-                GetSession()->SendPacket( &data );
-                SendSavedInstances();
             }
 
             // remove from old map now
@@ -1936,6 +1916,30 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // move packet sent by client always after far teleport
             // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
             SetSemaphoreTeleportFar(true);
+
+            if (!GetSession()->PlayerLogout())
+            {
+                // transfer finished, inform client to start load
+                WorldPacket data(SMSG_NEW_WORLD, (20));
+                data << uint32(mapid);
+                if (m_transport)
+                {
+                    data << float(m_movementInfo.GetTransportPos()->x);
+                    data << float(m_movementInfo.GetTransportPos()->y);
+                    data << float(m_movementInfo.GetTransportPos()->z);
+                    data << float(m_movementInfo.GetTransportPos()->o);
+                }
+                else
+                {
+                    data << float(final_x);
+                    data << float(final_y);
+                    data << float(final_z);
+                    data << float(final_o);
+                }
+
+                GetSession()->SendPacket( &data );
+                SendSavedInstances();
+            }
         }
         else
             return false;
