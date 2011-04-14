@@ -516,7 +516,7 @@ enum PlayerFlags
     PLAYER_FLAGS_COMMENTATOR            = 0x00080000,
     PLAYER_FLAGS_UNK21                  = 0x00100000,
     PLAYER_FLAGS_UNK22                  = 0x00200000,
-    PLAYER_FLAGS_COMMENTATOR2           = 0x00400000,       // something like COMMENTATOR_CAN_USE_INSTANCE_COMMAND
+    PLAYER_FLAGS_COMMENTATOR_UBER       = 0x00400000,       // something like COMMENTATOR_CAN_USE_INSTANCE_COMMAND
     PLAYER_FLAGS_UNK24                  = 0x00800000,       // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all abilitys on tab except autoattack
     PLAYER_FLAGS_UNK25                  = 0x01000000,       // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all melee ability on tab include autoattack
     PLAYER_FLAGS_XP_USER_DISABLED       = 0x02000000,
@@ -1499,7 +1499,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendCanTakeQuestResponse( uint32 msg ) const;
         void SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver);
         void SendPushToPartyResponse( Player *pPlayer, uint32 msg );
-        void SendQuestUpdateAddItem( Quest const* pQuest, uint32 item_idx, uint32 count );
         void SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 count);
 
         uint64 GetDivider() { return m_divider; }

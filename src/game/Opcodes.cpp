@@ -1296,7 +1296,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x4F3*/ { "UMSG_UNKNOWN_1267",                            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
     /*0x4F4*/ { "UMSG_UNKNOWN_1268",                            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
     /*0x4F5*/ { "UMSG_UNKNOWN_1269",                            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
-    /*0x4F6*/ { "CMSG_WORLD_STATE_UI_TIMER_UPDATE",             STATUS_LOGGEDIN, PROCESS_INPLACE,      &WorldSession::HandleWorldStateUITimerUpdateOpcode},
+    /*0x4F6*/ { "CMSG_WORLD_STATE_UI_TIMER_UPDATE",             STATUS_LOGGEDIN, PROCESS_INPLACE,      &WorldSession::HandleUITimeRequestOpcode       },
     /*0x4F7*/ { "SMSG_WORLD_STATE_UI_TIMER_UPDATE",             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x4F8*/ { "CMSG_CHAR_RACE_CHANGE",                        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
     /*0x4F9*/ { "UMSG_UNKNOWN_1273",                            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
