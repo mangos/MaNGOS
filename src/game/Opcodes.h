@@ -693,7 +693,7 @@ enum Opcodes
     CMSG_BUYBACK_ITEM                               = 0x290,
     SMSG_SERVER_MESSAGE                             = 0x291,
     CMSG_SET_SAVED_INSTANCE_EXTEND                  = 0x292,
-    CMSG_LFG_OFFER_CONTINUE                         = 0x293,
+    SMSG_LFG_OFFER_CONTINUE                         = 0x293,
     CMSG_TEST_DROP_RATE                             = 0x294,
     SMSG_TEST_DROP_RATE_RESULT                      = 0x295,
     CMSG_LFG_GET_STATUS                             = 0x296,
