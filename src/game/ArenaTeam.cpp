@@ -540,15 +540,6 @@ bool ArenaTeam::HaveMember(ObjectGuid guid) const
     return false;
 }
 
-uint32 ArenaTeam::GetAvgPersonalRating() const
-{
-    uint32 rating = 0;
-    for(MemberList::const_iterator itr = m_members.begin(); itr !=  m_members.end(); ++itr)
-        rating += itr->personal_rating;
-
-    return rating / m_Type;
-}
-
 uint32 ArenaTeam::GetPoints(uint32 MemberRating)
 {
     // returns how many points would be awarded with this team type with this rating
