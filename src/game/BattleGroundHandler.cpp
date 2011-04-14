@@ -699,17 +699,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
         arenaRating = at->GetRating();
         // the arena team id must match for everyone in the group
         // get the personal ratings for queue
-        uint32 avg_pers_rating = 0;
-        for(GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
-        {
-            Player *member = itr->getSource();
-
-            // calc avg personal rating
-            avg_pers_rating += member->GetArenaPersonalRating(arenaslot);
-        }
-
-        if (arenatype)
-            avg_pers_rating /= arenatype;
+        uint32 avg_pers_rating = at->GetAvgPersonalRating();
 
         // if avg personal rating is more than 150 points below the teams rating, the team will be queued against an opponent matching or similar to the average personal rating
         if (avg_pers_rating + 150 < arenaRating)

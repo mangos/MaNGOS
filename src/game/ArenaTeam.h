@@ -197,6 +197,7 @@ class ArenaTeam
         void Stats(WorldSession *session);
         void InspectStats(WorldSession *session, ObjectGuid guid);
 
+        uint32 GetAvgPersonalRating() const;
         uint32 GetPoints(uint32 MemberRating);
         float GetChanceAgainst(uint32 own_rating, uint32 enemy_rating);
         int32 WonAgainst(uint32 againstRating);
