@@ -67,22 +67,22 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
 /*
     for(uint32 i = 0; i < holidays_count; ++i)
     {
-        data << uint32(0);                                  // holiday id
-        data << uint32(0);                                  // Holidays.dbc field 37 (flags)
-        data << uint32(0);                                  // Holidays.dbc field 38 (flags)
-        data << uint32(0);                                  // Holidays.dbc field 52
-        data << uint32(0);                                  // Holidays.dbc field RepeatingMethod
+        data << uint32(0);                                  // Holidays.dbc ID
+        data << uint32(0);                                  // Holidays.dbc region
+        data << uint32(0);                                  // Holidays.dbc looping
+        data << uint32(0);                                  // Holidays.dbc priority
+        data << uint32(0);                                  // Holidays.dbc calendarFilterType
 
         for(uint32 j = 0; j < 26; j++)
-            data << uint32(0);                              // Holidays.dbc field Dates
+            data << uint32(0);                              // Holidays.dbc date
 
         for(uint32 j = 0; j < 10; j++)
-            data << uint32(0);                              // Holidays.dbc field unk1
+            data << uint32(0);                              // Holidays.dbc duration
 
         for(uint32 j = 0; j < 10; j++)
-            data << uint32(0);                              // Holidays.dbc field unk39
+            data << uint32(0);                              // Holidays.dbc calendarFlags
 
-        data << "";                                         // Holidays.dbc field texture
+        data << "";                                         // Holidays.dbc textureFilename
     }
 */
     //DEBUG_LOG("Sending calendar");
