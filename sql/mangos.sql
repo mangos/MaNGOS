@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11337_01_mangos_mangos_string` bit(1) default NULL
+  `required_11348_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14662,6 +14662,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (31024, 0,      0,       0,     0,     'Item - Living Ruby Pedant'),
 (17712, 0,      0,       0,     0,     'Item - Lifestone Healing'),
 (5707,  0,      0,       0,     0,     'Item - Lifestone Regeneration'),
+(43733, 0,      0,       0,     0,     'Item - Lightning Zap'),
 (38395, 0,      0,       0,     0,     'Item - Siphon Essence'),
 (40293, 0,      0,       0,     0,     'Item - Siphon Essence'),
 (71824, 0,      0,       0,     0,     'Item - Shaman T9 Elemental 4P Bonus');
