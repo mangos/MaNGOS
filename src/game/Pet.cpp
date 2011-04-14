@@ -567,35 +567,6 @@ void Pet::Update(uint32 update_diff, uint32 diff)
                     return;
                 }
             }
-
-            //regenerate focus for hunter pets or energy for deathknight's ghoul
-            if(m_regenTimer <= update_diff)
-            {
-                switch (getPowerType())
-                {
-                    case POWER_FOCUS:
-                    case POWER_ENERGY:
-                        Regenerate(getPowerType());
-                        break;
-                    default:
-                        break;
-                }
-                m_regenTimer = 4000;
-            }
-            else
-                m_regenTimer -= update_diff;
-
-            if(getPetType() != HUNTER_PET)
-                break;
-
-            if(m_happinessTimer <= update_diff)
-            {
-                LooseHappiness();
-                m_happinessTimer = 7500;
-            }
-            else
-                m_happinessTimer -= update_diff;
-
             break;
         }
         default:
@@ -604,6 +575,44 @@ void Pet::Update(uint32 update_diff, uint32 diff)
 
     Creature::Update(update_diff, diff);
 }
+
+void Pet::RegenerateAll( uint32 update_diff )
+{
+    //regenerate focus for hunter pets or energy for deathknight's ghoul
+    if (m_regenTimer <= update_diff)
+    {
+        switch (getPowerType())
+        {
+            case POWER_FOCUS:
+            case POWER_ENERGY:
+                Regenerate(getPowerType());
+                break;
+            default:
+                break;
+        }
+
+        if (!isInCombat() || IsPolymorphed())
+            RegenerateHealth();
+
+        RegenerateMana();
+
+        m_regenTimer = 4000;
+    }
+    else
+        m_regenTimer -= update_diff;
+
+    if (getPetType() != HUNTER_PET)
+        return;
+
+    if(m_happinessTimer <= update_diff)
+    {
+        LooseHappiness();
+        m_happinessTimer = 7500;
+    }
+    else
+        m_happinessTimer -= update_diff;
+}
+
 
 void Pet::Regenerate(Powers power)
 {

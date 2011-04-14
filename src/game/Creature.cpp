@@ -592,22 +592,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
             if(!isAlive())
                 break;
-            if(m_regenTimer > 0)
-            {
-                if(update_diff >= m_regenTimer)
-                    m_regenTimer = 0;
-                else
-                    m_regenTimer -= update_diff;
-            }
-            if (m_regenTimer != 0)
-                break;
-
-            if (!isInCombat() || IsPolymorphed())
-                RegenerateHealth();
-
-            RegenerateMana();
-
-            m_regenTimer = REGEN_TIME_FULL;
+            RegenerateAll(update_diff);
             break;
         }
         case CORPSE_FALLING:
@@ -635,6 +620,26 @@ void Creature::StopGroupLoot()
 
     m_groupLootTimer = 0;
     m_groupLootId = 0;
+}
+
+void Creature::RegenerateAll(uint32 update_diff)
+{
+    if (m_regenTimer > 0)
+    {
+        if(update_diff >= m_regenTimer)
+            m_regenTimer = 0;
+        else
+            m_regenTimer -= update_diff;
+    }
+    if (m_regenTimer != 0)
+        return;
+
+    if (!isInCombat() || IsPolymorphed())
+        RegenerateHealth();
+
+    RegenerateMana();
+
+    m_regenTimer = REGEN_TIME_FULL;
 }
 
 void Creature::RegenerateMana()
