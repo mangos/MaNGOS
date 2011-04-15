@@ -1657,8 +1657,8 @@ struct SpellRadiusEntry
 {
     uint32    ID;                                           //          m_ID
     float     Radius;                                       //          m_radius
-    float     Radius2;                                      //          m_radiusPerLevel
-                                                            //          m_radiusMax
+                                                            //          m_radiusPerLevel
+    //float     RadiusMax;                                  //          m_radiusMax
 };
 
 struct SpellRangeEntry
