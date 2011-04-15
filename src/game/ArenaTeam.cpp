@@ -107,7 +107,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     uint8 plClass;
 
     // arena team is full (can't have more than type * 2 players!)
-    if (GetMembersSize() >= GetType() * 2)
+    if (GetMembersSize() >= GetMaxMembersSize())
         return false;
 
     Player *pl = sObjectMgr.GetPlayer(playerGuid);

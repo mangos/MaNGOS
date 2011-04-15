@@ -147,6 +147,7 @@ class ArenaTeam
         void SetEmblem(uint32 backgroundColor, uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor);
 
         size_t GetMembersSize() const         { return m_members.size(); }
+        size_t GetMaxMembersSize() const      { return size_t(GetType() * 2); }
         bool   Empty() const                  { return m_members.empty(); }
         MemberList::iterator m_membersBegin() { return m_members.begin(); }
         MemberList::iterator m_membersEnd()   { return m_members.end(); }
