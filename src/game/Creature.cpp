@@ -495,7 +495,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 CreatureInfo const *cinfo = GetCreatureInfo();
 
                 SelectLevel(cinfo);
-                SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
+                SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
                 if (m_isDeadByDefault)
                 {
                     SetDeathState(JUST_DIED);
