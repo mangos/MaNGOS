@@ -264,7 +264,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult *arenaTeamMembersResult)
             continue;
         }
 
-        // arena team can't be > 2 * arenatype (2 for 2.x, 3 for 3x3, 5 for 5x5)
+        // arena team can't be > 2 * arenatype (2 for 2x2, 3 for 3x3, 5 for 5x5)
         if (m_members.size() >= m_Type * 2)
             return false;
 
