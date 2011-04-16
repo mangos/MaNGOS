@@ -4,10 +4,10 @@ DELETE FROM spell_proc_event WHERE entry IN
 (57907,62147,64952,64964,71174,71176,71178,71186,71191,71194,71198,71217,71226,71228);
 
 INSERT INTO spell_proc_event(entry, SchoolMask, SpellFamilyName,
-	SpellFamilyMaskA0, SpellFamilyMaskA1, SpellFamilyMaskA2,
-	SpellFamilyMaskB0, SpellFamilyMaskB1, SpellFamilyMaskB2,
-	SpellFamilyMaskC0, SpellFamilyMaskC1, SpellFamilyMaskC2,
-	procFlags, procEx, ppmRate, CustomChance, Cooldown) VALUES
+    SpellFamilyMaskA0, SpellFamilyMaskA1, SpellFamilyMaskA2,
+    SpellFamilyMaskB0, SpellFamilyMaskB1, SpellFamilyMaskB2,
+    SpellFamilyMaskC0, SpellFamilyMaskC1, SpellFamilyMaskC2,
+    procFlags, procEx, ppmRate, CustomChance, Cooldown) VALUES
 (57907, 0x00,  7, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.0, 0.0,  0),
 (62147, 0x00, 15, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00010000, 0x00000000, 0.0, 0.0,  0),
 (64952, 0x00,  7, 0x00000000, 0x00000000, 0x00000000, 0x00000440, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.0, 0.0,  0),
