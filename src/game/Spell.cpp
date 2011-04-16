@@ -5718,11 +5718,12 @@ SpellCastResult Spell::CheckCasterAuras() const
                 {
                     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
                     {
-                        if (GetSpellMechanicMask(itr->second->GetSpellProto(), 1 << i) & mechanic_immune)
+                        SpellEntry const * pEntry = holder->GetSpellProto();
+                        if (GetSpellMechanicMask(pEntry, 1 << i) & mechanic_immune)
                             continue;
-                        if (GetSpellSchoolMask(itr->second->GetSpellProto()) & school_immune)
+                        if ((GetSpellSchoolMask(pEntry) & school_immune) && !(pEntry->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))
                             continue;
-                        if ((1<<(itr->second->GetSpellProto()->Dispel)) & dispel_immune)
+                        if ((1<<(pEntry->Dispel)) & dispel_immune)
                             continue;
                         Aura *aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
                         if (!aura)
