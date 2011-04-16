@@ -357,8 +357,6 @@ enum ConditionType
                                                             // When player has spell or has item (when defined), condition return false.
 };
 
-#define MAX_CONDITION                 29                    // maximum value in ConditionType enum
-
 struct PlayerCondition
 {
     ConditionType condition;                                // additional condition type
