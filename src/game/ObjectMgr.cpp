@@ -7547,6 +7547,58 @@ bool PlayerCondition::Meets(Player const * player) const
             return sGameEventMgr.IsActiveHoliday(HolidayIds(value1));
         case CONDITION_NOT_ACTIVE_HOLIDAY:
             return !sGameEventMgr.IsActiveHoliday(HolidayIds(value1));
+        case CONDITION_LEARNABLE_ABILITY:
+        {
+            // Already know the spell
+            if (player->HasSpell(value1))
+                return false;
+
+            // If item defined, check if player has the item already.
+            if (value2)
+            {
+                // Hard coded item count. This should be ok, since the intention with this condition is to have
+                // a all-in-one check regarding items that learn some ability (primary/secondary tradeskills).
+                // Commonly, items like this is unique and/or are not expected to be obtained more than once.
+                if (player->HasItemCount(value2, 1, true))
+                    return false;
+            }
+
+            bool isSkillOk = false;
+
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(value1);
+
+            for(SkillLineAbilityMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+            {
+                const SkillLineAbilityEntry* skillInfo = itr->second;
+
+                if (!skillInfo)
+                    continue;
+
+                // doesn't have skill
+                if (!player->HasSkill(skillInfo->skillId))
+                    return false;
+
+                // doesn't match class
+                if (skillInfo->classmask && (skillInfo->classmask & player->getClassMask()) == 0)
+                    return false;
+
+                // doesn't match race
+                if (skillInfo->racemask && (skillInfo->racemask & player->getRaceMask()) == 0)
+                    return false;
+
+                // skill level too low
+                if (skillInfo->min_value > player->GetSkillValue(skillInfo->skillId))
+                    return false;
+
+                isSkillOk = true;
+                break;
+            }
+
+            if (isSkillOk)
+                return true;
+
+            return false;
+        }
         default:
             return false;
     }
@@ -7803,6 +7855,28 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
                 sLog.outErrorDb("Active holiday (%u) condition requires existing holiday id (%u), skipped", condition, value1);
                 return false;
             }
+            break;
+        }
+        case CONDITION_LEARNABLE_ABILITY:
+        {
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(value1);
+
+            if (bounds.first == bounds.second)
+            {
+                sLog.outErrorDb("CONDITION_LEARNABLE_ABILITY (%u) has spell id %u defined, but this spell is not listed in SkillLineAbility and can not be used, skipping.", condition, value1);
+                return false;
+            }
+
+            if (value2)
+            {
+                ItemPrototype const *proto = ObjectMgr::GetItemPrototype(value2);
+                if (!proto)
+                {
+                    sLog.outErrorDb("CONDITION_LEARNABLE_ABILITY (%u) has item entry %u defined but item does not exist, skipping.", condition, value2);
+                    return false;
+                }
+            }
+
             break;
         }
         case CONDITION_NONE:
