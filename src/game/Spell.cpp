@@ -5714,46 +5714,47 @@ SpellCastResult Spell::CheckCasterAuras() const
             Unit::SpellAuraHolderMap const& auras = m_caster->GetSpellAuraHolderMap();
             for(Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
-                if (SpellAuraHolder *holder = itr->second)
+                SpellAuraHolder *holder = itr->second;
+                SpellEntry const * pEntry = holder->GetSpellProto();
+
+                if ((GetSpellSchoolMask(pEntry) & school_immune) && !(pEntry->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))
+                    continue;
+                if ((1<<(pEntry->Dispel)) & dispel_immune)
+                    continue;
+
+                for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
                 {
-                    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    Aura *aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
+                    if (!aura)
+                        continue;
+
+                    if (GetSpellMechanicMask(pEntry, 1 << i) & mechanic_immune)
+                        continue;
+                    // Make a second check for spell failed so the right SPELL_FAILED message is returned.
+                    // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
+                    switch(aura->GetModifier()->m_auraname)
                     {
-                        SpellEntry const * pEntry = holder->GetSpellProto();
-                        if (GetSpellMechanicMask(pEntry, 1 << i) & mechanic_immune)
-                            continue;
-                        if ((GetSpellSchoolMask(pEntry) & school_immune) && !(pEntry->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))
-                            continue;
-                        if ((1<<(pEntry->Dispel)) & dispel_immune)
-                            continue;
-                        Aura *aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
-                        if (!aura)
-                            continue;
-                        // Make a second check for spell failed so the right SPELL_FAILED message is returned.
-                        // That is needed when your casting is prevented by multiple states and you are only immune to some of them.
-                        switch(aura->GetModifier()->m_auraname)
-                        {
-                            case SPELL_AURA_MOD_STUN:
-                                if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_STUNNED) || !aura->HasMechanic(MECHANIC_STUN))
-                                    return SPELL_FAILED_STUNNED;
-                                break;
-                            case SPELL_AURA_MOD_CONFUSE:
-                                if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED))
-                                    return SPELL_FAILED_CONFUSED;
-                                break;
-                            case SPELL_AURA_MOD_FEAR:
-                                if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_FEARED))
-                                    return SPELL_FAILED_FLEEING;
-                                break;
-                            case SPELL_AURA_MOD_SILENCE:
-                            case SPELL_AURA_MOD_PACIFY:
-                            case SPELL_AURA_MOD_PACIFY_SILENCE:
-                                if( m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
-                                    return SPELL_FAILED_PACIFIED;
-                                else if ( m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
-                                    return SPELL_FAILED_SILENCED;
-                                break;
-                            default: break;
-                        }
+                        case SPELL_AURA_MOD_STUN:
+                            if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_STUNNED) || !aura->HasMechanic(MECHANIC_STUN))
+                                return SPELL_FAILED_STUNNED;
+                            break;
+                        case SPELL_AURA_MOD_CONFUSE:
+                            if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED))
+                                return SPELL_FAILED_CONFUSED;
+                            break;
+                        case SPELL_AURA_MOD_FEAR:
+                            if (!(m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_USABLE_WHILE_FEARED))
+                                return SPELL_FAILED_FLEEING;
+                            break;
+                        case SPELL_AURA_MOD_SILENCE:
+                        case SPELL_AURA_MOD_PACIFY:
+                        case SPELL_AURA_MOD_PACIFY_SILENCE:
+                            if( m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY)
+                                return SPELL_FAILED_PACIFIED;
+                            else if ( m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
+                                return SPELL_FAILED_SILENCED;
+                            break;
+                        default: break;
                     }
                 }
             }
