@@ -1914,7 +1914,15 @@ CreatureDataAddon const* Creature::GetCreatureAddon() const
         return addon;
 
     // dependent from difficulty mode entry
-    return ObjectMgr::GetCreatureTemplateAddon(GetCreatureInfo()->Entry);
+    if (GetEntry() != GetCreatureInfo()->Entry)
+    {
+        // If CreatureTemplateAddon for difficulty_entry_N exist, it's there for a reason
+        if (CreatureDataAddon const* addon =  ObjectMgr::GetCreatureTemplateAddon(GetCreatureInfo()->Entry))
+            return addon;
+    }
+
+    // Return CreatureTemplateAddon when nothing else exist
+    return ObjectMgr::GetCreatureTemplateAddon(GetEntry());
 }
 
 //creature_addon table
