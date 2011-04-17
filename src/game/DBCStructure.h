@@ -524,7 +524,10 @@ struct AreaTableEntry
     char*   area_name[16];                                  // 11-26    m_AreaName_lang
                                                             // 27 string flags
     uint32  team;                                           // 28       m_factionGroupMask
-                                                            //          m_liquidTypeID, m_minElevation, m_ambient_multiplier, m_lightid...
+                                                            // 29-32    m_liquidTypeID[4]
+                                                            // 33       m_minElevation
+                                                            // 34       m_ambient_multiplier
+                                                            // 35       m_lightid
 };
 
 struct AreaGroupEntry
@@ -567,15 +570,15 @@ struct BankBagSlotPricesEntry
 struct BarberShopStyleEntry
 {
     uint32  Id;                                             // 0        m_ID
-    uint32  type;                                           // 1 value 0 -> hair, value 2 -> facialhair
-    //char*   name[16];                                     // 2-17 name of hair style
+    uint32  type;                                           // 1        m_type
+    //char*   name[16];                                     // 2-17     m_DisplayName_lang
     //uint32  name_flags;                                   // 18 string flags
-    //uint32  unk_name[16];                                 // 19-34 all empty
+    //uint32  unk_name[16];                                 // 19-34    m_Description_lang
     //uint32  unk_flags;                                    // 35 string flags
-    //float   CostMultiplier;                               // 36 values 1 and 0.75
-    uint32  race;                                           // 37 race
-    uint32  gender;                                         // 38 0 -> male, 1 -> female
-    uint32  hair_id;                                        // 39 real ID to hair/facial hair
+    //float   CostMultiplier;                               // 36       m_Cost_Modifier
+    uint32  race;                                           // 37       m_race
+    uint32  gender;                                         // 38       m_sex
+    uint32  hair_id;                                        // 39       m_data (real ID to hair/facial hair)
 };
 
 struct BattlemasterListEntry
