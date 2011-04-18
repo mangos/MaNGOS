@@ -6560,8 +6560,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     // For later, spell is used in gossip (with following despawn,
                     // so addon can reload the default model and data again).
 
-                    // It should be noted that additional spell id's have been seen in relation
-                    // to this spell, but those does not exist in client (45701 (regular spell), 45706 (aura)).
+                    // It should be noted that additional spell id's have been seen in relation to this spell, but
+                    // those does not exist in client (45701 (regular spell), 45705-45712 (auras), 45459-45460 (auras)).
+                    // We can assume 45705-45712 are transform auras, used instead of hard coded models in the below code.
 
                     // not in map yet OR no npc flags yet (restored after LoadCreatureAddon for respawn cases)
                     if (!m_caster->IsInMap(m_caster) || m_caster->GetUInt32Value(UNIT_NPC_FLAGS) == UNIT_NPC_FLAG_NONE)
