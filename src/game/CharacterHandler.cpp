@@ -821,13 +821,6 @@ void WorldSession::HandleSetFactionAtWarOpcode( WorldPacket & recv_data )
     GetPlayer()->GetReputationMgr().SetAtWar(repListID, flag);
 }
 
-void WorldSession::HandleMeetingStoneInfoOpcode( WorldPacket & /*recv_data*/ )
-{
-    DEBUG_LOG( "WORLD: Received CMSG_MEETING_STONE_INFO" );
-
-    SendLfgUpdate(0, 0, 0);
-}
-
 void WorldSession::HandleTutorialFlagOpcode( WorldPacket & recv_data )
 {
     uint32 iFlag;
