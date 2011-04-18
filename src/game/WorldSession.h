@@ -48,7 +48,6 @@ class MovementInfo;
 class WorldSession;
 
 struct OpcodeHandler;
-enum LfgType;
 
 enum AccountDataType
 {
@@ -156,6 +155,17 @@ enum LfgUpdateType
 {
     LFG_UPDATE_JOIN     = 5,
     LFG_UPDATE_LEAVE    = 7,
+};
+
+enum LfgType
+{
+    LFG_TYPE_NONE                 = 0,
+    LFG_TYPE_DUNGEON              = 1,
+    LFG_TYPE_RAID                 = 2,
+    LFG_TYPE_QUEST                = 3,
+    LFG_TYPE_ZONE                 = 4,
+    LFG_TYPE_HEROIC_DUNGEON       = 5,
+    LFG_TYPE_RANDOM_DUNGEON       = 6
 };
 
 enum ChatRestrictionType
