@@ -152,6 +152,12 @@ enum LfgJoinResult
     ERR_LFG_ROLE_CHECK_FAILED2                  = 0x12, 
 };
 
+enum LfgUpdateType
+{
+    LFG_UPDATE_JOIN     = 5,
+    LFG_UPDATE_LEAVE    = 7,
+};
+
 enum ChatRestrictionType
 {
     ERR_CHAT_RESTRICTED = 0,
@@ -226,9 +232,9 @@ class MANGOS_DLL_SPEC WorldSession
         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
         void SendNotification(int32 string_id,...);
         void SendPetNameInvalid(uint32 error, const std::string& name, DeclinedName *declinedName);
-        void SendLfgResult(LfgType type, uint32 entry);
+        void SendLfgSearchResults(LfgType type, uint32 entry);
         void SendLfgJoinResult(LfgJoinResult result);
-        void SendLfgUpdate(uint8 type);
+        void SendLfgUpdate(bool isGroup, LfgUpdateType updateType, uint32 id);
         void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
         void SendSetPhaseShift(uint32 phaseShift);

@@ -18,7 +18,6 @@
 
 #include "WorldSession.h"
 #include "Log.h"
-#include "Database/DatabaseEnv.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "ObjectMgr.h"
@@ -30,28 +29,35 @@ void WorldSession::HandleLfgJoinOpcode( WorldPacket & recv_data )
 
     uint8 dungeonsCount, counter2;
     std::string comment;
+    std::vector<uint32> dungeons;
 
     recv_data >> Unused<uint32>();                          // lfg roles
     recv_data >> Unused<uint8>();                           // lua: GetLFGInfoLocal
     recv_data >> Unused<uint8>();                           // lua: GetLFGInfoLocal
 
     recv_data >> dungeonsCount;
-    for (uint8 i = 0; i < dungeonsCount; ++i)
-        recv_data >> Unused<uint32>();                      // dungeons id/type
 
-    recv_data >> counter2;                                  // lua: GetLFGInfoLocal
+    dungeons.resize(dungeonsCount);
+
+    for (uint8 i = 0; i < dungeonsCount; ++i)
+        recv_data >> dungeons[i];                           // dungeons id/type
+
+    recv_data >> counter2;                                  // const count = 3, lua: GetLFGInfoLocal
+
     for (uint8 i = 0; i < counter2; ++i)
         recv_data >> Unused<uint8>();                       // lua: GetLFGInfoLocal
 
     recv_data >> comment;                                   // lfg comment
 
     //SendLfgJoinResult(ERR_LFG_OK);
-    //SendLfgUpdate(1);
+    //SendLfgUpdate(false, LFG_UPDATE_JOIN, dungeons[0]);
 }
 
 void WorldSession::HandleLfgLeaveOpcode( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG("CMSG_LFG_LEAVE");
+
+    //SendLfgUpdate(false, LFG_UPDATE_LEAVE, 0);
 }
 
 void WorldSession::HandleSearchLfgJoinOpcode( WorldPacket & recv_data )
@@ -64,7 +70,7 @@ void WorldSession::HandleSearchLfgJoinOpcode( WorldPacket & recv_data )
     entry = (temp & 0x00FFFFFF);
     LfgType type = LfgType((temp >> 24) & 0x000000FF);
 
-    //SendLfgResult(type, entry);
+    //SendLfgSearchResults(type, entry);
 }
 
 void WorldSession::HandleSearchLfgLeaveOpcode( WorldPacket & recv_data )
@@ -80,10 +86,10 @@ void WorldSession::HandleSetLfgCommentOpcode( WorldPacket & recv_data )
 
     std::string comment;
     recv_data >> comment;
-    DEBUG_LOG("LFG comment %s", comment.c_str());
+    DEBUG_LOG("LFG comment \"%s\"", comment.c_str());
 }
 
-void WorldSession::SendLfgResult(LfgType type, uint32 entry)
+void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
 {
     WorldPacket data(SMSG_LFG_SEARCH_RESULTS);
     data << uint32(type);                                   // type
@@ -130,12 +136,12 @@ void WorldSession::SendLfgResult(LfgType type, uint32 entry)
         }
     }
 
-    uint32 playersCount = 2;
-    data << uint32(playersCount);                           // players count
-    data << uint32(playersCount);                           // players count (total?)
-
     //TODO: Guard Player map
     HashMapHolder<Player>::MapType const& players = sObjectAccessor.GetPlayers();
+    uint32 playersSize = players.size();
+    data << uint32(playersSize);                            // players count
+    data << uint32(playersSize);                            // players count (total?)
+
     for(HashMapHolder<Player>::MapType::const_iterator iter = players.begin(); iter != players.end(); ++iter)
     {
         Player *plr = iter->second;
@@ -235,28 +241,31 @@ void WorldSession::SendLfgJoinResult(LfgJoinResult result)
     SendPacket(&data);
 }
 
-void WorldSession::SendLfgUpdate(uint8 type)
+void WorldSession::SendLfgUpdate(bool isGroup, LfgUpdateType updateType, uint32 id)
 {
-    WorldPacket data(type ? SMSG_LFG_UPDATE_PLAYER : SMSG_LFG_UPDATE_PARTY, 0);
-    uint8 updateType = 5;
+    WorldPacket data(isGroup ? SMSG_LFG_UPDATE_PARTY : SMSG_LFG_UPDATE_PLAYER, 0);
     data << uint8(updateType);
-    uint8 extra = 1;
+
+    uint8 extra = updateType == LFG_UPDATE_JOIN ? 1 : 0;
     data << uint8(extra);
+
     if(extra)
     {
         data << uint8(0);
         data << uint8(0);
         data << uint8(0);
-        if(!type)
+
+        if(isGroup)
         {
             data << uint8(0);
             for(uint32 i = 0; i < 3; ++i)
                 data << uint8(0);
         }
+
         uint8 count = 1;
-        data << count;
+        data << uint8(count);
         for(uint32 i = 0; i < count; ++i)
-            data << uint32(0x02000166);
+            data << uint32(id);
         data << "";
     }
     SendPacket(&data);
