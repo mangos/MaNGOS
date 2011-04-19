@@ -582,6 +582,7 @@ enum LootState
 };
 
 class Unit;
+struct GameObjectDisplayInfoEntry;
 
 // 5 sec for bobber catch
 #define FISHING_BOBBER_READY_TIME 5
