@@ -23,6 +23,13 @@
 #include "DBCEnums.h"
 #include "Unit.h"
 
+enum DynamicObjectType
+{
+    DYNAMIC_OBJECT_PORTAL           = 0x0,      // unused
+    DYNAMIC_OBJECT_AREA_SPELL       = 0x1,
+    DYNAMIC_OBJECT_FARSIGHT_FOCUS   = 0x2,
+};
+
 struct SpellEntry;
 
 class DynamicObject : public WorldObject
@@ -34,7 +41,7 @@ class DynamicObject : public WorldObject
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius);
+        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
         void Update(uint32 update_diff, uint32 p_time);
         void Delete();
         uint32 GetSpellId() const { return m_spellId; }
@@ -43,6 +50,7 @@ class DynamicObject : public WorldObject
         ObjectGuid const& GetCasterGuid() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
         Unit* GetCaster() const;
         float GetRadius() const { return m_radius; }
+        DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
         bool IsAffecting(Unit *unit) const { return m_affected.find(unit->GetObjectGuid()) != m_affected.end(); }
         void AddAffected(Unit *unit) { m_affected.insert(unit->GetObjectGuid()); }
         void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
