@@ -75,7 +75,7 @@ inline float Traveller<Creature>::Speed()
 {
     if(i_traveller.HasSplineFlag(SPLINEFLAG_WALKMODE))
         return i_traveller.GetSpeed(MOVE_WALK);
-    else if(i_traveller.HasSplineFlag(SPLINEFLAG_UNKNOWN7))
+    else if(i_traveller.HasSplineFlag(SPLINEFLAG_FLYING))
         return i_traveller.GetSpeed(MOVE_FLIGHT);
     else
         return i_traveller.GetSpeed(MOVE_RUN);
