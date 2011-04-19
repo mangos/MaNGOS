@@ -670,6 +670,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SetGoArtKit(uint8 artkit) { SetByteValue(GAMEOBJECT_BYTES_1, 2, artkit); }
         uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
         void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
+        uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
+        void SetDisplayId(uint32 modelId);
 
         float GetObjectBoundingRadius() const;              // overwrite WorldObject version
 
@@ -739,6 +741,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GuidsSet m_UniqueUsers;                             // all players who use item, some items activated after specific amount unique uses
 
         GameObjectInfo const* m_goInfo;
+        GameObjectDisplayInfoEntry const* m_displayInfo;
         uint64 m_rotation;
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);
