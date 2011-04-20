@@ -268,6 +268,7 @@ class Item;
 class Pet;
 class PetAura;
 class Totem;
+class VehicleInfo;
 
 struct SpellImmune
 {
@@ -1303,6 +1304,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void Mount(uint32 mount, uint32 spellId = 0);
         void Unmount(bool from_aura = false);
 
+        VehicleInfo* GetVehicleInfo() { return m_vehicleInfo; }
+        bool IsVehicle() const { return m_vehicleInfo != NULL; }
+        void SetVehicleId(uint32 entry);
+
         uint16 GetMaxSkillValueForLevel(Unit const* target = NULL) const { return (target ? GetLevelForTarget(target) : getLevel()) * 5; }
         void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);
         uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss);
@@ -2003,6 +2008,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_regenTimer;
         uint32 m_lastManaUseTimer;
 
+        VehicleInfo* m_vehicleInfo;
     private:
         void CleanupDeletedAuras();
 

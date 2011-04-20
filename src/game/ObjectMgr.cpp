@@ -725,6 +725,12 @@ void ObjectMgr::LoadCreatureTemplates()
             const_cast<CreatureInfo*>(cInfo)->MovementType = IDLE_MOTION_TYPE;
         }
 
+        if (cInfo->vehicleId && !sVehicleStore.LookupEntry(cInfo->vehicleId))
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has non-existing vehicle_id (%u), set to 0.", cInfo->Entry, cInfo->vehicleId);
+            const_cast<CreatureInfo*>(cInfo)->vehicleId = 0;
+        }
+
         if(cInfo->equipmentId > 0)                          // 0 no equipment
         {
             if(!GetEquipmentInfo(cInfo->equipmentId))

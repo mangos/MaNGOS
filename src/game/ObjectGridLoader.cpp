@@ -58,7 +58,7 @@ ObjectGridRespawnMover::Visit(CreatureMapType &m)
 
         Creature * c = iter->getSource();
 
-        MANGOS_ASSERT((!c->IsPet() || !c->IsVehicle()) && "ObjectGridRespawnMover don't must be called for pets");
+        MANGOS_ASSERT(!c->IsPet() && "ObjectGridRespawnMover don't must be called for pets");
 
         Cell const& cur_cell  = c->GetCurrentCell();
 
