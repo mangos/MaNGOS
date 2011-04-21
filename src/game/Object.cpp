@@ -252,12 +252,12 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
                     // (ok) most seem to have this
                     unit->m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
 
-                    if (!unit->hasUnitState(UNIT_STAT_MOVING))
+                    /*if (!((Creature*)unit)->hasUnitState(UNIT_STAT_MOVING))
                     {
                         // (ok) possibly some "hover" mode
                         unit->m_movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
                     }
-                    else
+                    else*/
                     {
                         if (((Creature*)unit)->IsMounted())
                         {
