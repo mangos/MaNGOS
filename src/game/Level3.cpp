@@ -2508,7 +2508,7 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
         {
             found = true;
             ItemPosCountVec dest;
-            uint8 msg = plTarget->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, pProto->ItemId, 1 );
+            InventoryResult msg = plTarget->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, pProto->ItemId, 1 );
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = plTarget->StoreNewItem( dest, pProto->ItemId, true);

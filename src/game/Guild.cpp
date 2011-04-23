@@ -1737,7 +1737,7 @@ void Guild::RemoveItem(uint8 tab, uint8 slot )
         GetId(), uint32(tab), uint32(slot));
 }
 
-uint8 Guild::_CanStoreItem_InSpecificSlot( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, uint32& count, bool swap, Item* pSrcItem ) const
+InventoryResult Guild::_CanStoreItem_InSpecificSlot( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, uint32& count, bool swap, Item* pSrcItem ) const
 {
     Item* pItem2 = m_TabListMap[tab]->Slots[slot];
 
@@ -1780,7 +1780,7 @@ uint8 Guild::_CanStoreItem_InSpecificSlot( uint8 tab, uint8 slot, GuildItemPosCo
     return EQUIP_ERR_OK;
 }
 
-uint8 Guild::_CanStoreItem_InTab( uint8 tab, GuildItemPosCountVec &dest, uint32& count, bool merge, Item* pSrcItem, uint8 skip_slot ) const
+InventoryResult Guild::_CanStoreItem_InTab( uint8 tab, GuildItemPosCountVec &dest, uint32& count, bool merge, Item* pSrcItem, uint8 skip_slot ) const
 {
     for (uint32 j = 0; j < GUILD_BANK_MAX_SLOTS; ++j)
     {
@@ -1837,7 +1837,7 @@ uint8 Guild::_CanStoreItem_InTab( uint8 tab, GuildItemPosCountVec &dest, uint32&
     return EQUIP_ERR_OK;
 }
 
-uint8 Guild::CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, uint32 count, Item *pItem, bool swap ) const
+InventoryResult Guild::CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, uint32 count, Item *pItem, bool swap ) const
 {
     DEBUG_LOG( "GUILD STORAGE: CanStoreItem tab = %u, slot = %u, item = %u, count = %u", tab, slot, pItem->GetEntry(), count);
 
@@ -1850,7 +1850,7 @@ uint8 Guild::CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, ui
     // in specific slot
     if (slot != NULL_SLOT)
     {
-        uint8 res = _CanStoreItem_InSpecificSlot(tab,slot,dest,count,swap,pItem);
+        InventoryResult res = _CanStoreItem_InSpecificSlot(tab,slot,dest,count,swap,pItem);
         if (res != EQUIP_ERR_OK)
             return res;
 
@@ -1863,7 +1863,7 @@ uint8 Guild::CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, ui
     // search stack in tab for merge to
     if (pItem->GetMaxStackCount() > 1)
     {
-        uint8 res = _CanStoreItem_InTab(tab, dest, count, true, pItem, slot);
+        InventoryResult res = _CanStoreItem_InTab(tab, dest, count, true, pItem, slot);
         if (res != EQUIP_ERR_OK)
             return res;
 
@@ -1872,7 +1872,7 @@ uint8 Guild::CanStoreItem( uint8 tab, uint8 slot, GuildItemPosCountVec &dest, ui
     }
 
     // search free slot in bag for place to
-    uint8 res = _CanStoreItem_InTab(tab, dest, count, false, pItem, slot);
+    InventoryResult res = _CanStoreItem_InTab(tab, dest, count, false, pItem, slot);
     if (res != EQUIP_ERR_OK)
         return res;
 
@@ -1950,7 +1950,7 @@ void Guild::SwapItems(Player * pl, uint8 BankTab, uint8 BankTabSlot, uint8 BankT
     if (SplitedAmount)
     {                                                   // Bank -> Bank item split (in empty or non empty slot
         GuildItemPosCountVec dest;
-        uint8 msg = CanStoreItem(BankTabDst, BankTabSlotDst, dest, SplitedAmount, pItemSrc, false);
+        InventoryResult msg = CanStoreItem(BankTabDst, BankTabSlotDst, dest, SplitedAmount, pItemSrc, false);
         if (msg != EQUIP_ERR_OK)
         {
             pl->SendEquipError( msg, pItemSrc, NULL );
@@ -1977,7 +1977,7 @@ void Guild::SwapItems(Player * pl, uint8 BankTab, uint8 BankTabSlot, uint8 BankT
     else                                                    // non split
     {
         GuildItemPosCountVec gDest;
-        uint8 msg = CanStoreItem(BankTabDst,BankTabSlotDst,gDest,pItemSrc->GetCount(), pItemSrc, false);
+        InventoryResult msg = CanStoreItem(BankTabDst,BankTabSlotDst,gDest,pItemSrc->GetCount(), pItemSrc, false);
         if (msg == EQUIP_ERR_OK)                            // merge to
         {
             CharacterDatabase.BeginTransaction();
@@ -2057,7 +2057,7 @@ void Guild::MoveFromBankToChar( Player * pl, uint8 BankTab, uint8 BankTabSlot, u
         }
 
         ItemPosCountVec dest;
-        uint8 msg = pl->CanStoreItem(PlayerBag, PlayerSlot, dest, pNewItem, false);
+        InventoryResult msg = pl->CanStoreItem(PlayerBag, PlayerSlot, dest, pNewItem, false);
         if (msg != EQUIP_ERR_OK)
         {
             pl->SendEquipError( msg, pNewItem, NULL );
@@ -2088,7 +2088,7 @@ void Guild::MoveFromBankToChar( Player * pl, uint8 BankTab, uint8 BankTabSlot, u
     else                                                    // Bank -> Char swap with slot (move)
     {
         ItemPosCountVec dest;
-        uint8 msg = pl->CanStoreItem(PlayerBag, PlayerSlot, dest, pItemBank, false);
+        InventoryResult msg = pl->CanStoreItem(PlayerBag, PlayerSlot, dest, pItemBank, false);
         if (msg == EQUIP_ERR_OK)                            // merge case
         {
             // check source pos rights (item moved to inventory)
@@ -2208,7 +2208,7 @@ void Guild::MoveFromCharToBank( Player * pl, uint8 PlayerBag, uint8 PlayerSlot, 
     if (SplitedAmount)
     {                                                       // Char -> Bank split to empty or non-empty slot (partly move)
         GuildItemPosCountVec dest;
-        uint8 msg = CanStoreItem(BankTab, BankTabSlot, dest, SplitedAmount, pItemChar, false);
+        InventoryResult msg = CanStoreItem(BankTab, BankTabSlot, dest, SplitedAmount, pItemChar, false);
         if (msg != EQUIP_ERR_OK)
         {
             pl->SendEquipError( msg, pItemChar, NULL );
@@ -2245,7 +2245,7 @@ void Guild::MoveFromCharToBank( Player * pl, uint8 PlayerBag, uint8 PlayerSlot, 
     else                                                    // Char -> Bank swap with empty or non-empty (move)
     {
         GuildItemPosCountVec dest;
-        uint8 msg = CanStoreItem(BankTab, BankTabSlot, dest, pItemChar->GetCount(), pItemChar, false);
+        InventoryResult msg = CanStoreItem(BankTab, BankTabSlot, dest, pItemChar->GetCount(), pItemChar, false);
         if (msg == EQUIP_ERR_OK)                            // merge
         {
             // logging item move to bank

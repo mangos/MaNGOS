@@ -1166,7 +1166,7 @@ void Item::BuildUpdateData(UpdateDataMapType& update_players)
     ClearUpdateMask(false);
 }
 
-uint8 Item::CanBeMergedPartlyWith( ItemPrototype const* proto ) const
+InventoryResult Item::CanBeMergedPartlyWith( ItemPrototype const* proto ) const
 {
     // check item type
     if (GetEntry() != proto->ItemId)
