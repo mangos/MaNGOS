@@ -147,6 +147,7 @@ CREATE TABLE `auction` (
   `itemowner` int(11) unsigned NOT NULL default '0',
   `buyoutprice` int(11) NOT NULL default '0',
   `time` bigint(40) NOT NULL default '0',
+  `moneyTime` bigint(40) NOT NULL default '0',
   `buyguid` int(11) unsigned NOT NULL default '0',
   `lastbid` int(11) NOT NULL default '0',
   `startbid` int(11) NOT NULL default '0',
