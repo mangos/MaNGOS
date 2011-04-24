@@ -6301,18 +6301,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP
                 {
-                    uint32 spells[4] = { 26272, 26157, 26273, 26274 };
+                    uint32 spells[4] = {26272, 26157, 26273, 26274};
 
                     // check presence
                     for(int j = 0; j < 4; ++j)
-                        if (unitTarget->HasAura(spells[j], EFFECT_INDEX_0))
+                        if(unitTarget->HasAura(spells[j], EFFECT_INDEX_0))
                             return;
 
-                    // select spell
-                    uint32 iTmpSpellId = spells[urand(0,3)];
-
                     // cast
-                    unitTarget->CastSpell(unitTarget, iTmpSpellId, true);
+                    unitTarget->CastSpell(unitTarget, spells[urand(0,3)], true);
                     return;
                 }
                 case 26465:                                 // Mercurial Shield - need remove one 26464 Mercurial Shield aura
