@@ -704,6 +704,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\shared\Auth\md5.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\shared\Auth\md5.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\shared\Auth\SARC4.cpp"
 				>
 			</File>
