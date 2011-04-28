@@ -2589,12 +2589,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 case 35356:                                 // Spawn Feign Death
                 case 35357:                                 // Spawn Feign Death
                 case 42557:                                 // Feign Death
+                case 51329:                                 // Feign Death
                 {
                     if (target->GetTypeId() == TYPEID_UNIT)
                     {
-                        // Flags not set like it's done in SetFeignDeath() and apparently always applied at spawn of creature
-                        // All three does however have SPELL_EFFECT_SPAWN(46) as effect1
-                        // It is possible this effect will remove some flags, and then the three here can be handled "normally"
+                        // Flags not set like it's done in SetFeignDeath()
+                        // UNIT_DYNFLAG_DEAD does not appear with these spells.
+                        // All of the spells appear to be present at spawn and not used to feign in combat or similar.
                         if (apply)
                         {
                             target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
@@ -2607,27 +2608,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
                             target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
 
-                            target->clearUnitState(UNIT_STAT_DIED);
-                        }
-                    }
-                    return;
-                }
-                case 51329:                                 // Feign Death
-                {
-                    // no bytes2 feign death flag nor any dynamic flag dead
-                    if (target->GetTypeId() == TYPEID_UNIT)
-                    {
-                        if (apply)
-                        {
-                            // The aura does not have any visual effect with only this flag set, but expected.
-                            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
-                            // Apparently, either of the ones with this aura appear "dead" in any way,
-                            // unit state stunned (from effect 1) are possibly sufficient.
-                            target->addUnitState(UNIT_STAT_DIED);
-                        }
-                        else
-                        {
-                            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
                             target->clearUnitState(UNIT_STAT_DIED);
                         }
                     }
