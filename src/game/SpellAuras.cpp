@@ -2563,7 +2563,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 case 29266:                                 // Permanent Feign Death
                 case 31261:                                 // Permanent Feign Death (Root)
                 case 37493:                                 // Feign Death
-                case 51329:                                 // Feign Death
                 case 52593:                                 // Bloated Abomination Feign Death
                 case 55795:                                 // Falling Dragon Feign Death
                 case 57626:                                 // Feign Death
@@ -2608,6 +2607,27 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
                             target->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
 
+                            target->clearUnitState(UNIT_STAT_DIED);
+                        }
+                    }
+                    return;
+                }
+                case 51329:                                 // Feign Death
+                {
+                    // no bytes2 feign death flag nor any dynamic flag dead
+                    if (target->GetTypeId() == TYPEID_UNIT)
+                    {
+                        if (apply)
+                        {
+                            // The aura does not have any visual effect with only this flag set, but expected.
+                            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                            // Apparently, either of the ones with this aura appear "dead" in any way,
+                            // unit state stunned (from effect 1) are possibly sufficient.
+                            target->addUnitState(UNIT_STAT_DIED);
+                        }
+                        else
+                        {
+                            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
                             target->clearUnitState(UNIT_STAT_DIED);
                         }
                     }
