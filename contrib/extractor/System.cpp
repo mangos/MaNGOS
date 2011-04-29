@@ -58,7 +58,7 @@ enum Extract
 };
 
 // Select data for extract
-int   CONF_extract = EXTRACT_MAP | EXTRACT_DBC;
+int   CONF_extract = /*EXTRACT_MAP |*/ EXTRACT_DBC;
 // This option allow limit minimum height to some value (Allow save some memory)
 bool  CONF_allow_height_limit = true;
 float CONF_use_minHeight = -500.0f;
@@ -110,12 +110,13 @@ bool FileExists( const char* FileName )
 void Usage(char* prg)
 {
     printf(
-        "Usage:\n"\
-        "%s -[var] [value]\n"\
-        "-i set input path\n"\
-        "-o set output path\n"\
-        "-e extract only MAP(1)/DBC(2) - standard: both(3)\n"\
-        "-f height stored as int (less map size but lost some accuracy) 1 by default\n"\
+        "Usage:\n"
+        "%s -[var] [value]\n"
+        "-i set input path\n"
+        "-o set output path\n"
+        //"-e extract only MAP(1)/DBC(2) - standard: both(3)\n"
+        "-e extract only MAP(1)/DBC(2) - allowed temporary only: DBC(2)\n"
+        "-f height stored as int (less map size but lost some accuracy) 1 by default\n"
         "Example: %s -f 0 -i \"c:\\games\\game\"", prg, prg);
     exit(1);
 }
@@ -156,7 +157,7 @@ void HandleArgs(int argc, char * arg[])
                 if(c + 1 < argc)                            // all ok
                 {
                     CONF_extract=atoi(arg[(c++) + 1]);
-                    if(!(CONF_extract > 0 && CONF_extract < 4))
+                    if(CONF_extract != 2)
                         Usage(arg[0]);
                 }
                 else
