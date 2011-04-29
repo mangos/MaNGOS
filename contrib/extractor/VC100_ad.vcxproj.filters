@@ -20,9 +20,6 @@
     <ClCompile Include="loadlib\loadlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mpq_libmpq.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="system.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,9 +35,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="loadlib\loadlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mpq_libmpq04.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="loadlib\wdt.h">
