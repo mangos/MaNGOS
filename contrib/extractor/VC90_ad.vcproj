@@ -49,10 +49,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="libmpq"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				AdditionalIncludeDirectories="..\..\dep\libmpq;..\..\dep\include\zlib;..\..\dep\libmpq\win"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;USE_LIBMPQ04"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)ad.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -78,12 +78,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib"
+				AdditionalDependencies="libmpq.lib"
 				OutputFile="ad_debug.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="./debug/"
-				IgnoreDefaultLibraryNames="LIBCD.lib"
+				AdditionalLibraryDirectories="..\..\dep\libmpq\bin\$(PlatformName)_$(ConfigurationName)"
+				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="./ad_debug.pdb"
 				SubSystem="1"
@@ -148,9 +148,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="3"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="libmpq"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
-				RuntimeLibrary="0"
+				AdditionalIncludeDirectories="..\..\dep\libmpq;..\..\dep\include\zlib;..\..\dep\libmpq\win"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;USE_LIBMPQ04"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)ad.pch"
 				AssemblerListingLocation="$(IntDir)\"
@@ -173,12 +173,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="zlib.lib"
+				AdditionalDependencies="libmpq.lib"
 				OutputFile="./ad.exe"
 				LinkIncremental="0"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="./release/"
-				IgnoreDefaultLibraryNames="LIBC.lib"
+				AdditionalLibraryDirectories="..\..\dep\libmpq\bin\$(PlatformName)_$(ConfigurationName)"
+				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ProgramDatabaseFile="./ad.pdb"
 				SubSystem="1"
 				RandomizedBaseAddress="1"
@@ -220,23 +220,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libmpq\common.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\dbcfile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\explode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\extract.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\huffman.cpp"
 				>
 			</File>
 			<File
@@ -244,15 +228,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libmpq\mpq.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\mpq_libmpq.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\parser.cpp"
 				>
 			</File>
 			<File
@@ -280,10 +256,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\libmpq\wave.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\loadlib\wdt.cpp"
 				>
 			</File>
@@ -297,19 +269,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libmpq\common.h"
-				>
-			</File>
-			<File
 				RelativePath=".\dbcfile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\explode.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\huffman.h"
 				>
 			</File>
 			<File
@@ -317,15 +277,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\libmpq\mpq.h"
-				>
-			</File>
-			<File
-				RelativePath=".\mpq_libmpq.h"
-				>
-			</File>
-			<File
-				RelativePath=".\libmpq\wave.h"
+				RelativePath=".\mpq_libmpq04.h"
 				>
 			</File>
 			<File

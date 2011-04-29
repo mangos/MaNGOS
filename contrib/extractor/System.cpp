@@ -12,7 +12,7 @@
 #endif
 
 #include "dbcfile.h"
-#include "mpq_libmpq.h"
+#include "mpq_libmpq04.h"
 
 #include "loadlib/adt.h"
 #include "loadlib/wdt.h"
