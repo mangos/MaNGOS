@@ -195,20 +195,9 @@ bool Pet::LoadPetFromDB( Player* owner, uint32 petentry, uint32 petnumber, bool 
     {
         case SUMMON_PET:
             petlevel=owner->getLevel();
-
-            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_MAGE);
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                                            // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:
-            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_WARRIOR);
-            SetByteValue(UNIT_FIELD_BYTES_0, 2, GENDER_NONE);
-            SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_FOCUS);
-            SetSheath(SHEATH_STATE_MELEE);
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
-
-            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-                                                            // this enables popup window (pet abandon, cancel)
             SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
             SetPower(POWER_HAPPINESS, fields[12].GetUInt32());
             setPowerType(POWER_FOCUS);
@@ -913,6 +902,23 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     }
 
     uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->Entry;
+
+    switch (getPetType())
+    {
+        case SUMMON_PET:
+            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_MAGE);
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            // this enables popup window (pet dismiss, cancel)
+            break;
+        case HUNTER_PET:
+            SetSheath(SHEATH_STATE_MELEE);
+            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_WARRIOR);
+            SetByteValue(UNIT_FIELD_BYTES_0, 2, GENDER_NONE);
+            SetSheath(SHEATH_STATE_MELEE);
+            SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            // this enables popup window (pet abandon, cancel)
+            break;
+    }
 
     SetLevel(petlevel);
 
