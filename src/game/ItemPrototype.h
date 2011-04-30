@@ -134,7 +134,7 @@ enum ItemPrototypeFlags
     ITEM_FLAG_BOA                             = 0x08000000, // bind on account (set in template for items that can binded in like way)
     ITEM_FLAG_ENCHANT_SCROLL                  = 0x10000000, // for enchant scrolls
     ITEM_FLAG_MILLABLE                        = 0x20000000, // item can have milling loot
-    ITEM_FLAG_UNK30                           = 0x04000000,
+    ITEM_FLAG_UNK30                           = 0x40000000,
     ITEM_FLAG_BOP_TRADEABLE                   = 0x80000000, // bound item that can be traded
 };
 
