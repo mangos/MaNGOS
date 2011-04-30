@@ -48,6 +48,7 @@ uint16 *LiqType;
 char output_path[128] = ".";
 char input_path[128] = ".";
 uint32 maxAreaId = 0;
+uint32 CONF_max_build = 0;
 
 //**************************************************
 // Extractor options
@@ -73,6 +74,8 @@ float CONF_flat_liquid_delta_limit = 0.001f; // If max - min less this value - l
 
 static char* const langs[] = {"enGB", "enUS", "deDE", "esES", "frFR", "koKR", "zhCN", "zhTW", "enCN", "enTW", "esMX", "ruRU" };
 #define LANG_COUNT 12
+
+#define MIN_SUPPORTED_BUILD 12911                           // code expect mpq files and mpq content files structure for this build or later
 
 void CreateDir( const std::string& Path )
 {
@@ -105,7 +108,8 @@ void Usage(char* prg)
         //"-e extract only MAP(1)/DBC(2) - standard: both(3)\n"
         "-e extract only MAP(1)/DBC(2) - temporary only: DBC(2)\n"
         "-f height stored as int (less map size but lost some accuracy) 1 by default\n"
-        "Example: %s -f 0 -i \"c:\\games\\game\"", prg, prg);
+        "-b extract data for specific build (at least not greater it from available). Min supported build %u.\n"
+        "Example: %s -f 0 -i \"c:\\games\\game\"", prg, MIN_SUPPORTED_BUILD, prg);
     exit(1);
 }
 
@@ -150,6 +154,19 @@ void HandleArgs(int argc, char * arg[])
                 }
                 else
                     Usage(arg[0]);
+                break;
+            case 'b':
+                if(c + 1 < argc)                            // all ok
+                {
+                    CONF_max_build = atoi(arg[(c++) + 1]);
+                    if (CONF_max_build < MIN_SUPPORTED_BUILD)
+                        Usage(arg[0]);
+                }
+                else
+                    Usage(arg[0]);
+                break;
+            default:
+                Usage(arg[0]);
                 break;
         }
     }
@@ -213,6 +230,12 @@ uint32 ReadBuild(int locale)
     if (build <= 0)
     {
         printf("Fatal error: Invalid  %s file format!\n", filename.c_str());
+        exit(1);
+    }
+
+    if (build < MIN_SUPPORTED_BUILD)
+    {
+        printf("Fatal error: tool can correctly extract data only for build %u or later (detected: %u)!\n", MIN_SUPPORTED_BUILD, build);
         exit(1);
     }
 
@@ -1010,8 +1033,8 @@ void AppendPatchMPQFilesToList(char const* subdir, char const* suffix, char cons
             if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
                 continue;
 
-            int ubuild = 0;
-            if (sscanf(ffd.cFileName, scanname, &ubuild) == 1)
+            uint32 ubuild = 0;
+            if (sscanf(ffd.cFileName, scanname, &ubuild) == 1 && (!CONF_max_build || ubuild <= CONF_max_build))
                 updates[ubuild] = UpdatesPair(ffd.cFileName, section);
         }
         while (FindNextFile(hFind, &ffd) != 0);
@@ -1026,7 +1049,7 @@ void AppendPatchMPQFilesToList(char const* subdir, char const* suffix, char cons
         int ubuild = 0;
         dirent *dirp;
         while ((dirp = readdir(dp)) != NULL)
-            if (sscanf(dirp->d_name, scanname, &ubuild) == 1)
+            if (sscanf(dirp->d_name, scanname, &ubuild) == 1 && (!CONF_max_build || ubuild <= CONF_max_build))
                 updates[ubuild] = UpdatesPair(dirp->d_name, section);
 
         closedir(dp);
