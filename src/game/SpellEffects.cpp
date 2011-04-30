@@ -941,6 +941,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 17950:                                 // Shadow Portal
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Shadow Portal
+                    const uint32 spell_list[6] = {17863, 17939, 17943, 17944, 17946, 17948};
+
+                    m_caster->CastSpell(unitTarget, spell_list[urand(0, 5)], true);
+                    return;
+                }
                 case 19411:                                 // Lava Bomb
                 case 20474:                                 // Lava Bomb
                 {
