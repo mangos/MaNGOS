@@ -451,14 +451,23 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
     }
 
     // cheating
-    if (price <= auction->bid || price < auction->startbid)
+    if (price < auction->startbid)
         return;
+
+    // cheating or client lags
+    if (price <= auction->bid)
+    {
+        // client test but possible in result lags
+        SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_ERR_HIGHER_BID);
+        return;
+    }
 
     // price too low for next bid if not buyout
     if ((price < auction->buyout || auction->buyout == 0) &&
         price < auction->bid + auction->GetAuctionOutBid())
     {
-        // auction has already higher bid, client tests it!
+        // client test but possible in result lags
+        SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_ERR_BID_INCREMENT);
         return;
     }
 
