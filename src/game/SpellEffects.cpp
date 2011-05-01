@@ -1986,6 +1986,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 52369:                                 // Detonate Explosives
+                case 52371:                                 // Detonate Explosives
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Cosmetic - Explosion
+                    unitTarget->CastSpell(unitTarget, 46419, true);
+                    return;
+                }
                 case 52759:                                 // Ancestral Awakening
                 {
                     if (!unitTarget)
