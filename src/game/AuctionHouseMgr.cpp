@@ -263,7 +263,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry * auction)
     if (owner || owner_accId)
     {
         std::ostringstream subject;
-        subject << auction->itemGuidLow << ":0:" << AUCTION_EXPIRED << ":0:0";
+        subject << auction->itemTemplate << ":0:" << AUCTION_EXPIRED << ":0:0";
 
         if (owner)
             owner->GetSession()->SendAuctionOwnerNotification(auction);
