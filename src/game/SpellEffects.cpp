@@ -1605,7 +1605,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     {
                         m_caster->CastSpell(unitTarget, pSpell, true);
 
-                        if (const SpellEntry *pSpellCredit = sSpellStore.LookupEntry(pSpell->EffectMiscValue[EFFECT_INDEX_0]))
+                        if (const SpellEntry *pSpellCredit = sSpellStore.LookupEntry(pSpell->EffectTriggerSpell[EFFECT_INDEX_0]))
                             ((Player*)m_caster)->KilledMonsterCredit(pSpellCredit->EffectMiscValue[EFFECT_INDEX_0]);
 
                         ((Creature*)unitTarget)->ForcedDespawn();
