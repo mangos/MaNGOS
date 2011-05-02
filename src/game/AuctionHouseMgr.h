@@ -59,6 +59,7 @@ struct AuctionEntry
     uint32 itemGuidLow;
     uint32 itemTemplate;
     uint32 owner;
+    std::wstring ownerName;                                 // cache name for sorting
     uint32 startbid;                                        // maybe useless
     uint32 bid;
     uint32 buyout;
@@ -78,7 +79,7 @@ struct AuctionEntry
     void SaveToDB() const;
 
     // -1,0,+1 order result
-    int CompareAuctionEntry(uint32 column, const AuctionEntry *auc) const;
+    int CompareAuctionEntry(uint32 column, const AuctionEntry *auc, Player* viewPlayer) const;
 };
 
 //this class is used as auctionhouse instance
@@ -128,11 +129,13 @@ class AuctionHouseObject
 class AuctionSorter
 {
     public:
-        AuctionSorter(uint8 *sort) : m_sort(sort) {}
+        AuctionSorter(AuctionSorter const& sorter) : m_sort(sorter.m_sort), m_viewPlayer(sorter.m_viewPlayer) {}
+        AuctionSorter(uint8 *sort, Player* viewPlayer) : m_sort(sort), m_viewPlayer(viewPlayer) {}
         bool operator()(const AuctionEntry *auc1, const AuctionEntry *auc2) const;
 
     private:
         uint8* m_sort;
+        Player* m_viewPlayer;
 };
 
 class AuctionHouseMgr

@@ -376,6 +376,9 @@ void AuctionHouseMgr::LoadAuctions()
 
     AuctionEntry *auction;
 
+    typedef std::map<uint32, std::wstring> PlayerNames;
+    PlayerNames playerNames;                                // caching for load time
+
     do
     {
         fields = result->Fetch();
@@ -388,6 +391,18 @@ void AuctionHouseMgr::LoadAuctions()
         auction->itemGuidLow = fields[2].GetUInt32();
         auction->itemTemplate = fields[3].GetUInt32();
         auction->owner = fields[4].GetUInt32();
+        std::wstring& plWName = playerNames[auction->owner];
+        if (plWName.empty())
+        {
+            std::string plName;
+            if (!sObjectMgr.GetPlayerNameByGUID(ObjectGuid(HIGHGUID_PLAYER, auction->owner), plName))
+                plName = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
+
+            Utf8toWStr(plName, plWName);
+        }
+
+        auction->ownerName = plWName;
+
         auction->buyout = fields[5].GetUInt32();
         auction->expireTime = fields[6].GetUInt32();
         auction->moneyDeliveryTime = fields[7].GetUInt32();
@@ -623,7 +638,7 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
     }
 }
 
-int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry *auc) const
+int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry *auc, Player* viewPlayer) const
 {
     switch (column)
     {
@@ -681,11 +696,27 @@ int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry *auc) co
             break;
         case 5:                                             // name = 5
         {
-            Item *item1 = sAuctionMgr.GetAItem(itemGuidLow);
-            Item *item2 = sAuctionMgr.GetAItem(auc->itemGuidLow);
-            if (!item1 || !item2)
-                return 0;
-            return strcmp(item1->GetProto()->Name1, item2->GetProto()->Name1);
+            int32 loc_idx = viewPlayer->GetSession()->GetSessionDbLocaleIndex();
+
+            std::string name1, name2;
+            if (loc_idx >= 0)
+            {
+                if(ItemLocale const *il = sObjectMgr.GetItemLocale(itemTemplate))
+                    name1 = il->Name[loc_idx];
+                if(ItemLocale const *il = sObjectMgr.GetItemLocale(auc->itemTemplate))
+                    name2 = il->Name[loc_idx];
+            }
+            if (name1.empty())
+                if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemTemplate))
+                    name1 = proto->Name1;
+            if (name2.empty())
+                if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(auc->itemTemplate))
+                    name2 = proto->Name1;
+
+            std::wstring wname1, wname2;
+            Utf8toWStr(name1, wname1);
+            Utf8toWStr(name2, wname2);
+            return wname1.compare(wname2);
         }
         case 6:                                             // minbidbuyout = 6
             if (bid)
@@ -711,13 +742,7 @@ int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry *auc) co
             }
             break;
         case 7:                                             // seller = 7
-        {
-            Player* pl1 = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner));
-            Player* pl2 = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, auc->owner));
-            if (!pl1 || !pl2)
-                return 0;
-            return strcmp(pl1->GetName(), pl2->GetName());
-        }
+            return ownerName.compare(auc->ownerName);
         case 8:                                             // bid = 8
             if (bid)
             {
@@ -770,7 +795,7 @@ bool AuctionSorter::operator()(const AuctionEntry *auc1, const AuctionEntry *auc
         if (m_sort[i] == MAX_AUCTION_SORT)                  // end of sort
             return false;
 
-        int res = auc1->CompareAuctionEntry(m_sort[i] & ~AUCTION_SORT_REVERSED, auc2);
+        int res = auc1->CompareAuctionEntry(m_sort[i] & ~AUCTION_SORT_REVERSED, auc2, m_viewPlayer);
         // "equal" by used column
         if (res == 0)
             continue;
