@@ -76,7 +76,9 @@ struct AuctionEntry
     bool BuildAuctionInfo(WorldPacket & data) const;
     void DeleteFromDB() const;
     void SaveToDB() const;
-    bool CompareAuctionEntry(uint32 column, const AuctionEntry *auc) const;
+
+    // -1,0,+1 order result
+    int CompareAuctionEntry(uint32 column, const AuctionEntry *auc) const;
 };
 
 //this class is used as auctionhouse instance
