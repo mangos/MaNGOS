@@ -26,6 +26,7 @@
 #include "Dynamic/FactoryHolder.h"
 
 class WorldObject;
+class GameObject;
 class Unit;
 class Creature;
 class Player;
