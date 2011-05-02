@@ -8068,6 +8068,9 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
 
     pGameObj->SummonLinkedTrapIfAny();
+
+    if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
+        ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
 }
 
 void Spell::EffectResurrect(SpellEffectIndex /*eff_idx*/)
