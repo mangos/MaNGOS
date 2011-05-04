@@ -374,8 +374,6 @@ void AuctionHouseMgr::LoadAuctions()
 
     barGoLink bar(AuctionCount);
 
-    AuctionEntry *auction;
-
     typedef std::map<uint32, std::wstring> PlayerNames;
     PlayerNames playerNames;                                // caching for load time
 
@@ -385,7 +383,7 @@ void AuctionHouseMgr::LoadAuctions()
 
         bar.step();
 
-        auction = new AuctionEntry;
+        AuctionEntry *auction = new AuctionEntry;
         auction->Id = fields[0].GetUInt32();
         uint32 houseid  = fields[1].GetUInt32();
         auction->itemGuidLow = fields[2].GetUInt32();
