@@ -101,13 +101,20 @@ struct SQLStorageLoaderBase
         template<class S>
             void convert_to_str(uint32 field_pos, S src, char * & dst);
         template<class D>
-            void convert_from_str(uint32 field_pos, char * src, D& dst);
-        void convert_str_to_str(uint32 field_pos, char *src, char *&dst);
+            void convert_from_str(uint32 field_pos, char const* src, D& dst);
+        void convert_str_to_str(uint32 field_pos, char const* src, char *&dst);
 
+        // trap, no body
+        template<class D>
+            void convert_from_str(uint32 field_pos, char* src, D& dst);
+        void convert_str_to_str(uint32 field_pos, char* src, char *&dst);
     private:
         template<class V>
-            void storeValue(V value, SQLStorage &store, char *p, int x, uint32 &offset);
-        void storeValue(char * value, SQLStorage &store, char *p, int x, uint32 &offset);
+            void storeValue(V value, SQLStorage &store, char *p, uint32 x, uint32 &offset);
+        void storeValue(char const* value, SQLStorage &store, char *p, uint32 x, uint32 &offset);
+
+        // trap, no body
+        void storeValue(char * value, SQLStorage &store, char *p, uint32 x, uint32 &offset);
 };
 
 struct SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader>

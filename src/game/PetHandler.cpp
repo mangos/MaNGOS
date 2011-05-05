@@ -53,7 +53,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
 
     if (GetPlayer()->GetObjectGuid() != pet->GetCharmerOrOwnerGuid())
     {
-        sLog.outError("HandlePetAction: %s isn't controlled by %s.", petGuid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
+        sLog.outError("HandlePetAction: %s isn't controlled by %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -144,7 +144,7 @@ void WorldSession::HandlePetAction( WorldPacket & recv_data )
                     {
                         Pet* p = (Pet*)pet;
                         if(p->getPetType() == HUNTER_PET)
-                            _player->RemovePet(p,PET_SAVE_AS_DELETED);
+                            p->Unsummon(PET_SAVE_AS_DELETED, _player);
                         else
                             //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                             p->SetDeathState(CORPSE);
@@ -291,7 +291,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
 
     if (GetPlayer()->GetObjectGuid() != pet->GetCharmerOrOwnerGuid())
     {
-        sLog.outError("HandlePetStopAttack: %s isn't charm/pet of %s.", petGuid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
+        sLog.outError("HandlePetStopAttack: %s isn't charm/pet of %s.", petGuid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -555,7 +555,7 @@ void WorldSession::HandlePetAbandon( WorldPacket & recv_data )
                 pet->SetPower(POWER_HAPPINESS ,(feelty-50000) > 0 ?(feelty-50000) : 0);
             }
 
-            _player->RemovePet((Pet*)pet,PET_SAVE_AS_DELETED);
+            ((Pet*)pet)->Unsummon(PET_SAVE_AS_DELETED, _player);
         }
         else if (pet->GetObjectGuid() == _player->GetCharmGuid())
         {
@@ -574,7 +574,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
     if (!pet || guid != pet->GetObjectGuid())
     {
-        sLog.outError("HandlePetUnlearnOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
+        sLog.outError("HandlePetUnlearnOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -584,7 +584,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
     CharmInfo *charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
     {
-        sLog.outError("WorldSession::HandlePetUnlearnOpcode: %s is considered pet-like but doesn't have a charminfo!", pet->GetObjectGuid().GetString().c_str());
+        sLog.outError("WorldSession::HandlePetUnlearnOpcode: %s is considered pet-like but doesn't have a charminfo!", pet->GetGuidStr().c_str());
         return;
     }
     pet->resetTalents();
@@ -602,7 +602,7 @@ void WorldSession::HandlePetSpellAutocastOpcode( WorldPacket& recvPacket )
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
     if (!pet || (guid != _player->GetPetGuid() && guid != _player->GetCharmGuid()))
     {
-        sLog.outError("HandlePetSpellAutocastOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
+        sLog.outError("HandlePetSpellAutocastOpcode. %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 
@@ -643,7 +643,7 @@ void WorldSession::HandlePetCastSpellOpcode( WorldPacket& recvPacket )
 
     if (!pet || (guid != _player->GetPetGuid() && guid != _player->GetCharmGuid()))
     {
-        sLog.outError("HandlePetCastSpellOpcode: %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetObjectGuid().GetString().c_str());
+        sLog.outError("HandlePetCastSpellOpcode: %s isn't pet of %s .", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
         return;
     }
 

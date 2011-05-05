@@ -671,6 +671,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
             {
                 case 28441:                                 // AB Effect 000
                     return false;
+                case 49634:                                 // Sergeant's Flare
                 case 54530:                                 // Opening
                     return true;
                 default:
@@ -1058,8 +1059,8 @@ void SpellMgr::LoadSpellTargetPositions()
                 // additional requirements
                 if (spellEffect->Effect==SPELL_EFFECT_BIND && spellEffect->EffectMiscValue)
                 {
-                    uint32 zone_id = sMapMgr.GetAreaId(st.target_mapId, st.target_X, st.target_Y, st.target_Z);
-                    if (zone_id != spellEffect->EffectMiscValue)
+                    uint32 zone_id = sTerrainMgr.GetAreaId(st.target_mapId, st.target_X, st.target_Y, st.target_Z);
+                    if (int32(zone_id) != spellEffect->EffectMiscValue)
                     {
                         sLog.outErrorDb("Spell (Id: %u) listed in `spell_target_position` expected point to zone %u bit point to zone %u.",Spell_ID, spellEffect->EffectMiscValue, zone_id);
                         break;
@@ -1387,7 +1388,7 @@ void SpellMgr::LoadSpellBonuses()
     mSpellBonusMap.clear();                             // need for reload case
     uint32 count = 0;
     //                                                0      1             2          3
-    QueryResult *result = WorldDatabase.Query("SELECT entry, direct_bonus, dot_bonus, ap_bonus FROM spell_bonus_data");
+    QueryResult *result = WorldDatabase.Query("SELECT entry, direct_bonus, dot_bonus, ap_bonus, ap_dot_bonus FROM spell_bonus_data");
     if( !result )
     {
         barGoLink bar( 1 );
@@ -1425,6 +1426,7 @@ void SpellMgr::LoadSpellBonuses()
         sbe.direct_damage = fields[1].GetFloat();
         sbe.dot_damage    = fields[2].GetFloat();
         sbe.ap_bonus      = fields[3].GetFloat();
+        sbe.ap_dot_bonus   = fields[4].GetFloat();
 
         bool need_dot = false;
         bool need_direct = false;
@@ -1508,23 +1510,28 @@ void SpellMgr::LoadSpellBonuses()
             dot_diff = std::abs(sbe.dot_damage - dot_calc);
         }
 
-        if (direct_diff < 0.02f && !need_dot && !sbe.ap_bonus)
+        if (direct_diff < 0.02f && !need_dot && !sbe.ap_bonus && !sbe.ap_dot_bonus)
             sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and `dot_bonus` also not used",
                 entry, sbe.direct_damage, direct_calc, direct_diff);
-        else if (direct_diff < 0.02f && dot_diff < 0.02f && !sbe.ap_bonus)
+        else if (direct_diff < 0.02f && dot_diff < 0.02f && !sbe.ap_bonus && !sbe.ap_dot_bonus)
         {
             sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not needed (data from table: %f, calculated %f, difference of %f) and ",
                 entry, sbe.direct_damage, direct_calc, direct_diff);
             sLog.outErrorDb("                                  ... `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f)",
                 sbe.dot_damage, dot_calc, dot_diff);
         }
-        else if (!need_direct && dot_diff < 0.02f && !sbe.ap_bonus)
+        else if (!need_direct && dot_diff < 0.02f && !sbe.ap_bonus && !sbe.ap_dot_bonus)
             sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not needed (data from table: %f, calculated %f, difference of %f) and direct also not used",
             entry, sbe.dot_damage, dot_calc, dot_diff);
         else if (!need_direct && sbe.direct_damage)
             sLog.outErrorDb("`spell_bonus_data` entry for spell %u `direct_bonus` not used (spell not have non-periodic affects)", entry);
         else if (!need_dot && sbe.dot_damage)
             sLog.outErrorDb("`spell_bonus_data` entry for spell %u `dot_bonus` not used (spell not have periodic affects)", entry);
+
+        if (!need_direct && sbe.ap_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `ap_bonus` not used (spell not have non-periodic affects)", entry);
+        else if (!need_dot && sbe.ap_dot_bonus)
+            sLog.outErrorDb("`spell_bonus_data` entry for spell %u `ap_dot_bonus` not used (spell not have periodic affects)", entry);
 
         mSpellBonusMap[entry] = sbe;
 
@@ -1924,6 +1931,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 // Blink & Improved Blink
                 if (classOptions1 && (classOptions1->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_2->SpellVisual[0] == 72 && spellInfo_2->SpellIconID == 1499) ||
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x0000000000010000)) && (spellInfo_1->SpellVisual[0] == 72 && spellInfo_1->SpellIconID == 1499) )
+                    return false;
+
+                // Fingers of Frost effects
+                if (spellInfo_1->SpellIconID == 2947 && spellInfo_2->SpellIconID == 2947)
                     return false;
 
                 // Living Bomb & Ignite (Dots)
@@ -3034,6 +3045,8 @@ void SpellMgr::LoadSpellScriptTarget()
                 spellEffect->EffectImplicitTargetB == TARGET_SCRIPT_COORDINATES ||
                 spellEffect->EffectImplicitTargetA == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
                 spellEffect->EffectImplicitTargetB == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT ||
+                spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_INSTANT ||
+                spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_INSTANT ||
                 spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_CUSTOM ||
                 spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_CUSTOM)
             {

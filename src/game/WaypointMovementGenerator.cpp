@@ -220,10 +220,10 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
                                 break;
                         }
 
-                        creature.Say(behavior->textid[rand() % i], 0, 0);
+                        creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL);
                     }
                     else
-                        creature.Say(behavior->textid[0], 0, 0);
+                        creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL);
                 }
             }                                               // wpBehaviour found
 
@@ -335,7 +335,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     player.clearUnitState(UNIT_STAT_TAXI_FLIGHT);
 
     float x, y, z;
-    i_destinationHolder.GetLocationNow(player.GetBaseMap(), x, y, z);
+    i_destinationHolder.GetLocationNow(player.GetMap(), x, y, z);
     player.SetPosition(x, y, z, player.GetOrientation());
 
     player.Unmount();

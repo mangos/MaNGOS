@@ -72,7 +72,7 @@ class RealmList
         uint32 size() const { return m_realms.size(); }
     private:
         void UpdateRealms(bool init);
-        void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const char* builds);
+        void UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds);
     private:
         RealmMap m_realms;                                  ///< Internal map of realms
         uint32   m_UpdateInterval;

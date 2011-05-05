@@ -30,10 +30,9 @@ enum PetType
     HUNTER_PET              = 1,
     GUARDIAN_PET            = 2,
     MINI_PET                = 3,
-    MAX_PET_TYPE            = 4
+    PROTECTOR_PET           = 4,                            // work as defensive guardian with mini pet suffix in name
+    MAX_PET_TYPE            = 5
 };
-
-extern char const* petTypeSuffix[MAX_PET_TYPE];
 
 #define MAX_PET_STABLES         4
 
@@ -44,7 +43,8 @@ enum PetSaveMode
     PET_SAVE_AS_CURRENT        =  0,                        // in current slot (with player)
     PET_SAVE_FIRST_STABLE_SLOT =  1,
     PET_SAVE_LAST_STABLE_SLOT  =  MAX_PET_STABLES,          // last in DB stable slot index (including), all higher have same meaning as PET_SAVE_NOT_IN_SLOT
-    PET_SAVE_NOT_IN_SLOT       =  100                       // for avoid conflict with stable size grow will use 100
+    PET_SAVE_NOT_IN_SLOT       =  100,                      // for avoid conflict with stable size grow will use 100
+    PET_SAVE_REAGENTS          =  101                       // PET_SAVE_NOT_IN_SLOT with reagents return
 };
 
 // There might be a lot more
@@ -153,7 +153,7 @@ class Pet : public Creature
         bool CreateBaseAtCreature(Creature* creature);
         bool LoadPetFromDB( Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false );
         void SavePetToDB(PetSaveMode mode);
-        void Remove(PetSaveMode mode, bool returnreagent = false);
+        void Unsummon(PetSaveMode mode, Unit* owner = NULL);
         static void DeleteFromDB(uint32 guidlow);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState

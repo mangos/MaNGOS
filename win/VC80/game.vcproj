@@ -46,7 +46,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /Zm200"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -80,169 +80,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
-				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
-			IntermediateDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP /Zm200"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SECURE_SCL=0"
-				StringPooling="true"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
-				EnableEnhancedInstructionSet="1"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="pchdef.h"
-				PrecompiledHeaderFile=".\game__$(PlatformName)_$(ConfigurationName)\game.pch"
-				AssemblerListingLocation=".\game__$(PlatformName)_$(ConfigurationName)\"
-				ObjectFile=".\game__$(PlatformName)_$(ConfigurationName)\"
-				ProgramDataBaseFileName=".\game__$(PlatformName)_$(ConfigurationName)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				CompileAs="0"
-				ForcedIncludeFiles="pchdef.h"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
-				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug_NoPCH|Win32"
-			OutputDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
-			IntermediateDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
-			ConfigurationType="4"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
-				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;"
-				StringPooling="false"
-				MinimalRebuild="false"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				RuntimeTypeInfo="true"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\game__$(PlatformName)_$(ConfigurationName)\game.pch"
-				AssemblerListingLocation=".\game__$(PlatformName)_$(ConfigurationName)\"
-				ObjectFile=".\game__$(PlatformName)_$(ConfigurationName)\"
-				ProgramDataBaseFileName=".\game__$(PlatformName)_$(ConfigurationName)\"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				CompileAs="0"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="1033"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
 				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
 				SuppressStartupBanner="true"
 			/>
@@ -292,7 +130,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /bigobj /Zm200"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -326,7 +164,89 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
+				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP /Zm200"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SECURE_SCL=0"
+				StringPooling="true"
+				RuntimeLibrary="2"
+				EnableFunctionLevelLinking="true"
+				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="pchdef.h"
+				PrecompiledHeaderFile=".\game__$(PlatformName)_$(ConfigurationName)\game.pch"
+				AssemblerListingLocation=".\game__$(PlatformName)_$(ConfigurationName)\"
+				ObjectFile=".\game__$(PlatformName)_$(ConfigurationName)\"
+				ProgramDataBaseFileName=".\game__$(PlatformName)_$(ConfigurationName)\"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				ForcedIncludeFiles="pchdef.h"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
 				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
 				SuppressStartupBanner="true"
 			/>
@@ -376,7 +296,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /bigobj /Zm200"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -409,7 +329,87 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
+				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug_NoPCH|Win32"
+			OutputDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
+			IntermediateDirectory=".\game__$(PlatformName)_$(ConfigurationName)"
+			ConfigurationType="4"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP"
+				Optimization="0"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
+				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;"
+				StringPooling="false"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				RuntimeTypeInfo="true"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\game__$(PlatformName)_$(ConfigurationName)\game.pch"
+				AssemblerListingLocation=".\game__$(PlatformName)_$(ConfigurationName)\"
+				ObjectFile=".\game__$(PlatformName)_$(ConfigurationName)\"
+				ProgramDataBaseFileName=".\game__$(PlatformName)_$(ConfigurationName)\"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
 				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
 				SuppressStartupBanner="true"
 			/>
@@ -459,7 +459,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /bigobj"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\shared\vmap;..\..\dep\ACE_wrappers"
+				AdditionalIncludeDirectories="..\..\dep\include;..\..\src\framework;..\..\src\shared;..\..\src\game\vmap;..\..\dep\ACE_wrappers;..\..\dep\include\g3dlite"
 				PreprocessorDefinitions="WIN32;_DEBUG;MANGOS_DEBUG;_LIB;"
 				StringPooling="false"
 				MinimalRebuild="false"
@@ -490,7 +490,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib"
+				AdditionalDependencies=".\shared__$(PlatformName)_$(ConfigurationName)\shared.lib .\g3dlite__$(PlatformName)_$(ConfigurationName)\g3dlite.lib"
 				OutputFile=".\game__$(PlatformName)_$(ConfigurationName)\game.lib"
 				SuppressStartupBanner="true"
 			/>
@@ -566,14 +566,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\BattleGroundRB.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\BattleGroundRB.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\BattleGroundAV.cpp"
 				>
 			</File>
@@ -631,6 +623,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\BattleGroundNA.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundRB.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\BattleGroundRB.h"
 				>
 			</File>
 			<File
@@ -842,14 +842,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\MapInstanced.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\MapInstanced.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\MapManager.cpp"
 				>
 			</File>
@@ -966,10 +958,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\UnitAuraProcHandler.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\SpellEffects.cpp"
 				>
 			</File>
@@ -991,6 +979,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\Transports.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\UnitAuraProcHandler.cpp"
 				>
 			</File>
 			<File
@@ -1502,6 +1494,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\SQLStorages.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\SQLStorages.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\WorldSession.cpp"
 				>
 			</File>
@@ -1626,6 +1626,78 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="vmaps"
+			>
+			<File
+				RelativePath="..\..\src\game\vmap\BIH.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\BIH.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\IVMapManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\MapTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\MapTree.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\ModelInstance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\ModelInstance.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\TileAssembler.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\TileAssembler.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapDefinitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapFactory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapFactory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapManager2.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapManager2.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\VMapTools.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\WorldModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\vmap\WorldModel.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\src\game\pchdef.cpp"
 			>
@@ -1639,7 +1711,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Release|Win32"
+				Name="Debug|x64"
 				>
 				<Tool
 					Name="VCCLCompilerTool"
@@ -1648,7 +1720,7 @@
 				/>
 			</FileConfiguration>
 			<FileConfiguration
-				Name="Debug|x64"
+				Name="Release|Win32"
 				>
 				<Tool
 					Name="VCCLCompilerTool"

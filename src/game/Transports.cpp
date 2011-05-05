@@ -91,6 +91,14 @@ void MapManager::LoadTransports()
         uint32 mapid;
         x = t->m_WayPoints[0].x; y = t->m_WayPoints[0].y; z = t->m_WayPoints[0].z; mapid = t->m_WayPoints[0].mapid; o = 1;
 
+        //current code does not support transports in dungeon!
+        const MapEntry* pMapInfo = sMapStore.LookupEntry(mapid);
+        if(!pMapInfo || pMapInfo->Instanceable())
+        {
+            delete t;
+            continue;
+        }
+
         // creates the Gameobject
         if (!t->Create(entry, mapid, x, y, z, o, GO_ANIMPROGRESS_DEFAULT, 0))
         {
@@ -410,9 +418,10 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
 
     //    sLog.outDetail("    Generated %lu waypoints, total time %u.", (unsigned long)m_WayPoints.size(), timer);
 
-    m_curr = m_WayPoints.begin();
-    m_curr = GetNextWayPoint();
-    m_next = GetNextWayPoint();
+    m_next = m_WayPoints.begin();                           // will used in MoveToNextWayPoint for init m_curr
+    MoveToNextWayPoint();                                   // m_curr -> first point
+    MoveToNextWayPoint();                                   // skip first point
+
     m_pathTime = timer;
 
     m_nextNodeTime = m_curr->first;
@@ -420,13 +429,13 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids)
     return true;
 }
 
-Transport::WayPointMap::const_iterator Transport::GetNextWayPoint()
+void Transport::MoveToNextWayPoint()
 {
-    WayPointMap::const_iterator iter = m_curr;
-    ++iter;
-    if (iter == m_WayPoints.end())
-        iter = m_WayPoints.begin();
-    return iter;
+    m_curr = m_next;
+
+    ++m_next;
+    if (m_next == m_WayPoints.end())
+        m_next = m_WayPoints.begin();
 }
 
 void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
@@ -498,8 +507,7 @@ void Transport::Update(uint32 /*p_time*/)
 
         DoEventIfAny(*m_curr,true);
 
-        m_curr = GetNextWayPoint();
-        m_next = GetNextWayPoint();
+        MoveToNextWayPoint();
 
         DoEventIfAny(*m_curr,false);
 
@@ -568,7 +576,7 @@ void Transport::DoEventIfAny(WayPointMap::value_type const& node, bool departure
 {
     if (uint32 eventid = departure ? node.second.departureEventID : node.second.arrivalEventID)
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_TRANSPORT_MOVES, "Taxi %s event %u of node %u of %s (%s) path", departure ? "departure" : "arrival", eventid, node.first, GetName(), GetObjectGuid().GetString().c_str());
+        DEBUG_FILTER_LOG(LOG_FILTER_TRANSPORT_MOVES, "Taxi %s event %u of node %u of %s \"%s\") path", departure ? "departure" : "arrival", eventid, node.first, GetGuidStr().c_str(), GetName());
 
         if (!Script->ProcessEventId(eventid, this, this, departure))
             GetMap()->ScriptsStart(sEventScripts, eventid, this, this);

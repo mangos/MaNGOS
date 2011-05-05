@@ -795,6 +795,7 @@ class MovementInfo
         int8 GetTransportSeat() const { return t_seat; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
+        void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
         void UpdateTime(uint32 _time) { time = _time; }
 
@@ -908,7 +909,7 @@ struct CalcDamageInfo
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage{
     SpellNonMeleeDamage(Unit *_attacker, Unit *_target, uint32 _SpellID, SpellSchoolMask _schoolMask)
-        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), overkill(0), schoolMask(_schoolMask),
+        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), schoolMask(_schoolMask),
         absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0)
     {}
 
@@ -916,7 +917,6 @@ struct SpellNonMeleeDamage{
     Unit   *attacker;
     uint32 SpellID;
     uint32 damage;
-    uint32 overkill;
     SpellSchoolMask schoolMask;
     uint32 absorb;
     uint32 resist;
@@ -1114,6 +1114,16 @@ struct CharmInfo
         GlobalCooldownMgr m_GlobalCooldownMgr;
 };
 
+// used in CallForAllControlledUnits/CheckAllControlledUnits
+enum ControlledUnitMask
+{
+    CONTROLLED_PET       = 0x01,
+    CONTROLLED_MINIPET   = 0x02,
+    CONTROLLED_GUARDIANS = 0x04,                            // including PROTECTOR_PET
+    CONTROLLED_CHARM     = 0x08,
+    CONTROLLED_TOTEMS    = 0x10,
+};
+
 // for clearing special attacks
 #define REACTIVE_TIMER_START 4000
 
@@ -1125,6 +1135,14 @@ enum ReactiveType
 };
 
 #define MAX_REACTIVE 3
+
+// Used as MiscValue for SPELL_AURA_IGNORE_UNIT_STATE
+enum IgnoreUnitState
+{
+    IGNORE_UNIT_TARGET_STATE      = 0,                      // target health, aura states, or combopoints
+    IGNORE_UNIT_COMBAT_STATE      = 1,                      // ignore caster in combat state
+    IGNORE_UNIT_TARGET_NON_FROZEN = 126,                    // ignore absent of frozen state
+};
 
 typedef std::set<uint64> GuardianPetList;
 
@@ -1313,6 +1331,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss);
         int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false, uint32 absorb = 0);
 
+        void PetOwnerKilledUnit(Unit* pVictim);
+
         void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = NULL);
         void ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const * procSpell, uint32 damage );
 
@@ -1426,6 +1446,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsPolymorphed() const;
 
         bool isFrozen() const;
+        bool IsIgnoreUnitState(SpellEntry const *spell, IgnoreUnitState ignoreState);
 
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
 
@@ -1500,6 +1521,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
+        void SetCritterGuid(ObjectGuid critterGuid) { SetGuidValue(UNIT_FIELD_CRITTER, critterGuid); }
+        ObjectGuid const& GetCritterGuid() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
+
+        void RemoveMiniPet();
+        Pet* GetMiniPet() const;
+        void SetMiniPet(Unit* pet) { SetCritterGuid(pet ? pet->GetObjectGuid() : ObjectGuid()); }
+
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return !GetCharmerGuid().IsEmpty() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {
@@ -1536,6 +1564,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveGuardian(Pet* pet);
         void RemoveGuardians();
         Pet* FindGuardianWithEntry(uint32 entry);
+        Pet* GetProtectorPet();                             // expected single case in guardian list
 
         bool isCharmed() const { return !GetCharmerGuid().IsEmpty(); }
 
@@ -1552,9 +1581,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void _RemoveTotem(Totem* totem);                    // only for call from Totem class
 
         template<typename Func>
-        void CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms);
+        void CallForAllControlledUnits(Func const& func, uint32 controlledMask);
         template<typename Func>
-        bool CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const;
+        bool CheckAllControlledUnits(Func const& func, uint32 controlledMask) const;
 
         bool AddSpellAuraHolder(SpellAuraHolder *holder);
         void AddAuraToModList(Aura *aura);
@@ -1577,6 +1606,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveNotOwnSingleTargetAuras(uint32 newPhase = 0x0);
         void RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive = false);
         void RemoveSpellsCausingAura(AuraType auraType);
+        void RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except);
         void RemoveRankAurasDueToSpell(uint32 spellId);
         bool RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder);
         void RemoveAurasWithInterruptFlags(uint32 flags);
@@ -1642,9 +1672,21 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_detectInvisibilityMask;
         uint32 m_invisibilityMask;
 
-        uint32 m_ShapeShiftFormSpellId;
-        ShapeshiftForm m_form;
-        bool IsInFeralForm() const { return m_form == FORM_CAT || m_form == FORM_BEAR || m_form == FORM_DIREBEAR; }
+        ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_2, 3)); }
+        void  SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_2, 3, form); }
+
+        bool IsInFeralForm() const
+        {
+            ShapeshiftForm form = GetShapeshiftForm();
+            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
+        }
+
+        bool IsInDisallowedMountForm() const
+        {
+            ShapeshiftForm form = GetShapeshiftForm();
+            return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
+                form != FORM_SHADOW;
+        }
 
         float m_modMeleeHitChance;
         float m_modRangedHitChance;
@@ -1735,7 +1777,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint8 GetVisibleAurasCount() { return m_visibleAuras.size(); }
 
         Aura* GetAura(uint32 spellId, SpellEffectIndex effindex);
-        Aura* GetAura(AuraType type, uint32 family, uint64 familyFlag, uint32 familyFlag2 = 0, uint64 casterGUID = 0);
+        Aura* GetAura(AuraType type, SpellFamily family, uint64 familyFlag, uint32 familyFlag2 = 0, ObjectGuid casterGuid = ObjectGuid());
         SpellAuraHolder* GetSpellAuraHolder (uint32 spellid, uint64 casterGUID = 0);
 
         SpellAuraHolderMap      & GetSpellAuraHolderMap()       { return m_spellAuraHolders; }
@@ -1794,7 +1836,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
         bool HasAuraStateForCaster(AuraState flag, uint64 caster) const;
         void UnsummonAllTotems();
-        Unit* SelectMagnetTarget(Unit *victim, SpellEntry const *spellInfo = NULL);
+        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = NULL, SpellEffectIndex eff = EFFECT_INDEX_0);
 
         int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, float defCoeffMod = 1.0f);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
@@ -1896,9 +1938,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsStopped() const { return !(hasUnitState(UNIT_STAT_MOVING)); }
         void StopMoving();
 
-        void SetFeared(bool apply, uint64 const& casterGUID = 0, uint32 spellID = 0, uint32 time = 0);
-        void SetConfused(bool apply, uint64 const& casterGUID = 0, uint32 spellID = 0);
-        void SetFeignDeath(bool apply, uint64 const& casterGUID = 0, uint32 spellID = 0);
+        void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
+        void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);
+        void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);
 
         void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }
         void RemoveComboPointHolder(uint32 lowguid) { m_ComboPointHolders.erase(lowguid); }
@@ -2013,48 +2055,59 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 };
 
 template<typename Func>
-void Unit::CallForAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms)
+void Unit::CallForAllControlledUnits(Func const& func, uint32 controlledMask)
 {
-    if (Pet* pet = GetPet())
-        func(pet);
+    if (controlledMask & CONTROLLED_PET)
+        if (Pet* pet = GetPet())
+            func(pet);
 
-    if (withGuardians)
+    if (controlledMask & CONTROLLED_MINIPET)
+        if (Unit* mini = GetMiniPet())
+            func(mini);
+
+    if (controlledMask & CONTROLLED_GUARDIANS)
     {
-        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet* guardian = _GetPet(*itr))
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end();)
+            if (Pet* guardian = _GetPet(*(itr++)))
                 func(guardian);
     }
 
-    if (withTotems)
+    if (controlledMask & CONTROLLED_TOTEMS)
     {
         for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
             if (Unit *totem = _GetTotem(TotemSlot(i)))
                 func(totem);
     }
 
-    if (withCharms)
+    if (controlledMask & CONTROLLED_CHARM)
         if (Unit* charm = GetCharm())
             func(charm);
 }
 
 
 template<typename Func>
-bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withGuardians, bool withCharms) const
+bool Unit::CheckAllControlledUnits(Func const& func, uint32 controlledMask) const
 {
-    if (Pet const* pet = GetPet())
-        if (func(pet))
-            return true;
+    if (controlledMask & CONTROLLED_PET)
+        if (Pet const* pet = GetPet())
+            if (func(pet))
+                return true;
 
-    if (withGuardians)
+    if (controlledMask & CONTROLLED_MINIPET)
+        if(Unit const* mini = GetMiniPet())
+            if (func(mini))
+                return true;
+
+    if (controlledMask & CONTROLLED_GUARDIANS)
     {
-        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
-            if (Pet const* guardian = _GetPet(*itr))
+        for(GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end();)
+            if (Pet const* guardian = _GetPet(*(itr++)))
                 if (func(guardian))
                     return true;
 
     }
 
-    if (withTotems)
+    if (controlledMask & CONTROLLED_TOTEMS)
     {
         for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
             if (Unit const* totem = _GetTotem(TotemSlot(i)))
@@ -2062,7 +2115,7 @@ bool Unit::CheckAllControlledUnits(Func const& func, bool withTotems, bool withG
                     return true;
     }
 
-    if (withCharms)
+    if (controlledMask & CONTROLLED_CHARM)
         if (Unit const* charm = GetCharm())
             if (func(charm))
                 return true;

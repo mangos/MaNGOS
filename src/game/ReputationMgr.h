@@ -32,7 +32,8 @@ enum FactionFlags
     FACTION_FLAG_INVISIBLE_FORCED   = 0x08,                 // always overwrite FACTION_FLAG_VISIBLE and hide faction in rep.list, used for hide opposite team factions
     FACTION_FLAG_PEACE_FORCED       = 0x10,                 // always overwrite FACTION_FLAG_AT_WAR, used for prevent war with own team factions
     FACTION_FLAG_INACTIVE           = 0x20,                 // player controlled, state stored in characters.data ( CMSG_SET_FACTION_INACTIVE )
-    FACTION_FLAG_RIVAL              = 0x40                  // flag for the two competing outland factions
+    FACTION_FLAG_RIVAL              = 0x40,                 // flag for the two competing outland factions
+    FACTION_FLAG_TEAM_REPUTATION    = 0x80                  // faction has own reputation standing despite teaming up sub-factions; spillover from subfactions will go this instead of other subfactions
 };
 
 typedef uint32 RepListID;
@@ -42,7 +43,8 @@ struct FactionState
     RepListID ReputationListID;
     uint32 Flags;
     int32  Standing;
-    bool Changed;
+    bool needSend;
+    bool needSave;
 };
 
 typedef std::map<RepListID,FactionState> FactionStateList;
@@ -120,7 +122,7 @@ class ReputationMgr
     public:                                                 // senders
         void SendInitialReputations();
         void SendForceReactions();
-        void SendState(FactionState const* faction) const;
+        void SendState(FactionState const* faction);
 
     private:                                                // internal helper functions
         void Initialize();

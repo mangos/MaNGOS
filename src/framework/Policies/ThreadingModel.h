@@ -121,12 +121,12 @@ namespace MaNGOS
             {
                 public:
 
-                    Lock(T& /*host*/)
+                    Lock(const T& /*host*/)
                     {
                         ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
                     }
 
-                    Lock(ClassLevelLockable<T, MUTEX> &)
+                    Lock(const ClassLevelLockable<T, MUTEX> &)
                     {
                         ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
                     }

@@ -97,6 +97,13 @@
 #include <ace/Thread_Mutex.h>
 #include <ace/OS_NS_arpa_inet.h>
 
+// Old ACE versions (pre-ACE-5.5.4) not have this type (add for allow use at Unix side external old ACE versions)
+#if PLATFORM != PLATFORM_WINDOWS
+#  ifndef ACE_OFF_T
+typedef off_t ACE_OFF_T;
+#  endif
+#endif
+
 #if PLATFORM == PLATFORM_WINDOWS
 #  if !defined (FD_SETSIZE)
 #    define FD_SETSIZE 4096

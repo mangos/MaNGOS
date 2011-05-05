@@ -89,7 +89,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     }
 
     // OK result but not send invite
-    if(player->GetSocial()->HasIgnore(GetPlayer()->GetGUIDLow()))
+    if(player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
         return;
 
     // not let enemies sign guild charter

@@ -106,7 +106,13 @@ AC_ARG_WITH(postgresql,
 	yes) DO_POSTGRESQL=yes ;;
 	no)  DO_POSTGRESQL=no ;;
 	maybe) DO_POSTGRESQL=maybe ;;
-	*)   AC_MSG_ERROR(Bad value ${withval} for --with-postgresql) ;;
+	*)
+        if test ! -x "${withval}" ; then
+            AC_MSG_ERROR([${withval} is not a executable file])
+        fi
+        POSTGRE_CONFIG_HOME="${withval}"
+        DO_POSTGRESQL=yes
+    ;;
     esac],
 [DO_POSTGRESQL=no])
 
@@ -121,14 +127,64 @@ AC_ARG_WITH(mysql,
 [DO_MYSQL=yes])
 
 # here Postgre
-AC_MSG_CHECKING(whether to build/link POSTGRESQL)
-if test "x$DO_POSTGRESQL" = "xyes"; then
-DO_MYSQL=no
-POSTGRE_INCLUDES="-I/usr/include/postgresql $POSTGRE_INCLUDES"
-POSTGRE_LIBS="-L/usr/lib/postresql -lpq -lz -lpthread -lcrypt -lnsl -lm -lpthread -L/usr/lib $OPENSSL_LIBS $POSTGRE_LIBS "
-CXXFLAGS="-DDO_POSTGRESQL $CXXFLAGS"
-fi
-AC_MSG_RESULT($DO_POSTGRESQL)
+case "$DO_POSTGRESQL" in
+    yes|maybe)
+
+    if test -z "$POSTGRE_CONFIG_HOME"; then
+        AC_PATH_PROG([POSTGRE_CONFIG_HOME], [pg_config], [no])
+    fi
+
+    if test "$POSTGRE_CONFIG_HOME" != "no" ; then
+        POSTGRE_VERSION="`$POSTGRE_CONFIG_HOME --version`"
+        POSTGRE_LIBS="-L`$POSTGRE_CONFIG_HOME --libdir` `$POSTGRE_CONFIG_HOME --libs` -lpq $OPENSSL_LIBS $POSTGRE_LIBS"
+        POSTGRE_INCLUDES="-I`$POSTGRE_CONFIG_HOME --includedir` $POSTGRE_INCLUDES"
+    else
+        POSTGRE_VERSION="unknown"
+        POSTGRE_LIBS="-L/usr/lib/postgresql/lib -lpq -lz -lpthread -lcrypt -lnsl -lm $OPENSSL_LIBS $POSTGRE_LIBS"
+        POSTGRE_INCLUDES="-I/usr/include/postgresql $POSTGRE_INCLUDES"
+    fi
+
+    POSTGRESQL_OLD_LIBS="$LIBS" ; LIBS="$LIBS ${POSTGRE_LIBS}"
+    POSTGRESQL_OLD_CPPFLAGS="$CPPFLAGS" ; CPPFLAGS="$CPPFLAGS ${POSTGRE_INCLUDES}"
+    AC_CHECK_LIB([pq], [PQsetdbLogin], [HAVE_POSTGRESQL="yes"], [])
+    AC_CHECK_HEADER([libpq-fe.h], [], [HAVE_POSTGRESQL="yes"], [])
+
+    AC_MSG_CHECKING(whether to build/link POSTGRESQL)
+    if test "${HAVE_POSTGRESQL}" != "yes" ; then
+        AC_MSG_RESULT([no])
+        if test "${DO_POSTGRESQL}" = "yes" ; then
+            AC_MSG_ERROR([PostgreSQL not found or incompatible (requested)])
+        else
+            AC_MSG_NOTICE([disabling PostgreSQL (optional)])
+            POSTGRE_VERSION=""
+            POSTGRE_INCLUDES=""
+            POSTGRE_LIBS=""
+        fi
+    else
+      AC_MSG_RESULT([yes ($POSTGRE_VERSION)])
+    fi
+    AC_MSG_CHECKING([PostgreSQL libs is a thread-safe])
+    AC_RUN_IFELSE([
+     AC_LANG_SOURCE(
+     [[
+      #include <libpq-fe.h>
+      int main() {
+         return !PQisthreadsafe();
+      }
+    ]])
+   ],
+   [
+     AC_MSG_RESULT([yes])
+   ],
+   [
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([postgre libs is not thread-safe, check your postgresql installation and /etc/ld.config*])
+   ])
+   CPPFLAGS="${POSTGRESQL_OLD_CPPFLAGS}"
+   LIBS="${POSTGRESQL_OLD_LIBS}"
+   CXXFLAGS="-DDO_POSTGRESQL $CXXFLAGS"
+   ;;
+esac
 
 # here mysql
 AC_MSG_CHECKING(whether to build/link MYSQL)
@@ -201,7 +257,6 @@ AC_CHECK_HEADERS([ arpa/inet.h fcntl.h limits.h locale.h malloc.h netdb.h netine
 
 AC_CHECK_HEADERS([pthread.h])
 AC_CHECK_HEADERS([mysql.h mysql/mysql.h])
-AC_CHECK_HEADERS([libpq-fe.h])
 AC_CHECK_HEADERS([zlib.h])
 
 ## Check for typedefs, structures, and compiler characteristics.
@@ -301,9 +356,9 @@ AC_CONFIG_FILES([
    src/shared/Auth/Makefile
    src/shared/Config/Makefile
    src/shared/Database/Makefile
-   src/shared/vmap/Makefile
    src/shared/SystemConfig.h
    src/game/Makefile
+   src/game/vmap/Makefile
    src/realmd/Makefile
    src/realmd/realmd.conf.dist
    src/mangosd/Makefile

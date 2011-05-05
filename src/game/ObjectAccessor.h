@@ -95,7 +95,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
     ObjectAccessor& operator=(const ObjectAccessor &);
 
     public:
-        typedef UNORDERED_MAP<uint64, Corpse* >      Player2CorpsesMapType;
+        typedef UNORDERED_MAP<ObjectGuid, Corpse*> Player2CorpsesMapType;
 
         // global (obj used for map only location local guid objects (pets currently)
         static Unit*   GetUnitInWorld(WorldObject const& obj, ObjectGuid guid);

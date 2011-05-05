@@ -32,7 +32,7 @@ ConfusedMovementGenerator<T>::Initialize(T &unit)
     y = unit.GetPositionY();
     z = unit.GetPositionZ();
 
-    Map const* map = unit.GetBaseMap();
+    TerrainInfo const* map = unit.GetTerrain();
 
     i_nextMove = 1;
 

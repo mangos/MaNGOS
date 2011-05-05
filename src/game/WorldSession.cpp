@@ -369,7 +369,7 @@ void WorldSession::LogoutPlayer(bool Save)
             if(BattleGroundQueueTypeId bgQueueTypeId = _player->GetBattleGroundQueueTypeId(i))
             {
                 _player->RemoveBattleGroundQueueId(bgQueueTypeId);
-                sBattleGroundMgr.m_BattleGroundQueues[ bgQueueTypeId ].RemovePlayer(_player->GetGUID(), true);
+                sBattleGroundMgr.m_BattleGroundQueues[ bgQueueTypeId ].RemovePlayer(_player->GetObjectGuid(), true);
             }
         }
 
@@ -391,7 +391,7 @@ void WorldSession::LogoutPlayer(bool Save)
         }
 
         ///- Remove pet
-        _player->RemovePet(NULL, PET_SAVE_AS_CURRENT, true);
+        _player->RemovePet(PET_SAVE_AS_CURRENT);
 
         ///- empty buyback items and save the player in the database
         // some save parts only correctly work in case player present in map/player_lists (pets, etc)
@@ -424,7 +424,7 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->GetGroup()->SendUpdate();
 
         ///- Broadcast a logout message to the player's friends
-        sSocialMgr.SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
+        sSocialMgr.SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetObjectGuid(), true);
         sSocialMgr.RemovePlayerSocial (_player->GetGUIDLow ());
 
         ///- Remove the player from the world

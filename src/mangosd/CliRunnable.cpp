@@ -414,7 +414,7 @@ bool ChatHandler::HandleCharacterEraseCommand(char* args)
         return false;
 
     Player* target;
-    uint64 target_guid;
+    ObjectGuid target_guid;
     std::string target_name;
     if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
@@ -433,7 +433,7 @@ bool ChatHandler::HandleCharacterEraseCommand(char* args)
     sAccountMgr.GetName (account_id,account_name);
 
     Player::DeleteFromDB(target_guid, account_id, true, true);
-    PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), GUID_LOPART(target_guid), account_name.c_str(), account_id);
+    PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), target_guid.GetCounter(), account_name.c_str(), account_id);
     return true;
 }
 

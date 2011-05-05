@@ -559,7 +559,7 @@ void Guild::BroadcastToGuild(WorldSession *session, const std::string& msg, uint
         {
             Player *pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
-            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(),GR_RIGHT_GCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetPlayer()->GetGUIDLow()) )
+            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(),GR_RIGHT_GCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetPlayer()->GetObjectGuid()) )
                 pl->GetSession()->SendPacket(&data);
         }
     }
@@ -576,7 +576,7 @@ void Guild::BroadcastToOfficers(WorldSession *session, const std::string& msg, u
 
             Player *pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
-            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(),GR_RIGHT_OFFCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetPlayer()->GetGUIDLow()))
+            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(),GR_RIGHT_OFFCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetPlayer()->GetObjectGuid()))
                 pl->GetSession()->SendPacket(&data);
         }
     }
@@ -1174,7 +1174,7 @@ void Guild::LoadGuildBankFromDB()
         }
 
         Item *pItem = NewItemOrBag(proto);
-        if (!pItem->LoadFromDB(ItemGuid, 0, fields))
+        if (!pItem->LoadFromDB(ItemGuid, fields))
         {
             CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE guildid='%u' AND TabId='%u' AND SlotId='%u'", m_Id, uint32(TabId), uint32(SlotId));
             sLog.outError("Item GUID %u not found in item_instance, deleting from Guild Bank!", ItemGuid);
@@ -1705,8 +1705,8 @@ Item* Guild::_StoreItem( uint8 tab, uint8 slot, Item *pItem, uint32 count, bool 
 
         m_TabListMap[tab]->Slots[slot] = pItem;
 
-        pItem->SetUInt64Value(ITEM_FIELD_CONTAINED, 0);
-        pItem->SetUInt64Value(ITEM_FIELD_OWNER, 0);
+        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
+        pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid());
         AddGBankItemToDB(GetId(), tab, slot, pItem->GetGUIDLow(), pItem->GetEntry());
         pItem->FSetState(ITEM_NEW);
         pItem->SaveToDB();                                  // not in inventory and can be save standalone

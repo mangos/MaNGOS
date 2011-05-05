@@ -18,7 +18,7 @@
 
 #include "AuctionHouseMgr.h"
 #include "Database/DatabaseEnv.h"
-#include "Database/SQLStorage.h"
+#include "SQLStorages.h"
 #include "DBCStores.h"
 #include "ProgressBar.h"
 
@@ -156,7 +156,7 @@ void AuctionHouseMgr::SendAuctionWonMail( AuctionEntry *auction )
         // will delete item or place to receiver mail list
         MailDraft(msgAuctionWonSubject.str(), msgAuctionWonBody.str())
             .AddItem(pItem)
-            .SendMailTo(MailReceiver(bidder,auction->bidder), auction, MAIL_CHECK_MASK_COPIED);
+            .SendMailTo(MailReceiver(bidder, bidder_guid), auction, MAIL_CHECK_MASK_COPIED);
     }
     // receiver not exist
     else
@@ -192,7 +192,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail( AuctionEntry * auction )
         DEBUG_LOG("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
 
         MailDraft(msgAuctionSalePendingSubject.str(), msgAuctionSalePendingBody.str())
-            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_COPIED);
+            .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED);
     }
 }
 
@@ -235,7 +235,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail( AuctionEntry * auction )
 
         MailDraft(msgAuctionSuccessfulSubject.str(), auctionSuccessfulBody.str())
             .AddMoney(profit)
-            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_COPIED, HOUR);
+            .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED, HOUR);
     }
 }
 
@@ -270,7 +270,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail( AuctionEntry * auction )
         // will delete item or place to receiver mail list
         MailDraft(subject.str(), "")                        // TODO: fix body
             .AddItem(pItem)
-            .SendMailTo(MailReceiver(owner,auction->owner), auction, MAIL_CHECK_MASK_COPIED);
+            .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED);
     }
     // owner not found
     else
@@ -318,7 +318,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         Item *item = NewItemOrBag(proto);
 
-        if(!item->LoadFromDB(item_guid,0, fields))
+        if(!item->LoadFromDB(item_guid, fields))
         {
             delete item;
             continue;
@@ -418,7 +418,7 @@ void AuctionHouseMgr::LoadAuctions()
             // item will deleted or added to received mail list
             MailDraft(msgAuctionCanceledOwner.str(), "")    // TODO: fix body
                 .AddItem(pItem)
-                .SendMailTo(MailReceiver(auction->owner), auction, MAIL_CHECK_MASK_COPIED);
+                .SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, auction->owner)), auction, MAIL_CHECK_MASK_COPIED);
 
             RemoveAItem(auction->item_guidlow);
             auction->DeleteFromDB();
@@ -626,7 +626,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         if (inventoryType != 0xffffffff && proto->InventoryType != inventoryType)
             continue;
 
-        if (quality != 0xffffffff && proto->Quality != quality)
+        if (quality != 0xffffffff && proto->Quality < quality)
             continue;
 
         if (levelmin != 0x00 && (proto->RequiredLevel < levelmin || (levelmax != 0x00 && proto->RequiredLevel > levelmax)))

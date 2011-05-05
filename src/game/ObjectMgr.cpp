@@ -18,10 +18,10 @@
 
 #include "ObjectMgr.h"
 #include "Database/DatabaseEnv.h"
-#include "Database/SQLStorage.h"
 #include "Database/SQLStorageImpl.h"
 #include "Policies/SingletonImp.h"
 
+#include "SQLStorages.h"
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectGuid.h"
@@ -494,7 +494,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
 struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader>
 {
     template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char const *src, D &dst)
     {
         dst = D(sObjectMgr.GetScriptId(src));
     }
@@ -855,6 +855,9 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
                 const_cast<CreatureDataAddon*>(addon)->mount = 0;
             }
         }
+
+        if (addon->sheath_state > SHEATH_STATE_RANGED)
+            sLog.outErrorDb("Creature (%s %u) has unknown sheath state (%u) defined in `%s`.", entryName, addon->guidOrEntry, addon->sheath_state, creatureaddons.GetTableName());
 
         if (!sEmotesStore.LookupEntry(addon->emote))
         {
@@ -1727,7 +1730,7 @@ bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
     return false;
 }
 
-uint32 ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
+Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 {
     // prevent DB access for online player
     if (Player* player = GetPlayer(guid))
@@ -1744,7 +1747,7 @@ uint32 ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
         return Player::TeamForRace(race);
     }
 
-    return 0;
+    return TEAM_NONE;
 }
 
 uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
@@ -1852,7 +1855,7 @@ void ObjectMgr::LoadItemLocales()
 struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader>
 {
     template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char const *src, D &dst)
     {
         dst = D(sObjectMgr.GetScriptId(src));
     }
@@ -5240,7 +5243,7 @@ void ObjectMgr::LoadPageTextLocales()
 struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
 {
     template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char const *src, D &dst)
     {
         dst = D(sObjectMgr.GetScriptId(src));
     }
@@ -5482,7 +5485,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->messageID = fields[0].GetUInt32();
         m->messageType = fields[1].GetUInt8();
         m->sender = fields[2].GetUInt32();
-        m->receiver = fields[3].GetUInt32();
+        m->receiverGuid = ObjectGuid(HIGHGUID_PLAYER, fields[3].GetUInt32());
         bool has_items = fields[4].GetBool();
         m->expire_time = (time_t)fields[5].GetUInt64();
         m->deliver_time = 0;
@@ -5492,7 +5495,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 
         Player *pl = 0;
         if (serverUp)
-            pl = GetPlayer((uint64)m->receiver);
+            pl = GetPlayer(m->receiverGuid);
         if (pl)
         {                                                   //this code will run very improbably (the time is between 4 and 5 am, in game is online a player, who has old mail
             //his in mailbox and he has already listed his mails )
@@ -5528,7 +5531,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             else
             {
                 //mail will be returned:
-                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'", m->receiver, m->sender, (uint64)(basetime + 30*DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, m->messageID);
+                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'",
+                    m->receiverGuid.GetCounter(), m->sender, (uint64)(basetime + 30*DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, m->messageID);
                 delete m;
                 continue;
             }
@@ -5787,7 +5791,7 @@ void ObjectMgr::LoadEventIdScripts()
     sLog.outString( ">> Loaded %u scripted event id", count );
 }
 
-uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid, uint32 team )
+uint32 ObjectMgr::GetNearestTaxiNode( float x, float y, float z, uint32 mapid, Team team )
 {
     bool found = false;
     float dist;
@@ -5850,7 +5854,7 @@ void ObjectMgr::GetTaxiPath( uint32 source, uint32 destination, uint32 &path, ui
     path = dest_i->second.ID;
 }
 
-uint32 ObjectMgr::GetTaxiMountDisplayId( uint32 id, uint32 team, bool allowed_alt_team /* = false */)
+uint32 ObjectMgr::GetTaxiMountDisplayId( uint32 id, Team team, bool allowed_alt_team /* = false */)
 {
     uint16 mount_entry = 0;
 
@@ -5920,33 +5924,33 @@ void ObjectMgr::LoadGraveyardZones()
         uint32 team   = fields[2].GetUInt32();
 
         WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(safeLocId);
-        if(!entry)
+        if (!entry)
         {
             sLog.outErrorDb("Table `game_graveyard_zone` has record for not existing graveyard (WorldSafeLocs.dbc id) %u, skipped.",safeLocId);
             continue;
         }
 
         AreaTableEntry const *areaEntry = GetAreaEntryByAreaID(zoneId);
-        if(!areaEntry)
+        if (!areaEntry)
         {
-            sLog.outErrorDb("Table `game_graveyard_zone` has record for not existing zone id (%u), skipped.",zoneId);
+            sLog.outErrorDb("Table `game_graveyard_zone` has record for not existing zone id (%u), skipped.", zoneId);
             continue;
         }
 
-        if(areaEntry->zone != 0)
+        if (areaEntry->zone != 0)
         {
-            sLog.outErrorDb("Table `game_graveyard_zone` has record subzone id (%u) instead of zone, skipped.",zoneId);
+            sLog.outErrorDb("Table `game_graveyard_zone` has record subzone id (%u) instead of zone, skipped.", zoneId);
             continue;
         }
 
-        if(team!=0 && team!=HORDE && team!=ALLIANCE)
+        if (team != TEAM_NONE && team != HORDE && team != ALLIANCE)
         {
-            sLog.outErrorDb("Table `game_graveyard_zone` has record for non player faction (%u), skipped.",team);
+            sLog.outErrorDb("Table `game_graveyard_zone` has record for non player faction (%u), skipped.", team);
             continue;
         }
 
-        if(!AddGraveYardLink(safeLocId,zoneId,team,false))
-            sLog.outErrorDb("Table `game_graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.",safeLocId,zoneId);
+        if(!AddGraveYardLink(safeLocId, zoneId, Team(team), false))
+            sLog.outErrorDb("Table `game_graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
     } while( result->NextRow() );
 
     delete result;
@@ -5955,10 +5959,10 @@ void ObjectMgr::LoadGraveyardZones()
     sLog.outString( ">> Loaded %u graveyard-zone links", count );
 }
 
-WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, uint32 team)
+WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team)
 {
     // search for zone associated closest graveyard
-    uint32 zoneId = sMapMgr.GetZoneId(MapId,x,y,z);
+    uint32 zoneId = sTerrainMgr.GetZoneId(MapId,x,y,z);
 
     // Simulate std. algorithm:
     //   found some graveyard associated to (ghost_zone,ghost_map)
@@ -5971,7 +5975,7 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
 
     if (bounds.first == bounds.second)
     {
-        sLog.outErrorDb("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.",zoneId,team);
+        sLog.outErrorDb("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.", zoneId, uint32(team));
         return NULL;
     }
 
@@ -6003,7 +6007,7 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
 
         // skip enemy faction graveyard
         // team == 0 case can be at call from .neargrave
-        if(data.team != 0 && team != 0 && data.team != team)
+        if (data.team != TEAM_NONE && team != TEAM_NONE && data.team != team)
             continue;
 
         // find now nearest graveyard at other (continent) map
@@ -6081,7 +6085,7 @@ GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId) cons
     return NULL;
 }
 
-bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inDB)
+bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
 {
     if(FindGraveYardData(id,zoneId))
         return false;
@@ -6097,7 +6101,7 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, uint32 team, bool inD
     if(inDB)
     {
         WorldDatabase.PExecuteLog("INSERT INTO game_graveyard_zone ( id,ghost_zone,faction) "
-            "VALUES ('%u', '%u','%u')",id,zoneId,team);
+            "VALUES ('%u', '%u','%u')", id, zoneId, uint32(team));
     }
 
     return true;
@@ -6532,7 +6536,7 @@ void ObjectMgr::LoadGameObjectLocales()
 struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader>
 {
     template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char *src, D &dst)
+    void convert_from_str(uint32 /*field_pos*/, char const *src, D &dst)
     {
         dst = D(sObjectMgr.GetScriptId(src));
     }
@@ -7108,7 +7112,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded `reputation_spillover_template`, table is empty!");
+        sLog.outString(">> Loaded `reputation_spillover_template`, table is empty.");
         return;
     }
 
@@ -7534,7 +7538,7 @@ void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
         next = itr;
         ++next;
 
-        if(GUID_HIPART(itr->first)==instance)
+        if (PAIR64_HIPART(itr->first)==instance)
             mGORespawnTimes.erase(itr);
     }
 
@@ -7543,7 +7547,7 @@ void ObjectMgr::DeleteRespawnTimeForInstance(uint32 instance)
         next = itr;
         ++next;
 
-        if(GUID_HIPART(itr->first)==instance)
+        if (PAIR64_HIPART(itr->first)==instance)
             mCreatureRespawnTimes.erase(itr);
     }
 
@@ -8251,7 +8255,7 @@ bool PlayerCondition::Meets(Player const * player) const
             return faction && player->GetReputationMgr().GetRank(faction) >= ReputationRank(value2);
         }
         case CONDITION_TEAM:
-            return player->GetTeam() == value1;
+            return uint32(player->GetTeam()) == value1;
         case CONDITION_SKILL:
             return player->HasSkill(value1) && player->GetBaseSkillValue(value1) >= value2;
         case CONDITION_QUESTREWARDED:

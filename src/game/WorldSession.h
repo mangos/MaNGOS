@@ -778,8 +778,8 @@ class MANGOS_DLL_SPEC WorldSession
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);
-        bool VerifyMovementInfo(MovementInfo&,ObjectGuid&, Unit*) const;
-        void HandleMoverRelocation(MovementInfo&, Unit*, Player*);
+        bool VerifyMovementInfo(MovementInfo const& movementInfo, ObjectGuid const& guid) const;
+        void HandleMoverRelocation(MovementInfo& movementInfo);
 
         void ExecuteOpcode( OpcodeHandler const& opHandle, WorldPacket* packet );
 

@@ -282,8 +282,8 @@ class MANGOS_DLL_SPEC Item : public Object
 
         ItemPrototype const* GetProto() const;
 
-        uint64 const& GetOwnerGUID()    const { return GetUInt64Value(ITEM_FIELD_OWNER); }
-        void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
+        ObjectGuid const& GetOwnerGuid()    const { return GetGuidValue(ITEM_FIELD_OWNER); }
+        void SetOwnerGuid(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
         void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED,val); }
@@ -292,7 +292,7 @@ class MANGOS_DLL_SPEC Item : public Object
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
         virtual void SaveToDB();
-        virtual bool LoadFromDB(uint32 guid, uint64 owner_guid, Field *fields);
+        virtual bool LoadFromDB(uint32 guidLow, Field *fields, ObjectGuid ownerGuid = ObjectGuid());
         virtual void DeleteFromDB();
         void DeleteFromInventoryDB();
         void LoadLootFromDB(Field *fields);

@@ -36,7 +36,6 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
         void EnterEvadeMode();
         void AttackedBy(Unit*);
         bool IsVisible(Unit *) const;
-        void JustDied(Unit* /*who*/) { _stopAttack(); }
 
         void UpdateAI(const uint32);
         static int Permissible(const Creature *);

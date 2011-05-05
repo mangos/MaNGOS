@@ -524,16 +524,12 @@ enum Language
 
 #define LANGUAGES_COUNT   21
 
+// In fact !=0 values is alliance/horde root faction ids
 enum Team
 {
+    TEAM_NONE           = 0,                                // used when team value unknown or not set, 0 is also meaning that can be used !team check
     HORDE               = 67,
     ALLIANCE            = 469,
-    //TEAM_STEAMWHEEDLE_CARTEL = 169,                       // not used in code
-    //TEAM_ALLIANCE_FORCES     = 891,
-    //TEAM_HORDE_FORCES        = 892,
-    //TEAM_SANCTUARY           = 936,
-    //TEAM_OUTLAND             = 980,
-    //TEAM_OTHER               = 0,                         // if ReputationListId > 0 && Flags != FACTION_FLAG_TEAM_HEADER
 };
 
 enum SpellEffects
@@ -628,7 +624,7 @@ enum SpellEffects
     SPELL_EFFECT_WMO_DAMAGE                = 87,
     SPELL_EFFECT_WMO_REPAIR                = 88,
     SPELL_EFFECT_WMO_CHANGE                = 89,
-    SPELL_EFFECT_KILL_CREDIT               = 90,
+    SPELL_EFFECT_KILL_CREDIT_PERSONAL      = 90,
     SPELL_EFFECT_THREAT_ALL                = 91,
     SPELL_EFFECT_ENCHANT_HELD_ITEM         = 92,
     SPELL_EFFECT_BREAK_PLAYER_TARGETING    = 93,
@@ -672,7 +668,7 @@ enum SpellEffects
     SPELL_EFFECT_131                       = 131,
     SPELL_EFFECT_PLAY_MUSIC                = 132,
     SPELL_EFFECT_UNLEARN_SPECIALIZATION    = 133,
-    SPELL_EFFECT_KILL_CREDIT2              = 134,
+    SPELL_EFFECT_KILL_CREDIT_GROUP         = 134,
     SPELL_EFFECT_CALL_PET                  = 135,
     SPELL_EFFECT_HEAL_PCT                  = 136,
     SPELL_EFFECT_ENERGIZE_PCT              = 137,
@@ -687,11 +683,11 @@ enum SpellEffects
     SPELL_EFFECT_ACTIVATE_RUNE             = 146,
     SPELL_EFFECT_QUEST_FAIL                = 147,
     SPELL_EFFECT_148                       = 148,
-    SPELL_EFFECT_149                       = 149,
+    SPELL_EFFECT_CHARGE2                   = 149,
     SPELL_EFFECT_150                       = 150,
     SPELL_EFFECT_TRIGGER_SPELL_2           = 151,
     SPELL_EFFECT_152                       = 152,
-    SPELL_EFFECT_153                       = 153,
+    SPELL_EFFECT_CREATE_PET                = 153,
     SPELL_EFFECT_TEACH_TAXI_NODE           = 154,
     SPELL_EFFECT_TITAN_GRIP                = 155,
     SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC    = 156,
@@ -919,7 +915,7 @@ enum AuraState
     AURA_STATE_DEFENSE                      = 1,            // C   |
     AURA_STATE_HEALTHLESS_20_PERCENT        = 2,            // CcT |
     AURA_STATE_BERSERKING                   = 3,            // C T |
-    AURA_STATE_FROZEN                       = 4,            //  c t| frozen target
+    AURA_STATE_FROZEN                       = 4,            //  cT | frozen target
     AURA_STATE_JUDGEMENT                    = 5,            // C   |
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
     AURA_STATE_HUNTER_PARRY                 = 7,            // C   |

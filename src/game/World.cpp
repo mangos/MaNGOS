@@ -216,7 +216,7 @@ World::AddSession_ (WorldSession* s)
         if(old != m_sessions.end())
         {
             // prevent decrease sessions count if session queued
-            if(RemoveQueuedPlayer(old->second))
+            if(RemoveQueuedSession(old->second))
                 decrease_session = false;
             // not remove replaced session form queue if listed
             delete old->second;
@@ -225,9 +225,9 @@ World::AddSession_ (WorldSession* s)
 
     m_sessions[s->GetAccountId ()] = s;
 
-    uint32 Sessions = GetActiveAndQueuedSessionCount ();
-    uint32 pLimit = GetPlayerAmountLimit ();
-    uint32 QueueSize = GetQueueSize ();                     //number of players in the queue
+    uint32 Sessions = GetActiveAndQueuedSessionCount();
+    uint32 pLimit = GetPlayerAmountLimit();
+    uint32 QueueSize = GetQueuedSessionCount();             //number of players in the queue
 
     //so we don't count the user trying to
     //login as a session and queue the socket that we are using
@@ -236,8 +236,8 @@ World::AddSession_ (WorldSession* s)
 
     if (pLimit > 0 && Sessions >= pLimit && s->GetSecurity () == SEC_PLAYER )
     {
-        AddQueuedPlayer (s);
-        UpdateMaxSessionCounters ();
+        AddQueuedSession(s);
+        UpdateMaxSessionCounters();
         DETAIL_LOG("PlayerQueue: Account id %u is in Queue Position (%u).", s->GetAccountId (), ++QueueSize);
         return;
     }
@@ -271,51 +271,51 @@ World::AddSession_ (WorldSession* s)
     }
 }
 
-int32 World::GetQueuePos(WorldSession* sess)
+int32 World::GetQueuedSessionPos(WorldSession* sess)
 {
     uint32 position = 1;
 
-    for(Queue::const_iterator iter = m_QueuedPlayer.begin(); iter != m_QueuedPlayer.end(); ++iter, ++position)
+    for(Queue::const_iterator iter = m_QueuedSessions.begin(); iter != m_QueuedSessions.end(); ++iter, ++position)
         if((*iter) == sess)
             return position;
 
     return 0;
 }
 
-void World::AddQueuedPlayer(WorldSession* sess)
+void World::AddQueuedSession(WorldSession* sess)
 {
     sess->SetInQueue(true);
-    m_QueuedPlayer.push_back (sess);
+    m_QueuedSessions.push_back (sess);
 
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
     WorldPacket packet (SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4 + 1);
-    packet << uint8 (AUTH_WAIT_QUEUE);
-    packet << uint32 (0);                                   // BillingTimeRemaining
-    packet << uint8 (0);                                    // BillingPlanFlags
-    packet << uint32 (0);                                   // BillingTimeRested
-    packet << uint8 (sess->Expansion());                    // 0 - normal, 1 - TBC, must be set in database manually for each account
-    packet << uint32(GetQueuePos (sess));                   // position in queue
+    packet << uint8(AUTH_WAIT_QUEUE);
+    packet << uint32(0);                                    // BillingTimeRemaining
+    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint32(0);                                    // BillingTimeRested
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, must be set in database manually for each account
+    packet << uint32(GetQueuedSessionPos(sess));            // position in queue
     packet << uint8(0);                                     // unk 3.3.0
-    sess->SendPacket (&packet);
+    sess->SendPacket(&packet);
 }
 
-bool World::RemoveQueuedPlayer(WorldSession* sess)
+bool World::RemoveQueuedSession(WorldSession* sess)
 {
     // sessions count including queued to remove (if removed_session set)
     uint32 sessions = GetActiveSessionCount();
 
     uint32 position = 1;
-    Queue::iterator iter = m_QueuedPlayer.begin();
+    Queue::iterator iter = m_QueuedSessions.begin();
 
     // search to remove and count skipped positions
     bool found = false;
 
-    for(;iter != m_QueuedPlayer.end(); ++iter, ++position)
+    for(;iter != m_QueuedSessions.end(); ++iter, ++position)
     {
         if(*iter==sess)
         {
             sess->SetInQueue(false);
-            iter = m_QueuedPlayer.erase(iter);
+            iter = m_QueuedSessions.erase(iter);
             found = true;                                   // removing queued session
             break;
         }
@@ -329,9 +329,9 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         --sessions;
 
     // accept first in queue
-    if( (!m_playerLimit || (int32)sessions < m_playerLimit) && !m_QueuedPlayer.empty() )
+    if( (!m_playerLimit || (int32)sessions < m_playerLimit) && !m_QueuedSessions.empty() )
     {
-        WorldSession* pop_sess = m_QueuedPlayer.front();
+        WorldSession* pop_sess = m_QueuedSessions.front();
         pop_sess->SetInQueue(false);
         pop_sess->SendAuthWaitQue(0);
         pop_sess->SendAddonsInfo();
@@ -343,16 +343,16 @@ bool World::RemoveQueuedPlayer(WorldSession* sess)
         pop_sess->SendAccountDataTimes(GLOBAL_CACHE_MASK);
         pop_sess->SendTutorialsData();
 
-        m_QueuedPlayer.pop_front();
+        m_QueuedSessions.pop_front();
 
         // update iter to point first queued socket or end() if queue is empty now
-        iter = m_QueuedPlayer.begin();
+        iter = m_QueuedSessions.begin();
         position = 1;
     }
 
     // update position from iter to end()
     // iter point to first not updated socket, position store new position
-    for(; iter != m_QueuedPlayer.end(); ++iter, ++position)
+    for(; iter != m_QueuedSessions.end(); ++iter, ++position)
         (*iter)->SendAuthWaitQue(position);
 
     return found;
@@ -1507,6 +1507,9 @@ void World::Update(uint32 diff)
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();
+
+    //cleanup unused GridMap objects as well as VMaps
+    sTerrainMgr.Update(diff);
 }
 
 /// Send a packet to all players (except self if mentioned)
@@ -1649,7 +1652,7 @@ void World::SendZoneText(uint32 zone, const char* text, WorldSession *self, uint
 /// Kick (and save) all players
 void World::KickAll()
 {
-    m_QueuedPlayer.clear();                                 // prevent send queue update packet and login queued sessions
+    m_QueuedSessions.clear();                               // prevent send queue update packet and login queued sessions
 
     // session not removed at kick and will removed in next update tick
     for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
@@ -1881,7 +1884,7 @@ void World::UpdateSessions( uint32 diff )
         ///- and remove not active sessions from the list
         if(!itr->second->Update(diff))                      // As interval = 0
         {
-            RemoveQueuedPlayer (itr->second);
+            RemoveQueuedSession (itr->second);
             delete itr->second;
             m_sessions.erase(itr);
         }
@@ -2102,8 +2105,8 @@ void World::SetPlayerLimit( int32 limit, bool needUpdate )
 
 void World::UpdateMaxSessionCounters()
 {
-    m_maxActiveSessionCount = std::max(m_maxActiveSessionCount,uint32(m_sessions.size()-m_QueuedPlayer.size()));
-    m_maxQueuedSessionCount = std::max(m_maxQueuedSessionCount,uint32(m_QueuedPlayer.size()));
+    m_maxActiveSessionCount = std::max(m_maxActiveSessionCount,uint32(m_sessions.size()-m_QueuedSessions.size()));
+    m_maxQueuedSessionCount = std::max(m_maxQueuedSessionCount,uint32(m_QueuedSessions.size()));
 }
 
 void World::LoadDBVersion()

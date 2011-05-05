@@ -6,7 +6,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
-#include "Database/SQLStorage.h"
+#include "SQLStorages.h"
 #include "Opcodes.h"
 #include "SharedDefines.h"
 #include "ObjectMgr.h"

@@ -17,9 +17,10 @@
 ## Process this file with automake to produce Makefile.in
 
 ## Sub-directories to parse
+SUBDIRS = vmap
 
 ## CPP flags for includes, defines, etc.
-AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../framework -I$(srcdir)/../shared -I$(srcdir)/../shared/vmap -I$(srcdir)/../realmd -DSYSCONFDIR=\"$(sysconfdir)/\"
+AM_CPPFLAGS = $(MANGOS_INCLUDES) -I$(top_builddir)/src/shared -I$(srcdir) -I$(srcdir)/../../dep/include -I$(srcdir)/../framework -I$(srcdir)/../shared -I$(srcdir)/vmap -I$(srcdir)/../realmd -I$(srcdir)/../../dep/include/g3dlite -DSYSCONFDIR=\"$(sysconfdir)/\"
 
 ## Build MaNGOS game library as convenience library.
 #  All libraries will be convenience libraries. Might be changed to shared
@@ -178,8 +179,6 @@ libmangosgame_a_SOURCES = \
 	Mail.h \
 	Map.cpp \
 	Map.h \
-	MapInstanced.cpp \
-	MapInstanced.h \
 	MapManager.cpp \
 	MapManager.h \
 	MapReference.h \
@@ -253,6 +252,8 @@ libmangosgame_a_SOURCES = \
 	SocialMgr.h \
 	SpellMgr.cpp \
 	SpellMgr.h \
+	SQLStorages.cpp \
+	SQLStorages.h \
 	StatSystem.cpp \
 	TargetedMovementGenerator.cpp \
 	TargetedMovementGenerator.h \

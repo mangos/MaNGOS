@@ -495,7 +495,7 @@ struct AchievementCriteriaEntry
                                                             // 7: ByKillNpcId,  9: ByUseItemId
     uint32  timedCriteriaMiscId;                            // 12 Alway appears with timed events, used internally to start the achievement, store 
     uint32  timeLimit;                                      // 13 time limit in seconds
-    uint32  showOrder;                                      // 14 show order
+    uint32  showOrder;                                      // 14 show order, also used in achievement shift-links as index in state bitmask
     //uint32 unk1;                                          // 15 only one value, still unknown
     //uint32 unk2;                                          // 16 all zeros
     //uint32 moreRequirement[3];                            // 17-19
@@ -828,10 +828,10 @@ struct FactionEntry
     int32       BaseRepValue[4];                            // 10-13    m_reputationBase
     uint32      ReputationFlags[4];                         // 14-17    m_reputationFlags
     uint32      team;                                       // 18       m_parentFactionID
-    //float     spilloverRate1;                             // 19       Members of the team gain (received_rep*rate). If spilloverRate1 is (0.0 || 1.0), spilloverRate2 are used instead...
-    //float     spilloverRate2;                             // 20       ...but only if spilloverRate2 is not (1.0 || 0.0). Faction must be member of a team before spillover are given.
-    //uint32    spilloverMaxRank;                           // 21       The highest rank player will receive spillover at (the cap). Above this rank will not give any spillover for this faction
-    //uint32    spilloverRank_unk;                          // 22
+    float       spilloverRateIn;                            // 19       Faction gains incoming rep * spilloverRateIn
+    float       spilloverRateOut;                           // 20       Faction outputs rep * spilloverRateOut as spillover reputation
+    uint32      spilloverMaxRankIn;                         // 21       The highest rank the faction will profit from incoming spillover
+    //uint32    spilloverRank_unk;                          // 22       It does not seem to be the max standing at which a faction outputs spillover ...so no idea
     DBCString name;                                         // 23       m_name_lang
     //char*     description;                                // 24       m_description_lang
     //uint32                                                // 25
@@ -938,6 +938,8 @@ struct GlyphSlotEntry
 
 // All Gt* DBC store data for 100 levels, some by 100 per class/race
 #define GT_MAX_LEVEL    100
+// gtOCTClassCombatRatingScalar.dbc stores data for 32 ratings, look at MAX_COMBAT_RATING for real used amount
+#define GT_MAX_RATING   32
 
 struct GtBarberShopCostBaseEntry
 {
@@ -972,6 +974,11 @@ struct GtChanceToSpellCritBaseEntry
 struct GtChanceToSpellCritEntry
 {
     //uint32 level;
+    float    ratio;
+};
+
+struct GtOCTClassCombatRatingScalarEntry
+{
     float    ratio;
 };
 
@@ -1241,6 +1248,15 @@ struct MovieEntry
     //char*       filename;                                 // 1
     //uint32      unk1;                                     // 2 100 or 250
     //uint32      unk2;                                     // 3 4.0.0
+};
+
+#define MAX_OVERRIDE_SPELLS     10
+
+struct OverrideSpellDataEntry
+{
+    uint32      Id;                                         // 0 index
+    uint32      Spells[MAX_OVERRIDE_SPELLS];                // 1-10 spells
+    //uint32      unk2;                                     // 11 possibly flag
 };
 
 struct PvPDifficultyEntry
@@ -1745,6 +1761,20 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32 GetTargets() const;
     uint32 GetEffectApplyAuraNameByIndex(SpellEffectIndex index) const;
 
+    bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
+    {
+        SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
+        return classOpt && ((classOpt->SpellFamilyFlags & familyFlags) || (classOpt->SpellFamilyFlags2 & familyFlags2));
+    }
+
+    bool IsFitToFamily(SpellFamily family, uint64 familyFlags, uint32 familyFlags2 = 0) const
+    {
+        SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
+
+        return classOpt && SpellFamily(classOpt->SpellFamilyName) == family &&
+            ((classOpt->SpellFamilyFlags & familyFlags) || (classOpt->SpellFamilyFlags2 & familyFlags2));
+    }
+
 private:
     // prevent creating custom entries (copy data from original in fact)
     SpellEntry(SpellEntry const&);                          // DON'T must have implementation
@@ -1862,8 +1892,10 @@ struct SummonPropertiesEntry
     uint32  Id;                                             // 0
     uint32  Group;                                          // 1, enum SummonPropGroup
     uint32  FactionId;                                      // 2,                        14 rows > 0
-    uint32  Type;                                           // 3, enum SummonPropType
-    uint32  Slot;                                           // 4,   if type = SUMMON_PROP_TYPE_TOTEM, its actual slot    0-6
+    uint32  Title;                                          // 3, enum UnitNameSummonTitle
+    uint32  Slot;                                           // 4, if title = UNITNAME_SUMMON_TITLE_TOTEM, its actual slot (0-6).
+                                                            //    if title = UNITNAME_SUMMON_TITLE_COMPANION, slot=6 -> defensive guardian, in other cases criter/minipet
+                                                            //    Slot may have other uses, selection of pet type in some cases?
     uint32  Flags;                                          // 5, enum SummonPropFlags
 };
 

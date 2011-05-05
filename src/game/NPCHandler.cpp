@@ -384,7 +384,7 @@ void WorldSession::SendSpiritResurrect()
     Corpse *corpse = _player->GetCorpse();
     if(corpse)
         corpseGrave = sObjectMgr.GetClosestGraveYard(
-            corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeam() );
+            corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeam());
 
     // now can spawn bones
     _player->SpawnCorpseBones();
@@ -393,7 +393,7 @@ void WorldSession::SendSpiritResurrect()
     if(corpseGrave)
     {
         WorldSafeLocsEntry const *ghostGrave = sObjectMgr.GetClosestGraveYard(
-            _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam() );
+            _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam());
 
         if(corpseGrave != ghostGrave)
             _player->TeleportTo(corpseGrave->map_id, corpseGrave->x, corpseGrave->y, corpseGrave->z, _player->GetOrientation());
@@ -414,16 +414,16 @@ void WorldSession::SendSpiritResurrect()
 
 void WorldSession::HandleBinderActivateOpcode( WorldPacket & recv_data )
 {
-    uint64 npcGUID;
-    recv_data >> npcGUID;
+    ObjectGuid npcGuid;
+    recv_data >> npcGuid;
 
     if(!GetPlayer()->IsInWorld() || !GetPlayer()->isAlive())
         return;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID,UNIT_NPC_FLAG_INNKEEPER);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid,UNIT_NPC_FLAG_INNKEEPER);
     if (!unit)
     {
-        DEBUG_LOG( "WORLD: HandleBinderActivateOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
+        DEBUG_LOG("WORLD: HandleBinderActivateOpcode - %s not found or you can't interact with him.", npcGuid.GetString().c_str());
         return;
     }
 
@@ -614,7 +614,7 @@ void WorldSession::HandleStablePet( WorldPacket & recv_data )
 
     if( free_slot > 0 && free_slot <= GetPlayer()->m_stableSlots)
     {
-        _player->RemovePet(pet,PetSaveMode(free_slot));
+        pet->Unsummon(PetSaveMode(free_slot), _player);
         SendStableResult(STABLE_SUCCESS_STABLE);
     }
     else
@@ -678,7 +678,7 @@ void WorldSession::HandleUnstablePet( WorldPacket & recv_data )
 
     // delete dead pet
     if(pet)
-        _player->RemovePet(pet,PET_SAVE_AS_DELETED);
+        pet->Unsummon(PET_SAVE_AS_DELETED, _player);
 
     Pet *newpet = new Pet(HUNTER_PET);
     if(!newpet->LoadPetFromDB(_player,creature_id,petnumber))
@@ -790,7 +790,7 @@ void WorldSession::HandleStableSwapPet( WorldPacket & recv_data )
     }
 
     // move alive pet to slot or delete dead pet
-    _player->RemovePet(pet,pet->isAlive() ? PetSaveMode(slot) : PET_SAVE_AS_DELETED);
+    pet->Unsummon(pet->isAlive() ? PetSaveMode(slot) : PET_SAVE_AS_DELETED, _player);
 
     // summon unstabled pet
     Pet *newpet = new Pet;
@@ -807,15 +807,16 @@ void WorldSession::HandleRepairItemOpcode( WorldPacket & recv_data )
 {
     DEBUG_LOG("WORLD: CMSG_REPAIR_ITEM");
 
-    uint64 npcGUID, itemGUID;
+    ObjectGuid npcGuid;
+    ObjectGuid itemGuid;
     uint8 guildBank;                                        // new in 2.3.2, bool that means from guild bank money
 
-    recv_data >> npcGUID >> itemGUID >> guildBank;
+    recv_data >> npcGuid >> itemGuid >> guildBank;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGUID, UNIT_NPC_FLAG_REPAIR);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_REPAIR);
     if (!unit)
     {
-        DEBUG_LOG( "WORLD: HandleRepairItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(npcGUID)) );
+        DEBUG_LOG( "WORLD: HandleRepairItemOpcode - %s not found or you can't interact with him.", npcGuid.GetString().c_str());
         return;
     }
 
@@ -827,20 +828,20 @@ void WorldSession::HandleRepairItemOpcode( WorldPacket & recv_data )
     float discountMod = _player->GetReputationPriceDiscount(unit);
 
     uint32 TotalCost = 0;
-    if (itemGUID)
+    if (!itemGuid.IsEmpty())
     {
-        DEBUG_LOG("ITEM: Repair item, itemGUID = %u, npcGUID = %u", GUID_LOPART(itemGUID), GUID_LOPART(npcGUID));
+        DEBUG_LOG("ITEM: %s repair of %s", npcGuid.GetString().c_str(), itemGuid.GetString().c_str());
 
-        Item* item = _player->GetItemByGuid(itemGUID);
+        Item* item = _player->GetItemByGuid(itemGuid);
 
         if(item)
-            TotalCost= _player->DurabilityRepair(item->GetPos(),true,discountMod,guildBank>0?true:false);
+            TotalCost= _player->DurabilityRepair(item->GetPos(), true, discountMod, (guildBank > 0));
     }
     else
     {
-        DEBUG_LOG("ITEM: Repair all items, npcGUID = %u", GUID_LOPART(npcGUID));
+        DEBUG_LOG("ITEM: %s repair all items", npcGuid.GetString().c_str());
 
-        TotalCost = _player->DurabilityRepairAll(true,discountMod,guildBank>0?true:false);
+        TotalCost = _player->DurabilityRepairAll(true, discountMod, (guildBank > 0));
     }
     if (guildBank)
     {

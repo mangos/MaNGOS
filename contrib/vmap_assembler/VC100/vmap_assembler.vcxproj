@@ -78,7 +78,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NO_CORE_FUNCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -110,7 +110,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NO_CORE_FUNCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NO_CORE_FUNCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\shared\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\dep\include\g3dlite;..\..\..\src\shared;..\..\..\src\game\vmap;..\..\..\src\framework;..\..\..\dep\ACE_wrappers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NO_CORE_FUNCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
@@ -182,21 +182,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\vmap_assembler.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\BIH.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\MapTree.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\ModelInstance.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\TileAssembler.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\VMapManager2.cpp" />
-    <ClCompile Include="..\..\..\src\shared\vmap\WorldModel.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\BIH.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\MapTree.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\ModelInstance.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\TileAssembler.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\VMapManager2.cpp" />
+    <ClCompile Include="..\..\..\src\game\vmap\WorldModel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\shared\vmap\BIH.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\MapTree.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\ModelInstance.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\TileAssembler.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\VMapManager2.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\VMapTools.h" />
-    <ClInclude Include="..\..\..\src\shared\vmap\WorldModel.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\BIH.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\MapTree.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\ModelInstance.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\TileAssembler.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\VMapManager2.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\VMapTools.h" />
+    <ClInclude Include="..\..\..\src\game\vmap\WorldModel.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\win\VC100\g3dlite.vcxproj">

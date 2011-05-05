@@ -67,13 +67,13 @@ void BattleGroundBE::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in constructor
     BattleGroundBEScore* sc = new BattleGroundBEScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 
     UpdateWorldState(0x9f1, GetAlivePlayersCountByTeam(ALLIANCE));
     UpdateWorldState(0x9f0, GetAlivePlayersCountByTeam(HORDE));
 }
 
-void BattleGroundBE::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
+void BattleGroundBE::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
     if (GetStatus() == STATUS_WAIT_LEAVE)
         return;
@@ -156,12 +156,12 @@ bool BattleGroundBE::SetupBattleGround()
 void BattleGroundBE::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
 
-    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetGUID());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
     if(itr == m_PlayerScores.end())                         // player not found...
         return;
 
     //there is nothing special in this score
-    BattleGround::UpdatePlayerScore(Source,type,value);
+    BattleGround::UpdatePlayerScore(Source, type, value);
 
 }
 

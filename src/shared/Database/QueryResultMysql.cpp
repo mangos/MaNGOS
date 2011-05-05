@@ -88,7 +88,6 @@ enum Field::DataTypes QueryResultMysql::ConvertNativeType(enum_field_types mysql
         case FIELD_TYPE_NULL:
             return Field::DB_TYPE_STRING;
         case FIELD_TYPE_TINY:
-
         case FIELD_TYPE_SHORT:
         case FIELD_TYPE_LONG:
         case FIELD_TYPE_INT24:

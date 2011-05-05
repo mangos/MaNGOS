@@ -67,13 +67,13 @@ void BattleGroundRL::AddPlayer(Player *plr)
     //create score and add it to map, default values are set in constructor
     BattleGroundRLScore* sc = new BattleGroundRLScore;
 
-    m_PlayerScores[plr->GetGUID()] = sc;
+    m_PlayerScores[plr->GetObjectGuid()] = sc;
 
     UpdateWorldState(0xbb8, GetAlivePlayersCountByTeam(ALLIANCE));
     UpdateWorldState(0xbb9, GetAlivePlayersCountByTeam(HORDE));
 }
 
-void BattleGroundRL::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
+void BattleGroundRL::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
     if (GetStatus() == STATUS_WAIT_LEAVE)
         return;

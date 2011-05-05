@@ -196,7 +196,7 @@ void Creature::RemoveCorpse()
 /**
  * change the entry of creature until respawn
  */
-bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
+bool Creature::InitEntry(uint32 Entry, const CreatureData *data )
 {
     CreatureInfo const *normalInfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!normalInfo)
@@ -283,10 +283,9 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    SetSpeedRate(MOVE_WALK, cinfo->speed_walk);
-    SetSpeedRate(MOVE_RUN,  cinfo->speed_run);
-    SetSpeedRate(MOVE_SWIM, 1.0f);                          // using 1.0 rate
-    SetSpeedRate(MOVE_FLIGHT, 1.0f);                        // using 1.0 rate
+    // update speed for the new CreatureInfo base speed mods
+    UpdateSpeed(MOVE_WALK, false);
+    UpdateSpeed(MOVE_RUN,  false);
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
@@ -294,9 +293,9 @@ bool Creature::InitEntry(uint32 Entry, uint32 team, const CreatureData *data )
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, uint32 team, const CreatureData *data, bool preserveHPAndPower)
+bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data, bool preserveHPAndPower)
 {
-    if (!InitEntry(Entry, team, data))
+    if (!InitEntry(Entry, data))
         return false;
 
     m_regenHealth = GetCreatureInfo()->RegenHealth;
@@ -659,7 +658,7 @@ void Creature::DoFleeToGetAssistance()
         UpdateSpeed(MOVE_RUN, false);
 
         if(!pCreature)
-            SetFeared(true, getVictim()->GetGUID(), 0 ,sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
+            SetFeared(true, getVictim()->GetObjectGuid(), 0 ,sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
         else
             GetMotionMaster()->MoveSeekAssistance(pCreature->GetPositionX(), pCreature->GetPositionY(), pCreature->GetPositionZ());
     }
@@ -682,7 +681,7 @@ bool Creature::AIM_Initialize()
     return true;
 }
 
-bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 team, const CreatureData *data)
+bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, Team team, const CreatureData *data)
 {
     MANGOS_ASSERT(map);
     SetMap(map);
@@ -725,24 +724,29 @@ bool Creature::Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, 
 
 bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
 {
-    if(!isTrainer())
+    if (!isTrainer())
         return false;
 
-    TrainerSpellData const* trainer_spells = GetTrainerSpells();
-
-    if(!trainer_spells || trainer_spells->spellList.empty())
+    // pet trainers not have spells in fact now
+    if (GetCreatureInfo()->trainer_type != TRAINER_TYPE_PETS)
     {
-        sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
-            GetGUIDLow(),GetEntry());
-        return false;
+        TrainerSpellData const* trainer_spells = GetTrainerSpells();
+
+        // for not pet trainer expected not empty trainer list always
+        if (!trainer_spells || trainer_spells->spellList.empty())
+        {
+            sLog.outErrorDb("Creature %u (Entry: %u) have UNIT_NPC_FLAG_TRAINER but have empty trainer spell list.",
+                GetGUIDLow(),GetEntry());
+            return false;
+        }
     }
 
     switch(GetCreatureInfo()->trainer_type)
     {
         case TRAINER_TYPE_CLASS:
-            if(pPlayer->getClass() != GetCreatureInfo()->trainer_class)
+            if (pPlayer->getClass() != GetCreatureInfo()->trainer_class)
             {
-                if(msg)
+                if (msg)
                 {
                     pPlayer->PlayerTalkClass->ClearMenus();
                     switch(GetCreatureInfo()->trainer_class)
@@ -762,17 +766,20 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
             }
             break;
         case TRAINER_TYPE_PETS:
-            if(pPlayer->getClass() != CLASS_HUNTER)
+            if (pPlayer->getClass() != CLASS_HUNTER)
             {
-                pPlayer->PlayerTalkClass->ClearMenus();
-                pPlayer->PlayerTalkClass->SendGossipMenu(3620, GetGUID());
+                if (msg)
+                {
+                    pPlayer->PlayerTalkClass->ClearMenus();
+                    pPlayer->PlayerTalkClass->SendGossipMenu(3620, GetGUID());
+                }
                 return false;
             }
             break;
         case TRAINER_TYPE_MOUNTS:
-            if(GetCreatureInfo()->trainer_race && pPlayer->getRace() != GetCreatureInfo()->trainer_race)
+            if (GetCreatureInfo()->trainer_race && pPlayer->getRace() != GetCreatureInfo()->trainer_race)
             {
-                if(msg)
+                if (msg)
                 {
                     pPlayer->PlayerTalkClass->ClearMenus();
                     switch(GetCreatureInfo()->trainer_class)
@@ -793,9 +800,9 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
             }
             break;
         case TRAINER_TYPE_TRADESKILLS:
-            if(GetCreatureInfo()->trainer_spell && !pPlayer->HasSpell(GetCreatureInfo()->trainer_spell))
+            if (GetCreatureInfo()->trainer_spell && !pPlayer->HasSpell(GetCreatureInfo()->trainer_spell))
             {
-                if(msg)
+                if (msg)
                 {
                     pPlayer->PlayerTalkClass->ClearMenus();
                     pPlayer->PlayerTalkClass->SendGossipMenu(11031, GetGUID());
@@ -1172,7 +1179,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
     }
 }
 
-bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 team, const CreatureData *data)
+bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, Team team, const CreatureData *data)
 {
     CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(Entry);
     if(!cinfo)
@@ -1213,8 +1220,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     else
         guidlow = sObjectMgr.GenerateLowGuid(HIGHGUID_UNIT);
 
-    uint16 team = 0;
-    if (!Create(guidlow, map, data->phaseMask, data->id, team, data))
+    if (!Create(guidlow, map, data->phaseMask, data->id, TEAM_NONE, data))
         return false;
 
     Relocate(data->posX, data->posY, data->posZ, data->orientation);
@@ -1237,7 +1243,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
         m_deathState = DEAD;
         if(CanFly())
         {
-            float tz = GetMap()->GetHeight(data->posX, data->posY, data->posZ, false);
+            float tz = GetTerrain()->GetHeight(data->posX, data->posY, data->posZ, false);
             if(data->posZ - tz > 0.1)
                 Relocate(data->posX, data->posY, tz);
         }
@@ -1427,7 +1433,7 @@ bool Creature::FallGround()
         return false;
 
     // use larger distance for vmap height search than in most other cases
-    float tz = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
+    float tz = GetTerrain()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
 
     if (tz < INVALID_HEIGHT)
     {
@@ -1851,20 +1857,19 @@ bool Creature::LoadCreatureAddon(bool reload)
         SetByteValue(UNIT_FIELD_BYTES_1, 3, uint8((cainfo->bytes1 >> 24) & 0xFF));
     }
 
-    if (cainfo->bytes2 != 0)
-    {
-        // 0 SheathState
-        // 1 UnitPVPStateFlags  Set at Creature::UpdateEntry (SetPvp())
-        // 2 UnitRename         Pet only, so always 0 for default creature
-        // 3 ShapeshiftForm     Must be determined/set by shapeshift spell/aura
+    // UNIT_FIELD_BYTES_2
+    // 0 SheathState
+    // 1 UnitPVPStateFlags  Set at Creature::UpdateEntry (SetPvp())
+    // 2 UnitRename         Pet only, so always 0 for default creature
+    // 3 ShapeshiftForm     Must be determined/set by shapeshift spell/aura
+    if (cainfo->sheath_state != 0)
+        SetByteValue(UNIT_FIELD_BYTES_2, 0, cainfo->sheath_state);
 
-        SetByteValue(UNIT_FIELD_BYTES_2, 0, uint8(cainfo->bytes2 & 0xFF));
-        SetByteValue(UNIT_FIELD_BYTES_2, 1, uint8((cainfo->bytes2 >> 8) & 0xFF));
-        //SetByteValue(UNIT_FIELD_BYTES_2, 2, uint8((cainfo->bytes2 >> 16) & 0xFF));
-        SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
-        //SetByteValue(UNIT_FIELD_BYTES_2, 3, uint8((cainfo->bytes2 >> 24) & 0xFF));
-        SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
-    }
+    if (cainfo->pvp_state != 0)
+        SetByteValue(UNIT_FIELD_BYTES_2, 1, cainfo->pvp_state);
+
+    //SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
+    //SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
 
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
@@ -1923,7 +1928,7 @@ bool Creature::LoadCreatureAddon(bool reload)
 /// Send a message to LocalDefense channel for players opposition team in the zone
 void Creature::SendZoneUnderAttackMessage(Player* attacker)
 {
-    uint32 enemy_team = attacker->GetTeam();
+    Team enemy_team = attacker->GetTeam();
 
     WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
     data << uint32(GetZoneId());
