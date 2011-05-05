@@ -1257,6 +1257,7 @@ struct OverrideSpellDataEntry
     uint32      Id;                                         // 0 index
     uint32      Spells[MAX_OVERRIDE_SPELLS];                // 1-10 spells
     //uint32      unk2;                                     // 11 possibly flag
+    //uint32      unk3;                                     // 12 possibly flag
 };
 
 struct PvPDifficultyEntry
@@ -1837,6 +1838,7 @@ struct SpellShapeshiftFormEntry
     //uint32 unk3;                                          // 9 unused always 0
     //uint32 unk4;                                          // 10 unused always 0
     uint32 spellId[8];                                      // 11-18 spells which appear in the bar after shapeshifting
+    //uint32 unk5;                                          // 19 unused, !=0 for fligh forms
 };
 
 struct SpellDifficultyEntry
@@ -1964,12 +1966,6 @@ struct TaxiPathNodeEntry
     uint32    delay;                                        // 8        m_delay
     uint32    arrivalEventID;                               // 9        m_arrivalEventID
     uint32    departureEventID;                             // 10       m_departureEventID
-};
-
-struct TeamContributionPoints
-{
-    //uint32    Entry;                                      // 0
-    float     Value;                                        // 1 (???)
 };
 
 struct TotemCategoryEntry

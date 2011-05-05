@@ -224,10 +224,12 @@ enum AchievementCriteriaTypes
     // 131 unused
     // 132 Earn a battleground rating of X.
     // 133 Create and purchase a guild crest.
-    // 0..133 => 134 criteria types total
+    // 134 Complete quests
+    // 135 Honorable kills
+    // 0..135 => 136 criteria types total
 };
 
-#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 134
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 136
 
 enum AchievementCriteriaMoreReqType
 {
