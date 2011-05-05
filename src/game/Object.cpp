@@ -1396,9 +1396,9 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float &z) const
             // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
             if (!((Creature const*)this)->CanFly())
             {
-                bool CanSwim = ((Creature const*)this)->CanSwim();
+                bool canSwim = ((Creature const*)this)->CanSwim();
                 float ground_z = z;
-                float max_z = CanSwim
+                float max_z = canSwim
                     ? GetTerrain()->GetWaterOrGroundLevel(x, y, z, &ground_z, !((Unit const*)this)->HasAuraType(SPELL_AURA_WATER_WALK))
                     : ((ground_z = GetTerrain()->GetHeight(x, y, z, true)));
                 if (max_z > INVALID_HEIGHT)
@@ -1653,24 +1653,18 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     if (GetTypeId()==TYPEID_PLAYER)
         team = ((Player*)this)->GetTeam();
 
-    if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), GetMap(), GetPhaseMask(), id, team))
-    {
-        delete pCreature;
-        return NULL;
-    }
+    CreatureCreatePos pos(GetMap(), x, y, z, ang, GetPhaseMask());
 
     if (x == 0.0f && y == 0.0f && z == 0.0f)
-        GetClosePoint(x, y, z, pCreature->GetObjectBoundingRadius());
+        pos = CreatureCreatePos(this, GetOrientation(), CONTACT_DISTANCE, ang);
 
-    pCreature->Relocate(x, y, z, ang);
-    pCreature->SetSummonPoint(x, y, z, ang);
-
-    if(!pCreature->IsPositionValid())
+    if (!pCreature->Create(GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, id, team))
     {
-        sLog.outError("Creature (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",pCreature->GetGUIDLow(),pCreature->GetEntry(),pCreature->GetPositionX(),pCreature->GetPositionY());
         delete pCreature;
         return NULL;
     }
+
+    pCreature->SetSummonPoint(pos);
 
     // Active state set before added to map
     pCreature->SetActiveObjectState(asActiveObject);
@@ -1912,10 +1906,7 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
     m_phaseMask = newPhaseMask;
 
     if(update && IsInWorld())
-    {
-        UpdateObjectVisibility();
-        GetViewPoint().Event_ViewPointVisibilityChanged();
-    }
+        UpdateVisibilityAndView();
 }
 
 void WorldObject::PlayDistanceSound( uint32 sound_id, Player* target /*= NULL*/ )
@@ -1937,6 +1928,13 @@ void WorldObject::PlayDirectSound( uint32 sound_id, Player* target /*= NULL*/ )
         target->SendDirectMessage( &data );
     else
         SendMessageToSet( &data, true );
+}
+
+void WorldObject::UpdateVisibilityAndView()
+{
+    GetViewPoint().Call_UpdateVisibilityForOwner();
+    UpdateObjectVisibility();
+    GetViewPoint().Event_ViewPointVisibilityChanged();
 }
 
 void WorldObject::UpdateObjectVisibility()

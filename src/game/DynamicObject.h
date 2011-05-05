@@ -65,6 +65,7 @@ class DynamicObject : public WorldObject
         SpellEffectIndex m_effIndex;
         int32 m_aliveDuration;
         float m_radius;                                     // radius apply persistent effect, 0 = no persistent effect
+        bool m_positive;
         AffectedSet m_affected;
     private:
         GridReference<DynamicObject> m_gridRef;

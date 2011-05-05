@@ -43,7 +43,7 @@ Map::~Map()
     UnloadAll(true);
 
     if(!m_scriptSchedule.empty())
-        sWorld.DecreaseScheduledScriptCount(m_scriptSchedule.size());
+        sScriptMgr.DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
     if (m_persistentState)
         m_persistentState->SetUsedByMapState(NULL);         // field pointer can be deleted after this
@@ -199,23 +199,6 @@ void Map::DeleteFromWorld(Player* pl)
     delete pl;
 }
 
-template<class T>
-void Map::AddNotifier(T* , Cell const& , CellPair const& )
-{
-}
-
-template<>
-void Map::AddNotifier(Player* obj, Cell const& cell, CellPair const& cellpair)
-{
-    PlayerRelocationNotify(obj,cell,cellpair);
-}
-
-template<>
-void Map::AddNotifier(Creature* obj, Cell const&, CellPair const&)
-{
-    obj->SetNeedNotify();
-}
-
 void
 Map::EnsureGridCreated(const GridPair &p)
 {
@@ -317,8 +300,6 @@ bool Map::Add(Player *player)
     player->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(player,cell,p);
 
-    AddNotifier(player,cell,p);
-
     if (i_data)
         i_data->OnPlayerEnter(player);
 
@@ -359,8 +340,6 @@ Map::Add(T *obj)
 
     obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(obj,cell,p);
-
-    AddNotifier(obj,cell,p);
 }
 
 void Map::MessageBroadcast(Player *player, WorldPacket *msg, bool to_self)
@@ -708,10 +687,7 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
         player->GetViewPoint().Event_GridChanged(&(*newGrid)(new_cell.CellX(),new_cell.CellY()));
     }
 
-    player->GetViewPoint().Call_UpdateVisibilityForOwner();
-    // if move then update what player see and who seen
-    UpdateObjectVisibility(player, new_cell, new_val);
-    PlayerRelocationNotify(player,new_cell,new_val);
+    player->OnRelocated();
 
     NGridType* newGrid = getNGrid(new_cell.GridX(), new_cell.GridY());
     if( !same_cell && newGrid->GetGridState()!= GRID_STATE_ACTIVE )
@@ -731,39 +707,31 @@ Map::CreatureRelocation(Creature *creature, float x, float y, float z, float ang
     CellPair new_val = MaNGOS::ComputeCellPair(x, y);
     Cell new_cell(new_val);
 
-    // delay creature move for grid/cell to grid/cell moves
     if (old_cell.DiffCell(new_cell) || old_cell.DiffGrid(new_cell))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u) added to moving list from grid[%u,%u]cell[%u,%u] to grid[%u,%u]cell[%u,%u].", creature->GetGUIDLow(), creature->GetEntry(), old_cell.GridX(), old_cell.GridY(), old_cell.CellX(), old_cell.CellY(), new_cell.GridX(), new_cell.GridY(), new_cell.CellX(), new_cell.CellY());
 
         // do move or do move to respawn or remove creature if previous all fail
-        if(CreatureCellRelocation(creature,new_cell))
+        if (CreatureCellRelocation(creature,new_cell))
         {
             // update pos
             creature->Relocate(x, y, z, ang);
-
-            // in diffcell/diffgrid case notifiers called in Creature::Update
-            creature->SetNeedNotify();
+            creature->OnRelocated();
         }
-        else
+        // if creature can't be move in new cell/grid (not loaded) move it to repawn cell/grid
+        // creature coordinates will be updated and notifiers send
+        else if (!CreatureRespawnRelocation(creature))
         {
-            // if creature can't be move in new cell/grid (not loaded) move it to repawn cell/grid
-            // creature coordinates will be updated and notifiers send
-            if(!CreatureRespawnRelocation(creature))
-            {
-                // ... or unload (if respawn grid also not loaded)
-                DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u ) can't be move to unloaded respawn grid.",creature->GetGUIDLow(),creature->GetEntry());
-                creature->SetNeedNotify();
-            }
+            // ... or unload (if respawn grid also not loaded)
+            DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u ) can't be move to unloaded respawn grid.",creature->GetGUIDLow(),creature->GetEntry());
         }
     }
     else
     {
         creature->Relocate(x, y, z, ang);
-        creature->SetNeedNotify();
+        creature->OnRelocated();
     }
 
-    creature->GetViewPoint().Call_UpdateVisibilityForOwner();
     MANGOS_ASSERT(CheckGridIntegrity(creature,true));
 }
 
@@ -847,7 +815,7 @@ bool Map::CreatureRespawnRelocation(Creature *c)
     {
         c->Relocate(resp_x, resp_y, resp_z, resp_o);
         c->GetMotionMaster()->Initialize();                 // prevent possible problems with default move generators
-        c->SetNeedNotify();
+        c->OnRelocated();
         return true;
     }
     else
@@ -962,19 +930,6 @@ void Map::UpdateObjectVisibility( WorldObject* obj, Cell cell, CellPair cellpair
     MaNGOS::VisibleChangesNotifier notifier(*obj);
     TypeContainerVisitor<MaNGOS::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
     cell.Visit(cellpair, player_notifier, *this, *obj, GetVisibilityDistance());
-}
-
-void Map::PlayerRelocationNotify( Player* player, Cell cell, CellPair cellpair )
-{
-    MaNGOS::PlayerRelocationNotifier relocationNotifier(*player);
-
-    TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, GridTypeMapContainer >  p2grid_relocation(relocationNotifier);
-    TypeContainerVisitor<MaNGOS::PlayerRelocationNotifier, WorldTypeMapContainer > p2world_relocation(relocationNotifier);
-
-    float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
-
-    cell.Visit(cellpair, p2grid_relocation, *this, *player, radius);
-    cell.Visit(cellpair, p2world_relocation, *this, *player, radius);
 }
 
 void Map::SendInitSelf( Player * player )
@@ -1720,11 +1675,11 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         sa.ownerGuid  = ownerGuid;
 
         sa.script = &iter->second;
-        m_scriptSchedule.insert(std::pair<time_t, ScriptAction>(time_t(sWorld.GetGameTime() + iter->first), sa));
+        m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + iter->first), sa));
         if (iter->first == 0)
             immedScript = true;
 
-        sWorld.IncreaseScheduledScriptsCount();
+        sScriptMgr.IncreaseScheduledScriptsCount();
     }
     ///- If one of the effects should be immediate, launch the script execution
     if (immedScript)
@@ -1746,9 +1701,9 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     sa.ownerGuid  = ownerGuid;
 
     sa.script = &script;
-    m_scriptSchedule.insert(std::pair<time_t, ScriptAction>(time_t(sWorld.GetGameTime() + delay), sa));
+    m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + delay), sa));
 
-    sWorld.IncreaseScheduledScriptsCount();
+    sScriptMgr.IncreaseScheduledScriptsCount();
 
     ///- If effects should be immediate, launch the script execution
     if(delay == 0)
@@ -1762,7 +1717,7 @@ void Map::ScriptsProcess()
         return;
 
     ///- Process overdue queued scripts
-    std::multimap<time_t, ScriptAction>::iterator iter = m_scriptSchedule.begin();
+    ScriptScheduleMap::iterator iter = m_scriptSchedule.begin();
     // ok as multimap is a *sorted* associative container
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
@@ -2868,9 +2823,9 @@ void Map::ScriptsProcess()
         }
 
         m_scriptSchedule.erase(iter);
-        sWorld.DecreaseScheduledScriptCount();
-
         iter = m_scriptSchedule.begin();
+
+        sScriptMgr.DecreaseScheduledScriptCount();
     }
 }
 

@@ -211,6 +211,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "setitemvalue",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetItemValueCommand,        "", NULL },
         { "setvalue",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSetValueCommand,            "", NULL },
         { "spellcheck",     SEC_CONSOLE,        true,  &ChatHandler::HandleDebugSpellCheckCommand,          "", NULL },
+        { "spellcoefs",     SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugSpellCoefsCommand,          "", NULL },
         { "spellmods",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpellModsCommand,           "", NULL },
         { "spawnvehicle",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSpawnVehicleCommand,        "", NULL },
         { "uws",            SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugUpdateWorldStateCommand,    "", NULL },
@@ -233,8 +234,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "ingame",         SEC_PLAYER,         true,  &ChatHandler::HandleGMListIngameCommand,        "", NULL },
         { "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleGMListFullCommand,          "", NULL },
         { "visible",        SEC_MODERATOR,      false, &ChatHandler::HandleGMVisibleCommand,           "", NULL },
-        { "",               SEC_MODERATOR,      false, &ChatHandler::HandleGMCommand,                  "", NULL },
         { "setview",        SEC_MODERATOR,      false, &ChatHandler::HandleSetViewCommand,             "", NULL },
+        { "",               SEC_MODERATOR,      false, &ChatHandler::HandleGMCommand,                  "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 

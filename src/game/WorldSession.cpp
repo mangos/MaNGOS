@@ -749,15 +749,32 @@ void WorldSession::SendTutorialsData()
 
 void WorldSession::SaveTutorialsData()
 {
+    static SqlStatementID updTutorial ;
+    static SqlStatementID insTutorial ;
+
     switch(m_tutorialState)
     {
         case TUTORIALDATA_CHANGED:
-            CharacterDatabase.PExecute("UPDATE character_tutorial SET tut0='%u', tut1='%u', tut2='%u', tut3='%u', tut4='%u', tut5='%u', tut6='%u', tut7='%u' WHERE account = '%u'",
-                m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7], GetAccountId());
+            {
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updTutorial, "UPDATE character_tutorial SET tut0=?, tut1=?, tut2=?, tut3=?, tut4=?, tut5=?, tut6=?, tut7=? WHERE account = ?");
+                for (int i = 0; i < 8; ++i)
+                    stmt.addUInt32(m_Tutorials[i]);
+
+                stmt.addUInt32(GetAccountId());
+                stmt.Execute();
+            }
             break;
+
         case TUTORIALDATA_NEW:
-            CharacterDatabase.PExecute("INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u', '%u')",
-                GetAccountId(), m_Tutorials[0], m_Tutorials[1], m_Tutorials[2], m_Tutorials[3], m_Tutorials[4], m_Tutorials[5], m_Tutorials[6], m_Tutorials[7]);
+            {
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insTutorial, "INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+                stmt.addUInt32(GetAccountId());
+                for (int i = 0; i < 8; ++i)
+                    stmt.addUInt32(m_Tutorials[i]);
+
+                stmt.Execute();
+            }
             break;
         case TUTORIALDATA_UNCHANGED:
             break;

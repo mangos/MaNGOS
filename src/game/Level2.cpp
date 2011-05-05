@@ -1551,24 +1551,13 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
         return false;
 
     Player *chr = m_session->GetPlayer();
-    float x = chr->GetPositionX();
-    float y = chr->GetPositionY();
-    float z = chr->GetPositionZ();
-    float o = chr->GetOrientation();
+    CreatureCreatePos pos(chr, chr->GetOrientation());
     Map *map = chr->GetMap();
 
     Creature* pCreature = new Creature;
-    if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id))
-    {
-        delete pCreature;
-        return false;
-    }
 
-    pCreature->Relocate(x,y,z,o);
-
-    if (!pCreature->IsPositionValid())
+    if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, id))
     {
-        sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",pCreature->GetGUIDLow(),pCreature->GetEntry(),pCreature->GetPositionX(),pCreature->GetPositionY());
         delete pCreature;
         return false;
     }
@@ -1741,7 +1730,9 @@ bool ChatHandler::HandleNpcChangeLevelCommand(char* args)
         pCreature->SetMaxHealth(100 + 30*lvl);
         pCreature->SetHealth(100 + 30*lvl);
         pCreature->SetLevel(lvl);
-        pCreature->SaveToDB();
+
+        if (pCreature->HasStaticDBSpawnData())
+            pCreature->SaveToDB();
     }
 
     return true;
@@ -1900,7 +1891,7 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     if (!ExtractUInt32(&args, lowguid))                     // case .setmovetype $move_type (with selected creature)
     {
         pCreature = getSelectedCreature();
-        if (!pCreature || pCreature->IsPet())
+        if (!pCreature || !pCreature->HasStaticDBSpawnData())
             return false;
         lowguid = pCreature->GetGUIDLow();
     }
@@ -1991,7 +1982,8 @@ bool ChatHandler::HandleNpcSetModelCommand(char* args)
     pCreature->SetDisplayId(displayId);
     pCreature->SetNativeDisplayId(displayId);
 
-    pCreature->SaveToDB();
+    if (pCreature->HasStaticDBSpawnData())
+        pCreature->SaveToDB();
 
     return true;
 }
@@ -2172,50 +2164,7 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
         return false;
     }
 
-    CreatureInfo const* cInfo = creatureTarget->GetCreatureInfo();
-
-    if (!cInfo->isTameable(player->CanTameExoticPets()))
-    {
-        PSendSysMessage(LANG_CREATURE_NON_TAMEABLE,cInfo->Entry);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // Everything looks OK, create new pet
-    Pet* pet = player->CreateTamedPetFrom (creatureTarget);
-    if (!pet)
-    {
-        PSendSysMessage (LANG_CREATURE_NON_TAMEABLE,cInfo->Entry);
-        SetSentErrorMessage (true);
-        return false;
-    }
-
-    // place pet before player
-    float x,y,z;
-    player->GetClosePoint(x, y, z, creatureTarget->GetObjectBoundingRadius(), CONTACT_DISTANCE);
-    pet->Relocate (x,y,z,M_PI_F-player->GetOrientation ());
-
-    // set pet to defensive mode by default (some classes can't control controlled pets in fact).
-    pet->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
-
-    // calculate proper level
-    uint32 level = (creatureTarget->getLevel() < (player->getLevel() - 5)) ? (player->getLevel() - 5) : creatureTarget->getLevel();
-
-    // prepare visual effect for levelup
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level - 1);
-
-    // add to world
-    pet->GetMap()->Add((Creature*)pet);
-
-    // visual effect for levelup
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL, level);
-
-    // caster have pet now
-    player->SetPet(pet);
-
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-    player->PetSpellInitialize();
-
+    player->CastSpell(creatureTarget, 13481, true);         // Tame Beast, triggered effect
     return true;
 }
 //npc phasemask handling
@@ -2243,7 +2192,7 @@ bool ChatHandler::HandleNpcSetPhaseCommand(char* args)
 
     pCreature->SetPhaseMask(phasemask,true);
 
-    if (!pCreature->IsPet())
+    if (pCreature->HasStaticDBSpawnData())
         pCreature->SaveToDB();
 
     return true;
@@ -2260,7 +2209,7 @@ bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
     }
 
     Creature* pCreature = getSelectedCreature();
-    if (!pCreature || pCreature->IsPet())
+    if (!pCreature || !pCreature->HasStaticDBSpawnData())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -2851,12 +2800,13 @@ bool ChatHandler::HandleWpAddCommand(char* args)
         // No GUID provided
         // -> Player must have selected a creature
 
-        if (!target || target->IsPet())
+        if (!target || !target->HasStaticDBSpawnData())
         {
             SendSysMessage(LANG_SELECT_CREATURE);
             SetSentErrorMessage(true);
             return false;
         }
+
         if (target->GetEntry() == VISUAL_WAYPOINT)
         {
             DEBUG_LOG("DEBUG: HandleWpAddCommand - target->GetEntry() == VISUAL_WAYPOINT (1) ");
@@ -3182,29 +3132,21 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
         // create the waypoint creature
         wpGuid = 0;
         Creature* wpCreature = new Creature;
-        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), VISUAL_WAYPOINT))
+
+        CreatureCreatePos pos(chr, chr->GetOrientation());
+
+        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, VISUAL_WAYPOINT))
         {
             PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
             delete wpCreature;
+            return false;
         }
-        else
-        {
-            wpCreature->Relocate(chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation());
 
-            if (!wpCreature->IsPositionValid())
-            {
-                sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",wpCreature->GetGUIDLow(),wpCreature->GetEntry(),wpCreature->GetPositionX(),wpCreature->GetPositionY());
-                delete wpCreature;
-            }
-            else
-            {
-                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
-                // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
-                wpCreature->LoadFromDB(wpCreature->GetGUIDLow(), map);
-                map->Add(wpCreature);
-                wpGuid = wpCreature->GetGUIDLow();
-            }
-        }
+        wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
+        // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
+        wpCreature->LoadFromDB(wpCreature->GetGUIDLow(), map);
+        map->Add(wpCreature);
+        wpGuid = wpCreature->GetGUIDLow();
 
         sWaypointMgr.AddAfterNode(lowguid, point, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), 0, 0, wpGuid);
 
@@ -3302,18 +3244,12 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
                 wpCreature->AddObjectToRemoveList();
                 // re-create
                 Creature* wpCreature2 = new Creature;
-                if (!wpCreature2->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), VISUAL_WAYPOINT))
+
+                CreatureCreatePos pos(chr, chr->GetOrientation());
+
+                if (!wpCreature2->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, VISUAL_WAYPOINT))
                 {
                     PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
-                    delete wpCreature2;
-                    return false;
-                }
-
-                wpCreature2->Relocate(chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation());
-
-                if (!wpCreature2->IsPositionValid())
-                {
-                    sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",wpCreature2->GetGUIDLow(),wpCreature2->GetEntry(),wpCreature2->GetPositionX(),wpCreature2->GetPositionY());
                     delete wpCreature2;
                     return false;
                 }
@@ -3593,32 +3529,18 @@ bool ChatHandler::HandleWpShowCommand(char* args)
 
         do
         {
-            Field *fields = result->Fetch();
-            uint32 point    = fields[0].GetUInt32();
-            float x         = fields[1].GetFloat();
-            float y         = fields[2].GetFloat();
-            float z         = fields[3].GetFloat();
-
-            uint32 id = VISUAL_WAYPOINT;
-
             Player *chr = m_session->GetPlayer();
             Map *map = chr->GetMap();
-            float o = chr->GetOrientation();
+
+            Field *fields = result->Fetch();
+            uint32 point    = fields[0].GetUInt32();
+            CreatureCreatePos pos(map, fields[1].GetFloat(), fields[2].GetFloat(), fields[3].GetFloat(), chr->GetOrientation(), chr->GetPhaseMaskForSpawn());
 
             Creature* wpCreature = new Creature;
-            if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id))
-            {
-                PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                delete wpCreature;
-                delete result;
-                return false;
-            }
 
-            wpCreature->Relocate(x, y, z, o);
-
-            if (!wpCreature->IsPositionValid())
+            if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, VISUAL_WAYPOINT))
             {
-                sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",wpCreature->GetGUIDLow(),wpCreature->GetEntry(),wpCreature->GetPositionX(),wpCreature->GetPositionY());
+                PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
                 delete wpCreature;
                 delete result;
                 return false;
@@ -3653,30 +3575,17 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             return false;
         }
 
-        Field *fields = result->Fetch();
-        float x         = fields[0].GetFloat();
-        float y         = fields[1].GetFloat();
-        float z         = fields[2].GetFloat();
-        uint32 id = VISUAL_WAYPOINT;
-
         Player *chr = m_session->GetPlayer();
-        float o = chr->GetOrientation();
         Map *map = chr->GetMap();
 
+        Field *fields = result->Fetch();
+        CreatureCreatePos pos(map, fields[0].GetFloat(), fields[1].GetFloat(), fields[2].GetFloat(), chr->GetOrientation(), chr->GetPhaseMaskForSpawn());
+
         Creature* pCreature = new Creature;
-        if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT),map, chr->GetPhaseMaskForSpawn(), id))
-        {
-            PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-            delete pCreature;
-            delete result;
-            return false;
-        }
 
-        pCreature->Relocate(x, y, z, o);
-
-        if (!pCreature->IsPositionValid())
+        if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, VISUAL_WAYPOINT))
         {
-            sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",pCreature->GetGUIDLow(),pCreature->GetEntry(),pCreature->GetPositionX(),pCreature->GetPositionY());
+            PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
             delete pCreature;
             delete result;
             return false;
@@ -3713,30 +3622,18 @@ bool ChatHandler::HandleWpShowCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
-        Field *fields = result->Fetch();
-        float x         = fields[0].GetFloat();
-        float y         = fields[1].GetFloat();
-        float z         = fields[2].GetFloat();
-        uint32 id = VISUAL_WAYPOINT;
 
         Player *chr = m_session->GetPlayer();
-        float o = chr->GetOrientation();
         Map *map = chr->GetMap();
 
+        Field *fields = result->Fetch();
+        CreatureCreatePos pos(map, fields[0].GetFloat(), fields[1].GetFloat(), fields[2].GetFloat(), chr->GetOrientation(), chr->GetPhaseMaskForSpawn());
+
         Creature* pCreature = new Creature;
-        if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id))
-        {
-            PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
-            delete pCreature;
-            delete result;
-            return false;
-        }
 
-        pCreature->Relocate(x, y, z, o);
-
-        if (!pCreature->IsPositionValid())
+        if (!pCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, VISUAL_WAYPOINT))
         {
-            sLog.outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",pCreature->GetGUIDLow(),pCreature->GetEntry(),pCreature->GetPositionX(),pCreature->GetPositionY());
+            PSendSysMessage(LANG_WAYPOINT_NOTCREATED, VISUAL_WAYPOINT);
             delete pCreature;
             delete result;
             return false;
@@ -4806,10 +4703,10 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     {
         PoolTemplateData const& mother_template = sPoolMgr.GetPoolTemplate(mother_pool_id);
         if (m_session)
-            PSendSysMessage(LANG_POOL_INFO_HEADER_CHAT, pool_id, mother_pool_id, mother_pool_id, mother_template.description.c_str(), 
+            PSendSysMessage(LANG_POOL_INFO_HEADER_CHAT, pool_id, mother_pool_id, mother_pool_id, mother_template.description.c_str(),
                 pool_template.AutoSpawn, pool_template.MaxLimit);
         else
-            PSendSysMessage(LANG_POOL_INFO_HEADER_CONSOLE, pool_id, mother_pool_id, mother_template.description.c_str(), 
+            PSendSysMessage(LANG_POOL_INFO_HEADER_CONSOLE, pool_id, mother_pool_id, mother_template.description.c_str(),
                 pool_template.AutoSpawn, pool_template.MaxLimit);
     }
 
@@ -4919,12 +4816,12 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
             PoolTemplateData const& itr_template = sPoolMgr.GetPoolTemplate(itr->guid);
             char const* active = poolSpawns && poolSpawns->find(itr->guid) != poolSpawns->end() ? active_str.c_str() : "";
             if (m_session)
-                PSendSysMessage(LANG_POOL_CHANCE_POOL_LIST_CHAT, itr->guid, 
+                PSendSysMessage(LANG_POOL_CHANCE_POOL_LIST_CHAT, itr->guid,
                     itr->guid, itr_template.description.c_str(), itr_template.AutoSpawn ? 1 : 0, itr_template.MaxLimit,
                     sPoolMgr.GetPoolCreatures(itr->guid).size(), sPoolMgr.GetPoolGameObjects(itr->guid).size(), sPoolMgr.GetPoolPools(itr->guid).size(),
                     itr->chance, active);
             else
-                PSendSysMessage(LANG_POOL_CHANCE_POOL_LIST_CONSOLE, itr->guid, 
+                PSendSysMessage(LANG_POOL_CHANCE_POOL_LIST_CONSOLE, itr->guid,
                     itr_template.description.c_str(), itr_template.AutoSpawn ? 1 : 0, itr_template.MaxLimit,
                     sPoolMgr.GetPoolCreatures(itr->guid).size(), sPoolMgr.GetPoolGameObjects(itr->guid).size(), sPoolMgr.GetPoolPools(itr->guid).size(),
                     itr->chance, active);
@@ -4940,12 +4837,12 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
             PoolTemplateData const& itr_template = sPoolMgr.GetPoolTemplate(itr->guid);
             char const* active = poolSpawns && poolSpawns->find(itr->guid) != poolSpawns->end() ? active_str.c_str() : "";
             if (m_session)
-                PSendSysMessage(LANG_POOL_POOL_LIST_CHAT, itr->guid, 
+                PSendSysMessage(LANG_POOL_POOL_LIST_CHAT, itr->guid,
                     itr->guid, itr_template.description.c_str(), itr_template.AutoSpawn ? 1 : 0, itr_template.MaxLimit,
                     sPoolMgr.GetPoolCreatures(itr->guid).size(), sPoolMgr.GetPoolGameObjects(itr->guid).size(), sPoolMgr.GetPoolPools(itr->guid).size(),
                     active);
             else
-                PSendSysMessage(LANG_POOL_POOL_LIST_CONSOLE, itr->guid, 
+                PSendSysMessage(LANG_POOL_POOL_LIST_CONSOLE, itr->guid,
                     itr_template.description.c_str(), itr_template.AutoSpawn ? 1 : 0, itr_template.MaxLimit,
                     sPoolMgr.GetPoolCreatures(itr->guid).size(), sPoolMgr.GetPoolGameObjects(itr->guid).size(), sPoolMgr.GetPoolPools(itr->guid).size(),
                     active);

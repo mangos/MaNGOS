@@ -129,7 +129,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                  // 94 SPELL_AURA_INTERRUPT_REGEN
     &Unit::HandleNULLProc,                                  // 95 SPELL_AURA_GHOST
     &Unit::HandleNULLProc,                                  // 96 SPELL_AURA_SPELL_MAGNET
-    &Unit::HandleNULLProc,                                  // 97 SPELL_AURA_MANA_SHIELD
+    &Unit::HandleManaShieldAuraProc,                        // 97 SPELL_AURA_MANA_SHIELD
     &Unit::HandleNULLProc,                                  // 98 SPELL_AURA_MOD_SKILL_TALENT
     &Unit::HandleNULLProc,                                  // 99 SPELL_AURA_MOD_ATTACK_POWER
     &Unit::HandleNULLProc,                                  //100 SPELL_AURA_AURAS_VISIBLE obsolete 3.x? all player can see all auras now, but still have 2 spells including GM-spell (1852,2855)
@@ -1092,16 +1092,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 target = this;
                 break;
             }
-            // Incanter's Regalia set (add trigger chance to Mana Shield)
-            if (dummyClassOptions && dummyClassOptions->SpellFamilyFlags & UI64LIT(0x0000000000008000))
-            {
-                if (GetTypeId() != TYPEID_PLAYER)
-                    return SPELL_AURA_PROC_FAILED;
-
-                target = this;
-                triggered_spell_id = 37436;
-                break;
-            }
             switch(dummySpell->Id)
             {
                 // Ignite
@@ -1614,6 +1604,28 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
                     pVictim->CastSpell(second, procSpell, true, NULL, triggeredByAura, GetGUID());
                     return SPELL_AURA_PROC_OK;
+                }
+            }
+            // King of the Jungle
+            if (dummySpell->SpellIconID == 2850)
+            {
+                switch (effIndex)
+                {
+                    case EFFECT_INDEX_0:    // Enrage (bear)
+                    {
+                        // note : aura removal is done in SpellAuraHolder::HandleSpellSpecificBoosts
+                        basepoints[0] = triggerAmount;
+                        triggered_spell_id = 51185;
+                        break;
+                    }
+                    case EFFECT_INDEX_1:    // Tiger's Fury (cat)
+                    {
+                        basepoints[0] = triggerAmount;
+                        triggered_spell_id = 51178;
+                        break;
+                    }
+                    default:
+                        return SPELL_AURA_PROC_FAILED;
                 }
             }
             // Eclipse
@@ -3125,6 +3137,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
             break;
         }
         case SPELLFAMILY_HUNTER:
+        {
             // Piercing Shots
             if (auraSpellInfo->SpellIconID == 3247 && auraSpellInfo->SpellVisual[0] == 0)
             {
@@ -3139,7 +3152,15 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 if (!(procClassOptions && procClassOptions->SpellFamilyFlags & UI64LIT(0x0000000000000020)))
                     return SPELL_AURA_PROC_FAILED;
             }
+            // Lock and Load
+            else if (auraSpellInfo->SpellIconID == 3579)
+            {
+                // Check for Lock and Load Marker
+                if (HasAura(67544))
+                    return SPELL_AURA_PROC_FAILED;
+            }
             break;
+        }
         case SPELLFAMILY_PALADIN:
         {
             /*
@@ -3820,7 +3841,7 @@ SpellAuraProcResult Unit::HandleAddPctModifierAuraProc(Unit* /*pVictim*/, uint32
         case SPELLFAMILY_PALADIN:
         {
             // Glyph of Divinity
-            if (spellInfo->Id == 11129)
+            if (spellInfo->Id == 54939)
             {
                 // Lookup base amount mana restore
                 for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -3879,6 +3900,64 @@ SpellAuraProcResult Unit::HandleModRating(Unit* /*pVictim*/, uint32 /*damage*/, 
         if (triggeredByAura->GetStackAmount() > 1 && !triggeredByAura->GetHolder()->ModStackAmount(-1))
             return SPELL_AURA_PROC_CANT_TRIGGER;
     }
+
+    return SPELL_AURA_PROC_OK;
+}
+
+SpellAuraProcResult Unit::HandleManaShieldAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
+{
+    SpellEntry const *dummySpell = triggeredByAura->GetSpellProto ();
+    SpellClassOptionsEntry const* dummyClassOptions = dummySpell->GetSpellClassOptions();
+
+    Item* castItem = !triggeredByAura->GetCastItemGuid().IsEmpty() && GetTypeId()==TYPEID_PLAYER
+        ? ((Player*)this)->GetItemByGuid(triggeredByAura->GetCastItemGuid()) : NULL;
+
+    uint32 triggered_spell_id = 0;
+    Unit* target = pVictim;
+
+    switch(dummyClassOptions->SpellFamilyName)
+    {
+        case SPELLFAMILY_MAGE:
+        {
+            // Incanter's Regalia set (add trigger chance to Mana Shield)
+            if (dummyClassOptions->IsFitToFamilyMask(UI64LIT(0x0000000000008000)))
+            {
+                if (GetTypeId() != TYPEID_PLAYER)
+                    return SPELL_AURA_PROC_FAILED;
+
+                target = this;
+                triggered_spell_id = 37436;
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    // processed charge only counting case
+    if (!triggered_spell_id)
+        return SPELL_AURA_PROC_OK;
+
+    SpellEntry const* triggerEntry = sSpellStore.LookupEntry(triggered_spell_id);
+
+    if (!triggerEntry)
+    {
+        sLog.outError("Unit::HandleManaShieldAuraProc: Spell %u have nonexistent triggered spell %u",dummySpell->Id,triggered_spell_id);
+        return SPELL_AURA_PROC_FAILED;
+    }
+
+    // default case
+    if (!target || (target != this && !target->isAlive()))
+        return SPELL_AURA_PROC_FAILED;
+
+    if (cooldown && GetTypeId()==TYPEID_PLAYER && ((Player*)this)->HasSpellCooldown(triggered_spell_id))
+        return SPELL_AURA_PROC_FAILED;
+
+    CastSpell(target, triggered_spell_id, true, castItem, triggeredByAura);
+
+    if (cooldown && GetTypeId()==TYPEID_PLAYER)
+        ((Player*)this)->AddSpellCooldown(triggered_spell_id,0,time(NULL) + cooldown);
 
     return SPELL_AURA_PROC_OK;
 }

@@ -21,7 +21,7 @@
 #ifndef _DATABASEMYSQL_H
 #define _DATABASEMYSQL_H
 
-#include "Common.h"
+//#include "Common.h"
 #include "Database.h"
 #include "Policies/Singleton.h"
 #include "ace/Thread_Mutex.h"
@@ -34,10 +34,42 @@
 #include <mysql.h>
 #endif
 
+//MySQL prepared statement class
+class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
+{
+public:
+    MySqlPreparedStatement(const std::string& fmt, SqlConnection& conn, MYSQL * mysql);
+    ~MySqlPreparedStatement();
+
+    //prepare statement
+    virtual bool prepare();
+
+    //bind input parameters
+    virtual void bind(const SqlStmtParameters& holder);
+
+    //execute DML statement
+    virtual bool execute();
+
+protected:
+    //bind parameters
+    void addParam(int nIndex, const SqlStmtFieldData& data);
+
+    static enum_field_types ToMySQLType( const SqlStmtFieldData &data, my_bool &bUnsigned );
+
+private:
+    void RemoveBinds();
+
+    MYSQL * m_pMySQLConn;
+    MYSQL_STMT * m_stmt;
+    MYSQL_BIND * m_pInputArgs;
+    MYSQL_BIND * m_pResult;
+    MYSQL_RES *m_pResultMetadata;
+};
+
 class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
 {
     public:
-        MySQLConnection() : mMysql(NULL) {}
+        MySQLConnection(Database& db) : SqlConnection(db), mMysql(NULL) {}
         ~MySQLConnection();
 
         bool Initialize(const char *infoString);
@@ -51,6 +83,9 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         bool BeginTransaction();
         bool CommitTransaction();
         bool RollbackTransaction();
+
+    protected:
+        SqlPreparedStatement * CreateStatement(const std::string& fmt);
 
     private:
         bool _TransactionCmd(const char *sql);

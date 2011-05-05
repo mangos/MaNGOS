@@ -381,11 +381,11 @@ m_isPersistent(false), m_in_use(0), m_spellAuraHolder(holder)
 
     MANGOS_ASSERT(spellproto && spellproto == sSpellStore.LookupEntry( spellproto->Id ) && "`info` must be pointer to sSpellStore element");
 
-    m_currentBasePoints = currentBasePoints ? *currentBasePoints : spellproto->CalculateSimpleValue(eff);
-
     m_spellEffect = spellproto->GetSpellEffect(m_effIndex);
 
     MANGOS_ASSERT(m_spellEffect);                           // need testing...
+
+    m_currentBasePoints = currentBasePoints ? *currentBasePoints : m_spellEffect->CalculateSimpleValue();
 
     bool isPassive = IsPassiveSpell(GetSpellProto());
     bool isPermanent = false;
@@ -2113,9 +2113,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41106, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 32614);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 32614);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                     case 41100:                             // Berserker Stance
@@ -2130,9 +2130,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41107, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 32614);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 32614);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                     case 41101:                             // Defensive Stance
@@ -2147,9 +2147,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41105, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 32604);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 31467);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 32604);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 31467);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                     case 53790:                             // Defensive Stance
@@ -2164,9 +2164,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41105, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 43625);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 39384);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 43625);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 39384);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                     case 53791:                             // Berserker Stance
@@ -2181,9 +2181,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41107, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 43625);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 43625);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 43625);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 43625);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                     case 53792:                             // Battle Stance
@@ -2198,9 +2198,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->CastSpell(target, 41106, true, NULL, this);
 
                         // equipment
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, 43623);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, 0);
-                        target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 43623);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+                        ((Creature*)target)->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
                         return;
                     }
                 }
@@ -2293,31 +2293,31 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             if (!caster || !caster->isAlive())
                 return;
 
-            uint32 finalSpelId = 0;
+            uint32 finalSpellId = 0;
             switch(GetId())
             {
-                case 19548: finalSpelId = 19597; break;
-                case 19674: finalSpelId = 19677; break;
-                case 19687: finalSpelId = 19676; break;
-                case 19688: finalSpelId = 19678; break;
-                case 19689: finalSpelId = 19679; break;
-                case 19692: finalSpelId = 19680; break;
-                case 19693: finalSpelId = 19684; break;
-                case 19694: finalSpelId = 19681; break;
-                case 19696: finalSpelId = 19682; break;
-                case 19697: finalSpelId = 19683; break;
-                case 19699: finalSpelId = 19685; break;
-                case 19700: finalSpelId = 19686; break;
-                case 30646: finalSpelId = 30647; break;
-                case 30653: finalSpelId = 30648; break;
-                case 30654: finalSpelId = 30652; break;
-                case 30099: finalSpelId = 30100; break;
-                case 30102: finalSpelId = 30103; break;
-                case 30105: finalSpelId = 30104; break;
+                case 19548: finalSpellId = 19597; break;
+                case 19674: finalSpellId = 19677; break;
+                case 19687: finalSpellId = 19676; break;
+                case 19688: finalSpellId = 19678; break;
+                case 19689: finalSpellId = 19679; break;
+                case 19692: finalSpellId = 19680; break;
+                case 19693: finalSpellId = 19684; break;
+                case 19694: finalSpellId = 19681; break;
+                case 19696: finalSpellId = 19682; break;
+                case 19697: finalSpellId = 19683; break;
+                case 19699: finalSpellId = 19685; break;
+                case 19700: finalSpellId = 19686; break;
+                case 30646: finalSpellId = 30647; break;
+                case 30653: finalSpellId = 30648; break;
+                case 30654: finalSpellId = 30652; break;
+                case 30099: finalSpellId = 30100; break;
+                case 30102: finalSpellId = 30103; break;
+                case 30105: finalSpellId = 30104; break;
             }
 
-            if (finalSpelId)
-                caster->CastSpell(target, finalSpelId, true, NULL, this);
+            if (finalSpellId)
+                caster->CastSpell(target, finalSpellId, true, NULL, this);
 
             return;
         }
@@ -2417,6 +2417,14 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 43969:                                     // Feathered Charm
+            {
+                // Steelfeather Quest Credit, Are there any requirements for this, like area?
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                    target->CastSpell(target, 43984, true);
+
+                return;
+            }
             case 44191:                                     // Flame Strike
             {
                 if (target->GetMap()->IsDungeon())
@@ -2474,6 +2482,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
                     target->CastSpell(target, 52092, true, NULL, this);
 
+                return;
+            }
+            case 53039:                                     // Deploy Parachute
+            {
+                // Crusader Parachute
+                target->RemoveAurasDueToSpell(53031);
                 return;
             }
             case 53790:                                     // Defensive Stance
@@ -8146,9 +8160,7 @@ void Aura::HandlePhase(bool apply, bool Real)
     else
         target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL, false);
 
-    // need triggering visibility update base at phase update of not GM invisible (other GMs anyway see in any phases)
-    if(target->GetVisibility() != VISIBILITY_OFF)
-        target->SetVisibility(target->GetVisibility());
+    target->UpdateVisibilityAndView();
 }
 
 void Aura::HandleAuraSafeFall( bool Apply, bool Real )
@@ -8230,8 +8242,7 @@ bool Aura::HasMechanic(uint32 mechanic) const
     if (GetSpellProto()->GetMechanic() == mechanic)
         return true;
 
-    SpellEffectEntry const* spellEffect = GetSpellProto()->GetSpellEffect(m_effIndex);
-    return spellEffect && spellEffect->EffectMechanic == mechanic;
+    return m_spellEffect->EffectMechanic == mechanic;
 }
 
 SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, WorldObject *caster, Item *castItem) :
@@ -8275,12 +8286,6 @@ m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0)
     // some custom stack values at aura holder create
     switch (m_spellProto->Id)
     {
-        case 22959:                                         // Improved Scorch
-            if (caster && caster->GetObjectGuid().IsUnit())
-                // Glyph of Improved Scorch
-                if (Aura* glyph = ((Unit*)caster)->GetDummyAura(56371))
-                    m_stackAmount = glyph->GetModifier()->m_amount;
-            break;
         // some auras applied with max stack
         case 24575:                                         // Brittle Armor
         case 24659:                                         // Unstable Power
@@ -8330,11 +8335,11 @@ void SpellAuraHolder::_AddSpellAuraHolder()
     // Lookup free slot
     if (m_target->GetVisibleAurasCount() < MAX_AURAS)
     {
-        Unit::VisibleAuraMap const *visibleAuras = m_target->GetVisibleAuras();
+        Unit::VisibleAuraMap const& visibleAuras = m_target->GetVisibleAuras();
         for(uint8 i = 0; i < MAX_AURAS; ++i)
         {
-            Unit::VisibleAuraMap::const_iterator itr = visibleAuras->find(i);
-            if(itr == visibleAuras->end())
+            Unit::VisibleAuraMap::const_iterator itr = visibleAuras.find(i);
+            if (itr == visibleAuras.end())
             {
                 slot = i;
                 // update for out of range group members (on 1 slot use)
@@ -8634,8 +8639,8 @@ void SpellAuraHolder::SetStackAmount(uint32 stackAmount)
     if (!target || !caster)
         return;
 
-    bool refresh = stackAmount >= uint32(m_stackAmount);
-    if (stackAmount != uint32(m_stackAmount))
+    bool refresh = stackAmount >= m_stackAmount;
+    if (stackAmount != m_stackAmount)
     {
         m_stackAmount = stackAmount;
 
@@ -8672,7 +8677,7 @@ Unit* SpellAuraHolder::GetCaster() const
     return ObjectAccessor::GetUnit(*m_target, m_casterGuid);// player will search at any maps
 }
 
-bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder* ref)
+bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const
 {
     // only item casted spells
     if (GetCastItemGuid().IsEmpty())
@@ -8724,23 +8729,17 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
     return !m_isPassive || totemAura || HasAreaAuraEffect(m_spellProto);
 }
 
-void SpellAuraHolder::SendAuraUpdate(bool remove)
+void SpellAuraHolder::BuildUpdatePacket(WorldPacket& data) const
 {
-    WorldPacket data(SMSG_AURA_UPDATE);
-    data << m_target->GetPackGUID();
     data << uint8(GetAuraSlot());
-    data << uint32(remove ? 0 : GetId());
-
-    if(remove)
-    {
-        m_target->SendMessageToSet(&data, true);
-        return;
-    }
+    data << uint32(GetId());
 
     uint8 auraFlags = GetAuraFlags();
     data << uint8(auraFlags);
     data << uint8(GetAuraLevel());
-    data << uint8(m_procCharges ? m_procCharges*m_stackAmount : m_stackAmount);
+
+    uint32 stackCount = m_procCharges ? m_procCharges*m_stackAmount : m_stackAmount;
+    data << uint8(stackCount <= 255 ? stackCount : 255);
 
     if(!(auraFlags & AFLAG_NOT_CASTER))
     {
@@ -8767,6 +8766,20 @@ void SpellAuraHolder::SendAuraUpdate(bool remove)
         data << uint32(max_duration);
         data << uint32(duration);
     }
+}
+
+void SpellAuraHolder::SendAuraUpdate(bool remove) const
+{
+    WorldPacket data(SMSG_AURA_UPDATE);
+    data << m_target->GetPackGUID();
+
+    if(remove)
+    {
+        data << uint8(GetAuraSlot());
+        data << uint32(0);
+    }
+    else
+        BuildUpdatePacket(data);
 
     m_target->SendMessageToSet(&data, true);
 }
@@ -9061,6 +9074,8 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
             // Barkskin
             if (GetId()==22812 && m_target->HasAura(63057)) // Glyph of Barkskin
                 spellId1 = 63058;                           // Glyph - Barkskin 01
+            else if (!apply && GetId() == 5229)             // Enrage (Druid Bear)
+                spellId1 = 51185;                           // King of the Jungle (Enrage damage aura)
             else
                 return;
             break;

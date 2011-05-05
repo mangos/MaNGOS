@@ -23,6 +23,7 @@
 #include "Policies/Singleton.h"
 #include "ObjectGuid.h"
 #include "DBCEnums.h"
+#include "ace/Atomic_Op.h"
 
 struct AreaTriggerEntry;
 class Aura;
@@ -297,6 +298,7 @@ struct ScriptAction
 
 typedef std::multimap<uint32, ScriptInfo> ScriptMap;
 typedef std::map<uint32, ScriptMap > ScriptMapMap;
+
 extern ScriptMapMap sQuestEndScripts;
 extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
@@ -343,6 +345,11 @@ class ScriptMgr
         void UnloadScriptLibrary();
         bool IsScriptLibraryLoaded() const { return m_hScriptLib != NULL; }
 
+        uint32 IncreaseScheduledScriptsCount() { return (uint32)++m_scheduledScripts; }
+        uint32 DecreaseScheduledScriptCount() { return (uint32)--m_scheduledScripts; }
+        uint32 DecreaseScheduledScriptCount(size_t count) { return (uint32)(m_scheduledScripts -= count); }
+        bool IsScriptScheduled() const { return m_scheduledScripts > 0; }
+
         CreatureAI* GetCreatureAI(Creature* pCreature);
         InstanceData* CreateInstanceData(Map* pMap);
 
@@ -386,6 +393,9 @@ class ScriptMgr
 
         ScriptNameMap           m_scriptNames;
         MANGOS_LIBRARY_HANDLE   m_hScriptLib;
+
+        //atomic op counter for active scripts amount
+        ACE_Atomic_Op<ACE_Thread_Mutex, long> m_scheduledScripts;
 
         void (MANGOS_IMPORT* m_pOnInitScriptLibrary)();
         void (MANGOS_IMPORT* m_pOnFreeScriptLibrary)();

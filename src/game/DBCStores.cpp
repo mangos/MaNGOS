@@ -393,7 +393,7 @@ void LoadDBCStores(const std::string& dataPath)
         exit(1);
     }
 
-    const uint32 DBCFilesCount = 90;
+    const uint32 DBCFilesCount = 101;
 
     barGoLink bar( (int)DBCFilesCount );
 

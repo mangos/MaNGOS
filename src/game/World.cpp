@@ -72,11 +72,13 @@ volatile uint32 World::m_worldLoopCounter = 0;
 float World::m_MaxVisibleDistanceOnContinents = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_MaxVisibleDistanceInInstances  = DEFAULT_VISIBILITY_INSTANCE;
 float World::m_MaxVisibleDistanceInBGArenas   = DEFAULT_VISIBILITY_BGARENAS;
-float World::m_MaxVisibleDistanceForObject    = DEFAULT_VISIBILITY_DISTANCE;
 
 float World::m_MaxVisibleDistanceInFlight     = DEFAULT_VISIBILITY_DISTANCE;
 float World::m_VisibleUnitGreyDistance        = 0;
 float World::m_VisibleObjectGreyDistance      = 0;
+
+float  World::m_relocation_lower_limit_sq     = 10.f * 10.f;
+uint32 World::m_relocation_ai_notify_delay    = 1000u;
 
 /// World constructor
 World::World()
@@ -91,7 +93,6 @@ World::World()
     m_maxQueuedSessionCount = 0;
     m_NextDailyQuestReset = 0;
     m_NextWeeklyQuestReset = 0;
-    m_scheduledScripts = 0;
 
     m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
@@ -769,6 +770,9 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", true);
 
+    m_relocation_ai_notify_delay = sConfig.GetIntDefault("Visibility.AIRelocationNotifyDelay", 1000u);
+    m_relocation_lower_limit_sq  = pow(sConfig.GetFloatDefault("Visibility.RelocationLowerLimit",10), 2);
+
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
     if(m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
@@ -821,17 +825,6 @@ void World::LoadConfigSettings(bool reload)
         m_MaxVisibleDistanceInBGArenas = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
-    m_MaxVisibleDistanceForObject    = sConfig.GetFloatDefault("Visibility.Distance.Object",   DEFAULT_VISIBILITY_DISTANCE);
-    if(m_MaxVisibleDistanceForObject < INTERACTION_DISTANCE)
-    {
-        sLog.outError("Visibility.Distance.Object can't be less max aggro radius %f",float(INTERACTION_DISTANCE));
-        m_MaxVisibleDistanceForObject = INTERACTION_DISTANCE;
-    }
-    else if(m_MaxVisibleDistanceForObject + m_VisibleObjectGreyDistance >  MAX_VISIBILITY_DISTANCE)
-    {
-        sLog.outError("Visibility.Distance.Object can't be greater %f",MAX_VISIBILITY_DISTANCE-m_VisibleObjectGreyDistance);
-        m_MaxVisibleDistanceForObject = MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance;
-    }
     m_MaxVisibleDistanceInFlight    = sConfig.GetFloatDefault("Visibility.Distance.InFlight",      DEFAULT_VISIBILITY_DISTANCE);
     if(m_MaxVisibleDistanceInFlight + m_VisibleObjectGreyDistance > MAX_VISIBILITY_DISTANCE)
     {
@@ -845,19 +838,24 @@ void World::LoadConfigSettings(bool reload)
     setConfigPos(CONFIG_UINT32_CHARDELETE_KEEP_DAYS, "CharDelete.KeepDays", 30);
 
     ///- Read the "Data" directory from the config file
-    std::string dataPath = sConfig.GetStringDefault("DataDir","./");
-    if( dataPath.at(dataPath.length()-1)!='/' && dataPath.at(dataPath.length()-1)!='\\' )
+    std::string dataPath = sConfig.GetStringDefault("DataDir", "./");
+
+    // for empty string use current dir as for absent case
+    if (dataPath.empty())
+        dataPath = "./";
+    // normalize dir path to path/ or path\ form
+    else if (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\')
         dataPath.append("/");
 
-    if(reload)
+    if (reload)
     {
-        if(dataPath!=m_dataPath)
-            sLog.outError("DataDir option can't be changed at mangosd.conf reload, using current value (%s).",m_dataPath.c_str());
+        if (dataPath != m_dataPath)
+            sLog.outError("DataDir option can't be changed at mangosd.conf reload, using current value (%s).", m_dataPath.c_str());
     }
     else
     {
         m_dataPath = dataPath;
-        sLog.outString("Using DataDir %s",m_dataPath.c_str());
+        sLog.outString("Using DataDir %s", m_dataPath.c_str());
     }
 
     setConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
@@ -1070,10 +1068,13 @@ void World::SetInitialWorldSettings()
     sLog.outString( ">>> Game Event Data loaded" );
     sLog.outString();
 
-    sLog.outString( "Loading Creature Respawn Data..." );   // must be after PackInstances(), LoadCreatures(), sPoolMgr.LoadFromDB(), sGameEventMgr.LoadFromDB();
+    sLog.outString( "Creating map persistent states for non-instanceable maps..." );   // must be after PackInstances(), LoadCreatures(), sPoolMgr.LoadFromDB(), sGameEventMgr.LoadFromDB();
+    sMapPersistentStateMgr.InitWorldMaps();
+
+    sLog.outString( "Loading Creature Respawn Data..." );   // must be after LoadCreatures(), and sMapPersistentStateMgr.InitWorldMaps()
     sMapPersistentStateMgr.LoadCreatureRespawnTimes();
 
-    sLog.outString( "Loading Gameobject Respawn Data..." ); // must be after PackInstances(), LoadGameobjects(), sPoolMgr.LoadFromDB(), sGameEventMgr.LoadFromDB();
+    sLog.outString( "Loading Gameobject Respawn Data..." ); // must be after LoadGameobjects(), and sMapPersistentStateMgr.InitWorldMaps()
     sMapPersistentStateMgr.LoadGameobjectRespawnTimes();
 
     sLog.outString( "Loading UNIT_NPC_FLAG_SPELLCLICK Data..." );
@@ -1362,7 +1363,8 @@ void World::DetectDBCLang()
         m_lang_confid = LOCALE_enUS;
     }
 
-    ChrRacesEntry const* race = sChrRacesStore.LookupEntry(1);
+    ChrRacesEntry const* race = sChrRacesStore.LookupEntry(RACE_HUMAN);
+    MANGOS_ASSERT(race);
 
     std::string availableLocalsStr;
 

@@ -314,9 +314,10 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
+        SpellEffectEntry const* effect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
+
         for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            SpellEffectEntry const* effect_1 = spellInfo_1->GetSpellEffect(SpellEffectIndex(i));
             SpellEffectEntry const* effect_2 = spellInfo_2->GetSpellEffect(SpellEffectIndex(j));
             if(!effect_1 || !effect_2)
                 continue;
@@ -725,17 +726,17 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                 case SPELL_AURA_MOD_DODGE_PERCENT:
                 case SPELL_AURA_MOD_HEALING_PCT:
                 case SPELL_AURA_MOD_HEALING_DONE:
-                    if(spellproto->CalculateSimpleValue(effIndex) < 0)
+                    if (spellEffect->CalculateSimpleValue() < 0)
                         return false;
                     break;
                 case SPELL_AURA_MOD_DAMAGE_TAKEN:           // dependent from bas point sign (positive -> negative)
-                    if(spellproto->CalculateSimpleValue(effIndex) > 0)
+                    if (spellEffect->CalculateSimpleValue() > 0)
                         return false;
                     break;
                 case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
                 case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
                 case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
-                    if(spellproto->CalculateSimpleValue(effIndex) > 0)
+                    if (spellEffect->CalculateSimpleValue() > 0)
                         return true;                        // some expected positive spells have SPELL_ATTR_EX_NEGATIVE or unclear target modes
                     break;
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
@@ -1935,6 +1936,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if ((spellInfo_1->Id == 8326 && spellInfo_2->Id == 20584) ||
                         (spellInfo_2->Id == 8326 && spellInfo_1->Id == 20584))
                          return false;
+
+                    // Blood Fury and Rage of the Unraveller
+                    if (spellInfo_1->SpellIconID == 1662 && spellInfo_2->SpellIconID == 1662)
+                        return false;
 
                     // Kindred Spirits
                     if (spellInfo_1->SpellIconID == 3559 && spellInfo_2->SpellIconID == 3559)
@@ -3310,7 +3315,7 @@ void SpellMgr::LoadSpellPetAuras()
                 continue;
             }
 
-            PetAura pa(pet, aura, spellEffect->EffectImplicitTargetA == TARGET_PET, spellInfo->CalculateSimpleValue(eff));
+            PetAura pa(pet, aura, spellEffect->EffectImplicitTargetA == TARGET_PET, spellEffect->CalculateSimpleValue());
             mSpellPetAuraMap[(spell<<8) + eff] = pa;
         }
 

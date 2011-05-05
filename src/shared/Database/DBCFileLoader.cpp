@@ -16,8 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Common.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,7 +41,7 @@ bool DBCFileLoader::Load(const char *filename, const char *fmt)
     FILE * f=fopen(filename,"rb");
     if(!f)return false;
 
-    if(fread(&header,4,1,f)!=1)                             // Signature
+    if(fread(&header,4,1,f)!=1)                             // Number of records
         return false;
 
     EndianConvert(header);
@@ -109,29 +107,42 @@ uint32 DBCFileLoader::GetFormatRecordSize(const char * format,int32* index_pos)
 {
     uint32 recordsize = 0;
     int32 i = -1;
-    for(uint32 x=0; format[x];++x)
+    for(uint32 x = 0; format[x]; ++ x)
+    {
         switch(format[x])
         {
             case FT_FLOAT:
+                recordsize += sizeof(float);
+                break;
             case FT_INT:
-                recordsize+=4;
+                recordsize += sizeof(uint32);
                 break;
             case FT_STRING:
-                recordsize+=sizeof(char*);
+                recordsize += sizeof(char*);
                 break;
             case FT_SORT:
                 i=x;
                 break;
             case FT_IND:
                 i=x;
-                recordsize+=4;
+                recordsize += sizeof(uint32);
                 break;
             case FT_BYTE:
-                recordsize += 1;
+                recordsize += sizeof(uint8);
+                break;
+            case FT_LOGIC:
+                assert(false && "DBC files not have logic field type");
+                break;
+            case FT_NA:
+            case FT_NA_BYTE:
+                break;
+            default:
+                assert(false && "unknown format character");
                 break;
         }
+    }
 
-    if(index_pos)
+    if (index_pos)
         *index_pos = i;
 
     return recordsize;
@@ -193,35 +204,45 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
 
     uint32 offset=0;
 
-    for(uint32 y =0;y<recordCount;y++)
+    for(uint32 y =0; y < recordCount; ++y)
     {
-        if(i>=0)
+        if (i >= 0)
         {
             indexTable[getRecord(y).getUInt(i)]=&dataTable[offset];
         }
         else
             indexTable[y]=&dataTable[offset];
 
-        for(uint32 x=0;x<fieldCount;x++)
+        for(uint32 x = 0; x < fieldCount; ++x)
         {
             switch(format[x])
             {
                 case FT_FLOAT:
                     *((float*)(&dataTable[offset]))=getRecord(y).getFloat(x);
-                    offset+=4;
+                    offset += sizeof(float);
                     break;
                 case FT_IND:
                 case FT_INT:
                     *((uint32*)(&dataTable[offset]))=getRecord(y).getUInt(x);
-                    offset+=4;
+                    offset += sizeof(uint32);
                     break;
                 case FT_BYTE:
                     *((uint8*)(&dataTable[offset]))=getRecord(y).getUInt8(x);
-                    offset+=1;
+                    offset += sizeof(uint8);
                     break;
                 case FT_STRING:
                     *((char**)(&dataTable[offset]))=NULL;   // will be replaces non-empty or "" strings in AutoProduceStrings
-                    offset+=sizeof(char*);
+                    offset += sizeof(char*);
+                    break;
+                case FT_LOGIC:
+                    assert(false && "DBC files not have logic field type");
+                    break;
+                case FT_NA:
+                case FT_NA_BYTE:
+                case FT_SORT:
+                    break;
+                default:
+                    assert(false && "unknown format character");
                     break;
             }
         }
@@ -304,40 +325,48 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable, Loc
 
     uint32 offset=0;
 
-    for(uint32 y =0;y<recordCount;y++)
+    for(uint32 y =0; y < recordCount; ++y)
     {
-        for(uint32 x=0;x<fieldCount;x++)
-            switch(format[x])
+        for(uint32 x = 0; x < fieldCount; ++x)
         {
-            case FT_FLOAT:
-            case FT_IND:
-            case FT_INT:
-                offset+=4;
-                break;
-            case FT_BYTE:
-                offset+=1;
-                break;
-            case FT_STRING:
+            switch(format[x])
             {
-                char** holder = *((char***)(&dataTable[offset]));
-                char** slot = &holder[loc];
-
-                // fill only not filled entries
-                if (*slot == nullStr)
+                case FT_FLOAT:
+                    offset += sizeof(float);
+                    break;
+                case FT_IND:
+                case FT_INT:
+                    offset += sizeof(uint32);
+                    break;
+                case FT_BYTE:
+                    offset += sizeof(uint8);
+                    break;
+                case FT_STRING:
                 {
-                    const char * st = getRecord(y).getString(x);
-                    *slot=stringPool+(st-(const char*)stringTable);
-                }
+                    char** holder = *((char***)(&dataTable[offset]));
+                    char** slot = &holder[loc];
 
-                offset+=sizeof(char*);
-                break;
+                    // fill only not filled entries
+                    if (*slot == nullStr)
+                    {
+                        const char * st = getRecord(y).getString(x);
+                        *slot=stringPool+(st-(const char*)stringTable);
+                    }
+
+                    offset+=sizeof(char*);
+                    break;
+                }
+                case FT_LOGIC:
+                    assert(false && "DBC files not have logic field type");
+                    break;
+                case FT_NA:
+                case FT_NA_BYTE:
+                case FT_SORT:
+                    break;
+                default:
+                    assert(false && "unknown format character");
+                    break;
             }
-            case FT_NA:
-            case FT_NA_BYTE:
-            case FT_SORT:
-                break;
-            default:
-                assert(false && "unknown format character");
         }
     }
 

@@ -34,8 +34,6 @@ class Unit;
 class WorldPacket;
 class InstanceData;
 class Group;
-struct ScriptInfo;
-struct ScriptAction;
 class BattleGround;
 class Map;
 

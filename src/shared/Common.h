@@ -62,9 +62,6 @@
 #endif                                                      // __SHOW_STUPID_WARNINGS__
 #endif                                                      // __GNUC__
 
-// must be the first thing to include for it to work
-#include "MemoryLeaks.h"
-
 #include "Utilities/UnorderedMapSet.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,11 +106,7 @@ typedef off_t ACE_OFF_T;
 #    define FD_SETSIZE 4096
 #  endif
 #  include <ace/config-all.h>
-// XP winver - needed to compile with standard leak check in MemoryLeaks.h
-// uncomment later if needed
-//#define _WIN32_WINNT 0x0501
 #  include <ws2tcpip.h>
-//#undef WIN32_WINNT
 #else
 #  include <sys/types.h>
 #  include <sys/ioctl.h>

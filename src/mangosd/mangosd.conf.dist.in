@@ -19,8 +19,8 @@ ConfVersion=2010100901
 #    LogsDir
 #        Logs directory setting.
 #        Important: Logs dir must exists, or all logs need to be disabled
-#        Default: "" - no log directory prefix, if used log names isn't absolute path
-#        then logs will be stored in current directory for run program.
+#        Default: "" - no log directory prefix. if used log names aren't absolute paths
+#                      then logs will be stored in the current directory of the running program.
 #
 #
 #    LoginDatabaseInfo
@@ -49,7 +49,7 @@ ConfVersion=2010100901
 #        Settings for maximum database-ping interval (minutes between pings)
 #
 #    WorldServerPort
-#        Default WorldServerPort
+#        Port on which the server will listen
 #
 #    BindIP
 #        Bind World Server to IP/hostname
@@ -104,7 +104,7 @@ BindIP = "0.0.0.0"
 #                 0 (save creature/gameobject respawn time at grid unload)
 #
 #    MaxOverspeedPings
-#        Maximum overspeed ping count before player kick (minimum is 2, 0 used for disable check)
+#        Maximum overspeed ping count before player kick (minimum is 2, 0 used to disable check)
 #        Default: 2
 #
 #    GridUnload
@@ -140,7 +140,8 @@ BindIP = "0.0.0.0"
 #
 #    vmap.enableLOS
 #    vmap.enableHeight
-#        Enable/Disable VMmap support for line of sight and height calculation
+#        Enable/Disable VMaps support for line of sight and height calculation
+#        You need to extract the VMaps in order to enable those options
 #        Default: 0 (disable)
 #                 1 (enable)
 #
@@ -158,12 +159,12 @@ BindIP = "0.0.0.0"
 #    DetectPosCollision
 #        Check final move position, summon position, etc for visible collision with other objects or
 #        wall (wall only if vmaps are enabled)
-#        Default: 1 (enable, required more CPU power usage)
-#                 0 (disable, less nice position selection but will less CPU power usage)
+#        Default: 1 (enable, requires more CPU power)
+#                 0 (disable, not so nice position selection but will require less CPU power)
 #
 #    TargetPosRecalculateRange
 #        Max distance from movement target point (+moving unit size) and targeted object (+size)
-#        after that new target movmeent point calculated. Max: melee attack range (5), min: contact range (0.5)
+#        after that new target movement point calculated. Max: melee attack range (5), min: contact range (0.5)
 #        More distance let have better performence, less distance let have more sensitive reaction at target move.
 #        Default: 1.5
 #
@@ -183,7 +184,7 @@ BindIP = "0.0.0.0"
 #                 0 (do not permit addon channel)
 #
 #    CleanCharacterDB
-#        Perform character db clean ups on start up
+#        Perform character db cleanups on start up
 #        Default: 1 (Enable)
 #                 0 (Disabled)
 #
@@ -219,7 +220,7 @@ CleanCharacterDB = 1
 #    LogSQL
 #        Enable logging of GM commands - all SQL code will be written to a log file
 #        All commands are written to a file: YYYY-MM-DD_logSQL.sql
-#        If a new day starts (00:00:00) then a new file is created - the old file will not be deleted.
+#        If a new day starts (00:00:00), a new file is created - the old file will not be deleted.
 #        Default: 1 - Write SQL code to logfile
 #                 0 - Do not log
 #
@@ -416,7 +417,7 @@ LogColors = ""
 #                     expansion 2 setting then allow visit expansion 2 maps, allow create new class character)
 #                 1 - check expansion 1 maps existence, and if client support expansion 1 and account have
 #                     expansion 1 setting then allow visit expansion 1 maps, allow create new races character)
-#                 0 - not check expansion maps existence, not allow wisit its, not allow create new race or new class
+#                 0 - not check expansion maps existence, not allow visit its, not allow create new race or new class
 #                     characters, ignore account expansion setting)
 #
 #    DBC.Locale
@@ -427,7 +428,7 @@ LogColors = ""
 #    DeclinedNames
 #    Allow russian clients to set and use declined names
 #    Default: 0 - do not use declined names, except when the Russian RealmZone is set
-#         1 - use declined names
+#             1 - use declined names
 #
 #    StrictPlayerNames
 #        Limit player name to language specific symbols set, not allow create characters, and set rename request and disconnect at not allowed symbols name
@@ -439,7 +440,7 @@ LogColors = ""
 #                 3 basic latin characters + server timezone specific
 #
 #    StrictCharterNames
-#        Limit guild/arena team charter names to language specific symbols set, not allow create charters with allowed symbols in name
+#        Limit guild/arena team charter names to language specific symbols set, not allow create charters with not allowed symbols in name
 #        Default: 0 disable
 #                 1 basic latin characters  (strict)
 #                 2 realm zone specific (strict). See RealmZone setting.
@@ -477,7 +478,7 @@ LogColors = ""
 #
 #    CharactersPerAccount
 #        Limit numbers of characters per account (at all realms).
-#        Note: this setting limit character creating at _current_ realm base at characters amount at all realms
+#        Note: this setting limits the character creating at the _current_ realm base at characters amount at all realms
 #        Default: 50
 #                The number must be >= CharactersPerRealm
 #
@@ -493,19 +494,19 @@ LogColors = ""
 #
 #    MinLevelForHeroicCharacterCreating
 #        Limit creating heroic characters only for account with another character of specific level (ignored for GM accounts)
-#                 0  - not require any existed character
-#                 1  - require at least any character existed
+#                 0  - does not require any existing character
+#                 1  - require at least one other existing character
 #        Default: 55 - default requirement
 #
 #
 #    SkipCinematics
 #        Disable in-game script movie at first character's login(allows to prevent buggy intro in case of custom start location coordinates)
-#        Default: 0 - show intro for each new characrer
+#        Default: 0 - show intro for each new character
 #                 1 - show intro only for first character of selected race
-#                 2 - disable intro show in all cases
+#                 2 - disable intro in all cases
 #
 #    MaxPlayerLevel
-#        Max level that can be reached by player for experience (in range from 1 to 100).
+#        Max level that can be reached by a player for experience (in range from 1 to 100).
 #        Change not recommended
 #        Default: 80
 #
@@ -519,7 +520,7 @@ LogColors = ""
 #
 #    StartPlayerMoney
 #        Amount of money that new players will start with.
-#        If you want to start with silver, use for example 100 (100 copper = 1 silver)
+#        If you want to start with one silver, use for example 100 (100 copper = 1 silver)
 #        Default: 0
 #
 #    MaxHonorPoints
@@ -558,7 +559,7 @@ LogColors = ""
 #                 0 (false)
 #
 #    CastUnstuck
-#        Allow cast or not Unstuck spell at .start or client Help option use
+#        Allow cast Unstuck spell at .start or client Help option use
 #        Default: 1 (true)
 #                 0 (false)
 #
@@ -801,7 +802,7 @@ Motd = "Welcome to the Massive Network Game Object Server."
 # PLAYER INTERACTION
 #
 #    AllowTwoSide.Accounts
-#        Allow or not accounts to create characters in the 2 teams in any game type.
+#        Allow accounts to create characters in both teams in any game type.
 #                 0 (Not allowed)
 #        Default: 1 (Allowed)
 #
@@ -817,12 +818,12 @@ Motd = "Welcome to the Massive Network Game Object Server."
 #                 1 (Allowed)
 #
 #    AllowTwoSide.WhoList
-#        Allow or not show player from both team in who list.
+#        Allow show player from both team in who list.
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
 #
 #    AllowTwoSide.AddFriend
-#        Allow or not adding friends from other team in friend list.
+#        Allow adding friends from other team in friend list.
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
 #
@@ -1123,10 +1124,6 @@ GM.AllowAchievementGain  = 1
 #        Max limited by active player zone: ~ 333
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #
-#    Visibility.Distance.Object
-#        Visible distance for gameobject, dynobject, bodies, corpses, bones
-#        Min limit is iteraction distance (5)
-#
 #    Visibility.Distance.InFlight
 #        Visible distance for player in flight
 #        Min limit is 0 (not show any objects)
@@ -1142,6 +1139,14 @@ GM.AllowAchievementGain  = 1
 #        Visibility grey distance for dynobjects/gameobjects/corpses/creature bodies
 #        Default: 10 (yards)
 #
+#    Visibility.RelocationLowerLimit
+#        Object's visibility update called, when distance between current object's position and position,
+#        where visiblity was updated last time, reaches RelocationLoverLimit value
+#        Default: 10 (yards)
+#
+#    Visibility.AIRelocationNotifyDelay
+#        Delay time between creature AI reactions on nearby movements
+#        Default: 1000 (milliseconds)
 #
 ###################################################################################################################
 
@@ -1149,10 +1154,11 @@ Visibility.GroupMode = 0
 Visibility.Distance.Continents    = 90
 Visibility.Distance.Instances     = 120
 Visibility.Distance.BGArenas      = 180
-Visibility.Distance.Object        = 100
 Visibility.Distance.InFlight      = 100
 Visibility.Distance.Grey.Unit   = 1
 Visibility.Distance.Grey.Object = 10
+Visibility.RelocationLowerLimit    = 10
+Visibility.AIRelocationNotifyDelay = 1000
 
 ###################################################################################################################
 # SERVER RATES

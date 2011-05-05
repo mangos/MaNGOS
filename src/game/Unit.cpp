@@ -218,6 +218,7 @@ Unit::Unit()
     m_AuraFlags = 0;
 
     m_Visibility = VISIBILITY_ON;
+    m_AINotifyScheduled = false;
 
     m_detectInvisibilityMask = 0;
     m_invisibilityMask = 0;
@@ -4422,7 +4423,7 @@ void Unit::RemoveSingleAuraFromSpellAuraHolder(uint32 spellId, SpellEffectIndex 
     }
 }
 
-void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, int32 stackAmount, uint64 casterGUID, Unit *dispeler)
+void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, uint32 stackAmount, uint64 casterGUID, Unit *dispeller)
 {
     SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
     SpellClassOptionsEntry const* classOptions = spellEntry->GetSpellClassOptions();
@@ -4441,7 +4442,7 @@ void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, int32 stackAmount,
             RemoveAuraHolderFromStack(spellId, stackAmount, casterGUID, AURA_REMOVE_BY_DISPEL);
 
             // backfire damage and silence
-            dispeler->CastCustomSpell(dispeler, 31117, &damage, NULL, NULL, true, NULL, NULL,casterGUID);
+            dispeller->CastCustomSpell(dispeller, 31117, &damage, NULL, NULL, true, NULL, NULL, casterGUID);
             return;
         }
     }
@@ -4591,14 +4592,14 @@ void Unit::RemoveAurasWithDispelType( DispelType type, uint64 casterGUID )
     }
 }
 
-void Unit::RemoveAuraHolderFromStack(uint32 spellId, int32 stackAmount, uint64 casterGUID, AuraRemoveMode mode)
+void Unit::RemoveAuraHolderFromStack(uint32 spellId, uint32 stackAmount, uint64 casterGUID, AuraRemoveMode mode)
 {
     SpellAuraHolderBounds spair = GetSpellAuraHolderBounds(spellId);
     for(SpellAuraHolderMap::iterator iter = spair.first; iter != spair.second; ++iter)
     {
         if (!casterGUID || iter->second->GetCasterGUID() == casterGUID)
         {
-            if (iter->second->ModStackAmount(-stackAmount))
+            if (iter->second->ModStackAmount(-int32(stackAmount)))
             {
                 RemoveSpellAuraHolder(iter->second, mode);
                 break;
@@ -7934,11 +7935,6 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
         if (!IsWithinDistInMap(viewPoint,World::GetMaxVisibleDistanceInFlight()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
             return false;
     }
-    else if(!isAlive())                                     // distance for show body
-    {
-        if (!IsWithinDistInMap(viewPoint,World::GetMaxVisibleDistanceForObject()+(inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), is3dDistance))
-            return false;
-    }
     else if(!at_same_transport)                             // distance for show player/pet/creature (no transport case)
     {
         // Any units far than max visible distance for viewer or not in our map are not visible too
@@ -7958,7 +7954,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
             return false;
 
     // Visible units, always are visible for all units, except for units under invisibility and phases
-    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0 && InSamePhase(u))
+    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask==0)
         return true;
 
     // GMs see any players, not higher GMs and all units in any phase
@@ -7972,10 +7968,6 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
 
     // non faction visibility non-breakable for non-GMs
     if (m_Visibility == VISIBILITY_OFF)
-        return false;
-
-    // phased visibility (both must phased in same way)
-    if(!InSamePhase(u))
         return false;
 
     // raw invisibility
@@ -8098,48 +8090,44 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
     return IsWithinLOS(ox,oy,oz);
 }
 
+void Unit::UpdateVisibilityAndView()
+{
+
+    static const AuraType auratypes[] = {SPELL_AURA_BIND_SIGHT, SPELL_AURA_FAR_SIGHT, SPELL_AURA_NONE};
+    for (AuraType const* type = &auratypes[0]; *type != SPELL_AURA_NONE; ++type)
+    {
+        AuraList& alist = m_modAuras[*type];
+        if(alist.empty())
+            continue;
+
+        for (AuraList::iterator it = alist.begin(); it != alist.end();)
+        {
+            Aura* aura = (*it);
+            Unit* owner = aura->GetCaster();
+
+            if (!owner || !isVisibleForOrDetect(owner,this,false))
+            {
+                alist.erase(it);
+                RemoveAura(aura);
+                it = alist.begin();
+            }
+            else
+                ++it;
+        }
+    }
+
+    GetViewPoint().Call_UpdateVisibilityForOwner();
+    UpdateObjectVisibility();
+    ScheduleAINotify(0);
+    GetViewPoint().Event_ViewPointVisibilityChanged();
+}
+
 void Unit::SetVisibility(UnitVisibility x)
 {
     m_Visibility = x;
 
     if(IsInWorld())
-    {
-        // some auras requires visible target
-        if(m_Visibility == VISIBILITY_GROUP_NO_DETECT || m_Visibility == VISIBILITY_OFF)
-        {
-            static const AuraType auratypes[] = {SPELL_AURA_BIND_SIGHT, SPELL_AURA_FAR_SIGHT, SPELL_AURA_NONE};
-            for (AuraType const* type = &auratypes[0]; *type != SPELL_AURA_NONE; ++type)
-            {
-                AuraList& alist = m_modAuras[*type];
-                if(alist.empty())
-                    continue;
-
-                for (AuraList::iterator it = alist.begin(); it != alist.end();)
-                {
-                    Aura* aura = (*it);
-                    Unit* owner = aura->GetCaster();
-
-                    if (!owner || !isVisibleForOrDetect(owner,this,false))
-                    {
-                        alist.erase(it);
-                        RemoveAura(aura);
-                        it = alist.begin();
-                    }
-                    else
-                        ++it;
-                }
-            }
-        }
-
-        Map *m = GetMap();
-
-        if(GetTypeId()==TYPEID_PLAYER)
-            m->PlayerRelocation((Player*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
-        else
-            m->CreatureRelocation((Creature*)this,GetPositionX(),GetPositionY(),GetPositionZ(),GetOrientation());
-
-        GetViewPoint().Event_ViewPointVisibilityChanged();
-    }
+        UpdateVisibilityAndView();
 }
 
 bool Unit::canDetectInvisibilityOf(Unit const* u) const
@@ -9411,6 +9399,7 @@ uint32 Unit::GetCreatePowers( Powers power ) const
 void Unit::AddToWorld()
 {
     Object::AddToWorld();
+    ScheduleAINotify(0);
 }
 
 void Unit::RemoveFromWorld()
@@ -10434,14 +10423,14 @@ void Unit::SetContestedPvP(Player *attackedPlayer)
         player->addUnitState(UNIT_STAT_ATTACK_PLAYER);
         player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
         // call MoveInLineOfSight for nearby contested guards
-        SetVisibility(GetVisibility());
+        UpdateVisibilityAndView();
     }
 
     if (!hasUnitState(UNIT_STAT_ATTACK_PLAYER))
     {
         addUnitState(UNIT_STAT_ATTACK_PLAYER);
         // call MoveInLineOfSight for nearby contested guards
-        SetVisibility(GetVisibility());
+        UpdateVisibilityAndView();
     }
 }
 
@@ -10457,51 +10446,6 @@ void Unit::RemovePetAura(PetAura const* petSpell)
     m_petAuras.erase(petSpell);
     if(Pet* pet = GetPet())
         pet->RemoveAurasDueToSpell(petSpell->GetAura(pet->GetEntry()));
-}
-
-Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget,uint32 spell_id)
-{
-    Pet* pet = new Pet(HUNTER_PET);
-
-    if(!pet->CreateBaseAtCreature(creatureTarget))
-    {
-        delete pet;
-        return NULL;
-    }
-
-    pet->SetOwnerGuid(GetObjectGuid());
-    pet->SetCreatorGuid(GetObjectGuid());
-    pet->setFaction(getFaction());
-    pet->SetUInt32Value(UNIT_CREATED_BY_SPELL, spell_id);
-
-    if(GetTypeId()==TYPEID_PLAYER)
-        pet->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-
-    if(IsPvP())
-        pet->SetPvP(true);
-
-    if(IsFFAPvP())
-        pet->SetFFAPvP(true);
-
-    // level of hunter pet can't be less owner level at 5 levels
-    uint32 level = creatureTarget->getLevel() + 5 < getLevel() ? (getLevel() - 5) : creatureTarget->getLevel();
-
-    if(!pet->InitStatsForLevel(level))
-    {
-        sLog.outError("Pet::InitStatsForLevel() failed for creature (Entry: %u)!",creatureTarget->GetEntry());
-        delete pet;
-        return NULL;
-    }
-
-    pet->GetCharmInfo()->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
-    // this enables pet details window (Shift+P)
-    pet->AIM_Initialize();
-    pet->InitPetCreateSpells();
-    pet->InitLevelupSpellsForLevel();
-    pet->InitTalentForLevel();
-    pet->SetHealth(pet->GetMaxHealth());
-
-    return pet;
 }
 
 void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, bool non_positive /*= false*/)
@@ -10530,19 +10474,30 @@ void Unit::RemoveAurasAtMechanicImmunity(uint32 mechMask, uint32 exceptSpellId, 
     }
 }
 
+struct SetPhaseMaskHelper
+{
+    explicit SetPhaseMaskHelper(uint32 _phaseMask) : phaseMask(_phaseMask) {}
+    void operator()(Unit* unit) const { unit->SetPhaseMask(phaseMask, true); }
+    uint32 phaseMask;
+};
+
 void Unit::SetPhaseMask(uint32 newPhaseMask, bool update)
 {
-    if(newPhaseMask==GetPhaseMask())
+    if (newPhaseMask==GetPhaseMask())
         return;
 
-    if(IsInWorld())
+    // first move to both phase for proper update controlled units
+    WorldObject::SetPhaseMask(GetPhaseMask() | newPhaseMask, false);
+
+    if (IsInWorld())
+    {
         RemoveNotOwnSingleTargetAuras(newPhaseMask);        // we can lost access to caster or target
 
-    WorldObject::SetPhaseMask(newPhaseMask,update);
+        // all controlled except not owned charmed units
+        CallForAllControlledUnits(SetPhaseMaskHelper(newPhaseMask), CONTROLLED_PET|CONTROLLED_GUARDIANS|CONTROLLED_MINIPET|CONTROLLED_TOTEMS);
+    }
 
-    if(IsInWorld())
-        if(Pet* pet = GetPet())
-            pet->SetPhaseMask(newPhaseMask,true);
+    WorldObject::SetPhaseMask(newPhaseMask, update);
 }
 
 void Unit::NearTeleportTo( float x, float y, float z, float orientation, bool casting /*= false*/ )
@@ -10886,4 +10841,63 @@ bool Unit::IsAllowedDamageInArea(Unit* pVictim) const
         return false;
 
     return true;
+}
+
+class RelocationNotifyEvent : public BasicEvent
+{
+public:
+    RelocationNotifyEvent(Unit& owner) : BasicEvent(), m_owner(owner)
+    {
+        m_owner._SetAINotifyScheduled(true);
+    }
+
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+    {
+        float radius = MAX_CREATURE_ATTACK_RADIUS * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+        if (m_owner.GetTypeId() == TYPEID_PLAYER)
+        {
+            MaNGOS::PlayerRelocationNotifier notify((Player&)m_owner);
+            Cell::VisitAllObjects(&m_owner,notify,radius);
+        }
+        else //if(m_owner.GetTypeId() == TYPEID_UNIT)
+        {
+            MaNGOS::CreatureRelocationNotifier notify((Creature&)m_owner);
+            Cell::VisitAllObjects(&m_owner,notify,radius);
+        }
+        m_owner._SetAINotifyScheduled(false);
+        return true;
+    }
+
+    void Abort(uint64)
+    {
+        m_owner._SetAINotifyScheduled(false);
+    }
+
+private:
+    Unit& m_owner;
+};
+
+void Unit::ScheduleAINotify(uint32 delay)
+{
+    if (!IsAINotifyScheduled())
+        m_Events.AddEvent(new RelocationNotifyEvent(*this), m_Events.CalculateTime(delay));
+}
+
+void Unit::OnRelocated()
+{
+    // switch to use G3D::Vector3 is good idea, maybe
+    float dx = m_last_notified_position.x - GetPositionX();
+    float dy = m_last_notified_position.y - GetPositionY();
+    float dz = m_last_notified_position.z - GetPositionZ();
+    float distsq = dx*dx+dy*dy+dz*dz;
+    if (distsq > World::GetRelocationLowerLimitSq())
+    {
+        m_last_notified_position.x = GetPositionX();
+        m_last_notified_position.y = GetPositionY();
+        m_last_notified_position.z = GetPositionZ();
+
+        GetViewPoint().Call_UpdateVisibilityForOwner();
+        UpdateObjectVisibility();
+    }
+    ScheduleAINotify(World::GetRelocationAINotifyDelay());
 }

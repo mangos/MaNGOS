@@ -49,6 +49,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (6788, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Weakened Soul',                      'Spell::cast'),
 (9512, -1,                -1,        -1,  -1,  -1,  -1, 30, -1,-1,'Restore Energy',                     'Spell::EffectEnergize'),
 (4073, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Mechanical Dragonling',              'Spell::EffectDummy'),
+(5229, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Enrage',                             'SpellAuraHolder::HandleSpellSpecificBoosts'),
 (5938,  8,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Shiv',                               'Spell::EffectDummy'),
 (5940, -1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Shiv',                               'Spell::EffectDummy'),
 (8017, 11,0x0000000000400000,0x00000000,  -1,  -1,  -1, 54, -1,-1,'Rockbiter Weapon',                   'Spell::EffectEnchantItemTmp'),
@@ -404,6 +405,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (50927,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Gluttonous Lurkers: Create Zul\'Drak Rat Cover','Spell::EffectDummy'),
 (51026, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Create Drakkari Medallion Cover',    'Spell::EffectDummy'),
 (51037,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Captured Chicken Cover',             'Spell::EffectDummy'),
+(51185,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'King of the Jungle',                 'SpellAuraHolder::HandleSpellSpecificBoosts'),
 (51209,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Hungering Cold',                     'Spell::EffectDummy'),
 (51276, 0,                -1,        -1,  -1,  -1,  -1,  3, -1,-1,'Incinerate Corpse',                  'Spell::EffectDummy'),
 (51278,-1,                -1,        -1,  -1,  -1,  -1, -1, -1,-1,'Incinerate Corpse',                  'Spell::EffectDummy'),
@@ -636,6 +638,7 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 9,0x0008000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Counterattack',                      'Spell::EffectSchoolDMG'),
 (    0, 5,                -1,        -1,  -1,  -1,1179, -1, -1,-1,'Curse of Doom',                      'Spell::CheckTargetCreatureType'),
 (    0, 8,0x0000000000010000,0x00000000,  -1,  -1,  -1, -1,  3,-1,'Deadly poison',                      'Spell::EffectSchoolDMG'),
+(    0, 8,0x0000000000010000,0x00000000,  -1,  -1,  -1,  6, -1,-1,'Deadly Poison',                      'Player::CastItemCombatSpell'),
 (    0,15,0x0000000000002000,0x00000000,  -1,  -1,  -1,  3, -1,-1,'Death Coil',                         'Spell::EffectDummy'),
 (    0,15,0x0000000000000010,0x00000000,  -1,  -1,  -1, 31, -1, 1,'Death Strike',                       'Spell::EffectWeaponDmg'),
 (    0,15,0x0000000000000010,0x00000000,  -1,  -1,  -1,  3, -1, 2,'Death Strike',                       'Spell::EffectDummy'),
@@ -652,7 +655,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 5,                -1,        -1,  16,  -1,  -1, -1, -1,-1,'Fire Shield',                        'Spell::CheckCast'),
 (    0,11,0x0000000000200000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Flametongue',                        'Spell::EffectDummy'),
 (    0, 9,                -1,        -1,1578,  -1,  -1,  2, -1,-1,'Gore',                               'Spell::EffectSchoolDMG'),
-(    0, 8,0x0000000000000008,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Gouge',                              'Spell::EffectSchoolDMG'),
 (    0,10,0x0000008000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Hammer of Wrath',                    'Spell::EffectSchoolDMG'),
 (    0,-1,                -1,        -1,  -1,7250,  -1,  2, -1,-1,'Hammer of Wrath',                    'Spell::CheckCast'),
 (    0,10,0x0004000000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Hammer of the Righteous',            'Spell::EffectSchoolDMG'),
@@ -673,10 +675,10 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 5,                -1,        -1, 208,  -1,  -1, -1,  4,-1,'Improved Life Tap',                  'Spell::EffectDummy'),
 (    0, 6,                -1,        -1,  95,  -1,  -1, -1,107,-1,'Improved Mind Blast',                'Spell::EffectSchoolDMG'),
 (    0, 5,0x0000004000000000,0x00000000,2128,  -1,  -1,  2, -1,-1,'Incinerate',                         'Spell::EffectSchoolDMG'),
-(    0, 8,0x0000000000002000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Instant Poison',                     'Spell::EffectSchoolDMG'),
 (    0,10,                -1,        -1, 561,  -1,  -1,  3, -1,-1,'Judgement of command',               'Spell::EffectDummy'),
 (    0,10,0x0000000800000000,0x00000000,2292,  -1,  -1,  2, -1,-1,'Judgement of Vengeance',             'Spell::EffectSchoolDMG'),
 (    0,10,0x0001000900B80400,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Judgements (all) / Holy Shock',      'Spell::prepareDataForTriggerSystem'),
+(    0, 7,0x0000000000000000,0x00000000,2850,  -1,  -1, -1,  4,-1,'King of the Jungle',                 'Unit::HandleDummyAuraProc'),
 (    0, 7,0x0000010000000000,0x00000000,2246,  -1,  -1,  2, -1,-1,'Lacerate',                           'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000000000000,0x00000004,  -1,  -1,  -1,  3, -1,-1,'Lava Lash',                          'Spell::EffectDummy'),
 (    0,10,0x0000000000008000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Lay on Hands',                       'Spell::cast'),
@@ -732,6 +734,6 @@ INSERT INTO spell_check (spellid,SpellFamilyName,SpellFamilyMaskA,SpellFamilyMas
 (    0, 4,0x0000000000000080,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Thunder Clap',                       'Spell::EffectSchoolDMG'),
 (    0,11,0x0000000004000000,0x00000000,  -1,  -1,  -1, -1, -1,-1,'Totem of Wrath',                     'Spell::cast'),
 (    0, 4,0x0000010000000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Victory Rush',                       'Spell::EffectSchoolDMG'),
-(    0, 7,                -1,        -1,2864,  -1,  -1,  0, -1, 2,'Wild Growth',                        'Spell::SetTargetMap'),
-(    0, 8,0x0000000010000000,0x00000000,  -1,  -1,  -1,  2, -1,-1,'Wound Poison',                       'Spell::EffectSchoolDMG');
+(    0, 7,                -1,        -1,2864,  -1,  -1,  0, -1, 2,'Wild Growth',                        'Spell::SetTargetMap')
 /*id   fm familyMaskA        fmMaskB    icon vis  cat  eff aur ef name                                  code                   */
+;

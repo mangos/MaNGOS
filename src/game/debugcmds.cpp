@@ -663,28 +663,19 @@ bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
     if (!ve)
         return false;
 
+    Player* chr = m_session->GetPlayer();
+
     Vehicle *v = new Vehicle;
-    Map *map = m_session->GetPlayer()->GetMap();
-    if (!v->Create(map->GenerateLocalLowGuid(HIGHGUID_VEHICLE), map, entry, id, m_session->GetPlayer()->GetTeam()))
+
+    CreatureCreatePos pos(chr, chr->GetOrientation());
+
+    if (!v->Create(pos.GetMap()->GenerateLocalLowGuid(HIGHGUID_VEHICLE), pos, entry, id, chr->GetTeam()))
     {
         delete v;
         return false;
     }
 
-    float px, py, pz;
-    m_session->GetPlayer()->GetClosePoint(px, py, pz, m_session->GetPlayer()->GetObjectBoundingRadius());
-
-    v->Relocate(px, py, pz, m_session->GetPlayer()->GetOrientation());
-
-    if (!v->IsPositionValid())
-    {
-        sLog.outError("Vehicle (guidlow %d, entry %d) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-            v->GetGUIDLow(), v->GetEntry(), v->GetPositionX(), v->GetPositionY());
-        delete v;
-        return false;
-    }
-
-    map->Add((Creature*)v);
+    pos.GetMap()->Add((Creature*)v);
 
     return true;
 }
@@ -1083,6 +1074,63 @@ bool ChatHandler::HandleDebugModValueCommand(char* args)
         return false;
 
     return HandlerDebugModValueHelper(target, field, typeStr, valStr);
+}
+
+bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
+{
+    uint32 spellid = ExtractSpellIdFromLink(&args);
+    if (!spellid)
+        return false;
+
+    SpellEntry const * spellEntry = sSpellStore.LookupEntry(spellid);
+    if (!spellEntry)
+        return false;
+
+    SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellid);
+
+    float direct_calc = CalculateDefaultCoefficient(spellEntry, SPELL_DIRECT_DAMAGE);
+    float dot_calc = CalculateDefaultCoefficient(spellEntry, DOT);
+
+    bool isDirectHeal = false;
+    for(int i = 0; i < 3; ++i)
+    {
+        SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
+            continue;
+        // Heals (Also count Mana Shield and Absorb effects as heals)
+        if (spellEffect->Effect == SPELL_EFFECT_HEAL || spellEffect->Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+            (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA && (spellEffect->EffectApplyAuraName == SPELL_AURA_SCHOOL_ABSORB || spellEffect->EffectApplyAuraName == SPELL_AURA_PERIODIC_HEAL)))
+        {
+            isDirectHeal = true;
+            break;
+        }
+    }
+
+    bool isDotHeal = false;
+    for(int i = 0; i < 3; ++i)
+    {
+        SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
+            continue;
+        // Periodic Heals
+        if (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA && spellEffect->EffectApplyAuraName == SPELL_AURA_PERIODIC_HEAL)
+        {
+            isDotHeal = true;
+            break;
+        }
+    }
+
+    char const* directHealStr = GetMangosString(LANG_DIRECT_HEAL);
+    char const* directDamageStr = GetMangosString(LANG_DIRECT_DAMAGE);
+    char const* dotHealStr = GetMangosString(LANG_DOT_HEAL);
+    char const* dotDamageStr = GetMangosString(LANG_DOT_DAMAGE);
+
+    PSendSysMessage(LANG_SPELLCOEFS, spellid, isDirectHeal ? directHealStr : directDamageStr,
+        direct_calc, direct_calc * 1.88f, bonus ? bonus->direct_damage : 0.0f, bonus ? bonus->ap_bonus : 0.0f);
+    PSendSysMessage(LANG_SPELLCOEFS, spellid, isDotHeal ? dotHealStr : dotDamageStr,
+        dot_calc, dot_calc * 1.88f, bonus ? bonus->dot_damage : 0.0f, bonus ? bonus->ap_dot_bonus : 0.0f);
+
+    return true;
 }
 
 bool ChatHandler::HandleDebugSpellModsCommand(char* args)

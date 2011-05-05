@@ -25,26 +25,26 @@
 
 /// ---- ASYNC STATEMENTS / TRANSACTIONS ----
 
-void SqlStatement::Execute(SqlConnection *conn)
+bool SqlPlainRequest::Execute(SqlConnection *conn)
 {
     /// just do it
     LOCK_DB_CONN(conn);
-    conn->Execute(m_sql);
+    return conn->Execute(m_sql);
 }
 
 SqlTransaction::~SqlTransaction()
 {
     while(!m_queue.empty())
     {
-        delete [] (const_cast<char*>(m_queue.back()));
+        delete m_queue.back();
         m_queue.pop_back();
     }
 }
 
-void SqlTransaction::Execute(SqlConnection *conn)
+bool SqlTransaction::Execute(SqlConnection *conn)
 {
     if(m_queue.empty())
-        return;
+        return true;
 
     LOCK_DB_CONN(conn);
 
@@ -53,30 +53,47 @@ void SqlTransaction::Execute(SqlConnection *conn)
     const int nItems = m_queue.size();
     for (int i = 0; i < nItems; ++i)
     {
-        const char *sql = m_queue[i];
+        SqlOperation * pStmt = m_queue[i];
 
-        if(!conn->Execute(sql))
+        if(!pStmt->Execute(conn))
         {
             conn->RollbackTransaction();
-            return;
+            return false;
         }
     }
 
-    conn->CommitTransaction();
+    return conn->CommitTransaction();
+}
+
+SqlPreparedRequest::SqlPreparedRequest(int nIndex, SqlStmtParameters * arg ) : m_nIndex(nIndex), m_param(arg)
+{
+}
+
+SqlPreparedRequest::~SqlPreparedRequest()
+{
+    delete m_param;
+}
+
+bool SqlPreparedRequest::Execute( SqlConnection *conn )
+{
+    LOCK_DB_CONN(conn);
+    return conn->ExecuteStmt(m_nIndex, *m_param);
 }
 
 /// ---- ASYNC QUERIES ----
 
-void SqlQuery::Execute(SqlConnection *conn)
+bool SqlQuery::Execute(SqlConnection *conn)
 {
     if(!m_callback || !m_queue)
-        return;
+        return false;
 
     LOCK_DB_CONN(conn);
     /// execute the query and store the result in the callback
     m_callback->SetResult(conn->Query(m_sql));
     /// add the callback to the sql result queue of the thread it originated from
     m_queue->add(m_callback);
+
+    return true;
 }
 
 void SqlResultQueue::Update()
@@ -190,10 +207,10 @@ void SqlQueryHolder::SetSize(size_t size)
     m_queries.resize(size);
 }
 
-void SqlQueryHolderEx::Execute(SqlConnection *conn)
+bool SqlQueryHolderEx::Execute(SqlConnection *conn)
 {
     if(!m_holder || !m_callback || !m_queue)
-        return;
+        return false;
 
     LOCK_DB_CONN(conn);
     /// we can do this, we are friends
@@ -207,4 +224,6 @@ void SqlQueryHolderEx::Execute(SqlConnection *conn)
 
     /// sync with the caller thread
     m_queue->add(m_callback);
+
+    return true;
 }

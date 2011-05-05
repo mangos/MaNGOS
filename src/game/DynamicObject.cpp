@@ -96,6 +96,7 @@ bool DynamicObject::Create( uint32 guidlow, Unit *caster, uint32 spellId, SpellE
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
+    m_positive = IsPositiveEffect(m_spellId, m_effIndex);
 
     return true;
 }
@@ -127,7 +128,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if(m_radius)
     {
         // TODO: make a timer and update this in larger intervals
-        MaNGOS::DynamicObjectUpdater notifier(*this, caster);
+        MaNGOS::DynamicObjectUpdater notifier(*this, caster, m_positive);
         Cell::VisitAllObjects(this, notifier, m_radius);
     }
 
@@ -196,7 +197,7 @@ bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* view
         return true;
 
     // normal case
-    return IsWithinDistInMap(viewPoint, World::GetMaxVisibleDistanceForObject() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+    return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
 }
 
 bool DynamicObject::IsHostileTo( Unit const* unit ) const

@@ -43,6 +43,7 @@
 #include "VMapFactory.h"
 #include "BattleGround.h"
 #include "Util.h"
+#include "Chat.h"
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -532,7 +533,7 @@ void Spell::FillTargetMap()
                     case TARGET_RANDOM_NEARBY_DEST:
                         // triggered spells get dest point from default target set, ignore it
                         if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) || m_IsTriggeredSpell)
-                            if (WorldObject* castObject = GetAffectiveCasterObject())
+                            if (WorldObject* castObject = GetCastingObject())
                                 m_targets.setDestination(castObject->GetPositionX(), castObject->GetPositionY(), castObject->GetPositionZ());
                         SetTargetMap(SpellEffectIndex(i), spellEffect->EffectImplicitTargetB, tmpUnitMap);
                         break;
@@ -2678,6 +2679,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_SKILL:
                     targetUnitMap.push_back(m_caster);
                     break;
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                    if(Unit* currentTarget = m_targets.getUnitTarget())
+                        m_targets.setDestination(currentTarget->GetPositionX(), currentTarget->GetPositionY(), currentTarget->GetPositionZ());
+                    break;
                 case SPELL_EFFECT_LEARN_PET_SPELL:
                     if (Pet* pet = m_caster->GetPet())
                         targetUnitMap.push_back(pet);
@@ -3779,7 +3784,7 @@ void Spell::WriteAmmoToPacket( WorldPacket * data )
     }
     else
     {
-        for (uint8 i = 0; i < 3; ++i)
+        for (uint8 i = 0; i < MAX_VIRTUAL_ITEM_SLOT; ++i)
         {
             if(uint32 item_id = m_caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i))
             {
@@ -4837,7 +4842,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                 SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
 
                 if (bounds.first == bounds.second)
-                    sLog.outErrorDb("Spell (ID: %u) has effect EffectImplicitTargetA/EffectImplicitTargetB = TARGET_SCRIPT or TARGET_SCRIPT_COORDINATES, but does not have record in `spell_script_target`", m_spellInfo->Id);
+                {
+                    if (spellEffect->EffectImplicitTargetA == TARGET_SCRIPT || spellEffect->EffectImplicitTargetB == TARGET_SCRIPT)
+                        sLog.outErrorDb("Spell entry %u, effect %i has EffectImplicitTargetA/EffectImplicitTargetB = TARGET_SCRIPT, but creature are not defined in `spell_script_target`", m_spellInfo->Id, j);
+
+                    if (spellEffect->EffectImplicitTargetA == TARGET_SCRIPT_COORDINATES || spellEffect->EffectImplicitTargetB == TARGET_SCRIPT_COORDINATES)
+                        sLog.outErrorDb("Spell entry %u, effect %i has EffectImplicitTargetA/EffectImplicitTargetB = TARGET_SCRIPT_COORDINATES, but gameobject or creature are not defined in `spell_script_target`", m_spellInfo->Id, j);
+
+                    if (spellEffect->EffectImplicitTargetA == TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT)
+                        sLog.outErrorDb("Spell entry %u, effect %i has EffectImplicitTargetA/EffectImplicitTargetB = TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT, but gameobject are not defined in `spell_script_target`", m_spellInfo->Id, j);
+                }
 
                 SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
                 float range = GetSpellMaxRange(srange);
@@ -5092,7 +5106,15 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 Player* plrCaster = (Player*)caster;
 
-                if(plrCaster->getClass() != CLASS_HUNTER)
+                bool gmmode = m_triggeredBySpellInfo == NULL;
+
+                if (gmmode && !ChatHandler(plrCaster).FindCommand("npc tame"))
+                {
+                    plrCaster->SendPetTameFailure(PETTAME_UNKNOWNERROR);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+
+                if(plrCaster->getClass() != CLASS_HUNTER && !gmmode)
                 {
                     plrCaster->SendPetTameFailure(PETTAME_UNITSCANTTAME);
                     return SPELL_FAILED_DONT_REPORT;
@@ -5106,13 +5128,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_DONT_REPORT;
                 }
 
-                if (target->getLevel() > plrCaster->getLevel())
+                if (target->getLevel() > plrCaster->getLevel() && !gmmode)
                 {
                     plrCaster->SendPetTameFailure(PETTAME_TOOHIGHLEVEL);
                     return SPELL_FAILED_DONT_REPORT;
                 }
 
-                if (target->GetCreatureInfo()->IsExotic() && !plrCaster->CanTameExoticPets())
+                if (target->GetCreatureInfo()->IsExotic() && !plrCaster->CanTameExoticPets() && !gmmode)
                 {
                     plrCaster->SendPetTameFailure(PETTAME_CANTCONTROLEXOTIC);
                     return SPELL_FAILED_DONT_REPORT;
@@ -6074,6 +6096,8 @@ SpellCastResult Spell::CheckItems()
         return SPELL_CAST_OK;
 
     Player* p_caster = (Player*)m_caster;
+    bool isScrollItem = false;
+    bool isVellumTarget = false;
 
     // cast item checks
     if(m_CastItem)
@@ -6088,6 +6112,9 @@ SpellCastResult Spell::CheckItems()
         ItemPrototype const *proto = m_CastItem->GetProto();
         if(!proto)
             return SPELL_FAILED_ITEM_NOT_FOUND;
+
+        if (proto->Flags & ITEM_FLAG_ENCHANT_SCROLL)
+            isScrollItem = true;
 
         for (int i = 0; i < 5; ++i)
             if (proto->Spells[i].SpellCharges)
@@ -6160,9 +6187,15 @@ SpellCastResult Spell::CheckItems()
             return m_IsTriggeredSpell  && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
                 ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ITEM_GONE;
 
+        isVellumTarget = m_targets.getItemTarget()->GetProto()->IsVellum();
         if(!m_targets.getItemTarget()->IsFitToSpellRequirements(m_spellInfo))
             return m_IsTriggeredSpell  && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
                 ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_EQUIPPED_ITEM_CLASS;
+
+        // Do not enchant vellum with scroll
+        if (isVellumTarget && isScrollItem)
+            return m_IsTriggeredSpell  && !(m_targets.m_targetMask & TARGET_FLAG_TRADE_ITEM)
+                ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_BAD_TARGETS;
     }
     // if not item target then required item must be equipped (for triggered case not report error)
     else
@@ -6326,6 +6359,17 @@ SpellCastResult Spell::CheckItems()
 
                 if( targetItem->GetProto()->ItemLevel < m_spellInfo->GetBaseLevel() )
                     return SPELL_FAILED_LOWLEVEL;
+                // Check if we can store a new scroll, enchanting vellum has implicit SPELL_EFFECT_CREATE_ITEM
+                if (isVellumTarget && spellEffect->EffectItemType)
+                {
+                    ItemPosCountVec dest;
+                    uint8 msg = p_caster->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, spellEffect->EffectItemType, 1 );
+                    if (msg != EQUIP_ERR_OK)
+                    {
+                        p_caster->SendEquipError( msg, NULL, NULL );
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
+                }
                 // Not allow enchant in trade slot for some enchant type
                 if( targetItem->GetOwner() != m_caster )
                 {
@@ -6335,6 +6379,9 @@ SpellCastResult Spell::CheckItems()
                         return SPELL_FAILED_ERROR;
                     if (pEnchant->slot & ENCHANTMENT_CAN_SOULBOUND)
                         return SPELL_FAILED_NOT_TRADEABLE;
+                    // cannot replace vellum with scroll in trade slot
+                    if (isVellumTarget)
+                        return SPELL_FAILED_ITEM_ENCHANT_TRADE_WINDOW;
                 }
                 break;
             }

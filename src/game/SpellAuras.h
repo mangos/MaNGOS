@@ -52,14 +52,15 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void ApplyAuraModifiers(bool apply, bool real = false);
         void _AddSpellAuraHolder();
         void _RemoveSpellAuraHolder();
-        void SendAuraUpdate(bool remove);
+        void BuildUpdatePacket(WorldPacket& data) const;
+        void SendAuraUpdate(bool remove) const;
         void HandleSpellSpecificBoosts(bool apply);
         void CleanupTriggeredSpells();
 
         void setDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
         DiminishingGroup getDiminishGroup() const { return m_AuraDRGroup; }
 
-        uint32 GetStackAmount() { return m_stackAmount; }
+        uint32 GetStackAmount() const { return m_stackAmount; }
         void SetStackAmount(uint32 stackAmount);
         bool ModStackAmount(int32 num); // return true if last charge dropped
 
@@ -83,7 +84,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         bool IsPersistent() const;
         bool IsPositive() const;
         bool IsAreaAura() const;                            // if one from auras of holder applied as area aura
-        bool IsWeaponBuffCoexistableWith(SpellAuraHolder* ref);
+        bool IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const;
         bool IsNeedVisibleSlot(Unit const* caster) const;
         bool IsRemovedOnShapeLost() const { return m_isRemovedOnShapeLost; }
         bool IsInUse() const { return m_in_use;}
@@ -107,7 +108,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void Update(uint32 diff);
         void RefreshHolder();
 
-        bool IsSingleTarget() {return m_isSingleTarget; }
+        bool IsSingleTarget() const {return m_isSingleTarget; }
         void SetIsSingleTarget(bool val) { m_isSingleTarget = val; }
         void UnregisterSingleCastHolder();
 
@@ -117,8 +118,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void SetAuraFlags(uint8 flags) { m_auraFlags = flags; }
         uint8 GetAuraLevel() const { return m_auraLevel; }
         void SetAuraLevel(uint8 level) { m_auraLevel = level; }
-        uint8 GetAuraCharges() const { return m_procCharges; }
-        void SetAuraCharges(uint8 charges)
+        uint32 GetAuraCharges() const { return m_procCharges; }
+        void SetAuraCharges(uint32 charges)
         {
             if (m_procCharges == charges)
                 return;
@@ -139,7 +140,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         void SetVisibleAura(bool remove) { m_target->SetVisibleAura(m_auraSlot, remove ? 0 : GetId()); }
         void SetRemoveMode(AuraRemoveMode mode) { m_removeMode = mode; }
-        void SetLoadedState(ObjectGuid casterGUID, ObjectGuid itemGUID, int32 stackAmount, int32 charges)
+        void SetLoadedState(ObjectGuid const& casterGUID, ObjectGuid const& itemGUID, uint32 stackAmount, uint32 charges)
         {
             m_casterGuid = casterGUID;
             m_castItemGuid = itemGUID;
@@ -162,8 +163,8 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         uint8 m_auraSlot;                                   // Aura slot on unit (for show in client)
         uint8 m_auraFlags;                                  // Aura info flag (for send data to client)
         uint8 m_auraLevel;                                  // Aura level (store caster level for correct show level dep amount)
-        uint8 m_procCharges;                                // Aura charges (0 for infinite)
-        uint8 m_stackAmount;                                // Aura stack amount
+        uint32 m_procCharges;                               // Aura charges (0 for infinite)
+        uint32 m_stackAmount;                               // Aura stack amount
 
         AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
         DiminishingGroup m_AuraDRGroup:8;                   // Diminishing

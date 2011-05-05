@@ -34,7 +34,7 @@ class Vehicle : public Creature
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, Team team);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, uint32 Entry, uint32 vehicleId, Team team);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
         void Update(uint32 update_diff, uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
@@ -48,7 +48,7 @@ class Vehicle : public Creature
         uint32 m_vehicleId;
 
     private:
-        void SaveToDB(uint32, uint8)                        // overwrited of Creature::SaveToDB     - don't must be called
+        void SaveToDB(uint32, uint8, uint32)                // overwrited of Creature::SaveToDB     - don't must be called
         {
             MANGOS_ASSERT(false);
         }

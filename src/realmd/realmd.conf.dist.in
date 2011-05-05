@@ -19,14 +19,14 @@ ConfVersion=2010062001
 #    LogsDir
 #         Logs directory setting.
 #         Important: Logs dir must exists, or all logs be disable
-#         Default: "" - no log directory prefix, if used log names isn't absolute path then logs will be
-#                       stored in current directory for run program.
+#         Default: "" - no log directory prefix. if used log names aren't absolute paths
+#                       then logs will be stored in the current directory of the running program.
 #
 #    MaxPingTime
 #         Settings for maximum database-ping interval (minutes between pings)
 #
 #    RealmServerPort
-#         Default RealmServerPort
+#         Port on which the server will listen
 #
 #    BindIP
 #         Bind Realm Server to IP/hostname

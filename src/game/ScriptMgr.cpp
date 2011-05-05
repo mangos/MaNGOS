@@ -66,7 +66,9 @@ ScriptMgr::ScriptMgr() :
     m_pOnEffectDummyCreature(NULL),
     m_pOnEffectDummyGO(NULL),
     m_pOnEffectDummyItem(NULL),
-    m_pOnAuraDummy(NULL)
+    m_pOnAuraDummy(NULL),
+
+    m_scheduledScripts(0)
 {
 }
 
@@ -77,7 +79,7 @@ ScriptMgr::~ScriptMgr()
 
 void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
 {
-    if (sWorld.IsScriptScheduled())                         // function don't must be called in time scripts use.
+    if (IsScriptScheduled())                                // function don't must be called in time scripts use.
         return;
 
     sLog.outString("%s :", tablename);
@@ -617,7 +619,7 @@ void ScriptMgr::LoadEventScripts()
         {
             for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(i));
+                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
                 if (!spellEffect)
                     continue;
 
@@ -793,7 +795,7 @@ void ScriptMgr::LoadEventIdScripts()
         {
             for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(i));
+                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
                 if (!spellEffect)
                     continue;
 

@@ -421,40 +421,58 @@ void Item::SaveToDB()
     {
         case ITEM_NEW:
         {
-            std::string text = m_text;
-            CharacterDatabase.escape_string(text);
-            CharacterDatabase.PExecute( "DELETE FROM item_instance WHERE guid = '%u'", guid );
+            static SqlStatementID delItem ;
+            static SqlStatementID insItem ;
+
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delItem, "DELETE FROM item_instance WHERE guid = ?");
+            stmt.PExecute(guid);
+
             std::ostringstream ss;
-            ss << "INSERT INTO item_instance (guid,owner_guid,data,text) VALUES (" << guid << "," << GetOwnerGuid().GetCounter() << ",'";
             for(uint16 i = 0; i < m_valuesCount; ++i )
                 ss << GetUInt32Value(i) << " ";
-            ss << "', '" << text << "')";
-            CharacterDatabase.Execute( ss.str().c_str() );
+
+            stmt = CharacterDatabase.CreateStatement(insItem, "INSERT INTO item_instance (guid,owner_guid,data,text) VALUES (?, ?, ?, ?)");
+            stmt.PExecute(guid, GetOwnerGuid().GetCounter(), ss.str().c_str(), m_text.c_str());
         } break;
         case ITEM_CHANGED:
         {
-            std::string text = m_text;
-            CharacterDatabase.escape_string(text);
+            static SqlStatementID updInstance ;
+            static SqlStatementID updGifts ;
+
+            SqlStatement stmt = CharacterDatabase.CreateStatement(updInstance, "UPDATE item_instance SET data = ?, owner_guid = ?, text = ? WHERE guid = ?");
+
             std::ostringstream ss;
-            ss << "UPDATE item_instance SET data = '";
             for(uint16 i = 0; i < m_valuesCount; ++i )
                 ss << GetUInt32Value(i) << " ";
-            ss << "', owner_guid = '" << GetOwnerGuid().GetCounter();
-            ss << "', text = '" << text << "' WHERE guid = '" << guid << "'";
 
-            CharacterDatabase.Execute( ss.str().c_str() );
+            stmt.PExecute(ss.str().c_str(), GetOwnerGuid().GetCounter(), m_text.c_str(), guid);
 
             if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
-                CharacterDatabase.PExecute("UPDATE character_gifts SET guid = '%u' WHERE item_guid = '%u'", GetOwnerGuid().GetCounter(), GetGUIDLow());
+            {
+                stmt = CharacterDatabase.CreateStatement(updGifts, "UPDATE character_gifts SET guid = ? WHERE item_guid = ?");
+                stmt.PExecute(GetOwnerGuid().GetCounter(), GetGUIDLow());
+            }
         } break;
         case ITEM_REMOVED:
         {
-            CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", guid);
+            static SqlStatementID delInst ;
+            static SqlStatementID delGifts ;
+            static SqlStatementID delLoot ;
+
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delInst, "DELETE FROM item_instance WHERE guid = ?");
+            stmt.PExecute(guid);
+
             if (HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
-                CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
+            {
+                stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM character_gifts WHERE item_guid = ?");
+                stmt.PExecute(GetGUIDLow());
+            }
 
             if (HasSavedLoot())
-                CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", GetGUIDLow());
+            {
+                stmt = CharacterDatabase.CreateStatement(delLoot, "DELETE FROM item_loot WHERE guid = ?");
+                stmt.PExecute(GetGUIDLow());
+            }
 
             delete this;
             return;
@@ -464,17 +482,28 @@ void Item::SaveToDB()
     }
 
     if (m_lootState == ITEM_LOOT_CHANGED || m_lootState == ITEM_LOOT_REMOVED)
-        CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u'", GetGUIDLow());
+    {
+        static SqlStatementID delLoot ;
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(delLoot, "DELETE FROM item_loot WHERE guid = ?");
+        stmt.PExecute(GetGUIDLow());
+    }
 
     if (m_lootState == ITEM_LOOT_NEW || m_lootState == ITEM_LOOT_CHANGED)
     {
         if(Player* owner = GetOwner())
         {
+            static SqlStatementID saveGold ;
+            static SqlStatementID saveLoot ;
+
             // save money as 0 itemid data
             if (loot.gold)
-                CharacterDatabase.PExecute("INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) "
-                    "VALUES (%u, %u, 0, %u, 0, 0)",
-                    GetGUIDLow(), owner->GetGUIDLow(), loot.gold);
+            {
+                SqlStatement stmt = CharacterDatabase.CreateStatement(saveGold, "INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) VALUES (?, ?, 0, ?, 0, 0)");
+                stmt.PExecute(GetGUIDLow(), owner->GetGUIDLow(), loot.gold);
+            }
+
+            SqlStatement stmt = CharacterDatabase.CreateStatement(saveLoot, "INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) VALUES (?, ?, ?, ?, ?, ?)");
 
             // save items and quest items (at load its all will added as normal, but this not important for item loot case)
             for (size_t i = 0; i < loot.GetMaxSlotInLootFor(owner); ++i)
@@ -489,9 +518,14 @@ void Item::SaveToDB()
                 if (!qitem && item->is_blocked)
                     continue;
 
-                CharacterDatabase.PExecute("INSERT INTO item_loot (guid,owner_guid,itemid,amount,suffix,property) "
-                    "VALUES (%u, %u, %u, %u, %u, %i)",
-                    GetGUIDLow(), owner->GetGUIDLow(), item->itemid, item->count, item->randomSuffix, item->randomPropertyId);
+                stmt.addUInt32(GetGUIDLow());
+                stmt.addUInt32(owner->GetGUIDLow());
+                stmt.addUInt32(item->itemid);
+                stmt.addUInt8(item->count);
+                stmt.addUInt32(item->randomSuffix);
+                stmt.addInt32(item->randomPropertyId);
+
+                stmt.Execute();
             }
         }
 
@@ -514,6 +548,8 @@ bool Item::LoadFromDB(uint32 guidLow, Field *fields, ObjectGuid ownerGuid)
         sLog.outError("Item #%d have broken data in `data` field. Can't be loaded.", guidLow);
         return false;
     }
+
+    SetText(fields[1].GetCppString());
 
     bool need_save = false;                                 // need explicit save data at load fixes
 
@@ -576,20 +612,28 @@ bool Item::LoadFromDB(uint32 guidLow, Field *fields, ObjectGuid ownerGuid)
             RemoveFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
             need_save = true;
 
+            static SqlStatementID delGifts ;
+
             // also cleanup for sure gift table
-            CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", GetGUIDLow());
+            SqlStatement stmt = CharacterDatabase.CreateStatement(delGifts, "DELETE FROM character_gifts WHERE item_guid = ?");
+            stmt.PExecute(GetGUIDLow());
         }
     }
 
     if (need_save)                                          // normal item changed state set not work at loading
     {
+        static SqlStatementID updItem ;
+
+        SqlStatement stmt = CharacterDatabase.CreateStatement(updItem, "UPDATE item_instance SET data = ?, owner_guid = ? WHERE guid = ?");
+
         std::ostringstream ss;
-        ss << "UPDATE item_instance SET data = '";
         for(uint16 i = 0; i < m_valuesCount; ++i )
             ss << GetUInt32Value(i) << " ";
-        ss << "', owner_guid = '" << GetOwnerGuid().GetCounter() << "' WHERE guid = '" << guidLow << "'";
 
-        CharacterDatabase.Execute( ss.str().c_str() );
+        stmt.addString(ss);
+        stmt.addUInt32(GetOwnerGuid().GetCounter());
+        stmt.addUInt32(guidLow);
+        stmt.Execute();
     }
 
     return true;
@@ -628,12 +672,18 @@ void Item::LoadLootFromDB(Field *fields)
 
 void Item::DeleteFromDB()
 {
-    CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'",GetGUIDLow());
+    static SqlStatementID delItem ;
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delItem, "DELETE FROM item_instance WHERE guid = ?");
+    stmt.PExecute(GetGUIDLow());
 }
 
 void Item::DeleteFromInventoryDB()
 {
-    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'",GetGUIDLow());
+    static SqlStatementID delInv ;
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(delInv, "DELETE FROM character_inventory WHERE item = ?");
+    stmt.PExecute(GetGUIDLow());
 }
 
 ItemPrototype const *Item::GetProto() const
@@ -960,8 +1010,25 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
     ItemPrototype const* proto = GetProto();
 
     SpellEquippedItemsEntry const* equippedItems = spellInfo->GetSpellEquippedItems();
-    if(!equippedItems)
+    if (!equippedItems)
         return true;
+
+    // Enchant spells only use Effect[0] (patch 3.3.2)
+    if (proto->IsVellum())
+    {
+        SpellEffectEntry const* spellEffect_0 = spellInfo->GetSpellEffect(EFFECT_INDEX_0);
+
+        if (spellEffect_0 && spellEffect_0->Effect == SPELL_EFFECT_ENCHANT_ITEM)
+        {
+            // EffectItemType[0] is the associated scroll itemID, if a scroll can be made
+            if (spellEffect_0->EffectItemType == 0)
+                return false;
+            // Other checks do not apply to vellum enchants, so return final result
+            int32 eqItemClass = spellInfo->GetEquippedItemClass();
+            return ((proto->SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT && eqItemClass == ITEM_CLASS_WEAPON) ||
+                    (proto->SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT && eqItemClass == ITEM_CLASS_ARMOR));
+        }
+    }
 
     if (equippedItems->EquippedItemClass != -1)             // -1 == any item class
     {

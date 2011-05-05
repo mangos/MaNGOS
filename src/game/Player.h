@@ -1333,6 +1333,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddItemToBuyBackSlot( Item *pItem );
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
+
+        void TakeExtendedCost(uint32 extendedCostId, uint32 count);
+
         uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
         void SendEquipError( uint8 msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 ) const;
         void SendBuyError( uint8 msg, Creature* pCreature, uint32 item, uint32 param );
@@ -1744,14 +1747,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool isRessurectRequested() const { return !m_resurrectGuid.IsEmpty(); }
         void ResurectUsingRequestData();
 
-        int getCinematic()
-        {
-            return m_cinematic;
-        }
-        void setCinematic(int cine)
-        {
-            m_cinematic = cine;
-        }
+        uint32 getCinematic() { return m_cinematic; }
+        void setCinematic(uint32 cine) { m_cinematic = cine; }
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player, bool msg = true);
         ActionButton* addActionButton(uint8 spec, uint8 button, uint32 action, uint8 type);
@@ -2015,10 +2012,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool RewardHonor(Unit *pVictim, uint32 groupsize, float honor = -1);
         uint32 GetHonorPoints() { return m_honorPoints; }
         uint32 GetArenaPoints() { return m_arenaPoints; }
-        void SetHonorPoints(uint32 honor) { m_honorPoints = honor; }
-        void SetArenaPoints(uint32 arena) { m_arenaPoints = arena; }
+        void SetHonorPoints(uint32 honor);
+        void SetArenaPoints(uint32 arena);
         void ModifyHonorPoints( int32 value );
         void ModifyArenaPoints( int32 value );
+
         uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot);
 
         //End of PvP System
@@ -2568,7 +2566,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         typedef std::list<Channel*> JoinedChannelsList;
         JoinedChannelsList m_channels;
 
-        int m_cinematic;
+        uint32 m_cinematic;
 
         TradeData* m_trade;
 
@@ -2635,6 +2633,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Runes *m_runes;
         EquipmentSets m_EquipmentSets;
     private:
+        void _HandleDeadlyPoison(Unit* Target, WeaponAttackType attType, SpellEntry const *spellInfo);
         // internal common parts for CanStore/StoreItem functions
         uint8 _CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool swap, Item *pSrcItem ) const;
         uint8 _CanStoreItem_InBag( uint8 bag, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool merge, bool non_specialized, Item *pSrcItem, uint8 skip_bag, uint8 skip_slot ) const;

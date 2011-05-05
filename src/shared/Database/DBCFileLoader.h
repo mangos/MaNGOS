@@ -20,6 +20,7 @@
 #define DBC_FILE_LOADER_H
 #include "Platform/Define.h"
 #include "Utilities/ByteConverter.h"
+#include "Common.h"
 #include <cassert>
 
 enum

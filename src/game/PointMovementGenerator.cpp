@@ -86,6 +86,10 @@ bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     {
         unit.clearUnitState(UNIT_STAT_ROAMING_MOVE);
         MovementInform(unit);
+
+        if (!IsActive(unit))
+            return true;
+
         return false;
     }
 

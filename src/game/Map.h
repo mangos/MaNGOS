@@ -263,8 +263,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void SendInitTransports( Player * player );
         void SendRemoveTransports( Player * player );
 
-        void PlayerRelocationNotify(Player* player, Cell cell, CellPair cellpair);
-
         bool CreatureCellRelocation(Creature *creature, Cell new_cell);
 
         bool loaded(const GridPair &) const;
@@ -321,7 +319,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
         std::set<WorldObject *> i_objectsToRemove;
-        std::multimap<time_t, ScriptAction> m_scriptSchedule;
+
+        typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
+        ScriptScheduleMap m_scriptSchedule;
 
         InstanceData* i_data;
         uint32 i_script_id;
@@ -336,9 +336,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         // Type specific code for add/remove to/from grid
         template<class T>
             void AddToGrid(T*, NGridType *, Cell const&);
-
-        template<class T>
-            void AddNotifier(T*, Cell const&, CellPair const&);
 
         template<class T>
             void RemoveFromGrid(T*, NGridType *, Cell const&);

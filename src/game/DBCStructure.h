@@ -1128,14 +1128,16 @@ struct ItemDamageEntry
   uint32    Id2;                                            // 8 item level
 };
 
+#define MAX_EXTENDED_COST_ITEMS 5
+
 struct ItemExtendedCostEntry
 {
     uint32      ID;                                         // 0 extended-cost entry id
     uint32      reqhonorpoints;                             // 1 required honor points
     uint32      reqarenapoints;                             // 2 required arena points
     uint32      reqarenaslot;                               // 4 arena slot restrictions (min slot value)
-    uint32      reqitem[5];                                 // 5-8 required item id
-    uint32      reqitemcount[5];                            // 9-13 required count of 1st item
+    uint32      reqitem[MAX_EXTENDED_COST_ITEMS];           // 5-8 required item id
+    uint32      reqitemcount[MAX_EXTENDED_COST_ITEMS];      // 9-13 required count of 1st item
     uint32      reqpersonalarenarating;                     // 14 required personal arena rating
     //uint32                                                // 15
     //uint32    someId[5];                                  // 16-20, may be currency id's
@@ -1582,6 +1584,10 @@ struct SpellEffectEntry
     uint32    EffectImplicitTargetB;                        // 91-93    m_implicitTargetB
     uint32    EffectSpellId;                                // new 4.0.0
     uint32    EffectIndex;                                  // new 4.0.0
+
+    // helpers
+
+    int32 CalculateSimpleValue() const { return EffectBasePoints; }
 };
 
 // SpellEquippedItems.dbc

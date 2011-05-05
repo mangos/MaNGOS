@@ -755,7 +755,7 @@ void ObjectMgr::LoadCreatureTemplates()
 
 void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr)
 {
-    // Now add the auras, format "spellid effectindex spellid effectindex..."
+    // Now add the auras, format "spell1 spell2 ..."
     char *p,*s;
     std::vector<int> val;
     s=p=(char*)reinterpret_cast<char const*>(addon->auras);
@@ -775,14 +775,6 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
 
         // free char* loaded memory
         delete[] (char*)reinterpret_cast<char const*>(addon->auras);
-
-        // wrong list
-        if (val.size()%2)
-        {
-            addon->auras = NULL;
-            sLog.outErrorDb("Creature (%s: %u) has wrong `auras` data in `%s`.",guidEntryStr,addon->guidOrEntry,table);
-            return;
-        }
     }
 
     // empty list
@@ -793,30 +785,18 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     }
 
     // replace by new structures array
-    const_cast<CreatureDataAddonAura*&>(addon->auras) = new CreatureDataAddonAura[val.size()/2+1];
+    const_cast<CreatureDataAddonAura*&>(addon->auras) = new CreatureDataAddonAura[val.size()+1];
 
-    uint32 i=0;
-    for(uint32 j = 0; j < val.size()/2; ++j)
+    uint32 i = 0;
+    for(uint32 j = 0; j < val.size(); ++j)
     {
         CreatureDataAddonAura& cAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
-        cAura.spell_id = uint32(val[2*j+0]);
-        cAura.effect_idx  = SpellEffectIndex(val[2*j+1]);
-        if (cAura.effect_idx >= MAX_EFFECT_INDEX)
-        {
-            sLog.outErrorDb("Creature (%s: %u) has wrong effect %u for spell %u in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.effect_idx,cAura.spell_id,table);
-            continue;
-        }
+        cAura.spell_id = uint32(val[j]);
+
         SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(cAura.spell_id);
         if (!AdditionalSpellInfo)
         {
             sLog.outErrorDb("Creature (%s: %u) has wrong spell %u defined in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.spell_id,table);
-            continue;
-        }
-
-        SpellEffectEntry const* spellEffect = AdditionalSpellInfo->GetSpellEffect(cAura.effect_idx);
-        if (spellEffect && (!spellEffect->Effect || !spellEffect->EffectApplyAuraName))
-        {
-            sLog.outErrorDb("Creature (%s: %u) has not aura effect %u of spell %u defined in `auras` field in `%s`.",guidEntryStr,addon->guidOrEntry,cAura.effect_idx,cAura.spell_id,table);
             continue;
         }
 
@@ -825,8 +805,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
 
     // fill terminator element (after last added)
     CreatureDataAddonAura& endAura = const_cast<CreatureDataAddonAura&>(addon->auras[i]);
-    endAura.spell_id   = 0;
-    endAura.effect_idx = EFFECT_INDEX_0;
+    endAura.spell_id = 0;
 }
 
 void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment)
@@ -1234,14 +1213,18 @@ void ObjectMgr::LoadCreatureModelRace()
 void ObjectMgr::LoadCreatures()
 {
     uint32 count = 0;
-    //                                                0              1   2    3
-    QueryResult *result = WorldDatabase.Query("SELECT creature.guid, id, map, modelid,"
+    //                                                0                       1   2    3
+    QueryResult *result = WorldDatabase.Query("SELECT creature.guid, creature.id, map, modelid,"
     //   4             5           6           7           8            9              10         11
         "equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint,"
-    //   12         13       14          15            16         17         18     19
-        "curhealth, curmana, DeathState, MovementType, spawnMask, phaseMask, event, pool_entry "
-        "FROM creature LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
-        "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
+    //   12         13       14          15            16         17         18
+        "curhealth, curmana, DeathState, MovementType, spawnMask, phaseMask, event,"
+    //   19                        20
+        "pool_creature.pool_entry, pool_creature_template.pool_entry "
+        "FROM creature "
+        "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
+        "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
+        "LEFT OUTER JOIN pool_creature_template ON creature.id = pool_creature_template.id");
 
     if(!result)
     {
@@ -1307,7 +1290,8 @@ void ObjectMgr::LoadCreatures()
         data.spawnMask          = fields[16].GetUInt8();
         data.phaseMask          = fields[17].GetUInt16();
         int16 gameEvent         = fields[18].GetInt16();
-        int16 PoolId            = fields[19].GetInt16();
+        int16 GuidPoolId        = fields[19].GetInt16();
+        int16 EntryPoolId       = fields[20].GetInt16();
 
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if(!mapEntry)
@@ -1401,7 +1385,7 @@ void ObjectMgr::LoadCreatures()
             data.phaseMask = 1;
         }
 
-        if (gameEvent==0 && PoolId==0)                      // if not this is to be managed by GameEvent System or Pool system
+        if (gameEvent==0 && GuidPoolId==0 && EntryPoolId==0)// if not this is to be managed by GameEvent System or Pool system
             AddCreatureToGrid(guid, &data);
 
         ++count;
@@ -1450,12 +1434,16 @@ void ObjectMgr::LoadGameobjects()
 {
     uint32 count = 0;
 
-    //                                                0                1   2    3           4           5           6
-    QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation,"
-    //   7          8          9          10         11             12            13     14         15         16     17
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, event, pool_entry "
-        "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
-        "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
+    //                                                0                           1   2    3           4           5           6
+    QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, gameobject.id, map, position_x, position_y, position_z, orientation,"
+    //   7          8          9          10         11             12            13     14         15         16
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, event,"
+    //   17                          18
+        "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry "
+        "FROM gameobject "
+        "LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
+        "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid "
+        "LEFT OUTER JOIN pool_gameobject_template ON gameobject.id = pool_gameobject_template.id");
 
     if(!result)
     {
@@ -1554,7 +1542,8 @@ void ObjectMgr::LoadGameobjects()
         data.spawnMask      = fields[14].GetUInt8();
         data.phaseMask      = fields[15].GetUInt16();
         int16 gameEvent     = fields[16].GetInt16();
-        int16 PoolId        = fields[17].GetInt16();
+        int16 GuidPoolId    = fields[17].GetInt16();
+        int16 EntryPoolId   = fields[18].GetInt16();
 
         if (data.rotation2 < -1.0f || data.rotation2 > 1.0f)
         {
@@ -1580,7 +1569,7 @@ void ObjectMgr::LoadGameobjects()
             data.phaseMask = 1;
         }
 
-        if (gameEvent == 0 && PoolId == 0)                  // if not this is to be managed by GameEvent System or Pool system
+        if (gameEvent==0 && GuidPoolId==0 && EntryPoolId==0)// if not this is to be managed by GameEvent System or Pool system
             AddGameobjectToGrid(guid, &data);
         ++count;
 
@@ -2377,7 +2366,7 @@ void ObjectMgr::LoadItemPrototypes()
 
 void ObjectMgr::LoadItemConverts()
 {
-    m_ItemRequiredTarget.clear();                           // needed for reload case
+    m_ItemConvert.clear();                                  // needed for reload case
 
     uint32 count = 0;
 
@@ -4102,7 +4091,8 @@ void ObjectMgr::LoadQuests()
             }
         }
 
-        for(int j = 0; j < QUEST_REWARD_CHOICES_COUNT; ++j )
+        bool choice_found = false;
+        for(int j = QUEST_REWARD_CHOICES_COUNT-1; j >=0; --j )
         {
             if (uint32 id = qinfo->RewChoiceItemId[j])
             {
@@ -4112,6 +4102,8 @@ void ObjectMgr::LoadQuests()
                         qinfo->GetQuestId(),j+1,id,id);
                     qinfo->RewChoiceItemId[j] = 0;          // no changes, quest will not reward this
                 }
+                else
+                    choice_found = true;
 
                 if (!qinfo->RewChoiceItemCount[j])
                 {
@@ -4119,6 +4111,14 @@ void ObjectMgr::LoadQuests()
                         qinfo->GetQuestId(),j+1,id,j+1);
                     // no changes, quest can't be done
                 }
+            }
+            else if (choice_found)                          // client crash if have gap in item reward choices
+            {
+                sLog.outErrorDb("Quest %u has `RewChoiceItemId%d` = 0 but `RewChoiceItemId%d` = %u, client can crash at like data.",
+                    qinfo->GetQuestId(),j+1,j+2,qinfo->RewChoiceItemId[j+1]);
+                // fill gap by clone later filled choice
+                qinfo->RewChoiceItemId[j] = qinfo->RewChoiceItemId[j+1];
+                qinfo->RewChoiceItemCount[j] = qinfo->RewChoiceItemCount[j+1];
             }
             else if (qinfo->RewChoiceItemCount[j]>0)
             {

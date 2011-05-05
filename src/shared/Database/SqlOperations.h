@@ -31,43 +31,53 @@
 class Database;
 class SqlConnection;
 class SqlDelayThread;
+class SqlStmtParameters;
 
 class SqlOperation
 {
     public:
         virtual void OnRemove() { delete this; }
-        virtual void Execute(SqlConnection *conn) = 0;
+        virtual bool Execute(SqlConnection *conn) = 0;
         virtual ~SqlOperation() {}
 };
 
 /// ---- ASYNC STATEMENTS / TRANSACTIONS ----
 
-class SqlStatement : public SqlOperation
+class SqlPlainRequest : public SqlOperation
 {
     private:
         const char *m_sql;
     public:
-        SqlStatement(const char *sql) : m_sql(mangos_strdup(sql)){}
-        ~SqlStatement() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        void Execute(SqlConnection *conn);
+        SqlPlainRequest(const char *sql) : m_sql(mangos_strdup(sql)){}
+        ~SqlPlainRequest() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
+        bool Execute(SqlConnection *conn);
 };
 
 class SqlTransaction : public SqlOperation
 {
     private:
-        std::vector<const char *> m_queue;
+        std::vector<SqlOperation * > m_queue;
 
     public:
         SqlTransaction() {}
         ~SqlTransaction();
 
-        void DelayExecute(const char *sql)
-        {
-            char* _sql = mangos_strdup(sql);
-            m_queue.push_back(_sql);
-        }
+        void DelayExecute(SqlOperation * sql)   {   m_queue.push_back(sql); }
 
-        void Execute(SqlConnection *conn);
+        bool Execute(SqlConnection *conn);
+};
+
+class SqlPreparedRequest : public SqlOperation
+{
+    public:
+        SqlPreparedRequest(int nIndex, SqlStmtParameters * arg);
+        ~SqlPreparedRequest();
+
+        bool Execute(SqlConnection *conn);
+
+    private:
+        const int m_nIndex;
+        SqlStmtParameters * m_param;
 };
 
 /// ---- ASYNC QUERIES ----
@@ -95,7 +105,7 @@ class SqlQuery : public SqlOperation
         SqlQuery(const char *sql, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue)
             : m_sql(mangos_strdup(sql)), m_callback(callback), m_queue(queue) {}
         ~SqlQuery() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        void Execute(SqlConnection *conn);
+        bool Execute(SqlConnection *conn);
 };
 
 class SqlQueryHolder
@@ -124,6 +134,6 @@ class SqlQueryHolderEx : public SqlOperation
     public:
         SqlQueryHolderEx(SqlQueryHolder *holder, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue)
             : m_holder(holder), m_callback(callback), m_queue(queue) {}
-        void Execute(SqlConnection *conn);
+        bool Execute(SqlConnection *conn);
 };
 #endif                                                      //__SQLOPERATIONS_H

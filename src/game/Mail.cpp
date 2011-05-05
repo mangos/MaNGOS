@@ -873,10 +873,10 @@ MailDraft& MailDraft::AddItem( Item* item )
 /**
  * Prepares the items in a MailDraft.
  */
-void MailDraft::prepareItems(Player* receiver)
+bool MailDraft::prepareItems(Player* receiver)
 {
     if (!m_mailTemplateId || !m_mailTemplateItemsNeed)
-        return;
+        return false;
 
     m_mailTemplateItemsNeed = false;
 
@@ -897,6 +897,8 @@ void MailDraft::prepareItems(Player* receiver)
             }
         }
     }
+
+    return true;
 }
 /**
  * Deletes the items included in a MailDraft.
@@ -1002,9 +1004,14 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 {
     Player* pReceiver = receiver.GetPlayer();               // can be NULL
 
-    if (pReceiver)
-        prepareItems(pReceiver);                            // generate mail template items
+    bool has_items = !m_items.empty();
 
+    // generate mail template items for online player, for offline player items will generated at open
+    if (pReceiver)
+    {
+        if (prepareItems(pReceiver))
+            has_items = true;
+    }
 
     uint32 mailId = sObjectMgr.GenerateMailID();
 
@@ -1030,7 +1037,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("INSERT INTO mail (id,messageType,stationery,mailTemplateId,sender,receiver,subject,body,has_items,expire_time,deliver_time,money,cod,checked) "
         "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%s', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%u')",
-        mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), safe_body.c_str(), (m_items.empty() ? 0 : 1), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
+        mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), safe_body.c_str(), (has_items ? 1 : 0), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
 
     for(MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
@@ -1079,4 +1086,48 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     else if (!m_items.empty())
         deleteIncludedItems();
 }
+
+/**
+ * Generate items from template at mails loading (this happens when mail with mail template items send in time when receiver has been offline)
+ *
+ * @param receiver             reciver of mail
+ */
+
+void Mail::prepareTemplateItems( Player* receiver )
+{
+    if (!mailTemplateId || !items.empty())
+        return;
+
+    has_items = true;
+
+    Loot mailLoot;
+
+    // can be empty
+    mailLoot.FillLoot(mailTemplateId, LootTemplates_Mail, receiver, true, true);
+
+    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.PExecute("UPDATE mail SET has_items = 1 WHERE id = %u", messageID);
+
+    uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver);
+    for(uint32 i = 0; items.size() < MAX_MAIL_ITEMS && i < max_slot; ++i)
+    {
+        if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver))
+        {
+            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
+            {
+                item->SaveToDB();
+
+                AddItem(item->GetGUIDLow(), item->GetEntry());
+
+                receiver->AddMItem(item);
+
+                CharacterDatabase.PExecute("INSERT INTO mail_items (mail_id,item_guid,item_template,receiver) VALUES ('%u', '%u', '%u','%u')",
+                    messageID, item->GetGUIDLow(), item->GetEntry(), receiver->GetGUIDLow());
+            }
+        }
+    }
+
+    CharacterDatabase.CommitTransaction();
+}
+
 /*! @} */

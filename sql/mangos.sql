@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11169_02_mangos_command` bit(1) default NULL
+  `required_11234_01_mangos_command` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -552,6 +552,7 @@ INSERT INTO `command` VALUES
 ('debug play sound',1,'Syntax: .debug play sound #soundid\r\n\r\nPlay sound with #soundid.\r\nSound will be play only for you. Other players do not hear this.\r\nWarning: client may have more 5000 sounds...'),
 ('debug setitemvalue',3,'Syntax: .debug setitemvalue #guid #field [int|hex|bit|float] #value\r\n\r\nSet the field #field of the item #itemguid in your inventroy to value #value.\r\n\r\nUse type arg for set input format: int (decimal number), hex (hex value), bit (bitstring), float. By default expect integer input format.'),
 ('debug setvalue',3,'Syntax: .debug setvalue #field [int|hex|bit|float] #value\r\n\r\nSet the field #field of the selected target to value #value. If no target is selected, set the content of your field.\r\n\r\nUse type arg for set input format: int (decimal number), hex (hex value), bit (bitstring), float. By default expect integer input format.'),
+('debug spellcoefs',3,'Syntax: .debug spellcoefs #spellid\r\n\r\nShow default calculated and DB stored coefficients for direct/dot heal/damage.'),
 ('debug spellmods',3,'Syntax: .debug spellmods (flat|pct) #spellMaskBitIndex #spellModOp #value\r\n\r\nSet at client side spellmod affect for spell that have bit set with index #spellMaskBitIndex in spell family mask for values dependent from spellmod #spellModOp to #value.'),
 ('delticket',2,'Syntax: .delticket all\r\n        .delticket #num\r\n        .delticket $character_name\r\n\rall to dalete all tickets at server, $character_name to delete ticket of this character, #num to delete ticket #num.'),
 ('demorph',2,'Syntax: .demorph\r\n\r\nDemorph the selected player.'),
@@ -3859,6 +3860,11 @@ INSERT INTO `mangos_string` VALUES
 (1169,'Scripting library build for different mangosd revision.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1200,'You try to view cinemitic %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1201,'You try to view movie %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1202,'Spell %u %s = %f (*1.88 = %f) DB = %f AP = %f',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1203,'direct heal',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1204,'direct damage',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1205,'dot heal',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1206,'dot damage',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1500,'%u - [%s] AutoSpawn: %u MaxLimit: %u Creatures: %u GameObjecs: %u Pools %u Chance: %f %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1501,'%u - |cffffffff|Hpool:%u|h[%s]|h|r AutoSpawn: %u MaxLimit: %u Creatures: %u GameObjecs: %u Pools %u %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1502,'%u - [%s] AutoSpawn: %u MaxLimit: %u Creatures: %u GameObjecs: %u Pools %u %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -13787,7 +13793,6 @@ LOCK TABLES `points_of_interest` WRITE;
 /*!40000 ALTER TABLE `points_of_interest` ENABLE KEYS */;
 UNLOCK TABLES;
 
-
 --
 -- Table structure for table `pool_creature`
 --
@@ -13802,7 +13807,6 @@ CREATE TABLE `pool_creature` (
   INDEX `pool_idx` (pool_entry)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
 --
 -- Dumping data for table `pool_creature`
 --
@@ -13810,6 +13814,29 @@ CREATE TABLE `pool_creature` (
 LOCK TABLES `pool_creature` WRITE;
 /*!40000 ALTER TABLE `pool_creature` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pool_creature` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pool_creature_template`
+--
+
+DROP TABLE IF EXISTS `pool_creature_template`;
+CREATE TABLE `pool_creature_template` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `pool_entry` mediumint(8) unsigned NOT NULL default '0',
+  `chance` float unsigned NOT NULL default '0',
+  `description` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `pool_idx` (pool_entry)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pool_creature_template`
+--
+
+LOCK TABLES `pool_creature_template` WRITE;
+/*!40000 ALTER TABLE `pool_creature_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_creature_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -13833,6 +13860,29 @@ CREATE TABLE `pool_gameobject` (
 LOCK TABLES `pool_gameobject` WRITE;
 /*!40000 ALTER TABLE `pool_gameobject` DISABLE KEYS */;
 /*!40000 ALTER TABLE `pool_gameobject` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pool_gameobject_template`
+--
+
+DROP TABLE IF EXISTS `pool_gameobject_template`;
+CREATE TABLE `pool_gameobject_template` (
+  `id` int(10) unsigned NOT NULL default '0',
+  `pool_entry` mediumint(8) unsigned NOT NULL default '0',
+  `chance` float unsigned NOT NULL default '0',
+  `description` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  INDEX `pool_idx` (pool_entry)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `pool_gameobject_template`
+--
+
+LOCK TABLES `pool_gameobject_template` WRITE;
+/*!40000 ALTER TABLE `pool_gameobject_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pool_gameobject_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -14559,6 +14609,9 @@ INSERT INTO `spell_bonus_data` VALUES
 /* Rogue */
 (2818,  0,      0,       0,     0.03,  'Rogue - Deadly Poison'),
 (703,   0,      0,       0,     0.07,  'Rogue - Garrote'),
+(1776,  0,      0,       0.21,  0,     'Rogue - Gouge'),
+(8680,  0,      0,       0.10,  0,     'Rogue - Instant Poison'),
+(13218, 0,      0,       0.04,  0,     'Rogue - Wound Poison'),
 /* Shaman */
 (974,   0.4762, 0,       0,     0,     'Shaman - Earth Shield'),
 (379,   0,      0,       0,     0,     'Shaman - Earth Shield Triggered'),
@@ -17302,6 +17355,7 @@ INSERT INTO `spell_proc_event` VALUES
 (48110, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000A02A8, 0x00000000, 0.000000, 0.000000,  0),
 (48111, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x000A02A8, 0x00000000, 0.000000, 0.000000,  0),
 (48483, 0x00,  7, 0x00008800, 0x00008800, 0x00008800, 0x00000440, 0x00000440, 0x00000440, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
+(48492, 0x00,  7, 0x00080000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000800, 0x00000000, 0x00004000, 0x00000000, 0.000000, 0.000000,  0),
 (48496, 0x00,  7, 0x00000060, 0x00000060, 0x00000060, 0x02000002, 0x02000002, 0x02000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000,  0),
 (48506, 0x00,  7, 0x00000005, 0x00000005, 0x00000005, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000,  0),
 (48516, 0x00,  7, 0x00000005, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000002, 0.000000, 0.000000, 30),

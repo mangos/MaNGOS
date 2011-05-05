@@ -551,6 +551,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void AddObjectToRemoveList();
 
         void UpdateObjectVisibility();
+        virtual void UpdateVisibilityAndView();             // update visibility for object and object for all around
 
         // main visibility check function in normal case (ignore grey zone distance check)
         bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }

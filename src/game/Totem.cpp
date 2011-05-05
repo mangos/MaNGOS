@@ -24,11 +24,49 @@
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "CreatureAI.h"
+#include "InstanceData.h"
 
 Totem::Totem() : Creature(CREATURE_SUBTYPE_TOTEM)
 {
     m_duration = 0;
     m_type = TOTEM_PASSIVE;
+}
+
+bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, uint32 Entry, Unit* owner)
+{
+    SetMap(cPos.GetMap());
+    SetPhaseMask(cPos.GetPhaseMask(), false);
+
+    Team team = owner->GetTypeId() == TYPEID_PLAYER ? ((Player*)owner)->GetTeam() : TEAM_NONE;
+
+    if (!CreateFromProto(guidlow, Entry, team))
+        return false;
+
+    // special model selection case for totems
+    if (owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (uint32 modelid_race = sObjectMgr.GetModelForRace(GetNativeDisplayId(), owner->getRaceMask()))
+            SetDisplayId(modelid_race);
+    }
+
+    cPos.SelectFinalPoint(this);
+
+    // totem must be at same Z in case swimming caster and etc.
+    if (fabs(cPos.m_pos.z - owner->GetPositionZ() ) > 5.0f)
+        cPos.m_pos.z = owner->GetPositionZ();
+
+    if (!cPos.Relocate(this))
+        return false;
+
+    //Notify the map's instance data.
+    //Only works if you create the object in it, not if it is moves to that map.
+    //Normally non-players do not teleport to other maps.
+    if (InstanceData* iData = GetMap()->GetInstanceData())
+        iData->OnCreatureCreate(this);
+
+    LoadCreatureAddon();
+
+    return true;
 }
 
 void Totem::Update(uint32 update_diff, uint32 time )
