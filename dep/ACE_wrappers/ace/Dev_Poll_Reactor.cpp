@@ -1,4 +1,4 @@
-// $Id: Dev_Poll_Reactor.cpp 91535 2010-08-27 18:16:14Z shuston $
+// $Id: Dev_Poll_Reactor.cpp 92199 2010-10-11 11:58:35Z johnnyw $
 
 #include "ace/OS_NS_errno.h"
 #include "ace/Dev_Poll_Reactor.h"
@@ -997,7 +997,7 @@ ACE_Dev_Poll_Reactor::handle_events (ACE_Time_Value *max_wait_time)
   //
   // The destructor of this object will automatically compute how much
   // time elapsed since this method was called.
-  ACE_MT (ACE_Countdown_Time countdown (max_wait_time));
+  ACE_Countdown_Time countdown (max_wait_time);
 
   Token_Guard guard (this->token_);
   int const result = guard.acquire_quietly (max_wait_time);

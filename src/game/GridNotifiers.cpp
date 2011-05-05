@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -188,7 +188,8 @@ ObjectUpdater::Visit(GridRefManager<T> &m)
 {
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        iter->getSource()->Update(i_timeDiff);
+        WorldObject::UpdateHelper helper(iter->getSource());
+        helper.Update(i_timeDiff);
     }
 }
 
@@ -215,7 +216,7 @@ void MaNGOS::RespawnDo::operator()( Creature* u ) const
     Map* map = u->GetMap();
     if (map->IsBattleGroundOrArena())
     {
-        BattleGroundEventIdx eventId = sBattleGroundMgr.GetCreatureEventIndex(u->GetDBTableGUIDLow());
+        BattleGroundEventIdx eventId = sBattleGroundMgr.GetCreatureEventIndex(u->GetGUIDLow());
         if (!((BattleGroundMap*)map)->GetBG()->IsActiveEvent(eventId.event1, eventId.event2))
             return;
     }
@@ -229,7 +230,7 @@ void MaNGOS::RespawnDo::operator()( GameObject* u ) const
     Map* map = u->GetMap();
     if (map->IsBattleGroundOrArena())
     {
-        BattleGroundEventIdx eventId = sBattleGroundMgr.GetGameObjectEventIndex(u->GetDBTableGUIDLow());
+        BattleGroundEventIdx eventId = sBattleGroundMgr.GetGameObjectEventIndex(u->GetGUIDLow());
         if (!((BattleGroundMap*)map)->GetBG()->IsActiveEvent(eventId.event1, eventId.event2))
             return;
     }

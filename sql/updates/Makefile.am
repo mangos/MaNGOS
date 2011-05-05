@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -130,6 +130,37 @@ pkgdata_DATA = \
 	10788_01_mangos_creature_addon.sql \
 	10788_02_mangos_creature_template_addon.sql \
 	10835_01_mangos_spell_proc_event.sql \
+	10862_01_characters_mail.sql \
+	10863_01_mangos_spell_proc_event.sql \
+	10864_01_mangos_spell_proc_event.sql \
+	10867_01_mangos_npc_trainer_template.sql \
+	10867_02_mangos_creature_template.sql \
+	10883_01_mangos_spell_proc_event.sql \
+	10906_01_mangos_spell_proc_event.sql \
+	10906_02_mangos_spell_bonus_data.sql \
+	10932_01_mangos_game_event_creature_data.sql \
+	10945_01_mangos_mangos_string.sql \
+	10946_01_mangos_spell_proc_event.sql \
+	10949_01_mangos_mangos_string.sql \
+	10950_01_mangos_mangos_string.sql \
+	10951_01_mangos_spell_proc_event.sql \
+	10972_01_mangos_command.sql \
+	10973_01_characters_game_event_status.sql \
+	10973_01_mangos_game_event_mail.sql \
+	10988_01_mangos_mangos_string.sql \
+	10989_01_mangos_loot_template.sql \
+	10993_01_mangos_loot_template.sql \
+	10998_01_mangos_spell_proc_event.sql \
+	11002_01_mangos_spell_proc_event.sql \
+	11018_01_mangos_command.sql \
+	11023_01_mangos_spell_threat.sql \
+	11036_01_mangos_spell_threat.sql \
+	11040_01_mangos_spell_chain.sql \
+	11040_02_mangos_spell_bonus_data.sql \
+	11058_01_mangos_spell_proc_event.sql \
+	11115_01_mangos_command.sql \
+	11117_01_mangos_world_template.sql \
+	11117_02_characters_world.sql \
 	README
 
 ## Additional files to include when running 'make dist'
@@ -240,4 +271,35 @@ EXTRA_DIST = \
 	10788_01_mangos_creature_addon.sql \
 	10788_02_mangos_creature_template_addon.sql \
 	10835_01_mangos_spell_proc_event.sql \
+	10862_01_characters_mail.sql \
+	10863_01_mangos_spell_proc_event.sql \
+	10864_01_mangos_spell_proc_event.sql \
+	10867_01_mangos_npc_trainer_template.sql \
+	10867_02_mangos_creature_template.sql \
+	10883_01_mangos_spell_proc_event.sql \
+	10906_01_mangos_spell_proc_event.sql \
+	10906_02_mangos_spell_bonus_data.sql \
+	10932_01_mangos_game_event_creature_data.sql \
+	10945_01_mangos_mangos_string.sql \
+	10946_01_mangos_spell_proc_event.sql \
+	10949_01_mangos_mangos_string.sql \
+	10950_01_mangos_mangos_string.sql \
+	10951_01_mangos_spell_proc_event.sql \
+	10972_01_mangos_command.sql \
+	10973_01_characters_game_event_status.sql \
+	10973_01_mangos_game_event_mail.sql \
+	10988_01_mangos_mangos_string.sql \
+	10989_01_mangos_loot_template.sql \
+	10993_01_mangos_loot_template.sql \
+	10998_01_mangos_spell_proc_event.sql \
+	11002_01_mangos_spell_proc_event.sql \
+	11018_01_mangos_command.sql \
+	11023_01_mangos_spell_threat.sql \
+	11036_01_mangos_spell_threat.sql \
+	11040_01_mangos_spell_chain.sql \
+	11040_02_mangos_spell_bonus_data.sql \
+	11058_01_mangos_spell_proc_event.sql \
+	11115_01_mangos_command.sql \
+	11117_01_mangos_world_template.sql \
+	11117_02_characters_world.sql \
 	README

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -460,7 +460,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 m_creature->setFaction(action.set_faction.factionId);
             else
             {
-                if (CreatureInfo const* ci = GetCreatureTemplateStore(m_creature->GetEntry()))
+                if (CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_creature->GetEntry()))
                 {
                     //if no id provided, assume reset and then use default
                     if (m_creature->getFaction() != ci->faction_A)
@@ -476,7 +476,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 //set model based on entry from creature_template
                 if (action.morph.creatureId)
                 {
-                    if (CreatureInfo const* ci = GetCreatureTemplateStore(action.morph.creatureId))
+                    if (CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(action.morph.creatureId))
                     {
                         uint32 display_id = Creature::ChooseDisplayId(ci);
                         m_creature->SetDisplayId(display_id);
@@ -836,7 +836,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                 // set model based on entry from creature_template
                 if (action.mount.creatureId)
                 {
-                    if (CreatureInfo const* cInfo = GetCreatureTemplateStore(action.mount.creatureId))
+                    if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(action.mount.creatureId))
                     {
                         uint32 display_id = Creature::ChooseDisplayId(cInfo);
                         m_creature->Mount(display_id);
@@ -1361,20 +1361,6 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
         case CHAT_TYPE_ZONE_YELL:
             pSource->MonsterYellToZone(textEntry, (*i).second.Language, target);
             break;
-    }
-}
-
-void CreatureEventAI::DoMeleeAttackIfReady()
-{
-    //Make sure our attack is ready before checking distance
-    if (m_creature->isAttackReady())
-    {
-        //If we are within range melee the target
-        if (m_creature->IsWithinDistInMap(m_creature->getVictim(), ATTACK_DISTANCE))
-        {
-            m_creature->AttackerStateUpdate(m_creature->getVictim());
-            m_creature->resetAttackTimer();
-        }
     }
 }
 

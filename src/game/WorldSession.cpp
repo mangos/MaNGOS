@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,46 @@
 #include "Auth/AuthCrypt.h"
 #include "Auth/HMACSHA1.h"
 #include "zlib/zlib.h"
+
+// select opcodes appropriate for processing in Map::Update context for current session state
+static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
+{
+    // we do not process thread-unsafe packets
+    if (opHandle.packetProcessing == PROCESS_THREADUNSAFE)
+        return false;
+
+    // we do not process not loggined player packets
+    Player * plr = session->GetPlayer();
+    if (!plr)
+        return false;
+
+    // in Map::Update() we do not process packets where player is not in world!
+    return plr->IsInWorld();
+}
+
+
+bool MapSessionFilter::Process(WorldPacket * packet)
+{
+    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+    if (opHandle.packetProcessing == PROCESS_INPLACE)
+        return true;
+
+    // let's check if our opcode can be really processed in Map::Update()
+    return MapSessionFilterHelper(m_pSession, opHandle);
+}
+
+// we should process ALL packets when player is not in world/logged in
+// OR packet handler is not thread-safe!
+bool WorldSessionFilter::Process(WorldPacket* packet)
+{
+    OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
+    // check if packet handler is supposed to be safe
+    if (opHandle.packetProcessing == PROCESS_INPLACE)
+        return true;
+
+    // let's check if our opcode can't be processed in Map::Update()
+    return !MapSessionFilterHelper(m_pSession, opHandle);
+}
 
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale) :
@@ -158,12 +198,12 @@ void WorldSession::LogUnprocessedTail(WorldPacket *packet)
 }
 
 /// Update the WorldSession (triggered by World update)
-bool WorldSession::Update(uint32 /*diff*/)
+bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
     ///- Retrieve packets from the receive queue and call the appropriate handlers
-    /// not proccess packets if socket already closed
+    /// not process packets if socket already closed
     WorldPacket* packet;
-    while (m_Socket && !m_Socket->IsClosed() && _recvQueue.next(packet))
+    while (m_Socket && !m_Socket->IsClosed() && _recvQueue.next(packet, updater))
     {
         /*#if 1
         sLog.outError( "MOEP: %s (0x%.4X)",
@@ -266,13 +306,18 @@ bool WorldSession::Update(uint32 /*diff*/)
         m_Socket = NULL;
     }
 
-    ///- If necessary, log the player out
-    time_t currTime = time(NULL);
-    if (!m_Socket || (ShouldLogOut(currTime) && !m_playerLoading))
-        LogoutPlayer(true);
+    //check if we are safe to proceed with logout
+    //logout procedure should happen only in World::UpdateSessions() method!!!
+    if(updater.ProcessLogout())
+    {
+        ///- If necessary, log the player out
+        time_t currTime = time(NULL);
+        if (!m_Socket || (ShouldLogOut(currTime) && !m_playerLoading))
+            LogoutPlayer(true);
 
-    if (!m_Socket)
-        return false;                                       //Will remove this session from the world session map
+        if (!m_Socket)
+            return false;                                       //Will remove this session from the world session map
+    }
 
     return true;
 }
@@ -431,9 +476,18 @@ void WorldSession::LogoutPlayer(bool Save)
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
         // calls to GetMap in this case may cause crashes
-        Map* _map = _player->GetMap();
-        _map->Remove(_player, true);
-        SetPlayer(NULL);                                    // deleted in Remove call
+        if (_player->IsInWorld())
+        {
+            Map* _map = _player->GetMap();
+            _map->Remove(_player, true);
+        }
+        else
+        {
+            _player->CleanupsBeforeDelete();
+            Map::DeleteFromWorld(_player);
+        }
+
+        SetPlayer(NULL);                                    // deleted in Remove/DeleteFromWorld call
 
         ///- Send the 'logout complete' packet to the client
         WorldPacket data( SMSG_LOGOUT_COMPLETE, 0 );

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +34,10 @@ class Field
             DB_TYPE_BOOL    = 0x04
         };
 
-        Field();
-        Field(Field &f);
-        Field(const char *value, enum DataTypes type);
+        Field() : mValue(NULL), mType(DB_TYPE_UNKNOWN) {}
+        Field(const char *value, enum DataTypes type) : mType(type) { mValue = const_cast<char * >(value); }
 
-        ~Field();
+        ~Field() {}
 
         enum DataTypes GetType() const { return mType; }
         bool IsNULL() const { return mValue == NULL; }
@@ -68,10 +67,14 @@ class Field
         }
 
         void SetType(enum DataTypes type) { mType = type; }
-
-        void SetValue(const char *value);
+        //no need for memory allocations to store resultset field strings
+        //all we need is to cache pointers returned by different DBMS APIs
+        void SetValue(const char *value) { mValue = const_cast<char * >(value); };
 
     private:
+        Field(Field &f);
+        Field& operator=(const Field& );
+
         char *mValue;
         enum DataTypes mType;
 };

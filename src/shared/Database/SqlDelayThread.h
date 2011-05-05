@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 class Database;
 class SqlOperation;
+class SqlConnection;
 
 class SqlDelayThread : public ACE_Based::Runnable
 {
@@ -34,11 +35,15 @@ class SqlDelayThread : public ACE_Based::Runnable
     private:
         SqlQueue m_sqlQueue;                                ///< Queue of SQL statements
         Database* m_dbEngine;                               ///< Pointer to used Database engine
+        SqlConnection * m_dbConnection;                     ///< Pointer to DB connection
         volatile bool m_running;
 
-        SqlDelayThread();
+        //process all enqueued requests
+        void ProcessRequests();
+
     public:
-        SqlDelayThread(Database* db);
+        SqlDelayThread(Database* db, SqlConnection* conn);
+        ~SqlDelayThread();
 
         ///< Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }

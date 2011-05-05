@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_10664_01_characters_arena_team_stats` bit(1) default NULL
+  `required_11117_02_characters_world` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -374,12 +374,12 @@ CREATE TABLE `character_aura` (
   `spell` int(11) unsigned NOT NULL default '0',
   `stackcount` int(11) NOT NULL default '1',
   `remaincharges` int(11) NOT NULL default '0',
-  `basepoints0` INT(11) NOT NULL DEFAULT '0', 
-  `basepoints1` INT(11) NOT NULL DEFAULT '0', 
+  `basepoints0` INT(11) NOT NULL DEFAULT '0',
+  `basepoints1` INT(11) NOT NULL DEFAULT '0',
   `basepoints2` INT(11) NOT NULL DEFAULT '0',
   `maxduration0` INT(11) NOT NULL DEFAULT '0',
   `maxduration1` INT(11) NOT NULL DEFAULT '0',
-  `maxduration2` INT(11) NOT NULL DEFAULT '0', 
+  `maxduration2` INT(11) NOT NULL DEFAULT '0',
   `remaintime0` INT(11) NOT NULL DEFAULT '0',
   `remaintime1` INT(11) NOT NULL DEFAULT '0',
   `remaintime2` INT(11) NOT NULL DEFAULT '0',
@@ -1061,6 +1061,25 @@ LOCK TABLES `creature_respawn` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `game_event_status`
+--
+
+DROP TABLE IF EXISTS `game_event_status`;
+CREATE TABLE `game_event_status` (
+  `event` smallint(6) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Game event system';
+
+--
+-- Dumping data for table `game_event_status`
+--
+
+LOCK TABLES `game_event_status` WRITE;
+/*!40000 ALTER TABLE `game_event_status` DISABLE KEYS */;
+/*!40000 ALTER TABLE `game_event_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `gameobject_respawn`
 --
 
@@ -1548,12 +1567,12 @@ CREATE TABLE `pet_aura` (
   `spell` int(11) unsigned NOT NULL default '0',
   `stackcount` int(11) NOT NULL default '1',
   `remaincharges` int(11) NOT NULL default '0',
-  `basepoints0` INT(11) NOT NULL DEFAULT '0', 
-  `basepoints1` INT(11) NOT NULL DEFAULT '0', 
+  `basepoints0` INT(11) NOT NULL DEFAULT '0',
+  `basepoints1` INT(11) NOT NULL DEFAULT '0',
   `basepoints2` INT(11) NOT NULL DEFAULT '0',
   `maxduration0` INT(11) NOT NULL DEFAULT '0',
   `maxduration1` INT(11) NOT NULL DEFAULT '0',
-  `maxduration2` INT(11) NOT NULL DEFAULT '0', 
+  `maxduration2` INT(11) NOT NULL DEFAULT '0',
   `remaintime0` INT(11) NOT NULL DEFAULT '0',
   `remaintime1` INT(11) NOT NULL DEFAULT '0',
   `remaintime2` INT(11) NOT NULL DEFAULT '0',
@@ -1684,6 +1703,25 @@ LOCK TABLES `saved_variables` WRITE;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+--
+-- Table structure for table `world`
+--
+
+DROP TABLE IF EXISTS `world`;
+CREATE TABLE `world` (
+  `map` int(11) unsigned NOT NULL default '0',
+  `data` longtext,
+  PRIMARY KEY  (`map`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `world`
+--
+
+LOCK TABLES `world` WRITE;
+/*!40000 ALTER TABLE `world` DISABLE KEYS */;
+/*!40000 ALTER TABLE `world` ENABLE KEYS */;
+UNLOCK TABLES;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

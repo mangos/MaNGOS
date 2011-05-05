@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ namespace MaNGOS
             }
 
             _Callback(_Callback<Class, ParamType1, ParamType2, ParamType3, ParamType4> const& cb)
-                : m_object(cb.object), m_method(cb.m_method),
+                : m_object(cb.m_object), m_method(cb.m_method),
                 m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3), m_param4(cb.m_param4)
             {
             }
@@ -68,12 +68,12 @@ namespace MaNGOS
         public:
             _Callback(Class *object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : m_object(object), m_method(method),
-                m_param1(param1), m_param2(param2)
+                m_param1(param1), m_param2(param2), m_param3(param3)
             {
             }
 
             _Callback(_Callback<Class, ParamType1, ParamType2, ParamType3> const& cb)
-                : m_object(cb.object), m_method(cb.m_method),
+                : m_object(cb.m_object), m_method(cb.m_method),
                 m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3)
             {
             }

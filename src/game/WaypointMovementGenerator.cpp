@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,16 +39,16 @@ alter table creature_movement add `wpguid` int(11) default '0';
 #include "CreatureAI.h"
 #include "WaypointManager.h"
 #include "WorldPacket.h"
-#include "ScriptCalls.h"
+#include "ScriptMgr.h"
 
 #include <cassert>
 
 //-----------------------------------------------//
 void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
 {
-    DETAIL_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "LoadPath: loading waypoint path for creature %u, %u", creature.GetGUIDLow(), creature.GetDBTableGUIDLow());
+    DETAIL_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "LoadPath: loading waypoint path for %s", creature.GetGuidStr().c_str());
 
-    i_path = sWaypointMgr.GetPath(creature.GetDBTableGUIDLow());
+    i_path = sWaypointMgr.GetPath(creature.GetGUIDLow());
 
     // We may LoadPath() for several occasions:
 
@@ -70,7 +70,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
         if (!i_path)
         {
             sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path",
-                creature.GetName(), creature.GetEntry(), creature.GetDBTableGUIDLow());
+                creature.GetName(), creature.GetEntry(), creature.GetGUIDLow());
             return;
         }
     }
@@ -186,7 +186,7 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
 
             if (i_path->at(i_currentNode).script_id)
             {
-                DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for creature %u (entry %u).", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetDBTableGUIDLow(), creature.GetEntry());
+                DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for %s.", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetGuidStr().c_str());
                 creature.GetMap()->ScriptsStart(sCreatureMovementScripts, i_path->at(i_currentNode).script_id, &creature, &creature);
             }
 
@@ -435,7 +435,7 @@ void FlightPathMovementGenerator::DoEventIfAny(Player& player, TaxiPathNodeEntry
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Taxi %s event %u of node %u of path %u for player %s", departure ? "departure" : "arrival", eventid, node.index, node.path, player.GetName());
 
-        if (!Script->ProcessEventId(eventid, &player, &player, departure))
+        if (!sScriptMgr.OnProcessEvent(eventid, &player, &player, departure))
             player.GetMap()->ScriptsStart(sEventScripts, eventid, &player, &player);
     }
 }

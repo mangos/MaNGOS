@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,29 +44,11 @@ void HostileRefManager::threatAssist(Unit *pVictim, float pThreat, SpellEntry co
     Unit* redirectedTarget = redirectedMod ? pVictim->getHostileRefManager().GetThreatRedirectionTarget() : NULL;
 
     uint32 size = pSingleTarget ? 1 : getSize();            // if pSingleTarget do not devide threat
+    float threat = pThreat/size;
     HostileReference* ref = getFirst();
-    while(ref != NULL)
+    while (ref)
     {
-        float threat = ThreatCalcHelper::calcThreat(pVictim, iOwner, pThreat, false, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
-
-        if (threat > 0.0f)
-        {
-            if (redirectedTarget && redirectedTarget != ref->getTarget() && redirectedTarget->isAlive())
-            {
-                float redirectedThreat = threat * redirectedMod;
-                threat -= redirectedThreat;
-
-                if(redirectedTarget == getOwner())          // It is faster to modify the threat durectly if possible
-                    ref->addThreat(float (threat) / size);
-                else
-                    ref->getSource()->addThreat(redirectedTarget, redirectedThreat);
-            }
-        }
-
-        if (pVictim == getOwner())
-            ref->addThreat(float (threat) / size);          // It is faster to modify the threat durectly if possible
-        else
-            ref->getSource()->addThreat(pVictim, float (threat) / size);
+        ref->getSource()->addThreat(pVictim, threat, false, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell);
 
         ref = ref->next();
     }

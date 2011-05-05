@@ -1,5 +1,5 @@
 //  -*- MPC -*- now wouldn't this be cool...
-// $Id: ace.mpc 91579 2010-08-31 12:41:37Z johnnyw $
+// $Id: ace.mpc 91791 2010-09-16 09:29:32Z johnnyw $
 
 project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, uuid, filecache, versioned_namespace, pkgconfig, support_ostream {
   avoids       = ace_for_tao
@@ -348,7 +348,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Stream_Modules.cpp
     String_Base.cpp
     Svc_Handler.cpp
-    Synch_T.cpp
     Refcountable_T.cpp
     TSS_T.cpp
     Task_Ex_T.cpp
@@ -382,7 +381,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Reverse_Lock_T.inl
     TSS_T.inl
     ace_wchar.inl
-    OS.inl
   }
 
   Header_Files {
@@ -390,7 +388,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     recurse = 1
 
     ACE_export.h
-    Array.h
     Bound_Ptr.h
     CE_Screen_Output.h
     Codeset_Symbols.h
@@ -408,8 +405,6 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Lock_Adapter_T.h
     Log_Priority.h
     Malloc_Base.h
-    Map.h
-    Method_Object.h
     Metrics_Cache.h
     Metrics_Cache_T.h
     Memory_Pool.h
@@ -420,23 +415,17 @@ project(ACE) : ace_output, acedefaults, install, other, codecs, token, svcconf, 
     Null_Mutex.h
     Null_Semaphore.h
     Numeric_Limits.h
-    OS.h
-    OS_Dirent.h
     OS_Memory.h
     OS_NS_macros.h
-    OS_String.h
     OS_Thread_Adapter.h
     Object_Manager_Base.h
     Obstack.h
-    Pair.h
     Proactor_Impl.h
     Reactor_Impl.h
     Reactor_Timer_Interface.h
-    Refcountable.h
     Refcounted_Auto_Ptr.h
     Reverse_Lock_T.h
     Select_Reactor.h
-    Service_Templates.h
     SOCK_Netlink.h
     SStringfwd.h
     Stack_Trace.h

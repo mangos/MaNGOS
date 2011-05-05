@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "../../game/Player.h"
 #include "../../game/Map.h"
 #include "../../game/ObjectMgr.h"
+#include "../../game/ScriptMgr.h"
 #include "../../game/SpellAuras.h"
 
 //uint8 loglevel = 0;

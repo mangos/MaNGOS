@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,7 +88,9 @@ enum MangosStrings
     LANG_RA_PASS                        = 62,
     LANG_GM_ACCEPTS_WHISPER             = 63,
     LANG_GM_NO_WHISPER                  = 64,
-    // Room for more level 0              65-99 not used
+    LANG_USING_SCRIPT_LIB_UNKNOWN       = 65,
+    LANG_USING_SCRIPT_LIB_NONE          = 66,
+    // Room for more level 0              67-99 not used
 
     // level 1 chat
     LANG_GLOBAL_NOTIFY                  = 100,
@@ -367,7 +369,7 @@ enum MangosStrings
     // Room for more level 2              376-399 not used
 
     // level 3 chat
-    LANG_SCRIPTS_RELOADED               = 400,
+    LANG_SCRIPTS_RELOADED_ANNOUNCE      = 400,
     LANG_YOU_CHANGE_SECURITY            = 401,
     LANG_YOURS_SECURITY_CHANGED         = 402,
     LANG_YOURS_SECURITY_IS_LOW          = 403,
@@ -885,7 +887,11 @@ enum MangosStrings
     LANG_ACHIEVEMENT_NOT_EXIST          = 1163,
     LANG_ACHIEVEMENT_CRITERIA_NOT_EXIST = 1164,
     LANG_SPELL_NO_HAVE_AURAS            = 1165,
-    // Room for more level 3              1166-1199 not used
+    LANG_SCRIPTS_NOT_FOUND              = 1166,
+    LANG_SCRIPTS_WRONG_API              = 1167,
+    LANG_SCRIPTS_RELOADED_OK            = 1168,
+    LANG_SCRIPTS_OUTDATED               = 1169,
+    // Room for more level 3              1170-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

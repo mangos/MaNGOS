@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,7 +81,6 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void HealBy(Unit * /*healer*/, uint32 /*amount_healed*/) {}
 
         // Helper functions for cast spell
-        CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, uint64 uiOriginalCasterGUID = 0);
         virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered);
 
         // Called at any Damage to any victim (before damage apply)
@@ -150,6 +149,10 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called when victim entered water and creature can not enter water
         virtual bool canReachByRangeAttack(Unit*) { return false; }
+
+        ///== Helper functions =============================
+        bool DoMeleeAttackIfReady();
+        CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, uint64 uiOriginalCasterGUID = 0);
 
         ///== Fields =======================================
 

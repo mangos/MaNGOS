@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ class TemporarySummon : public Creature
     public:
         explicit TemporarySummon(ObjectGuid summoner = ObjectGuid());
         virtual ~TemporarySummon(){};
-        void Update(uint32 time);
+        void Update(uint32 update_diff, uint32 time);
         void Summon(TempSummonType type, uint32 lifetime);
         void MANGOS_DLL_SPEC UnSummon();
         void SaveToDB();

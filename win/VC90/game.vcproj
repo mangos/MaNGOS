@@ -799,14 +799,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\InstanceSaveMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\InstanceSaveMgr.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\ItemHandler.cpp"
 				>
 			</File>
@@ -840,6 +832,22 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\MapManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MapPersistentStateMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MapPersistentStateMgr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MassMailMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MassMailMgr.h"
 				>
 			</File>
 			<File
@@ -903,11 +911,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\ScriptCalls.cpp"
+				RelativePath="..\..\src\game\ScriptMgr.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\ScriptCalls.h"
+				RelativePath="..\..\src\game\ScriptMgr.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,6 @@
 = MaNGOS -- History of visible changes =
 
-Copyright (C) 2005-2010 MaNGOS project <http://getmangos.com/>
+Copyright (C) 2005-2011 MaNGOS project <http://getmangos.com/>
 
 See the COPYING file for copying conditions.
 
@@ -15,7 +15,7 @@ http://mangos.lighthouseapp.com/
 
 Version 0.17
  * Under discussion.
- * ACE Framework updated to ACE 5.8.2.
+ * ACE Framework updated to ACE 5.8.3.
  * MySQL client libs updated to MySQL 5.1.49.
  * Upgrade to client version 3.3.5a (build 12340).
 

@@ -1,4 +1,4 @@
-// $Id: SOCK_Dgram_Bcast.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: SOCK_Dgram_Bcast.cpp 91685 2010-09-09 09:35:14Z johnnyw $
 
 #include "ace/SOCK_Dgram_Bcast.h"
 
@@ -151,18 +151,9 @@ ACE_SOCK_Dgram_Bcast::mk_broadcast (const ACE_TCHAR *host_name)
       if (hp == 0)
         return -1;
       else
-#if defined(_UNICOS)
-        {
-          ACE_UINT64 haddr;  // a place to put the address
-          char * haddrp = (char *) &haddr;  // convert to char pointer
-          ACE_OS::memcpy(haddrp,(char *) hp->h_addr,hp->h_length);
-          host_addr.sin_addr.s_addr = haddr;
-        }
-#else /* ! _UNICOS */
         ACE_OS::memcpy ((char *) &host_addr.sin_addr.s_addr,
                         (char *) hp->h_addr,
                         hp->h_length);
-#endif /* ! _UNICOS */
     }
 
 

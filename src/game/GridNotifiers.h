@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -687,18 +687,66 @@ namespace MaNGOS
             NearestGameObjectEntryInObjectRangeCheck(NearestGameObjectEntryInObjectRangeCheck const&);
     };
 
-    class GameObjectWithDbGUIDCheck
+    // Success at gameobject in range of xyz, range update for next check (this can be use with GameobjectLastSearcher to find nearest GO)
+    class NearestGameObjectEntryInPosRangeCheck
     {
         public:
-            GameObjectWithDbGUIDCheck(WorldObject const& obj,uint32 db_guid) : i_obj(obj), i_db_guid(db_guid) {}
+            NearestGameObjectEntryInPosRangeCheck(WorldObject const& obj, uint32 entry, float x, float y, float z, float range)
+                : i_obj(obj), i_x(x), i_y(y), i_z(z), i_entry(entry), i_range(range) {}
+
             WorldObject const& GetFocusObject() const { return i_obj; }
-            bool operator()(GameObject const* go) const
+
+            bool operator()(GameObject* go)
             {
-                return go->GetDBTableGUIDLow() == i_db_guid;
+                if (go->GetEntry() == i_entry && go->IsWithinDist3d(i_x, i_y, i_z, i_range))
+                {
+                    // use found GO range as new range limit for next check
+                    i_range = go->GetDistance(i_x,i_y,i_z);
+                    return true;
+                }
+
+                return false;
             }
+
+            float GetLastRange() const { return i_range; }
+
         private:
             WorldObject const& i_obj;
-            uint32 i_db_guid;
+            uint32 i_entry;
+            float i_x, i_y, i_z;
+            float i_range;
+
+            // prevent clone this object
+            NearestGameObjectEntryInPosRangeCheck(NearestGameObjectEntryInPosRangeCheck const&);
+    };
+
+    // Success at gameobject with entry in range of provided xyz
+    class GameObjectEntryInPosRangeCheck
+    {
+        public:
+            GameObjectEntryInPosRangeCheck(WorldObject const& obj, uint32 entry, float x, float y, float z, float range)
+                : i_obj(obj), i_x(x), i_y(y), i_z(z), i_entry(entry), i_range(range) {}
+
+            WorldObject const& GetFocusObject() const { return i_obj; }
+
+            bool operator()(GameObject* go)
+            {
+                if (go->GetEntry() == i_entry && go->IsWithinDist3d(i_x, i_y, i_z, i_range))
+                    return true;
+
+                return false;
+            }
+
+            float GetLastRange() const { return i_range; }
+
+        private:
+            WorldObject const& i_obj;
+            uint32 i_entry;
+            float i_x, i_y, i_z;
+            float i_range;
+
+            // prevent clone this object
+            GameObjectEntryInPosRangeCheck(GameObjectEntryInPosRangeCheck const&);
     };
 
     // Unit checks

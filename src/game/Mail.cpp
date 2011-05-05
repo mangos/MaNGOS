@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@
 #include "Unit.h"
 #include "Language.h"
 #include "DBCStores.h"
-#include "BattleGroundMgr.h"
 #include "Item.h"
 #include "AuctionHouseMgr.h"
 
@@ -272,8 +271,8 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     // will delete item or place to receiver mail list
     draft
-        .AddMoney(money)
-        .AddCOD(COD)
+        .SetMoney(money)
+        .SetCOD(COD)
         .SendMailTo(MailReceiver(receive, rc), pl, body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     CharacterDatabase.BeginTransaction();
@@ -389,13 +388,15 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
     // send back only to existing players and simple drop for other cases
     if (m->messageType == MAIL_NORMAL && m->sender)
     {
-        MailDraft draft(m->subject, m->body);
+        MailDraft draft;
         if (m->mailTemplateId)
-            draft = MailDraft(m->mailTemplateId, false);    // items already included
+            draft.SetMailTemplate(m->mailTemplateId, false);// items already included
+        else
+            draft.SetSubjectAndBody(m->subject, m->body);
 
         if(m->HasItems())
         {
-            for(std::vector<MailItemInfo>::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+            for(MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
             {
                 if(Item *item = pl->GetMItem(itr2->item_guid))
                     draft.AddItem(item);
@@ -404,7 +405,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
             }
         }
 
-        draft.AddMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
+        draft.SetMoney(m->money).SendReturnToSender(GetAccountId(), m->receiverGuid, ObjectGuid(HIGHGUID_PLAYER, m->sender));
     }
 
     delete m;                                               // we can deallocate old mail
@@ -484,7 +485,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
             if(sender || sender_accId)
             {
                 MailDraft(m->subject, "")
-                    .AddMoney(m->COD)
+                    .SetMoney(m->COD)
                     .SendMailTo(MailReceiver(sender, sender_guid), _player, MAIL_CHECK_MASK_COD_PAYMENT);
             }
 
@@ -695,17 +696,17 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
     }
 
     Item *bodyItem = new Item;                              // This is not bag and then can be used new Item.
-    if(!bodyItem->Create(sObjectMgr.GenerateLowGuid(HIGHGUID_ITEM), MAIL_BODY_ITEM_TEMPLATE, pl))
+    if (!bodyItem->Create(sObjectMgr.GenerateItemLowGuid(), MAIL_BODY_ITEM_TEMPLATE, pl))
     {
         delete bodyItem;
         return;
     }
 
     // in mail template case we need create new item text
-    if(m->mailTemplateId)
+    if (m->mailTemplateId)
     {
         MailTemplateEntry const* mailTemplateEntry = sMailTemplateStore.LookupEntry(m->mailTemplateId);
-        if(!mailTemplateEntry)
+        if (!mailTemplateEntry)
         {
             pl->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
             return;
@@ -916,6 +917,33 @@ void MailDraft::deleteIncludedItems( bool inDB /**= false*/ )
 
     m_items.clear();
 }
+/**
+ * Clone MailDraft from another MailDraft.
+ *
+ * @param draft Point to source for draft cloning.
+ */
+void MailDraft::CloneFrom(MailDraft const& draft)
+{
+    m_mailTemplateId = draft.GetMailTemplateId();
+    m_mailTemplateItemsNeed = draft.m_mailTemplateItemsNeed;
+
+    m_subject = draft.GetSubject();
+    m_body = draft.GetBody();
+    m_money = draft.GetMoney();
+    m_COD = draft.GetCOD();
+
+    for(MailItemMap::const_iterator mailItemIter = draft.m_items.begin(); mailItemIter != draft.m_items.end(); ++mailItemIter)
+    {
+        Item* item = mailItemIter->second;
+
+        if(Item* newitem = item->CloneItem(item->GetCount()))
+        {
+            newitem->SaveToDB();
+            AddItem(newitem);
+        }
+    }
+}
+
 /*
  * Returns a mail to its sender.
  * @param sender_acc           The id of the account of the sender.
@@ -986,9 +1014,6 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
     // auction mail without any items and money (auction sale note) pending 1 hour
     if (sender.GetMailMessageType() == MAIL_AUCTION && m_items.empty() && !m_money)
         expire_delay = HOUR;
-    // mail from battlemaster (rewardmarks) should last only one day
-    else if (sender.GetMailMessageType() == MAIL_CREATURE && sBattleGroundMgr.GetBattleMasterBG(sender.GetSenderId()) != BATTLEGROUND_TYPE_NONE)
-        expire_delay = DAY;
     // default case: expire time if COD 3 days, if no COD 30 days
     else
         expire_delay = (m_COD > 0) ? 3 * DAY : 30 * DAY;
@@ -997,13 +1022,12 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
     // Add to DB
     std::string safe_subject = GetSubject();
-    CharacterDatabase.BeginTransaction();
     CharacterDatabase.escape_string(safe_subject);
 
     std::string safe_body = GetBody();
-    CharacterDatabase.BeginTransaction();
     CharacterDatabase.escape_string(safe_body);
 
+    CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("INSERT INTO mail (id,messageType,stationery,mailTemplateId,sender,receiver,subject,body,has_items,expire_time,deliver_time,money,cod,checked) "
         "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%s', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%u')",
         mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), safe_body.c_str(), (m_items.empty() ? 0 : 1), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);

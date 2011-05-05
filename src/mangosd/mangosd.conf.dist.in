@@ -37,6 +37,14 @@ ConfVersion=2010100901
 #                    hostname;port;username;password;database
 #                    .;/path/to/unix_socket/DIRECTORY or . for default path;username;password;database - use Unix sockets at Unix/Linux
 #
+#	LoginDatabaseConnections
+#	WorldDatabaseConnections
+#	CharacterDatabaseConnections
+#		 Amount of connections to database which will be used for SELECT queries. Maximum 16 connections per database.
+#		 Please, note, for data consistency only one connection for each database is used for transactions and async SELECTs.
+#		 So formula to find out how many connections will be established: X = ¹_connections + 1
+#		 Default: 1 connection for SELECT statements
+#
 #    MaxPingTime
 #        Settings for maximum database-ping interval (minutes between pings)
 #
@@ -57,6 +65,9 @@ LogsDir = ""
 LoginDatabaseInfo     = "127.0.0.1;3306;mangos;mangos;realmd"
 WorldDatabaseInfo     = "127.0.0.1;3306;mangos;mangos;mangos"
 CharacterDatabaseInfo = "127.0.0.1;3306;mangos;mangos;characters"
+LoginDatabaseConnections = 1
+WorldDatabaseConnections = 1
+CharacterDatabaseConnections = 1
 MaxPingTime = 30
 WorldServerPort = 8085
 BindIP = "0.0.0.0"
@@ -100,10 +111,6 @@ BindIP = "0.0.0.0"
 #        Unload grids (if you have lot memory you can disable it to speed up player move to new grids second time)
 #        Default: 1 (unload grids)
 #                 0 (do not unload grids)
-#
-#    SocketSelectTime
-#        Socket select time (in milliseconds)
-#        Default: 10000 (10 secs)
 #
 #    GridCleanUpDelay
 #        Grid clean up delay (in milliseconds)
@@ -189,7 +196,6 @@ PlayerLimit = 100
 SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
 GridUnload = 1
-SocketSelectTime = 10000
 GridCleanUpDelay = 300000
 MapUpdateInterval = 100
 ChangeWeatherInterval = 600000
@@ -666,6 +672,11 @@ LogColors = ""
 #        Mail delivery delay time for item sending
 #        Default: 3600 sec (1 hour)
 #
+#    MassMailer.SendPerTick
+#        Max amount mail send each tick from mails list scheduled for mass mailer proccesing.
+#        More mails increase server load but speedup mass mail proccess. Normal tick length: 50 msecs, so 20 ticks in sec and 200 mails in sec by default.
+#        Default: 10
+#
 #    SkillChance.Prospecting
 #        For prospecting skillup impossible by default, but can be allowed as custom setting
 #        Default: 0 - no skilups
@@ -696,6 +707,11 @@ LogColors = ""
 #
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
+#        Default: 1 (true)
+#                 0 (false)
+#
+#    ShowProgressBars
+#        Control show progress bars for load steps at server startup
 #        Default: 1 (true)
 #                 0 (false)
 #
@@ -764,6 +780,7 @@ MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
+MassMailer.SendPerTick = 10
 SkillChance.Prospecting = 0
 SkillChance.Milling = 0
 OffhandCheckAtTalentsReset = 0
@@ -771,6 +788,7 @@ PetUnsummonAtMount = 1
 ClientCacheVersion = 0
 Event.Announce = 0
 BeepAtStart = 1
+ShowProgressBars = 1
 WaitAtStartupError = 0
 Motd = "Welcome to the Massive Network Game Object Server."
 
@@ -1232,6 +1250,21 @@ Visibility.Distance.Grey.Object = 10
 #         Default: 0  - no decrease
 #                  75 - in 2 times each 75 skill points
 #
+#    SkillFail.Loot.Fishing
+#         For fishing instead fail provided junk loot
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
+#    SkillFail.Gain.Fishing
+#         For fishing skill gain possible at fail also
+#         Default: 1 (enabled)
+#                  0 (disabled)
+#
+#    SkillFail.Possible.FishingPool
+#         For fishing pool impossible fail from low skill by default
+#         Default: 0 (disabled)
+#                  1 (enabled)
+#
 #    DurabilityLossChance.Damage
 #         Chance lost one from equiped items durability point at damage apply or receive.
 #         Default: 0.5 (100/0.5 = 200) Each 200 damage apply one from 19 possible equipped items
@@ -1265,6 +1298,11 @@ Visibility.Distance.Grey.Object = 10
 #         Enable/disable creating bones instead corpse at resurrection (in normal zones/instacnes, or battleground/arenas)
 #         Default: 1 (enabled)
 #                  0 (disabled)
+#
+#    Death.Ghost.RunSpeed.World
+#    Death.Ghost.RunSpeed.Battleground
+#         Modifies the speed of player's ghosts, removed upon reviving, not permanent/saved, in non-BG and BG maps
+#         Default: 1.0 (normal speed)
 #
 ###################################################################################################################
 
@@ -1315,6 +1353,9 @@ SkillChance.Green  = 25
 SkillChance.Grey   = 0
 SkillChance.MiningSteps   = 0
 SkillChance.SkinningSteps = 0
+SkillFail.Loot.Fishing = 1
+SkillFail.Gain.Fishing = 1
+SkillFail.Possible.FishingPool = 0
 DurabilityLossChance.Damage = 0.5
 DurabilityLossChance.Absorb = 0.5
 DurabilityLossChance.Parry  = 0.05
@@ -1324,6 +1365,8 @@ Death.CorpseReclaimDelay.PvP = 1
 Death.CorpseReclaimDelay.PvE = 1
 Death.Bones.World = 1
 Death.Bones.BattlegroundOrArena = 1
+Death.Ghost.RunSpeed.World = 1.0
+Death.Ghost.RunSpeed.Battleground = 1.0
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG

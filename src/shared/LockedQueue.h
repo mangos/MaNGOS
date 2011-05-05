@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,30 +55,37 @@ namespace ACE_Based
             //! Adds an item to the queue.
             void add(const T& item)
             {
-                lock();
-
-                //ASSERT(!this->_canceled);
-                // throw Cancellation_Exception();
-
+                ACE_Guard<LockType> g(this->_lock);
                 _queue.push_back(item);
-
-                unlock();
             }
 
             //! Gets the next result in the queue, if any.
             bool next(T& result)
             {
-                ACE_Guard<LockType> g(this->_lock);
+                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
 
                 if (_queue.empty())
                     return false;
 
-                //ASSERT (!_queue.empty() || !this->_canceled);
-                // throw Cancellation_Exception();
-
                 result = _queue.front();
                 _queue.pop_front();
 
+                return true;
+            }
+
+            template<class Checker>
+            bool next(T& result, Checker& check)
+            {
+                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
+
+                if (_queue.empty())
+                    return false;
+
+                result = _queue.front();
+                if(!check.Process(result))
+                    return false;
+
+                _queue.pop_front();
                 return true;
             }
 
@@ -95,18 +102,14 @@ namespace ACE_Based
             //! Cancels the queue.
             void cancel()
             {
-                lock();
-
+                ACE_Guard<LockType> g(this->_lock);
                 _canceled = true;
-
-                unlock();
             }
 
             //! Checks if the queue is cancelled.
             bool cancelled()
             {
                 ACE_Guard<LockType> g(this->_lock);
-
                 return _canceled;
             }
 
@@ -120,6 +123,13 @@ namespace ACE_Based
             void unlock()
             {
                 this->_lock.release();
+            }
+
+            ///! Checks if we're empty or not with locks held
+            bool empty()
+            {
+                ACE_Guard<LockType> g(this->_lock);
+                return _queue.empty();
             }
     };
 }

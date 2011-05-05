@@ -423,7 +423,6 @@
     <ClCompile Include="..\..\src\game\HostileRefManager.cpp" />
     <ClCompile Include="..\..\src\game\IdleMovementGenerator.cpp" />
     <ClCompile Include="..\..\src\game\InstanceData.cpp" />
-    <ClCompile Include="..\..\src\game\InstanceSaveMgr.cpp" />
     <ClCompile Include="..\..\src\game\Item.cpp" />
     <ClCompile Include="..\..\src\game\ItemEnchantmentMgr.cpp" />
     <ClCompile Include="..\..\src\game\ItemHandler.cpp" />
@@ -437,6 +436,8 @@
     <ClCompile Include="..\..\src\game\Mail.cpp" />
     <ClCompile Include="..\..\src\game\Map.cpp" />
     <ClCompile Include="..\..\src\game\MapManager.cpp" />
+    <ClCompile Include="..\..\src\game\MapPersistentStateMgr.cpp" />
+    <ClCompile Include="..\..\src\game\MassMailMgr.cpp" />
     <ClCompile Include="..\..\src\game\MiscHandler.cpp" />
     <ClCompile Include="..\..\src\game\MotionMaster.cpp" />
     <ClCompile Include="..\..\src\game\MovementGenerator.cpp" />
@@ -474,7 +475,7 @@
     <ClCompile Include="..\..\src\game\RandomMovementGenerator.cpp" />
     <ClCompile Include="..\..\src\game\ReactorAI.cpp" />
     <ClCompile Include="..\..\src\game\ReputationMgr.cpp" />
-    <ClCompile Include="..\..\src\game\ScriptCalls.cpp" />
+    <ClCompile Include="..\..\src\game\ScriptMgr.cpp" />
     <ClCompile Include="..\..\src\game\SkillDiscovery.cpp" />
     <ClCompile Include="..\..\src\game\SkillExtraItems.cpp" />
     <ClCompile Include="..\..\src\game\SkillHandler.cpp" />
@@ -582,7 +583,6 @@
     <ClInclude Include="..\..\src\game\HostileRefManager.h" />
     <ClInclude Include="..\..\src\game\IdleMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\InstanceData.h" />
-    <ClInclude Include="..\..\src\game\InstanceSaveMgr.h" />
     <ClInclude Include="..\..\src\game\Item.h" />
     <ClInclude Include="..\..\src\game\ItemEnchantmentMgr.h" />
     <ClInclude Include="..\..\src\game\ItemPrototype.h" />
@@ -591,8 +591,10 @@
     <ClInclude Include="..\..\src\game\Mail.h" />
     <ClInclude Include="..\..\src\game\Map.h" />
     <ClInclude Include="..\..\src\game\MapManager.h" />
+    <ClInclude Include="..\..\src\game\MapPersistentStateMgr.h" />
     <ClInclude Include="..\..\src\game\MapReference.h" />
     <ClInclude Include="..\..\src\game\MapRefManager.h" />
+    <ClInclude Include="..\..\src\game\MassMailMgr.h" />
     <ClInclude Include="..\..\src\game\MotionMaster.h" />
     <ClInclude Include="..\..\src\game\MovementGenerator.h" />
     <ClInclude Include="..\..\src\game\NPCHandler.h" />
@@ -616,7 +618,7 @@
     <ClInclude Include="..\..\src\game\RandomMovementGenerator.h" />
     <ClInclude Include="..\..\src\game\ReactorAI.h" />
     <ClInclude Include="..\..\src\game\ReputationMgr.h" />
-    <ClInclude Include="..\..\src\game\ScriptCalls.h" />
+    <ClInclude Include="..\..\src\game\ScriptMgr.h" />
     <ClInclude Include="..\..\src\game\SharedDefines.h" />
     <ClInclude Include="..\..\src\game\SkillDiscovery.h" />
     <ClInclude Include="..\..\src\game\SkillExtraItems.h" />

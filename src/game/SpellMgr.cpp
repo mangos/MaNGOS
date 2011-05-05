@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -324,7 +324,7 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2)
                 && effect_1->EffectApplyAuraName == effect_2->EffectApplyAuraName
                 && effect_1->EffectMiscValue == effect_2->EffectMiscValue
                 && effect_1->EffectItemType == effect_2->EffectItemType
-                && (effect_1->Effect != 0 || effect_1->EffectApplyAuraName != 0 || 
+                && (effect_1->Effect != 0 || effect_1->EffectApplyAuraName != 0 ||
                     effect_1->EffectMiscValue != 0 || effect_1->EffectItemType != 0))
                 return true;
         }
@@ -1088,11 +1088,69 @@ void SpellMgr::LoadSpellTargetPositions()
     sLog.outString( ">> Loaded %u spell teleport coordinates", count );
 }
 
+template <typename EntryType, typename WorkerType, typename StorageType>
+struct SpellRankHelper
+{
+    SpellRankHelper(SpellMgr &_mgr, StorageType &_storage): mgr(_mgr), worker(_storage), customRank(0) {}
+    void RecordRank(EntryType &entry, uint32 spell_id)
+    {
+        const SpellEntry *spell = sSpellStore.LookupEntry(spell_id);
+        if (!spell)
+        {
+            sLog.outErrorDb("Spell %u listed in `%s` does not exist", spell_id, worker.TableName());
+            return;
+        }
+
+        uint32 first_id = mgr.GetFirstSpellInChain(spell_id);
+
+        // most spell ranks expected same data
+        if(first_id)
+        {
+            firstRankSpells.insert(first_id);
+
+            if (first_id != spell_id)
+            {
+                if (!worker.IsValidCustomRank(entry, spell_id, first_id))
+                    return;
+                // for later check that first rank also added
+                else
+                {
+                    firstRankSpellsWithCustomRanks.insert(first_id);
+                    ++customRank;
+                }
+            }
+        }
+
+        worker.AddEntry(entry, spell);
+    }
+    void FillHigherRanks()
+    {
+        // check that first rank added for custom ranks
+        for (std::set<uint32>::const_iterator itr = firstRankSpellsWithCustomRanks.begin(); itr != firstRankSpellsWithCustomRanks.end(); ++itr)
+            if (!worker.HasEntry(*itr))
+                sLog.outErrorDb("Spell %u must be listed in `%s` as first rank for listed custom ranks of spell but not found!", *itr, worker.TableName());
+
+        // fill absent non first ranks data base at first rank data
+        for (std::set<uint32>::const_iterator itr = firstRankSpells.begin(); itr != firstRankSpells.end(); ++itr)
+        {
+            if (worker.SetStateToEntry(*itr))
+                mgr.doForHighRanks(*itr, worker);
+        }
+    }
+    std::set<uint32> firstRankSpells;
+    std::set<uint32> firstRankSpellsWithCustomRanks;
+
+    SpellMgr &mgr;
+    WorkerType worker;
+    uint32 customRank;
+};
+
 struct DoSpellProcEvent
 {
-    DoSpellProcEvent(SpellProcEventMap& _spe_map, SpellProcEventEntry const& _spe) : spe_map(_spe_map), spe(_spe) {}
+    DoSpellProcEvent(SpellProcEventMap& _spe_map) : spe_map(_spe_map), customProc(0), count(0) {}
     void operator() (uint32 spell_id)
     {
+        SpellProcEventEntry const& spe = state->second;
         // add ranks only for not filled data (some ranks have ppm data different for ranks for example)
         SpellProcEventMap::const_iterator spellItr = spe_map.find(spell_id);
         if (spellItr == spe_map.end())
@@ -1138,102 +1196,33 @@ struct DoSpellProcEvent
         }
     }
 
-    SpellProcEventMap& spe_map;
-    SpellProcEventEntry const& spe;
-};
-
-void SpellMgr::LoadSpellProcEvents()
-{
-    mSpellProcEventMap.clear();                             // need for reload case
-
-    uint32 count = 0;
-
-    //                                                0      1           2                3                  4                  5                  6                  7                  8                  9                  10                 11                 12         13      14       15            16
-    QueryResult *result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMaskA0, SpellFamilyMaskA1, SpellFamilyMaskA2, SpellFamilyMaskB0, SpellFamilyMaskB1, SpellFamilyMaskB2, SpellFamilyMaskC0, SpellFamilyMaskC1, SpellFamilyMaskC2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
-    if( !result )
+    const char* TableName() { return "spell_proc_event"; }
+    bool IsValidCustomRank(SpellProcEventEntry const &spe, uint32 entry, uint32 first_id)
     {
-        barGoLink bar( 1 );
-        bar.step();
-        sLog.outString();
-        sLog.outString( ">> Loaded %u spell proc event conditions", count  );
-        return;
+        // let have independent data in table for spells with ppm rates (exist rank dependent ppm rate spells)
+        if (!spe.ppmRate)
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_proc_event` is not first rank (%u) in chain", entry, first_id);
+            // prevent loading since it won't have an effect anyway
+            return false;
+        }
+        return true;
     }
-
-    std::set<uint32> firstRankSpells;
-    std::set<uint32> firstRankSpellsWithCustomRanks;
-
-    barGoLink bar( (int)result->GetRowCount() );
-    uint32 customProc = 0;
-    uint32 customRank = 0;
-    do
+    void AddEntry(SpellProcEventEntry const &spe, SpellEntry const *spell)
     {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-
-        const SpellEntry *spell = sSpellStore.LookupEntry(entry);
-        if (!spell)
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_proc_event` does not exist", entry);
-            continue;
-        }
-
-        SpellProcEventEntry spe;
-
-        spe.schoolMask      = fields[1].GetUInt32();
-        spe.spellFamilyName = fields[2].GetUInt32();
-
-        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-        {
-            spe.spellFamilyMask[i] = (uint64)fields[i+3].GetUInt32()|((uint64)fields[i+6].GetUInt32()<<32);
-            spe.spellFamilyMask2[i] = fields[i+9].GetUInt32();
-        }
-        spe.procFlags       = fields[12].GetUInt32();
-        spe.procEx          = fields[13].GetUInt32();
-        spe.ppmRate         = fields[14].GetFloat();
-        spe.customChance    = fields[15].GetFloat();
-        spe.cooldown        = fields[16].GetUInt32();
-
-        uint32 first_id = GetFirstSpellInChain(entry);
-
-        // most spell ranks expected same data
-        if(first_id)
-        {
-            firstRankSpells.insert(first_id);
-
-            if ( first_id != entry)
-            {
-                // let have independent data in table for spells with ppm rates (exist rank dependent ppm rate spells)
-                if (!spe.ppmRate)
-                {
-                    sLog.outErrorDb("Spell %u listed in `spell_proc_event` is not first rank (%u) in chain", entry, first_id);
-                    // prevent loading since it won't have an effect anyway
-                    continue;
-                }
-                // for later check that first rank als added
-                else
-                {
-                    firstRankSpellsWithCustomRanks.insert(first_id);
-                    ++customRank;
-                }
-            }
-        }
-
-        mSpellProcEventMap[entry] = spe;
+        spe_map[spell->Id] = spe;
 
         bool isCustom = false;
 
         if (spe.procFlags == 0)
         {
             if (spell->GetProcFlags()==0)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no proc flags)", entry);
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no proc flags)", spell->Id);
         }
         else
         {
             if (spell->GetProcFlags()==spe.procFlags)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` have exactly same proc flags as in spell.dbc, field value redundent", entry);
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` has exactly same proc flags as in spell.dbc, field value redundant", spell->Id);
             else
                 isCustom = true;
         }
@@ -1242,13 +1231,13 @@ void SpellMgr::LoadSpellProcEvents()
         {
             /* enable for re-check cases, 0 chance ok for some cases because in some cases it set by another spell/talent spellmod)
             if (spell->procChance==0 && !spe.ppmRate)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no chance or ppm)", entry);
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` probally not triggered spell (no chance or ppm)", spell->Id);
             */
         }
         else
         {
             if (spell->GetProcChance()==spe.customChance)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` have exactly same custom chance as in spell.dbc, field value redundent", entry);
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` has exactly same custom chance as in spell.dbc, field value redundant", spell->Id);
             else
                 isCustom = true;
         }
@@ -1267,39 +1256,80 @@ void SpellMgr::LoadSpellProcEvents()
                     if(!ptr)
                         continue;
                     if ((((uint64*)ptr)[0] != 0 && spe.spellFamilyMask[i] == ((uint64*)ptr)[0]) && (ptr[2] == 0 || spe.spellFamilyMask2[i] == ptr[2]))
-                        sLog.outErrorDb("Spell %u listed in `spell_proc_event` have same class mask as in Spell.dbc (EffectIndex %u) and doesn't have any other data", entry, i);
+                        sLog.outErrorDb("Spell %u listed in `spell_proc_event` has same class mask as in Spell.dbc (EffectIndex %u) and doesn't have any other data", spell->Id, i);
                 }
             }
             if (empty)
-                sLog.outErrorDb("Spell %u listed in `spell_proc_event` not have any useful data", entry);
+                sLog.outErrorDb("Spell %u listed in `spell_proc_event` doesn't have any useful data", spell->Id);
         }
 
         if (isCustom)
             ++customProc;
         else
             ++count;
-    } while( result->NextRow() );
-
-    // check that first rank added for custom ranks
-    for(std::set<uint32>::const_iterator itr = firstRankSpellsWithCustomRanks.begin(); itr != firstRankSpellsWithCustomRanks.end(); ++itr)
-        if (mSpellProcEventMap.find(*itr) == mSpellProcEventMap.end())
-            sLog.outErrorDb("Spell %u must be listed in `spell_proc_event` as first rank for listed custom ranks of spell but not found!", *itr);
-
-    // fill absent non first ranks data base at first rank data
-    for(std::set<uint32>::const_iterator itr = firstRankSpells.begin(); itr != firstRankSpells.end(); ++itr)
-    {
-        SpellProcEventMap::const_iterator speItr = mSpellProcEventMap.find(*itr);
-        if (speItr != mSpellProcEventMap.end())
-        {
-            DoSpellProcEvent worker(mSpellProcEventMap, speItr->second);
-            doForHighRanks(speItr->first,worker);
-        }
     }
+
+    bool HasEntry(uint32 spellId) { return spe_map.count(spellId) > 0; }
+    bool SetStateToEntry(uint32 spellId) { return (state = spe_map.find(spellId)) != spe_map.end(); }
+    SpellProcEventMap& spe_map;
+    SpellProcEventMap::const_iterator state;
+
+    uint32 customProc;
+    uint32 count;
+};
+
+void SpellMgr::LoadSpellProcEvents()
+{
+    mSpellProcEventMap.clear();                             // need for reload case
+
+    //                                                0      1           2                3                  4                  5                  6                  7                  8                  9                  10                 11                 12         13      14       15            16
+    QueryResult *result = WorldDatabase.Query("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMaskA0, SpellFamilyMaskA1, SpellFamilyMaskA2, SpellFamilyMaskB0, SpellFamilyMaskB1, SpellFamilyMaskB2, SpellFamilyMaskC0, SpellFamilyMaskC1, SpellFamilyMaskC2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event");
+    if( !result )
+    {
+        barGoLink bar( 1 );
+        bar.step();
+        sLog.outString();
+        sLog.outString( ">> No spell proc event conditions loaded");
+        return;
+    }
+
+    SpellRankHelper<SpellProcEventEntry, DoSpellProcEvent, SpellProcEventMap> rankHelper(*this, mSpellProcEventMap);
+
+    barGoLink bar( (int)result->GetRowCount() );
+    do
+    {
+        Field *fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+
+        SpellProcEventEntry spe;
+
+        spe.schoolMask      = fields[1].GetUInt32();
+        spe.spellFamilyName = fields[2].GetUInt32();
+
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            spe.spellFamilyMask[i] = (uint64)fields[i+3].GetUInt32()|((uint64)fields[i+6].GetUInt32()<<32);
+            spe.spellFamilyMask2[i] = fields[i+9].GetUInt32();
+        }
+        spe.procFlags       = fields[12].GetUInt32();
+        spe.procEx          = fields[13].GetUInt32();
+        spe.ppmRate         = fields[14].GetFloat();
+        spe.customChance    = fields[15].GetFloat();
+        spe.cooldown        = fields[16].GetUInt32();
+
+        rankHelper.RecordRank(spe, entry);
+
+    } while (result->NextRow());
+
+    rankHelper.FillHigherRanks();
 
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u extra spell proc event conditions +%u custom proc (inc. +%u custom ranks)",  count, customProc, customRank );
+    sLog.outString( ">> Loaded %u extra spell proc event conditions +%u custom proc (inc. +%u custom ranks)",  rankHelper.worker.count, rankHelper.worker.customProc, rankHelper.customRank);
 }
 
 struct DoSpellProcItemEnchant
@@ -1661,25 +1691,77 @@ void SpellMgr::LoadSpellElixirs()
     sLog.outString( ">> Loaded %u spell elixir definitions", count );
 }
 
+struct DoSpellThreat
+{
+    DoSpellThreat(SpellThreatMap& _threatMap) : threatMap(_threatMap), count(0) {}
+    void operator() (uint32 spell_id)
+    {
+        SpellThreatEntry const &ste = state->second;
+        // add ranks only for not filled data (spells adding flat threat are usually different for ranks)
+        SpellThreatMap::const_iterator spellItr = threatMap.find(spell_id);
+        if (spellItr == threatMap.end())
+            threatMap[spell_id] = ste;
+
+        // just assert that entry is not redundant
+        else
+        {
+            SpellThreatEntry const& r_ste = spellItr->second;
+            if (ste.threat == r_ste.threat && ste.multiplier == r_ste.multiplier && ste.ap_bonus == r_ste.ap_bonus)
+                sLog.outErrorDb("Spell %u listed in `spell_threat` as custom rank has same data as Rank 1, so redundant", spell_id);
+        }
+    }
+    const char* TableName() { return "spell_threat"; }
+    bool IsValidCustomRank(SpellThreatEntry const &ste, uint32 entry, uint32 first_id)
+    {
+        if (!ste.threat)
+        {
+            sLog.outErrorDb("Spell %u listed in `spell_threat` is not first rank (%u) in chain and has no threat", entry, first_id);
+            // prevent loading unexpected data
+            return false;
+        }
+        return true;
+    }
+    void AddEntry(SpellThreatEntry const &ste, SpellEntry const *spell)
+    {
+        threatMap[spell->Id] = ste;
+
+        // flat threat bonus and attack power bonus currently only work properly when all
+        // effects have same targets, otherwise, we'd need to seperate it by effect index
+        if (ste.threat || ste.ap_bonus != 0.f)
+        {
+            SpellEffectEntry const* spellEffect0 = spell->GetSpellEffect(EFFECT_INDEX_0);
+            SpellEffectEntry const* spellEffect1 = spell->GetSpellEffect(EFFECT_INDEX_1);
+            SpellEffectEntry const* spellEffect2 = spell->GetSpellEffect(EFFECT_INDEX_2);
+            if ((spellEffect1 && spellEffect1->EffectImplicitTargetA && (!spellEffect0 || spellEffect1->EffectImplicitTargetA != spellEffect0->EffectImplicitTargetA)) ||
+                (spellEffect2 && spellEffect2->EffectImplicitTargetA && (!spellEffect0 || spellEffect2->EffectImplicitTargetA != spellEffect0->EffectImplicitTargetA)))
+                sLog.outErrorDb("Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly", spell->Id);
+        }
+        ++count;
+    }
+    bool HasEntry(uint32 spellId) { return threatMap.count(spellId) > 0; }
+    bool SetStateToEntry(uint32 spellId) { return (state = threatMap.find(spellId)) != threatMap.end(); }
+
+    SpellThreatMap& threatMap;
+    SpellThreatMap::const_iterator state;
+    uint32 count;
+};
+
 void SpellMgr::LoadSpellThreats()
 {
     mSpellThreatMap.clear();                                // need for reload case
 
-    uint32 count = 0;
-
-    //                                                0      1
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat FROM spell_threat");
+    //                                                0      1       2           3
+    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat");
     if( !result )
     {
-
         barGoLink bar( 1 );
-
         bar.step();
-
         sLog.outString();
-        sLog.outString( ">> Loaded %u aggro generating spells", count );
+        sLog.outString( ">> No spell threat entries loaded.");
         return;
     }
+
+    SpellRankHelper<SpellThreatEntry, DoSpellThreat, SpellThreatMap> rankHelper(*this, mSpellThreatMap);
 
     barGoLink bar( (int)result->GetRowCount() );
 
@@ -1690,23 +1772,22 @@ void SpellMgr::LoadSpellThreats()
         bar.step();
 
         uint32 entry = fields[0].GetUInt32();
-        uint16 Threat = fields[1].GetUInt16();
 
-        if (!sSpellStore.LookupEntry(entry))
-        {
-            sLog.outErrorDb("Spell %u listed in `spell_threat` does not exist", entry);
-            continue;
-        }
+        SpellThreatEntry ste;
+        ste.threat = fields[1].GetUInt16();
+        ste.multiplier = fields[2].GetFloat();
+        ste.ap_bonus = fields[3].GetFloat();
 
-        mSpellThreatMap[entry] = Threat;
+        rankHelper.RecordRank(ste, entry);
 
-        ++count;
     } while( result->NextRow() );
+
+    rankHelper.FillHigherRanks();
 
     delete result;
 
     sLog.outString();
-    sLog.outString( ">> Loaded %u aggro generating spells", count );
+    sLog.outString( ">> Loaded %u spell threat entries", rankHelper.worker.count );
 }
 
 bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const
@@ -1830,6 +1911,16 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         (spellInfo_2->Id == 23170 && spellInfo_1->Id == 23171))
                         return false;
 
+                    // Male Shadowy Disguise
+                    if ((spellInfo_1->Id == 32756 && spellInfo_2->Id == 38080) ||
+                        (spellInfo_2->Id == 32756 && spellInfo_1->Id == 38080))
+                         return false;
+
+                    // Female Shadowy Disguise
+                    if ((spellInfo_1->Id == 32756 && spellInfo_2->Id == 38081) ||
+                        (spellInfo_2->Id == 32756 && spellInfo_1->Id == 38081))
+                         return false;
+
                     // Cool Down (See PeriodicAuraTick())
                     if ((spellInfo_1->Id == 52441 && spellInfo_2->Id == 52443) ||
                         (spellInfo_2->Id == 52441 && spellInfo_1->Id == 52443))
@@ -1847,6 +1938,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
                     // Kindred Spirits
                     if (spellInfo_1->SpellIconID == 3559 && spellInfo_2->SpellIconID == 3559)
+                        return false;
+
+                    // Vigilance and Damage Reduction (Vigilance triggered spell)
+                    if (spellInfo_1->SpellIconID == 2834 && spellInfo_2->SpellIconID == 2834)
                         return false;
 
                     break;
@@ -2004,6 +2099,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if ((spellInfo_1->SpellIconID == 456 && spellInfo_2->SpellIconID == 2006) ||
                     (spellInfo_2->SpellIconID == 456 && spellInfo_1->SpellIconID == 2006))
                     return false;
+
+                // Defensive/Berserker/Battle stance aura can not stack (needed for dummy auras)
+                if (((classOptions1->SpellFamilyFlags & UI64LIT(0x800000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x800000))) ||
+                    ((classOptions2->SpellFamilyFlags & UI64LIT(0x800000)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x800000))))
+                    return true;
             }
 
             // Hamstring -> Improved Hamstring (multi-family check)
@@ -2570,7 +2670,7 @@ void SpellMgr::LoadSpellChains()
                 mSpellChains[forward_id] = node;
                 continue;
             }
-            
+
             // need temporary store for later rank calculation
             prevRanks[forward_id] = spell_id;
         }
@@ -3048,7 +3148,9 @@ void SpellMgr::LoadSpellScriptTarget()
                 spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_INSTANT ||
                 spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_INSTANT ||
                 spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_CUSTOM ||
-                spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_CUSTOM)
+                spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_CUSTOM ||
+                spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_GO_AROUND_DEST ||
+                spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_GO_AROUND_DEST)
             {
                 targetfound = true;
                 break;

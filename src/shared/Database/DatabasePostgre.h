@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,11 @@
 #ifndef _DatabasePostgre_H
 #define _DatabasePostgre_H
 
+#include "Common.h"
+#include "Database.h"
 #include "Policies/Singleton.h"
+#include "ace/Thread_Mutex.h"
+#include "ace/Guard_T.h"
 #include <stdarg.h>
 
 #ifdef WIN32
@@ -30,7 +34,32 @@
 #include <libpq-fe.h>
 #endif
 
-class DatabasePostgre : public Database
+class MANGOS_DLL_SPEC PostgreSQLConnection : public SqlConnection
+{
+    public:
+        PostgreSQLConnection() : mPGconn(NULL) {}
+        ~PostgreSQLConnection();
+
+        bool Initialize(const char *infoString);
+
+        QueryResult* Query(const char *sql);
+        QueryNamedResult* QueryNamed(const char *sql);
+        bool Execute(const char *sql);
+
+        unsigned long escape_string(char *to, const char *from, unsigned long length);
+
+        bool BeginTransaction();
+        bool CommitTransaction();
+        bool RollbackTransaction();
+
+    private:
+        bool _TransactionCmd(const char *sql);
+        bool _Query(const char *sql, PGresult **pResult, uint64* pRowCount, uint32* pFieldCount);
+
+        PGconn *mPGconn;
+};
+
+class MANGOS_DLL_SPEC DatabasePostgre : public Database
 {
     friend class MaNGOS::OperatorNew<DatabasePostgre>;
 
@@ -40,30 +69,11 @@ class DatabasePostgre : public Database
 
         //! Initializes Postgres and connects to a server.
         /*! infoString should be formated like hostname;username;password;database. */
-        bool Initialize(const char *infoString);
-        void InitDelayThread();
-        void HaltDelayThread();
-        QueryResult* Query(const char *sql);
-        QueryNamedResult* QueryNamed(const char *sql);
-        bool Execute(const char *sql);
-        bool DirectExecute(const char* sql);
-        bool BeginTransaction();
-        bool CommitTransaction();
-        bool RollbackTransaction();
 
-        operator bool () const { return mPGconn != NULL; }
+    protected:
+        virtual SqlConnection * CreateConnection();
 
-        unsigned long escape_string(char *to, const char *from, unsigned long length);
-        using Database::escape_string;
     private:
-        ACE_Thread_Mutex mMutex;
-        ACE_Based::Thread * tranThread;
-
-        PGconn *mPGconn;
-
         static size_t db_count;
-
-        bool _TransactionCmd(const char *sql);
-        bool _Query(const char *sql, PGresult **pResult, uint64* pRowCount, uint32* pFieldCount);
 };
 #endif

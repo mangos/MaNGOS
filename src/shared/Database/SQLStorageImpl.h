@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -121,7 +121,7 @@ void SQLStorageLoaderBase<T>::storeValue(char const* value, SQLStorage &store, c
 }
 
 template<class T>
-void SQLStorageLoaderBase<T>::Load(SQLStorage &store)
+void SQLStorageLoaderBase<T>::Load(SQLStorage &store, bool error_at_empty /*= true*/)
 {
     uint32 maxi;
     Field *fields;
@@ -150,7 +150,11 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store)
 
     if(!result)
     {
-        sLog.outError("%s table is empty!\n", store.table);
+        if (error_at_empty)
+            sLog.outError("%s table is empty!\n", store.table);
+        else
+            sLog.outString("%s table is empty!\n", store.table);
+
         store.RecordCount = 0;
         return;
     }

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -158,8 +158,6 @@ libmangosgame_a_SOURCES = \
 	IdleMovementGenerator.h \
 	InstanceData.cpp \
 	InstanceData.h \
-	InstanceSaveMgr.cpp \
-	InstanceSaveMgr.h \
 	Item.cpp \
 	Item.h \
 	ItemEnchantmentMgr.cpp \
@@ -181,8 +179,12 @@ libmangosgame_a_SOURCES = \
 	Map.h \
 	MapManager.cpp \
 	MapManager.h \
+	MapPersistentStateMgr.cpp \
+	MapPersistentStateMgr.h \
 	MapReference.h \
 	MapRefManager.h \
+	MassMailMgr.cpp \
+	MassMailMgr.h \
 	MiscHandler.cpp \
 	MotionMaster.cpp \
 	MotionMaster.h \
@@ -233,8 +235,8 @@ libmangosgame_a_SOURCES = \
 	ReactorAI.h \
 	ReputationMgr.cpp \
 	ReputationMgr.h \
-	ScriptCalls.cpp \
-	ScriptCalls.h \
+	ScriptMgr.cpp \
+	ScriptMgr.h \
 	SharedDefines.h \
 	SkillHandler.cpp \
 	SpellAuraDefines.h \

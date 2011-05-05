@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "ProgressBar.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "ScriptMgr.h"
 
 INSTANTIATE_SINGLETON_1(WaypointManager);
 
@@ -220,7 +221,7 @@ void WaypointManager::Load()
             for(std::set<uint32>::const_iterator itr = creatureNoMoveType.begin(); itr != creatureNoMoveType.end(); ++itr)
             {
                 const CreatureData* cData = sObjectMgr.GetCreatureData(*itr);
-                const CreatureInfo* cInfo = sObjectMgr.GetCreatureTemplate(cData->id);
+                const CreatureInfo* cInfo = ObjectMgr::GetCreatureTemplate(cData->id);
 
                 sLog.outErrorDb("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Creature will not use this path.", *itr, cData->id);
 
@@ -287,7 +288,7 @@ void WaypointManager::Load()
             uint32 entry        = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
 
-            const CreatureInfo* cInfo = sObjectMgr.GetCreatureTemplate(entry);
+            const CreatureInfo* cInfo = ObjectMgr::GetCreatureTemplate(entry);
 
             if (!cInfo)
             {
@@ -452,7 +453,7 @@ void WaypointManager::AddLastNode(uint32 id, float x, float y, float z, float o,
 void WaypointManager::AddAfterNode(uint32 id, uint32 point, float x, float y, float z, float o, uint32 delay, uint32 wpGuid)
 {
     for(uint32 i = GetLastPoint(id, 0); i > point; i--)
-        WorldDatabase.PExecuteLog("UPDATE creature_movement SET point=point+1 WHERE id='%u' AND point='%u'", id, i);
+        WorldDatabase.PExecuteLog("UPDATE creature_movement SET point=point+1 WHERE id=%u AND point=%u", id, i);
 
     _addNode(id, point + 1, x, y, z, o, delay, wpGuid);
 }
@@ -462,7 +463,7 @@ void WaypointManager::_addNode(uint32 id, uint32 point, float x, float y, float 
 {
     if(point == 0) return;                                  // counted from 1 in the DB
     WorldDatabase.PExecuteLog("INSERT INTO creature_movement (id,point,position_x,position_y,position_z,orientation,wpguid,waittime) "
-        "VALUES ('%u','%u','%f', '%f', '%f', '%f', '%u', '%u')",
+        "VALUES (%u,%u, %f,%f,%f,%f, %u,%u)",
         id, point, x, y, z, o, wpGuid, delay);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if(itr == m_pathMap.end())
@@ -488,8 +489,8 @@ uint32 WaypointManager::GetLastPoint(uint32 id, uint32 default_notfound)
 void WaypointManager::DeleteNode(uint32 id, uint32 point)
 {
     if(point == 0) return;                                  // counted from 1 in the DB
-    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id='%u' AND point='%u'", id, point);
-    WorldDatabase.PExecuteLog("UPDATE creature_movement SET point=point-1 WHERE id='%u' AND point>'%u'", id, point);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u AND point=%u", id, point);
+    WorldDatabase.PExecuteLog("UPDATE creature_movement SET point=point-1 WHERE id=%u AND point>%u", id, point);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if(itr != m_pathMap.end() && point <= itr->second.size())
         itr->second.erase(itr->second.begin() + (point-1));
@@ -497,7 +498,7 @@ void WaypointManager::DeleteNode(uint32 id, uint32 point)
 
 void WaypointManager::DeletePath(uint32 id)
 {
-    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id='%u'", id);
+    WorldDatabase.PExecuteLog("DELETE FROM creature_movement WHERE id=%u", id);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if(itr != m_pathMap.end())
         _clearPath(itr->second);
@@ -510,7 +511,7 @@ void WaypointManager::DeletePath(uint32 id)
 void WaypointManager::SetNodePosition(uint32 id, uint32 point, float x, float y, float z)
 {
     if(point == 0) return;                                  // counted from 1 in the DB
-    WorldDatabase.PExecuteLog("UPDATE creature_movement SET position_x = '%f',position_y = '%f',position_z = '%f' where id = '%u' AND point='%u'", x, y, z, id, point);
+    WorldDatabase.PExecuteLog("UPDATE creature_movement SET position_x=%f, position_y=%f, position_z=%f WHERE id=%u AND point=%u", x, y, z, id, point);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if(itr != m_pathMap.end() && point <= itr->second.size())
     {

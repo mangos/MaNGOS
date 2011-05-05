@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class Vehicle : public Creature
         bool Create (uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, Team team);
 
         void SetDeathState(DeathState s);                   // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
-        void Update(uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
+        void Update(uint32 update_diff, uint32 diff);                           // overwrite virtual Creature::Update and Unit::Update
 
         uint32 GetVehicleId() { return m_vehicleId; }
         void SetVehicleId(uint32 vehicleid) { m_vehicleId = vehicleid; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,6 +86,28 @@ struct WorldLocation
         : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
 };
 
+
+//use this class to measure time between world update ticks
+//essential for units updating their spells after cells become active
+class WorldUpdateCounter
+{
+    public:
+        WorldUpdateCounter() : m_tmStart(0) {}
+
+        time_t timeElapsed()
+        {
+            if(!m_tmStart)
+                m_tmStart = WorldTimer::tickPrevTime();
+
+            return WorldTimer::getMSTimeDiff(m_tmStart, WorldTimer::tickTime());
+        }
+
+        void Reset() { m_tmStart = WorldTimer::tickTime(); }
+
+    private:
+        uint32 m_tmStart;
+};
+
 class MANGOS_DLL_SPEC Object
 {
     public:
@@ -135,6 +157,7 @@ class MANGOS_DLL_SPEC Object
         virtual void AddToClientUpdateList();
         virtual void RemoveFromClientUpdateList();
         virtual void BuildUpdateData(UpdateDataMapType& update_players);
+        void MarkForClientUpdate();
 
         void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
@@ -222,15 +245,20 @@ class MANGOS_DLL_SPEC Object
             return (m_uint32Values[ index ] & flag) != 0;
         }
 
+        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        {
+            if (apply)
+                SetFlag(index, flag);
+            else
+                RemoveFlag(index, flag);
+        }
+
         void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
         void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
 
-        void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
-        void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
-
-        void ToggleFlag( uint16 index, uint8 offset, uint8 flag )
+        void ToggleByteFlag( uint16 index, uint8 offset, uint8 flag )
         {
-            if(HasByteFlag(index, offset, flag))
+            if (HasByteFlag(index, offset, flag))
                 RemoveByteFlag(index, offset, flag);
             else
                 SetByteFlag(index, offset, flag);
@@ -243,9 +271,37 @@ class MANGOS_DLL_SPEC Object
             return (((uint8*)&m_uint32Values[index])[offset] & flag) != 0;
         }
 
-        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        void ApplyModByteFlag( uint16 index, uint8 offset, uint32 flag, bool apply)
         {
-            if(apply) SetFlag(index,flag); else RemoveFlag(index,flag);
+            if (apply)
+                SetByteFlag(index, offset, flag);
+            else
+                RemoveByteFlag(index, offset, flag);
+        }
+
+        void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
+        void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
+
+        void ToggleShortFlag( uint16 index, bool highpart, uint8 flag )
+        {
+            if (HasShortFlag(index, highpart, flag))
+                RemoveShortFlag(index, highpart, flag);
+            else
+                SetShortFlag(index, highpart, flag);
+        }
+
+        bool HasShortFlag( uint16 index, bool highpart, uint8 flag ) const
+        {
+            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            return (((uint16*)&m_uint32Values[index])[highpart ? 1 : 0] & flag) != 0;
+        }
+
+        void ApplyModShortFlag( uint16 index, bool highpart, uint32 flag, bool apply)
+        {
+            if (apply)
+                SetShortFlag(index, highpart, flag);
+            else
+                RemoveShortFlag(index, highpart, flag);
         }
 
         void SetFlag64( uint16 index, uint64 newFlag )
@@ -264,7 +320,7 @@ class MANGOS_DLL_SPEC Object
 
         void ToggleFlag64( uint16 index, uint64 flag)
         {
-            if(HasFlag64(index, flag))
+            if (HasFlag64(index, flag))
                 RemoveFlag64(index, flag);
             else
                 SetFlag64(index, flag);
@@ -278,7 +334,10 @@ class MANGOS_DLL_SPEC Object
 
         void ApplyModFlag64( uint16 index, uint64 flag, bool apply)
         {
-            if(apply) SetFlag64(index,flag); else RemoveFlag64(index, flag);
+            if (apply)
+                SetFlag64(index, flag);
+            else
+                RemoveFlag64(index, flag);
         }
 
         void ClearUpdateMask(bool remove);
@@ -342,9 +401,31 @@ class MANGOS_DLL_SPEC WorldObject : public Object
     friend struct WorldObjectChangeAccumulator;
 
     public:
+
+        //class is used to manipulate with WorldUpdateCounter
+        //it is needed in order to get time diff between two object's Update() calls
+        class MANGOS_DLL_SPEC UpdateHelper
+        {
+            public:
+                explicit UpdateHelper(WorldObject * obj) : m_obj(obj) {}
+                ~UpdateHelper() { }
+
+                void Update( uint32 time_diff )
+                {
+                    m_obj->Update( m_obj->m_updateTracker.timeElapsed(), time_diff);
+                    m_obj->m_updateTracker.Reset();
+                }
+
+            private:
+                UpdateHelper( const UpdateHelper& );
+                UpdateHelper& operator=( const UpdateHelper& );
+
+                WorldObject * const m_obj;
+        };
+
         virtual ~WorldObject ( ) {}
 
-        virtual void Update ( uint32 /*time_diff*/ ) { }
+        virtual void Update ( uint32 /*update_diff*/, uint32 /*time_diff*/ ) {}
 
         void _Create( uint32 guidlow, HighGuid guidhigh, uint32 phaseMask);
 
@@ -519,6 +600,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float m_orientation;
 
         ViewPoint m_viewPoint;
+
+        WorldUpdateCounter m_updateTracker;
 };
 
 #endif

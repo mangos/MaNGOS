@@ -1,4 +1,4 @@
-// $Id: Codecs.cpp 91368 2010-08-16 13:03:34Z mhengstmengel $
+// $Id: Codecs.cpp 91813 2010-09-17 07:52:52Z johnnyw $
 
 #include "ace/Codecs.h"
 #include "ace/Log_Msg.h"
@@ -69,7 +69,7 @@ ACE_Base64::encode (const ACE_Byte* input,
           result[pos++] = alphabet[bits & 0x3f];
           cols += 4;
           if (cols == max_columns) {
-            if (is_chunked) 
+            if (is_chunked)
               result[pos++] = '\n';
             cols = 0;
           }

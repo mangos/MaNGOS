@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1383,12 +1383,20 @@ enum SessionStatus
     STATUS_UNHANDLED                                        ///< We don' handle this opcode yet
 };
 
+enum PacketProcessing
+{
+    PROCESS_INPLACE = 0,                                    //process packet whenever we receive it - mostly for non-handled or non-implemented packets
+    PROCESS_THREADUNSAFE,                                   //packet is not thread-safe - process it in World::UpdateSessions()
+    PROCESS_THREADSAFE                                      //packet is thread-safe - process it in Map::Update()
+};
+
 class WorldPacket;
 
 struct OpcodeHandler
 {
     char const* name;
     SessionStatus status;
+    PacketProcessing packetProcessing;
     void (WorldSession::*handler)(WorldPacket& recvPacket);
 };
 

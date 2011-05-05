@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2010 MaNGOS project <http://getmangos.com/>
+# Copyright (C) 2005-2011 MaNGOS project <http://getmangos.com/>
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -18,11 +18,11 @@ message(FATAL_ERROR
 add_subdirectory (libmpq)
 add_subdirectory (loadlib)
 
-include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq) 
-include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib) 
+include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
+include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
-link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq) 
-link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib) 
+link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
+link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
 add_executable (ad dbcfile.cpp mpq_libmpq.cpp System.cpp)
 

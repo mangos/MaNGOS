@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
  */
 
 #include "Util.h"
+#include "Timer.h"
 
 #include "utf8cpp/utf8.h"
 #include "mersennetwister/MersenneTwister.h"
@@ -26,6 +27,60 @@
 typedef ACE_TSS<MTRand> MTRandTSS;
 static MTRandTSS mtRand;
 
+static ACE_Time_Value g_SystemTickTime = ACE_OS::gettimeofday();
+
+uint32 WorldTimer::m_iTime = 0;
+uint32 WorldTimer::m_iPrevTime = 0;
+
+uint32 WorldTimer::tickTime() { return m_iTime; }
+uint32 WorldTimer::tickPrevTime() { return m_iPrevTime; }
+
+uint32 WorldTimer::tick()
+{
+    //save previous world tick time
+    m_iPrevTime = m_iTime;
+
+    //get the new one and don't forget to persist current system time in m_SystemTickTime
+    m_iTime = WorldTimer::getMSTime_internal(true);
+
+    //return tick diff
+    return getMSTimeDiff(m_iPrevTime, m_iTime);
+}
+
+uint32 WorldTimer::getMSTime()
+{
+    return getMSTime_internal();
+}
+
+uint32 WorldTimer::getMSTime_internal(bool savetime /*= false*/)
+{
+    //get current time
+    const ACE_Time_Value currTime = ACE_OS::gettimeofday();
+    //calculate time diff between two world ticks
+    //special case: curr_time < old_time - we suppose that our time has not ticked at all
+    //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
+    uint32 diff = 0;
+    //regular case: curr_time >= old_time
+    if(currTime > g_SystemTickTime)
+        diff = (currTime - g_SystemTickTime).msec();
+
+    //reset last system time value
+    if(savetime)
+        g_SystemTickTime = currTime;
+
+    //lets calculate current world time
+    uint32 iRes = m_iTime;
+    //normalize world time
+    const uint32 tmp = uint32(0xFFFFFFFF) - iRes;
+    if(tmp < diff)
+        iRes = diff - tmp;
+    else
+        iRes += diff;
+
+    return iRes;
+}
+
+//////////////////////////////////////////////////////////////////////////
 int32 irand (int32 min, int32 max)
 {
     return int32 (mtRand->randInt (max - min)) + min;

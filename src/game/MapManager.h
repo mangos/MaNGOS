@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,6 +150,9 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         //get list of all maps
         const MapMapType& Maps() const { return i_maps; }
 
+        template<typename Do>
+        void DoForAllMapsWithMapId(uint32 mapId, Do& _do);
+
     private:
 
         // debugging code, should be deleted some day
@@ -168,13 +171,22 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void DeleteStateMachine();
 
         Map* CreateInstance(uint32 id, Player * player);
-        InstanceMap* CreateInstanceMap(uint32 id, uint32 InstanceId, Difficulty difficulty, InstanceSave *save = NULL);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, Difficulty difficulty, DungeonPersistentState *save = NULL);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;
         MapMapType i_maps;
         IntervalTimer i_timer;
 };
+
+template<typename Do>
+inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Do& _do)
+{
+    MapMapType::const_iterator start = i_maps.lower_bound(MapID(mapId,0));
+    MapMapType::const_iterator end   = i_maps.lower_bound(MapID(mapId+1,0));
+    for(MapMapType::const_iterator itr = start; itr != end; ++itr)
+        _do(itr->second);
+}
 
 #define sMapMgr MapManager::Instance()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,12 +137,14 @@ namespace VMAP
         // child bounds are defined in object space:
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         //Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-        float zDist;
-        if (info.hitModel->GetLiquidLevel(pModel, zDist))
+        float zLevel;
+        if (info.hitModel->GetLiquidLevel(pModel, zLevel))
         {
             // calculate world height (zDist in model coords):
-            // assume WMO not tilted (wouldn't make much sense anyway)
-            liqHeight = zDist * iScale + iPos.z;
+            // despite making little sense, there ARE some (slightly) tilted WMOs...
+            // we can only determine liquid height in LOCAL z-direction (heightmap data),
+            // so with increasing tilt, liquid calculation gets increasingly wrong...not my fault, really :p
+            liqHeight = (zLevel - pModel.z) * iScale + p.z;
             return true;
         }
         return false;

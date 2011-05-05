@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,31 @@
 #include <mysql.h>
 #endif
 
+class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
+{
+    public:
+        MySQLConnection() : mMysql(NULL) {}
+        ~MySQLConnection();
+
+        bool Initialize(const char *infoString);
+
+        QueryResult* Query(const char *sql);
+        QueryNamedResult* QueryNamed(const char *sql);
+        bool Execute(const char *sql);
+
+        unsigned long escape_string(char *to, const char *from, unsigned long length);
+
+        bool BeginTransaction();
+        bool CommitTransaction();
+        bool RollbackTransaction();
+
+    private:
+        bool _TransactionCmd(const char *sql);
+        bool _Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
+
+        MYSQL *mMysql;
+};
+
 class MANGOS_DLL_SPEC DatabaseMysql : public Database
 {
     friend class MaNGOS::OperatorNew<DatabaseMysql>;
@@ -44,37 +69,18 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
 
         //! Initializes Mysql and connects to a server.
         /*! infoString should be formated like hostname;username;password;database. */
-        bool Initialize(const char *infoString);
-        void InitDelayThread();
-        void HaltDelayThread();
-        QueryResult* Query(const char *sql);
-        QueryNamedResult* QueryNamed(const char *sql);
-        bool Execute(const char *sql);
-        bool DirectExecute(const char* sql);
-        bool BeginTransaction();
-        bool CommitTransaction();
-        bool RollbackTransaction();
-
-        operator bool () const { return mMysql != NULL; }
-
-        unsigned long escape_string(char *to, const char *from, unsigned long length);
-        using Database::escape_string;
 
         // must be call before first query in thread
         void ThreadStart();
         // must be call before finish thread run
         void ThreadEnd();
+
+    protected:
+        virtual SqlConnection * CreateConnection();
+
     private:
-        ACE_Thread_Mutex mMutex;
-
-        ACE_Based::Thread * tranThread;
-
-        MYSQL *mMysql;
-
         static size_t db_count;
-
-        bool _TransactionCmd(const char *sql);
-        bool _Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
 };
+
 #endif
 #endif

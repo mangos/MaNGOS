@@ -16,11 +16,11 @@ __fastcall TFrmSearch::TFrmSearch(TComponent* Owner)
 //---------------------------------------------------------------------------
 void __fastcall TFrmSearch::btOkClick(TObject *Sender)
 {
-     ModalResult = mrOk;        
+     ModalResult = mrOk;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFrmSearch::btCancelClick(TObject *Sender)
 {
-     ModalResult = mrCancel;        
+     ModalResult = mrCancel;
 }
 //---------------------------------------------------------------------------

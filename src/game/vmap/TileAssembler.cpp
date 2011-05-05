@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -268,7 +268,7 @@ namespace VMAP
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
-        CMP_OR_RETURN(ident, "VMAP003");
+        CMP_OR_RETURN(ident, RAW_VMAP_MAGIC);
 
         // we have to read one int. This is needed during the export and we have to skip it here
         uint32 tempNVectors;
@@ -374,7 +374,7 @@ namespace VMAP
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
-        CMP_OR_RETURN(ident, "VMAP003");
+        CMP_OR_RETURN(ident, RAW_VMAP_MAGIC);
 
         // we have to read one int. This is needed during the export and we have to skip it here
         uint32 tempNVectors;

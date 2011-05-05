@@ -1,14 +1,12 @@
-// $Id: SOCK_Dgram.cpp 91604 2010-09-02 14:51:58Z vzykov $
+// $Id: SOCK_Dgram.cpp 91622 2010-09-06 08:26:30Z sma $
 
 #include "ace/SOCK_Dgram.h"
 
-#include "ace/Handle_Set.h"
 #include "ace/Log_Msg.h"
 #include "ace/INET_Addr.h"
 #include "ace/ACE.h"
 #include "ace/OS_NS_string.h"
 #include "ace/OS_Memory.h"
-#include "ace/OS_NS_sys_select.h"
 #include "ace/OS_NS_ctype.h"
 #include "ace/os_include/net/os_if.h"
 #include "ace/Truncate.h"
@@ -52,34 +50,9 @@ ACE_SOCK_Dgram::recv (iovec *io_vec,
 {
   ACE_TRACE ("ACE_SOCK_Dgram::recv");
 #if defined (FIONREAD)
-  ACE_Handle_Set handle_set;
-  handle_set.reset ();
-  handle_set.set_bit (this->get_handle ());
-
-  // Check the status of the current socket to make sure there's data
-  // to recv (or time out).
-#  if defined (ACE_WIN32)
-  // This arg is ignored on Windows and causes pointer truncation
-  // warnings on 64-bit compiles.
-  int select_width = 0;
-#  else
-  int select_width = int (this->get_handle ()) + 1;
-#  endif /* ACE_WIN32 */
-  switch (ACE_OS::select (select_width,
-                          handle_set,
-                          0, 0,
-                          timeout))
+  if( ACE::handle_read_ready (this->get_handle (), timeout) != 1 )
     {
-    case -1:
       return -1;
-      /* NOTREACHED */
-    case 0:
-      errno = ETIME;
-      return -1;
-      /* NOTREACHED */
-    default:
-      // Goes fine, fallthrough to get data
-      break;
     }
 
   sockaddr *saddr = (sockaddr *) addr.get_addr ();
@@ -451,34 +424,14 @@ ACE_SOCK_Dgram::recv (void *buf,
                       int flags,
                       const ACE_Time_Value *timeout) const
 {
-  ACE_Handle_Set handle_set;
-  handle_set.reset ();
-  handle_set.set_bit (this->get_handle ());
-
-  // Check the status of the current socket.
-#if defined (ACE_WIN32)
-  // This arg is ignored on Windows and causes pointer truncation
-  // warnings on 64-bit compiles.
-  int select_width = 0;
-#else
-  int select_width = int (this->get_handle ()) + 1;
-#endif /* ACE_WIN32 */
-  switch (ACE_OS::select (select_width,
-                          handle_set,
-                          0,
-                          0,
-                          timeout))
+  if( ACE::handle_read_ready (this->get_handle (), timeout) == 1 )
     {
-    case -1:
-      return -1;
-      /* NOTREACHED */
-    case 0:
-      errno = ETIME;
-      return -1;
-      /* NOTREACHED */
-    default:
       // Goes fine, call <recv> to get data
       return this->recv (buf, n, addr, flags);
+    }
+  else
+    {
+      return -1;
     }
 }
 
@@ -489,34 +442,15 @@ ACE_SOCK_Dgram::send (const void *buf,
                       int flags,
                       const ACE_Time_Value *timeout) const
 {
-  ACE_Handle_Set handle_set;
-  handle_set.reset ();
-  handle_set.set_bit (this->get_handle ());
-
   // Check the status of the current socket.
-#if defined (ACE_WIN32)
-  // This arg is ignored on Windows and causes pointer truncation
-  // warnings on 64-bit compiles.
-  int select_width = 0;
-#else
-  int select_width = int (this->get_handle ()) + 1;
-#endif /* ACE_WIN32 */
-  switch (ACE_OS::select (select_width,
-                          0,
-                          handle_set,
-                          0,
-                          timeout))
+  if( ACE::handle_write_ready (this->get_handle (), timeout) == 1 )
     {
-    case -1:
-      return -1;
-      /* NOTREACHED */
-    case 0:
-      errno = ETIME;
-      return -1;
-      /* NOTREACHED */
-    default:
       // Goes fine, call <send> to transmit the data.
       return this->send (buf, n, addr, flags);
+    }
+  else
+    {
+      return -1;
     }
 }
 

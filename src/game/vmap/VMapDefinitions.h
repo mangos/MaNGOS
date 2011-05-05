@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,8 @@
 
 namespace VMAP
 {
-    const char VMAP_MAGIC[] = "VMAP_3.0";
+    const char VMAP_MAGIC[] = "VMAP_3.0";                   // used in final vmap files
+    const char RAW_VMAP_MAGIC[] = "VMAP003";                // used in extracted vmap files with raw data
 
     // defined in TileAssembler.cpp currently...
     bool readChunk(FILE *rf, char *dest, const char *compare, uint32 len);

@@ -1,4 +1,4 @@
-// $Id: config-kfreebsd.h 91429 2010-08-23 14:50:15Z johnnyw $
+// $Id: config-kfreebsd.h 91743 2010-09-13 18:24:51Z johnnyw $
 
 #ifndef ACE_CONFIG_KFREEBSD_H
 #define ACE_CONFIG_KFREEBSDH
@@ -133,7 +133,7 @@
 
 /* Define to 1 if platform has the <new.h> header file. */
 #ifdef ACE_HAS_NEW_H
-#undef ACE_HAS_NEW_H 
+#undef ACE_HAS_NEW_H
 #endif
 
 #ifndef ACE_LACKS_NEW_H

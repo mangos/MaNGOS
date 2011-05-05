@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -723,7 +723,7 @@ struct CreatureDisplayInfoEntry
     uint32      Displayid;                                  // 0        m_ID
                                                             // 1        m_modelID
                                                             // 2        m_soundID
-                                                            // 3        m_extendedDisplayInfoID
+    uint32      ExtendedDisplayInfoID;                      // 3        m_extendedDisplayInfoID -> CreatureDisplayInfoExtraEntry::DisplayExtraId
     float       scale;                                      // 4        m_creatureModelScale
                                                             // 5        m_creatureModelAlpha
                                                             // 6-8      m_textureVariation[3]
@@ -734,7 +734,22 @@ struct CreatureDisplayInfoEntry
                                                             // 13       m_particleColorID
                                                             // 14       m_creatureGeosetData
                                                             // 15       m_objectEffectPackageID
-                                                            // 16
+                                                            // 16       all 0
+};
+
+struct CreatureDisplayInfoExtraEntry
+{
+    uint32      DisplayExtraId;                             // 0        CreatureDisplayInfoEntry::m_extendedDisplayInfoID
+    uint32      Race;                                       // 1
+    //uint32    Gender;                                     // 2        Model gender, exist not small amount cases when query creature data return different gender from used model, so can't be replacement for model gender field.
+    //uint32    SkinColor;                                  // 3
+    //uint32    FaceType;                                   // 4
+    //uint32    HairType;                                   // 5        CharHairGeosets.dbc
+    //uint32    HairStyle;                                  // 6        CharSections.dbc, where GeneralType=3
+    //uint32    BeardStyle;                                 // 7
+    //uint32    Equipment[11];                              // 8-18     equipped static items EQUIPMENT_SLOT_HEAD..EQUIPMENT_SLOT_HANDS, client show its by self
+    //uint32    CanEquip;                                   // 19       0..1 Can equip additional things when used for players
+    //char*                                                 // 20       CreatureDisplayExtra-*.blp
 };
 
 struct CreatureFamilyEntry
@@ -1222,7 +1237,7 @@ struct MapEntry
             MapID==209 || MapID==269 || MapID==309 ||       // TanarisInstance, CavernsOfTime, Zul'gurub
             MapID==509 || MapID==534 || MapID==560 ||       // AhnQiraj, HyjalPast, HillsbradPast
             MapID==568 || MapID==580 || MapID==595 ||       // ZulAman, Sunwell Plateau, Culling of Stratholme
-            MapID==615 || MapID==616;                       // Obsidian Sanctum, Eye Of Eternity
+            MapID==603 || MapID==615 || MapID==616;         // Ulduar, The Obsidian Sanctum, The Eye Of Eternity
     }
 
     bool IsContinent() const
@@ -1516,6 +1531,19 @@ struct SpellClassOptionsEntry
     uint32    SpellFamilyFlags2;                            // 151      addition to m_spellClassMask
     uint32    SpellFamilyName;                              // 148      m_spellClassSet
     //char*   Description;                                  // 6 4.0.0
+
+    // helpers
+
+    bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
+    {
+        return (SpellFamilyFlags & familyFlags) || (SpellFamilyFlags2 & familyFlags2);
+    }
+
+    bool IsFitToFamily(SpellFamily family, uint64 familyFlags, uint32 familyFlags2 = 0) const
+    {
+        return SpellFamily(SpellFamilyName) == family &&
+            ((SpellFamilyFlags & familyFlags) || (SpellFamilyFlags2 & familyFlags2));
+    }
 };
 
 // SpellCooldowns.dbc
@@ -1765,15 +1793,13 @@ struct MANGOS_DLL_SPEC SpellEntry
     bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
     {
         SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
-        return classOpt && ((classOpt->SpellFamilyFlags & familyFlags) || (classOpt->SpellFamilyFlags2 & familyFlags2));
+        return classOpt && classOpt->IsFitToFamilyMask(familyFlags, familyFlags2);
     }
 
     bool IsFitToFamily(SpellFamily family, uint64 familyFlags, uint32 familyFlags2 = 0) const
     {
         SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
-
-        return classOpt && SpellFamily(classOpt->SpellFamilyName) == family &&
-            ((classOpt->SpellFamilyFlags & familyFlags) || (classOpt->SpellFamilyFlags2 & familyFlags2));
+        return classOpt && classOpt->IsFitToFamily(family, familyFlags, familyFlags2);
     }
 
 private:

@@ -1,4 +1,4 @@
-// $Id: Shared_Memory_Pool.cpp 91286 2010-08-05 09:04:31Z johnnyw $
+// $Id: Shared_Memory_Pool.cpp 91685 2010-09-09 09:35:14Z johnnyw $
 
 // Shared_Memory_Pool.cpp
 #include "ace/Shared_Memory_Pool.h"
@@ -168,7 +168,6 @@ ACE_Shared_Memory_Pool::handle_signal (int , siginfo_t *siginfo, ucontext_t *)
         ACE_ERROR ((LM_ERROR,
                     ACE_TEXT ("(%P|%t) %p\n"),
                     ACE_TEXT ("in_use")));
-#if !defined(_UNICOS)
       else if (!(siginfo->si_code == SEGV_MAPERR
            && siginfo->si_addr < (((char *) this->base_addr_) + offset)
            && siginfo->si_addr >= ((char *) this->base_addr_)))
@@ -176,15 +175,6 @@ ACE_Shared_Memory_Pool::handle_signal (int , siginfo_t *siginfo, ucontext_t *)
                            "(%P|%t) address %u out of range\n",
                            siginfo->si_addr),
                           -1);
-#else /* ! _UNICOS */
-      else if (!(siginfo->si_code == SEGV_MEMERR
-           && siginfo->si_addr < (((unsigned long) this->base_addr_) + offset)
-           && siginfo->si_addr >= ((unsigned long) this->base_addr_)))
-        ACE_ERROR_RETURN ((LM_ERROR,
-                           "(%P|%t) address %u out of range\n",
-                           siginfo->si_addr),
-                          -1);
-#endif /* ! _UNICOS */
     }
 
   // The above if case will check to see that the address is in the
@@ -194,11 +184,7 @@ ACE_Shared_Memory_Pool::handle_signal (int , siginfo_t *siginfo, ucontext_t *)
 
   size_t counter; // ret value to get shmid from the st table.
 
-#if !defined(_UNICOS)
   if (this->find_seg (siginfo->si_addr, offset, counter) == -1)
-#else /* ! _UNICOS */
-  if (this->find_seg ((const void *)siginfo->si_addr, offset, counter) == -1)
-#endif /* ! _UNICOS */
       ACE_ERROR_RETURN ((LM_ERROR,
                          ACE_TEXT ("(%P|%t) %p\n"),
                          ACE_TEXT ("in_use")),

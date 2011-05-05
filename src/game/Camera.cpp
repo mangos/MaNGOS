@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ Camera::Camera(Player* pl) : m_owner(*pl), m_source(pl)
 Camera::~Camera()
 {
     // view of camera should be already reseted to owner (RemoveFromWorld -> Event_RemovedFromWorld -> ResetView)
-    MANGOS_ASSERT(m_source == &m_owner);	
+    MANGOS_ASSERT(m_source == &m_owner);
 
     // for symmetry with constructor and way to make viewpoint's list empty
     m_source->GetViewPoint().Detach(this);

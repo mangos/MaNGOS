@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "GameSystem/GridRefManager.h"
 #include "MapRefManager.h"
 #include "Utilities/TypeList.h"
+#include "ScriptMgr.h"
 
 #include <bitset>
 #include <list>
@@ -44,9 +45,11 @@ class Unit;
 class WorldPacket;
 class InstanceData;
 class Group;
-class InstanceSave;
+class MapPersistentState;
+class WorldPersistentState;
+class DungeonPersistentState;
+class BattleGroundPersistentState;
 struct ScriptInfo;
-struct ScriptAction;
 class BattleGround;
 class GridMap;
 
@@ -67,6 +70,12 @@ struct InstanceTemplate
     uint32 script_id;
 };
 
+struct WorldTemplate
+{
+    uint32 map;                                             // non-instance map
+    uint32 script_id;
+};
+
 enum LevelRequirementVsMode
 {
     LEVELREQUIREMENT_HEROIC = 70
@@ -80,13 +89,15 @@ enum LevelRequirementVsMode
 
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
-class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
+class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     friend class ObjectGridLoader;
     friend class ObjectWorldLoader;
-    public:
+    protected:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
+
+    public:
         virtual ~Map();
 
         // currently unused for normal maps
@@ -102,6 +113,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         virtual void Remove(Player *, bool);
         template<class T> void Add(T *);
         template<class T> void Remove(T *, bool);
+
+        static void DeleteFromWorld(Player* player);        // player object will deleted at call
 
         virtual void Update(const uint32&);
 
@@ -179,7 +192,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
         bool IsBattleGroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattleGroundOrArena(); }
 
-        InstanceSave* GetInstanceSave() const { return m_instanceSave; }
+        // can't be NULL for loaded map
+        MapPersistentState* GetPersistentState() const { return m_persistentState; }
 
         void AddObjectToRemoveList(WorldObject *obj);
 
@@ -236,6 +250,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         //get corresponding TerrainData object for this particular map
         const TerrainInfo * GetTerrain() const { return m_TerrainData; }
 
+        void CreateInstanceData(bool load);
+        InstanceData* GetInstanceData() { return i_data; }
+        uint32 GetScriptId() const { return i_script_id; }
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -276,7 +293,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void SendObjectUpdates();
         std::set<Object *> i_objectsToClientUpdate;
     protected:
-        typedef MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>::Lock Guard;
 
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
@@ -284,7 +300,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 i_InstanceId;
         uint32 m_unloadTimer;
         float m_VisibleDistance;
-        InstanceSave* m_instanceSave;                       // can be NULL for non dungeons...
+        MapPersistentState* m_persistentState;
 
         MapRefManager m_mapRefManager;
         MapRefManager::iterator m_mapRefIter;
@@ -307,7 +323,12 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         std::set<WorldObject *> i_objectsToRemove;
         std::multimap<time_t, ScriptAction> m_scriptSchedule;
 
+        InstanceData* i_data;
+        uint32 i_script_id;
+
         // Map local low guid counters
+        ObjectGuidGenerator<HIGHGUID_UNIT> m_CreatureGuids;
+        ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameObjectGuids;
         ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
         ObjectGuidGenerator<HIGHGUID_PET> m_PetGuids;
         ObjectGuidGenerator<HIGHGUID_VEHICLE> m_VehicleGuids;
@@ -321,39 +342,50 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         template<class T>
             void RemoveFromGrid(T*, NGridType *, Cell const&);
-
-        template<class T>
-            void DeleteFromWorld(T*);
 };
 
-class MANGOS_DLL_SPEC InstanceMap : public Map
+class MANGOS_DLL_SPEC WorldMap : public Map
 {
+    private:
+        using Map::GetPersistentState;                      // hide in subclass for overwrite
     public:
-        InstanceMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
-        ~InstanceMap();
+        WorldMap(uint32 id, time_t expiry) : Map(id, expiry, 0, REGULAR_DIFFICULTY) {}
+        ~WorldMap() {}
+
+        // can't be NULL for loaded map
+        WorldPersistentState* GetPersistanceState() const;
+};
+
+class MANGOS_DLL_SPEC DungeonMap : public Map
+{
+    private:
+        using Map::GetPersistentState;                      // hide in subclass for overwrite
+    public:
+        DungeonMap(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
+        ~DungeonMap();
         bool Add(Player *);
         void Remove(Player *, bool);
         void Update(const uint32&);
-        void CreateInstanceData(bool load);
         bool Reset(InstanceResetMethod method);
-        uint32 GetScriptId() { return i_script_id; }
-        InstanceData* GetInstanceData() { return i_data; }
         void PermBindAllPlayers(Player *player);
         void UnloadAll(bool pForce);
         bool CanEnter(Player* player);
         void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
 
+        // can't be NULL for loaded map
+        DungeonPersistentState* GetPersistanceState() const;
+
         virtual void InitVisibilityDistance();
     private:
         bool m_resetAfterUnload;
         bool m_unloadWhenEmpty;
-        InstanceData* i_data;
-        uint32 i_script_id;
 };
 
 class MANGOS_DLL_SPEC BattleGroundMap : public Map
 {
+    private:
+        using Map::GetPersistentState;                      // hide in subclass for overwrite
     public:
         BattleGroundMap(uint32 id, time_t, uint32 InstanceId, uint8 spawnMode);
         ~BattleGroundMap();
@@ -368,6 +400,10 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
         virtual void InitVisibilityDistance();
         BattleGround* GetBG() { return m_bg; }
         void SetBG(BattleGround* bg) { m_bg = bg; }
+
+        // can't be NULL for loaded map
+        BattleGroundPersistentState* GetPersistanceState() const;
+
     private:
         BattleGround* m_bg;
 };

@@ -89,11 +89,11 @@ private:	// User declarations
 
 
         thOpenFile  *thOpen;
-        bool Term; 
+        bool Term;
 
 public:		// User declarations
         bool       OpenOk;
-       
+
         AnsiString CurrentOpenFile;
         __fastcall TFrmMain(TComponent* Owner);
         void SaveToFile(const char * pszFileName);

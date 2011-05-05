@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ const char ChatChannelsEntryfmt[]="iixsx";
 const char ChrClassesEntryfmt[]="nixsxxxixiixxx";
 const char ChrRacesEntryfmt[]="nxixiixixxxxixsxxxxxixxx";
 const char CinematicSequencesEntryfmt[]="nxxxxxxxxx";
-const char CreatureDisplayInfofmt[]="nxxxfxxxxxxxxxxxx";
+const char CreatureDisplayInfofmt[]="nxxifxxxxxxxxxxxx";
+const char CreatureDisplayInfoExtrafmt[]="nixxxxxxxxxxxxxxxxxxx";
 const char CreatureFamilyfmt[]="nfifiiiiixsx";
 const char CreatureSpellDatafmt[]="niiiixxxx";
 const char CreatureTypefmt[]="nxx";

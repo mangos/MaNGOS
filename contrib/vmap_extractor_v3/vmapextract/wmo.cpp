@@ -107,7 +107,7 @@ bool WMORoot::ConvertToVMAPRootWmo(FILE *pOutfile)
 {
     //printf("Convert RootWmo...\n");
 
-    fwrite("VMAP003",1,8,pOutfile);
+    fwrite(szRawVMAPMagic,1,8,pOutfile);
     unsigned int nVectors = 0;
     fwrite(&nVectors,sizeof(nVectors),1,pOutfile); // will be filled later
     fwrite(&nGroups,4,1,pOutfile);

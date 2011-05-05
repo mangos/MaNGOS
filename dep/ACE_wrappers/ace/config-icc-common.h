@@ -1,6 +1,6 @@
 // -*- C++ -*-
 //
-// $Id: config-icc-common.h 91285 2010-08-05 08:29:30Z johnnyw $
+// $Id: config-icc-common.h 91685 2010-09-09 09:35:14Z johnnyw $
 
 #ifndef ACE_LINUX_ICC_COMMON_H
 #define ACE_LINUX_ICC_COMMON_H
@@ -8,7 +8,6 @@
 
 # define ACE_HAS_CPLUSPLUS_HEADERS
 # define ACE_HAS_STDCPP_STL_INCLUDES
-# define ACE_HAS_TEMPLATE_TYPEDEFS
 # define ACE_HAS_STANDARD_CPP_LIBRARY 1
 # define ACE_HAS_WORKING_EXPLICIT_TEMPLATE_DESTRUCTOR
 # define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1

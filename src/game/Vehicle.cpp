@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,9 +56,9 @@ void Vehicle::SetDeathState(DeathState s)                       // overwrite vir
     Creature::SetDeathState(s);
 }
 
-void Vehicle::Update(uint32 diff)
+void Vehicle::Update( uint32 update_diff, uint32 diff)
 {
-    Creature::Update(diff);
+    Creature::Update(update_diff, diff);
 }
 
 bool Vehicle::Create(uint32 guidlow, Map *map, uint32 Entry, uint32 vehicleId, Team team)

@@ -3,7 +3,7 @@
 /**
  *  @file   config-win32-msvc-9.h
  *
- *  $Id: config-win32-msvc-9.h 91285 2010-08-05 08:29:30Z johnnyw $
+ *  $Id: config-win32-msvc-9.h 91685 2010-09-09 09:35:14Z johnnyw $
  *
  *  @brief  Microsoft Visual C++ 9.0 configuration file.
  *
@@ -78,7 +78,6 @@
 #define ACE_LACKS_STRRECVFD
 #define ACE_HAS_CPLUSPLUS_HEADERS
 
-#define ACE_HAS_TEMPLATE_TYPEDEFS
 #define ACE_TEMPLATES_REQUIRE_SOURCE
 
 // Platform provides ACE_TLI function prototypes.

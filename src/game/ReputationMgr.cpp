@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -489,8 +489,10 @@ void ReputationMgr::LoadFromDB(QueryResult *result)
 
                 // reset changed flag if values similar to saved in DB
                 if(faction->Flags==dbFactionFlags)
+                {
                     faction->needSend = false;
                     faction->needSave = false;
+                }
             }
         }
         while( result->NextRow() );

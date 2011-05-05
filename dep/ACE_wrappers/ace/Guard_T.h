@@ -4,7 +4,7 @@
 /**
  *  @file    Guard_T.h
  *
- *  $Id: Guard_T.h 91459 2010-08-25 09:51:01Z mcorino $
+ *  $Id: Guard_T.h 91626 2010-09-07 10:59:20Z johnnyw $
  *
  *   Moved from Synch.h.
  *
@@ -25,6 +25,8 @@
 #include "ace/Global_Macros.h"
 #include "ace/OS_NS_Thread.h"
 
+// FUZZ: disable check_for_ACE_Guard
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 /**
@@ -38,7 +40,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * the very least the <acquire>, <tryacquire>, <release>, and
  * <remove> methods.
  *
- * WARNING: A successfully constructed ACE_Guard does NOT mean that the
+ * @warning A successfully constructed ACE_Guard does NOT mean that the
  * lock was acquired!  It is the caller's responsibility, after
  * constructing an ACE_Guard, to check whether the lock was successfully
  * acquired.  Code like this is dangerous:
@@ -138,7 +140,7 @@ private:
  * <ACE_LOCK> it is instantiated with must support the appropriate
  * API).
  *
- * WARNING: See important "WARNING" in comments at top of ACE_Guard.
+ * @warning See important "WARNING" in comments at top of ACE_Guard.
  */
 template <class ACE_LOCK>
 class ACE_Write_Guard : public ACE_Guard<ACE_LOCK>
@@ -184,7 +186,7 @@ public:
  * <ACE_LOCK> it is instantiated with must support the appropriate
  * API).
  *
- * WARNING: See important "WARNING" in comments at top of ACE_Guard.
+ * @warning See important "WARNING" in comments at top of ACE_Guard.
  */
 template <class ACE_LOCK>
 class ACE_Read_Guard : public ACE_Guard<ACE_LOCK>
@@ -241,7 +243,7 @@ public:
  * is released even if a thread exits via <thr_exit>!
  */
 template <class ACE_LOCK>
-class ACE_TSS_Guard
+class ACE_TSS_Guard : private ACE_Copy_Disabled
 {
 public:
   // = Initialization and termination methods.
@@ -288,9 +290,9 @@ protected:
   ACE_thread_key_t key_;
 
 private:
-  // = Prevent assignment and initialization.
-  ACE_UNIMPLEMENTED_FUNC (void operator= (const ACE_TSS_Guard<ACE_LOCK> &))
-  ACE_UNIMPLEMENTED_FUNC (ACE_TSS_Guard (const ACE_TSS_Guard<ACE_LOCK> &))
+  // FUZZ: disable check_for_ACE_Guard
+  typedef ACE_Guard<ACE_LOCK> Guard_Type;
+  // FUZZ: enable check_for_ACE_Guard
 };
 
 /**
@@ -331,6 +333,11 @@ public:
 
   // ACE_ALLOC_HOOK_DECLARE;
   // Declare the dynamic allocation hooks.
+private:
+  // FUZZ: disable check_for_ACE_Guard
+  typedef ACE_Guard<ACE_LOCK> Guard_Type;
+  typedef ACE_Write_Guard<ACE_LOCK> Write_Guard_Type;
+  // FUZZ: enable check_for_ACE_Guard
 };
 
 /**
@@ -370,6 +377,11 @@ public:
 
   // ACE_ALLOC_HOOK_DECLARE;
   // Declare the dynamic allocation hooks.
+private:
+  // FUZZ: disable check_for_ACE_Guard
+  typedef ACE_Guard<ACE_LOCK> Guard_Type;
+  typedef ACE_Read_Guard<ACE_LOCK> Read_Guard_Type;
+  // FUZZ: enable check_for_ACE_Guard
 };
 
 #endif /* !(defined (ACE_HAS_THREADS) && (defined (ACE_HAS_THREAD_SPECIFIC_STORAGE) || defined (ACE_HAS_TSS_EMULATION))) */

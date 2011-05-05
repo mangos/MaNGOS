@@ -1,5 +1,5 @@
 /* -*- C++ -*- */
-// $Id: config-sunos5.5.h 91321 2010-08-09 06:38:18Z johnnyw $
+// $Id: config-sunos5.5.h 92102 2010-09-30 08:14:15Z johnnyw $
 
 // This configuration file is designed to work for SunOS 5.5 platforms
 // using the following compilers:
@@ -58,7 +58,6 @@
     // If -compat=4 is turned on, the old 4.2 settings for iostreams are used,
     // but the newer, explicit instantiation is used (above)
 #   if (__SUNPRO_CC_COMPAT >= 5)
-#     define ACE_HAS_TEMPLATE_TYPEDEFS
 #     define ACE_HAS_STANDARD_CPP_LIBRARY 1
 #     define ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB 1
 #     define ACE_HAS_THR_C_DEST
@@ -364,16 +363,7 @@
 # define ACE_CC_MAJOR_VERSION (__SUNPRO_CC >> 8)
 # define ACE_CC_MINOR_VERSION (__SUNPRO_CC & 0x00ff)
 # define ACE_CC_BETA_VERSION  (0)
-#elif defined (__GNUG__)
-# define ACE_CC_MAJOR_VERSION __GNUC__
-# define ACE_CC_MINOR_VERSION __GNUC_MINOR__
-# define ACE_CC_BETA_VERSION  (0)
-# if __GNUC_MINOR__ >= 90
-#   define ACE_CC_NAME ACE_TEXT ("egcs")
-# else
-#   define ACE_CC_NAME ACE_TEXT ("g++")
-# endif /* __GNUC_MINOR__ */
-#endif /* __GNUG__ */
+#endif /* __SUNPRO_CC */
 
 #if defined (i386) && (_FILE_OFFSET_BITS==32)
 # define ACE_HAS_X86_STAT_MACROS
