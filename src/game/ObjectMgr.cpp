@@ -8843,7 +8843,7 @@ bool FindCreatureData::operator()( CreatureDataPair const& dataPair )
 
     // skip not spawned (in any state),
     uint16 pool_id = sPoolMgr.IsPartOfAPool<Creature>(dataPair.first);
-    if (pool_id && !sPoolMgr.IsSpawnedObject<Creature>(dataPair.first))
+    if (pool_id && !i_player->GetMap()->GetPersistentState()->IsSpawnedPoolObject<Creature>(dataPair.first))
         return false;
 
     if (!i_spawnedData || new_dist < i_spawnedDist)
@@ -8893,7 +8893,7 @@ bool FindGOData::operator()( GameObjectDataPair const& dataPair )
 
     // skip not spawned (in any state)
     uint16 pool_id = sPoolMgr.IsPartOfAPool<GameObject>(dataPair.first);
-    if (pool_id && !sPoolMgr.IsSpawnedObject<GameObject>(dataPair.first))
+    if (pool_id && !i_player->GetMap()->GetPersistentState()->IsSpawnedPoolObject<GameObject>(dataPair.first))
         return false;
 
     if (!i_spawnedData || new_dist < i_spawnedDist)

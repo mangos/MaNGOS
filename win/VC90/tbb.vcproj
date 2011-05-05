@@ -51,7 +51,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MDd /Od /Ob0 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /DTBB_USE_DEBUG /DDO_ITT_ANNOTATE /D_USE_RTM_VERSION /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -133,7 +133,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MDd /Od /Ob0 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /DTBB_USE_DEBUG /DDO_ITT_ANNOTATE /D_USE_RTM_VERSION /GS- /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -215,7 +215,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MD /O2 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /Oy /D_USE_RTM_VERSION /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -297,7 +297,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MD /O2 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /D_USE_RTM_VERSION /GS- /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -378,7 +378,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MDd /Od /Ob0 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /DTBB_USE_DEBUG /DDO_ITT_ANNOTATE /D_USE_RTM_VERSION /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -460,7 +460,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=" /c /MDd /Od /Ob0 /Zi /EHsc /GR /Zc:forScope /Zc:wchar_t /DTBB_USE_DEBUG /DDO_ITT_ANNOTATE /D_USE_RTM_VERSION /GS- /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 /D__TBB_BUILD=1 /W4 /I../../src /I../../include"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject"
+				AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\src;..\..\dep\tbb\build;..\..\dep\tbb\build\vsproject;..\..\dep\tbb\src\rml\include"
 				PreprocessorDefinitions=""
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -1139,6 +1139,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1147,6 +1148,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1155,6 +1157,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1163,6 +1166,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1171,6 +1175,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -1179,6 +1184,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						AdditionalOptions="/I../../src /I../../include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400"
+						AdditionalIncludeDirectories="..\..\dep\tbb\include;..\..\dep\tbb\build\vsproject"
 					/>
 				</FileConfiguration>
 			</File>

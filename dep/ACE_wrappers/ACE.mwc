@@ -1,0 +1,32 @@
+// $Id: ACE.mwc 86476 2009-08-13 03:27:23Z elliott_c $
+workspace {
+  exclude(automake) {
+    build
+  }
+  exclude {
+    TAO
+  }
+
+  // The associate scope does not add directories to the workspace;
+  // it only associates a name with one or more directories.
+  associate(examples) {
+    examples
+  }
+  associate(tests) {
+    performance-tests
+    tests
+  }
+  associate(gperf) {
+    gperf
+  }
+
+  // The '--' is a special key that indicates that the associated
+  // projects should be of the form @NAME@ in the generated Makefile.am.
+  associate(--) {
+    ACEXML
+    ASNMP
+    protocols
+    KOKYU
+    TAO
+  }
+}

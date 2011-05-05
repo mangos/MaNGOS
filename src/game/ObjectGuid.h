@@ -93,6 +93,8 @@ class MANGOS_DLL_SPEC ObjectGuid
         ObjectGuid(HighGuid hi, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) {}
     private:
         ObjectGuid(uint32 const&);                          // no implementation, used for catch wrong type assign
+        ObjectGuid(HighGuid, uint32, uint64 counter);       // no implementation, used for catch wrong type assign
+        ObjectGuid(HighGuid, uint64 counter);               // no implementation, used for catch wrong type assign
 
     public:                                                 // modifiers
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }

@@ -14,7 +14,12 @@ pkgconfigdir = @libdir@/pkgconfig
 ACE_BUILDDIR = $(top_builddir)
 ACE_ROOT = $(top_srcdir)
 
-SUBDIRS =
+SUBDIRS = \
+        . \
+        ETCL \
+        Monitor_Control \
+        SSL
+
 CLEANFILES =
 lib_LTLIBRARIES =
 pkgconfig_DATA =

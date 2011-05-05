@@ -1,0 +1,25 @@
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}'
+    & eval 'exec perl -S $0 $argv:q'
+    if 0;
+# -*- perl -*-
+# $Id: reverse_clean 80826 2008-03-04 14:51:23Z wotte $
+#
+# This script does a realclean of the list in the reverse order that
+# is passed to this. This is just a utility script
+
+@ARGS = ();
+
+if ($ARGV[0] eq ''){
+    print STDERR "$0:  No directories provided\n";
+    die "provide list of directories";
+}       
+
+my $make = $ARGV[0];
+shift;
+
+@BUILD_LIST = @ARGV;
+
+
+foreach $i (reverse (@BUILD_LIST)) {
+    system ("$make -k -C $i realclean");
+}

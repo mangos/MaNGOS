@@ -30,6 +30,7 @@
 #include "GridNotifiersImpl.h"
 #include "Transports.h"
 #include "ObjectMgr.h"
+#include "GameEventMgr.h"
 #include "World.h"
 #include "Group.h"
 #include "InstanceData.h"
@@ -40,7 +41,6 @@ INSTANTIATE_SINGLETON_1( MapPersistentStateManager );
 static uint32 resetEventTypeDelay[MAX_RESET_EVENT_TYPE] = { 0, 3600, 900, 300, 60 };
 
 //== MapPersistentState functions ==========================
-
 MapPersistentState::MapPersistentState(uint16 MapId, uint32 InstanceId, Difficulty difficulty)
 : m_instanceid(InstanceId), m_mapid(MapId),
   m_difficulty(difficulty), m_usedByMap(NULL)
@@ -161,6 +161,7 @@ void MapPersistentState::RemoveGameobjectFromGrid( uint32 guid, GameObjectData c
 }
 
 //== WorldPersistentState functions ========================
+SpawnedPoolData WorldPersistentState::m_sharedSpawnedPoolData;
 
 bool WorldPersistentState::CanBeUnload() const
 {
@@ -561,6 +562,14 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
     else
         m_instanceSaveByMapId[mapEntry->MapID] = state;
 
+    // pool system initialized already for persistent state (can be shared by map states)
+    if (!state->GetSpawnedPoolData().IsInitialized())
+    {
+        sPoolMgr.Initialize(state);                         // init pool system data for map persistent state
+        sGameEventMgr.Initialize(state);                    // init pool system data for map persistent state
+        state->GetSpawnedPoolData().SetInitialized();
+    }
+
     return state;
 }
 
@@ -819,8 +828,6 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficu
         else
             ((DungeonMap*)map2)->Reset(INSTANCE_RESET_GLOBAL);
     }
-
-    // TODO: delete creature/gameobject respawn times even if the maps are not loaded
 }
 
 void MapPersistentStateManager::GetStatistics(uint32& numStates, uint32& numBoundPlayers, uint32& numBoundGroups)

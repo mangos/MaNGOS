@@ -43,7 +43,7 @@
 //
 #include <winresrc.h>
 #define ENDL "\r\n"
-#include "../tbb/tbb_version.h"
+#include "tbb/tbb_version.h"
 
 #define TBBMALLOC_VERNUMBERS TBB_VERSION_MAJOR, TBB_VERSION_MINOR, __TBB_VERSION_YMD
 #define TBBMALLOC_VERSION __TBB_STRING(TBBMALLOC_VERNUMBERS)

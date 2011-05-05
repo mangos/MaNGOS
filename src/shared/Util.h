@@ -258,6 +258,16 @@ inline bool isEastAsianString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
+inline void strToUpper(std::string& str)
+{
+    std::transform( str.begin(), str.end(), str.begin(), toupper );
+}
+
+inline void strToLower(std::string& str)
+{
+    std::transform( str.begin(), str.end(), str.begin(), tolower );
+}
+
 inline wchar_t wcharToUpper(wchar_t wchar)
 {
     if(wchar >= L'a' && wchar <= L'z')                      // LATIN SMALL LETTER A - LATIN SMALL LETTER Z

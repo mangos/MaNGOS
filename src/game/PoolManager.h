@@ -25,10 +25,25 @@
 #include "Creature.h"
 #include "GameObject.h"
 
+class MapPersistentState;
+struct MapEntry;
+
 struct PoolTemplateData
 {
+    PoolTemplateData() : mapEntry(NULL), MaxLimit(0), AutoSpawn(false) {}
+
+    MapEntry const* mapEntry;                               // Map id used for pool creature/gameobject spams. In case non-instanceable map
+                                                            // it can be not unique but base at sharing same pool system dynamic data in this case this is not important.
+                                                            // NULL is no spawns by some reason
     uint32  MaxLimit;
     bool AutoSpawn;                                         // spawn at pool system start (not part of another pool and not part of event spawn)
+    std::string description;
+
+    // helpers
+    bool CanBeSpawnedAtMap(MapEntry const* entry) const
+    {
+        return mapEntry && (mapEntry == entry || !entry->Instanceable() && !mapEntry->Instanceable());
+    }
 };
 
 struct PoolObject
@@ -53,6 +68,8 @@ typedef std::map<uint32,uint32> SpawnedPoolPools;
 class SpawnedPoolData
 {
     public:
+        SpawnedPoolData() : m_isInitialized(false) {}
+
         template<typename T>
         bool IsSpawnedObject(uint32 db_guid_or_pool_id) const;
 
@@ -63,16 +80,25 @@ class SpawnedPoolData
 
         template<typename T>
         void RemoveSpawn(uint32 db_guid_or_pool_id, uint32 pool_id);
+
+        bool IsInitialized() const { return m_isInitialized; }
+        void SetInitialized() { m_isInitialized = true; }
+
+        SpawnedPoolObjects const& GetSpawnedCreatures() const { return mSpawnedCreatures; }
+        SpawnedPoolObjects const& GetSpawnedGameobjects() const { return mSpawnedGameobjects; }
+        SpawnedPoolPools const& GetSpawnedPools() const { return mSpawnedPools; }
     private:
         SpawnedPoolObjects mSpawnedCreatures;
         SpawnedPoolObjects mSpawnedGameobjects;
         SpawnedPoolPools   mSpawnedPools;
+        bool m_isInitialized;
 };
+
+typedef std::vector<PoolObject> PoolObjectList;
 
 template <class T>
 class PoolGroup
 {
-    typedef std::vector<PoolObject> PoolObjectList;
     public:
         explicit PoolGroup() : poolId(0) { }
         void SetPoolId(uint32 pool_id) { poolId = pool_id; }
@@ -82,14 +108,19 @@ class PoolGroup
         bool CheckPool() const;
         void CheckEventLinkAndReport(int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const;
         PoolObject* RollOne(SpawnedPoolData& spawns, uint32 triggerFrom);
-        void DespawnObject(SpawnedPoolData& spawns, uint32 guid=0);
-        void Despawn1Object(uint32 guid);
-        void SpawnObject(SpawnedPoolData& spawns, uint32 limit, uint32 triggerFrom, bool instantly);
+        void DespawnObject(MapPersistentState& mapState, uint32 guid=0);
+        void Despawn1Object(MapPersistentState& mapState, uint32 guid);
+        void SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly);
         void SetExcludeObject(uint32 guid, bool state);
 
-        void Spawn1Object(PoolObject* obj, bool instantly);
-        void ReSpawn1Object(PoolObject* obj);
+        void Spawn1Object(MapPersistentState& mapState, PoolObject* obj, bool instantly);
+        void ReSpawn1Object(MapPersistentState& mapState, PoolObject* obj);
         void RemoveOneRelation(uint16 child_pool_id);
+
+        PoolObjectList const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
+        PoolObjectList const& GetEqualChanced() const { return EqualChanced; }
+
+        size_t size() const { return ExplicitlyChanced.size() + EqualChanced.size(); }
     private:
         uint32 poolId;
         PoolObjectList ExplicitlyChanced;
@@ -103,7 +134,9 @@ class PoolManager
         ~PoolManager() {};
 
         void LoadFromDB();
-        void Initialize();
+        void Initialize(MapPersistentState* state);         // called at new MapPersistentState object create
+
+        uint16 GetMaxPoolId() const { return max_pool_id; }
 
         template<typename T>
         uint16 IsPartOfAPool(uint32 db_guid_or_pool_id) const;
@@ -124,27 +157,39 @@ class PoolManager
         }
 
         template<typename T>
-        bool IsSpawnedObject(uint32 db_guid_or_pool_id) const { return mSpawnedData.IsSpawnedObject<T>(db_guid_or_pool_id); }
-
-        template<typename T>
         void SetExcludeObject(uint16 pool_id, uint32 db_guid_or_pool_id, bool state);
 
         bool CheckPool(uint16 pool_id) const;
         void CheckEventLinkAndReport(uint16 pool_id, int16 event_id, std::map<uint32, int16> const& creature2event, std::map<uint32, int16> const& go2event) const;
 
-        void SpawnPool(uint16 pool_id, bool instantly);
-        void DespawnPool(uint16 pool_id);
+        void SpawnPool(MapPersistentState& mapState, uint16 pool_id, bool instantly);
+        void DespawnPool(MapPersistentState& mapState, uint16 pool_id);
 
         template<typename T>
-        void UpdatePool(uint16 pool_id, uint32 db_guid_or_pool_id = 0);
+        void UpdatePool(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid_or_pool_id = 0);
+
+        // used for calling from global systems when need spawn pool in all appropriate map instances
+        void SpawnPoolInMaps(uint16 pool_id, bool instantly);
+        void DespawnPoolInMaps(uint16 pool_id);
+
+        // used for calling from global systems when need initialize spawn pool state in appropriate (possible) map persistent state
+        void InitSpawnPool(MapPersistentState& mapState, uint16 pool_id);
+
+        template<typename T>
+        void UpdatePoolInMaps(uint16 pool_id, uint32 db_guid_or_pool_id = 0);
 
         void RemoveAutoSpawnForPool(uint16 pool_id) { mPoolTemplate[pool_id].AutoSpawn = false; }
+
+        typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
+        PoolTemplateData const& GetPoolTemplate(uint16 pool_id) const { return mPoolTemplate[pool_id]; }
+        PoolGroup<Creature> const& GetPoolCreatures(uint16 pool_id) const  { return mPoolCreatureGroups[pool_id]; }
+        PoolGroup<GameObject> const& GetPoolGameObjects(uint16 pool_id) const  { return mPoolGameobjectGroups[pool_id]; }
+        PoolGroup<Pool> const& GetPoolPools(uint16 pool_id) const  { return mPoolPoolGroups[pool_id]; }
     protected:
         template<typename T>
-        void SpawnPoolGroup(uint16 pool_id, uint32 db_guid_or_pool_id, bool instantly);
+        void SpawnPoolGroup(MapPersistentState& mapState, uint16 pool_id, uint32 db_guid_or_pool_id, bool instantly);
 
         uint16 max_pool_id;
-        typedef std::vector<PoolTemplateData> PoolTemplateDataMap;
 
         typedef std::vector<PoolGroup<Creature> >   PoolGroupCreatureMap;
         typedef std::vector<PoolGroup<GameObject> > PoolGroupGameObjectMap;
@@ -161,9 +206,6 @@ class PoolManager
         SearchMap mCreatureSearchMap;
         SearchMap mGameobjectSearchMap;
         SearchMap mPoolSearchMap;
-
-        // dynamic data
-        SpawnedPoolData mSpawnedData;
 };
 
 #define sPoolMgr MaNGOS::Singleton<PoolManager>::Instance()

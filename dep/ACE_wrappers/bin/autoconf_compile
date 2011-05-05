@@ -1,0 +1,517 @@
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}'
+    & eval 'exec perl -S $0 $argv:q'
+    if 0;
+
+# -*- perl -*-
+# $Id: autoconf_compile 80826 2008-03-04 14:51:23Z wotte $
+#
+# This script checkouts ACE from CVS, configures ACE, and compiles
+# `ace', `tests' and finally runs `tests/run_tests.sh'.
+#
+# If it detects any problem it sends e-mail.
+#
+# DO NOT invoke this script from your crontab, use
+# autoconf_compile_wrapper for that.
+#
+# This script requires Perl 5.
+#
+# TODO: Modify the script or split it in such a way that the main copy
+# can be obtained either using cvs or downloading the latest beta
+# from the WWW.
+#
+
+# The first three lines above let this script run without specifying the
+# full path to perl, as long as it is in the user's PATH.
+# Taken from perlrun man page.
+
+use File::Basename;
+use FileHandle;
+require POSIX;
+
+$directory_mode=0755;
+
+# This is the module we will checkout, someday someone could define a
+# smaller module.
+$MODULE='ACE_wrappers';
+
+# These are the sub-directories (in the module) we really compile.
+
+# Find out the command name.
+$CMD = basename($0);
+
+$single_threaded = 0;
+$minimum_corba = 0;
+$ami = 0;
+$dont_update = 0;
+$dont_run = 0;
+$pre_clean = 0;
+$post_clean = 0;
+$report_success = 0;
+$debug = 0;
+@BUILD_LIST= ();
+
+@ARGS = ();
+while ($#ARGV >= 0) {
+  if (!($ARGV[0] =~ m/-/)) {
+    push @ARGS, $ARGV[0];
+    shift;
+  } elsif ($ARGV[0] eq "-single_threaded") {
+    $single_threaded = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-minimum_corba") {
+    $minimum_corba = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-ami") {
+      $ami =1;
+      shift;
+  } elsif ($ARGV[0] eq "-build_list") {
+    shift;
+    @BUILD_LIST = split (/,/, $ARGV[0]);
+    shift;
+  } elsif ($ARGV[0] eq "-dont_update") {
+    $dont_update = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-dont_run") {
+    $dont_run = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-pre_clean") {
+    $pre_clean = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-post_clean") {
+    $post_clean = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-report_success") {
+    $report_success = 1;
+    shift;
+  } elsif ($ARGV[0] eq "-debug") {
+    $debug = 1;
+    shift;
+  }
+}
+
+# Extract configuration information from command line.
+  # TODO: Some validation and checking should be done here.
+$CHECKOUT = $ARGS[0];
+$BUILD    = $ARGS[1];
+$LOGDIR   = $ARGS[2];
+$ADMIN    = $ARGS[3];
+$MAIL = "mail";
+if ($#ARGS >= 4) {
+  $MAIL     = $ARGS[4];
+}
+
+# We obtain our revision to report errors.
+$REVISION='$Revision: 80826 $ ';
+
+# When an error is found we try to die gracefully and send some email
+# to ADMIN.
+
+$disable_file = $LOGDIR . '/.disable';
+$histfile = $LOGDIR . '/history';
+$LOGBASE = POSIX::strftime("%b%d_%Y.txt", localtime);
+$LOGFILE = $LOGDIR . '/' . $LOGBASE;
+$HOST = `hostname`;
+chop $HOST;
+$LOG_NAME =  $HOST . "_" . $BUILD . "_" . $LOGBASE;
+$STATUS = "OK";
+
+if ($debug) {
+  print "CHECKOUT = $CHECKOUT\n";
+  print "BUILD = $BUILD\n";
+  print "LOGDIR = $LOGDIR\n";
+  print "ADMIN = $ADMIN\n";
+  print "MAIL = $MAIL\n";
+}
+
+push @INC, $CHECKOUT . '/' . $MODULE . '/bin';
+#require run_all_list;
+@RUN_LIST = ('tests');   # Temporary hack
+
+
+if ($#BUILD_LIST == -1) {
+  @BUILD_LIST=
+    ('ace');
+}
+if ($debug) {
+
+  @BUILD_LIST = ('ace');
+  @RUN_LIST = ('tests');
+#  @SINGLE_THREADED_LIST = ('TAO/tests/OctetSeq');
+#  @MINIMUM_CORBA_LIST = ('TAO/tests/OctetSeq');
+  $ADMIN = $ENV{'LOGNAME'};
+
+}
+
+sub mydie {
+  unlink $disable_file;
+  die $_ . "\n";
+}
+
+sub report_errors {
+  # First clear the lock, so the next execution works...
+  unlink $disable_file; # Ignore errors!
+
+  # Now send a summary of the errors to the ADMIN account...
+  local $to = $ADMIN;
+
+  open (MAIL, "|".$MAIL.' -s "[AUTO_COMPILE] '.$BUILD.'" '.$to)
+    || mydie "Cannot open mail pipe for: $_\n";
+
+  print MAIL 'The following message is brought to you by: ', "\n";
+  print MAIL $CMD, ' [', $REVISION, "] for $BUILD on $CHECKOUT\n\n";
+
+  local $m;
+  foreach $m (@_) {
+    print MAIL $m, "\n";
+  }
+
+  print MAIL "\nPlease check the following log for more info:\n\n";
+  print MAIL 'http://www.cs.wustl.edu/~bugzilla/auto_compile_logs/',
+             $LOG_NAME, "\n\n";
+
+  close (MAIL); # Ignore errors....
+
+  # Now send the complete log to bugzilla...
+  local $bugs = 'bugzilla'.'@cs.wustl.edu';
+  open (MAIL, "|".$MAIL.' -s AUTO_COMPILE_LOG='.$LOG_NAME.' '.$bugs)
+    || mydie "Cannot open mail pipe for: $LOG_NAME\n";
+
+  print MAIL 'This is the log for: ', "\n";
+  print MAIL $CMD, ' [', $REVISION, "] for $BUILD on $CHECKOUT\n";
+
+  print MAIL "\n================================================================\n";
+
+ if (open (THELOG, "$LOGFILE"))
+    {
+      while (<THELOG>) {
+	print MAIL $_;
+      }
+      close (THELOG);
+    }
+  close (MAIL); # Ignore errors....
+}
+
+### MAIN FUNCTION
+
+if (-f $disable_file) {
+  print 'The following message is brought to you by: ', "\n";
+  print $CMD, ' [', $REVISION, "] for $BUILD on $CHECKOUT\n";
+
+  print "DISABLED\n";
+
+  exit 0;
+}
+
+open (DISABLE, '>' . $disable_file)
+    || die "cannot open disable file";
+print DISABLE "autoconf_compile <$date> is running\n";
+close (DISABLE)
+    || die "cannot close disable file";
+
+open(HIST, '>>' . $histfile)
+    # Do not use 'mydie' to report the problem, it tries to remove the
+    # disable file  
+    || mydie "cannot open history file \"$histfile\"\n";
+
+$date = localtime;
+
+print HIST $CMD, ': running at ', $date, ' ';
+
+open(LOG, '>' . $LOGFILE)
+    || mydie "cannot open log file";
+
+LOG->autoflush ();
+
+# The following lines are useful when debugging the script or wrapper.
+# print LOG $CHECKOUT, " ", $BUILD, " ", $LOGDIR, " ", $ADMIN, "\n";
+#while (($key,$value) = each %ENV) {
+#  print LOG $key, " = ", $value, "\n";
+#}
+
+chdir($CHECKOUT)
+    || mydie "Cannot chdir to $CHECKOUT";
+
+if ($dont_update == 0) {
+  $date = localtime;
+  print LOG "$CMD: starting checkout at ", $date, "\n";
+  open(CVS, "cvs -q checkout -P $MODULE 2>&1 |")
+    || mydie "cannot start checkout of $MODULE";
+#  open(CVS, "cvsup -g -L 2 -P m ace-supfile 2>&1 |")
+#    || mydie "cannot start checkout";
+
+  $conflicts = 0;
+  while (<CVS>) {
+    if (m/^C /) {
+      $conflicts = 1;
+    }
+    print LOG $_;
+  }
+  close(CVS)
+    || mydie "error while checking out $MODULE";
+  $date = localtime;
+  print LOG "$CMD: checkout finished at ", $date, "\n";
+
+  if ($conflicts != 0) {
+    mydie "conflicts on checkout";
+  }
+}
+
+chdir($MODULE)
+    || mydie "cannot chdir to $MODULE";
+
+open (CHLOG, "ChangeLog")
+  ||  mydie "cannot open Changelog";
+$_ = <CHLOG>;
+chop;
+print LOG "ACE ChangeLogTag:", $_, "\n";
+close (CHLOG);
+
+open (CHLOG, "TAO/ChangeLog")
+  ||  mydie "cannot open TAO/Changelog";
+$_ = <CHLOG>;
+chop;
+print LOG "TAO ChangeLogTag:", $_, "\n";
+close (CHLOG);
+
+# Bootstrap the workspace
+print LOG "$CMD: ==================================================\n\n";
+print LOG "$CMD: bootstrapping the workspace\n";
+open(BOOTSTRAP, "cd $CHECKOUT/ACE_wrappers && "
+     . "sh bin/bootstrap workspace --enable-deps 2>&1 |")
+    || mydie "cannot bootstrap workspace for $BUILD";
+while(<BOOTSTRAP>) {
+    print LOG $_;
+}
+close(BOOTSTRAP)
+    || mydie "error while bootstrapping the workspace";
+print LOG "$CMD: ==================================================\n\n";
+
+# Begin the workspace configuration
+$date = localtime;
+print LOG "$CMD: starting configuration at ", $date, "\n";
+
+# Check that we're in an ACE "top level" directory.
+# We can actually build outside of the top level ACE directory, but
+# let's do it this way for now.
+(-d 'ace' && -d 'm4')  ||
+  die "$0:  must be in top level ACE directory!\n";
+
+# Create build directories, if needed.
+-d 'build'  ||  mkdir ('build', $directory_mode);
+-d "$build"  ||  mkdir ('build/' . "$BUILD", $directory_mode);
+
+# Now enter the build directory.
+chdir('build/' . $BUILD)
+    || mydie "cannot chdir to $BUILD";
+
+# Remove the configuration cache file to make sure a fresh
+# configuration is created.
+unlink "config.cache";
+
+# Run the configuration script.
+open(CONFIGURE, "sh $CHECKOUT/ACE_wrappers/configure 2>&1 |")
+    || mydie "cannot configure for $BUILD";
+while(<CONFIGURE>) {
+    print LOG $_;
+}
+close(CONFIGURE)
+    || mydie "error while configuring ACE";
+$date = localtime;
+print LOG "$CMD: configure finished at ", $date, "\n";
+
+
+@failures = ();
+
+if ($pre_clean) {
+  foreach $i (@BUILD_LIST) {
+    $date = localtime;
+    print LOG "$CMD: =============================================\n";
+    print LOG "$CMD: make clean in $i started at ", $date, "\n";
+    open(MAKE, "make -k $MAKEFLAGS -C $i clean 2>&1 |")
+      || mydie "cannot start make in $i";
+
+    while (<MAKE>) {
+      # Ignore errors....
+    }
+    if (close(MAKE) == 0) {
+	push @failures, "errors while cleaning $i";
+    }
+    $date = localtime;
+    print LOG "$CMD: make clean in $i finished at ", $date, "\n";
+    print LOG "$CMD: ==================================================\n\n";
+  }
+}
+
+$MAKEFLAGS .= "";
+foreach $i (@BUILD_LIST) {
+    $date = localtime;
+    print LOG "$CMD: =============================================\n";
+    print LOG "$CMD: make for $i started at ", $date, "\n";
+    open(MAKE, "make -k $MAKEFLAGS -C $i 2>&1 |")
+        || mydie "cannot start make for $i";
+
+    local $current_dir = $i;
+    local $last_error = "";
+    while (<MAKE>) {
+        chop;
+        if ($^O eq 'hpux'
+            && m/^Warning:[ \t]+[0-9]+ future errors were detected/) {
+            next;
+        }
+        print LOG $_, "\n";
+
+        if (m/^make(\[[0-9]+\])?: Entering directory /) {
+            s/^make(\[[0-9]+\])?: Entering directory //;
+            $current_dir = $_;
+        }
+        if (m/error:/i || m/error /i
+            || m/^make(\[[0-9]+\])?: \*\*\*/) {
+            if ($last_error ne $current_dir
+                || STATUS eq "COMPILATION WARNING") {
+              $STATUS = "COMPILATION ERROR";
+              push @failures, "Error while compiling in $current_dir \n";
+              $last_error = $current_dir;
+            }
+        }
+        if (m/warning:/i || m/warning /i) {
+          if ($last_error ne $current_dir) {
+            if ($STATUS eq "OK") {
+              $STATUS = "COMPILATION WARNING";
+            }
+            push @failures, "Warning while compiling in $current_dir\n";
+            $last_error = $current_dir;
+          }
+        }
+    }
+    if (close(MAKE) == 0) {
+        push @failures, "errors while running make in $i";
+    }
+    $date = localtime;
+    print LOG "$CMD: make for $i finished at ", $date, "\n";
+    print LOG "$CMD: =============================================\n\n";
+}
+
+if ($dont_run == 0) {
+  @LIST = @RUN_LIST; 
+  if ($single_threaded) {
+    @LIST = @SINGLE_THREADED_LIST;
+  } elsif ($minimum_corba) {
+    @LIST = @MINIMUM_CORBA_LIST;
+  } elsif ($ami) {
+      @LIST = @AMI_CORBA_LIST;
+  }
+
+  foreach $i (@LIST) {
+
+    $date = localtime;
+    print LOG "$CMD: ==================================================\n";
+    print LOG "$CMD: running checks in $i at ", $date, "\n";
+    local $subdir =
+	$CHECKOUT .'/'. $MODULE .'/build/'. $BUILD .'/'. $i;
+    chdir ($subdir)
+	|| mydie "cannot chdir to $subdir";
+
+    $run_error = 0;
+    open(CHECK, "make -k $MAKEFLAGS -C $subdir check 2>&1 |");
+
+    local $current_dir = $i;
+    local $last_error = "";
+    while (<CHECK>) {
+        chop;
+        if ($^O eq 'hpux'
+            && m/^Warning:[ \t]+[0-9]+ future errors were detected/) {
+            next;
+        }
+        print LOG $_, "\n";
+
+        if (m/^make(\[[0-9]+\])?: Entering directory /) {
+            s/^make(\[[0-9]+\])?: Entering directory //;
+            $current_dir = $_;
+        }
+        if (m/error:/i || m/error /i
+            || m/^make(\[[0-9]+\])?: \*\*\*/) {
+            if ($last_error ne $current_dir
+                || STATUS eq "COMPILATION WARNING") {
+              $STATUS = "COMPILATION ERROR";
+              push @failures, "Error while compiling in $current_dir \n";
+              $last_error = $current_dir;
+            }
+        }
+        if (m/warning:/i || m/warning /i) {
+          if ($last_error ne $current_dir) {
+            if ($STATUS eq "OK") {
+              $STATUS = "COMPILATION WARNING";
+            }
+            push @failures, "Warning while compiling in $current_dir\n";
+            $last_error = $current_dir;
+          }
+        }
+	if (m/Error/
+	    || m/ERROR/
+	    || m/FAILED/
+	    || m/failed/
+	    || m/FAIL/
+	    || m/EXCEPTION/
+	    || m/pure virtual /i) {
+	  if ($STATUS eq "OK") {
+	    $STATUS = "RUNTIME ERROR";
+	  }
+	  $run_error = 1;
+	}
+    }
+
+    if (close(CHECK) == 0) {
+      if ($STATUS eq "OK") {
+	$STATUS = "RUNTIME ERROR";
+      }
+      push @failures, "Error when closing pipe in $i";
+      next;
+    }
+    $date = localtime;
+    print LOG "$CMD: check finished ", $date, "\n";
+
+    if ($run_error != 0) {
+      push @failures,
+      "errors detected while making check in $i";
+    }
+  }
+}
+
+if ($post_clean) {
+  foreach $i (@BUILD_LIST) {
+    $date = localtime;
+    print LOG "$CMD: ==================================================\n";
+    print LOG "$CMD: make clean in $i started at ", $date, "\n";
+    open(MAKE, "make -k $MAKEFLAGS -C $i clean 2>&1 |");
+
+    while (<MAKE>) {
+      # Ignore errors....
+    }
+    if (close(MAKE) == 0) {
+	push @failures, "errors while cleaning $i";
+    }
+    $date = localtime;
+    print LOG "$CMD: make clean in $i finished at ", $date, "\n";
+    print LOG "$CMD: ==================================================\n\n";
+  }
+}
+
+if ($#failures >= 0) {
+  report_errors @failures;
+}
+
+close(LOG)
+    || mydie "cannot close LOGFILE";
+
+print HIST "$STATUS\n";
+close(HIST)
+    || mydie "cannot close history file";
+
+unlink $disable_file
+    || die "cannot unlink disable file";
+
+if ($report_success && $STATUS eq "OK") {
+  report_errors "Congratulations: No errors or warnings detected\n";
+}
+
+exit 0;

@@ -1,0 +1,11 @@
+//  -*- MPC -*- now wouldn't this be cool...
+// $Id: ace_foxreactor.mpc 91839 2010-09-17 20:16:53Z mitza $
+
+project(ACE_FoxReactor) : acedefaults, install, acelib, ace_output, ace_fox {
+  sharedname   = ACE_FoxReactor
+  dynamicflags += ACE_FOXREACTOR_BUILD_DLL
+
+  specific {
+    install_dir = ace/FoxReactor
+  }
+}

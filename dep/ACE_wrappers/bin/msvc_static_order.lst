@@ -1,0 +1,9 @@
+# $Id: msvc_static_order.lst 92057 2010-09-27 14:52:00Z johnnyw $
+#
+# This file lists the project files that must be build first in a static
+# build using msvc_static_compile.pl
+
+ace/ace
+ace/ACE_ETCL
+ace/ACE_ETCL_Parser
+ace/MonitorControl/MonitorControl

@@ -80,7 +80,7 @@ ifneq ($(BUILDING_PHASE),1)
  # definitions for top-level Makefiles
  origin_build_dir:=$(origin tbb_build_dir)
  tbb_build_dir?=$(tbb_root)$(SLASH)build
- tbb_build_prefix?=$(tbb_os)_$(arch)_$(compiler)_$(runtime)
+ tbb_build_prefix?=libs
  work_dir=$(tbb_build_dir)$(SLASH)$(tbb_build_prefix)
  ifneq ($(BUILDING_PHASE),0)
   work_dir:=$(work_dir)

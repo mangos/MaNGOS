@@ -1,0 +1,237 @@
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}'
+    & eval 'exec perl -S $0 $argv:q'
+    if 0;
+
+# $Id: ace_ld 80826 2008-03-04 14:51:23Z wotte $
+#
+# Drop-in replacement for "ld" that supports munching.
+#
+# The first three lines above let this script run without specifying the
+# full path to perl, as long as it is in the user's PATH.
+# Taken from perlrun man page.
+
+##
+## Symbols that produce a warning due to size changing.
+## This is a harmless known bug with the version of gcc that comes with
+## Tornado II.  Anything in this list will be suppressed unless the -w
+## option is used.
+##
+my(@symbols) = ('dequeue__t17ACE_Message_Queue1Z14ACE_NULL_SYNCHRP17ACE_Message_BlockP14ACE_Time_Value',
+                'activate__t17ACE_Message_Queue1Z14ACE_NULL_SYNCH',
+               );
+
+$usage =
+  "usage: $0 [-? | [-w] [-o <VDIR>] [[-C <compile> --] [-m <munch>] [-n <nm>]] [-f]]] " .
+  "<ld command>\n";
+
+#### To avoid quoting problems on the command line, all arguments
+#### between -C and -- are combined into the single compile command.
+$compile_option = 0;
+$ss_change_warn = 0;
+
+####
+#### process command line args
+####
+while ( $#ARGV >= 0  &&  $ARGV[0] =~ /^-/ ) {
+    if ( $ARGV[0] eq '-C' ) {
+        $compile_option = 1;
+        if ( $ARGV[1] !~ /^[-].+$/ ) {
+            $compile = $ARGV[1]; shift;
+        } else {
+            print STDERR "$0:  must provide argument for -c option\n";
+            die $usage;
+        }
+    } elsif ( $ARGV[0] eq '--' ) {
+        $compile_option = 0;
+    } elsif ( $ARGV[0] eq '-m' ) {
+        if ( $ARGV[1] !~ /^[-].+$/ ) {
+            $munch = $ARGV[1]; shift;
+        } else {
+            print STDERR "$0:  must provide argument for -m option\n";
+            die $usage;
+        }
+    } elsif ( $ARGV[0] eq '-n' ) {
+        if ( $ARGV[1] !~ /^[-].+$/ ) {
+            $nm = $ARGV[1]; shift;
+        } else {
+            print STDERR "$0:  must provide argument for -n option\n";
+            die $usage;
+        }
+    } elsif ( $ARGV[0] eq '-o' ) {
+        if ( $ARGV[1] !~ /^[-].+$/ ) {
+            $vdir = $ARGV[1]; shift;
+        } else {
+            print STDERR "$0:  must provide argument for -o option\n";
+            die $usage;
+        }
+    } elsif ( $ARGV[0] eq '-w' ) {
+      $ss_change_warn = 1;
+    } elsif ( $ARGV[0] eq '-?' ) {
+        print "$usage";
+        exit;
+    } else {
+        if ($compile_option) {
+          $compile .= " $ARGV[0]";
+        } else {
+          warn "$0:  unknown option $ARGV[0]\n";
+         die $usage;
+        }
+    }
+    shift;
+}
+
+####
+#### If $vdir is empty, set default object file directory (.obj)
+####
+if ($vdir eq ''){
+   $vdir = ".obj";
+}
+
+####
+#### Save link command, i.e., current @ARGV, for use below.
+####
+@args = @ARGV;
+
+
+####
+#### Find full path to each library.
+####
+@libDirs = ();
+$current_dir_in_libDirs = 0;
+@libs = ();
+@objs = '';
+
+foreach $arg (@ARGV) {
+  if ($arg =~ /^['"]?-L([\S]+)/) {
+    ($dir = $1) =~ s%/+$%%;     #### trim any trailing slashes
+    push (@libDirs, $dir);
+    $current_dir_in_libDirs = 1 if $dir eq '.';
+  } elsif ($arg =~ /^['"]?-l([\S]+)/) {
+    push (@libs, $1);
+  } elsif ($arg =~ /\.o$/) {
+    push (@objs, $arg);
+  }
+}
+
+#### Add . to libDirs if it doesn't already have it.
+push (@libDirs, ".") unless $current_dir_in_libDirs;
+
+foreach $lib (@libs) {
+  foreach $libDir (@libDirs) {
+    if (-e "$libDir/lib$lib.a") {
+      $full_path{$lib} = "$libDir/lib$lib.a";
+      last;
+    }
+  }
+}
+
+
+####
+#### Set up signal handler.
+####
+$done = 0;
+$SIG{'HUP'} = $SIG{'INT'} = $SIG{'QUIT'} = $SIG{'TERM'} = 'cleanup';
+
+
+####
+#### Munch, if $munch is non-null.
+####
+if ($munch) {
+  $munch_objs = join (' ', @objs);
+  $munch_libs = join (' ', values %full_path);
+
+  open (MUNCH, "$nm $munch_objs $munch_libs | $munch |") ||
+    &fail ("$0: unable to run \"$nm\" or \"$munch\"\n");
+
+  open (CTORDTOR, "> __ctordtor.c") ||
+    &fail ("$0: unable to open \"__ctordtor.c\"\n");
+
+  while (<MUNCH>) {
+    #### Filter out munch output that contains '.cpp'.  It results from
+    #### .cpp files that have no text or data, e.g., .cpp files that
+    #### only contain template instantiations.  These lines confuse g++.
+    print CTORDTOR unless /\.cpp/;
+  }
+
+  close CTORDTOR || &fail ("$0: unable to write \"__ctordtor.c\"\n");
+  close MUNCH;
+
+   system ("$compile -o $vdir/__ctordtor.o __ctordtor.c") &&
+    &fail ("$0: \"$compile\" failed\n");
+}
+
+
+####
+#### Construct the link command from @args and perform the link.
+####
+if ($munch) {
+  #### Insert ctordtor object file before first library in link command.
+  $arg_lib = 0;
+  foreach $arg (@ARGV) {
+    if ($arg =~ /^['"]?-l/) {
+      last;
+    }
+    ++$arg_lib;
+  }
+  splice (@args, $arg_lib, 0, "$vdir/__ctordtor.o");
+}
+
+$link_command = join (' ', @args);
+
+if (open(PP, "$link_command 2>&1 |")) {
+  while(<PP>) {
+    my($line) = $_;
+    if ($ss_change_warn) {
+      print $line;
+    }
+    else {
+      my($found) = 0;
+      foreach my $symbol (@symbols) {
+        if ($line =~ /Warning: size of symbol `$symbol\'/) {
+          $found = 1;
+        }
+      }
+      if (!$found) {
+        print $line;
+      }
+    }
+  }
+  close(PP);
+
+  if ($? ne 0) {
+    fail ("$0: $link_command failed\n");
+  }
+}
+else {
+  fail ("$0: $link_command failed\n");
+}
+
+
+$done = 1;
+&cleanup;
+
+
+####
+####
+####
+sub fail {
+  local ($message) = @_;
+
+  warn $message;
+  &cleanup;
+}
+
+
+####
+#### clean up when done or on signal
+####
+sub cleanup {
+  unlink "__ctordtor.c", "$vdir/__ctordtor.o";
+  if ($done) {
+    exit 0;
+  } else {
+    exit 1;
+  }
+}
+
+#### EOF

@@ -1,0 +1,17 @@
+#! /bin/sh
+# $Id: make-components 80826 2008-03-04 14:51:23Z wotte $
+
+# Allow each ACE component to be built in a simple way, as follows:
+#
+# $ACE_ROOT/bin/make-components "your flags"
+#
+# to build libACE.$(SOEXT), libACE_OS.$(SOEXT), etc.
+
+flags="$*"
+cd $ACE_ROOT/ace
+make $flags
+for component in `cat $ACE_ROOT/ace/ACE_COMPONENTS.list`
+do
+   make $flags LIBACE=libACE_$component ACE_COMPONENTS=$component
+done
+exit 0

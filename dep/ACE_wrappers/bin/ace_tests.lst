@@ -1,0 +1,19 @@
+# $Id: ace_tests.lst 90206 2010-05-20 22:05:46Z mitza $
+#
+# This is the list of run_test.pl's that need to be run by
+# auto_run_tests.pl.
+# Each line has its own test, and a test can be followed by a
+# list of configurations it does _not_ run on.
+#
+# Example: TAO\examples\foo\run_test.pl: !MINIMUM !ST
+#
+# NOTE: This file contains tests only for ACE. Please do not include
+# tests in TAO here..
+tests/run_test.pl
+examples/Reactor/WFMO_Reactor/run_test.pl: !Cygwin !VxWorks !ACE_FOR_TAO !LabVIEW_RT
+protocols/tests/RMCast/run_test.pl: RMCAST !ST !NO_MCAST !nsk !LynxOS !ACE_FOR_TAO !VxWorks !LabVIEW_RT
+protocols/tests/HTBP/ping/run_test.pl: !NO_UUID !nsk !LynxOS !ACE_FOR_TAO !VxWorks !LabVIEW_RT
+protocols/tests/HTBP/Send_Recv_Tests/run_test.pl: !NO_UUID !nsk !LynxOS !ACE_FOR_TAO !VxWorks !LabVIEW_RT
+protocols/tests/HTBP/Send_Large_Msg/run_test.pl: !NO_UUID !nsk !LynxOS !ACE_FOR_TAO !VxWorks !LabVIEW_RT
+protocols/tests/HTBP/Reactor_Tests/run_test.pl: !NO_UUID !nsk !LynxOS !ACE_FOR_TAO !VxWorks !LabVIEW_RT
+tests/non_mpc_makefile/Bug_3708_Regression.pl: !ARCH

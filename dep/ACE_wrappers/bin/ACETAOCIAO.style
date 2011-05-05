@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style>
+<name>ACETAOCIAO</name>
+<description>This style is used for ACE/TAO/CIAO</description>
+<sample></sample>
+<flags />
+<rule name="align-global">
+<presetreference>Global_Align Global Variables_false</presetreference>
+</rule>
+<rule name="align-global-func">
+<presetreference>Global_Align Global Function Declarations_false</presetreference>
+</rule>
+<rule name="align-global-together">
+<presetreference>Global_Align Globals Together_false</presetreference>
+</rule>
+<rule name="brace-space">
+<presetreference>Global_Space Before Brace_True</presetreference>
+</rule>
+<rule name="case-statement-indent">
+<presetreference>Switch_Case Statement Indentation_True</presetreference>
+</rule>
+<rule name="catch-bracing-style">
+<presetreference>Try_Catch Brace Position_Indented</presetreference>
+</rule>
+<rule name="chevron-alignment">
+<presetreference>Templates_Chevron Alignment_AlignAtBracket</presetreference>
+</rule>
+<rule name="class-access-specifier-indent">
+<presetreference>Classes and Structs_Access Specifier Indentation_False</presetreference>
+</rule>
+<rule name="class-access-specifier-newline">
+<presetreference>Classes and Structs_Access Specifier New Line_True</presetreference>
+</rule>
+<rule name="class-bracing-style">
+<presetreference>Classes and Structs_Brace Position_Aligned</presetreference>
+</rule>
+<rule name="class-indent">
+<presetreference>Classes and Structs_Indentation_True</presetreference>
+</rule>
+<rule name="class-inheritance-list">
+<presetreference>Classes and Structs_Inheritance List_SameLine</presetreference>
+</rule>
+<rule name="class-member-align">
+<presetreference>Classes and Structs_Member Alignment_False</presetreference>
+</rule>
+<rule name="class-member-function-align">
+<presetreference>Classes and Structs_Member Function Alignment_False</presetreference>
+</rule>
+<rule name="class-member-function-align-together">
+<presetreference>Classes and Structs_Member Alignment Together_False</presetreference>
+</rule>
+<rule name="constructor-initialiser-packing">
+<presetreference>Constructor_Member Initializers_One Per Line Comma Below</presetreference>
+</rule>
+<rule name="constructor-initialiser-style">
+<presetreference>Constructor_Initializer Alignment_True</presetreference>
+</rule>
+<rule name="declaration-newline">
+<presetreference>Declarations_Start On New Line_True</presetreference>
+</rule>
+<rule name="declarations-keyword-spacing">
+<presetreference>Declarations_Keyword Spacing_True</presetreference>
+</rule>
+<rule name="do-bracing-style">
+<presetreference>Do_Brace Position_Aligned</presetreference>
+</rule>
+<rule name="do-indented-style">
+<presetreference>Do_Indentation_True</presetreference>
+</rule>
+<rule name="do-while-style">
+<presetreference>Do_While Position_SameLine</presetreference>
+</rule>
+<rule name="enum-align-initialisers">
+<presetreference>Enums_Align Initializers_False</presetreference>
+</rule>
+<rule name="enum-bracing-style">
+<presetreference>Enums_Brace Position_Aligned</presetreference>
+</rule>
+<rule name="enum-indent">
+<presetreference>Enums_Indentation_True</presetreference>
+</rule>
+<rule name="enum-items">
+<presetreference>Enums_Items_OnePerLine</presetreference>
+</rule>
+<rule name="enum-single-entry">
+<presetreference>Enums_Single Entry_Normal</presetreference>
+</rule>
+<rule name="exceptions-exc-pos">
+<presetreference>Exceptions_Exception Position_Packed</presetreference>
+</rule>
+<rule name="exceptions-throw-pos">
+<presetreference>Exceptions_Throw Position_Same Line</presetreference>
+</rule>
+<rule name="expression-casts">
+<presetreference>Expressions_C Style Casts_No space after</presetreference>
+</rule>
+<rule name="expression-wrapping">
+<presetreference>Expressions_Binary Operator Wrapping_After</presetreference>
+</rule>
+<rule name="expressions-binary-spacing">
+<presetreference>Expressions_Binary Operators_Spaced</presetreference>
+</rule>
+<rule name="expressions-conditional-spacing">
+<presetreference>Expressions_Conditional Operators_Spaced</presetreference>
+</rule>
+<rule name="expressions-conditional-spacing" override="true">
+<presetreference>Expressions_Conditional Operators_Disabled</presetreference>
+</rule>
+<rule name="expressions-functioncall-spacing">
+<presetreference>Functions_Calls_Spaced</presetreference>
+</rule>
+<rule name="expressions-member-spacing">
+<presetreference>Expressions_Member Operators_Not Spaced</presetreference>
+</rule>
+<rule name="expressions-pointer-spacing">
+<presetreference>Expressions_Pointer Operators_Not Spaced</presetreference>
+</rule>
+<rule name="expressions-pointer-wrapping">
+<presetreference>Expressions_Pointer Operator Wrapping_After</presetreference>
+</rule>
+<rule name="expressions-unary-spacing">
+<presetreference>Expressions_Logical and Bitwise Unary Operators_Not Spaced</presetreference>
+</rule>
+<rule name="extern-braces">
+<presetreference>Declarations_Extern Brace Position_Aligned</presetreference>
+</rule>
+<rule name="extern-indentation">
+<presetreference>Declarations_Extern Indentation_True</presetreference>
+</rule>
+<rule name="for-bracing-indent">
+<presetreference>For_Indentation_True</presetreference>
+</rule>
+<rule name="for-bracing-style">
+<presetreference>For_Brace Position_Indented</presetreference>
+</rule>
+<rule name="for-semicolon-spacing">
+<presetreference>For_Semicolon Spacing_SpaceAfter</presetreference>
+</rule>
+<rule name="function-align-params">
+<presetreference>Functions_Parameter Name Alignment_False</presetreference>
+</rule>
+<rule name="function-bracing-style">
+<presetreference>Functions_Brace Position_Aligned</presetreference>
+</rule>
+<rule name="function-call-lines">
+<presetreference>Functions_Call Parameter Lines_SingleLine</presetreference>
+</rule>
+<rule name="function-call-spacing">
+<presetreference>Functions_Call Spacing_AfterComma</presetreference>
+</rule>
+<rule name="function-declaration-alignment">
+<presetreference>Functions_Declaration Alignment_False</presetreference>
+</rule>
+<rule name="function-indent">
+<presetreference>Functions_Indentation_True</presetreference>
+</rule>
+<rule name="function-name-style">
+<presetreference>Functions_Definitions_True</presetreference>
+</rule>
+<rule name="function-parameter-alignment">
+<presetreference>Functions_Parameter Alignment_Bracket</presetreference>
+</rule>
+<rule name="function-parameter-brackets" override="true">
+<presetreference>Functions_Parameter Brackets_Disabled</presetreference>
+</rule>
+<rule name="function-parameter-lines">
+<presetreference>Functions_Parameter Lines_True</presetreference>
+</rule>
+<rule name="function-parameter-spacing">
+<presetreference>Functions_Parameter Spacing_AfterComma</presetreference>
+</rule>
+<rule name="function-parenthesis-spacing">
+<presetreference>Functions_Bracket Spacing_False</presetreference>
+</rule>
+<rule name="function-type-style">
+<presetreference>Functions_Return Type_OwnLine</presetreference>
+</rule>
+<rule name="function-wrapping">
+<presetreference>Functions_Don't Wrap Function Declarations_False</presetreference>
+</rule>
+<rule name="global-alignment-space">
+<presetreference>Global_Alignment ensures at least one space_False</presetreference>
+</rule>
+<rule name="global-bracing-style">
+<presetreference>Global_Default Block Brace Position_Indented</presetreference>
+</rule>
+<rule name="global-bracket-alignment">
+<presetreference>Expressions_Bracket Alignment_AlignAtBracket</presetreference>
+</rule>
+<rule name="global-bracket-spacing">
+<presetreference>Expressions_Bracket Spacing_NoSpace</presetreference>
+</rule>
+<rule name="global-comma-spacing">
+<presetreference>Expressions_Comma Spacing_AfterComma</presetreference>
+</rule>
+<rule name="global-function-bracket-alignment">
+<presetreference>Functions_Bracket Alignment_AlignAtBracket</presetreference>
+</rule>
+<rule name="global-function-empty-brackets">
+<presetreference>Functions_Empty Brackets_NoSpace</presetreference>
+</rule>
+<rule name="global-function-empty-chevron">
+<presetreference>Templates_Empty Chevrons_NoSpace</presetreference>
+</rule>
+<rule name="global-function-single-line">
+<presetreference>Functions_Empty Functions_Formatted</presetreference>
+</rule>
+<rule name="global-indentation">
+<presetreference>Global_Default Block Indentation_Yes</presetreference>
+</rule>
+<rule name="global-initialiser-comma-spacing">
+<presetreference>Declarations_Comma Spacing_AfterComma</presetreference>
+</rule>
+<rule name="global-semicolon-spacing">
+<presetreference>Global_Semicolon Spacing_False</presetreference>
+</rule>
+<rule name="global-statement-newline">
+<presetreference>Global_Statements On New Line_False</presetreference>
+</rule>
+<rule name="global-statement-spacing">
+<presetreference>Global_Statement Spacing_True</presetreference>
+</rule>
+<rule name="identifier-spacing">
+<presetreference>Declarations_Spacing Before Identifier_Space</presetreference>
+</rule>
+<rule name="if-bracing-style">
+<presetreference>If_Brace Position_Indented</presetreference>
+</rule>
+<rule name="if-else-style">
+<presetreference>If_Else Position_OwnLine</presetreference>
+</rule>
+<rule name="if-indented-style">
+<presetreference>If_Indentation_True</presetreference>
+</rule>
+<rule name="indent-amount">
+<presetreference>Global_Indentation Amount_2</presetreference>
+</rule>
+<rule name="indent-continuation">
+<presetreference>Global_Indent Continuation Lines_true</presetreference>
+</rule>
+<rule name="initialiser-braces">
+<presetreference>Declarations_Initializer Brace Position_Aligned</presetreference>
+</rule>
+<rule name="initialiser-indentation">
+<presetreference>Declarations_Initializer Indentation_True</presetreference>
+</rule>
+<rule name="initialiser-list">
+<presetreference>Declarations_Initializer List Entries_Pack</presetreference>
+</rule>
+<rule name="initialiser-spacing">
+<presetreference>Declarations_Initializer Spacing_True</presetreference>
+</rule>
+<rule name="label-indentation">
+<presetreference>Global_Label Indentation_None</presetreference>
+</rule>
+<rule name="line-wrap-width">
+<presetreference>Global_Line Wrapping_80</presetreference>
+</rule>
+<rule name="member-initialiser-position">
+<presetreference>Constructor_Member Initializer Position_Below</presetreference>
+</rule>
+<rule name="min-member-align">
+<presetreference>Classes and Structs_Minimum Member Alignment_None</presetreference>
+</rule>
+<rule name="multiple-inheritance">
+<presetreference>Classes and Structs_Multiple Inheritance_OnePerLine</presetreference>
+</rule>
+<rule name="namespace-bracing-style">
+<presetreference>Namespaces_Brace Position_Aligned</presetreference>
+</rule>
+<rule name="namespace-indent">
+<presetreference>Namespaces_Indentation_True</presetreference>
+</rule>
+<rule name="pointer-hangleft">
+<presetreference>Pointers and References_Hang Left on Alignment_False</presetreference>
+</rule>
+<rule name="pointer-position">
+<presetreference>Pointers and References_Positioning_Var</presetreference>
+</rule>
+<rule name="pointer-qualifier">
+<presetreference>Pointers and References_Qualifiers_True</presetreference>
+</rule>
+<rule name="pointer-spacing">
+<presetreference>Pointers and References_Spacing_False</presetreference>
+</rule>
+<rule name="preprocessor-indent">
+<presetreference>Global_Preprocessor Indentation_False</presetreference>
+</rule>
+<rule name="statement-force">
+<presetreference>Global_Force Statements To Start On New Line_True</presetreference>
+</rule>
+<rule name="strict-whitespace">
+<presetreference>Global_Trim Excess Newlines_False</presetreference>
+</rule>
+<rule name="switch-align-braces">
+<presetreference>Switch_Align Braces With Case_False</presetreference>
+</rule>
+<rule name="switch-bracing-style">
+<presetreference>Switch_Brace Position_Indented</presetreference>
+</rule>
+<rule name="switch-indentation-style">
+<presetreference>Switch_Statement Indentation_True</presetreference>
+</rule>
+<rule name="template-dec-comma">
+<presetreference>Templates_Comma Spacing_AfterComma</presetreference>
+</rule>
+<rule name="template-declaration-chevron">
+<presetreference>Templates_Chevron Spacing_False</presetreference>
+</rule>
+<rule name="template-declaration-id">
+<presetreference>Templates_Identifier Spacing_True</presetreference>
+</rule>
+<rule name="template-newline">
+<presetreference>Templates_Declaration On New Line_True</presetreference>
+</rule>
+<rule name="template-parameter-lines">
+<presetreference>Templates_Parameter Lines_False</presetreference>
+</rule>
+<rule name="trim-trailing-whitespace">
+<presetreference>Global_Trim Trailing Whitespace_True</presetreference>
+</rule>
+<rule name="try-bracing-style">
+<presetreference>Try_Try Brace Position_Indented</presetreference>
+</rule>
+<rule name="try-catch-style">
+<presetreference>Try_Catch Position_NewLine</presetreference>
+</rule>
+<rule name="try-indented-style">
+<presetreference>Try_Indentation_True</presetreference>
+</rule>
+<rule name="use-tabs">
+<presetreference>Global_Indentation Type_Spaces</presetreference>
+</rule>
+<rule name="while-bracing-style">
+<presetreference>While_Brace Position_Indented</presetreference>
+</rule>
+<rule name="while-indent-style">
+<presetreference>While_Indentation_True</presetreference>
+</rule>
+</style>

@@ -1,0 +1,123 @@
+#! /bin/sh
+
+# -------------------------------------------------------------------------
+#       $Id: bootstrap 88269 2009-12-21 11:25:29Z johnnyw $
+# 
+# Bootstrap ACE/TAO configuration tools when checked out from CVS.
+# Requires GNU autoconf, GNU automake and GNU libtool.
+#
+# This script is only meant to be run by ACE/TAO maintainers.
+# 
+# -------------------------------------------------------------------------
+
+#  Copyright (C) 1999, 2002  Ossama Othman
+#
+#  All Rights Reserved
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the current ACE distribution terms.
+# 
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+set -e
+
+# If paginator environment variable isn't set then use `more'.
+PAGER=${PAGER:-more}
+
+usage()
+{
+    cat <<EOF | $PAGER
+Usage: bootstrap [OPTIONS]
+
+Generic options:
+  --help	  display this help and exit
+
+EOF
+
+    exit $1
+}
+
+
+if test $# -gt 2; then
+    usage 1
+fi
+
+while test $# -gt 0; do
+    case "$1" in
+    --help)
+	usage 0
+	;;
+    esac
+    shift
+done
+
+
+# This script must be run from the top-level ACE source directory
+if test -d m4; then
+
+  ##
+  # The beta is now cut on a linux box. These are available in /usr/bin. 
+  #
+  # Set the PATH containing the GNU tools
+  #if (uname | grep SunOS > /dev/null 2>&1); then
+  #  PATH=/project/danzon/pkg/gnu/bin:$PATH
+  #  export PATH
+  #fi
+
+  # Update the NEWS file
+  # For now just copy the contents of the `VERSION' file to make automake
+  # happy.  Eventually, we should start putting real news in to it.
+
+    autoupdate -f
+ 
+#    autoreconf -I m4 --install --force --symlink --verbose
+    autoreconf -I m4 --install --force 
+
+#   # Generate the man pages.
+#   # Only generate man pages if bootstrapping a release.
+#   if test $bootstrap_release = yes; then
+#     if test -f man/man3/ACE.3; then
+#       echo ACE man pages have already been generated.
+#     else
+#       echo 'Generating the ACE man pages (this may take several minutes)'
+
+#       (ACE_ROOT=.; \
+#        export ACE_ROOT; \
+#        ./bin/generate_doxygen.pl -is_release -exclude_tao > /dev/null)
+#     fi  # test -f man/man3/ACE.3
+#   fi  # test $bootstrap_release = yes
+
+#   # Regenerate the man pages lists in the man page Makefiles.
+
+#   if test -f man/man3/Makefile.am; then
+#     # Only insert man page lists if bootstrapping a release.
+#     if test $bootstrap_release = yes; then
+#       echo 'Inserting ACE man page lists into appropriate Makefile.am files.'
+#       ACE_MAN_PAGES=`(cd man/man3 && echo *.3)`
+#     else
+#       ACE_MAN_PAGES=
+#     fi
+
+#     (cd man/man3; \
+#      eval "sed -e 's/^man_MANS =.*$/man_MANS = $ACE_MAN_PAGES/' \
+#        Makefile.am > Makefile.am.new"; \
+#      mv Makefile.am.new Makefile.am)
+#     (cd man/html; \
+#      eval "sed -e 's/^html_DATA =.*$/html_DATA = $ACE_HTML_MAN_PAGES/' \
+#        Makefile.am > Makefile.am.new"; \
+#      mv Makefile.am.new Makefile.am)
+#   else
+#     test -f man/man3/Makefile.am || echo 'man/man3/Makefile.am is missing!'
+#     exit 1;
+#   fi  # test -f man/man3/Makefile.am
+
+  # Provide some more "useful" information.
+  echo "Done bootstrapping ACE autotool support."
+else
+  echo "ACE autotool support must be bootstrapped from the"
+  echo "top-level ACE source directory."
+  exit 1;
+fi  # test -d m4

@@ -1,0 +1,21 @@
+//  -*- MPC -*-
+// $Id: qos.mpc 90826 2010-06-24 09:07:33Z johnnyw $
+
+project(QoS) : acelib, ace_output, install {
+  requires    += qos
+  sharedname   = ACE_QoS
+  dynamicflags += ACE_QoS_BUILD_DLL
+  macros      += ACE_HAS_QOS
+
+  specific(prop:windows) {
+    macros += ACE_HAS_WINSOCK2_GQOS
+  }
+
+  specific {
+    install_dir = ace/qos
+  }
+
+  pkgconfig_files {
+    ACE_QoS.pc.in
+  }
+}

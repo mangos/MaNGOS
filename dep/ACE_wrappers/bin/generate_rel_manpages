@@ -1,0 +1,108 @@
+eval '(exit $?0)' && eval 'exec perl -S $0 ${1+"$@"}'
+    & eval 'exec perl -S $0 $argv:q'
+    if 0;
+
+# $Id: generate_rel_manpages 90981 2010-07-05 08:48:35Z johnnyw $
+
+use strict;
+require Cwd;
+
+
+###########
+###### Sanity Checks
+##########
+
+my  $perl_path = '/usr/bin/perl';
+
+my $status= 0;
+
+&can_run($perl_path.' -V') ||
+  die "$0: perl path is incorrect, please fix the script\n";
+
+my  $doxy_path = '/usr/local/bin';
+
+$ENV{'PATH'} = $ENV{'PATH'}.':'.$doxy_path;
+
+print "Starting doxygen document generation \n";
+
+my $chgrp = 'chgrp';
+my $cpio = 'cpio';
+my $date = 'date';
+my $egrep = 'egrep';
+my $find = 'find';
+my $gzip = 'gzip';
+my $bzip = 'bzip2';
+my $tar = 'tar';
+my $make = 'make -f Release -s';
+my $mv = 'mv -f';
+my $scp = 'scp ';
+my $rm = 'rm -f';
+my $cp = 'cp -f';
+my $md5sum = 'md5sum';
+my $shell_cd = 'cd';
+my $cksum_ext = 'md5';
+my $redirect =  '>';
+my $checksum = '$md5sum';
+
+$SIG{'HUP'} = $SIG{'INT'} = $SIG{'QUIT'} = $SIG{'TERM'} = 'cleanup';
+
+my $release_filter = '\\( -name .svn -o -name build \\) -prune -o ' .
+                     '! -name \'.\#*\' ! -name \'\#*\' ! -name \'*~\' ' .
+                     '! -name \'*.MAK\' -print';
+
+my $bin_files =
+    "\"\\.mak|\\.mdp|\\.ide|\\.exe\|\\.ico\|\\.gz\|\\.zip\|" .
+    "\\.gif|\\.vcp|\\.vcproj|\\.vcw|\\.sln\"";
+
+my $release_files = '';
+
+chomp ($release_files = `$make show_release_files`);
+
+########
+######## Main execution thread.
+########
+&ex ("bin/generate_doxygen.pl -is_release -perl_path $perl_path")
+    && die "$0: failed to generate ACE man pages\n";
+
+my $build_command =
+    "$find ./html $release_filter | $cpio -o -H tar | " .
+    "$gzip -9 > ACE-html.tar.gz && ".
+    "$find ./html $release_filter | $cpio -o -H tar | " .
+    "$bzip -9 > ACE-html.tar.bz2 && ".
+    "$find ./html $release_filter | $egrep -v $bin_files | " .
+    "zip ACE-html.zip -q9@ &&" .
+    "md5sum ACE-html.tar.gz > ACE-html.tar.gz.md5 &&" .
+    "md5sum ACE-html.tar.bz2 > ACE-html.tar.bz2.md5 &&" .
+    "md5sum ACE-html.zip > ACE-html.zip.md5;";
+
+&ex ($build_command)
+    && die "$0: failed to package ACE man pages\n";
+
+exit $status;
+
+
+########
+######## Verify that a command can be executed, return 1 on sucess
+########
+sub can_run {
+  my $command = shift;
+
+  open (RUN, "$command 2>&1 |")
+    || return 0;
+  while (<RUN>) {}
+  close(RUN)
+    || return 0;
+  return 1;
+}
+
+########
+######## Execute a command, unless -n had been specified.  Return value
+######## of 0 indicates success.
+########
+sub ex ()
+{
+  my ($command) = @_;
+
+  print "Command is $command \n";
+  system ("$command");
+}

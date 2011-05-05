@@ -14,7 +14,7 @@ ConfVersion=2010100901
 #    DataDir
 #        Data directory setting.
 #        Important: DataDir needs to be quoted, as it is a string which may contain space characters.
-#        Example: "@prefix@/share/mangos"
+#        Example: "@CMAKE_INSTALL_PREFIX@/share/mangos"
 #
 #    LogsDir
 #        Logs directory setting.
@@ -568,6 +568,10 @@ LogColors = ""
 #                 0 (no limit)
 #        Default: 10
 #
+#   BirthdayTime
+#        Set to birthday (date in unix time), By default 28th August 2005, when MaNGOS got it’s name
+#        Default: 1125180000
+#
 #    Instance.IgnoreLevel
 #        Ignore level requirement to enter instance
 #        Default: 0 (false)
@@ -758,6 +762,7 @@ AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
 CastUnstuck = 1
 MaxSpellCastsInChain = 10
+BirthdayTime = 1125180000
 Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
