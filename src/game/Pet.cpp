@@ -1302,7 +1302,7 @@ void Pet::_LoadAuras(uint32 timediff)
                 if ((effIndexMask & (1 << i)) == 0)
                     continue;
 
-                if (remaintime[i] != -1 && !IsPositiveEffect(spellid, SpellEffectIndex(i)))
+                if (remaintime[i] != -1 && !IsPositiveEffect(spellproto, SpellEffectIndex(i)))
                 {
                     if (remaintime[i]/IN_MILLISECONDS <= int32(timediff))
                     continue;

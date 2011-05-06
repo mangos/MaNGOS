@@ -268,7 +268,7 @@ inline bool IsNonCombatSpell(SpellEntry const *spellInfo)
 }
 
 bool IsPositiveSpell(uint32 spellId);
-bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex);
+bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 
 bool IsExplicitPositiveTarget(uint32 targetA);

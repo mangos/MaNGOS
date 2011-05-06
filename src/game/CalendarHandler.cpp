@@ -26,19 +26,19 @@
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
 {
-    DEBUG_LOG("WORLD: CMSG_CALENDAR_GET_CALENDAR");     // empty
+    DEBUG_LOG("WORLD: CMSG_CALENDAR_GET_CALENDAR");         // empty
 
     time_t cur_time = time(NULL);
 
-    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR,4+4*0+4+4*0+4+4);
+    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR, 4+4*0+4+4*0+4+4);
 
     // TODO: calendar invite event output
-    data << (uint32) 0;                                     //invite node count
+    data << (uint32) 0;                                     // invite node count
     // TODO: calendar event output
-    data << (uint32) 0;                                     //event count
+    data << (uint32) 0;                                     // event count
 
-    data << (uint32) 0;                                     //wtf??
-    data << (uint32) secsToTimeBitFields(cur_time);         // current time
+    data << (uint32) 0;                                     // Current Unix Time?
+    data << (uint32) secsToTimeBitFields(cur_time);         // current packed time
 
     uint32 counter = 0;
     size_t p_counter = data.wpos();
@@ -61,9 +61,30 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
     }
     data.put<uint32>(p_counter,counter);
 
-    data << (uint32) 1135753200;                            //wtf?? (28.12.2005 12:00)
-    data << (uint32) 0;                                     //  unk counter 4
-    data << (uint32) 0;                                     // unk counter 5
+    data << (uint32) 1135753200;                            // base date (28.12.2005 12:00)
+    data << (uint32) 0;                                     //  raid reset count
+    data << (uint32) 0;                                     // holidays count
+/*
+    for(uint32 i = 0; i < holidays_count; ++i)
+    {
+        data << uint32(0);                                   // holiday id
+        data << uint32(0);                                   // Holidays.dbc field 37 (flags)
+        data << uint32(0);                                   // Holidays.dbc field 38 (flags)
+        data << uint32(0);                                   // Holidays.dbc field 52
+        data << uint32(0);                                   // Holidays.dbc field RepeatingMethod
+
+        for(uint32 j = 0; j < 26; j++)
+            data << uint32(0);                               // Holidays.dbc field Dates
+
+        for(uint32 j = 0; j < 10; j++)
+            data << uint32(0);                               // Holidays.dbc field unk1
+
+        for(uint32 j = 0; j < 10; j++)
+            data << uint32(0);                               // Holidays.dbc field unk39
+
+        data << "";                                          // Holidays.dbc field texture
+    }
+*/
     //DEBUG_LOG("Sending calendar");
     //data.hexlike();
     SendPacket(&data);

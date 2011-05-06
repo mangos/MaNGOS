@@ -7222,11 +7222,16 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
 
         // Check for immune to application of harmful magical effects
         AuraList const& immuneAuraApply = GetAurasByType(SPELL_AURA_MOD_IMMUNE_AURA_APPLY_SCHOOL);
-        for(AuraList::const_iterator iter = immuneAuraApply.begin(); iter != immuneAuraApply.end(); ++iter)
-            if (spellInfo->GetDispel() == DISPEL_MAGIC &&                                 // Magic debuff
-                ((*iter)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellInfo)) &&  // Check school
-                !IsPositiveEffect(spellInfo->Id, index))                                  // Harmful
-                return true;
+        if (!immuneAuraApply.empty() &&
+            spellInfo->GetDispel() == DISPEL_MAGIC &&       // Magic debuff)
+            !IsPositiveEffect(spellInfo, index))            // Harmful
+        {
+            // Check school
+            SpellSchoolMask schoolMask = GetSpellSchoolMask(spellInfo);
+            for(AuraList::const_iterator iter = immuneAuraApply.begin(); iter != immuneAuraApply.end(); ++iter)
+                if ((*iter)->GetModifier()->m_miscvalue & schoolMask)
+                    return true;
+        }
     }
 
     return false;
@@ -8791,7 +8796,7 @@ int32 Unit::CalculateSpellDuration(SpellEntry const* spellProto, SpellEffectInde
         // Find total mod value (negative bonus)
         int32 durationMod_always = target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MECHANIC_DURATION_MOD, mechanic);
         // Modify from SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL aura for negative effects (stack always ?)
-        if (!IsPositiveEffect(spellProto->Id, effect_index))
+        if (!IsPositiveEffect(spellProto, effect_index))
             durationMod_always+=target->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_DURATION_OF_EFFECTS_BY_DISPEL, spellProto->GetDispel());
         // Find max mod (negative bonus)
         int32 durationMod_not_stack = target->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MECHANIC_DURATION_MOD_NOT_STACK, mechanic);

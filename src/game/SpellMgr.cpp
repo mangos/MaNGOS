@@ -654,12 +654,8 @@ bool IsExplicitNegativeTarget(uint32 targetA)
     return false;
 }
 
-bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
+bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
 {
-    SpellEntry const *spellproto = sSpellStore.LookupEntry(spellId);
-    if (!spellproto)
-        return false;
-
     SpellEffectEntry const* spellEffect = spellproto->GetSpellEffect(effIndex);
     if(!spellEffect)
         return false;
@@ -668,12 +664,13 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
     {
         case SPELL_EFFECT_DUMMY:
             // some explicitly required dummy effect sets
-            switch(spellId)
+            switch(spellproto->Id)
             {
                 case 28441:                                 // AB Effect 000
                     return false;
                 case 49634:                                 // Sergeant's Flare
                 case 54530:                                 // Opening
+                case 62105:                                 // To'kini's Blowgun
                     return true;
                 default:
                     break;
@@ -742,7 +739,7 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
                     return true;
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
-                    if (spellId != spellEffect->EffectTriggerSpell)
+                    if (spellproto->Id != spellEffect->EffectTriggerSpell)
                     {
                         uint32 spellTriggeredId = spellEffect->EffectTriggerSpell;
                         SpellEntry const *spellTriggeredProto = sSpellStore.LookupEntry(spellTriggeredId);
@@ -752,13 +749,13 @@ bool IsPositiveEffect(uint32 spellId, SpellEffectIndex effIndex)
                             // non-positive targets of main spell return early
                             for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
                             {
-                                SpellEffectEntry const* triggerSpellEffect = spellTriggeredProto->GetSpellEffect(effIndex);
-                                if(!triggerSpellEffect)
+                                SpellEffectEntry const* triggerSpellEffect = spellTriggeredProto->GetSpellEffect(SpellEffectIndex(i));
+                                if (!triggerSpellEffect)
                                     continue;
                                 // if non-positive trigger cast targeted to positive target this main cast is non-positive
                                 // this will place this spell auras as debuffs
                                 if (IsPositiveTarget(triggerSpellEffect->EffectImplicitTargetA,triggerSpellEffect->EffectImplicitTargetB) &&
-                                    !IsPositiveEffect(spellTriggeredId,SpellEffectIndex(i)))
+                                    !IsPositiveEffect(spellTriggeredProto, SpellEffectIndex(i)))
                                     return false;
                             }
                         }
@@ -891,7 +888,7 @@ bool IsPositiveSpell(uint32 spellId)
     // spells with at least one negative effect are considered negative
     // some self-applied spells have negative effects but in self casting case negative check ignored.
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-        if (!IsPositiveEffect(spellId, SpellEffectIndex(i)))
+        if (spellproto->GetSpellEffectIdByIndex(SpellEffectIndex(i)) && !IsPositiveEffect(spellproto, SpellEffectIndex(i)))
             return false;
     return true;
 }
@@ -2481,7 +2478,7 @@ SpellEntry const* SpellMgr::SelectAuraRankForLevel(SpellEntry const* spellInfo, 
             IsAreaEffectPossitiveTarget(Targets(spellEffect->EffectImplicitTargetA)))) ||
             spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY ||
             spellEffect->Effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID) &&
-            IsPositiveEffect(spellInfo->Id, SpellEffectIndex(i)))
+            IsPositiveEffect(spellInfo, SpellEffectIndex(i)))
         {
             needRankSelection = true;
             break;
