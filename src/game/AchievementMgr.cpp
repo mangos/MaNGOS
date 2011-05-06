@@ -24,6 +24,7 @@
 #include "GameEventMgr.h"
 #include "ObjectMgr.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "SpellMgr.h"

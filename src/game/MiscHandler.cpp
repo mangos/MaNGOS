@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "World.h"
+#include "GuildMgr.h"
 #include "ObjectMgr.h"
 #include "WorldSession.h"
 #include "Auth/BigNumber.h"
