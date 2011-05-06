@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "ArenaTeam.h"
 #include "GossipDef.h"
 #include "SocialMgr.h"
@@ -146,7 +147,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
 
     if(type == 9)
     {
-        if(sObjectMgr.GetGuildByName(name))
+        if (sGuildMgr.GetGuildByName(name))
         {
             SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_EXISTS_S);
             return;
@@ -403,7 +404,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket & recv_data)
 
     if(type == 9)
     {
-        if(sObjectMgr.GetGuildByName(newname))
+        if (sGuildMgr.GetGuildByName(newname))
         {
             SendGuildCommandResult(GUILD_CREATE_S, newname, ERR_GUILD_NAME_EXISTS_S);
             return;
@@ -794,7 +795,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     if(type == 9)
     {
-        if(sObjectMgr.GetGuildByName(name))
+        if (sGuildMgr.GetGuildByName(name))
         {
             SendGuildCommandResult(GUILD_CREATE_S, name, ERR_GUILD_NAME_EXISTS_S);
             delete result;
@@ -835,7 +836,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
         }
 
         // register guild and add guildmaster
-        sObjectMgr.AddGuild(guild);
+        sGuildMgr.AddGuild(guild);
 
         // add members
         for(uint8 i = 0; i < signs; ++i)

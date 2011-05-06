@@ -31,6 +31,7 @@
 #include "Chat.h"
 #include "Log.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "MapManager.h"
 #include "MassMailMgr.h"
@@ -3553,16 +3554,16 @@ bool ChatHandler::HandleGuildCreateCommand(char* args)
         return true;
     }
 
-    Guild *guild = new Guild;
-    if (!guild->Create (target,guildname))
+    Guild* guild = new Guild;
+    if (!guild->Create(target, guildname))
     {
         delete guild;
-        SendSysMessage (LANG_GUILD_NOT_CREATED);
-        SetSentErrorMessage (true);
+        SendSysMessage(LANG_GUILD_NOT_CREATED);
+        SetSentErrorMessage(true);
         return false;
     }
 
-    sObjectMgr.AddGuild (guild);
+    sGuildMgr.AddGuild(guild);
     return true;
 }
 
@@ -3581,7 +3582,7 @@ bool ChatHandler::HandleGuildInviteCommand(char *args)
         return false;
 
     std::string glName = guildStr;
-    Guild* targetGuild = sObjectMgr.GetGuildByName (glName);
+    Guild* targetGuild = sGuildMgr.GetGuildByName(glName);
     if (!targetGuild)
         return false;
 
@@ -3603,7 +3604,7 @@ bool ChatHandler::HandleGuildUninviteCommand(char *args)
     if (!glId)
         return false;
 
-    Guild* targetGuild = sObjectMgr.GetGuildById (glId);
+    Guild* targetGuild = sGuildMgr.GetGuildById(glId);
     if (!targetGuild)
         return false;
 
@@ -3625,7 +3626,7 @@ bool ChatHandler::HandleGuildRankCommand(char *args)
     if (!glId)
         return false;
 
-    Guild* targetGuild = sObjectMgr.GetGuildById (glId);
+    Guild* targetGuild = sGuildMgr.GetGuildById(glId);
     if (!targetGuild)
         return false;
 
@@ -3655,7 +3656,7 @@ bool ChatHandler::HandleGuildDeleteCommand(char* args)
 
     std::string gld = guildStr;
 
-    Guild* targetGuild = sObjectMgr.GetGuildByName (gld);
+    Guild* targetGuild = sGuildMgr.GetGuildByName(gld);
     if (!targetGuild)
         return false;
 

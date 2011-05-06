@@ -43,7 +43,6 @@
 #include <limits>
 
 class Group;
-class Guild;
 class ArenaTeam;
 class Item;
 
@@ -441,8 +440,6 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, Group*> GroupMap;
 
-        typedef UNORDERED_MAP<uint32, Guild*> GuildMap;
-
         typedef UNORDERED_MAP<uint32, ArenaTeam*> ArenaTeamMap;
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
@@ -469,13 +466,6 @@ class ObjectMgr
         Group* GetGroupById(uint32 id) const;
         void AddGroup(Group* group);
         void RemoveGroup(Group* group);
-
-        Guild* GetGuildByLeader(ObjectGuid guid) const;
-        Guild* GetGuildById(uint32 GuildId) const;
-        Guild* GetGuildByName(const std::string& guildname) const;
-        std::string GetGuildNameById(uint32 GuildId) const;
-        void AddGuild(Guild* guild);
-        void RemoveGuild(uint32 Id);
 
         ArenaTeam* GetArenaTeamById(uint32 arenateamid) const;
         ArenaTeam* GetArenaTeamByName(const std::string& arenateamname) const;
@@ -626,7 +616,6 @@ class ObjectMgr
             return NULL;
         }
 
-        void LoadGuilds();
         void LoadArenaTeams();
         void LoadGroups();
         void LoadQuests();
@@ -1075,7 +1064,6 @@ class ObjectMgr
         typedef std::pair<CreatureModelRaceMap::const_iterator, CreatureModelRaceMap::const_iterator> CreatureModelRaceMapBounds;
 
         GroupMap            mGroupMap;
-        GuildMap            mGuildMap;
         ArenaTeamMap        mArenaTeamMap;
 
         QuestAreaTriggerMap mQuestAreaTriggerMap;

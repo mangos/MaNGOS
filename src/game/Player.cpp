@@ -44,6 +44,7 @@
 #include "Formulas.h"
 #include "Group.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "Pet.h"
 #include "Util.h"
 #include "Transports.h"
@@ -4178,7 +4179,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
 
     // remove from guild
     if (uint32 guildId = GetGuildIdFromDB(playerguid))
-        if (Guild* guild = sObjectMgr.GetGuildById(guildId))
+        if (Guild* guild = sGuildMgr.GetGuildById(guildId))
             guild->DelMember(playerguid);
 
     // remove from arena teams
@@ -4827,7 +4828,7 @@ uint32 Player::DurabilityRepair(uint16 pos, bool cost, float discountMod, bool g
                     return TotalCost;
                 }
 
-                Guild *pGuild = sObjectMgr.GetGuildById(GetGuildId());
+                Guild* pGuild = sGuildMgr.GetGuildById(GetGuildId());
                 if (!pGuild)
                     return TotalCost;
 

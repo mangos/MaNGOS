@@ -30,7 +30,6 @@
 #include "UpdateMask.h"
 #include "World.h"
 #include "Group.h"
-#include "Guild.h"
 #include "ArenaTeam.h"
 #include "Transports.h"
 #include "ProgressBar.h"
@@ -172,11 +171,8 @@ ObjectMgr::~ObjectMgr()
         for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
             delete[] playerInfo[race][class_].levelInfo;
 
-    // free group and guild objects
+    // free objects
     for (GroupMap::iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
-        delete itr->second;
-
-    for (GuildMap::iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
         delete itr->second;
 
     for (ArenaTeamMap::iterator itr = mArenaTeamMap.begin(); itr != mArenaTeamMap.end(); ++itr)
@@ -197,42 +193,6 @@ Group* ObjectMgr::GetGroupById(uint32 id) const
     GroupMap::const_iterator itr = mGroupMap.find(id);
     if (itr != mGroupMap.end())
         return itr->second;
-
-    return NULL;
-}
-
-Guild* ObjectMgr::GetGuildById(uint32 GuildId) const
-{
-    GuildMap::const_iterator itr = mGuildMap.find(GuildId);
-    if (itr != mGuildMap.end())
-        return itr->second;
-
-    return NULL;
-}
-
-Guild * ObjectMgr::GetGuildByName(const std::string& guildname) const
-{
-    for(GuildMap::const_iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
-        if (itr->second->GetName() == guildname)
-            return itr->second;
-
-    return NULL;
-}
-
-std::string ObjectMgr::GetGuildNameById(uint32 GuildId) const
-{
-    GuildMap::const_iterator itr = mGuildMap.find(GuildId);
-    if (itr != mGuildMap.end())
-        return itr->second->GetName();
-
-    return "";
-}
-
-Guild* ObjectMgr::GetGuildByLeader(ObjectGuid guid) const
-{
-    for(GuildMap::const_iterator itr = mGuildMap.begin(); itr != mGuildMap.end(); ++itr)
-        if (itr->second->GetLeaderGuid() == guid)
-            return itr->second;
 
     return NULL;
 }
@@ -3328,89 +3288,6 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
                 info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3: (lvl > 5 ? 1: 0));
         }
     }
-}
-
-void ObjectMgr::LoadGuilds()
-{
-    Guild *newGuild;
-    uint32 count = 0;
-
-    //                                                    0             1          2          3           4           5           6
-    QueryResult *result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
-    //   7               8    9    10         11        12
-        "BackgroundColor,info,motd,createdate,BankMoney,(SELECT COUNT(guild_bank_tab.guildid) FROM guild_bank_tab WHERE guild_bank_tab.guildid = guild.guildid) "
-        "FROM guild ORDER BY guildid ASC");
-
-    if( !result )
-    {
-
-        barGoLink bar( 1 );
-
-        bar.step();
-
-        sLog.outString();
-        sLog.outString( ">> Loaded %u guild definitions", count );
-        return;
-    }
-
-    // load guild ranks
-    //                                                                0       1   2     3      4
-    QueryResult *guildRanksResult   = CharacterDatabase.Query("SELECT guildid,rid,rname,rights,BankMoneyPerDay FROM guild_rank ORDER BY guildid ASC, rid ASC");
-
-    // load guild members
-    //                                                                0       1                 2    3     4       5                  6
-    QueryResult *guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,BankResetTimeMoney,BankRemMoney,"
-    //   7                 8                9                 10               11                12
-        "BankResetTimeTab0,BankRemSlotsTab0,BankResetTimeTab1,BankRemSlotsTab1,BankResetTimeTab2,BankRemSlotsTab2,"
-    //   13                14               15                16               17                18
-        "BankResetTimeTab3,BankRemSlotsTab3,BankResetTimeTab4,BankRemSlotsTab4,BankResetTimeTab5,BankRemSlotsTab5,"
-    //   19               20                21                22               23                      24
-        "characters.name, characters.level, characters.class, characters.zone, characters.logout_time, characters.account "
-        "FROM guild_member LEFT JOIN characters ON characters.guid = guild_member.guid ORDER BY guildid ASC");
-
-    // load guild bank tab rights
-    //                                                                      0       1     2   3       4
-    QueryResult *guildBankTabRightsResult = CharacterDatabase.Query("SELECT guildid,TabId,rid,gbright,SlotPerDay FROM guild_bank_right ORDER BY guildid ASC, TabId ASC");
-
-    barGoLink bar( (int)result->GetRowCount() );
-
-    do
-    {
-        //Field *fields = result->Fetch();
-
-        bar.step();
-        ++count;
-
-        newGuild = new Guild;
-        if (!newGuild->LoadGuildFromDB(result) ||
-            !newGuild->LoadRanksFromDB(guildRanksResult) ||
-            !newGuild->LoadMembersFromDB(guildMembersResult) ||
-            !newGuild->LoadBankRightsFromDB(guildBankTabRightsResult) ||
-            !newGuild->CheckGuildStructure()
-            )
-        {
-            newGuild->Disband();
-            delete newGuild;
-            continue;
-        }
-        newGuild->LoadGuildEventLogFromDB();
-        newGuild->LoadGuildBankEventLogFromDB();
-        newGuild->LoadGuildBankFromDB();
-        AddGuild(newGuild);
-    } while( result->NextRow() );
-
-    delete result;
-    delete guildRanksResult;
-    delete guildMembersResult;
-    delete guildBankTabRightsResult;
-
-    //delete unused LogGuid records in guild_eventlog and guild_bank_eventlog table
-    //you can comment these lines if you don't plan to change CONFIG_UINT32_GUILD_EVENT_LOG_COUNT and CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT
-    CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE LogGuid > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT));
-    CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE LogGuid > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT));
-
-    sLog.outString();
-    sLog.outString( ">> Loaded %u guild definitions", count );
 }
 
 void ObjectMgr::LoadArenaTeams()
@@ -8835,16 +8712,6 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     }
 
     return true;
-}
-
-void ObjectMgr::AddGuild( Guild* guild )
-{
-    mGuildMap[guild->GetId()] = guild ;
-}
-
-void ObjectMgr::RemoveGuild( uint32 Id )
-{
-    mGuildMap.erase(Id);
 }
 
 void ObjectMgr::AddGroup( Group* group )
