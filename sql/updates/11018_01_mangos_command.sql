@@ -4,4 +4,3 @@ DELETE FROM command WHERE name IN ('send mass mail');
 
 INSERT INTO command (name, security, help) VALUES
 ('send mass mail',3,'Syntax: .send mass mail #racemask|$racename|alliance|horde|all "#subject" "#text"\r\n\r\nSend a mail to players. Subject and mail text must be in "".');
-

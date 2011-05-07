@@ -9,5 +9,3 @@ CREATE TABLE `pool_creature_template` (
   PRIMARY KEY  (`id`),
   INDEX `pool_idx` (pool_entry)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-
