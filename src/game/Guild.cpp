@@ -23,6 +23,7 @@
 #include "Opcodes.h"
 #include "ObjectMgr.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "Chat.h"
 #include "SocialMgr.h"
 #include "Util.h"
@@ -104,7 +105,7 @@ Guild::~Guild()
 
 bool Guild::Create(Player* leader, std::string gname)
 {
-    if (sObjectMgr.GetGuildByName(gname))
+    if (sGuildMgr.GetGuildByName(gname))
         return false;
 
     WorldSession* lSession = leader->GetSession();
@@ -707,7 +708,7 @@ void Guild::Disband()
     CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE guildid = '%u'", m_Id);
     CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE guildid = '%u'", m_Id);
     CharacterDatabase.CommitTransaction();
-    sObjectMgr.RemoveGuild(m_Id);
+    sGuildMgr.RemoveGuild(m_Id);
 }
 
 void Guild::Roster(WorldSession *session /*= NULL*/)

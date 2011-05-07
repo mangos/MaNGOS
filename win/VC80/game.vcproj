@@ -798,6 +798,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\GuildMgr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\GuildMgr.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\InstanceData.cpp"
 				>
 			</File>
