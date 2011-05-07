@@ -19,7 +19,6 @@
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldPacket.h"
-#include "Vehicle.h"
 #include "Player.h"
 #include "Opcodes.h"
 #include "Chat.h"
@@ -93,7 +92,7 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendEquipError(msg, NULL, NULL);
+    m_session->GetPlayer()->SendEquipError(InventoryResult(msg), NULL, NULL);
     return true;
 }
 
@@ -103,7 +102,7 @@ bool ChatHandler::HandleDebugSendSellErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendSellError(msg, 0, 0, 0);
+    m_session->GetPlayer()->SendSellError(SellResult(msg), 0, 0, 0);
     return true;
 }
 
@@ -113,7 +112,7 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendBuyError(msg, 0, 0, 0);
+    m_session->GetPlayer()->SendBuyError(BuyResult(msg), 0, 0, 0);
     return true;
 }
 
@@ -642,41 +641,6 @@ bool ChatHandler::HandleDebugBattlegroundCommand(char* /*args*/)
 bool ChatHandler::HandleDebugArenaCommand(char* /*args*/)
 {
     sBattleGroundMgr.ToggleArenaTesting();
-    return true;
-}
-
-bool ChatHandler::HandleDebugSpawnVehicleCommand(char* args)
-{
-    uint32 entry;
-    if (!ExtractUInt32(&args, entry))
-        return false;
-
-    uint32 id;
-    if (!ExtractUInt32(&args, id))
-        return false;
-
-    CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
-    if (!ci)
-        return false;
-
-    VehicleEntry const *ve = sVehicleStore.LookupEntry(id);
-    if (!ve)
-        return false;
-
-    Player* chr = m_session->GetPlayer();
-
-    Vehicle *v = new Vehicle;
-
-    CreatureCreatePos pos(chr, chr->GetOrientation());
-
-    if (!v->Create(pos.GetMap()->GenerateLocalLowGuid(HIGHGUID_VEHICLE), pos, entry, id, chr->GetTeam()))
-    {
-        delete v;
-        return false;
-    }
-
-    pos.GetMap()->Add((Creature*)v);
-
     return true;
 }
 

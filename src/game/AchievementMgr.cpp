@@ -536,6 +536,9 @@ void AchievementMgr::SaveToDB()
 
 void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult)
 {
+    // Note: this code called before any character data loading so don't must triggering any events req. inventory/etc
+    // all like cases must be happens in CheckAllAchievementCriteria called after character data load
+
     if(achievementResult)
     {
         do
@@ -1270,7 +1273,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
             {
-                // miscvalue1=loot_type (note: 0 = LOOT_CORSPE and then it ignored)
+                // miscvalue1=loot_type (note: 0 = LOOT_CORPSE and then it ignored)
                 // miscvalue2=count of item loot
                 if (!miscvalue1 || !miscvalue2)
                     continue;

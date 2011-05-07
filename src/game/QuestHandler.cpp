@@ -636,7 +636,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
     {
         uint8 dialogStatus = DIALOG_STATUS_NONE;
 
-        if (itr->IsCreatureOrPet())
+        if (itr->IsAnyTypeCreature())
         {
             // need also pet quests case support
             Creature *questgiver = GetPlayer()->GetMap()->GetAnyTypeCreature(*itr);

@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
 
 class QueryResult;
 class WorldPacket;
@@ -86,13 +87,6 @@ enum ArenaTeamStatTypes
     STAT_TYPE_RANK          = 5
 };
 
-enum ArenaTeamTypes
-{
-    ARENA_TEAM_2v2      = 2,
-    ARENA_TEAM_3v3      = 3,
-    ARENA_TEAM_5v5      = 5
-};
-
 struct ArenaTeamMember
 {
     ObjectGuid guid;
@@ -125,15 +119,15 @@ class ArenaTeam
         ArenaTeam();
         ~ArenaTeam();
 
-        bool Create(ObjectGuid captainGuid, uint32 type, std::string arenaTeamName);
+        bool Create(ObjectGuid captainGuid, ArenaType type, std::string arenaTeamName);
         void Disband(WorldSession *session);
 
         typedef std::list<ArenaTeamMember> MemberList;
 
         uint32 GetId() const              { return m_TeamId; }
-        uint32 GetType() const            { return m_Type; }
+        ArenaType GetType() const         { return m_Type; }
         uint8  GetSlot() const            { return GetSlotByType(GetType()); }
-        static uint8 GetSlotByType(uint32 type);
+        static uint8 GetSlotByType(ArenaType type);
         ObjectGuid GetCaptainGuid() const { return m_CaptainGuid; }
         std::string GetName() const       { return m_Name; }
         const ArenaTeamStats& GetStats() const { return m_stats; }
@@ -153,6 +147,7 @@ class ArenaTeam
         void SetEmblem(uint32 backgroundColor, uint32 emblemStyle, uint32 emblemColor, uint32 borderStyle, uint32 borderColor);
 
         size_t GetMembersSize() const         { return m_members.size(); }
+        size_t GetMaxMembersSize() const      { return size_t(GetType() * 2); }
         bool   Empty() const                  { return m_members.empty(); }
         MemberList::iterator m_membersBegin() { return m_members.begin(); }
         MemberList::iterator m_membersEnd()   { return m_members.end(); }
@@ -215,7 +210,7 @@ class ArenaTeam
     protected:
 
         uint32 m_TeamId;
-        uint32 m_Type;
+        ArenaType m_Type;
         std::string m_Name;
         ObjectGuid m_CaptainGuid;
 

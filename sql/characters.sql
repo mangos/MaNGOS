@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: characters
 -- ------------------------------------------------------
--- Server version	5.0.45-Debian_1ubuntu3.1-log
+-- Server version    5.0.45-Debian_1ubuntu3.1-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_11117_02_characters_world` bit(1) default NULL
+  `required_11391_01_characters_auction` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -147,6 +147,7 @@ CREATE TABLE `auction` (
   `itemowner` int(11) unsigned NOT NULL default '0',
   `buyoutprice` int(11) NOT NULL default '0',
   `time` bigint(40) NOT NULL default '0',
+  `moneyTime` bigint(40) NOT NULL default '0',
   `buyguid` int(11) unsigned NOT NULL default '0',
   `lastbid` int(11) NOT NULL default '0',
   `startbid` int(11) NOT NULL default '0',
@@ -372,18 +373,17 @@ CREATE TABLE `character_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL default '0' COMMENT 'Full Global Unique Identifier',
   `item_guid` int(11) unsigned NOT NULL default '0',
   `spell` int(11) unsigned NOT NULL default '0',
-  `stackcount` int(11) NOT NULL default '1',
-  `remaincharges` int(11) NOT NULL default '0',
+  `stackcount` INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  `remaincharges` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `basepoints0` INT(11) NOT NULL DEFAULT '0',
   `basepoints1` INT(11) NOT NULL DEFAULT '0',
   `basepoints2` INT(11) NOT NULL DEFAULT '0',
-  `maxduration0` INT(11) NOT NULL DEFAULT '0',
-  `maxduration1` INT(11) NOT NULL DEFAULT '0',
-  `maxduration2` INT(11) NOT NULL DEFAULT '0',
-  `remaintime0` INT(11) NOT NULL DEFAULT '0',
-  `remaintime1` INT(11) NOT NULL DEFAULT '0',
-  `remaintime2` INT(11) NOT NULL DEFAULT '0',
-  `effIndexMask` INT(11) NOT NULL DEFAULT '0',
+  `periodictime0` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `periodictime1` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `periodictime2` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `maxduration` INT(11) NOT NULL DEFAULT '0',
+  `remaintime` INT(11) NOT NULL DEFAULT '0',
+  `effIndexMask` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`caster_guid`,`item_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
 
@@ -1565,18 +1565,17 @@ CREATE TABLE `pet_aura` (
   `caster_guid` bigint(20) unsigned NOT NULL default '0' COMMENT 'Full Global Unique Identifier',
   `item_guid` int(11) unsigned NOT NULL default '0',
   `spell` int(11) unsigned NOT NULL default '0',
-  `stackcount` int(11) NOT NULL default '1',
-  `remaincharges` int(11) NOT NULL default '0',
+  `stackcount` INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  `remaincharges` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `basepoints0` INT(11) NOT NULL DEFAULT '0',
   `basepoints1` INT(11) NOT NULL DEFAULT '0',
   `basepoints2` INT(11) NOT NULL DEFAULT '0',
-  `maxduration0` INT(11) NOT NULL DEFAULT '0',
-  `maxduration1` INT(11) NOT NULL DEFAULT '0',
-  `maxduration2` INT(11) NOT NULL DEFAULT '0',
-  `remaintime0` INT(11) NOT NULL DEFAULT '0',
-  `remaintime1` INT(11) NOT NULL DEFAULT '0',
-  `remaintime2` INT(11) NOT NULL DEFAULT '0',
-  `effIndexMask` INT(11) NOT NULL DEFAULT '0',
+  `periodictime0` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `periodictime1` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `periodictime2` INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  `maxduration` INT(11) NOT NULL DEFAULT '0',
+  `remaintime` INT(11) NOT NULL DEFAULT '0',
+  `effIndexMask` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`caster_guid`,`item_guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet System';
 

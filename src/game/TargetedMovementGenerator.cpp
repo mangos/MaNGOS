@@ -80,7 +80,7 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
 
     D::_addUnitStateMove(owner);
     if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->CanFly())
-        ((Creature&)owner).AddSplineFlag(SPLINEFLAG_UNKNOWN7);
+        ((Creature&)owner).AddSplineFlag(SPLINEFLAG_FLYING);
 }
 
 template<>
@@ -147,7 +147,7 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     {
         D::_addUnitStateMove(owner);
         if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->CanFly())
-            ((Creature&)owner).AddSplineFlag(SPLINEFLAG_UNKNOWN7);
+            ((Creature&)owner).AddSplineFlag(SPLINEFLAG_FLYING);
 
         i_destinationHolder.StartTravel(traveller);
         return true;
@@ -211,7 +211,7 @@ void ChaseMovementGenerator<Creature>::Initialize(Creature &owner)
     owner.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
 
     if (((Creature*)&owner)->CanFly())
-        owner.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
+        owner.AddSplineFlag(SPLINEFLAG_FLYING);
 
     _setTargetLocation(owner);
 }
@@ -282,7 +282,7 @@ void FollowMovementGenerator<Creature>::Initialize(Creature &owner)
     _updateSpeed(owner);
 
     if (((Creature*)&owner)->CanFly())
-        owner.AddSplineFlag(SPLINEFLAG_UNKNOWN7);
+        owner.AddSplineFlag(SPLINEFLAG_FLYING);
 
     _setTargetLocation(owner);
 }

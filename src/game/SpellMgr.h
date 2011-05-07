@@ -35,6 +35,7 @@
 
 class Player;
 class Spell;
+class Unit;
 struct CreatureInfo;
 struct SpellModifier;
 
@@ -113,6 +114,7 @@ inline uint32 GetSpellRecoveryTime(SpellEntry const *spellInfo)
 }
 int32 GetSpellDuration(SpellEntry const *spellInfo);
 int32 GetSpellMaxDuration(SpellEntry const *spellInfo);
+int32 CalculateSpellDuration(SpellEntry const *spellInfo, Unit const* caster = NULL);
 uint16 GetSpellAuraMaxTicks(SpellEntry const* spellInfo);
 WeaponAttackType GetWeaponAttackType(SpellEntry const *spellInfo);
 
@@ -268,6 +270,7 @@ inline bool IsNonCombatSpell(SpellEntry const *spellInfo)
 }
 
 bool IsPositiveSpell(uint32 spellId);
+bool IsPositiveSpell(SpellEntry const *spellproto);
 bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 
@@ -511,15 +514,26 @@ inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
     return SpellSchoolMask(spellInfo->SchoolMask);
 }
 
-inline uint32 GetSpellMechanicMask(SpellEntry const* spellInfo, int32 effect)
+inline uint32 GetSpellMechanicMask(SpellEntry const* spellInfo, uint32 effectMask)
 {
-    SpellCategoriesEntry const* spellCategory = spellInfo->GetSpellCategories();
     uint32 mask = 0;
-    if (spellCategory && spellCategory->Mechanic)
-        mask |= 1 << (spellCategory->Mechanic - 1);
-    SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(effect));
-    if (effectEntry && effectEntry->EffectMechanic)
-        mask |= 1 << (effectEntry->EffectMechanic - 1);
+
+    if (uint32 mech = spellInfo->GetMechanic())
+        mask |= 1 << (mech - 1);
+
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (!(effectMask & (1 << i)))
+            continue;
+
+        SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+        if (!effectEntry)
+            continue;
+
+        if (effectEntry->EffectMechanic)
+            mask |= 1 << (effectEntry->EffectMechanic - 1);
+    }
+
     return mask;
 }
 

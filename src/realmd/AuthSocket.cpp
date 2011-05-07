@@ -110,9 +110,9 @@ typedef struct AUTH_LOGON_PROOF_S
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
-    uint32  unk1;
-    uint32  unk2;
-    uint16  unk3;
+    uint32  unk1;                                           // AccountFlags (trial 0x08, ProPass 0x800000, gm 0x01)
+    uint32  unk2;                                           // SurveyId
+    uint16  unk3;                                           // some flags (AccountMsgAvailable = 0x01)
 } sAuthLogonProof_S;
 
 typedef struct AUTH_LOGON_PROOF_S_BUILD_6005

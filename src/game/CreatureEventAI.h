@@ -187,7 +187,8 @@ struct CreatureEventAI_Action
         // ACTION_T_SET_FACTION                             = 2
         struct
         {
-            uint32 factionId;                               // faction or 0 for default)
+            uint32 factionId;                               // faction id or 0 to restore default faction
+            uint32 factionFlags;                            // flags will restore default faction at evade and/or respawn
         } set_faction;
         // ACTION_T_MORPH_TO_ENTRY_OR_MODEL                 = 3
         struct

@@ -83,6 +83,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
             break;
         }
         case HIGHGUID_UNIT:
+        case HIGHGUID_VEHICLE:
         {
             Creature* pCreature = GetPlayer()->GetMap()->GetCreature(lguid);
 
@@ -127,7 +128,7 @@ void WorldSession::HandleAutostoreLootItemOpcode( WorldPacket & recv_data )
         pItem->SetLootState(ITEM_LOOT_CHANGED);
 
     ItemPosCountVec dest;
-    uint8 msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, item->itemid, item->count );
+    InventoryResult msg = player->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, item->itemid, item->count );
     if ( msg == EQUIP_ERR_OK )
     {
         Item * newitem = player->StoreNewItem( dest, item->itemid, true, item->randomPropertyId);
@@ -216,6 +217,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
             break;
         }
         case HIGHGUID_UNIT:
+        case HIGHGUID_VEHICLE:
         {
             Creature* pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
@@ -460,6 +462,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             return;                                         // item can be looted only single player
         }
         case HIGHGUID_UNIT:
+        case HIGHGUID_VEHICLE:
         {
             Creature* pCreature = GetPlayer()->GetMap()->GetCreature(lguid);
 
@@ -520,7 +523,7 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
 
     Loot *pLoot = NULL;
 
-    if(lootguid.IsCreature())
+    if (lootguid.IsCreatureOrVehicle())
     {
         Creature *pCreature = GetPlayer()->GetMap()->GetCreature(lootguid);
         if(!pCreature)
@@ -548,7 +551,7 @@ void WorldSession::HandleLootMasterGiveOpcode( WorldPacket & recv_data )
     LootItem& item = pLoot->items[slotid];
 
     ItemPosCountVec dest;
-    uint8 msg = target->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, item.itemid, item.count );
+    InventoryResult msg = target->CanStoreNewItem( NULL_BAG, NULL_SLOT, dest, item.itemid, item.count );
     if ( msg != EQUIP_ERR_OK )
     {
         target->SendEquipError( msg, NULL, NULL, item.itemid );

@@ -37,7 +37,7 @@ struct ItemSetEffect
     SpellEntry const *spells[8];
 };
 
-enum InventoryChangeFailure
+enum InventoryResult
 {
     EQUIP_ERR_OK                                 = 0,
     EQUIP_ERR_CANT_EQUIP_LEVEL_I                 = 1,       // ERR_CANT_EQUIP_LEVEL_I
@@ -80,7 +80,7 @@ enum InventoryChangeFailure
     EQUIP_ERR_YOU_ARE_DEAD                       = 38,      // ERR_PLAYER_DEAD
     EQUIP_ERR_CANT_DO_RIGHT_NOW                  = 39,      // ERR_CLIENT_LOCKED_OUT
     EQUIP_ERR_INT_BAG_ERROR                      = 40,      // ERR_INTERNAL_BAG_ERROR
-    EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER2            = 41,      // ERR_ONLY_ONE_BOLT
+    EQUIP_ERR_CAN_EQUIP_ONLY1_BOLT               = 41,      // ERR_ONLY_ONE_BOLT
     EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH          = 42,      // ERR_ONLY_ONE_AMMO
     EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED          = 43,      // ERR_CANT_WRAP_STACKABLE
     EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED           = 44,      // ERR_CANT_WRAP_EQUIPPED
@@ -131,7 +131,7 @@ enum InventoryChangeFailure
     EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS  = 89
 };
 
-enum BuyFailure
+enum BuyResult
 {
     BUY_ERR_CANT_FIND_ITEM                      = 0,
     BUY_ERR_ITEM_ALREADY_SOLD                   = 1,
@@ -144,7 +144,7 @@ enum BuyFailure
     BUY_ERR_REPUTATION_REQUIRE                  = 12
 };
 
-enum SellFailure
+enum SellResult
 {
     SELL_ERR_CANT_FIND_ITEM                      = 1,
     SELL_ERR_CANT_SELL_ITEM                      = 2,       // merchant doesn't like that item
@@ -313,7 +313,7 @@ class MANGOS_DLL_SPEC Item : public Object
         uint32 GetMaxStackCount() const { return GetProto()->GetMaxStackSize(); }
         uint8 GetGemCountWithID(uint32 GemID) const;
         uint8 GetGemCountWithLimitCategory(uint32 limitCategory) const;
-        uint8 CanBeMergedPartlyWith(ItemPrototype const* proto) const;
+        InventoryResult CanBeMergedPartlyWith(ItemPrototype const* proto) const;
 
         uint8 GetSlot() const {return m_slot;}
         Bag *GetContainer() { return m_container; }

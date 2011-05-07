@@ -902,7 +902,7 @@ void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        GameEventUpdateCreatureDataInMapsWorker worker(ObjectGuid(HIGHGUID_UNIT, data->id, itr->first), data, &itr->second, activate);
+        GameEventUpdateCreatureDataInMapsWorker worker(data->GetObjectGuid(itr->first), data, &itr->second, activate);
         sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
     }
 }

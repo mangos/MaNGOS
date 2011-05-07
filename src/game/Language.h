@@ -915,7 +915,8 @@ enum MangosStrings
     LANG_SCRIPTS_WRONG_API              = 1167,
     LANG_SCRIPTS_RELOADED_OK            = 1168,
     LANG_SCRIPTS_OUTDATED               = 1169,
-    // Room for more level 3              1170-1199 not used
+    LANG_NPCINFO_CHAR_DIFFICULTY        = 1170,
+    // Room for more level 3              1171-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
@@ -935,7 +936,8 @@ enum MangosStrings
     LANG_POOL_CHANCE_POOL_LIST_CONSOLE  = 1500,
     LANG_POOL_POOL_LIST_CHAT            = 1501,
     LANG_POOL_POOL_LIST_CONSOLE         = 1502,
-    // Room for more Level 2              1503-1599 not used
+    LANG_NO_FREE_STATIC_GUID_FOR_SPAWN  = 1503,
+    // Room for more Level 2              1504-1599 not used
 
     // FREE IDS                           1600-9999
 

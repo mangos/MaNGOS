@@ -51,8 +51,7 @@ if(WIN32 AND MSVC)
   )
   ExternalProject_Add_Step(ACE_Project ACE_Build
     DEPENDEES ACE_Upgrade
-    COMMAND ${ACE_BUILD_TOOL} <SOURCE_DIR>\\ace\\ace_vc8.sln /build Debug|${ACE_CONFIGURATION}
-    COMMAND ${ACE_BUILD_TOOL} <SOURCE_DIR>\\ace\\ace_vc8.sln /build Release|${ACE_CONFIGURATION}
+    COMMAND ${ACE_BUILD_TOOL} <SOURCE_DIR>\\ace\\ace_vc8.sln /project ACE /build ${CMAKE_BUILD_TYPE}|${ACE_CONFIGURATION}
     ALWAYS 0
   )
 elseif(UNIX)

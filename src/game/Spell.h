@@ -345,6 +345,7 @@ class Spell
         void EffectPlayMusic(SpellEffectEntry const* effect);
         void EffectSpecCount(SpellEffectEntry const* effect);
         void EffectActivateSpec(SpellEffectEntry const* effect);
+        void EffectCancelAura(SpellEffectEntry const* effect);
 
         Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL);
         ~Spell();
@@ -392,14 +393,14 @@ class Spell
         void DoSummonTotem(SpellEffectEntry const* effect, uint8 slot_dbc = 0);
         void DoSummonCritter(SpellEffectEntry const* effect, uint32 forceFaction = 0);
 
-        void WriteSpellGoTargets( WorldPacket * data );
-        void WriteAmmoToPacket( WorldPacket * data );
+        void WriteSpellGoTargets(WorldPacket* data);
+        void WriteAmmoToPacket(WorldPacket* data);
 
         typedef std::list<Unit*> UnitList;
         void FillTargetMap();
         void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList &targetUnitMap);
 
-        void FillAreaTargets(UnitList &targetUnitMap, float x, float y, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);
+        void FillAreaTargets(UnitList &targetUnitMap, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);
         void FillRaidOrPartyTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster);
         void FillRaidOrPartyManaPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
         void FillRaidOrPartyHealthPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
@@ -468,7 +469,7 @@ class Spell
         Unit* GetCaster() const { return m_caster; }
         // real source of cast affects, explicit caster, or DoT/HoT applier, or GO owner, or wild GO itself. Can be NULL
         WorldObject* GetAffectiveCasterObject() const;
-        // limited version returning NULL in cases not Unit* caster object, need for Aura (auras currently not support non-Unit caster)
+        // limited version returning NULL in cases wild gameobject caster object, need for Aura (auras currently not support non-Unit caster)
         Unit* GetAffectiveCaster() const { return !m_originalCasterGUID.IsEmpty() ? m_originalCaster : m_caster; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
@@ -512,6 +513,7 @@ class Spell
         WeaponAttackType m_attackType;                      // For weapon based attack
         uint32 m_powerCost;                                 // Calculated spell cost     initialized only in Spell::prepare
         int32 m_casttime;                                   // Calculated spell cast time initialized only in Spell::prepare
+        int32 m_duration;
         bool m_canReflect;                                  // can reflect this spell?
         bool m_autoRepeat;
         uint8 m_runesState;
@@ -542,7 +544,7 @@ class Spell
         Unit* unitTarget;
         Item* itemTarget;
         GameObject* gameObjTarget;
-        SpellAuraHolder* spellAuraHolder;                   // spell aura holder for current target, created only if spell has aura applying effect
+        SpellAuraHolder* m_spellAuraHolder;                 // spell aura holder for current target, created only if spell has aura applying effect
         int32 damage;
 
         // this is set in Spell Hit, but used in Apply Aura handler
@@ -581,7 +583,6 @@ class Spell
             uint8  effectMask:8;
             bool   processed:1;
         };
-        std::list<TargetInfo> m_UniqueTargetInfo;
         uint8 m_needAliveTargetMask;                        // Mask req. alive targets
 
         struct GOTargetInfo
@@ -591,14 +592,20 @@ class Spell
             uint8  effectMask:8;
             bool   processed:1;
         };
-        std::list<GOTargetInfo> m_UniqueGOTargetInfo;
 
         struct ItemTargetInfo
         {
             Item  *item;
             uint8 effectMask;
         };
-        std::list<ItemTargetInfo> m_UniqueItemInfo;
+
+        typedef std::list<TargetInfo>     TargetList;
+        typedef std::list<GOTargetInfo>   GOTargetList;
+        typedef std::list<ItemTargetInfo> ItemTargetList;
+
+        TargetList     m_UniqueTargetInfo;
+        GOTargetList   m_UniqueGOTargetInfo;
+        ItemTargetList m_UniqueItemInfo;
 
         void AddUnitTarget(Unit* target, SpellEffectIndex effIndex);
         void AddUnitTarget(uint64 unitGUID, SpellEffectIndex effIndex);
@@ -648,13 +655,13 @@ namespace MaNGOS
 {
     struct MANGOS_DLL_DECL SpellNotifierPlayer
     {
-        std::list<Unit*> &i_data;
+        Spell::UnitList &i_data;
         Spell &i_spell;
         const uint32& i_index;
         float i_radius;
         WorldObject* i_originalCaster;
 
-        SpellNotifierPlayer(Spell &spell, std::list<Unit*> &data, const uint32 &i, float radius)
+        SpellNotifierPlayer(Spell &spell, Spell::UnitList &data, const uint32 &i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)
         {
             i_originalCaster = i_spell.GetAffectiveCasterObject();
@@ -683,29 +690,64 @@ namespace MaNGOS
 
     struct MANGOS_DLL_DECL SpellNotifierCreatureAndPlayer
     {
-        std::list<Unit*> *i_data;
+        Spell::UnitList *i_data;
         Spell &i_spell;
         SpellNotifyPushType i_push_type;
         float i_radius;
         SpellTargets i_TargetType;
         WorldObject* i_originalCaster;
+        WorldObject* i_castingObject;
         bool i_playerControlled;
+        float i_centerX;
+        float i_centerY;
 
-        SpellNotifierCreatureAndPlayer(Spell &spell, std::list<Unit*> &data, float radius, SpellNotifyPushType type,
+        float GetCenterX() const { return i_centerX; }
+        float GetCenterY() const { return i_centerY; }
+
+        SpellNotifierCreatureAndPlayer(Spell &spell, Spell::UnitList &data, float radius, SpellNotifyPushType type,
             SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY, WorldObject* originalCaster = NULL)
             : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType),
-            i_originalCaster(originalCaster)
+            i_originalCaster(originalCaster), i_castingObject(i_spell.GetCastingObject())
         {
             if (!i_originalCaster)
                 i_originalCaster = i_spell.GetAffectiveCasterObject();
             i_playerControlled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
+
+            switch(i_push_type)
+            {
+                case PUSH_IN_FRONT:
+                case PUSH_IN_FRONT_90:
+                case PUSH_IN_FRONT_30:
+                case PUSH_IN_FRONT_15:
+                case PUSH_IN_BACK:
+                case PUSH_SELF_CENTER:
+                    if (i_castingObject)
+                    {
+                        i_centerX = i_castingObject->GetPositionX();
+                        i_centerY = i_castingObject->GetPositionY();
+                    }
+                    break;
+                case PUSH_DEST_CENTER:
+                    i_centerX = i_spell.m_targets.m_destX;
+                    i_centerY = i_spell.m_targets.m_destY;
+                    break;
+                case PUSH_TARGET_CENTER:
+                    if (Unit* target = i_spell.m_targets.getUnitTarget())
+                    {
+                        i_centerX = target->GetPositionX();
+                        i_centerY = target->GetPositionY();
+                    }
+                    break;
+                default:
+                    sLog.outError("SpellNotifierCreatureAndPlayer: unsupported PUSH_* case %u.", i_push_type);
+            }
         }
 
         template<class T> inline void Visit(GridRefManager<T>  &m)
         {
             MANGOS_ASSERT(i_data);
 
-            if(!i_originalCaster)
+            if (!i_originalCaster || !i_castingObject)
                 return;
 
             for(typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
@@ -761,35 +803,35 @@ namespace MaNGOS
                 switch(i_push_type)
                 {
                     case PUSH_IN_FRONT:
-                        if(i_spell.GetCaster()->isInFront((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_90:
-                        if(i_spell.GetCaster()->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/2 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/2 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_30:
-                        if(i_spell.GetCaster()->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/6 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/6 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_15:
-                        if(i_spell.GetCaster()->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/12 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/12 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_BACK:
-                        if(i_spell.GetCaster()->isInBack((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
+                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_SELF_CENTER:
-                        if(i_spell.GetCaster()->IsWithinDist((Unit*)(itr->getSource()), i_radius))
+                        if (i_castingObject->IsWithinDist((Unit*)(itr->getSource()), i_radius))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_DEST_CENTER:
-                        if(itr->getSource()->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
+                        if (itr->getSource()->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_TARGET_CENTER:
-                        if(i_spell.m_targets.getUnitTarget()->IsWithinDist((Unit*)(itr->getSource()), i_radius))
+                        if (i_spell.m_targets.getUnitTarget() && i_spell.m_targets.getUnitTarget()->IsWithinDist((Unit*)(itr->getSource()), i_radius))
                             i_data->push_back(itr->getSource());
                         break;
                 }

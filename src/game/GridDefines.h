@@ -26,7 +26,6 @@
 // Forward class definitions
 class Corpse;
 class Creature;
-class Vehicle;
 class DynamicObject;
 class GameObject;
 class Pet;
@@ -60,7 +59,7 @@ class Camera;
 // Cameras in world list just because linked with Player objects
 typedef TYPELIST_4(Player, Creature/*pets*/, Corpse/*resurrectable*/, Camera)           AllWorldObjectTypes;
 typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
-typedef TYPELIST_5(Creature, Pet, Vehicle, GameObject, DynamicObject)                   AllMapStoredObjectTypes;
+typedef TYPELIST_4(Creature, Pet, GameObject, DynamicObject)                            AllMapStoredObjectTypes;
 
 typedef GridRefManager<Camera>          CameraMapType;
 typedef GridRefManager<Corpse>          CorpseMapType;

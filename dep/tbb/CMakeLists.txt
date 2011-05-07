@@ -48,8 +48,8 @@ if(WIN32 AND MSVC)
   )
   ExternalProject_Add_Step(TBB_Project TBB_Build
     DEPENDEES TBB_Upgrade
-    COMMAND ${TBB_BUILD_TOOL} ${TBB_SOURCE}\\makefile.sln /build Debug|${TBB_CONFIGURATION}
-    COMMAND ${TBB_BUILD_TOOL} ${TBB_SOURCE}\\makefile.sln /build Release|${TBB_CONFIGURATION}
+    COMMAND ${TBB_BUILD_TOOL} ${TBB_SOURCE}\\makefile.sln /project tbb /build ${CMAKE_BUILD_TYPE}|${TBB_CONFIGURATION}
+    COMMAND ${TBB_BUILD_TOOL} ${TBB_SOURCE}\\makefile.sln /project tbbmalloc /build ${CMAKE_BUILD_TYPE}|${TBB_CONFIGURATION}
     ALWAYS 0
   )
 elseif(UNIX)

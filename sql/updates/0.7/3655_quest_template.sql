@@ -19,6 +19,6 @@ UPDATE `quest_template` SET `ZoneOrSort` = -304 WHERE `ZoneOrSort` = 0  AND `Req
 UPDATE `quest_template` SET `ZoneOrSort` = -324 WHERE `ZoneOrSort` = 0  AND `RequiredSkill` = 129;
 
 ALTER TABLE `quest_template`
-	ADD COLUMN  `SuggestedPlayers` int(11) unsigned NOT NULL DEFAULT 0 AFTER `RequiredRepValue`,
-	DROP COLUMN `RequiredClass`,
-	DROP COLUMN `RequiredSkill`;
+    ADD COLUMN  `SuggestedPlayers` int(11) unsigned NOT NULL DEFAULT 0 AFTER `RequiredRepValue`,
+    DROP COLUMN `RequiredClass`,
+    DROP COLUMN `RequiredSkill`;

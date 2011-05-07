@@ -171,7 +171,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)\ADEd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)\ACEd.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)ACEd.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
@@ -210,7 +210,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)\ADEd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)\ACEd.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)ACEd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
@@ -323,7 +323,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)\ADEd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)\ACEd.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)ACEd.lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
@@ -362,7 +362,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ProgramDatabaseFile>$(TargetDir)\ADEd.pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(TargetDir)\ACEd.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)ACEd.lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>

@@ -143,7 +143,10 @@ void Corpse::DeleteFromDB()
     MANGOS_ASSERT(GetType() != CORPSE_BONES);
 
     // all corpses (not bones)
-    CharacterDatabase.PExecute("DELETE FROM corpse WHERE player = '%u' AND corpse_type <> '0'",  GetOwnerGuid().GetCounter());
+    static SqlStatementID id;
+
+    SqlStatement stmt = CharacterDatabase.CreateStatement(id, "DELETE FROM corpse WHERE player = ? AND corpse_type <> '0'");
+    stmt.PExecute(GetOwnerGuid().GetCounter());
 }
 
 bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)

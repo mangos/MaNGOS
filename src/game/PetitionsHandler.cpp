@@ -185,10 +185,10 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket & recv_data)
     }
 
     ItemPosCountVec dest;
-    uint8 msg = _player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount );
+    InventoryResult msg = _player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, charterid, pProto->BuyCount );
     if(msg != EQUIP_ERR_OK)
     {
-        _player->SendBuyError(msg, pCreature, charterid, 0);
+        _player->SendEquipError(msg, NULL, NULL, charterid);
         return;
     }
 
@@ -496,7 +496,10 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
             return;
         }
 
-        uint8 slot = ArenaTeam::GetSlotByType(type);
+        if (!IsArenaTypeValid(ArenaType(type)))
+            return;
+
+        uint8 slot = ArenaTeam::GetSlotByType(ArenaType(type));
         if(slot >= MAX_ARENA_SLOT)
             return;
 
@@ -647,7 +650,10 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket & recv_data)
             return;
         }
 
-        uint8 slot = ArenaTeam::GetSlotByType(type);
+        if (!IsArenaTypeValid(ArenaType(type)))
+            return;
+
+        uint8 slot = ArenaTeam::GetSlotByType(ArenaType(type));
         if(slot >= MAX_ARENA_SLOT)
             return;
 
@@ -736,7 +742,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     }
     else
     {
-        sLog.outError("petition table has broken data!");
+        sLog.outError("CMSG_TURN_IN_PETITION: petition table not have data for guid %u!", petitionGuid.GetCounter());
         return;
     }
 
@@ -752,7 +758,10 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     }
     else
     {
-        uint8 slot = ArenaTeam::GetSlotByType(type);
+        if (!IsArenaTypeValid(ArenaType(type)))
+            return;
+
+        uint8 slot = ArenaTeam::GetSlotByType(ArenaType(type));
         if (slot >= MAX_ARENA_SLOT)
             return;
 
@@ -844,7 +853,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     else                                                    // or arena team
     {
         ArenaTeam* at = new ArenaTeam;
-        if (!at->Create(_player->GetObjectGuid(), type, name))
+        if (!at->Create(_player->GetObjectGuid(), ArenaType(type), name))
         {
             sLog.outError("PetitionsHandler: arena team create failed.");
             delete at;

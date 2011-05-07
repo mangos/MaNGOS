@@ -24,20 +24,17 @@
 #include "ObjectMgr.h"
 #include "WorldPacket.h"
 
-void
-HomeMovementGenerator<Creature>::Initialize(Creature & owner)
+void HomeMovementGenerator<Creature>::Initialize(Creature & owner)
 {
     owner.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
     _setTargetLocation(owner);
 }
 
-void
-HomeMovementGenerator<Creature>::Reset(Creature &)
+void HomeMovementGenerator<Creature>::Reset(Creature &)
 {
 }
 
-void
-HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
+void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
     if (owner.hasUnitState(UNIT_STAT_NOT_MOVE))
         return;
@@ -55,8 +52,7 @@ HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     owner.clearUnitState(UNIT_STAT_ALL_STATE);
 }
 
-bool
-HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff)
+bool HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff)
 {
     CreatureTraveller traveller( owner);
     if (i_destinationHolder.UpdateTraveller(traveller, time_diff, false))
@@ -65,7 +61,20 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
             return true;                                    // not expire now, but already lost
     }
 
-    if (time_diff > i_travel_timer)
+    if (time_diff >= i_travel_timer)
+    {
+        i_travel_timer = 0;                                 // Used as check in Finalize
+        return false;
+    }
+
+    i_travel_timer -= time_diff;
+
+    return true;
+}
+
+void HomeMovementGenerator<Creature>::Finalize(Creature& owner)
+{
+    if (i_travel_timer == 0)
     {
         owner.AddSplineFlag(SPLINEFLAG_WALKMODE);
 
@@ -80,12 +89,10 @@ HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff
             }
         }
 
+        if (owner.GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_REACH_HOME)
+            owner.ClearTemporaryFaction();
+
         owner.LoadCreatureAddon(true);
         owner.AI()->JustReachedHome();
-        return false;
     }
-
-    i_travel_timer -= time_diff;
-
-    return true;
 }
