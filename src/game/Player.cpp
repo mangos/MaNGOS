@@ -16393,8 +16393,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
 
     uint32 slot = 0;
 
-    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
+    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12          13          14
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4, itemcount5, itemcount6 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if(result)
     {
@@ -16444,6 +16444,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
                 questStatusData.m_itemcount[1] = fields[10].GetUInt32();
                 questStatusData.m_itemcount[2] = fields[11].GetUInt32();
                 questStatusData.m_itemcount[3] = fields[12].GetUInt32();
+                questStatusData.m_itemcount[4] = fields[13].GetUInt32();
+                questStatusData.m_itemcount[5] = fields[14].GetUInt32();
 
                 questStatusData.uState = QUEST_UNCHANGED;
 
@@ -17640,8 +17642,8 @@ void Player::_SaveQuestStatus()
         {
             case QUEST_NEW :
                 {
-                    SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4) "
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4,itemcount5,itemcount6) "
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
                     stmt.addUInt32(GetGUIDLow());
                     stmt.addUInt32(i->first);
@@ -17651,7 +17653,7 @@ void Player::_SaveQuestStatus()
                     stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS+ sWorld.GetGameTime()));
                     for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
                         stmt.addUInt32(i->second.m_creatureOrGOcount[k]);
-                    for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
+                    for (int k = 0; k < QUEST_ITEM_OBJECTIVES_COUNT; ++k)
                         stmt.addUInt32(i->second.m_itemcount[k]);
                     stmt.Execute();
                 }
@@ -17659,7 +17661,7 @@ void Player::_SaveQuestStatus()
             case QUEST_CHANGED :
                 {
                     SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,explored = ?,timer = ?,"
-                        "mobcount1 = ?,mobcount2 = ?,mobcount3 = ?,mobcount4 = ?,itemcount1 = ?,itemcount2 = ?,itemcount3 = ?,itemcount4 = ?  WHERE guid = ? AND quest = ?");
+                        "mobcount1 = ?,mobcount2 = ?,mobcount3 = ?,mobcount4 = ?,itemcount1 = ?,itemcount2 = ?,itemcount3 = ?,itemcount4 = ?,itemcount5 = ?,itemcount6 = ? WHERE guid = ? AND quest = ?");
 
                     stmt.addUInt8(i->second.m_status);
                     stmt.addUInt8(i->second.m_rewarded);
@@ -17667,7 +17669,7 @@ void Player::_SaveQuestStatus()
                     stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS + sWorld.GetGameTime()));
                     for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
                         stmt.addUInt32(i->second.m_creatureOrGOcount[k]);
-                    for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
+                    for (int k = 0; k < QUEST_ITEM_OBJECTIVES_COUNT; ++k)
                         stmt.addUInt32(i->second.m_itemcount[k]);
                     stmt.addUInt32(GetGUIDLow());
                     stmt.addUInt32(i->first);
