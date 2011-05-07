@@ -360,6 +360,7 @@ class ScriptMgr
 
         const char* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
         uint32 GetScriptId(const char *name) const;
+        uint32 GetScriptIdsCount() const { return m_scriptNames.size(); }
 
         ScriptLoadResult LoadScriptLibrary(const char* libName);
         void UnloadScriptLibrary();
@@ -452,5 +453,7 @@ class ScriptMgr
 MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 triggerId);
 MANGOS_DLL_SPEC uint32 GetEventIdScriptId(uint32 eventId);
 MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
+MANGOS_DLL_SPEC char const* GetScriptName(uint32 id);
+MANGOS_DLL_SPEC uint32 GetScriptIdsCount();
 
 #endif
