@@ -816,6 +816,7 @@ MailSender::MailSender( Object* sender, MailStationery stationery ) : m_statione
             m_senderId = sender->GetEntry();
             break;
         case TYPEID_ITEM:
+        case TYPEID_CONTAINER:
             m_messageType = MAIL_ITEM;
             m_senderId = sender->GetEntry();
             break;
