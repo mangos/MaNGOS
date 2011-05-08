@@ -707,6 +707,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
                     }
                 }   break;
                 case SPELL_AURA_MOD_DAMAGE_DONE:            // dependent from base point sign (negative -> negative)
+                case SPELL_AURA_MOD_RESISTANCE:
                 case SPELL_AURA_MOD_STAT:
                 case SPELL_AURA_MOD_SKILL:
                 case SPELL_AURA_MOD_DODGE_PERCENT:
