@@ -8040,11 +8040,11 @@ void Aura::HandleAuraMirrorImage(bool apply, bool Real)
     // Target of aura should always be creature (ref Spell::CheckCast)
     Creature* pCreature = (Creature*)GetTarget();
 
-    // Caster can be player or creature, the unit who pCreature will become an clone of.
-    Unit* caster = GetCaster();
-
     if (apply)
     {
+        // Caster can be player or creature, the unit who pCreature will become an clone of.
+        Unit* caster = GetCaster();
+
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 0, caster->getRace());
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 1, caster->getClass());
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 2, caster->getGender());

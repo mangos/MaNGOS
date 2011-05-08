@@ -638,7 +638,7 @@ void WorldSession::HandleGetMirrorimageData(WorldPacket& recv_data)
     data << (uint8)pCreature->getGender();
     data << (uint8)pCreature->getClass();
 
-    if (pCaster->GetTypeId() == TYPEID_PLAYER)
+    if (pCaster && pCaster->GetTypeId() == TYPEID_PLAYER)
     {
         Player* pPlayer = (Player*)pCaster;
 
@@ -677,7 +677,9 @@ void WorldSession::HandleGetMirrorimageData(WorldPacket& recv_data)
     }
     else
     {
-        // No data when cloner is not player, data is taken from CreatureDisplayInfoExtraEntry by model already
+        // pCaster may have been NULL (usually not expected, but may happen at disconnect, etc)
+        // OR
+        // pCaster is not player, data is taken from CreatureDisplayInfoExtraEntry by model already
         data << (uint8)0;
         data << (uint8)0;
         data << (uint8)0;
