@@ -5535,10 +5535,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 Unit* pTarget = m_targets.getUnitTarget();
 
+                // In case of TARGET_SCRIPT, we have already added a target. Use it here (and find a better solution)
+                if (m_UniqueTargetInfo.size() == 1)
+                    pTarget = m_caster->GetMap()->GetAnyTypeCreature(m_UniqueTargetInfo.front().targetGUID);
+
                 if (!pTarget)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (pTarget->GetTypeId() != TYPEID_UNIT)    // Target must be creature
+                if (pTarget->GetTypeId() != TYPEID_UNIT)    // Target must be creature. TODO: Check if target can also be player
                     return SPELL_FAILED_BAD_TARGETS;
 
                 if (pTarget == m_caster)                    // Clone self can't be accepted
