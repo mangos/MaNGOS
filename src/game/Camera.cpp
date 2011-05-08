@@ -65,7 +65,7 @@ void Camera::SetView(WorldObject *obj, bool update_far_sight_field /*= true*/)
         return;
     }
 
-    if (!obj->isType(TYPEMASK_DYNAMICOBJECT | TYPEMASK_UNIT))
+    if (!obj->isType(TypeMask(TYPEMASK_DYNAMICOBJECT | TYPEMASK_UNIT)))
     {
         sLog.outError("Camera::SetView, viewpoint type is not available for client");
         return;

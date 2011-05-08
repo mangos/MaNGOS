@@ -13737,7 +13737,7 @@ void Player::AddQuest( Quest const *pQuest, Object *questGiver )
     }
 
     // remove start item if not need
-    if (questGiver && questGiver->isType(TYPEID_ITEM))
+    if (questGiver && questGiver->isType(TYPEMASK_ITEM))
     {
         // destroy not required for quest finish quest starting item
         bool notRequiredItem = true;
