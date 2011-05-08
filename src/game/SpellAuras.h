@@ -362,6 +362,7 @@ class MANGOS_DLL_SPEC Aura
         void HandlePreventFleeing(bool apply, bool Real);
         void HandleManaShield(bool apply, bool Real);
         void HandleArenaPreparation(bool apply, bool Real);
+        void HandleAuraMirrorImage(bool apply, bool Real);
         void HandleAuraConvertRune(bool apply, bool Real);
         void HandleAuraIncreaseBaseHealthPercent(bool Apply, bool Real);
         void HandleNoReagentUseAura(bool Apply, bool Real);

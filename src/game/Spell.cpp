@@ -5531,6 +5531,25 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 break;
             }
+            case SPELL_AURA_MIRROR_IMAGE:
+            {
+                Unit* pTarget = m_targets.getUnitTarget();
+
+                if (!pTarget)
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                if (pTarget->GetTypeId() != TYPEID_UNIT)    // Target must be creature
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                if (pTarget == m_caster)                    // Clone self can't be accepted
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                // It is assumed that target can not be cloned if already cloned by same or other clone auras
+                if (!pTarget->GetAurasByType(SPELL_AURA_MIRROR_IMAGE).empty())
+                    return SPELL_FAILED_BAD_TARGETS;
+
+                break;
+            }
             default:
                 break;
         }

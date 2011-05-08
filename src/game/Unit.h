@@ -547,7 +547,7 @@ enum UnitFlags2
     UNIT_FLAG2_UNK1                 = 0x00000002,           // Hides body and body armor. Weapons and shoulder and head armor still visible
     UNIT_FLAG2_UNK2                 = 0x00000004,
     UNIT_FLAG2_COMPREHEND_LANG      = 0x00000008,
-    UNIT_FLAG2_UNK4                 = 0x00000010,
+    UNIT_FLAG2_CLONED               = 0x00000010,           // Used in SPELL_AURA_MIRROR_IMAGE
     UNIT_FLAG2_UNK5                 = 0x00000020,
     UNIT_FLAG2_FORCE_MOVE           = 0x00000040,
     UNIT_FLAG2_DISARM_OFFHAND       = 0x00000080,           // also shield case

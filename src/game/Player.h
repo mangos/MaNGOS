@@ -1178,6 +1178,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetItemByLimitedCategory(uint32 limitedCategory) const;
         Item* GetItemByPos( uint16 pos ) const;
         Item* GetItemByPos( uint8 bag, uint8 slot ) const;
+        uint32 GetItemDisplayIdInSlot(uint8 bag, uint8 slot) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const;
         Item* GetShield(bool useable = false) const;
