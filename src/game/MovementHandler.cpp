@@ -169,17 +169,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         GetPlayer()->m_taxi.ClearTaxiDestinations();
     }
 
-    // resurrect character at enter into instance where his corpse exist after add to map
-    Corpse *corpse = GetPlayer()->GetCorpse();
-    if (corpse && corpse->GetType() != CORPSE_BONES && corpse->GetMapId() == GetPlayer()->GetMapId())
-    {
-        if( mEntry->IsDungeon() )
-        {
-            GetPlayer()->ResurrectPlayer(0.5f);
-            GetPlayer()->SpawnCorpseBones();
-        }
-    }
-
     if (mInstance)
     {
         Difficulty diff = GetPlayer()->GetDifficulty(mEntry->IsRaid());
