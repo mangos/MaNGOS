@@ -847,7 +847,7 @@ bool Item::CanBeTraded(bool mail) const
     {
         if (owner->CanUnequipItem(GetPos(),false) !=  EQUIP_ERR_OK )
             return false;
-        if (owner->GetLootGUID()==GetGUID())
+        if (owner->GetLootGuid() == GetObjectGuid())
             return false;
     }
 

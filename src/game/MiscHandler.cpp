@@ -264,8 +264,9 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG( "WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity() );
 
-    if (uint64 lguid = GetPlayer()->GetLootGUID())
-        DoLootRelease(lguid);
+    ObjectGuid lootGuid = GetPlayer()->GetLootGuid();
+    if (!lootGuid.IsEmpty())
+        DoLootRelease(lootGuid);
 
     //Can not logout if...
     if( GetPlayer()->isInCombat() ||                        //...is in combat

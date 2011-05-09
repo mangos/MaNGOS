@@ -490,111 +490,111 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
     DEBUG_LOG(  "WORLD: Received CMSG_SELL_ITEM" );
 
     ObjectGuid vendorGuid;
-    uint64 itemguid;
+    ObjectGuid itemGuid;
     uint32 count;
 
     recv_data >> vendorGuid;
-    recv_data >> itemguid;
+    recv_data >> itemGuid;
     recv_data >> count;
 
-    if(!itemguid)
+    if (itemGuid.IsEmpty())
         return;
 
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleSellItemOpcode - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, itemguid, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, itemGuid, 0);
         return;
     }
 
     // remove fake death
-    if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    Item *pItem = _player->GetItemByGuid( itemguid );
+    Item *pItem = _player->GetItemByGuid(itemGuid);
     if (pItem)
     {
         // prevent sell not owner item
         if (_player->GetObjectGuid() != pItem->GetOwnerGuid())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // prevent sell non empty bag by drag-and-drop at vendor's item list
-        if(pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
+        if (pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // prevent sell currently looted item
-        if(_player->GetLootGUID() == pItem->GetGUID())
+        if (_player->GetLootGuid() == pItem->GetObjectGuid())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // special case at auto sell (sell all)
-        if(count == 0)
+        if (count == 0)
         {
             count = pItem->GetCount();
         }
         else
         {
             // prevent sell more items that exist in stack (possible only not from client)
-            if(count > pItem->GetCount())
+            if (count > pItem->GetCount())
             {
-                _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
                 return;
             }
         }
 
         ItemPrototype const *pProto = pItem->GetProto();
-        if( pProto )
+        if (pProto)
         {
-            if( pProto->SellPrice > 0 )
+            if (pProto->SellPrice > 0)
             {
-                if(count < pItem->GetCount())               // need split items
+                if (count < pItem->GetCount())              // need split items
                 {
                     Item *pNewItem = pItem->CloneItem( count, _player );
                     if (!pNewItem)
                     {
                         sLog.outError("WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count );
-                        _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
                         return;
                     }
 
-                    pItem->SetCount( pItem->GetCount() - count );
-                    _player->ItemRemovedQuestCheck( pItem->GetEntry(), count );
-                    if( _player->IsInWorld() )
-                        pItem->SendCreateUpdateToPlayer( _player );
+                    pItem->SetCount(pItem->GetCount() - count);
+                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), count);
+                    if (_player->IsInWorld())
+                        pItem->SendCreateUpdateToPlayer(_player);
                     pItem->SetState(ITEM_CHANGED, _player);
 
-                    _player->AddItemToBuyBackSlot( pNewItem );
-                    if( _player->IsInWorld() )
-                        pNewItem->SendCreateUpdateToPlayer( _player );
+                    _player->AddItemToBuyBackSlot(pNewItem);
+                    if (_player->IsInWorld())
+                        pNewItem->SendCreateUpdateToPlayer(_player);
                 }
                 else
                 {
-                    _player->ItemRemovedQuestCheck( pItem->GetEntry(), pItem->GetCount());
-                    _player->RemoveItem( pItem->GetBagSlot(), pItem->GetSlot(), true);
+                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
+                    _player->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                     pItem->RemoveFromUpdateQueueOf(_player);
-                    _player->AddItemToBuyBackSlot( pItem );
+                    _player->AddItemToBuyBackSlot(pItem);
                 }
 
                 uint32 money = pProto->SellPrice * count;
 
-                _player->ModifyMoney( money );
+                _player->ModifyMoney(money);
                 _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
             }
             else
-                _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
     }
-    _player->SendSellError( SELL_ERR_CANT_FIND_ITEM, pCreature, itemguid, 0);
+    _player->SendSellError(SELL_ERR_CANT_FIND_ITEM, pCreature, itemGuid, 0);
     return;
 }
 
@@ -610,7 +610,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleBuybackItem - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, ObjectGuid(), 0);
         return;
     }
 
@@ -619,10 +619,10 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemFromBuyBackSlot( slot );
-    if( pItem )
+    if (pItem)
     {
         uint32 price = _player->GetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + slot - BUYBACK_SLOT_START );
-        if( _player->GetMoney() < price )
+        if (_player->GetMoney() < price)
         {
             _player->SendBuyError( BUY_ERR_NOT_ENOUGHT_MONEY, pCreature, pItem->GetEntry(), 0);
             return;
@@ -630,7 +630,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
 
         ItemPosCountVec dest;
         InventoryResult msg = _player->CanStoreItem( NULL_BAG, NULL_SLOT, dest, pItem, false );
-        if( msg == EQUIP_ERR_OK )
+        if (msg == EQUIP_ERR_OK)
         {
             _player->ModifyMoney( -(int32)price );
             _player->RemoveItemFromBuyBackSlot( slot, false );
@@ -643,7 +643,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         return;
     }
     else
-        _player->SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
+        _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
 }
 
 void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data )
@@ -730,7 +730,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: SendListInventory - %s not found or you can't interact with him.", vendorguid.GetString().c_str());
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, ObjectGuid(), 0);
         return;
     }
 

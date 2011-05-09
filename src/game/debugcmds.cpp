@@ -102,7 +102,7 @@ bool ChatHandler::HandleDebugSendSellErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendSellError(SellResult(msg), 0, 0, 0);
+    m_session->GetPlayer()->SendSellError(SellResult(msg), 0, ObjectGuid(), 0);
     return true;
 }
 
