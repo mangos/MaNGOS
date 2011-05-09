@@ -17391,7 +17391,7 @@ void Player::_SaveAuras()
         SpellAuraHolder *holder = itr->second;
         //skip all holders from spells that are passive or channeled
         //do not save single target holders (unless they were cast by the player)
-        if (!holder->IsPassive() && !IsChanneledSpell(holder->GetSpellProto()) && (holder->GetCasterGUID() == GetGUID() || !holder->IsSingleTarget()))
+        if (!holder->IsPassive() && !IsChanneledSpell(holder->GetSpellProto()) && (holder->GetCasterGuid() == GetObjectGuid() || !holder->IsSingleTarget()))
         {
             int32  damage[MAX_EFFECT_INDEX];
             uint32 periodicTime[MAX_EFFECT_INDEX];
@@ -17405,7 +17405,7 @@ void Player::_SaveAuras()
                 if (Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
                 {
                     // don't save not own area auras
-                    if (aur->IsAreaAura() && holder->GetCasterGUID() != GetGUID())
+                    if (aur->IsAreaAura() && holder->GetCasterGuid() != GetObjectGuid())
                         continue;
 
                     damage[i] = aur->GetModifier()->m_amount;
@@ -20736,7 +20736,7 @@ void Player::RemoveItemDependentAurasAndCasts( Item * pItem )
 
         // skip passive (passive item dependent spells work in another way) and not self applied auras
         SpellEntry const* spellInfo = holder->GetSpellProto();
-        if(holder->IsPassive() ||  holder->GetCasterGUID()!=GetGUID())
+        if(holder->IsPassive() ||  holder->GetCasterGuid() != GetObjectGuid())
         {
             ++itr;
             continue;

@@ -160,7 +160,7 @@ void DynamicObject::Delay(int32 delaytime)
         Unit *target = GetMap()->GetUnit((*iter));
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid().GetRawValue());
+            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
             if (!holder)
             {
                 ++iter;
@@ -183,7 +183,7 @@ void DynamicObject::Delay(int32 delaytime)
                 continue;
             }
 
-            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid().GetRawValue());
+            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid());
             ++iter;
         }
         else

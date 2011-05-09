@@ -3731,10 +3731,10 @@ SpellAuraProcResult Unit::HandleMendingAuraProc( Unit* /*pVictim*/, uint32 /*dam
 
                 // remove before apply next (locked against deleted)
                 triggeredByAura->SetInUse(true);
-                RemoveAurasByCasterSpell(spellProto->Id,caster->GetGUID());
+                RemoveAurasByCasterSpell(spellProto->Id,caster->GetObjectGuid());
 
                 caster->AddSpellMod(mod, true);
-                CastCustomSpell(target,spellProto->Id,&heal,NULL,NULL,true,NULL,triggeredByAura,caster->GetGUID());
+                CastCustomSpell(target, spellProto->Id, &heal, NULL, NULL, true, NULL, triggeredByAura, caster->GetObjectGuid());
                 caster->AddSpellMod(mod, false);
                 triggeredByAura->SetInUse(false);
             }

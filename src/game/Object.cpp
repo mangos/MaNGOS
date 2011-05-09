@@ -603,7 +603,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     if (IsPerCasterAuraState)
                     {
                         // IsPerCasterAuraState set if related pet caster aura state set already
-                        if (((Unit*)this)->HasAuraStateForCaster(AURA_STATE_CONFLAGRATE,target->GetGUID()))
+                        if (((Unit*)this)->HasAuraStateForCaster(AURA_STATE_CONFLAGRATE, target->GetObjectGuid()))
                             *data << m_uint32Values[index];
                         else
                             *data << (m_uint32Values[index] & ~(1 << (AURA_STATE_CONFLAGRATE-1)));

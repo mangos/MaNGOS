@@ -479,7 +479,7 @@ void WorldSession::HandleCancelAuraOpcode( WorldPacket& recvPacket)
     SpellAuraHolder *holder = _player->GetSpellAuraHolder(spellId);
 
     // not own area auras can't be cancelled (note: maybe need to check for aura on holder and not general on spell)
-    if (holder && holder->GetCasterGUID() != _player->GetGUID() && HasAreaAuraEffect(holder->GetSpellProto()))
+    if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && HasAreaAuraEffect(holder->GetSpellProto()))
         return;
 
     // non channeled case

@@ -718,7 +718,7 @@ void AreaAura::Update(uint32 diff)
                     if(actualSpellInfo != GetSpellProto())
                         actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
 
-                    SpellAuraHolder *holder = (*tIter)->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGUID());
+                    SpellAuraHolder *holder = (*tIter)->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
 
                     bool addedToExisting = true;
                     if (!holder)
@@ -763,7 +763,7 @@ void AreaAura::Update(uint32 diff)
             caster->IsFriendlyTo(target) != needFriendly
            )
         {
-            target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(),GetCasterGUID());
+            target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
         }
         else if( m_areaAuraType == AREA_AURA_PARTY)         // check if in same sub group
         {
@@ -777,10 +777,10 @@ void AreaAura::Update(uint32 diff)
                 {
                     Player* checkTarget = target->GetCharmerOrOwnerPlayerOrPlayerItself();
                     if(!checkTarget || !pGroup->SameSubGroup(check, checkTarget))
-                        target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(),GetCasterGUID());
+                        target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
                 }
                 else
-                    target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(),GetCasterGUID());
+                    target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
             }
         }
         else if( m_areaAuraType == AREA_AURA_RAID)          // TODO: fix me!
@@ -795,16 +795,16 @@ void AreaAura::Update(uint32 diff)
                 {
                     Player* checkTarget = target->GetCharmerOrOwnerPlayerOrPlayerItself();
                     if(!checkTarget)
-                        target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGUID());
+                        target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
                 }
                 else
-                    target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGUID());
+                    target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
             }
         }
         else if (m_areaAuraType == AREA_AURA_PET || m_areaAuraType == AREA_AURA_OWNER)
         {
             if (target->GetObjectGuid() != caster->GetCharmerOrOwnerGuid())
-                target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGUID());
+                target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid());
         }
     }
 }
@@ -9405,13 +9405,13 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     else
     {
         if (spellId1)
-            m_target->RemoveAurasByCasterSpell(spellId1, GetCasterGUID());
+            m_target->RemoveAurasByCasterSpell(spellId1, GetCasterGuid());
         if (spellId2)
-            m_target->RemoveAurasByCasterSpell(spellId2, GetCasterGUID());
+            m_target->RemoveAurasByCasterSpell(spellId2, GetCasterGuid());
         if (spellId3)
-            m_target->RemoveAurasByCasterSpell(spellId3, GetCasterGUID());
+            m_target->RemoveAurasByCasterSpell(spellId3, GetCasterGuid());
         if (spellId4)
-            m_target->RemoveAurasByCasterSpell(spellId4, GetCasterGUID());
+            m_target->RemoveAurasByCasterSpell(spellId4, GetCasterGuid());
     }
 
     SetInUse(false);
@@ -9464,7 +9464,7 @@ void SpellAuraHolder::Update(uint32 diff)
         Unit* caster = GetCaster();
         if(!caster)
         {
-            m_target->RemoveAurasByCasterSpell(GetId(), GetCasterGUID());
+            m_target->RemoveAurasByCasterSpell(GetId(), GetCasterGuid());
             return;
         }
 
