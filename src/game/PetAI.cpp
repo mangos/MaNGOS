@@ -250,15 +250,15 @@ void PetAI::UpdateAI(const uint32 diff)
             else
             {
                 bool spellUsed = false;
-                for(std::set<uint64>::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
+                for (AllySet::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
                 {
                     Unit* Target = ObjectAccessor::GetUnit(*m_creature,*tar);
 
                     //only buff targets that are in combat, unless the spell can only be cast while out of combat
-                    if(!Target)
+                    if (!Target)
                         continue;
 
-                    if(spell->CanAutoCast(Target))
+                    if (spell->CanAutoCast(Target))
                     {
                         targetSpellStore.push_back(std::make_pair<Unit*, Spell*>(Target, spell));
                         spellUsed = true;
@@ -317,36 +317,36 @@ void PetAI::UpdateAllies()
 
     m_updateAlliesTimer = 10*IN_MILLISECONDS;                //update friendly targets every 10 seconds, lesser checks increase performance
 
-    if(!owner)
+    if (!owner)
         return;
-    else if(owner->GetTypeId() == TYPEID_PLAYER)
+    else if (owner->GetTypeId() == TYPEID_PLAYER)
         pGroup = ((Player*)owner)->GetGroup();
 
     //only pet and owner/not in group->ok
-    if(m_AllySet.size() == 2 && !pGroup)
+    if (m_AllySet.size() == 2 && !pGroup)
         return;
     //owner is in group; group members filled in already (no raid -> subgroupcount = whole count)
-    if(pGroup && !pGroup->isRaidGroup() && m_AllySet.size() == (pGroup->GetMembersCount() + 2))
+    if (pGroup && !pGroup->isRaidGroup() && m_AllySet.size() == (pGroup->GetMembersCount() + 2))
         return;
 
     m_AllySet.clear();
-    m_AllySet.insert(m_creature->GetGUID());
-    if(pGroup)                                              //add group
+    m_AllySet.insert(m_creature->GetObjectGuid());
+    if (pGroup)                                             //add group
     {
-        for(GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
         {
             Player* Target = itr->getSource();
-            if(!Target || !pGroup->SameSubGroup((Player*)owner, Target))
+            if (!Target || !pGroup->SameSubGroup((Player*)owner, Target))
                 continue;
 
-            if(Target->GetGUID() == owner->GetGUID())
+            if (Target->GetGUID() == owner->GetGUID())
                 continue;
 
-            m_AllySet.insert(Target->GetGUID());
+            m_AllySet.insert(Target->GetObjectGuid());
         }
     }
     else                                                    //remove group
-        m_AllySet.insert(owner->GetGUID());
+        m_AllySet.insert(owner->GetObjectGuid());
 }
 
 void PetAI::AttackedBy(Unit *attacker)
