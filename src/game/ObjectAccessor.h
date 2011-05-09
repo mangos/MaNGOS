@@ -46,7 +46,7 @@ class HashMapHolder
 {
     public:
 
-        typedef UNORDERED_MAP< uint64, T* >   MapType;
+        typedef UNORDERED_MAP<ObjectGuid, T*>   MapType;
         typedef ACE_RW_Thread_Mutex LockType;
         typedef ACE_Read_Guard<LockType> ReadGuard;
         typedef ACE_Write_Guard<LockType> WriteGuard;
@@ -54,19 +54,19 @@ class HashMapHolder
         static void Insert(T* o)
         {
             WriteGuard guard(i_lock);
-            m_objectMap[o->GetGUID()] = o;
+            m_objectMap[o->GetObjectGuid()] = o;
         }
 
         static void Remove(T* o)
         {
             WriteGuard guard(i_lock);
-            m_objectMap.erase(o->GetGUID());
+            m_objectMap.erase(o->GetObjectGuid());
         }
 
         static T* Find(ObjectGuid guid)
         {
             ReadGuard guard(i_lock);
-            typename MapType::iterator itr = m_objectMap.find(guid.GetRawValue());
+            typename MapType::iterator itr = m_objectMap.find(guid);
             return (itr != m_objectMap.end()) ? itr->second : NULL;
         }
 

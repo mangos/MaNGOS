@@ -142,14 +142,14 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
     data << uint32(playersSize);                            // players count
     data << uint32(playersSize);                            // players count (total?)
 
-    for(HashMapHolder<Player>::MapType::const_iterator iter = players.begin(); iter != players.end(); ++iter)
+    for (HashMapHolder<Player>::MapType::const_iterator iter = players.begin(); iter != players.end(); ++iter)
     {
         Player *plr = iter->second;
 
-        if(!plr || plr->GetTeam() != _player->GetTeam())
+        if (!plr || plr->GetTeam() != _player->GetTeam())
             continue;
 
-        if(!plr->IsInWorld())
+        if (!plr->IsInWorld())
             continue;
 
         data << plr->GetObjectGuid();                       // guid
@@ -157,7 +157,7 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
         uint32 flags = 0xFF;
         data << uint32(flags);                              // flags
 
-        if(flags & 0x1)
+        if (flags & 0x1)
         {
             data << uint8(plr->getLevel());
             data << uint8(plr->getClass());
@@ -188,25 +188,25 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
             data << uint32(0);                              // Expertise
         }
 
-        if(flags & 0x2)
+        if (flags & 0x2)
             data << "";                                     // comment
 
-        if(flags & 0x4)
+        if (flags & 0x4)
             data << uint8(0);                               // group leader
 
-        if(flags & 0x8)
+        if (flags & 0x8)
             data << uint64(1);                              // group guid
 
-        if(flags & 0x10)
+        if (flags & 0x10)
             data << uint8(0);                               // roles
 
-        if(flags & 0x20)
+        if (flags & 0x20)
             data << uint32(plr->GetZoneId());               // areaid
 
-        if(flags & 0x40)
+        if (flags & 0x40)
             data << uint8(0);                               // status
 
-        if(flags & 0x80)
+        if (flags & 0x80)
         {
             data << uint64(0);                              // instance guid
             data << uint32(0);                              // completed encounters
