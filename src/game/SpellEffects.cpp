@@ -7765,8 +7765,8 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
     duel2->startTimer = 0;
     target->duel      = duel2;
 
-    caster->SetUInt64Value(PLAYER_DUEL_ARBITER, pGameObj->GetGUID());
-    target->SetUInt64Value(PLAYER_DUEL_ARBITER, pGameObj->GetGUID());
+    caster->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetObjectGuid());
+    target->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetObjectGuid());
 }
 
 void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
