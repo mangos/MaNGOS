@@ -191,7 +191,7 @@ void Creature::AddToWorld()
 {
     ///- Register the creature for guid lookup
     if (!IsInWorld() && GetObjectGuid().IsCreatureOrVehicle())
-        GetMap()->GetObjectsStore().insert<Creature>(GetGUID(), (Creature*)this);
+        GetMap()->GetObjectsStore().insert<Creature>(GetObjectGuid(), (Creature*)this);
 
     Unit::AddToWorld();
 }
@@ -200,7 +200,7 @@ void Creature::RemoveFromWorld()
 {
     ///- Remove the creature from the accessor
     if (IsInWorld() && GetObjectGuid().IsCreatureOrVehicle())
-        GetMap()->GetObjectsStore().erase<Creature>(GetGUID(), (Creature*)NULL);
+        GetMap()->GetObjectsStore().erase<Creature>(GetObjectGuid(), (Creature*)NULL);
 
     Unit::RemoveFromWorld();
 }
