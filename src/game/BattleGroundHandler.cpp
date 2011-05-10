@@ -249,15 +249,15 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode( WorldPacket & /*recv
                 data << count2;                                     // horde flag holders count - obsolete, now count of next fields
                 if (ali_plr)
                 {
-                    data << (uint64)ali_plr->GetGUID();
-                    data << (float)ali_plr->GetPositionX();
-                    data << (float)ali_plr->GetPositionY();
+                    data << ObjectGuid(ali_plr->GetObjectGuid());
+                    data << float(ali_plr->GetPositionX());
+                    data << float(ali_plr->GetPositionY());
                 }
                 if (horde_plr)
                 {
-                    data << (uint64)horde_plr->GetGUID();
-                    data << (float)horde_plr->GetPositionX();
-                    data << (float)horde_plr->GetPositionY();
+                    data << ObjectGuid(horde_plr->GetObjectGuid());
+                    data << float(horde_plr->GetPositionX());
+                    data << float(horde_plr->GetPositionY());
                 }
 
                 SendPacket(&data);

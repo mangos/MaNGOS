@@ -622,7 +622,7 @@ void WorldSession::HandleRaidReadyCheckOpcode( WorldPacket & recv_data )
 
         // everything is fine, do it
         WorldPacket data(MSG_RAID_READY_CHECK, 8);
-        data << GetPlayer()->GetGUID();
+        data << ObjectGuid(GetPlayer()->GetObjectGuid());
         group->BroadcastPacket(&data, false, -1);
 
         group->OfflineReadyCheck();

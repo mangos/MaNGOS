@@ -141,14 +141,14 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 
     if(deleteThis)
     {
-        caster->RemoveDynObjectWithGUID(GetGUID());
+        caster->RemoveDynObjectWithGUID(GetObjectGuid());
         Delete();
     }
 }
 
 void DynamicObject::Delete()
 {
-    SendObjectDeSpawnAnim(GetGUID());
+    SendObjectDeSpawnAnim(GetObjectGuid());
     AddObjectToRemoveList();
 }
 

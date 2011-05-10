@@ -335,14 +335,14 @@ void PetAI::UpdateAllies()
     {
         for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
         {
-            Player* Target = itr->getSource();
-            if (!Target || !pGroup->SameSubGroup((Player*)owner, Target))
+            Player* target = itr->getSource();
+            if (!target || !pGroup->SameSubGroup((Player*)owner, target))
                 continue;
 
-            if (Target->GetGUID() == owner->GetGUID())
+            if (target->GetObjectGuid() == owner->GetObjectGuid())
                 continue;
 
-            m_AllySet.insert(Target->GetObjectGuid());
+            m_AllySet.insert(target->GetObjectGuid());
         }
     }
     else                                                    //remove group

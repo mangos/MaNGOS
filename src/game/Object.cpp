@@ -213,7 +213,7 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) c
 
 void Object::BuildOutOfRangeUpdateBlock(UpdateData * data) const
 {
-    data->AddOutOfRangeGUID(GetGUID());
+    data->AddOutOfRangeGUID(GetObjectGuid());
 }
 
 void Object::DestroyForPlayer( Player *target, bool anim ) const
@@ -1605,17 +1605,17 @@ void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skippe
     }
 }
 
-void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
+void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << uint64(guid);
+    data << ObjectGuid(guid);
     SendMessageToSet(&data, true);
 }
 
-void WorldObject::SendGameObjectCustomAnim(uint64 guid)
+void WorldObject::SendGameObjectCustomAnim(ObjectGuid guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8+4);
-    data << uint64(guid);
+    data << ObjectGuid(guid);
     data << uint32(0);                                      // not known what this is
     SendMessageToSet(&data, true);
 }
