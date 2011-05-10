@@ -92,15 +92,15 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleAutoEquipItemSlotOpcode( WorldPacket & recv_data )
 {
-    uint64 itemguid;
+    ObjectGuid itemGuid;
     uint8 dstslot;
-    recv_data >> itemguid >> dstslot;
+    recv_data >> itemGuid >> dstslot;
 
     // cheating attempt, client should never send opcode in that case
     if(!Player::IsEquipmentPos(INVENTORY_SLOT_BAG_0, dstslot))
         return;
 
-    Item* item = _player->GetItemByGuid(itemguid);
+    Item* item = _player->GetItemByGuid(itemGuid);
     uint16 dstpos = dstslot | (INVENTORY_SLOT_BAG_0 << 8);
 
     if(!item || item->GetPos() == dstpos)
@@ -1049,25 +1049,25 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket & recv_data)
         GetPlayer()->SetAmmo(item);
 }
 
-void WorldSession::SendEnchantmentLog(uint64 Target, uint64 Caster,uint32 ItemID,uint32 SpellID)
+void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8+8+4+4+1));     // last check 2.0.10
-    data << uint64(Target);
-    data << uint64(Caster);
-    data << uint32(ItemID);
-    data << uint32(SpellID);
+    data << ObjectGuid(targetGuid);
+    data << ObjectGuid(casterGuid);
+    data << uint32(itemId);
+    data << uint32(spellId);
     data << uint8(0);
     SendPacket(&data);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid,uint32 slot,uint32 Duration)
+void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
                                                             // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8+4+4+8));
-    data << uint64(Itemguid);
+    data << ObjectGuid(itemGuid);
     data << uint32(slot);
-    data << uint32(Duration);
-    data << uint64(Playerguid);
+    data << uint32(duration);
+    data << ObjectGuid(playerGuid);
     SendPacket(&data);
 }
 
@@ -1222,22 +1222,29 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_SOCKET_GEMS");
 
-    uint64 item_guid;
-    uint64 gem_guids[MAX_GEM_SOCKETS];
+    ObjectGuid itemGuid;
+    ObjectGuid gemGuids[MAX_GEM_SOCKETS];
 
-    recv_data >> item_guid;
-    if(!item_guid)
+    recv_data >> itemGuid;
+    if (!itemGuid.IsItem())
         return;
 
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        recv_data >> gem_guids[i];
+        recv_data >> gemGuids[i];
 
     //cheat -> tried to socket same gem multiple times
-    if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
-        (gem_guids[1] && (gem_guids[1] == gem_guids[2])))
-        return;
+    for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    {
+        ObjectGuid gemGuid = gemGuids[0];
+        if (!gemGuid.IsItem())
+            return;
 
-    Item *itemTarget = _player->GetItemByGuid(item_guid);
+        for(int j = i+1; j < MAX_GEM_SOCKETS; ++j)
+            if (gemGuids[j] == gemGuid)
+                return;
+    }
+
+    Item *itemTarget = _player->GetItemByGuid(itemGuid);
     if(!itemTarget)                                         //missing item to socket
         return;
 
@@ -1250,7 +1257,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 
     Item *Gems[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        Gems[i] = gem_guids[i] ? _player->GetItemByGuid(gem_guids[i]) : NULL;
+        Gems[i] = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL;
 
     GemPropertiesEntry const *GemProps[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
@@ -1392,15 +1399,15 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     //if a meta gem is being equipped, all information has to be written to the item before testing if the conditions for the gem are met
 
     //remove ALL enchants
-    for(uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
         _player->ApplyEnchantment(itemTarget, EnchantmentSlot(enchant_slot), false);
 
-    for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
     {
-        if(GemEnchants[i])
+        if (GemEnchants[i])
         {
             itemTarget->SetEnchantment(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + i), GemEnchants[i], 0, 0);
-            if(Item* guidItem = _player->GetItemByGuid(gem_guids[i]))
+            if(Item* guidItem = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL)
                 _player->DestroyItem(guidItem->GetBagSlot(), guidItem->GetSlot(), true );
         }
     }

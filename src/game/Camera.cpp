@@ -84,7 +84,7 @@ void Camera::SetView(WorldObject *obj, bool update_far_sight_field /*= true*/)
     m_source->GetViewPoint().Attach(this);
 
     if (update_far_sight_field)
-        m_owner.SetUInt64Value(PLAYER_FARSIGHT, (m_source == &m_owner ? 0 : m_source->GetGUID()));
+        m_owner.SetGuidValue(PLAYER_FARSIGHT, (m_source == &m_owner ? ObjectGuid() : m_source->GetObjectGuid()));
 
     UpdateForCurrentViewPoint();
 }
