@@ -189,9 +189,9 @@ FleeingMovementGenerator<T>::_setMoveData(T &owner)
 {
     float cur_dist_xyz = owner.GetDistance(i_caster_x, i_caster_y, i_caster_z);
 
-    if(i_to_distance_from_caster > 0.0f)
+    if (i_to_distance_from_caster > 0.0f)
     {
-        if((i_last_distance_from_caster > i_to_distance_from_caster && cur_dist_xyz < i_to_distance_from_caster)   ||
+        if ((i_last_distance_from_caster > i_to_distance_from_caster && cur_dist_xyz < i_to_distance_from_caster)   ||
                                                             // if we reach lower distance
            (i_last_distance_from_caster > i_to_distance_from_caster && cur_dist_xyz > i_last_distance_from_caster) ||
                                                             // if we can't be close
@@ -217,12 +217,10 @@ FleeingMovementGenerator<T>::_setMoveData(T &owner)
     float cur_dist;
     float angle_to_caster;
 
-    Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID);
-
-    if(fright)
+    if (Unit* fright = owner.GetMap()->GetUnit(i_frightGuid))
     {
         cur_dist = fright->GetDistance(&owner);
-        if(cur_dist < cur_dist_xyz)
+        if (cur_dist < cur_dist_xyz)
         {
             i_caster_x = fright->GetPositionX();
             i_caster_y = fright->GetPositionY();
@@ -286,7 +284,7 @@ FleeingMovementGenerator<T>::Initialize(T &owner)
 
     _Init(owner);
 
-    if(Unit * fright = ObjectAccessor::GetUnit(owner, i_frightGUID))
+    if (Unit * fright = owner.GetMap()->GetUnit(i_frightGuid))
     {
         i_caster_x = fright->GetPositionX();
         i_caster_y = fright->GetPositionY();

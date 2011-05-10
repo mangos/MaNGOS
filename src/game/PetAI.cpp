@@ -252,7 +252,7 @@ void PetAI::UpdateAI(const uint32 diff)
                 bool spellUsed = false;
                 for (AllySet::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
                 {
-                    Unit* Target = ObjectAccessor::GetUnit(*m_creature,*tar);
+                    Unit* Target = m_creature->GetMap()->GetUnit(*tar);
 
                     //only buff targets that are in combat, unless the spell can only be cast while out of combat
                     if (!Target)
