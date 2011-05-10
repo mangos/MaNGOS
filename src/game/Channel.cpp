@@ -624,7 +624,7 @@ void Channel::Invite(uint64 p, const char *newname)
     if(!newp->GetSocial()->HasIgnore(p))
     {
         MakeInvite(&data, p);
-        SendToOne(&data, newp->GetGUID());
+        SendToOne(&data, newp->GetObjectGuid());
         data.clear();
     }
     MakePlayerInvited(&data, newp->GetName());
@@ -667,9 +667,9 @@ void Channel::SendToAll(WorldPacket *data, uint64 p)
                 plr->GetSession()->SendPacket(data);
 }
 
-void Channel::SendToOne(WorldPacket *data, uint64 who)
+void Channel::SendToOne(WorldPacket *data, ObjectGuid who)
 {
-    if (Player *plr = sObjectMgr.GetPlayer(who))
+    if (Player *plr = ObjectMgr::GetPlayer(who))
         plr->GetSession()->SendPacket(data);
 }
 
