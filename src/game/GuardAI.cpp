@@ -30,7 +30,7 @@ int GuardAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-GuardAI::GuardAI(Creature *c) : CreatureAI(c), i_victimGuid(0), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
+GuardAI::GuardAI(Creature *c) : CreatureAI(c), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
 {
 }
 
@@ -64,7 +64,7 @@ void GuardAI::EnterEvadeMode()
 
         i_state = STATE_NORMAL;
 
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
         return;
@@ -95,7 +95,7 @@ void GuardAI::EnterEvadeMode()
 
     m_creature->RemoveAllAuras();
     m_creature->DeleteThreatList();
-    i_victimGuid = 0;
+    i_victimGuid.Clear();
     m_creature->CombatStop(true);
     i_state = STATE_NORMAL;
 
@@ -110,7 +110,7 @@ void GuardAI::UpdateAI(const uint32 /*diff*/)
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
-    i_victimGuid = m_creature->getVictim()->GetGUID();
+    i_victimGuid = m_creature->getVictim()->GetObjectGuid();
 
     DoMeleeAttackIfReady();
 }
@@ -128,7 +128,7 @@ void GuardAI::AttackStart(Unit *u)
 
     if(m_creature->Attack(u,true))
     {
-        i_victimGuid = u->GetGUID();
+        i_victimGuid = u->GetObjectGuid();
         m_creature->AddThreat(u);
         m_creature->SetInCombatWith(u);
         u->SetInCombatWith(m_creature);
