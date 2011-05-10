@@ -1646,7 +1646,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void DecreaseCastCounter() { if (m_castCounter) --m_castCounter; }
 
         uint32 m_addDmgOnce;
-        uint64 m_ObjectSlot[4];
+        ObjectGuid m_ObjectSlotGuid[4];
         uint32 m_detectInvisibilityMask;
         uint32 m_invisibilityMask;
 

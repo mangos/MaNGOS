@@ -210,7 +210,6 @@ Unit::Unit() :
 
     m_addDmgOnce = 0;
 
-    m_ObjectSlot[0] = m_ObjectSlot[1] = m_ObjectSlot[2] = m_ObjectSlot[3] = 0;
     //m_Aura = NULL;
     //m_AurasCheck = 2000;
     //m_removeAuraTimer = 4;

@@ -34,11 +34,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     uint8 bagIndex, slot;
     uint8 unk_flags;                                        // flags (if 0x02 - some additional data are received)
     uint8 cast_count;                                       // next cast if exists (single or not)
-    uint64 item_guid;
+    ObjectGuid itemGuid;
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellid;                                         // casted spell id
 
-    recvPacket >> bagIndex >> slot >> cast_count >> spellid >> item_guid >> glyphIndex >> unk_flags;
+    recvPacket >> bagIndex >> slot >> cast_count >> spellid >> itemGuid >> glyphIndex >> unk_flags;
 
     // TODO: add targets.read() check
     Player* pUser = _player;
@@ -66,7 +66,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pItem->GetGUID() != item_guid)
+    if (pItem->GetObjectGuid() != itemGuid)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, NULL );
@@ -250,7 +250,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
             uint32 entry = fields[0].GetUInt32();
             uint32 flags = fields[1].GetUInt32();
 
-            pItem->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, 0);
+            pItem->SetGuidValue(ITEM_FIELD_GIFTCREATOR, ObjectGuid());
             pItem->SetEntry(entry);
             pItem->SetUInt32Value(ITEM_FIELD_FLAGS, flags);
             pItem->SetState(ITEM_CHANGED, pUser);

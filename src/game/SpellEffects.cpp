@@ -4302,7 +4302,7 @@ void Spell::EffectEnergisePct(SpellEffectIndex eff_idx)
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);
 }
 
-void Spell::SendLoot(uint64 guid, LootType loottype)
+void Spell::SendLoot(ObjectGuid guid, LootType loottype)
 {
     if (gameObjTarget)
     {
@@ -4345,7 +4345,7 @@ void Spell::EffectOpenLock(SpellEffectIndex eff_idx)
     Player* player = (Player*)m_caster;
 
     uint32 lockId = 0;
-    uint64 guid = 0;
+    ObjectGuid guid;
 
     // Get lockId
     if (gameObjTarget)
@@ -4377,12 +4377,12 @@ void Spell::EffectOpenLock(SpellEffectIndex eff_idx)
             }
         }
         lockId = goInfo->GetLockId();
-        guid = gameObjTarget->GetGUID();
+        guid = gameObjTarget->GetObjectGuid();
     }
     else if (itemTarget)
     {
         lockId = itemTarget->GetProto()->LockID;
-        guid = itemTarget->GetGUID();
+        guid = itemTarget->GetObjectGuid();
     }
     else
     {
@@ -8059,7 +8059,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     uint32 go_id = m_spellInfo->EffectMiscValue[eff_idx];
 
     uint8 slot = 0;
-    switch(m_spellInfo->Effect[eff_idx])
+    switch (m_spellInfo->Effect[eff_idx])
     {
         case SPELL_EFFECT_SUMMON_OBJECT_SLOT1: slot = 0; break;
         case SPELL_EFFECT_SUMMON_OBJECT_SLOT2: slot = 1; break;
@@ -8068,11 +8068,13 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
         default: return;
     }
 
-    if(uint64 guid = m_caster->m_ObjectSlot[slot])
+    ObjectGuid guid = m_caster->m_ObjectSlotGuid[slot];
+
+    if (!guid.IsEmpty())
     {
-        if(GameObject* obj = m_caster ? m_caster->GetMap()->GetGameObject(guid) : NULL)
+        if (GameObject* obj = m_caster ? m_caster->GetMap()->GetGameObject(guid) : NULL)
             obj->SetLootState(GO_JUST_DEACTIVATED);
-        m_caster->m_ObjectSlot[slot] = 0;
+        m_caster->m_ObjectSlotGuid[slot].Clear();
     }
 
     GameObject* pGameObj = new GameObject;
@@ -8105,7 +8107,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
 
     map->Add(pGameObj);
 
-    m_caster->m_ObjectSlot[slot] = pGameObj->GetGUID();
+    m_caster->m_ObjectSlotGuid[slot] = pGameObj->GetObjectGuid();
 
     pGameObj->SummonLinkedTrapIfAny();
 
