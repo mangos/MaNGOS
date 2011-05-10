@@ -4921,11 +4921,11 @@ void Player::LeftChannel(Channel *c)
 
 void Player::CleanupChannels()
 {
-    while(!m_channels.empty())
+    while (!m_channels.empty())
     {
         Channel* ch = *m_channels.begin();
         m_channels.erase(m_channels.begin());               // remove from player's channel list
-        ch->Leave(GetGUID(), false);                        // not send to client, not remove from player's channel list
+        ch->Leave(GetObjectGuid(), false);                  // not send to client, not remove from player's channel list
         if (ChannelMgr* cMgr = channelMgr(GetTeam()))
             cMgr->LeftChannel(ch->GetName());               // deleted channel if empty
 
@@ -4968,12 +4968,12 @@ void Player::UpdateLocalChannels(uint32 newZone )
         snprintf(new_channel_name_buf,100,ch->pattern[m_session->GetSessionDbcLocale()],current_zone_name.c_str());
         Channel* new_channel = cMgr->GetJoinChannel(new_channel_name_buf,ch->ChannelID);
 
-        if((*i)!=new_channel)
+        if ((*i)!=new_channel)
         {
-            new_channel->Join(GetGUID(),"");                // will output Changed Channel: N. Name
+            new_channel->Join(GetObjectGuid(),"");          // will output Changed Channel: N. Name
 
             // leave old channel
-            (*i)->Leave(GetGUID(),false);                   // not send leave channel, it already replaced at client
+            (*i)->Leave(GetObjectGuid(),false);             // not send leave channel, it already replaced at client
             std::string name = (*i)->GetName();             // store name, (*i)erase in LeftChannel
             LeftChannel(*i);                                // remove from player's channel list
             cMgr->LeftChannel(name);                        // delete if empty
@@ -4986,9 +4986,9 @@ void Player::LeaveLFGChannel()
 {
     for(JoinedChannelsList::iterator i = m_channels.begin(); i != m_channels.end(); ++i )
     {
-        if((*i)->IsLFG())
+        if ((*i)->IsLFG())
         {
-            (*i)->Leave(GetGUID());
+            (*i)->Leave(GetObjectGuid());
             break;
         }
     }
@@ -19907,7 +19907,7 @@ void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* targe
 template<class T>
 inline void UpdateVisibilityOf_helper(ObjectGuidSet& s64, T* target)
 {
-    s64.insert(target->GetGUID());
+    s64.insert(target->GetObjectGuid());
 }
 
 template<>

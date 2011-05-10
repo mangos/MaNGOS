@@ -444,7 +444,7 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
             if(ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
                 if(Channel *chn = cMgr->GetChannel(channel, _player))
-                    chn->Say(_player->GetGUID(), msg.c_str(), lang);
+                    chn->Say(_player->GetObjectGuid(), msg.c_str(), lang);
         } break;
 
         case CHAT_MSG_AFK:
