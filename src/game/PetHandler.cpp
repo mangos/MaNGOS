@@ -302,7 +302,7 @@ void WorldSession::HandlePetNameQueryOpcode(WorldPacket& recv_data)
     DETAIL_LOG("HandlePetNameQuery. CMSG_PET_NAME_QUERY");
 
     uint32 petnumber;
-    uint64 petguid;
+    ObjectGuid petguid;
 
     recv_data >> petnumber;
     recv_data >> petguid;
@@ -310,7 +310,7 @@ void WorldSession::HandlePetNameQueryOpcode(WorldPacket& recv_data)
     SendPetNameQuery(petguid, petnumber);
 }
 
-void WorldSession::SendPetNameQuery(uint64 petguid, uint32 petnumber)
+void WorldSession::SendPetNameQuery(ObjectGuid petguid, uint32 petnumber)
 {
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(petguid);
     if (!pet || !pet->GetCharmInfo() || pet->GetCharmInfo()->GetPetNumber() != petnumber)
@@ -347,12 +347,12 @@ void WorldSession::HandlePetSetAction(WorldPacket& recv_data)
 {
     DETAIL_LOG("HandlePetSetAction. CMSG_PET_SET_ACTION");
 
-    uint64 petguid;
+    ObjectGuid petGuid;
     uint8  count;
 
-    recv_data >> petguid;
+    recv_data >> petGuid;
 
-    Creature* pet = _player->GetMap()->GetAnyTypeCreature(petguid);
+    Creature* pet = _player->GetMap()->GetAnyTypeCreature(petGuid);
 
     if (!pet || (pet != _player->GetPet() && pet != _player->GetCharm()))
     {
@@ -460,17 +460,17 @@ void WorldSession::HandlePetRename(WorldPacket& recv_data)
 {
     DETAIL_LOG("HandlePetRename. CMSG_PET_RENAME");
 
-    uint64 petguid;
+    ObjectGuid petGuid;
     uint8 isdeclined;
 
     std::string name;
     DeclinedName declinedname;
 
-    recv_data >> petguid;
+    recv_data >> petGuid;
     recv_data >> name;
     recv_data >> isdeclined;
 
-    Pet* pet = _player->GetMap()->GetPet(petguid);
+    Pet* pet = _player->GetMap()->GetPet(petGuid);
                                                             // check it!
     if (!pet || pet->getPetType() != HUNTER_PET ||
         !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||

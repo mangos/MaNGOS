@@ -672,12 +672,12 @@ void Channel::SendToOne(WorldPacket *data, ObjectGuid who)
         plr->GetSession()->SendPacket(data);
 }
 
-void Channel::Voice(uint64 /*guid1*/, uint64 /*guid2*/)
+void Channel::Voice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
 {
 
 }
 
-void Channel::DeVoice(uint64 /*guid1*/, uint64 /*guid2*/)
+void Channel::DeVoice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
 {
 
 }
@@ -904,10 +904,10 @@ void Channel::MakePlayerInvited(WorldPacket *data, const std::string& name)
 }
 
 // done 0x1E
-void Channel::MakePlayerInviteBanned(WorldPacket *data, uint64 guid)
+void Channel::MakePlayerInviteBanned(WorldPacket *data, ObjectGuid guid)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_INVITE_BANNED_NOTICE);
-    *data << uint64(guid);                                  // should be string!!
+    *data << ObjectGuid(guid);                              // should be string!!
 }
 
 // done 0x1F
@@ -929,17 +929,17 @@ void Channel::MakeNotInLfg(WorldPacket *data)
 }
 
 // done 0x22
-void Channel::MakeVoiceOn(WorldPacket *data, uint64 guid)
+void Channel::MakeVoiceOn(WorldPacket *data, ObjectGuid guid)
 {
     MakeNotifyPacket(data, CHAT_VOICE_ON_NOTICE);
-    *data << uint64(guid);
+    *data << ObjectGuid(guid);
 }
 
 // done 0x23
-void Channel::MakeVoiceOff(WorldPacket *data, uint64 guid)
+void Channel::MakeVoiceOff(WorldPacket *data, ObjectGuid guid)
 {
     MakeNotifyPacket(data, CHAT_VOICE_OFF_NOTICE);
-    *data << uint64(guid);
+    *data << ObjectGuid(guid);
 }
 
 void Channel::JoinNotify(ObjectGuid guid)

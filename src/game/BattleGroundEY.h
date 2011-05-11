@@ -263,7 +263,6 @@ class BattleGroundEY : public BattleGround
         void RespawnFlagAfterDrop();
 
         void RemovePlayer(Player *plr, ObjectGuid guid);
-        void HandleBuffUse(uint64 const& buff_guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
         void HandleKillPlayer(Player *player, Player *killer);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);

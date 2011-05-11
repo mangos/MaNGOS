@@ -317,7 +317,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendPetitionQueryOpcode(ObjectGuid petitionguid);
 
         //pet
-        void SendPetNameQuery(uint64 guid, uint32 petnumber);
+        void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
         void SendStablePet(ObjectGuid guid);
         void SendStableResult(uint8 res);
         bool CheckStableMaster(ObjectGuid guid);

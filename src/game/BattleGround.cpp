@@ -183,7 +183,7 @@ namespace MaNGOS
                 data << uint32(0);                          // 2.1.0
                 data << uint32(strlen(i_source->GetName())+1);
                 data << i_source->GetName();
-                data << uint64(0);                          // Unit Target - isn't important for bgs
+                data << ObjectGuid();                       // Unit Target - isn't important for bgs
                 data << uint32(strlen(str)+1);
                 data << str;
                 data << uint8(0);                           // ChatTag - for bgs allways 0?

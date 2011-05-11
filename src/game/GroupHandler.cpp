@@ -544,8 +544,12 @@ void WorldSession::HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data )
     // everything is fine, do it
     if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
         group->ChangeMembersGroup(player, groupNr);
-    else if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name.c_str()))
-        group->ChangeMembersGroup(guid, groupNr);
+    else
+    {
+        ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name.c_str());
+        if (!guid.IsEmpty())
+            group->ChangeMembersGroup(guid, groupNr);
+    }
 }
 
 void WorldSession::HandleGroupAssistantLeaderOpcode( WorldPacket & recv_data )

@@ -60,11 +60,12 @@
  */
 void WorldSession::HandleSendMail(WorldPacket & recv_data )
 {
-    uint64 mailbox, unk3;
+    ObjectGuid mailboxGuid;
+    uint64 unk3;
     std::string receiver, subject, body;
     uint32 unk1, unk2, money, COD;
     uint8 unk4;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> receiver;
 
     recv_data >> subject;
@@ -84,12 +85,12 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
         return;
     }
 
-    uint64 itemGUIDs[MAX_MAIL_ITEMS];
+    ObjectGuid itemGuids[MAX_MAIL_ITEMS];
 
     for(uint8 i = 0; i < items_count; ++i)
     {
         recv_data.read_skip<uint8>();                       // item slot in mail, not used
-        recv_data >> itemGUIDs[i];
+        recv_data >> itemGuids[i];
     }
 
     recv_data >> money >> COD;                              // money and cod
@@ -98,7 +99,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     // packet read complete, now do check
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     if (receiver.empty())
@@ -108,7 +109,7 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     ObjectGuid rc;
     if (normalizePlayerName(receiver))
-        rc = sObjectMgr.GetPlayerGUIDByName(receiver);
+        rc = sObjectMgr.GetPlayerGuidByName(receiver);
 
     if (rc.IsEmpty())
     {
@@ -180,13 +181,13 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
     for(uint8 i = 0; i < items_count; ++i)
     {
-        if (!itemGUIDs[i])
+        if (!itemGuids[i].IsItem())
         {
             pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
             return;
         }
 
-        Item* item = pl->GetItemByGuid(itemGUIDs[i]);
+        Item* item = pl->GetItemByGuid(itemGuids[i]);
 
         // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to mail)
         if(!item)
@@ -293,12 +294,12 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player *pl = _player;
@@ -323,13 +324,13 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailDelete(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
     recv_data.read_skip<uint32>();                          // mailTemplateId
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player* pl = _player;
@@ -359,13 +360,13 @@ void WorldSession::HandleMailDelete(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
     recv_data.read_skip<uint64>();                          // original sender GUID for return to, not used
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player *pl = _player;
@@ -417,14 +418,14 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
     uint32 itemId;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
     recv_data >> itemId;                                    // item guid low
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player* pl = _player;
@@ -514,12 +515,12 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailTakeMoney(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player *pl = _player;
@@ -551,10 +552,10 @@ void WorldSession::HandleMailTakeMoney(WorldPacket & recv_data )
  */
 void WorldSession::HandleGetMailList(WorldPacket & recv_data )
 {
-    uint64 mailbox;
-    recv_data >> mailbox;
+    ObjectGuid mailboxGuid;
+    recv_data >> mailboxGuid;
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     // client can't work with packets > max int16 value
@@ -677,13 +678,13 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data )
  */
 void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data )
 {
-    uint64 mailbox;
+    ObjectGuid mailboxGuid;
     uint32 mailId;
 
-    recv_data >> mailbox;
+    recv_data >> mailboxGuid;
     recv_data >> mailId;
 
-    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailbox, GAMEOBJECT_TYPE_MAILBOX))
+    if (!GetPlayer()->GetGameObjectIfCanInteractWith(mailboxGuid, GAMEOBJECT_TYPE_MAILBOX))
         return;
 
     Player *pl = _player;

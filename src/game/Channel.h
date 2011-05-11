@@ -180,8 +180,8 @@ class Channel
         void Moderate(ObjectGuid p);
         void Say(ObjectGuid p, const char *what, uint32 lang);
         void Invite(ObjectGuid p, const char *newp);
-        void Voice(uint64 guid1, uint64 guid2);
-        void DeVoice(uint64 guid1, uint64 guid2);
+        void Voice(ObjectGuid guid1, ObjectGuid guid2);
+        void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
         void JoinNotify(ObjectGuid guid);                                       // invisible notify
         void LeaveNotify(ObjectGuid guid);                                      // invisible notify
 
@@ -219,12 +219,12 @@ class Channel
         void MakeInvalidName(WorldPacket *data);                                //? 0x1B
         void MakeNotModerated(WorldPacket *data);                               //? 0x1C
         void MakePlayerInvited(WorldPacket *data, const std::string& name);     //+ 0x1D
-        void MakePlayerInviteBanned(WorldPacket *data, uint64 guid);            //? 0x1E
+        void MakePlayerInviteBanned(WorldPacket *data, ObjectGuid guid);        //? 0x1E
         void MakeThrottled(WorldPacket *data);                                  //? 0x1F
         void MakeNotInArea(WorldPacket *data);                                  //? 0x20
         void MakeNotInLfg(WorldPacket *data);                                   //? 0x21
-        void MakeVoiceOn(WorldPacket *data, uint64 guid);                       //+ 0x22
-        void MakeVoiceOff(WorldPacket *data, uint64 guid);                      //+ 0x23
+        void MakeVoiceOn(WorldPacket *data, ObjectGuid guid);                   //+ 0x22
+        void MakeVoiceOff(WorldPacket *data, ObjectGuid guid);                  //+ 0x23
 
         void SendToAll(WorldPacket *data, ObjectGuid p = ObjectGuid());
         void SendToOne(WorldPacket *data, ObjectGuid who);
