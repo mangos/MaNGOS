@@ -1112,8 +1112,29 @@ void Aura::TriggerSpell()
                         target->CastSpell(target, 23171, true, NULL, this);
                         return;
                     }
-//                    // Mark of Frost
-//                    case 23184: break;
+                    case 23184:                             // Mark of Frost
+                    case 25041:                             // Mark of Nature
+                    {
+                        std::list<Player*> targets;
+
+                        // spells existed in 1.x.x; 23183 - mark of frost; 25042 - mark of nature; both had radius of 100.0 yards in 1.x.x DBC
+                        // spells are used by Azuregos and the Emerald dragons in order to put a stun debuff on the players which resurrect during the encounter
+                        // in order to implement the missing spells we need to make a grid search for hostile players and check their auras; if they are marked apply debuff
+
+                        // Mark of Frost or Mark of Nature
+                        uint32 markSpellId = auraId == 23184 ? 23182 : 25040;
+                        // Aura of Frost or Aura of Nature
+                        uint32 debufSpellId = auraId == 23184 ? 23186 : 25043;
+
+                        MaNGOS::AnyPlayerInObjectRangeWithAuraCheck u_check(GetTarget(), 100.0f, markSpellId);
+                        MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeWithAuraCheck > checker(targets, u_check);
+                        Cell::VisitWorldObjects(GetTarget(), checker, 100.0f);
+
+                        for (std::list<Player*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+                            (*itr)->CastSpell((*itr), debufSpellId, true, NULL, NULL, casterGUID);
+
+                        return;
+                    }
                     case 23493:                             // Restoration
                     {
                         uint32 heal = triggerTarget->GetMaxHealth() / 10;
@@ -1161,8 +1182,6 @@ void Aura::TriggerSpell()
                     }
 //                    // Stink Trap
 //                    case 24918: break;
-//                    // Mark of Nature
-//                    case 25041: break;
 //                    // Agro Drones
 //                    case 25152: break;
                     case 25371:                             // Consume
