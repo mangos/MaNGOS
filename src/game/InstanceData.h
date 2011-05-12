@@ -82,6 +82,10 @@ class MANGOS_DLL_SPEC InstanceData
         virtual uint64 GetData64(uint32 /*Data*/) { return 0; }
         virtual void SetData64(uint32 /*Data*/, uint64 /*Value*/) { }
 
+        //Guid data storage (wrapper for set/get from uint64 storage
+        ObjectGuid GetGuid(uint32 dataIdx) { return ObjectGuid(GetData64(dataIdx)); }
+        void SetGuid(uint32 dataIdx, ObjectGuid value) { SetData64(dataIdx, value.GetRawValue()); }
+
         //All-purpose data storage 32 bit
         virtual uint32 GetData(uint32 /*Type*/) { return 0; }
         virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
