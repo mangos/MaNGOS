@@ -529,8 +529,8 @@ void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
-    uint64 ID;
-    recvPacket >> ID;
+    ObjectGuid otherGuid;
+    recvPacket >> otherGuid;
 
     if (GetPlayer()->m_trade)
         return;
@@ -559,7 +559,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    Player* pOther = ObjectAccessor::FindPlayer( ID );
+    Player* pOther = ObjectAccessor::FindPlayer( otherGuid );
 
     if (!pOther)
     {
@@ -620,8 +620,8 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     pOther->m_trade = new TradeData(pOther, _player);
 
     WorldPacket data(SMSG_TRADE_STATUS, 12);
-    data << (uint32) TRADE_STATUS_BEGIN_TRADE;
-    data << (uint64)_player->GetGUID();
+    data << uint32(TRADE_STATUS_BEGIN_TRADE);
+    data << ObjectGuid(_player->GetObjectGuid());
     pOther->GetSession()->SendPacket(&data);
 }
 

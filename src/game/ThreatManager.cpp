@@ -61,7 +61,7 @@ HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, f
     iThreat = pThreat;
     iTempThreatModifyer = 0.0f;
     link(pUnit, pThreatManager);
-    iUnitGuid = pUnit->GetGUID();
+    iUnitGuid = pUnit->GetObjectGuid();
     iOnline = true;
     iAccessible = true;
 }
@@ -128,10 +128,9 @@ void HostileReference::updateOnlineStatus()
     bool online = false;
     bool accessible = false;
 
-    if(!isValid())
+    if (!isValid())
     {
-        Unit* target = ObjectAccessor::GetUnit(*getSourceUnit(), getUnitGuid());
-        if(target)
+        if (Unit* target = ObjectAccessor::GetUnit(*getSourceUnit(), getUnitGuid()))
             link(target, getSource());
     }
     // only check for online status if
@@ -224,10 +223,10 @@ void ThreatContainer::clearReferences()
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 {
     HostileReference* result = NULL;
-    uint64 guid = pVictim->GetGUID();
+    ObjectGuid guid = pVictim->GetObjectGuid();
     for(ThreatList::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
-        if((*i)->getUnitGuid() == guid)
+        if ((*i)->getUnitGuid() == guid)
         {
             result = (*i);
             break;

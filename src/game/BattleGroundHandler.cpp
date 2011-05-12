@@ -239,25 +239,25 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode( WorldPacket & /*recv
                     ++count2;
 
                 WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4+4+16*count1+16*count2));
-                data << count1;                                     // alliance flag holders count - obsolete, now always 0
+                data << count1;                             // alliance flag holders count - obsolete, now always 0
                 /*for(uint8 i = 0; i < count1; ++i)
                 {
-                    data << uint64(0);                              // guid
-                    data << (float)0;                               // x
-                    data << (float)0;                               // y
+                    data << ObjectGuid(0);                  // guid
+                    data << (float)0;                       // x
+                    data << (float)0;                       // y
                 }*/
-                data << count2;                                     // horde flag holders count - obsolete, now count of next fields
+                data << count2;                             // horde flag holders count - obsolete, now count of next fields
                 if (ali_plr)
                 {
-                    data << (uint64)ali_plr->GetGUID();
-                    data << (float)ali_plr->GetPositionX();
-                    data << (float)ali_plr->GetPositionY();
+                    data << ObjectGuid(ali_plr->GetObjectGuid());
+                    data << float(ali_plr->GetPositionX());
+                    data << float(ali_plr->GetPositionY());
                 }
                 if (horde_plr)
                 {
-                    data << (uint64)horde_plr->GetGUID();
-                    data << (float)horde_plr->GetPositionX();
-                    data << (float)horde_plr->GetPositionY();
+                    data << ObjectGuid(horde_plr->GetObjectGuid());
+                    data << float(horde_plr->GetPositionX());
+                    data << float(horde_plr->GetPositionY());
                 }
 
                 SendPacket(&data);
@@ -785,7 +785,7 @@ void WorldSession::HandleBattlemasterJoinArena( WorldPacket & recv_data )
 
 void WorldSession::HandleReportPvPAFK( WorldPacket & recv_data )
 {
-    uint64 playerGuid;
+    ObjectGuid playerGuid;
     recv_data >> playerGuid;
     Player *reportedPlayer = sObjectMgr.GetPlayer(playerGuid);
 

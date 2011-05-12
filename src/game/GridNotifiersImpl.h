@@ -34,7 +34,7 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T> &m)
     for(typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         i_camera.UpdateVisibilityOf(iter->getSource(), i_data, i_visibleNow);
-        i_clientGUIDs.erase(iter->getSource()->GetGUID());
+        i_clientGUIDs.erase(iter->getSource()->GetObjectGuid());
     }
 }
 
@@ -160,7 +160,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     // Apply PersistentAreaAura on target
     // in case 2 dynobject overlap areas for same spell, same holder is selected, so dynobjects share holder
-    SpellAuraHolder *holder = target->GetSpellAuraHolder(spellInfo->Id, i_dynobject.GetCasterGuid().GetRawValue());
+    SpellAuraHolder *holder = target->GetSpellAuraHolder(spellInfo->Id, i_dynobject.GetCasterGuid());
 
     if (holder)
     {
@@ -545,6 +545,15 @@ void MaNGOS::PlayerSearcher<Check>::Visit(PlayerMapType &m)
             return;
         }
     }
+}
+
+template<class Check>
+void MaNGOS::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
+{
+    for(PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+        if (itr->getSource()->InSamePhase(i_phaseMask))
+            if (i_check(itr->getSource()))
+                i_objects.push_back(itr->getSource());
 }
 
 template<class Builder>

@@ -41,7 +41,7 @@ void DynamicObject::AddToWorld()
 {
     ///- Register the dynamicObject for guid lookup
     if(!IsInWorld())
-        GetMap()->GetObjectsStore().insert<DynamicObject>(GetGUID(), (DynamicObject*)this);
+        GetMap()->GetObjectsStore().insert<DynamicObject>(GetObjectGuid(), (DynamicObject*)this);
 
     Object::AddToWorld();
 }
@@ -51,7 +51,7 @@ void DynamicObject::RemoveFromWorld()
     ///- Remove the dynamicObject from the accessor
     if(IsInWorld())
     {
-        GetMap()->GetObjectsStore().erase<DynamicObject>(GetGUID(), (DynamicObject*)NULL);
+        GetMap()->GetObjectsStore().erase<DynamicObject>(GetObjectGuid(), (DynamicObject*)NULL);
         GetViewPoint().Event_RemovedFromWorld();
     }
 
@@ -141,14 +141,14 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 
     if(deleteThis)
     {
-        caster->RemoveDynObjectWithGUID(GetGUID());
+        caster->RemoveDynObjectWithGUID(GetObjectGuid());
         Delete();
     }
 }
 
 void DynamicObject::Delete()
 {
-    SendObjectDeSpawnAnim(GetGUID());
+    SendObjectDeSpawnAnim(GetObjectGuid());
     AddObjectToRemoveList();
 }
 
@@ -160,7 +160,7 @@ void DynamicObject::Delay(int32 delaytime)
         Unit *target = GetMap()->GetUnit((*iter));
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid().GetRawValue());
+            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
             if (!holder)
             {
                 ++iter;
@@ -186,7 +186,7 @@ void DynamicObject::Delay(int32 delaytime)
                 continue;
             }
 
-            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid().GetRawValue());
+            target->DelaySpellAuraHolder(m_spellId, delaytime, GetCasterGuid());
             ++iter;
         }
         else

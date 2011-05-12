@@ -47,12 +47,12 @@ VisibleNotifier::Notify()
     {
         for(Transport::PlayerSet::const_iterator itr = transport->GetPassengers().begin();itr!=transport->GetPassengers().end();++itr)
         {
-            if (i_clientGUIDs.find((*itr)->GetGUID()) != i_clientGUIDs.end())
+            if (i_clientGUIDs.find((*itr)->GetObjectGuid()) != i_clientGUIDs.end())
             {
                 // ignore far sight case
                 (*itr)->UpdateVisibilityOf(*itr, &player);
                 player.UpdateVisibilityOf(&player, *itr, i_data, i_visibleNow);
-                i_clientGUIDs.erase((*itr)->GetGUID());
+                i_clientGUIDs.erase((*itr)->GetObjectGuid());
             }
         }
     }

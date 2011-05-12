@@ -92,15 +92,15 @@ void WorldSession::HandleSwapInvItemOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandleAutoEquipItemSlotOpcode( WorldPacket & recv_data )
 {
-    uint64 itemguid;
+    ObjectGuid itemGuid;
     uint8 dstslot;
-    recv_data >> itemguid >> dstslot;
+    recv_data >> itemGuid >> dstslot;
 
     // cheating attempt, client should never send opcode in that case
     if(!Player::IsEquipmentPos(INVENTORY_SLOT_BAG_0, dstslot))
         return;
 
-    Item* item = _player->GetItemByGuid(itemguid);
+    Item* item = _player->GetItemByGuid(itemGuid);
     uint16 dstpos = dstslot | (INVENTORY_SLOT_BAG_0 << 8);
 
     if(!item || item->GetPos() == dstpos)
@@ -472,7 +472,7 @@ void WorldSession::HandleReadItemOpcode( WorldPacket & recv_data )
             DETAIL_LOG("STORAGE: Unable to read item");
             _player->SendEquipError( msg, pItem, NULL );
         }
-        data << pItem->GetGUID();
+        data << ObjectGuid(pItem->GetObjectGuid());
         SendPacket(&data);
     }
     else
@@ -496,111 +496,111 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
     DEBUG_LOG(  "WORLD: Received CMSG_SELL_ITEM" );
 
     ObjectGuid vendorGuid;
-    uint64 itemguid;
+    ObjectGuid itemGuid;
     uint32 count;
 
     recv_data >> vendorGuid;
-    recv_data >> itemguid;
+    recv_data >> itemGuid;
     recv_data >> count;
 
-    if(!itemguid)
+    if (itemGuid.IsEmpty())
         return;
 
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleSellItemOpcode - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, itemguid, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, itemGuid, 0);
         return;
     }
 
     // remove fake death
-    if(GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    Item *pItem = _player->GetItemByGuid( itemguid );
+    Item *pItem = _player->GetItemByGuid(itemGuid);
     if (pItem)
     {
         // prevent sell not owner item
         if (_player->GetObjectGuid() != pItem->GetOwnerGuid())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // prevent sell non empty bag by drag-and-drop at vendor's item list
-        if(pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
+        if (pItem->IsBag() && !((Bag*)pItem)->IsEmpty())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // prevent sell currently looted item
-        if(_player->GetLootGUID() == pItem->GetGUID())
+        if (_player->GetLootGuid() == pItem->GetObjectGuid())
         {
-            _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
 
         // special case at auto sell (sell all)
-        if(count == 0)
+        if (count == 0)
         {
             count = pItem->GetCount();
         }
         else
         {
             // prevent sell more items that exist in stack (possible only not from client)
-            if(count > pItem->GetCount())
+            if (count > pItem->GetCount())
             {
-                _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
                 return;
             }
         }
 
         ItemPrototype const *pProto = pItem->GetProto();
-        if( pProto )
+        if (pProto)
         {
-            if( pProto->SellPrice > 0 )
+            if (pProto->SellPrice > 0)
             {
-                if(count < pItem->GetCount())               // need split items
+                if (count < pItem->GetCount())              // need split items
                 {
                     Item *pNewItem = pItem->CloneItem( count, _player );
                     if (!pNewItem)
                     {
                         sLog.outError("WORLD: HandleSellItemOpcode - could not create clone of item %u; count = %u", pItem->GetEntry(), count );
-                        _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                        _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
                         return;
                     }
 
-                    pItem->SetCount( pItem->GetCount() - count );
-                    _player->ItemRemovedQuestCheck( pItem->GetEntry(), count );
-                    if( _player->IsInWorld() )
-                        pItem->SendCreateUpdateToPlayer( _player );
+                    pItem->SetCount(pItem->GetCount() - count);
+                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), count);
+                    if (_player->IsInWorld())
+                        pItem->SendCreateUpdateToPlayer(_player);
                     pItem->SetState(ITEM_CHANGED, _player);
 
-                    _player->AddItemToBuyBackSlot( pNewItem );
-                    if( _player->IsInWorld() )
-                        pNewItem->SendCreateUpdateToPlayer( _player );
+                    _player->AddItemToBuyBackSlot(pNewItem);
+                    if (_player->IsInWorld())
+                        pNewItem->SendCreateUpdateToPlayer(_player);
                 }
                 else
                 {
-                    _player->ItemRemovedQuestCheck( pItem->GetEntry(), pItem->GetCount());
-                    _player->RemoveItem( pItem->GetBagSlot(), pItem->GetSlot(), true);
+                    _player->ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
+                    _player->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                     pItem->RemoveFromUpdateQueueOf(_player);
-                    _player->AddItemToBuyBackSlot( pItem );
+                    _player->AddItemToBuyBackSlot(pItem);
                 }
 
                 uint32 money = pProto->SellPrice * count;
 
-                _player->ModifyMoney( money );
+                _player->ModifyMoney(money);
                 _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_MONEY_FROM_VENDORS, money);
             }
             else
-                _player->SendSellError( SELL_ERR_CANT_SELL_ITEM, pCreature, itemguid, 0);
+                _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, pCreature, itemGuid, 0);
             return;
         }
     }
-    _player->SendSellError( SELL_ERR_CANT_FIND_ITEM, pCreature, itemguid, 0);
+    _player->SendSellError(SELL_ERR_CANT_FIND_ITEM, pCreature, itemGuid, 0);
     return;
 }
 
@@ -616,7 +616,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleBuybackItem - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
-        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        _player->SendSellError( SELL_ERR_CANT_FIND_VENDOR, NULL, ObjectGuid(), 0);
         return;
     }
 
@@ -625,10 +625,10 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Item *pItem = _player->GetItemFromBuyBackSlot( slot );
-    if( pItem )
+    if (pItem)
     {
         uint32 price = _player->GetUInt32Value( PLAYER_FIELD_BUYBACK_PRICE_1 + slot - BUYBACK_SLOT_START );
-        if( _player->GetMoney() < price )
+        if (_player->GetMoney() < price)
         {
             _player->SendBuyError( BUY_ERR_NOT_ENOUGHT_MONEY, pCreature, pItem->GetEntry(), 0);
             return;
@@ -636,7 +636,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
 
         ItemPosCountVec dest;
         InventoryResult msg = _player->CanStoreItem( NULL_BAG, NULL_SLOT, dest, pItem, false );
-        if( msg == EQUIP_ERR_OK )
+        if (msg == EQUIP_ERR_OK)
         {
             _player->ModifyMoney( -(int32)price );
             _player->RemoveItemFromBuyBackSlot( slot, false );
@@ -649,7 +649,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         return;
     }
     else
-        _player->SendBuyError( BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
+        _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
 }
 
 void WorldSession::HandleBuyItemInSlotOpcode( WorldPacket & recv_data )
@@ -736,7 +736,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: SendListInventory - %s not found or you can't interact with him.", vendorguid.GetString().c_str());
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, NULL, ObjectGuid(), 0);
         return;
     }
 
@@ -1055,25 +1055,25 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket & recv_data)
         GetPlayer()->SetAmmo(item);
 }
 
-void WorldSession::SendEnchantmentLog(uint64 Target, uint64 Caster,uint32 ItemID,uint32 SpellID)
+void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8+8+4+4+1));     // last check 2.0.10
-    data << uint64(Target);
-    data << uint64(Caster);
-    data << uint32(ItemID);
-    data << uint32(SpellID);
+    data << ObjectGuid(targetGuid);
+    data << ObjectGuid(casterGuid);
+    data << uint32(itemId);
+    data << uint32(spellId);
     data << uint8(0);
     SendPacket(&data);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid,uint32 slot,uint32 Duration)
+void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
                                                             // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8+4+4+8));
-    data << uint64(Itemguid);
+    data << ObjectGuid(itemGuid);
     data << uint32(slot);
-    data << uint32(Duration);
-    data << uint64(Playerguid);
+    data << uint32(duration);
+    data << ObjectGuid(playerGuid);
     SendPacket(&data);
 }
 
@@ -1228,22 +1228,29 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_SOCKET_GEMS");
 
-    uint64 item_guid;
-    uint64 gem_guids[MAX_GEM_SOCKETS];
+    ObjectGuid itemGuid;
+    ObjectGuid gemGuids[MAX_GEM_SOCKETS];
 
-    recv_data >> item_guid;
-    if(!item_guid)
+    recv_data >> itemGuid;
+    if (!itemGuid.IsItem())
         return;
 
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        recv_data >> gem_guids[i];
+        recv_data >> gemGuids[i];
 
     //cheat -> tried to socket same gem multiple times
-    if ((gem_guids[0] && (gem_guids[0] == gem_guids[1] || gem_guids[0] == gem_guids[2])) ||
-        (gem_guids[1] && (gem_guids[1] == gem_guids[2])))
-        return;
+    for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    {
+        ObjectGuid gemGuid = gemGuids[0];
+        if (!gemGuid.IsItem())
+            return;
 
-    Item *itemTarget = _player->GetItemByGuid(item_guid);
+        for(int j = i+1; j < MAX_GEM_SOCKETS; ++j)
+            if (gemGuids[j] == gemGuid)
+                return;
+    }
+
+    Item *itemTarget = _player->GetItemByGuid(itemGuid);
     if(!itemTarget)                                         //missing item to socket
         return;
 
@@ -1256,7 +1263,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 
     Item *Gems[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        Gems[i] = gem_guids[i] ? _player->GetItemByGuid(gem_guids[i]) : NULL;
+        Gems[i] = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL;
 
     GemPropertiesEntry const *GemProps[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
@@ -1398,15 +1405,15 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     //if a meta gem is being equipped, all information has to be written to the item before testing if the conditions for the gem are met
 
     //remove ALL enchants
-    for(uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
         _player->ApplyEnchantment(itemTarget, EnchantmentSlot(enchant_slot), false);
 
-    for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
     {
-        if(GemEnchants[i])
+        if (GemEnchants[i])
         {
             itemTarget->SetEnchantment(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + i), GemEnchants[i], 0, 0);
-            if(Item* guidItem = _player->GetItemByGuid(gem_guids[i]))
+            if(Item* guidItem = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL)
                 _player->DestroyItem(guidItem->GetBagSlot(), guidItem->GetSlot(), true );
         }
     }

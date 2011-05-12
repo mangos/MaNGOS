@@ -48,7 +48,7 @@ ReactorAI::AttackStart(Unit *p)
     if(m_creature->Attack(p,true))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Tag unit GUID: %u (TypeId: %u) as a victim", p->GetGUIDLow(), p->GetTypeId());
-        i_victimGuid = p->GetGUID();
+        i_victimGuid = p->GetObjectGuid();
         m_creature->AddThreat(p);
 
         m_creature->SetInCombatWith(p);
@@ -71,7 +71,7 @@ ReactorAI::UpdateAI(const uint32 /*time_diff*/)
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
-    i_victimGuid = m_creature->getVictim()->GetGUID();
+    i_victimGuid = m_creature->getVictim()->GetObjectGuid();
 
     DoMeleeAttackIfReady();
 }
@@ -84,7 +84,7 @@ ReactorAI::EnterEvadeMode()
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, he is dead [guid=%u]", m_creature->GetGUIDLow());
         m_creature->GetMotionMaster()->MovementExpired();
         m_creature->GetMotionMaster()->MoveIdle();
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
         return;
@@ -111,7 +111,7 @@ ReactorAI::EnterEvadeMode()
 
     m_creature->RemoveAllAuras();
     m_creature->DeleteThreatList();
-    i_victimGuid = 0;
+    i_victimGuid.Clear();
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(NULL);
 

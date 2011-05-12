@@ -973,7 +973,7 @@ bool Item::CanBeTraded(bool mail) const
     {
         if (owner->CanUnequipItem(GetPos(),false) !=  EQUIP_ERR_OK )
             return false;
-        if (owner->GetLootGUID()==GetGUID())
+        if (owner->GetLootGuid() == GetObjectGuid())
             return false;
     }
 
@@ -1209,7 +1209,7 @@ void Item::SendTimeUpdate(Player* owner)
         return;
 
     WorldPacket data(SMSG_ITEM_TIME_UPDATE, (8+4));
-    data << uint64(GetGUID());
+    data << ObjectGuid(GetObjectGuid());
     data << uint32(duration);
     owner->GetSession()->SendPacket(&data);
 }

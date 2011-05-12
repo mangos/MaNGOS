@@ -24,6 +24,7 @@
 #include "Utilities/LinkedReference/Reference.h"
 #include "UnitEvents.h"
 #include "Timer.h"
+#include "ObjectGuid.h"
 #include <list>
 
 //==============================================================
@@ -55,7 +56,11 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 
         void setThreat(float pThreat) { addThreat(pThreat - getThreat()); }
 
-        void addThreatPercent(int32 pPercent) { float tmpThreat = iThreat; tmpThreat = tmpThreat * (pPercent+100) / 100; addThreat(tmpThreat-iThreat); }
+        void addThreatPercent(int32 pPercent)
+        {
+            // for special -100 case avoid rounding
+            addThreat(pPercent == -100 ? -iThreat : iThreat * pPercent / 100.0f);
+        }
 
         float getThreat() const { return iThreat; }
 
@@ -92,7 +97,7 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 
         //=================================================
 
-        uint64 getUnitGuid() const { return iUnitGuid; }
+        ObjectGuid const& getUnitGuid() const { return iUnitGuid; }
 
         //=================================================
         // reference is not needed anymore. realy delete it !
@@ -121,7 +126,7 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
     private:
         float iThreat;
         float iTempThreatModifyer;                          // used for taunt
-        uint64 iUnitGuid;
+        ObjectGuid iUnitGuid;
         bool iOnline;
         bool iAccessible;
 };

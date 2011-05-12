@@ -144,47 +144,49 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
 
     // TODO: Guard Player map
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for(HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+    for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
+        Player* pl = itr->second;
+
         if (security == SEC_PLAYER)
         {
             // player can see member of other team only if CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST
-            if (itr->second->GetTeam() != team && !allowTwoSideWhoList )
+            if (pl->GetTeam() != team && !allowTwoSideWhoList )
                 continue;
 
             // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
-            if (itr->second->GetSession()->GetSecurity() > gmLevelInWhoList)
+            if (pl->GetSession()->GetSecurity() > gmLevelInWhoList)
                 continue;
         }
 
         // do not process players which are not in world
-        if(!(itr->second->IsInWorld()))
+        if (!pl->IsInWorld())
             continue;
 
         // check if target is globally visible for player
-        if (!(itr->second->IsVisibleGloballyFor(_player)))
+        if (!pl->IsVisibleGloballyFor(_player))
             continue;
 
         // check if target's level is in level range
-        uint32 lvl = itr->second->getLevel();
+        uint32 lvl = pl->getLevel();
         if (lvl < level_min || lvl > level_max)
             continue;
 
         // check if class matches classmask
-        uint32 class_ = itr->second->getClass();
+        uint32 class_ = pl->getClass();
         if (!(classmask & (1 << class_)))
             continue;
 
         // check if race matches racemask
-        uint32 race = itr->second->getRace();
+        uint32 race = pl->getRace();
         if (!(racemask & (1 << race)))
             continue;
 
-        uint32 pzoneid = itr->second->GetZoneId();
-        uint8 gender = itr->second->getGender();
+        uint32 pzoneid = pl->GetZoneId();
+        uint8 gender = pl->getGender();
 
         bool z_show = true;
-        for(uint32 i = 0; i < zones_count; ++i)
+        for (uint32 i = 0; i < zones_count; ++i)
         {
             if(zoneids[i] == pzoneid)
             {
@@ -197,7 +199,7 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         if (!z_show)
             continue;
 
-        std::string pname = itr->second->GetName();
+        std::string pname = pl->GetName();
         std::wstring wpname;
         if(!Utf8toWStr(pname,wpname))
             continue;
@@ -206,9 +208,9 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         if (!(wplayer_name.empty() || wpname.find(wplayer_name) != std::wstring::npos))
             continue;
 
-        std::string gname = sGuildMgr.GetGuildNameById(itr->second->GetGuildId());
+        std::string gname = sGuildMgr.GetGuildNameById(pl->GetGuildId());
         std::wstring wgname;
-        if(!Utf8toWStr(gname,wgname))
+        if (!Utf8toWStr(gname,wgname))
             continue;
         wstrToLower(wgname);
 
@@ -216,11 +218,11 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
             continue;
 
         std::string aname;
-        if(AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(itr->second->GetZoneId()))
+        if (AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(pzoneid))
             aname = areaEntry->area_name[GetSessionDbcLocale()];
 
         bool s_show = true;
-        for(uint32 i = 0; i < str_count; ++i)
+        for (uint32 i = 0; i < str_count; ++i)
         {
             if (!str[i].empty())
             {
@@ -262,8 +264,9 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG( "WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity() );
 
-    if (uint64 lguid = GetPlayer()->GetLootGUID())
-        DoLootRelease(lguid);
+    ObjectGuid lootGuid = GetPlayer()->GetLootGuid();
+    if (!lootGuid.IsEmpty())
+        DoLootRelease(lootGuid);
 
     //Can not logout if...
     if( GetPlayer()->isInCombat() ||                        //...is in combat
@@ -502,7 +505,7 @@ void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 acc
 
 void WorldSession::HandleDelFriendOpcode( WorldPacket & recv_data )
 {
-    uint64 friendGuid;
+    ObjectGuid friendGuid;
 
     DEBUG_LOG( "WORLD: Received CMSG_DEL_FRIEND" );
 
@@ -572,7 +575,7 @@ void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 acc
 
 void WorldSession::HandleDelIgnoreOpcode( WorldPacket & recv_data )
 {
-    uint64 ignoreGuid;
+    ObjectGuid ignoreGuid;
 
     DEBUG_LOG( "WORLD: Received CMSG_DEL_IGNORE" );
 
@@ -714,7 +717,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         return;
 
     uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger( Trigger_ID );
-    if( quest_id && pl->isAlive() && pl->IsActiveQuest(quest_id) )
+    if ( quest_id && pl->isAlive() && pl->IsActiveQuest(quest_id) )
     {
         Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id);
         if( pQuest )
@@ -725,7 +728,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     }
 
     // enter to tavern, not overwrite city rest
-    if(sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
+    if (sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
     {
         // set resting flag we are in the inn
         if (pl->GetRestType() != REST_TYPE_IN_CITY)
@@ -733,7 +736,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         return;
     }
 
-    if(pl->InBattleGround())
+    if (pl->InBattleGround())
     {
         if (BattleGround* bg = pl->GetBattleGround())
             bg->HandleAreaTrigger(pl, Trigger_ID);
@@ -742,69 +745,108 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 
     // NULL if all values default (non teleport trigger)
     AreaTrigger const* at = sObjectMgr.GetAreaTrigger(Trigger_ID);
-    if(!at)
+    if (!at)
         return;
 
-    if(!GetPlayer()->isGameMaster())
+    MapEntry const* targetMapEntry = sMapStore.LookupEntry(at->target_mapId);
+    if (!targetMapEntry)
+        return;
+
+    if (!pl->isGameMaster())
     {
+        // ghost resurrected at enter attempt to dungeon with corpse (including fail enter cases)
+        if (!pl->isAlive() && targetMapEntry->IsDungeon())
+        {
+            int32 corpseMapId = 0;
+            if (Corpse *corpse = pl->GetCorpse())
+                corpseMapId = corpse->GetMapId();
+
+            // check back way from corpse to entrance
+            uint32 instance_map = corpseMapId;
+            do
+            {
+                // most often fast case
+                if (instance_map==targetMapEntry->MapID)
+                    break;
+
+                InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(instance_map);
+                instance_map = instance ? instance->parent : 0;
+            }
+            while (instance_map);
+
+            // corpse not in dungeon or some linked deep dungeons
+            if (!instance_map)
+            {
+                WorldPacket data(SMSG_AREA_TRIGGER_NO_CORPSE);
+                pl->GetSession()->SendPacket(&data);
+                return;
+            }
+
+            // need find areatrigger to inner dungeon for landing point
+            if (at->target_mapId != corpseMapId)
+                if (AreaTrigger const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
+                    at = corpseAt;
+
+            // now we can resurrect player, and then check teleport requirements
+            pl->ResurrectPlayer(0.5f);
+            pl->SpawnCorpseBones();
+        }
+
+        // check trigger requirements
         bool missingItem = false;
         bool missingLevel = false;
         bool missingQuest = false;
 
-        if(GetPlayer()->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
+        if (pl->getLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
             missingLevel = true;
 
         // must have one or the other, report the first one that's missing
-        if(at->requiredItem)
+        if (at->requiredItem)
         {
-            if(!GetPlayer()->HasItemCount(at->requiredItem, 1) &&
+            if (!pl->HasItemCount(at->requiredItem, 1) &&
                 (!at->requiredItem2 || !GetPlayer()->HasItemCount(at->requiredItem2, 1)))
                 missingItem = true;
         }
-        else if(at->requiredItem2 && !GetPlayer()->HasItemCount(at->requiredItem2, 1))
+        else if (at->requiredItem2 && !pl->HasItemCount(at->requiredItem2, 1))
             missingItem = true;
 
-        MapEntry const* mapEntry = sMapStore.LookupEntry(at->target_mapId);
-        if(!mapEntry)
-            return;
-
-        bool isRegularTargetMap = !mapEntry->IsDungeon() || GetPlayer()->GetDifficulty(mapEntry->IsRaid()) == REGULAR_DIFFICULTY;
+        bool isRegularTargetMap = !targetMapEntry->IsDungeon() || pl->GetDifficulty(targetMapEntry->IsRaid()) == REGULAR_DIFFICULTY;
 
         if (!isRegularTargetMap)
         {
-            if(at->heroicKey)
+            if (at->heroicKey)
             {
-                if(!GetPlayer()->HasItemCount(at->heroicKey, 1) &&
-                    (!at->heroicKey2 || !GetPlayer()->HasItemCount(at->heroicKey2, 1)))
+                if (!pl->HasItemCount(at->heroicKey, 1) &&
+                    (!at->heroicKey2 || !pl->HasItemCount(at->heroicKey2, 1)))
                     missingItem = true;
             }
-            else if(at->heroicKey2 && !GetPlayer()->HasItemCount(at->heroicKey2, 1))
+            else if (at->heroicKey2 && !pl->HasItemCount(at->heroicKey2, 1))
                 missingItem = true;
         }
 
         if (!isRegularTargetMap)
         {
-            if (at->requiredQuestHeroic && !GetPlayer()->GetQuestRewardStatus(at->requiredQuestHeroic))
+            if (at->requiredQuestHeroic && !pl->GetQuestRewardStatus(at->requiredQuestHeroic))
                 missingQuest = true;
         }
         else
         {
-            if (at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
+            if (at->requiredQuest && !pl->GetQuestRewardStatus(at->requiredQuest))
                 missingQuest = true;
         }
 
-        if(missingItem || missingLevel || missingQuest)
+        if (missingItem || missingLevel || missingQuest)
         {
             // hack for "Opening of the Dark Portal"
-            if(missingQuest && at->target_mapId == 269)
+            if (missingQuest && at->target_mapId == 269)
                 SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
-            else if(missingQuest && mapEntry->IsContinent())// do not report anything for quest areatriggers
+            else if (missingQuest && targetMapEntry->IsContinent())// do not report anything for quest areatriggers
                 return;
             // hack for TBC heroics
-            else if(missingLevel && !mapEntry->IsRaid() && GetPlayer()->GetDifficulty(false) == DUNGEON_DIFFICULTY_HEROIC && mapEntry->addon == 1)
+            else if (missingLevel && !targetMapEntry->IsRaid() && GetPlayer()->GetDifficulty(false) == DUNGEON_DIFFICULTY_HEROIC && targetMapEntry->addon == 1)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), at->requiredLevel);
             else
-                GetPlayer()->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, GetPlayer()->GetDifficulty(mapEntry->IsRaid()));
+                pl->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, pl->GetDifficulty(targetMapEntry->IsRaid()));
             return;
         }
     }

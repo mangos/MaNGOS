@@ -544,8 +544,12 @@ void WorldSession::HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data )
     // everything is fine, do it
     if (Player* player = sObjectMgr.GetPlayer(name.c_str()))
         group->ChangeMembersGroup(player, groupNr);
-    else if (uint64 guid = sObjectMgr.GetPlayerGUIDByName(name.c_str()))
-        group->ChangeMembersGroup(guid, groupNr);
+    else
+    {
+        ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name.c_str());
+        if (!guid.IsEmpty())
+            group->ChangeMembersGroup(guid, groupNr);
+    }
 }
 
 void WorldSession::HandleGroupAssistantLeaderOpcode( WorldPacket & recv_data )
@@ -622,7 +626,7 @@ void WorldSession::HandleRaidReadyCheckOpcode( WorldPacket & recv_data )
 
         // everything is fine, do it
         WorldPacket data(MSG_RAID_READY_CHECK, 8);
-        data << GetPlayer()->GetGUID();
+        data << ObjectGuid(GetPlayer()->GetObjectGuid());
         group->BroadcastPacket(&data, false, -1);
 
         group->OfflineReadyCheck();

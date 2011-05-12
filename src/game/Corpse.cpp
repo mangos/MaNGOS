@@ -126,7 +126,7 @@ void Corpse::SaveToDB()
 void Corpse::DeleteBonesFromWorld()
 {
     MANGOS_ASSERT(GetType() == CORPSE_BONES);
-    Corpse* corpse = GetMap()->GetCorpse(GetGUID());
+    Corpse* corpse = GetMap()->GetCorpse(GetObjectGuid());
 
     if (!corpse)
     {
