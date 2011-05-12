@@ -51,7 +51,7 @@ std::string ObjectGuid::GetString() const
     if (IsPlayer())
     {
         std::string name;
-        if (sObjectMgr.GetPlayerNameByGUID(m_guid, name))
+        if (sObjectMgr.GetPlayerNameByGUID(*this, name))
             str << " " << name;
     }
 
