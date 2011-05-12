@@ -1118,8 +1118,9 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
         GetScriptHookPtr((P), (N));             \
         if (!(P))                               \
         {                                       \
-            MANGOS_CLOSE_LIBRARY(m_hScriptLib); \
-            m_hScriptLib = NULL;                \
+            /* prevent call before init */      \
+            m_pOnFreeScriptLibrary = NULL;      \
+            UnloadScriptLibrary();              \
             return SCRIPT_LOAD_ERR_WRONG_API;   \
         }
 
@@ -1160,7 +1161,11 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
 #   undef GET_SCRIPT_HOOK_PTR
 
     if (strcmp(pGetMangosRevStr(), REVISION_NR) != 0)
+    {
+        m_pOnFreeScriptLibrary = NULL;                      // prevent call before init
+        UnloadScriptLibrary();
         return SCRIPT_LOAD_ERR_OUTDATED;
+    }
 
     m_pOnInitScriptLibrary();
     return SCRIPT_LOAD_OK;
