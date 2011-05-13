@@ -1236,6 +1236,9 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
     {
         ObjectGuid gemGuid = gemGuids[0];
+        if (gemGuid.IsEmpty())
+            continue;
+
         if (!gemGuid.IsItem())
             return;
 
