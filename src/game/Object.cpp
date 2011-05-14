@@ -575,8 +575,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
             {
                 if (index == UNIT_NPC_FLAGS)
                 {
-                    // remove custom flag before sending
-                    uint32 appendValue = m_uint32Values[index] & ~UNIT_NPC_FLAG_GUARD;
+                    uint32 appendValue = m_uint32Values[index];
 
                     if (GetTypeId() == TYPEID_UNIT)
                     {
