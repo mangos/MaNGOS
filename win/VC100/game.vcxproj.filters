@@ -159,6 +159,9 @@
     <ClCompile Include="..\..\src\game\Mail.cpp">
       <Filter>World/Handlers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\MailHandler.cpp">
+      <Filter>World/Handlers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\game\Map.cpp">
       <Filter>World/Handlers</Filter>
     </ClCompile>
