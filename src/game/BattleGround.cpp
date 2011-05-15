@@ -1592,7 +1592,7 @@ void BattleGround::SpawnBGCreature(ObjectGuid guid, uint32 respawntime)
 
 bool BattleGround::DelObject(uint32 type)
 {
-    if (m_BgObjects[type].IsEmpty())
+    if (!m_BgObjects[type])
         return true;
 
     GameObject *obj = GetBgMap()->GetGameObject(m_BgObjects[type]);

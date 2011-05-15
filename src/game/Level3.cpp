@@ -3671,8 +3671,7 @@ bool ChatHandler::HandleGetDistanceCommand(char* args)
 
     if (*args)
     {
-        ObjectGuid guid = ExtractGuidFromLink(&args);
-        if (!guid.IsEmpty())
+        if (ObjectGuid guid = ExtractGuidFromLink(&args))
             obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
 
         if(!obj)
@@ -3710,20 +3709,20 @@ bool ChatHandler::HandleDieCommand(char* /*args*/)
 {
     Unit* target = getSelectedUnit();
 
-    if(!target || m_session->GetPlayer()->GetSelectionGuid().IsEmpty())
+    if (!target || !m_session->GetPlayer()->GetSelectionGuid())
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if(target->GetTypeId()==TYPEID_PLAYER)
+    if (target->GetTypeId()==TYPEID_PLAYER)
     {
         if (HasLowerSecurity((Player*)target, ObjectGuid(), false))
             return false;
     }
 
-    if( target->isAlive() )
+    if (target->isAlive())
     {
         m_session->GetPlayer()->DealDamage(target, target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
     }
@@ -3738,7 +3737,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
 
     Unit* target = getSelectedUnit();
 
-    if (!target || m_session->GetPlayer()->GetSelectionGuid().IsEmpty())
+    if (!target || !m_session->GetPlayer()->GetSelectionGuid())
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
@@ -4890,7 +4889,7 @@ bool ChatHandler::HandleResetSpecsCommand(char* args)
             target->SendTalentsInfoData(true);
         return true;
     }
-    else if (!target_guid.IsEmpty())
+    else if (target_guid)
     {
         uint32 at_flags = AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS;
         CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE guid = '%u'", at_flags, target_guid.GetCounter());
@@ -5712,7 +5711,7 @@ bool ChatHandler::HandleRespawnCommand(char* /*args*/)
 
     // accept only explicitly selected target (not implicitly self targeting case)
     Unit* target = getSelectedUnit();
-    if (!pl->GetSelectionGuid().IsEmpty() && target)
+    if (pl->GetSelectionGuid() && target)
     {
         if (target->GetTypeId() != TYPEID_UNIT)
         {
@@ -5863,7 +5862,7 @@ bool ChatHandler::HandlePDumpWriteCommand(char *args)
         }
 
         guid = sObjectMgr.GetPlayerGuidByName(name);
-        if (guid.IsEmpty())
+        if (!guid)
         {
             PSendSysMessage(LANG_PLAYER_NOT_FOUND);
             SetSentErrorMessage(true);

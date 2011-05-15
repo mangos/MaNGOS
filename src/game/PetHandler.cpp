@@ -170,7 +170,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
         case ACT_ENABLED:                                   // 0xC1    spell
         {
             Unit* unit_target = NULL;
-            if (!targetGuid.IsEmpty())
+            if (targetGuid)
                 unit_target = _player->GetMap()->GetUnit(targetGuid);
 
             // do not cast unknown spells

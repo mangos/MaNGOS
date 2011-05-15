@@ -837,7 +837,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 
     if (target)
         target_session = target->GetSession();
-    else if (!guid.IsEmpty())
+    else if (guid)
         target_account = sObjectMgr.GetPlayerAccountIdByGUID(guid);
 
     if(!target_session && !target_account)
@@ -2039,7 +2039,7 @@ void ChatHandler::FillMessageData( WorldPacket *data, WorldSession* session, uin
             *data << speaker->GetName();
             ObjectGuid listener_guid;
             *data << listener_guid;
-            if (!listener_guid.IsEmpty() && !listener_guid.IsPlayer())
+            if (listener_guid && !listener_guid.IsPlayer())
             {
                 *data << uint32(1);                         // string listener_name_length
                 *data << uint8(0);                          // string listener_name
@@ -2080,7 +2080,7 @@ Player * ChatHandler::getSelectedPlayer()
 
     ObjectGuid guid  = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid.IsEmpty())
+    if (!guid)
         return m_session->GetPlayer();
 
     return sObjectMgr.GetPlayer(guid);
@@ -2093,7 +2093,7 @@ Unit* ChatHandler::getSelectedUnit()
 
     ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid.IsEmpty())
+    if (!guid)
         return m_session->GetPlayer();
 
     // can be selected player at another map
@@ -2989,8 +2989,7 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
                 return true;
             }
 
-            ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name);
-            if (!guid.IsEmpty())
+            if (ObjectGuid guid = sObjectMgr.GetPlayerGuidByName(name))
             {
                 // to point where player stay (if loaded)
                 float o;
@@ -3222,7 +3221,7 @@ bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, O
             *player_guid = pl ? pl->GetObjectGuid() : guid;
 
         if(player_name)
-            *player_name = pl || !guid.IsEmpty() ? name : "";
+            *player_name = pl || guid ? name : "";
     }
     else
     {
@@ -3239,7 +3238,7 @@ bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, O
     }
 
     // some from req. data must be provided (note: name is empty if player not exist)
-    if((!player || !*player) && (!player_guid || player_guid->IsEmpty()) && (!player_name || player_name->empty()))
+    if((!player || !*player) && (!player_guid || !*player_guid) && (!player_name || player_name->empty()))
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);

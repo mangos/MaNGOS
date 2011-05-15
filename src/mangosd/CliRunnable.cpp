@@ -269,7 +269,7 @@ void ChatHandler::HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo
         return;
     }
 
-    if (!sObjectMgr.GetPlayerGuidByName(delInfo.name).IsEmpty())
+    if (sObjectMgr.GetPlayerGuidByName(delInfo.name))
     {
         PSendSysMessage(LANG_CHARACTER_DELETED_SKIP_NAME, delInfo.name.c_str(), delInfo.lowguid, delInfo.accountId);
         return;

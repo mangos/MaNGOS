@@ -655,7 +655,7 @@ void Creature::RegenerateMana()
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
-    if (isInCombat() || !GetCharmerOrOwnerGuid().IsEmpty())
+    if (isInCombat() || GetCharmerOrOwnerGuid())
     {
         if(!IsUnderLastManaUseEffect())
         {
@@ -685,7 +685,7 @@ void Creature::RegenerateHealth()
     uint32 addvalue = 0;
 
     // Not only pet, but any controlled creature
-    if (!GetCharmerOrOwnerGuid().IsEmpty())
+    if (GetCharmerOrOwnerGuid())
     {
         float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
         float Spirit = GetStat(STAT_SPIRIT);
@@ -969,7 +969,7 @@ void Creature::PrepareBodyLootState()
  */
 Player* Creature::GetOriginalLootRecipient() const
 {
-    return !m_lootRecipientGuid.IsEmpty() ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
+    return m_lootRecipientGuid ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
 }
 
 /**
@@ -1835,7 +1835,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
         return false;
 
     // only free creature
-    if (!GetCharmerOrOwnerGuid().IsEmpty())
+    if (GetCharmerOrOwnerGuid())
         return false;
 
     // only from same creature faction

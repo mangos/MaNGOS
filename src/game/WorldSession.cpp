@@ -336,8 +336,7 @@ void WorldSession::LogoutPlayer(bool Save)
     {
         sLog.outChar("Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() ,_player->GetGUIDLow());
 
-        ObjectGuid lootGuid = GetPlayer()->GetLootGuid();
-        if (!lootGuid.IsEmpty())
+        if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
 
         ///- If the player just died before logging out, make him appear as a ghost

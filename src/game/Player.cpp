@@ -308,7 +308,7 @@ TradeData* TradeData::GetTraderData() const
 
 Item* TradeData::GetItem( TradeSlots slot ) const
 {
-    return !m_items[slot].IsEmpty() ? m_player->GetItemByGuid(m_items[slot]) : NULL;
+    return m_items[slot] ? m_player->GetItemByGuid(m_items[slot]) : NULL;
 }
 
 bool TradeData::HasItem( ObjectGuid item_guid ) const
@@ -322,7 +322,7 @@ bool TradeData::HasItem( ObjectGuid item_guid ) const
 
 Item* TradeData::GetSpellCastItem() const
 {
-    return !m_spellCastItem.IsEmpty() ?  m_player->GetItemByGuid(m_spellCastItem) : NULL;
+    return m_spellCastItem ?  m_player->GetItemByGuid(m_spellCastItem) : NULL;
 }
 
 void TradeData::SetItem( TradeSlots slot, Item* item )
@@ -1473,7 +1473,7 @@ void Player::Update( uint32 update_diff, uint32 p_time )
     SendUpdateToOutOfRangeGroupMembers();
 
     Pet* pet = GetPet();
-    if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (!GetCharmGuid().IsEmpty() && (pet->GetObjectGuid() != GetCharmGuid())))
+    if (pet && !pet->IsWithinDistInMap(this, GetMap()->GetVisibilityDistance()) && (GetCharmGuid() && (pet->GetObjectGuid() != GetCharmGuid())))
         pet->Unsummon(PET_SAVE_REAGENTS, this);
 
     if (IsHasDelayedTeleport())
@@ -2231,7 +2231,7 @@ void Player::RegenerateHealth(uint32 diff)
 Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 {
     // some basic checks
-    if (guid.IsEmpty() || !IsInWorld() || IsTaxiFlying())
+    if (!guid || !IsInWorld() || IsTaxiFlying())
         return NULL;
 
     // not in interactive state
@@ -2261,7 +2261,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
         return NULL;
 
     // not allow interaction under control, but allow with own pets
-    if (!unit->GetCharmerGuid().IsEmpty())
+    if (unit->GetCharmerGuid())
         return NULL;
 
     // not enemy
@@ -2285,7 +2285,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
 GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type) const
 {
     // some basic checks
-    if (guid.IsEmpty() || !IsInWorld() || IsTaxiFlying())
+    if (!guid || !IsInWorld() || IsTaxiFlying())
         return NULL;
 
     // not in interactive state
@@ -7959,8 +7959,7 @@ void Player::SendLootRelease(ObjectGuid guid)
 
 void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 {
-    ObjectGuid lootGuid = GetLootGuid();
-    if (!lootGuid.IsEmpty())
+    if (ObjectGuid lootGuid = GetLootGuid())
         m_session->DoLootRelease(lootGuid);
 
     Loot    *loot = 0;
@@ -17000,7 +16999,7 @@ void Player::ConvertInstancesToGroup(Player *player, Group *group, ObjectGuid pl
             group = player->GetGroup();
     }
 
-    MANGOS_ASSERT(!player_guid.IsEmpty());
+    MANGOS_ASSERT(player_guid);
 
     // copy all binds to the group, when changing leader it's assumed the character
     // will not have any solo binds
@@ -18370,7 +18369,7 @@ void Player::PetSpellInitialize()
 
 void Player::SendPetGUIDs()
 {
-    if (GetPetGuid().IsEmpty())
+    if (!GetPetGuid())
         return;
 
     // Later this function might get modified for multiple guids
@@ -19985,7 +19984,7 @@ void Player::AddComboPoints(Unit* target, int8 count)
     }
     else
     {
-        if (!m_comboTargetGuid.IsEmpty())
+        if (m_comboTargetGuid)
             if(Unit* target2 = ObjectAccessor::GetUnit(*this, m_comboTargetGuid))
                 target2->RemoveComboPointHolder(GetGUIDLow());
 
@@ -20003,7 +20002,7 @@ void Player::AddComboPoints(Unit* target, int8 count)
 
 void Player::ClearComboPoints()
 {
-    if (m_comboTargetGuid.IsEmpty())
+    if (!m_comboTargetGuid)
         return;
 
     // without combopoints lost (duration checked in aura)
@@ -22081,7 +22080,7 @@ void Player::ResummonPetTemporaryUnSummonedIfAny()
     if (IsPetNeedBeTemporaryUnsummoned())
         return;
 
-    if (!GetPetGuid().IsEmpty())
+    if (GetPetGuid())
         return;
 
     Pet* NewPet = new Pet;

@@ -1570,7 +1570,7 @@ void WorldObject::BuildMonsterChat(WorldPacket *data, uint8 msgtype, char const*
     *data << uint32(strlen(name)+1);
     *data << name;
     *data << ObjectGuid(targetGuid);                        // Unit Target
-    if (!targetGuid.IsEmpty() && !targetGuid.IsPlayer())
+    if (targetGuid && !targetGuid.IsPlayer())
     {
         *data << uint32(strlen(targetName)+1);              // target name length
         *data << targetName;                                // target name

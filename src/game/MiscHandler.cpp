@@ -264,8 +264,7 @@ void WorldSession::HandleLogoutRequestOpcode( WorldPacket & /*recv_data*/ )
 {
     DEBUG_LOG( "WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity() );
 
-    ObjectGuid lootGuid = GetPlayer()->GetLootGuid();
-    if (!lootGuid.IsEmpty())
+    if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
         DoLootRelease(lootGuid);
 
     //Can not logout if...
@@ -472,7 +471,7 @@ void WorldSession::HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 acc
         return;
 
     FriendsResult friendResult = FRIEND_NOT_FOUND;
-    if (!friendGuid.IsEmpty())
+    if (friendGuid)
     {
         if (friendGuid == session->GetPlayer()->GetObjectGuid())
             friendResult = FRIEND_SELF;
@@ -552,7 +551,7 @@ void WorldSession::HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 acc
         return;
 
     FriendsResult ignoreResult = FRIEND_IGNORE_NOT_FOUND;
-    if (!ignoreGuid.IsEmpty())
+    if (ignoreGuid)
     {
         if (ignoreGuid == session->GetPlayer()->GetObjectGuid())
             ignoreResult = FRIEND_IGNORE_SELF;

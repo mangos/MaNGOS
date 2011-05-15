@@ -471,7 +471,7 @@ bool Item::LoadFromDB(uint32 guidLow, Field *fields, ObjectGuid ownerGuid)
     }
 
     // set correct owner
-    if (!ownerGuid.IsEmpty() && GetOwnerGuid() != ownerGuid)
+    if (ownerGuid && GetOwnerGuid() != ownerGuid)
     {
         SetOwnerGuid(ownerGuid);
         need_save = true;

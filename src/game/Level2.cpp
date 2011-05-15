@@ -909,8 +909,7 @@ bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
         return false;
     }
 
-    ObjectGuid ownerGuid = obj->GetOwnerGuid();
-    if (!ownerGuid.IsEmpty())
+    if (ObjectGuid ownerGuid = obj->GetOwnerGuid())
     {
         Unit* owner = ObjectAccessor::GetUnit(*m_session->GetPlayer(), ownerGuid);
         if (!owner || !ownerGuid.IsPlayer())
@@ -1213,7 +1212,7 @@ bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
     ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
 
-    if (guid.IsEmpty())
+    if (!guid)
     {
         SendSysMessage(LANG_NO_SELECTION);
         SetSentErrorMessage(true);
@@ -2207,7 +2206,7 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
 
     Player *player = m_session->GetPlayer ();
 
-    if (!player->GetPetGuid().IsEmpty())
+    if (player->GetPetGuid())
     {
         SendSysMessage(LANG_YOU_ALREADY_HAVE_PET);
         SetSentErrorMessage(true);

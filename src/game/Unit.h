@@ -1218,7 +1218,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void clearUnitState(uint32 f) { m_state &= ~f; }
         bool CanFreeMove() const
         {
-            return !hasUnitState(UNIT_STAT_NO_FREE_MOVE) && GetOwnerGuid().IsEmpty();
+            return !hasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid();
         }
 
         uint32 getLevel() const { return GetUInt32Value(UNIT_FIELD_LEVEL); }
@@ -1504,11 +1504,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Pet* GetMiniPet() const;
         void SetMiniPet(Unit* pet) { SetCritterGuid(pet ? pet->GetObjectGuid() : ObjectGuid()); }
 
-        ObjectGuid const& GetCharmerOrOwnerGuid() const { return !GetCharmerGuid().IsEmpty() ? GetCharmerGuid() : GetOwnerGuid(); }
+        ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {
-            ObjectGuid const& guid = GetCharmerOrOwnerGuid();
-            if (!guid.IsEmpty())
+            if (ObjectGuid const& guid = GetCharmerOrOwnerGuid())
                 return guid;
             return GetObjectGuid();
         }
@@ -1521,7 +1520,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetCharmer() const;
         Unit* GetCharm() const;
         void Uncharm();
-        Unit* GetCharmerOrOwner() const { return !GetCharmerGuid().IsEmpty() ? GetCharmer() : GetOwner(); }
+        Unit* GetCharmerOrOwner() const { return GetCharmerGuid() ? GetCharmer() : GetOwner(); }
         Unit* GetCharmerOrOwnerOrSelf()
         {
             if(Unit* u = GetCharmerOrOwner())

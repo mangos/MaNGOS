@@ -112,7 +112,7 @@ void Channel::Join(ObjectGuid p, const char *pass)
     JoinNotify(p);
 
     // if no owner first logged will become
-    if(!IsConstant() && m_ownerGuid.IsEmpty())
+    if(!IsConstant() && !m_ownerGuid)
     {
         SetOwner(p, (m_players.size() > 1 ? true : false));
         m_players[p].SetModerator(true);
@@ -632,7 +632,7 @@ void Channel::Invite(ObjectGuid p, const char *newname)
 
 void Channel::SetOwner(ObjectGuid guid, bool exclaim)
 {
-    if (!m_ownerGuid.IsEmpty())
+    if (m_ownerGuid)
     {
         // [] will re-add player after it possible removed
         PlayerList::iterator p_itr = m_players.find(m_ownerGuid);
@@ -641,7 +641,8 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
     }
 
     m_ownerGuid = guid;
-    if (!m_ownerGuid.IsEmpty())
+
+    if (m_ownerGuid)
     {
         uint8 oldFlag = GetPlayerFlags(m_ownerGuid);
         m_players[m_ownerGuid].SetOwner(true);
@@ -662,7 +663,7 @@ void Channel::SendToAll(WorldPacket *data, ObjectGuid p)
 {
     for(PlayerList::const_iterator i = m_players.begin(); i != m_players.end(); ++i)
         if (Player *plr = sObjectMgr.GetPlayer(i->first))
-            if (p.IsEmpty() || !plr->GetSocial()->HasIgnore(p))
+            if (!p || !plr->GetSocial()->HasIgnore(p))
                 plr->GetSession()->SendPacket(data);
 }
 
@@ -775,7 +776,7 @@ void Channel::MakeChannelOwner(WorldPacket *data)
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);
-    *data << ((IsConstant() || m_ownerGuid.IsEmpty()) ? "Nobody" : name);
+    *data << ((IsConstant() || !m_ownerGuid) ? "Nobody" : name);
 }
 
 // done 0x0C

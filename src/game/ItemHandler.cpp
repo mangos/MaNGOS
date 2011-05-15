@@ -497,7 +497,7 @@ void WorldSession::HandleSellItemOpcode( WorldPacket & recv_data )
     recv_data >> itemGuid;
     recv_data >> count;
 
-    if (itemGuid.IsEmpty())
+    if (!itemGuid)
         return;
 
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
@@ -1158,7 +1158,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (!item->GetGuidValue(ITEM_FIELD_GIFTCREATOR).IsEmpty())// HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
+    if (item->GetGuidValue(ITEM_FIELD_GIFTCREATOR))         // HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
     {
         _player->SendEquipError( EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, NULL );
         return;
@@ -1236,7 +1236,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
     {
         ObjectGuid gemGuid = gemGuids[i];
-        if (gemGuid.IsEmpty())
+        if (!gemGuid)
             continue;
 
         if (!gemGuid.IsItem())
@@ -1260,7 +1260,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
 
     Item *Gems[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)
-        Gems[i] = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL;
+        Gems[i] = gemGuids[i] ? _player->GetItemByGuid(gemGuids[i]) : NULL;
 
     GemPropertiesEntry const *GemProps[MAX_GEM_SOCKETS];
     for(int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
@@ -1410,7 +1410,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         if (GemEnchants[i])
         {
             itemTarget->SetEnchantment(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + i), GemEnchants[i], 0, 0);
-            if(Item* guidItem = !gemGuids[i].IsEmpty() ? _player->GetItemByGuid(gemGuids[i]) : NULL)
+            if (Item* guidItem = gemGuids[i] ? _player->GetItemByGuid(gemGuids[i]) : NULL)
                 _player->DestroyItem(guidItem->GetBagSlot(), guidItem->GetSlot(), true );
         }
     }
