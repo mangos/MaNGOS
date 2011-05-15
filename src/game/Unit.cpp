@@ -5962,10 +5962,12 @@ void Unit::RemoveGuardians()
 {
     while (!m_guardianPets.empty())
     {
-        if (Pet* pet = GetMap()->GetPet(*m_guardianPets.begin()))
+        ObjectGuid guid = *m_guardianPets.begin();
+
+        if (Pet* pet = GetMap()->GetPet(guid))
             pet->Unsummon(PET_SAVE_AS_DELETED, this);
 
-        m_guardianPets.erase(m_guardianPets.begin());
+        m_guardianPets.erase(guid);
     }
 }
 
