@@ -257,7 +257,6 @@ CREATE TABLE `characters` (
   `activeSpec` tinyint(3) UNSIGNED NOT NULL default '0',
   `exploredZones` longtext,
   `equipmentCache` longtext,
-  `ammoId` int(10) UNSIGNED NOT NULL default '0',
   `knownTitles` longtext,
   `actionBars` tinyint(3) UNSIGNED NOT NULL default '0',
   `deleteInfos_Account` int(11) UNSIGNED default NULL,
