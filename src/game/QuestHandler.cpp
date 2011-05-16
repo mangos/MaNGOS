@@ -154,7 +154,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
         if( _player->CanAddQuest( qInfo, true ) )
         {
-            _player->AddQuest( qInfo, pObject );
+            _player->AddQuest( qInfo, pObject );            // pObject (if it item) can be destroyed at call
 
             if (qInfo->HasQuestFlag(QUEST_FLAGS_PARTY_ACCEPT))
             {
