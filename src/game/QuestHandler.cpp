@@ -472,7 +472,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     continue;
                 }
 
-                if (!pPlayer->GetDividerGuid().IsEmpty())
+                if (pPlayer->GetDividerGuid())
                 {
                     _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_BUSY);
                     continue;

@@ -63,7 +63,7 @@ void GMTicketMgr::LoadGMTickets()
 
         GMTicket& ticket = m_GMTicketMap[guid];
 
-        if (!ticket.GetPlayerGuid().IsEmpty())              // already exist
+        if (ticket.GetPlayerGuid())                         // already exist
         {
             CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE ticket_id = '%u'", fields[4].GetUInt32());
             continue;

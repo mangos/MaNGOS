@@ -180,7 +180,7 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
 
     Player *player = GetPlayer();
     ObjectGuid guid = player->GetLootGuid();
-    if (guid.IsEmpty())
+    if (!guid)
         return;
 
     Loot *pLoot = NULL;
@@ -297,8 +297,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
     // use internal stored guid
     recv_data.read_skip<uint64>();                          // guid;
 
-    ObjectGuid lootGuid = GetPlayer()->GetLootGuid();
-    if (!lootGuid.IsEmpty())
+    if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
         DoLootRelease(lootGuid);
 }
 

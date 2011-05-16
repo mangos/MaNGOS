@@ -844,7 +844,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
             Field* fields = result->Fetch();
 
             ObjectGuid signGuid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
-            if (signGuid.IsEmpty())
+            if (!signGuid)
                 continue;
 
             guild->AddMember(signGuid, guild->GetLowestRank());
@@ -876,7 +876,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
         {
             Field* fields = result->Fetch();
             ObjectGuid memberGUID = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
-            if (memberGUID.IsEmpty())
+            if (!memberGUID)
                 continue;
 
             DEBUG_LOG("PetitionsHandler: adding arena member %s", memberGUID.GetString().c_str());

@@ -2335,7 +2335,7 @@ void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 
 {
     uint8 strCount = !str1 ? 0 : (!str2 ? 1 : (!str3 ? 2 : 3));
 
-    WorldPacket data(SMSG_GUILD_EVENT, 1 + 1 + 1*strCount + (guid.IsEmpty() ? 0 : 8));
+    WorldPacket data(SMSG_GUILD_EVENT, 1 + 1 + 1*strCount + (!guid ? 0 : 8));
     data << uint8(event);
     data << uint8(strCount);
 
@@ -2353,8 +2353,8 @@ void Guild::BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 
     else if (str1)
         data << str1;
 
-    if (!guid.IsEmpty())
-        data << guid;
+    if (guid)
+        data << ObjectGuid(guid);
 
     BroadcastPacket(&data);
 

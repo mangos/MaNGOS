@@ -106,9 +106,9 @@ struct PlayerSpell
 
 struct PlayerTalent
 {
-    PlayerSpellState state;
-    TalentEntry const *m_talentEntry;
+    TalentEntry const *talentEntry;
     uint32 currentRank;
+    PlayerSpellState state;
 };
 
 typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;

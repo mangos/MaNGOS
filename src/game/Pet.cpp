@@ -531,7 +531,9 @@ void Pet::Update(uint32 update_diff, uint32 diff)
         {
             // unsummon pet that lost owner
             Unit* owner = GetOwner();
-            if (!owner || (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (!owner->GetCharmGuid().IsEmpty() && (owner->GetCharmGuid() != GetObjectGuid()))) || (isControlled() && owner->GetPetGuid().IsEmpty()))
+            if (!owner ||
+                (!IsWithinDistInMap(owner, GetMap()->GetVisibilityDistance()) && (owner->GetCharmGuid() && (owner->GetCharmGuid() != GetObjectGuid()))) ||
+                (isControlled() && !owner->GetPetGuid()))
             {
                 Unsummon(PET_SAVE_REAGENTS);
                 return;

@@ -56,7 +56,7 @@ namespace FactorySelector
         if (!ai_factory && !ainame.empty())
             ai_factory = ai_registry.GetRegistryItem( ainame.c_str() );
 
-        if (!ai_factory && creature->isGuard() )
+        if (!ai_factory && creature->IsGuard())
             ai_factory = ai_registry.GetRegistryItem("GuardAI");
 
         // select by permit check

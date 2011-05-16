@@ -286,7 +286,7 @@ void WorldSession::HandleCharCreateOpcode( WorldPacket & recv_data )
         return;
     }
 
-    if (!sObjectMgr.GetPlayerGuidByName(name).IsEmpty())
+    if (sObjectMgr.GetPlayerGuidByName(name))
     {
         data << (uint8)CHAR_CREATE_NAME_IN_USE;
         SendPacket( &data );
@@ -1183,7 +1183,7 @@ void WorldSession::HandleCharCustomizeOpcode(WorldPacket& recv_data)
 
     // character with this name already exist
     ObjectGuid newguid = sObjectMgr.GetPlayerGuidByName(newname);
-    if (!newguid.IsEmpty() && newguid != guid)
+    if (newguid && newguid != guid)
     {
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
         data << uint8(CHAR_CREATE_NAME_IN_USE);
@@ -1244,7 +1244,7 @@ void WorldSession::HandleEquipmentSetSaveOpcode(WorldPacket &recv_data)
 
         Item *item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
 
-        if(!item && !itemGuid.IsEmpty())                    // cheating check 1
+        if(!item && itemGuid)                               // cheating check 1
             return;
 
         if(item && item->GetObjectGuid() != itemGuid)       // cheating check 2

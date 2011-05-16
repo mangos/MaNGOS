@@ -162,7 +162,7 @@ class SpellCastTargets
             }
         }
 
-        bool IsEmpty() const { return m_GOTargetGUID.IsEmpty() && m_unitTargetGUID.IsEmpty() && m_itemTarget==NULL && m_CorpseTargetGUID.IsEmpty(); }
+        bool IsEmpty() const { return !m_GOTargetGUID && !m_unitTargetGUID && !m_itemTarget && !m_CorpseTargetGUID; }
 
         void Update(Unit* caster);
 
@@ -471,7 +471,7 @@ class Spell
         // real source of cast affects, explicit caster, or DoT/HoT applier, or GO owner, or wild GO itself. Can be NULL
         WorldObject* GetAffectiveCasterObject() const;
         // limited version returning NULL in cases wild gameobject caster object, need for Aura (auras currently not support non-Unit caster)
-        Unit* GetAffectiveCaster() const { return !m_originalCasterGUID.IsEmpty() ? m_originalCaster : m_caster; }
+        Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_caster; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
 

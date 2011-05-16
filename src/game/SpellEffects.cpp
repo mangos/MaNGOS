@@ -915,11 +915,12 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                         spell_id = 11538;
                     else if (roll < 70)                     // Chain Lighting (20% chance)
                         spell_id = 21179;
-                    else if (roll < 80)                     // Polymorph (10% chance)
+                    else if (roll < 77)                     // Polymorph (10% chance, 7% to target)
+                        spell_id = 14621;
+                    else if (roll < 80)                     // Polymorph (10% chance, 3% to self, backfire)
                     {
                         spell_id = 14621;
-                        if (urand(0, 9) < 3)                // 30% chance to self-cast
-                            newTarget = m_caster;
+                        newTarget = m_caster;
                     }
                     else if (roll < 95)                     // Enveloping Winds (15% chance)
                         spell_id = 25189;
@@ -4717,11 +4718,12 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
 
 void Spell::DoSummon(SpellEffectEntry const* effect)
 {
-    if (!m_caster->GetPetGuid().IsEmpty())
+    if (m_caster->GetPetGuid())
         return;
 
     if (!unitTarget)
         return;
+
     uint32 pet_entry = effect->EffectMiscValue;
     if (!pet_entry)
         return;
@@ -8120,9 +8122,7 @@ void Spell::EffectSummonObject(SpellEffectEntry const* effect)
         default: return;
     }
 
-    ObjectGuid guid = m_caster->m_ObjectSlotGuid[slot];
-
-    if (!guid.IsEmpty())
+    if (ObjectGuid guid = m_caster->m_ObjectSlotGuid[slot])
     {
         if (GameObject* obj = m_caster ? m_caster->GetMap()->GetGameObject(guid) : NULL)
             obj->SetLootState(GO_JUST_DEACTIVATED);

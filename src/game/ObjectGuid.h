@@ -88,9 +88,11 @@ class MANGOS_DLL_SPEC ObjectGuid
 {
     public:                                                 // constructors
         ObjectGuid() : m_guid(0) {}
-        ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // NOTE: must be explicit in future for more strict control type conversions
+        ObjectGuid(uint64 const& guid) : m_guid(guid) {}    // temporary allowed implicit cast, really bad in connection with operator uint64()
         ObjectGuid(HighGuid hi, uint32 entry, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) {}
         ObjectGuid(HighGuid hi, uint32 counter) : m_guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) {}
+
+        operator uint64() const { return m_guid; }
     private:
         ObjectGuid(uint32 const&);                          // no implementation, used for catch wrong type assign
         ObjectGuid(HighGuid, uint32, uint64 counter);       // no implementation, used for catch wrong type assign
@@ -162,6 +164,7 @@ class MANGOS_DLL_SPEC ObjectGuid
 
         TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
 
+        bool operator! () const { return IsEmpty(); }
         bool operator== (ObjectGuid const& guid) const { return GetRawValue() == guid.GetRawValue(); }
         bool operator!= (ObjectGuid const& guid) const { return GetRawValue() != guid.GetRawValue(); }
         bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }

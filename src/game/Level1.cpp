@@ -102,7 +102,7 @@ bool ChatHandler::HandleNpcWhisperCommand(char* args)
         return false;
 
     ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
-    if (guid.IsEmpty())
+    if (!guid)
         return false;
 
     Creature* pCreature = m_session->GetPlayer()->GetMap()->GetCreature(guid);
@@ -252,8 +252,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
     WorldObject *obj = NULL;
     if (*args)
     {
-        ObjectGuid guid = ExtractGuidFromLink(&args);
-        if (!guid.IsEmpty())
+        if (ObjectGuid guid = ExtractGuidFromLink(&args))
             obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
 
         if(!obj)

@@ -269,10 +269,10 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
         return false;
     }
 
-    if (!m_session->GetPlayer()->GetSelectionGuid().IsEmpty())
-        unit->PlayDistanceSound(dwSoundId,m_session->GetPlayer());
+    if (m_session->GetPlayer()->GetSelectionGuid())
+        unit->PlayDistanceSound(dwSoundId, m_session->GetPlayer());
     else
-        unit->PlayDirectSound(dwSoundId,m_session->GetPlayer());
+        unit->PlayDirectSound(dwSoundId, m_session->GetPlayer());
 
     PSendSysMessage(LANG_YOU_HEAR_SOUND, dwSoundId);
     return true;

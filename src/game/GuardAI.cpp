@@ -24,7 +24,7 @@
 
 int GuardAI::Permissible(const Creature *creature)
 {
-    if( creature->isGuard())
+    if (creature->IsGuard())
         return PERMIT_BASE_SPECIAL;
 
     return PERMIT_BASE_NO;
