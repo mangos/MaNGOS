@@ -17277,8 +17277,6 @@ void Player::SaveToDB()
     }
     uberInsert.addString(ss);
 
-    uberInsert.addUInt32(0);                                // FIXME 4x GetUInt32Value(PLAYER_AMMO_ID));
-
     for(uint32 i = 0; i < KNOWN_TITLES_SIZE*2; ++i )                //string
     {
         ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << " ";
