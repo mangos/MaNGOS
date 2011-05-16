@@ -6529,15 +6529,28 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
     TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, schoolMask);
 
     // .. taken pct: dummy auras
-    if (GetTypeId() == TYPEID_PLAYER)
+    AuraList const& mDummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
+    for(AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
     {
-        //Cheat Death
-        if (Aura *dummy = GetDummyAura(45182))
+        switch((*i)->GetId())
         {
-            float mod = -((Player*)this)->GetRatingBonusValue(CR_CRIT_TAKEN_SPELL)*2*4;
-            if (mod < float(dummy->GetModifier()->m_amount))
-                mod = float(dummy->GetModifier()->m_amount);
-            TakenTotalMod *= (mod+100.0f)/100.0f;
+            case 45182:                                     // Cheating Death
+                if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+                {
+                    if(GetTypeId() != TYPEID_PLAYER)
+                        continue;
+
+                    float mod = ((Player*)this)->GetRatingBonusValue(CR_CRIT_TAKEN_MELEE)*(-8.0f);
+                    if (mod < float((*i)->GetModifier()->m_amount))
+                        mod = float((*i)->GetModifier()->m_amount);
+
+                    TakenTotalMod *= (mod + 100.0f) / 100.0f;
+                }
+                break;
+            case 20911:                                     // Blessing of Sanctuary
+            case 25899:                                     // Greater Blessing of Sanctuary
+                TakenTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+                break;
         }
     }
 
@@ -7501,10 +7514,9 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
     AuraList const& mDummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
     for(AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
     {
-        switch((*i)->GetSpellProto()->SpellIconID)
+        switch((*i)->GetId())
         {
-            //Cheat Death
-            case 2109:
+            case 45182:                                     // Cheating Death
                 if((*i)->GetModifier()->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
                 {
                     if(GetTypeId() != TYPEID_PLAYER)
@@ -7516,6 +7528,10 @@ uint32 Unit::MeleeDamageBonusTaken(Unit *pCaster, uint32 pdamage,WeaponAttackTyp
 
                     TakenPercent *= (mod + 100.0f) / 100.0f;
                 }
+                break;
+            case 20911:                                     // Blessing of Sanctuary
+            case 25899:                                     // Greater Blessing of Sanctuary
+                TakenPercent *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
                 break;
         }
     }
