@@ -15390,7 +15390,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
     //SetUInt32Value(PLAYER_AMMO_ID, fields[63].GetUInt32());
 
     // Action bars state
-    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[65].GetUInt8());
+    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[67].GetUInt8());
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for(uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
