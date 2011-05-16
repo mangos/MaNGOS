@@ -13728,31 +13728,6 @@ void Player::AddQuest( Quest const *pQuest, Object *questGiver )
             questStatusData.m_creatureOrGOcount[i] = 0;
     }
 
-    // remove start item if not need
-    if (questGiver && questGiver->isType(TYPEMASK_ITEM))
-    {
-        // destroy not required for quest finish quest starting item
-        bool notRequiredItem = true;
-        for(int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
-        {
-            if (pQuest->ReqItemId[i] == questGiver->GetEntry())
-            {
-                notRequiredItem = false;
-                break;
-            }
-        }
-
-        if (pQuest->GetSrcItemId() == questGiver->GetEntry())
-            notRequiredItem = false;
-
-        if (notRequiredItem)
-            DestroyItem(((Item*)questGiver)->GetBagSlot(), ((Item*)questGiver)->GetSlot(), true);
-    }
-
-    GiveQuestSourceItemIfNeed(pQuest);
-
-    AdjustQuestReqItemCount( pQuest, questStatusData );
-
     if( pQuest->GetRepObjectiveFaction() )
         if(FactionEntry const* factionEntry = sFactionStore.LookupEntry(pQuest->GetRepObjectiveFaction()))
             GetReputationMgr().SetVisible(factionEntry);
@@ -13778,9 +13753,53 @@ void Player::AddQuest( Quest const *pQuest, Object *questGiver )
     if (questStatusData.uState != QUEST_NEW)
         questStatusData.uState = QUEST_CHANGED;
 
-    //starting initial quest script
-    if(questGiver && pQuest->GetQuestStartScript()!=0)
-        GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), questGiver, this);
+    // quest accept scripts
+    if (questGiver)
+    {
+        switch (questGiver->GetTypeId())
+        {
+            case TYPEID_UNIT:
+                sScriptMgr.OnQuestAccept(this, (Creature*)questGiver, pQuest);
+                break;
+            case TYPEID_ITEM:
+            case TYPEID_CONTAINER:
+                sScriptMgr.OnQuestAccept(this, (Item*)questGiver, pQuest);
+                break;
+            case TYPEID_GAMEOBJECT:
+                sScriptMgr.OnQuestAccept(this, (GameObject*)questGiver, pQuest);
+                break;
+        }
+
+        // starting initial DB quest script
+        if (pQuest->GetQuestStartScript() != 0)
+            GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), questGiver, this);
+
+    }
+
+    // remove start item if not need
+    if (questGiver && questGiver->isType(TYPEMASK_ITEM))
+    {
+        // destroy not required for quest finish quest starting item
+        bool notRequiredItem = true;
+        for(int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+        {
+            if (pQuest->ReqItemId[i] == questGiver->GetEntry())
+            {
+                notRequiredItem = false;
+                break;
+            }
+        }
+
+        if (pQuest->GetSrcItemId() == questGiver->GetEntry())
+            notRequiredItem = false;
+
+        if (notRequiredItem)
+            DestroyItem(((Item*)questGiver)->GetBagSlot(), ((Item*)questGiver)->GetSlot(), true);
+    }
+
+    GiveQuestSourceItemIfNeed(pQuest);
+
+    AdjustQuestReqItemCount( pQuest, questStatusData );
 
     // Some spells applied at quest activation
     SpellAreaForQuestMapBounds saBounds = sSpellMgr.GetSpellAreaForQuestMapBounds(quest_id,true);
