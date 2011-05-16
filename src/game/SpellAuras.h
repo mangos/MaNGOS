@@ -380,6 +380,7 @@ class MANGOS_DLL_SPEC Aura
         int32 GetMiscBValue() const { return m_spellEffect ? m_spellEffect->EffectMiscValueB : 0; }
         
         SpellEntry const* GetSpellProto() const { return GetHolder()->GetSpellProto(); }
+        SpellEffectEntry const* GetSpellEffect() const { return m_spellEffect; }
         uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
         ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }

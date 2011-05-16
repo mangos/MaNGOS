@@ -9588,11 +9588,11 @@ bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        SpellEffectEntry const* spellEffect = m_spellProto->GetSpellEffect(SpellEffectIndex(i));
-        if(!spellEffect)
-            continue;
-        if (m_auras[i] && spellEffect->EffectMechanic == mechanic)
-            return true;
+        if (Aura* aura = m_auras[i])
+        {
+            if (aura->GetSpellEffect()->EffectMechanic == mechanic)
+                return true;
+        }
     }
     return false;
 }
@@ -9604,11 +9604,11 @@ bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        SpellEffectEntry const* spellEffect = m_spellProto->GetSpellEffect(SpellEffectIndex(i));
-        if(!spellEffect)
-            continue;
-        if (m_auras[i] && spellEffect->EffectMechanic && ((1 << (spellEffect->EffectMechanic - 1)) & mechanicMask))
-            return true;
+        if (Aura* aura = m_auras[i])
+        {
+            if (aura->GetSpellEffect()->EffectMechanic && ((1 << (aura->GetSpellEffect()->EffectMechanic - 1)) & mechanicMask))
+                return true;
+        }
     }
     return false;
 }
