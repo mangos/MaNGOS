@@ -153,10 +153,11 @@ enum Powers
     POWER_RUNIC_POWER                   = 6,
     POWER_SOUL_SHARDS                   = 7,
     POWER_ECLIPSE                       = 8,
+    POWER_HOLY_POWER                    = 9,
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        9
+#define MAX_POWERS                        10
 
 enum SpellSchools
 {

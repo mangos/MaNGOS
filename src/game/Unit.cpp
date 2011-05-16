@@ -9364,6 +9364,7 @@ uint32 Unit::GetCreatePowers( Powers power ) const
         case POWER_RUNIC_POWER: return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 1000 : 0);
         case POWER_SOUL_SHARDS: return 0;                   // TODO: fix me
         case POWER_ECLIPSE:     return 0;                   // TODO: fix me
+        case POWER_HOLY_POWER:  return 0;
     }
 
     return 0;
