@@ -145,7 +145,7 @@ extern int main(int argc, char **argv)
             break;
         case 's':
             stopDaemon();
-            break
+            break;
     }
 #endif
 
