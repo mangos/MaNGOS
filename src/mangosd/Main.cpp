@@ -87,14 +87,7 @@ extern int main(int argc, char **argv)
     ACE_Get_Opt cmd_opts(argc, argv, options);
     cmd_opts.long_option("version", 'v');
 
-#ifndef WIN32                                               // need call before options for posix daemon
-    if (!sConfig.SetSource(cfg_file))
-    {
-        sLog.outError("Could not find configuration file %s.", cfg_file);
-        Log::WaitBeforeContinueIfNeed();
-        return 1;
-    }
-#endif
+    char serviceDaemonMode = '\0';
 
     int option;
     while ((option = cmd_opts()) != EOF)
@@ -108,24 +101,20 @@ extern int main(int argc, char **argv)
                 printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
                 return 0;
             case 's':
-                        {
-#ifdef WIN32
+            {
                 const char *mode = cmd_opts.opt_arg();
 
-                if (!strcmp(mode, "install"))
-                {
-                    if (WinServiceInstall())
-                        sLog.outString("Installing service");
-                    return 1;
-                }
+                if (!strcmp(mode, "run"))
+                    serviceDaemonMode = 'r';
+#ifdef WIN32
+                else if (!strcmp(mode, "install"))
+                    serviceDaemonMode = 'i';
                 else if (!strcmp(mode, "uninstall"))
-                {
-                    if (WinServiceUninstall())
-                        sLog.outString("Uninstalling service");
-                    return 1;
-                }
-                else if (!strcmp(mode, "run"))
-                    WinServiceRun();
+                    serviceDaemonMode = 'u';
+#else
+                else if (!strcmp(mode, "stop"))
+                    serviceDaemonMode = 's';
+#endif
                 else
                 {
                     sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
@@ -134,22 +123,7 @@ extern int main(int argc, char **argv)
                     return 1;
                 }
                 break;
-#else
-                const char *mode = cmd_opts.opt_arg();
-                if (!strcmp(mode, "run"))
-                    startDaemon(120);
-                else if (!strcmp(mode, "stop"))
-                    stopDaemon();
-                else
-                {
-                    sLog.outError("Runtime-Error: -%c unsupported argument %s", cmd_opts.opt_opt(), mode);
-                    usage(argv[0]);
-                    Log::WaitBeforeContinueIfNeed();
-                    return 1;
-                }
-#endif
             }
-            break;
             case ':':
                 sLog.outError("Runtime-Error: -%c option requires an input argument", cmd_opts.opt_opt());
                 usage(argv[0]);
@@ -163,12 +137,39 @@ extern int main(int argc, char **argv)
         }
     }
 
-#ifdef WIN32                                                // need call after options for windows service
+#ifndef WIN32                                               // posix daemon commands need apply before config read
+    switch (serviceDaemonMode)
+    {
+        case 'r':
+            startDaemon();
+            break;
+        case 's':
+            stopDaemon();
+            break
+    }
+#endif
+
     if (!sConfig.SetSource(cfg_file))
     {
         sLog.outError("Could not find configuration file %s.", cfg_file);
         Log::WaitBeforeContinueIfNeed();
         return 1;
+    }
+
+#ifdef WIN32                                                // windows service command need execute after config read
+    switch (serviceDaemonMode)
+    {
+        case 'i':
+            if (WinServiceInstall())
+                sLog.outString("Installing service");
+            return 1;
+        case 'u':
+            if (WinServiceUninstall())
+                sLog.outString("Uninstalling service");
+            return 1;
+        case 'r':
+            WinServiceRun();
+            break;
     }
 #endif
 
