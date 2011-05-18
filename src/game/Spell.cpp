@@ -3037,8 +3037,11 @@ void Spell::cast(bool skipCheck)
             break;
         case SPELLFAMILY_HUNTER:
         {
+            // Deterrence
+            if (m_spellInfo->Id == 19263)
+                AddPrecastSpell(67801);
             // Kill Command
-            if (m_spellInfo->Id == 34026)
+            else if (m_spellInfo->Id == 34026)
             {
                 if (m_caster->HasAura(37483))               // Improved Kill Command - Item set bonus
                     m_caster->CastSpell(m_caster, 37482, true);// Exploited Weakness
