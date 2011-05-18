@@ -2849,7 +2849,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 //case 44820: break;                        // Hate Monster (Spar) (<30%)
                 case 45057:                                 // Evasive Maneuvers (Commendation of Kael`thas trinket)
                     // reduce you below $s1% health (in fact in this specific case can proc from any attack while health in result less $s1%)
-                    if (int32(GetHealth()) - int32(damage) >= GetMaxHealth() * triggerAmount / 100)
+                    if (int32(GetHealth()) - int32(damage) >= int32(GetMaxHealth() * triggerAmount / 100))
                         return SPELL_AURA_PROC_FAILED;
                     break;
                 //case 45903: break:                        // Offensive State
