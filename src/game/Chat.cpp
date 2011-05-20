@@ -946,7 +946,7 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
     va_list ap;
     char str [2048];
     va_start(ap, entry);
-    vsnprintf(str,2048,format, ap );
+    vsnprintf(str, 2048, format, ap);
     va_end(ap);
     SendSysMessage(str);
 }
@@ -956,7 +956,7 @@ void ChatHandler::PSendSysMessage(const char *format, ...)
     va_list ap;
     char str [2048];
     va_start(ap, format);
-    vsnprintf(str,2048,format, ap );
+    vsnprintf(str, 2048, format, ap);
     va_end(ap);
     SendSysMessage(str);
 }
@@ -1311,7 +1311,7 @@ bool ChatHandler::ParseCommands(const char* text)
 bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd)
 {
     std::string list;
-    for(uint32 i = 0; table[i].Name != NULL; ++i)
+    for (uint32 i = 0; table[i].Name != NULL; ++i)
     {
         // must be available (ignore handler existence for show command with possible available subcommands
         if (!isAvailable(table[i]))
@@ -1331,14 +1331,16 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd)
     if (list.empty())
         return false;
 
-    if (table==getCommandTable())
+    if (table == getCommandTable())
     {
         SendSysMessage(LANG_AVIABLE_CMD);
-        PSendSysMessage("%s",list.c_str());
+        SendSysMessage(list.c_str());
     }
     else
-        PSendSysMessage(LANG_SUBCMDS_LIST,cmd,list.c_str());
-
+    {
+        PSendSysMessage(LANG_SUBCMDS_LIST, cmd);
+        SendSysMessage(list.c_str());
+    }
     return true;
 }
 
