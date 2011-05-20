@@ -436,7 +436,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x197*/ { "SMSG_QUESTUPDATE_FAILEDTIMER",                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x198*/ { "SMSG_QUESTUPDATE_COMPLETE",                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x199*/ { "SMSG_QUESTUPDATE_ADD_KILL",                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
-    /*0x19A*/ { "SMSG_QUESTUPDATE_ADD_ITEM_OBOSLETE",           STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
+    /*0x19A*/ { "SMSG_QUESTUPDATE_ADD_ITEM_OBSOLETE",           STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x19B*/ { "CMSG_QUEST_CONFIRM_ACCEPT",                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleQuestConfirmAccept        },
     /*0x19C*/ { "SMSG_QUEST_CONFIRM_ACCEPT",                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x19D*/ { "CMSG_PUSHQUESTTOPARTY",                        STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePushQuestToParty          },
