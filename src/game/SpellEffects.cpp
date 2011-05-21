@@ -7997,8 +7997,7 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
     if (m_caster->IsFFAPvP())
         pTotem->SetFFAPvP(true);
 
-    pTotem->Summon(m_caster);
-
+    // sending SMSG_TOTEM_CREATED before add to map (done in Summon)
     if (slot < MAX_TOTEM_SLOT && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
@@ -8008,6 +8007,8 @@ void Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
         data << uint32(m_spellInfo->Id);
         ((Player*)m_caster)->SendDirectMessage(&data);
     }
+
+    pTotem->Summon(m_caster);
 }
 
 void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
