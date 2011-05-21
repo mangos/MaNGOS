@@ -2051,6 +2051,10 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     case 48025:                             // Headless Horseman's Mount
                         Spell::SelectMountByAreaAndSkill(target, GetSpellProto(), 51621, 48024, 51617, 48023, 0);
                         return;
+                    case 48143:                             // Forgotten Aura
+                        // See Death's Door
+                        target->CastSpell(target, 48814, true, NULL, this);
+                        return;
                     case 51405:                             // Digging for Treasure
                         target->HandleEmote(EMOTE_STATE_WORK);
                         // Pet will be following owner, this makes him stop
@@ -4505,6 +4509,9 @@ void Aura::HandleInvisibility(bool apply, bool Real)
                     target->SetVisibility(VISIBILITY_ON);
             }
         }
+
+        if (GetId() == 48809)                               // Binding Life
+            target->CastSpell(target, GetSpellProto()->CalculateSimpleValue(m_effIndex), true);
     }
 }
 

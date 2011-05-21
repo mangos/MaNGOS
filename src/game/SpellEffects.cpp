@@ -6908,6 +6908,52 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, spellId, true);
                     return;
                 }
+                case 48810:                                 // Death's Door
+                {
+                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // Spell effect order will summon creature first and then apply invisibility to caster.
+                    // This result in that summoner/summoned can not see each other and that is not expected.
+                    // Aura from 48814 can be used as a hack from creature_addon, but we can not get the
+                    // summoned to cast this from this spell effect since we have no way to get pointer to creature.
+                    // Most proper would be to summon to same visibility mask as summoner, and not use spell at all.
+
+                    // Binding Life
+                    m_caster->CastSpell(m_caster, 48809, true);
+
+                    // After (after: meaning creature does not have auras at creation)
+                    // creature is summoned and visible for player in map, it is expected to
+                    // gain two auras. First from 29266(aura slot0) and then from 48808(aura slot1).
+                    // We have no pointer to summoned, so only 48808 is possible from this spell effect.
+
+                    // Binding Death
+                    m_caster->CastSpell(m_caster, 48808, true);
+                    return;
+                }
+                case 48811:                                 // Despawn Forgotten Soul
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
+                        return;
+
+                    if (!((Creature*)unitTarget)->IsTemporarySummon())
+                        return;
+
+                    TemporarySummon* pSummon = (TemporarySummon*)unitTarget;
+
+                    Unit::AuraList const& images = unitTarget->GetAurasByType(SPELL_AURA_MIRROR_IMAGE);
+
+                    if (images.empty())
+                        return;
+
+                    Unit* pCaster = images.front()->GetCaster();
+                    Unit* pSummoner = unitTarget->GetMap()->GetUnit(pSummon->GetSummonerGuid());
+
+                    if (pSummoner && pSummoner == pCaster)
+                        pSummon->UnSummon();
+
+                    return;
+                }
                 case 48917:                                 // Who Are They: Cast from Questgiver
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
