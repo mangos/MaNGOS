@@ -58,7 +58,7 @@ bool WinServiceInstall()
     }
 
     char path[_MAX_PATH + 10];
-    if (!GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0]) ) > 0)
+    if (!GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0])))
     {
         CloseServiceHandle(serviceControlManager);
         sLog.outError("SERVICE: Can't get service binary filename.");
