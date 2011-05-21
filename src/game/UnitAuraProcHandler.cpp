@@ -1598,6 +1598,14 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     pVictim->CastSpell(second, procSpell, true, NULL, triggeredByAura, GetObjectGuid());
                     return SPELL_AURA_PROC_OK;
                 }
+                // Item - Druid T10 Balance 4P Bonus
+                case 70723:
+                {
+                    basepoints[0] = int32(triggerAmount * damage / 100);
+                    basepoints[0] = int32(basepoints[0] / 2);   // 2 ticks
+                    triggered_spell_id = 71023;
+                    break;
+                }
             }
             // King of the Jungle
             if (dummySpell->SpellIconID == 2850)
