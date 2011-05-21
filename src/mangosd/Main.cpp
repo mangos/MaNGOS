@@ -137,26 +137,7 @@ extern int main(int argc, char **argv)
         }
     }
 
-#ifndef WIN32                                               // posix daemon commands need apply before config read
-    switch (serviceDaemonMode)
-    {
-        case 'r':
-            startDaemon();
-            break;
-        case 's':
-            stopDaemon();
-            break;
-    }
-#endif
-
-    if (!sConfig.SetSource(cfg_file))
-    {
-        sLog.outError("Could not find configuration file %s.", cfg_file);
-        Log::WaitBeforeContinueIfNeed();
-        return 1;
-    }
-
-#ifdef WIN32                                                // windows service command need execute after config read
+#ifdef WIN32                                                // windows service command need execute before config read
     switch (serviceDaemonMode)
     {
         case 'i':
@@ -170,6 +151,25 @@ extern int main(int argc, char **argv)
         case 'r':
             WinServiceRun();
             break;
+    }
+#endif
+
+    if (!sConfig.SetSource(cfg_file))
+    {
+        sLog.outError("Could not find configuration file %s.", cfg_file);
+        Log::WaitBeforeContinueIfNeed();
+        return 1;
+    }
+
+#ifndef WIN32                                               // posix daemon commands need apply after config read
+    switch (serviceDaemonMode)
+    {
+    case 'r':
+        startDaemon();
+        break;
+    case 's':
+        stopDaemon();
+        break;
     }
 #endif
 
