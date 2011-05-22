@@ -389,6 +389,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "add",            SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddCommand,              "", NULL },
         { "additem",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddVendorItemCommand,    "", NULL },
         { "addmove",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddMoveCommand,          "", NULL },
+        { "aiinfo",         SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAIInfoCommand,           "", NULL },
         { "allowmove",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleNpcAllowMovementCommand,    "", NULL },
         { "changeentry",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleNpcChangeEntryCommand,      "", NULL },
         { "changelevel",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcChangeLevelCommand,      "", NULL },
@@ -807,6 +808,11 @@ ChatHandler::~ChatHandler() {}
 const char *ChatHandler::GetMangosString(int32 entry) const
 {
     return m_session->GetMangosString(entry);
+}
+
+const char *ChatHandler::GetOnOffStr(bool value) const
+{
+    return value ?  GetMangosString(LANG_ON) : GetMangosString(LANG_OFF);
 }
 
 uint32 ChatHandler::GetAccountId() const

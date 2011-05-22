@@ -28,6 +28,8 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "InstanceData.h"
+#include "Chat.h"
+#include "Language.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer( Creature* creature, uint32 repeatMin, uint32 repeatMax )
 {
@@ -50,6 +52,13 @@ int CreatureEventAI::Permissible(const Creature *creature)
     if( creature->GetAIName() == "EventAI" )
         return PERMIT_BASE_SPECIAL;
     return PERMIT_BASE_NO;
+}
+
+void CreatureEventAI::GetAIInformation(ChatHandler& reader)
+{
+    reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
+    reader.PSendSysMessage(LANG_NPC_EVENTAI_MOVE, reader.GetOnOffStr(m_CombatMovementEnabled));
+    reader.PSendSysMessage(LANG_NPC_EVENTAI_COMBAT, reader.GetOnOffStr(m_MeleeEnabled));
 }
 
 CreatureEventAI::CreatureEventAI(Creature *c ) : CreatureAI(c)
