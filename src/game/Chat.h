@@ -62,7 +62,7 @@ enum ChatCommandSearchResult
     CHAT_COMMAND_UNKNOWN_SUBCOMMAND,                        // command found but some level subcommand not find in subcommand list
 };
 
-class ChatHandler
+class MANGOS_DLL_SPEC ChatHandler
 {
     public:
         explicit ChatHandler(WorldSession* session);
