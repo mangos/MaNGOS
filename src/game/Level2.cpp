@@ -46,6 +46,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <typeinfo>
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 
