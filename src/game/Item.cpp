@@ -253,7 +253,7 @@ bool Item::Create( uint32 guidlow, uint32 itemid, Player const* owner)
     SetObjectScale(DEFAULT_OBJECT_SCALE);
 
     SetGuidValue(ITEM_FIELD_OWNER, owner ? owner->GetObjectGuid() : ObjectGuid());
-    SetGuidValue(ITEM_FIELD_CONTAINED, owner ? owner->GetObjectGuid() : ObjectGuid());
+    SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
 
     ItemPrototype const *itemProto = ObjectMgr::GetItemPrototype(itemid);
     if(!itemProto)
