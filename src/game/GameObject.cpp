@@ -1673,6 +1673,7 @@ void GameObject::SetRotationQuat(float qx, float qy, float qz, float qw)
     if (qz == 0 && qw == 0)
         quat = Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
 
+    quat.unitize();
     m_rotation = QuaternionCompressed(quat).m_raw;
     SetFloatValue(GAMEOBJECT_PARENTROTATION+0, quat.x);
     SetFloatValue(GAMEOBJECT_PARENTROTATION+1, quat.y);
