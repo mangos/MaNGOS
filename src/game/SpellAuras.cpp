@@ -1010,8 +1010,10 @@ void Aura::HandleAddModifier(bool apply, bool Real)
 
     if (apply)
     {
+        SpellEntry const* spellProto = GetSpellProto();
+
         // Add custom charges for some mod aura
-        switch (GetSpellProto()->Id)
+        switch (spellProto->Id)
         {
             case 17941:                                     // Shadow Trance
             case 22008:                                     // Netherwind Focus
@@ -1036,6 +1038,13 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             // prevent expire spell mods with (charges > 0 && m_stackAmount > 1)
             // all this spell expected expire not at use but at spell proc event check
             GetSpellProto()->StackAmount > 1 ? 0 : GetHolder()->GetAuraCharges());
+
+        // Everlasting Affliction, overwrite wrong data, if will need more better restore support of spell_affect table
+        if (spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && spellProto->SpellIconID == 3169)
+        {
+            m_spellmod->mask = UI64LIT(0x0000010000000002); // Corruption and Unstable Affliction
+            m_spellmod->mask2 = 0x00000000;
+        }
     }
 
     ((Player*)GetTarget())->AddSpellMod(m_spellmod, apply);
