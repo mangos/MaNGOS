@@ -958,23 +958,13 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
         return false;
     }
 
-    float o;
-    if (!ExtractOptFloat(&args, o, m_session->GetPlayer()->GetOrientation()))
-        return false;
+    float z_rot, y_rot, x_rot;
+    if (!ExtractFloat(&args, z_rot) || !ExtractOptFloat(&args, y_rot, 0) || !ExtractOptFloat(&args, x_rot, 0))
+        return false;         
 
-    Map* map = obj->GetMap();
-    map->Remove(obj,false);
-
-    obj->Relocate(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), o);
-    obj->UpdateRotationFields();
-
-    map->Add(obj);
-
+    obj->SetRotationAngles(z_rot, y_rot, x_rot);
     obj->SaveToDB();
-    obj->Refresh();
-
     PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
-
     return true;
 }
 
