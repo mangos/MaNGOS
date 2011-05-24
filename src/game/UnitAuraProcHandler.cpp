@@ -54,7 +54,7 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS]=
     &Unit::HandleNULLProc,                                  // 19 SPELL_AURA_MOD_INVISIBILITY_DETECTION
     &Unit::HandleNULLProc,                                  // 20 SPELL_AURA_OBS_MOD_HEALTH
     &Unit::HandleNULLProc,                                  // 21 SPELL_AURA_OBS_MOD_MANA
-    &Unit::HandleNULLProc,                                  // 22 SPELL_AURA_MOD_RESISTANCE
+    &Unit::HandleModResistanceAuraProc,                     // 22 SPELL_AURA_MOD_RESISTANCE
     &Unit::HandleNULLProc,                                  // 23 SPELL_AURA_PERIODIC_TRIGGER_SPELL
     &Unit::HandleNULLProc,                                  // 24 SPELL_AURA_PERIODIC_ENERGIZE
     &Unit::HandleNULLProc,                                  // 25 SPELL_AURA_MOD_PACIFY
@@ -1844,6 +1844,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 // Judgement of Light
                 case 20185:
                 {
+                    // only at real damage
+                    if (!damage)
+                        return SPELL_AURA_PROC_FAILED;
+
                     basepoints[0] = int32( pVictim->GetMaxHealth() * triggeredByAura->GetModifier()->m_amount / 100 );
                     pVictim->CastCustomSpell(pVictim, 20267, &basepoints[0], NULL, NULL, true, NULL, triggeredByAura);
                     return SPELL_AURA_PROC_OK;
@@ -1851,6 +1855,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 // Judgement of Wisdom
                 case 20186:
                 {
+                    // only at real damage
+                    if (!damage)
+                        return SPELL_AURA_PROC_FAILED;
+
                     if (pVictim->getPowerType() == POWER_MANA)
                     {
                         // 2% of maximum base mana
@@ -3011,7 +3019,13 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 trigger_spell_id = 12721;
                 break;
             }
-            if (auraSpellInfo->Id == 50421)             // Scent of Blood
+            else if (auraSpellInfo->SpellIconID == 2961)    // Taste for Blood
+            {
+                // only at real damage
+                if (!damage)
+                    return SPELL_AURA_PROC_FAILED;
+            }
+            else if (auraSpellInfo->Id == 50421)            // Scent of Blood
                 trigger_spell_id = 50422;
             break;
         case SPELLFAMILY_WARLOCK:
@@ -3965,6 +3979,21 @@ SpellAuraProcResult Unit::HandleManaShieldAuraProc(Unit *pVictim, uint32 damage,
 
     if (cooldown && GetTypeId()==TYPEID_PLAYER)
         ((Player*)this)->AddSpellCooldown(triggered_spell_id,0,time(NULL) + cooldown);
+
+    return SPELL_AURA_PROC_OK;
+}
+
+SpellAuraProcResult Unit::HandleModResistanceAuraProc(Unit* /*pVictim*/, uint32 damage, Aura* triggeredByAura, SpellEntry const* /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)
+{
+    SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
+
+    // Inner Fire
+    if (spellInfo->IsFitToFamilyMask(SPELLFAMILY_PRIEST, UI64LIT(0x0000000000002)))
+    {
+        // only at real damage
+        if (!damage)
+            return SPELL_AURA_PROC_FAILED;
+    }
 
     return SPELL_AURA_PROC_OK;
 }
