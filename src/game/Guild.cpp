@@ -301,10 +301,8 @@ bool Guild::CheckGuildStructure()
     int32 GM_rights = GetRank(m_LeaderGuid);
     if (GM_rights == -1)
     {
-        DelMember(m_LeaderGuid);
-        // check no members case (disbanded)
-        if (members.empty())
-            return false;
+        if (DelMember(m_LeaderGuid))
+            return false;                                   // guild will disbanded and deleted in caller
     }
     else if (GM_rights != GR_GUILDMASTER)
         SetLeader(m_LeaderGuid);
@@ -488,7 +486,15 @@ void Guild::SetLeader(ObjectGuid guid)
     CharacterDatabase.PExecute("UPDATE guild SET leaderguid='%u' WHERE guildid='%u'", guid.GetCounter(), m_Id);
 }
 
-void Guild::DelMember(ObjectGuid guid, bool isDisbanding)
+/**
+ * Remove character from guild
+ *
+ * @param guid          Character that removed from guild
+ * @param isDisbanding  Flag set if function called from Guild::Disband, so not need update DB in per-member mode only or leader update
+ *
+ * @return true, if guild need to be disband and erase (no members or can't setup leader)
+ */
+bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
 {
     uint32 lowguid = guid.GetCounter();
 
@@ -513,11 +519,9 @@ void Guild::DelMember(ObjectGuid guid, bool isDisbanding)
                 newLeaderGUID = ObjectGuid(HIGHGUID_PLAYER, i->first);
             }
         }
+
         if (!best)
-        {
-            Disband();
-            return;
-        }
+            return true;
 
         SetLeader(newLeaderGUID);
 
@@ -547,6 +551,8 @@ void Guild::DelMember(ObjectGuid guid, bool isDisbanding)
 
     if (!isDisbanding)
         UpdateAccountsNumber();
+
+    return members.empty();
 }
 
 void Guild::BroadcastToGuild(WorldSession *session, const std::string& msg, uint32 language)
@@ -685,6 +691,11 @@ void Guild::SetRankRights(uint32 rankId, uint32 rights)
     CharacterDatabase.PExecute("UPDATE guild_rank SET rights='%u' WHERE rid='%u' AND guildid='%u'", rights, rankId, m_Id);
 }
 
+/**
+ * Disband guild including cleanup structures and DB
+ *
+ * Note: guild object need deleted after this in caller code.
+ */
 void Guild::Disband()
 {
     BroadcastEvent(GE_DISBANDED);
