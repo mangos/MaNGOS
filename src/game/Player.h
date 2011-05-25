@@ -2235,6 +2235,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         Camera& GetCamera() { return m_camera; }
 
+        virtual void SetPhaseMask(uint32 newPhaseMask, bool update);// overwrite Unit::SetPhaseMask
+
         uint8 m_forced_speed_changes[MAX_MOVE_TYPE];
 
         bool HasAtLoginFlag(AtLoginFlags f) const { return m_atLoginFlags & f; }

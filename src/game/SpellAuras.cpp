@@ -8214,49 +8214,30 @@ void Aura::HandlePhase(bool apply, bool Real)
             target->RemoveAurasDueToSpell(phases.front()->GetId(), GetHolder());
     }
 
+    target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL, true);
     // no-phase is also phase state so same code for apply and remove
-
-    // phase auras normally not expected at BG but anyway better check
-    if(target->GetTypeId() == TYPEID_PLAYER)
+    if (GetEffIndex() == EFFECT_INDEX_0 && target->GetTypeId() == TYPEID_PLAYER)
     {
-        // drop flag at invisible in bg
-        if(((Player*)target)->InBattleGround())
-            if(BattleGround *bg = ((Player*)target)->GetBattleGround())
-                bg->EventPlayerDroppedFlag((Player*)target);
-
-        // GM-mode have mask 0xFFFFFFFF
-        if(!((Player*)target)->isGameMaster())
-            target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL, false);
-
-        ((Player*)target)->GetSession()->SendSetPhaseShift(apply ? GetMiscValue() : PHASEMASK_NORMAL);
-
-        if (GetEffIndex() == EFFECT_INDEX_0)
+        SpellAreaForAreaMapBounds saBounds = sSpellMgr.GetSpellAreaForAuraMapBounds(GetId());
+        if(saBounds.first != saBounds.second)
         {
-            SpellAreaForAreaMapBounds saBounds = sSpellMgr.GetSpellAreaForAuraMapBounds(GetId());
-            if(saBounds.first != saBounds.second)
-            {
-                uint32 zone, area;
-                target->GetZoneAndAreaId(zone, area);
+            uint32 zone, area;
+            target->GetZoneAndAreaId(zone, area);
 
-                for(SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+            for(SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+            {
+                // some auras remove at aura remove
+                if(!itr->second->IsFitToRequirements((Player*)target, zone, area))
+                    target->RemoveAurasDueToSpell(itr->second->spellId);
+                // some auras applied at aura apply
+                else if(itr->second->autocast)
                 {
-                    // some auras remove at aura remove
-                    if(!itr->second->IsFitToRequirements((Player*)target, zone, area))
-                        target->RemoveAurasDueToSpell(itr->second->spellId);
-                    // some auras applied at aura apply
-                    else if(itr->second->autocast)
-                    {
-                        if (!target->HasAura(itr->second->spellId, EFFECT_INDEX_0))
-                            target->CastSpell(target, itr->second->spellId, true);
-                    }
+                    if (!target->HasAura(itr->second->spellId, EFFECT_INDEX_0))
+                        target->CastSpell(target, itr->second->spellId, true);
                 }
             }
         }
     }
-    else
-        target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL, false);
-
-    target->UpdateVisibilityAndView();
 }
 
 void Aura::HandleAuraSafeFall( bool Apply, bool Real )

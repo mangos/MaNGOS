@@ -19980,6 +19980,20 @@ template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*  
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
+void Player::SetPhaseMask(uint32 newPhaseMask, bool update)
+{
+    // GM-mode have mask PHASEMASK_ANYWHERE always
+    if (isGameMaster())
+        newPhaseMask = PHASEMASK_ANYWHERE;
+
+    // phase auras normally not expected at BG but anyway better check
+    if (BattleGround *bg = GetBattleGround())
+        bg->EventPlayerDroppedFlag(this);
+
+    Unit::SetPhaseMask(newPhaseMask, update);
+    GetSession()->SendSetPhaseShift(GetPhaseMask());
+}
+
 void Player::InitPrimaryProfessions()
 {
     SetFreePrimaryProfessions(sWorld.getConfig(CONFIG_UINT32_MAX_PRIMARY_TRADE_SKILL));
