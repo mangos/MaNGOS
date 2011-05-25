@@ -225,6 +225,18 @@ inline bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
     return !IsSpellHaveEffect(spellProto,SPELL_EFFECT_APPLY_AURA);
 }
 
+inline bool IsSpellRemoveAllMovementAndControlLossEffects(SpellEntry const* spellProto)
+{
+    return spellProto->EffectApplyAuraName[EFFECT_INDEX_0] == SPELL_AURA_MECHANIC_IMMUNITY &&
+        spellProto->EffectMiscValue[EFFECT_INDEX_0] == 1 &&
+        spellProto->EffectApplyAuraName[EFFECT_INDEX_1] == 0 &&
+        spellProto->EffectApplyAuraName[EFFECT_INDEX_2] == 0 &&
+        (spellProto->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)/* && -- all above selected spells have SPELL_ATTR_EX5_* mask
+        ((spellProto->AttributesEx5 &
+            (SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED|SPELL_ATTR_EX5_USABLE_WHILE_FEARED|SPELL_ATTR_EX5_USABLE_WHILE_STUNNED)) ==
+            (SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED|SPELL_ATTR_EX5_USABLE_WHILE_FEARED|SPELL_ATTR_EX5_USABLE_WHILE_STUNNED))*/;
+}
+
 inline bool IsDeathOnlySpell(SpellEntry const *spellInfo)
 {
     return spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD

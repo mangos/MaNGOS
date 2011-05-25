@@ -713,12 +713,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     SpellAuraHolderMap& Auras = pVictim->GetSpellAuraHolderMap();
                     for(SpellAuraHolderMap::const_iterator iter = Auras.begin(); iter != Auras.end();)
                     {
-                        SpellEntry const *spell = iter->second->GetSpellProto();
-
-                        if( spell->Mechanic == MECHANIC_STUN ||
-                            iter->second->HasMechanic(MECHANIC_STUN))
+                        if (iter->second->HasMechanic(MECHANIC_STUN))
                         {
-                            pVictim->RemoveAurasDueToSpell(spell->Id);
+                            pVictim->RemoveAurasDueToSpell(iter->second->GetId());
                             iter = Auras.begin();
                         }
                         else
