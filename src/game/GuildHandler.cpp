@@ -177,7 +177,14 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    guild->DelMember(slot->guid);
+    // possible last member removed, do cleanup, and no need events
+    if (guild->DelMember(slot->guid))
+    {
+        guild->Disband();
+        delete guild;
+        return;
+    }
+
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_UNINVITE_PLAYER, GetPlayer()->GetObjectGuid(), slot->guid);
 
@@ -376,16 +383,23 @@ void WorldSession::HandleGuildLeaveOpcode(WorldPacket& /*recvPacket*/)
     if (_player->GetObjectGuid() == guild->GetLeaderGuid())
     {
         guild->Disband();
+        delete guild;
         return;
     }
 
-    guild->DelMember(_player->GetObjectGuid());
+    SendGuildCommandResult(GUILD_QUIT_S, guild->GetName(), ERR_PLAYER_NO_MORE_IN_GUILD);
+
+    if (guild->DelMember(_player->GetObjectGuid()))
+    {
+        guild->Disband();
+        delete guild;
+        return;
+    }
+
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_LEAVE_GUILD, _player->GetObjectGuid());
 
     guild->BroadcastEvent(GE_LEFT, _player->GetObjectGuid(), _player->GetName());
-
-    SendGuildCommandResult(GUILD_QUIT_S, guild->GetName(), ERR_PLAYER_NO_MORE_IN_GUILD);
 }
 
 void WorldSession::HandleGuildDisbandOpcode(WorldPacket& /*recvPacket*/)
@@ -406,6 +420,7 @@ void WorldSession::HandleGuildDisbandOpcode(WorldPacket& /*recvPacket*/)
     }
 
     guild->Disband();
+    delete guild;
 
     DEBUG_LOG("WORLD: Guild Successfully Disbanded");
 }

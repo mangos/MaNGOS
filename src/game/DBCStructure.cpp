@@ -174,10 +174,10 @@ int32 SpellEntry::GetEquippedItemClass() const
     return items ? items->EquippedItemClass : -1;
 }
 
-uint32 SpellEntry::GetSpellFamilyName() const
+SpellFamily SpellEntry::GetSpellFamilyName() const
 {
     SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
-    return classOpt ? classOpt->SpellFamilyName : 0;
+    return classOpt ? SpellFamily(classOpt->SpellFamilyName) : SPELLFAMILY_GENERIC;
 }
 
 uint32 SpellEntry::GetDmgClass() const

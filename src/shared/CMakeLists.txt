@@ -20,7 +20,12 @@
 file(GLOB_RECURSE shared_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.h)
 
 # Exclude Win32 files
-if(NOT WIN32)
+if(WIN32)
+  list(REMOVE_ITEM shared_SRCS
+    PosixDaemon.h
+    PosixDaemon.cpp
+  )
+else()
   list(REMOVE_ITEM shared_SRCS
     WheatyExceptionReport.cpp
     WheatyExceptionReport.h

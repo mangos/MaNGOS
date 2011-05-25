@@ -937,7 +937,12 @@ enum MangosStrings
     LANG_POOL_POOL_LIST_CHAT            = 1501,
     LANG_POOL_POOL_LIST_CONSOLE         = 1502,
     LANG_NO_FREE_STATIC_GUID_FOR_SPAWN  = 1503,
-    // Room for more Level 2              1504-1599 not used
+    LANG_NPC_AI_HEADER                  = 1504,
+    LANG_NPC_AI_NAMES                   = 1505,
+    LANG_NPC_EVENTAI_PHASE              = 1506,
+    LANG_NPC_EVENTAI_MOVE               = 1507,
+    LANG_NPC_EVENTAI_COMBAT             = 1508,
+    // Room for more Level 2              1509-1599 not used
 
     // FREE IDS                           1600-9999
 

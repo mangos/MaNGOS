@@ -575,13 +575,15 @@ struct CreatureEventAIHolder
 
 class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
 {
-
     public:
         explicit CreatureEventAI(Creature *c);
         ~CreatureEventAI()
         {
             m_CreatureEventAIList.clear();
         }
+
+        void GetAIInformation(ChatHandler& reader);
+
         void JustRespawned();
         void Reset();
         void JustReachedHome();

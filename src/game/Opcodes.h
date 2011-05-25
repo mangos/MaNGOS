@@ -444,7 +444,7 @@ enum Opcodes
     SMSG_QUESTUPDATE_FAILEDTIMER                    = 0x197,
     SMSG_QUESTUPDATE_COMPLETE                       = 0x198,
     SMSG_QUESTUPDATE_ADD_KILL                       = 0x199,
-    SMSG_QUESTUPDATE_ADD_ITEM_OBOSLETE              = 0x19A,
+    SMSG_QUESTUPDATE_ADD_ITEM_OBSOLETE              = 0x19A,
     CMSG_QUEST_CONFIRM_ACCEPT                       = 0x19B,
     SMSG_QUEST_CONFIRM_ACCEPT                       = 0x19C,
     CMSG_PUSHQUESTTOPARTY                           = 0x19D,

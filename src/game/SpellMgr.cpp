@@ -465,11 +465,11 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                 return SPELL_CURSE;
 
             // Warlock (Demon Armor | Demon Skin | Fel Armor)
-            if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x2000002000000000) || classOpt->SpellFamilyFlags2 & 0x00000010)
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x2000002000000000), 0x00000010))
                 return SPELL_WARLOCK_ARMOR;
 
             // Unstable Affliction | Immolate
-            if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x10000000004))
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0000010000000004)))
                 return SPELL_UA_IMMOLATE;
             break;
         }
@@ -489,7 +489,7 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                 return SPELL_STING;
 
             // only hunter aspects have this
-            if( classOpt && (classOpt->SpellFamilyFlags & UI64LIT(0x0044000000380000) || classOpt->SpellFamilyFlags2 & 0x00001010))
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0044000000380000), 0x00001010))
                 return SPELL_ASPECT;
 
             break;
@@ -499,18 +499,18 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if (IsSealSpell(spellInfo))
                 return SPELL_SEAL;
 
-            if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x0000000011010002))
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000011010002)))
                 return SPELL_BLESSING;
 
-            if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x0000000000002190))
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000002190)))
                 return SPELL_HAND;
 
             // skip Heart of the Crusader that have also same spell family mask
-            if (classOpt && (classOpt->SpellFamilyFlags & UI64LIT(0x00000820180400)) && (spellInfo->AttributesEx3 & 0x200) && (spellInfo->SpellIconID != 237))
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x00000820180400)) && (spellInfo->AttributesEx3 & 0x200) && (spellInfo->SpellIconID != 237))
                 return SPELL_JUDGEMENT;
 
-            // only paladin auras have this (for paladin class family)
-            if( classOpt && classOpt->SpellFamilyFlags2 & 0x00000020 )
+            // only paladin auras have this (for palaldin class family)
+            if (spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000000000), 0x00000020))
                 return SPELL_AURA;
 
             break;
@@ -2142,6 +2142,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     (spellInfo_2->SpellIconID == 456 && spellInfo_1->SpellIconID == 2006))
                     return false;
 
+                // Glyph of Revenge (triggered), and Sword and Board (triggered)
+                if ((spellInfo_1->SpellIconID == 856 && spellInfo_2->SpellIconID == 2780) ||
+                    (spellInfo_2->SpellIconID == 856 && spellInfo_1->SpellIconID == 2780))
+                    return false;
+
                 // Defensive/Berserker/Battle stance aura can not stack (needed for dummy auras)
                 if (((classOptions1->SpellFamilyFlags & UI64LIT(0x800000)) && (classOptions2->SpellFamilyFlags & UI64LIT(0x800000))) ||
                     ((classOptions2->SpellFamilyFlags & UI64LIT(0x800000)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x800000))))
@@ -2276,6 +2281,10 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     (classOptions2->SpellFamilyFlags & UI64LIT(0x4)) && (classOptions1->SpellFamilyFlags & UI64LIT(0x00000004000)) )
                     return false;
 
+                // Deterrence
+                if (spellInfo_1->SpellIconID == 83 && spellInfo_2->SpellIconID == 83)
+                    return false;
+
                 // Bestial Wrath
                 if (spellInfo_1->SpellIconID == 1680 && spellInfo_2->SpellIconID == 1680)
                     return false;
@@ -2315,6 +2324,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
                 // Divine Sacrifice and Divine Guardian
                 if (spellInfo_1->SpellIconID == 3837 && spellInfo_2->SpellIconID == 3837)
+                    return false;
+
+                // Blood Corruption, Holy Vengeance, Righteous Vengeance
+                if ((spellInfo_1->SpellIconID == 2292 && spellInfo_2->SpellIconID == 3025) ||
+                    (spellInfo_2->SpellIconID == 2292 && spellInfo_1->SpellIconID == 3025))
                     return false;
             }
 

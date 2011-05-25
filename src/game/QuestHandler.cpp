@@ -154,7 +154,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
         if( _player->CanAddQuest( qInfo, true ) )
         {
-            _player->AddQuest( qInfo, pObject );
+            _player->AddQuest( qInfo, pObject );            // pObject (if it item) can be destroyed at call
 
             if (qInfo->HasQuestFlag(QUEST_FLAGS_PARTY_ACCEPT))
             {
@@ -185,19 +185,6 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode( WorldPacket & recv_data )
 
             _player->GetAchievementMgr().StartTimedAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, quest);
 
-            switch(pObject->GetTypeId())
-            {
-                case TYPEID_UNIT:
-                    sScriptMgr.OnQuestAccept(_player, (Creature*)pObject, qInfo);
-                    break;
-                case TYPEID_ITEM:
-                case TYPEID_CONTAINER:
-                    sScriptMgr.OnQuestAccept(_player, (Item*)pObject, qInfo);
-                    break;
-                case TYPEID_GAMEOBJECT:
-                    sScriptMgr.OnQuestAccept(_player, (GameObject*)pObject, qInfo);
-                    break;
-            }
             _player->PlayerTalkClass->CloseGossip();
 
             if( qInfo->GetSrcSpell() > 0 )

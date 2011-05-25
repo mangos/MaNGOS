@@ -20,6 +20,10 @@
     \ingroup mangosd
 */
 
+#ifndef WIN32
+    #include "PosixDaemon.h"
+#endif
+
 #include "WorldSocketMgr.h"
 #include "Common.h"
 #include "Master.h"
@@ -197,6 +201,9 @@ int Master::Run()
     ///- Initialize the World
     sWorld.SetInitialWorldSettings();
 
+    #ifndef WIN32
+    detachDaemon();
+    #endif
     //server loaded successfully => enable async DB requests
     //this is done to forbid any async transactions during server startup!
     CharacterDatabase.AllowAsyncTransactions();

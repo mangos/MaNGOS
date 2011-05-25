@@ -32,6 +32,7 @@ class Unit;
 class Creature;
 class Player;
 struct SpellEntry;
+class ChatHandler;
 
 #define TIME_INTERVAL_LOOK   5000
 #define VISIBILITY_RANGE    10000
@@ -64,6 +65,9 @@ class MANGOS_DLL_SPEC CreatureAI
         explicit CreatureAI(Creature* creature) : m_creature(creature) {}
 
         virtual ~CreatureAI();
+
+        ///== Information about AI ========================
+        virtual void GetAIInformation(ChatHandler& /*reader*/) {}
 
         ///== Reactions At =================================
 

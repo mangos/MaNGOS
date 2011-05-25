@@ -1628,6 +1628,11 @@ struct SpellClassOptionsEntry
         return SpellFamily(SpellFamilyName) == family &&
             ((SpellFamilyFlags & familyFlags) || (SpellFamilyFlags2 & familyFlags2));
     }
+
+    private:
+        // catch wrong uses
+        template<typename T>
+        bool IsFitToFamilyMask(SpellFamily family, T t) const;
 };
 
 // SpellCooldowns.dbc
@@ -1848,7 +1853,7 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32 GetStartRecoveryCategory() const;
     uint32 GetSpellLevel() const;
     int32 GetEquippedItemClass() const;
-    uint32 GetSpellFamilyName() const;
+    SpellFamily GetSpellFamilyName() const;
     uint32 GetDmgClass() const;
     uint32 GetDispel() const;
     uint32 GetMaxAffectedTargets() const;
@@ -1890,9 +1895,13 @@ struct MANGOS_DLL_SPEC SpellEntry
         return classOpt && classOpt->IsFitToFamily(family, familyFlags, familyFlags2);
     }
 
-private:
-    // prevent creating custom entries (copy data from original in fact)
-    SpellEntry(SpellEntry const&);                          // DON'T must have implementation
+    private:
+        // prevent creating custom entries (copy data from original in fact)
+        SpellEntry(SpellEntry const&);                      // DON'T must have implementation
+
+        // catch wrong uses
+        template<typename T>
+        bool IsFitToFamilyMask(SpellFamily family, T t) const;
 };
 
 struct SpellCastTimesEntry

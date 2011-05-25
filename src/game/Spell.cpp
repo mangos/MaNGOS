@@ -702,54 +702,48 @@ void Spell::prepareDataForTriggerSystem()
     else if (!m_triggeredByAuraSpell)
         m_canTrigger = true;                                // Triggered from SPELL_EFFECT_TRIGGER_SPELL - can trigger
 
-    SpellClassOptionsEntry const* classOpt = m_spellInfo->GetSpellClassOptions();
-
     if (!m_canTrigger)                                      // Exceptions (some periodic triggers)
     {
-        if(classOpt)
+        switch (m_spellInfo->GetSpellFamilyName())
         {
-            switch (classOpt->SpellFamilyName)
-            {
-                case SPELLFAMILY_MAGE:
-                    // Arcane Missles / Blizzard triggers need do it
-                    if (classOpt->SpellFamilyFlags & UI64LIT(0x0000000000200080))
-                        m_canTrigger = true;
-                    // Clearcasting trigger need do it
-                    else if (classOpt->SpellFamilyFlags & UI64LIT(0x0000000200000000) && classOpt->SpellFamilyFlags2 & 0x8)
-                        m_canTrigger = true;
-                    // Replenish Mana, item spell with triggered cases (Mana Agate, etc mana gems)
-                    else if (classOpt->SpellFamilyFlags & UI64LIT(0x0000010000000000))
-                        m_canTrigger = true;
-                    break;
-                case SPELLFAMILY_WARLOCK:
-                    // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
-                    if (classOpt->SpellFamilyFlags & UI64LIT(0x0000800000000060))
-                        m_canTrigger = true;
-                    break;
-                case SPELLFAMILY_PRIEST:
-                    // For Penance,Mind Sear,Mind Flay heal/damage triggers need do it
-                    if (classOpt->SpellFamilyFlags & UI64LIT(0x0001800000800000) || (classOpt->SpellFamilyFlags2 & 0x00000040))
-                        m_canTrigger = true;
-                    break;
-                case SPELLFAMILY_ROGUE:
-                    // For poisons need do it
-                    if (classOpt->SpellFamilyFlags & UI64LIT(0x000000101001E000))
-                        m_canTrigger = true;
-                    break;
-                case SPELLFAMILY_HUNTER:
-                    // Hunter Rapid Killing/Explosive Trap Effect/Immolation Trap Effect/Frost Trap Aura/Snake Trap Effect/Explosive Shot
-                    if ((classOpt->SpellFamilyFlags & UI64LIT(0x0100200000000214)) ||
-                        classOpt->SpellFamilyFlags2 & 0x200)
-                        m_canTrigger = true;
-                    break;
-                case SPELLFAMILY_PALADIN:
-                    // For Judgements (all) / Holy Shock triggers need do it
-                    if (classOpt->SpellFamilyFlags & UI64LIT(0x0001000900B80400))
-                        m_canTrigger = true;
-                    break;
-                default:
-                    break;
-            }
+            case SPELLFAMILY_MAGE:
+                // Arcane Missles / Blizzard triggers need do it
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000200080)))
+                    m_canTrigger = true;
+                // Clearcasting trigger need do it
+                else if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000200000000), 0x00000008))
+                    m_canTrigger = true;
+                // Replenish Mana, item spell with triggered cases (Mana Agate, etc mana gems)
+                else if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000010000000000)))
+                    m_canTrigger = true;
+                break;
+            case SPELLFAMILY_WARLOCK:
+                // For Hellfire Effect / Rain of Fire / Seed of Corruption triggers need do it
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000800000000060)))
+                    m_canTrigger = true;
+                break;
+            case SPELLFAMILY_PRIEST:
+                // For Penance,Mind Sear,Mind Flay heal/damage triggers need do it
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0001800000800000), 0x00000040))
+                    m_canTrigger = true;
+                break;
+            case SPELLFAMILY_ROGUE:
+                // For poisons need do it
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x000000101001E000)))
+                    m_canTrigger = true;
+                break;
+            case SPELLFAMILY_HUNTER:
+                // Hunter Rapid Killing/Explosive Trap Effect/Immolation Trap Effect/Frost Trap Aura/Snake Trap Effect/Explosive Shot
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0100200000000214), 0x200))
+                    m_canTrigger = true;
+                break;
+            case SPELLFAMILY_PALADIN:
+                // For Judgements (all) / Holy Shock triggers need do it
+                if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0001000900B80400)))
+                    m_canTrigger = true;
+                break;
+            default:
+                break;
         }
     }
 
@@ -803,7 +797,7 @@ void Spell::prepareDataForTriggerSystem()
 
     // Hunter traps spells (for Entrapment trigger)
     // Gives your Immolation Trap, Frost Trap, Explosive Trap, and Snake Trap ....
-    if (classOpt && classOpt->SpellFamilyName == SPELLFAMILY_HUNTER && (classOpt->SpellFamilyFlags & UI64LIT(0x000020000000001C)))
+    if (m_spellInfo->IsFitToFamily(SPELLFAMILY_HUNTER, UI64LIT(0x000020000000001C)))
         m_procAttacker |= PROC_FLAG_ON_TRAP_ACTIVATION;
 }
 
@@ -1616,7 +1610,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case SPELLFAMILY_DRUID:
         {
-            if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000000000), 0x00000100))// Starfall
+            // Starfall
+            if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000000000), 0x00000100))
                 unMaxTargets = 2;
             break;
         }
@@ -3016,6 +3011,12 @@ void Spell::cast(bool skipCheck)
                 if (m_caster->HasAura(58375))               // Glyph of Blocking
                     AddTriggeredSpell(58374);               // Glyph of Blocking
             }
+            // Bloodsurge (triggered), Sudden Death (triggered)
+            else if (m_spellInfo->Id == 46916 || m_spellInfo->Id == 52437)
+                // Item - Warrior T10 Melee 4P Bonus
+                if (Aura *aur = m_caster->GetAura(70847, EFFECT_INDEX_0))
+                    if (roll_chance_i(aur->GetModifier()->m_amount))
+                        AddTriggeredSpell(70849);           // Extra Charge!
             break;
         }
         case SPELLFAMILY_PRIEST:
@@ -3048,6 +3049,12 @@ void Spell::cast(bool skipCheck)
             // Faerie Fire (Feral)
             if (m_spellInfo->Id == 16857 && m_caster->GetShapeshiftForm() != FORM_CAT)
                 AddTriggeredSpell(60089);
+            // Clearcasting
+            else if (m_spellInfo->Id == 16870)
+            {
+                if (m_caster->HasAura(70718))               // Item - Druid T10 Balance 2P Bonus
+                    AddPrecastSpell(70721);                 // Omen of Doom
+            }
             // Berserk (Bear Mangle part)
             else if (m_spellInfo->Id == 50334)
                 AddTriggeredSpell(58923);
@@ -3063,8 +3070,11 @@ void Spell::cast(bool skipCheck)
             break;
         case SPELLFAMILY_HUNTER:
         {
+            // Deterrence
+            if (m_spellInfo->Id == 19263)
+                AddPrecastSpell(67801);
             // Kill Command
-            if (m_spellInfo->Id == 34026)
+            else if (m_spellInfo->Id == 34026)
             {
                 if (m_caster->HasAura(37483))               // Improved Kill Command - Item set bonus
                     m_caster->CastSpell(m_caster, 37482, true);// Exploited Weakness
@@ -3190,15 +3200,15 @@ void Spell::cast(bool skipCheck)
 
 void Spell::handle_immediate()
 {
-    // start channeling if applicable
+    // process immediate effects (items, ground, etc.) also initialize some variables
+    _handle_immediate_phase();
+
+    // start channeling if applicable (after _handle_immediate_phase for get persistent effect dynamic object for channel target
     if (IsChanneledSpell(m_spellInfo) && m_duration)
     {
         m_spellState = SPELL_STATE_CASTING;
         SendChannelStart(m_duration);
     }
-
-    // process immediate effects (items, ground, etc.) also initialize some variables
-    _handle_immediate_phase();
 
     for(TargetList::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         DoAllEffectOnTarget(&(*ihit));
@@ -4057,8 +4067,11 @@ void Spell::SendChannelStart(uint32 duration)
 {
     WorldObject* target = NULL;
 
+    // select dynobject created by first effect if any
+    if (m_spellInfo->GetSpellEffectIdByIndex(EFFECT_INDEX_0) == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+        target = m_caster->GetDynObject(m_spellInfo->Id, EFFECT_INDEX_0);
     // select first not resisted target from target list for _0_ effect
-    if (!m_UniqueTargetInfo.empty())
+    else if (!m_UniqueTargetInfo.empty())
     {
         for(TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
         {

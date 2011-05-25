@@ -51,71 +51,84 @@ bool WinServiceInstall()
     HMODULE advapi32;
     SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CREATE_SERVICE);
 
-    if (serviceControlManager)
+    if (!serviceControlManager)
     {
-        char path[_MAX_PATH + 10];
-        if (GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0]) ) > 0)
-        {
-            SC_HANDLE service;
-            std::strcat(path, " -s run");
-            service = CreateService(serviceControlManager,
-                serviceName,                                // name of service
-                serviceLongName,                            // service name to display
-                SERVICE_ALL_ACCESS,                         // desired access
-                                                            // service type
-                SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
-                SERVICE_AUTO_START,                         // start type
-                SERVICE_ERROR_IGNORE,                       // error control type
-                path,                                       // service's binary
-                0,                                          // no load ordering group
-                0,                                          // no tag identifier
-                0,                                          // no dependencies
-                0,                                          // LocalSystem account
-                0);                                         // no password
-            if (service)
-            {
-                advapi32 = GetModuleHandle("ADVAPI32.DLL");
-                if(!advapi32)
-                {
-                    CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
-                    return false;
-                }
-
-                ChangeService_Config2 = (CSD_T) GetProcAddress(advapi32, "ChangeServiceConfig2A");
-                if (!ChangeService_Config2)
-                {
-                    CloseServiceHandle(service);
-                    CloseServiceHandle(serviceControlManager);
-                    return false;
-                }
-
-                SERVICE_DESCRIPTION sdBuf;
-                sdBuf.lpDescription = serviceDescription;
-                ChangeService_Config2(
-                    service,                                // handle to service
-                    SERVICE_CONFIG_DESCRIPTION,             // change: description
-                    &sdBuf);                                // new data
-
-                SC_ACTION _action[1];
-                _action[0].Type = SC_ACTION_RESTART;
-                _action[0].Delay = 10000;
-                SERVICE_FAILURE_ACTIONS sfa;
-                ZeroMemory(&sfa, sizeof(SERVICE_FAILURE_ACTIONS));
-                sfa.lpsaActions = _action;
-                sfa.cActions = 1;
-                sfa.dwResetPeriod =INFINITE;
-                ChangeService_Config2(
-                    service,                                // handle to service
-                    SERVICE_CONFIG_FAILURE_ACTIONS,         // information level
-                    &sfa);                                  // new data
-
-                CloseServiceHandle(service);
-
-            }
-        }
-        CloseServiceHandle(serviceControlManager);
+        sLog.outError("SERVICE: No access to service control manager.");
+        return false;
     }
+
+    char path[_MAX_PATH + 10];
+    if (!GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0])))
+    {
+        CloseServiceHandle(serviceControlManager);
+        sLog.outError("SERVICE: Can't get service binary filename.");
+        return false;
+    }
+
+    std::strcat(path, " -s run");
+
+    SC_HANDLE service = CreateService(serviceControlManager,
+        serviceName,                                // name of service
+        serviceLongName,                            // service name to display
+        SERVICE_ALL_ACCESS,                         // desired access
+                                                    // service type
+        SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
+        SERVICE_AUTO_START,                         // start type
+        SERVICE_ERROR_IGNORE,                       // error control type
+        path,                                       // service's binary
+        0,                                          // no load ordering group
+        0,                                          // no tag identifier
+        0,                                          // no dependencies
+        0,                                          // LocalSystem account
+        0);                                         // no password
+
+    if (!service)
+    {
+        CloseServiceHandle(serviceControlManager);
+        sLog.outError("SERVICE: Can't register service for: %s", path);
+        return false;
+    }
+
+    advapi32 = GetModuleHandle("ADVAPI32.DLL");
+    if(!advapi32)
+    {
+        sLog.outError("SERVICE: Can't access ADVAPI32.DLL");
+        CloseServiceHandle(service);
+        CloseServiceHandle(serviceControlManager);
+        return false;
+    }
+
+    ChangeService_Config2 = (CSD_T) GetProcAddress(advapi32, "ChangeServiceConfig2A");
+    if (!ChangeService_Config2)
+    {
+        sLog.outError("SERVICE: Can't access ChangeServiceConfig2A from ADVAPI32.DLL");
+        CloseServiceHandle(service);
+        CloseServiceHandle(serviceControlManager);
+        return false;
+    }
+
+    SERVICE_DESCRIPTION sdBuf;
+    sdBuf.lpDescription = serviceDescription;
+    ChangeService_Config2(
+        service,                                // handle to service
+        SERVICE_CONFIG_DESCRIPTION,             // change: description
+        &sdBuf);                                // new data
+
+    SC_ACTION _action[1];
+    _action[0].Type = SC_ACTION_RESTART;
+    _action[0].Delay = 10000;
+    SERVICE_FAILURE_ACTIONS sfa;
+    ZeroMemory(&sfa, sizeof(SERVICE_FAILURE_ACTIONS));
+    sfa.lpsaActions = _action;
+    sfa.cActions = 1;
+    sfa.dwResetPeriod =INFINITE;
+    ChangeService_Config2(
+        service,                                // handle to service
+        SERVICE_CONFIG_FAILURE_ACTIONS,         // information level
+        &sfa);                                  // new data
+
+    CloseServiceHandle(service);
+    CloseServiceHandle(serviceControlManager);
     return true;
 }
 
@@ -123,23 +136,31 @@ bool WinServiceUninstall()
 {
     SC_HANDLE serviceControlManager = OpenSCManager(0, 0, SC_MANAGER_CONNECT);
 
-    if (serviceControlManager)
+    if (!serviceControlManager)
     {
-        SC_HANDLE service = OpenService(serviceControlManager,
-            serviceName, SERVICE_QUERY_STATUS | DELETE);
-        if (service)
-        {
-            SERVICE_STATUS serviceStatus2;
-            if (QueryServiceStatus(service, &serviceStatus2))
-            {
-                if (serviceStatus2.dwCurrentState == SERVICE_STOPPED)
-                    DeleteService(service);
-            }
-            CloseServiceHandle(service);
-        }
-
-        CloseServiceHandle(serviceControlManager);
+        sLog.outError("SERVICE: No access to service control manager.");
+        return false;
     }
+
+    SC_HANDLE service = OpenService(serviceControlManager,
+        serviceName, SERVICE_QUERY_STATUS | DELETE);
+
+    if (!service)
+    {
+        CloseServiceHandle(serviceControlManager);
+        sLog.outError("SERVICE: Service not found: %s", serviceName);
+        return false;
+    }
+
+    SERVICE_STATUS serviceStatus2;
+    if (QueryServiceStatus(service, &serviceStatus2))
+    {
+        if (serviceStatus2.dwCurrentState == SERVICE_STOPPED)
+            DeleteService(service);
+    }
+
+    CloseServiceHandle(service);
+    CloseServiceHandle(serviceControlManager);
     return true;
 }
 
