@@ -108,6 +108,25 @@ void Object::SetObjectScale(float newScale)
     SetFloatValue(OBJECT_FIELD_SCALE_X, newScale);
 }
 
+void Object::SendForcedObjectUpdate()
+{
+    if (!m_inWorld || !m_objectUpdated)
+        return;
+
+    UpdateDataMapType update_players;
+
+    BuildUpdateData(update_players);
+    RemoveFromClientUpdateList();
+
+    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
+    for(UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    {
+        iter->second.BuildPacket(&packet);
+        iter->first->GetSession()->SendPacket(&packet);
+        packet.clear();                                     // clean the string
+    }
+}
+
 void Object::BuildMovementUpdateBlock(UpdateData * data, uint16 flags ) const
 {
     ByteBuffer buf(500);

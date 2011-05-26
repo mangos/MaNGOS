@@ -164,6 +164,7 @@ class MANGOS_DLL_SPEC Object
         virtual void RemoveFromClientUpdateList();
         virtual void BuildUpdateData(UpdateDataMapType& update_players);
         void MarkForClientUpdate();
+        void SendForcedObjectUpdate();
 
         void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
         void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
