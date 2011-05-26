@@ -7322,6 +7322,13 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72588, true);
                     return;
                 }
+                case 72034:                                 // Whiteout
+                case 72096:                                 // Whiteout (heroic)
+                {
+                    // cast Whiteout visual
+                    m_caster->CastSpell(unitTarget, 72036, true);
+                    return;
+                }
             }
             break;
         }
