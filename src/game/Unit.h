@@ -206,7 +206,7 @@ enum Swing
 
 enum VictimState
 {
-    VICTIMSTATE_UNKNOWN1       = 0,
+    VICTIMSTATE_UNAFFECTED     = 0,                         // seen in relation with HITINFO_MISS
     VICTIMSTATE_NORMAL         = 1,
     VICTIMSTATE_DODGE          = 2,
     VICTIMSTATE_PARRY          = 3,
