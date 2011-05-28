@@ -1898,6 +1898,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                         (spellInfo_2->Id == 8326 && spellInfo_1->Id == 20584))
                          return false;
 
+                    // Aura of Despair auras
+                    if ((spellInfo_1->Id == 64848 && spellInfo_2->Id == 62692) ||
+                        (spellInfo_2->Id == 64848 && spellInfo_1->Id == 62692))
+                        return false;
+
                     // Blood Fury and Rage of the Unraveller
                     if (spellInfo_1->SpellIconID == 1662 && spellInfo_2->SpellIconID == 1662)
                         return false;
