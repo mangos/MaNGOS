@@ -9870,8 +9870,17 @@ void Unit::SendPetCastFail(uint32 spellid, SpellCastResult msg)
     data << uint8(0);                                       // cast count?
     data << uint32(spellid);
     data << uint8(msg);
-    // uint32 for some reason
-    // uint32 for some reason
+
+    // More cases exist, see Spell::SendCastResult (can possibly be unified)
+    switch(msg)
+    {
+        case SPELL_FAILED_NOT_READY:
+            data << uint32(0);                              // unknown
+            break;
+        default:
+            break;
+    }
+
     ((Player*)owner)->GetSession()->SendPacket(&data);
 }
 
