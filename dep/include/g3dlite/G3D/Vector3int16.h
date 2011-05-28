@@ -80,7 +80,7 @@ public:
     inline Vector3int16& operator+=(const Vector3int16& other) {
         x += other.x;
         y += other.y;
-        z += other.y;
+        z += other.z;
         return *this;
     }
 
