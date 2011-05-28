@@ -1324,9 +1324,8 @@ void Player::Update( uint32 update_diff, uint32 p_time )
                 }
             }
 
-            Unit *owner = pVictim->GetOwner();
-            Unit *u = owner ? owner : pVictim;
-            if (u->IsPvP() && (!duel || duel->opponent != u))
+            Player *vOwner = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner))
             {
                 UpdatePvP(true);
                 RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -6792,6 +6791,9 @@ void Player::UpdateArea(uint32 newArea)
 
     if (area)
     {
+        // check leave duel allowed area
+        CheckDuelArea(area);
+
         // Dalaran restricted flight zone
         if ((area->flags & AREA_FLAG_CANNOT_FLY) && IsFreeFlying() && !isGameMaster() && !HasAura(58600))
             CastSpell(this, 58600, true);                   // Restricted Flight Area
@@ -6898,6 +6900,15 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     UpdateZoneDependentPets();
 }
 
+void Player::CheckDuelArea(AreaTableEntry const* areaEntry)
+{
+    if (!duel)
+        return;
+
+    if (!(areaEntry->flags & AREA_FLAG_DUEL))
+        DuelComplete(DUEL_FLED);
+}
+
 //If players are too far way of duel flag... then player loose the duel
 void Player::CheckDuelDistance(time_t currTime)
 {
@@ -6905,8 +6916,12 @@ void Player::CheckDuelDistance(time_t currTime)
         return;
 
     GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER));
-    if(!obj)
+    if (!obj)
+    {
+        // player not at duel start map
+        DuelComplete(DUEL_FLED);
         return;
+    }
 
     if (duel->outOfBound == 0)
     {
@@ -6937,7 +6952,7 @@ void Player::CheckDuelDistance(time_t currTime)
 void Player::DuelComplete(DuelCompleteType type)
 {
     // duel not requested
-    if(!duel)
+    if (!duel)
         return;
 
     WorldPacket data(SMSG_DUEL_COMPLETE, (1));
@@ -6945,7 +6960,7 @@ void Player::DuelComplete(DuelCompleteType type)
     GetSession()->SendPacket(&data);
     duel->opponent->GetSession()->SendPacket(&data);
 
-    if(type != DUEL_INTERUPTED)
+    if (type != DUEL_INTERUPTED)
     {
         data.Initialize(SMSG_DUEL_WINNER, (1+20));          // we guess size
         data << (uint8)((type==DUEL_WON) ? 0 : 1);          // 0 = just won; 1 = fled

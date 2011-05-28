@@ -640,14 +640,13 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if(m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
-                Unit *owner = (*itr)->GetOwner();
-                Unit *u = owner ? owner : (*itr);
-                if(u!=m_caster && u->IsPvP() && (!me->duel || me->duel->opponent != u))
+                Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
+                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
