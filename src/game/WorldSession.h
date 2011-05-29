@@ -300,6 +300,8 @@ class MANGOS_DLL_SPEC WorldSession
         void SendListInventory(ObjectGuid guid);
         bool CheckBanker(ObjectGuid guid);
         void SendShowBank(ObjectGuid guid);
+        bool CheckMailBox(ObjectGuid guid);
+        void SendShowMailBox(ObjectGuid guid);
         void SendTabardVendorActivate(ObjectGuid guid);
         void SendSpiritResurrect();
         void SendBindPoint(Creature* npc);

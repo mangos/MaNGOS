@@ -4502,6 +4502,12 @@ bool ChatHandler::HandleBankCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleMailBoxCommand(char* /*args*/)
+{
+    m_session->SendShowMailBox(m_session->GetPlayer()->GetObjectGuid());
+    return true;
+}
+
 bool ChatHandler::HandleStableCommand(char* /*args*/)
 {
     m_session->SendStablePet(m_session->GetPlayer()->GetObjectGuid());
