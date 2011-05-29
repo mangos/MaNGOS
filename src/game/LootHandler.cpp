@@ -234,6 +234,9 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
 
     if (pLoot)
     {
+        // This portion with SMSG_LOOT_MONEY_NOTIFY is possibly in wrong order.
+        // Apparently, SMSG_LOOT_MONEY_NOTIFY is sent after SMSG_LOOT_CLEAR_MONEY as
+        // example (same with SMSG_LOOT_LIST which is normally last when it's sent)
         if (!guid.IsItem() && player->GetGroup())           //item can be looted only single player
         {
             Group *group = player->GetGroup();
@@ -257,13 +260,18 @@ void WorldSession::HandleLootMoneyOpcode( WorldPacket & /*recv_data*/ )
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4+1);
                 data << uint32(money_per_player);
-                data << uint8(0);                           // unknown
+                data << uint8(0);                           // Control the text displayed, but apparently always 0 in group cases
 
                 (*i)->GetSession()->SendPacket(&data);
             }
         }
         else
         {
+            WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4+1);
+            data << uint32(pLoot->gold);
+            data << uint8(1);                               // 1 is "you loot..."
+            player->GetSession()->SendPacket(&data);
+
             player->ModifyMoney( pLoot->gold );
             player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, pLoot->gold);
         }
