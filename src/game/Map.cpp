@@ -2869,6 +2869,42 @@ void Map::ScriptsProcess()
                 sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) unexpected error, attacker or victim could not be found, no action.", step.script->id);
                 break;
             }
+            case SCRIPT_COMMAND_GO_LOCK_STATE:
+            {
+                if ((!source || !source->isType(TYPEMASK_WORLDOBJECT)) && (!target || !target->isType(TYPEMASK_WORLDOBJECT)))
+                {
+                    sLog.outError("SCRIPT_COMMAND_GO_LOCK_STATE (script id %u) call for non-worldobject (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", step.script->id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                WorldObject* pSearcher = source && source->isType(TYPEMASK_WORLDOBJECT) ? (WorldObject*)source : (WorldObject*)target;
+                GameObject* pGo = NULL;
+
+                MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*pSearcher, step.script->goLockState.goEntry, step.script->goLockState.searchRadius);
+                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> searcher(pGo, u_check);
+
+                Cell::VisitGridObjects(pSearcher, searcher, step.script->goLockState.searchRadius);
+
+                /* flag lockState
+                 * go_lock          0x01
+                 * go_unlock        0x02
+                 * go_nonInteract   0x04
+                 * go_Interact      0x08
+                 */
+                if (pGo)
+                {
+                    // Lock or Unlock
+                    if (step.script->goLockState.lockState & 0x01)
+                        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    else if (step.script->goLockState.lockState & 0x02)
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                    // Set Non Interactable or Set Interactable
+                    if (step.script->goLockState.lockState & 0x04)
+                        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    else if (step.script->goLockState.lockState & 0x08)
+                        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
+            }
             default:
                 sLog.outError("Unknown SCRIPT_COMMAND_ %u called for script id %u.",step.script->command, step.script->id);
                 break;

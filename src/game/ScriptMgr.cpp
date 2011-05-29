@@ -533,6 +533,32 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_GO_LOCK_STATE:
+            {
+                if (!ObjectMgr::GetGameObjectInfo(tmp.goLockState.goEntry))
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_GO_LOCK_STATE for script id %u, but this gameobject_template does not exist.", tablename, tmp.goLockState.goEntry, tmp.id);
+                    continue;
+                }
+                if (!tmp.goLockState.searchRadius)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid search radius (datalong3 = %u) in SCRIPT_COMMAND_GO_LOCK_STATE for script id %u.", tablename, tmp.goLockState.searchRadius, tmp.id);
+                    continue;
+                }
+                if (// lock(0x01) and unlock(0x02) together
+                    ((tmp.goLockState.lockState & 0x01) && (tmp.goLockState.lockState & 0x02)) ||
+                    // non-interact (0x4) and interact (0x08) together
+                    ((tmp.goLockState.lockState & 0x04) && (tmp.goLockState.lockState & 0x08)) ||
+                    // no setting
+                    !tmp.goLockState.lockState ||
+                    // invalid number
+                    tmp.goLockState.lockState >= 0x10)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid lock state (datalong = %u) in SCRIPT_COMMAND_GO_LOCK_STATE for script id %u.", tablename, tmp.goLockState.lockState, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

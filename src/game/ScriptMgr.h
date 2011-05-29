@@ -92,6 +92,9 @@ enum eScriptCommand
                                                             // datalong2=creature entry, datalong3=search radius
     SCRIPT_COMMAND_ATTACK_START             = 26,           // source = Creature (or WorldObject when creature entry are defined), target = Player
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
+    SCRIPT_COMMAND_GO_LOCK_STATE            = 27,           // source or target must be WorldObject
+                                                            // datalong= 1=lock, 2=unlock, 4=set not-interactable, 8=set interactable
+                                                            // datalong2= go entry, datalong3= go search radius
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
@@ -283,6 +286,13 @@ struct ScriptInfo
             uint32 empty2;                                  // datalong4
             uint32 flags;                                   // data_flags
         } attack;
+
+        struct                                              // SCRIPT_COMMAND_GO_LOCK_STATE (27)
+        {
+            uint32 lockState;                               // datalong
+            uint32 goEntry;                                 // datalong2
+            uint32 searchRadius;                            // datalong3
+        } goLockState;
 
         struct
         {

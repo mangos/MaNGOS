@@ -289,10 +289,24 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
     if(!obj)
         return;
 
+    // Additional check preventing exploits (ie loot despawned chests)
+    if (!obj->isSpawned())
+    {
+        sLog.outError("HandleGameObjectUseOpcode: CMSG_GAMEOBJ_USE for despawned GameObject (Entry %u), didn't expect this to happen.", obj->GetEntry());
+        return;
+    }
+
     // Never expect this opcode for some type GO's
     if (obj->GetGoType() == GAMEOBJECT_TYPE_GENERIC)
     {
         sLog.outError("HandleGameObjectUseOpcode: CMSG_GAMEOBJ_USE for not allowed GameObject type %u (Entry %u), didn't expect this to happen.", obj->GetGoType(), obj->GetEntry());
+        return;
+    }
+
+    // Never expect this opcode for non intractable GO's
+    if (obj->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT))
+    {
+        sLog.outError("HandleGameObjectUseOpcode: CMSG_GAMEOBJ_USE for GameObject (Entry %u) with non intractable flag (Flags %u), didn't expect this to happen.", obj->GetEntry(), obj->GetUInt32Value(GAMEOBJECT_FLAGS));
         return;
     }
 

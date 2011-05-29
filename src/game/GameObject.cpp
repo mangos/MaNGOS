@@ -398,8 +398,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             if (GetGOInfo()->IsDespawnAtAction() || GetGoAnimProgress() > 0)
             {
                 SendObjectDeSpawnAnim(GetObjectGuid());
-                //reset flags
-                SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
+                // reset flags: In Instances do not restore GO_FLAG_LOCKED or GO_FLAG_NO_INTERACT
+                if (GetMap()->Instanceable())
+                    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags & ~(GO_FLAG_LOCKED | GO_FLAG_NO_INTERACT));
+                else
+                    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);
             }
 
             loot.clear();
