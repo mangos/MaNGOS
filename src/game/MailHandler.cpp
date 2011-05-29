@@ -81,6 +81,8 @@ bool WorldSession::CheckMailBox(ObjectGuid guid)
             return false;
         }
     }
+    else
+        return false;
 
     return true;
 }
