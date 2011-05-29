@@ -1994,7 +1994,7 @@ enum CreatureTypeFlags
     CREATURE_TYPEFLAGS_UNK21            = 0x00100000,       // no idea, but it used by client, may be related to rendering
     CREATURE_TYPEFLAGS_UNK22            = 0x00200000,       // may be has something to do with animation (disable animation?)
     CREATURE_TYPEFLAGS_UNK23            = 0x00400000,       // this one probably controls some creature visual
-    CREATURE_TYPEFLAGS_UNK24            = 0x00800000,       // ? First seen in 3.2.2. Related to banner/backpack of creature/companion, used in CanInteract function by client
+    CREATURE_TYPEFLAGS_SQUIRE           = 0x00800000,       // First seen in 3.2.2. Related to banner/backpack of creature/companion, used in CanInteract function by client
     CREATURE_TYPEFLAGS_UNK25            = 0x01000000,       // pet sounds related?
     CREATURE_TYPEFLAGS_UNK26            = 0x02000000,       // this one probably controls some creature visual
     CREATURE_TYPEFLAGS_UNK27            = 0x04000000,       // creature has no type, or forces creature to be considered as in party, may be related to creature assistance

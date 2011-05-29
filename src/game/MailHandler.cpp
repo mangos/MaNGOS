@@ -51,11 +51,33 @@ bool WorldSession::CheckMailBox(ObjectGuid guid)
         }
     }
     // mailbox case
-    else
+    else if (guid.IsGameObject())
     {
         if (!GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_MAILBOX))
         {
-            DEBUG_LOG("Mailbox %s not found or you can't interact with him.", guid.GetString().c_str());
+            DEBUG_LOG("Mailbox %s not found or %s can't interact with him.", guid.GetString().c_str(), GetPlayer()->GetGuidStr().c_str());
+            return false;
+        }
+    }
+    // squire case
+    else if (guid.IsAnyTypeCreature())
+    {
+        Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+        if (!creature)
+        {
+            DEBUG_LOG("%s not found or %s can't interact with him.", creature->GetGuidStr().c_str(), GetPlayer()->GetGuidStr().c_str());
+            return false;
+        }
+
+        if (!(creature->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_SQUIRE))
+        {
+            DEBUG_LOG("%s not have access to mailbox.", creature->GetGuidStr().c_str());
+            return false;
+        }
+
+        if (creature->GetOwnerGuid() != GetPlayer()->GetObjectGuid())
+        {
+            DEBUG_LOG("%s not owned by %s for access to mailbox.", creature->GetGuidStr().c_str(), GetPlayer()->GetGuidStr().c_str());
             return false;
         }
     }
