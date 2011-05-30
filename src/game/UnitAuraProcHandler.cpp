@@ -959,6 +959,16 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 case 63320:
                     triggered_spell_id = 63321;
                     break;
+                // Meteor Fists
+                case 66725:
+                case 68161:
+                    triggered_spell_id = 66765;
+                    break;
+                // Meteor Fists
+                case 66808:
+                case 68160:
+                    triggered_spell_id = 66809;
+                    break;
                 // Shiny Shard of the Scale - Equip Effect
                 case 69739:
                     // Cauterizing Heal or Searing Flame
