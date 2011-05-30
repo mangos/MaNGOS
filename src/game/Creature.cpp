@@ -50,10 +50,10 @@
 #include "Policies/SingletonImp.h"
 
 
-HighGuid CreatureData::GetHighGuid() const
+ObjectGuid CreatureData::GetObjectGuid(uint32 lowguid) const
 {
     // info existence checked at loading
-    return ObjectMgr::GetCreatureTemplate(id)->GetHighGuid();
+    return ObjectMgr::GetCreatureTemplate(id)->GetObjectGuid(lowguid);
 }
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
@@ -1280,7 +1280,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     GameEventCreatureData const* eventData = sGameEventMgr.GetCreatureUpdateDataForActiveEvent(guidlow);
 
     // Creature can be loaded already in map if grid has been unloaded while creature walk to another grid
-    if (map->GetCreature(data->GetObjectGuid(guidlow)))
+    if (map->GetCreature(cinfo->GetObjectGuid(guidlow)))
         return false;
 
     CreatureCreatePos pos(map, data->posX, data->posY, data->posZ, data->orientation, data->phaseMask);

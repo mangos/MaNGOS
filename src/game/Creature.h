@@ -147,6 +147,8 @@ struct CreatureInfo
         return vehicleId ? HIGHGUID_VEHICLE : HIGHGUID_UNIT;
     }
 
+    ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(GetHighGuid(), Entry, lowguid); }
+
     SkillType GetRequiredLootSkill() const
     {
         if(type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
@@ -202,8 +204,7 @@ struct CreatureData
     uint8 spawnMask;
 
     // helper function
-    HighGuid GetHighGuid() const;
-    ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(GetHighGuid(), id, lowguid); }
+    ObjectGuid GetObjectGuid(uint32 lowguid) const;
 };
 
 // from `creature_addon` and `creature_template_addon`tables
