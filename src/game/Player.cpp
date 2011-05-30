@@ -15487,7 +15487,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
     _LoadBoundInstances(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES));
 
-    if(!IsPositionValid())
+    if (!IsPositionValid())
     {
         sLog.outError("%s have invalid coordinates (X: %f Y: %f Z: %f O: %f). Teleport to default race/class locations.",
             guid.GetString().c_str(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
@@ -15500,13 +15500,13 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
     _LoadBGData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBGDATA));
 
-    if(m_bgData.bgInstanceID)                                                //saved in BattleGround
+    if (m_bgData.bgInstanceID)                              //saved in BattleGround
     {
         BattleGround *currentBg = sBattleGroundMgr.GetBattleGround(m_bgData.bgInstanceID, BATTLEGROUND_TYPE_NONE);
 
         bool player_at_bg = currentBg && currentBg->IsPlayerInBattleGround(GetObjectGuid());
 
-        if(player_at_bg && currentBg->GetStatus() != STATUS_WAIT_LEAVE)
+        if (player_at_bg && currentBg->GetStatus() != STATUS_WAIT_LEAVE)
         {
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(currentBg->GetTypeID(), currentBg->GetArenaType());
             AddBattleGroundQueueId(bgQueueTypeId);
@@ -15532,6 +15532,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
 
             // We are not in BG anymore
             SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);
+            // remove outdated DB data in DB
+            _SaveBGData();
         }
     }
     else
@@ -15544,6 +15546,11 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder )
             const WorldLocation& _loc = GetBattleGroundEntryPoint();
             SetLocationMapId(_loc.mapid);
             Relocate(_loc.coord_x, _loc.coord_y, _loc.coord_z, _loc.orientation);
+
+            // We are not in BG anymore
+            SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);
+            // remove outdated DB data in DB
+            _SaveBGData();
         }
     }
 
