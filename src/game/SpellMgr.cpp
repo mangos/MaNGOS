@@ -649,6 +649,12 @@ bool IsExplicitNegativeTarget(uint32 targetA)
 
 bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
 {
+    // explicit targeting set positiveness independent from real effect
+    // Note: IsExplicitNegativeTarget can't be used symmetric (look some TARGET_SINGLE_ENEMY spells for example)
+    if (IsExplicitPositiveTarget(spellproto->EffectImplicitTargetA[effIndex]) ||
+        IsExplicitPositiveTarget(spellproto->EffectImplicitTargetB[effIndex]))
+        return true;
+
     switch(spellproto->Effect[effIndex])
     {
         case SPELL_EFFECT_DUMMY:
