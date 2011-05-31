@@ -3087,3 +3087,111 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
     MANGOS_ASSERT(0);
     return 0;
 }
+
+/**
+ * Helper structure for building static chat information
+ *
+ */
+class StaticMonsterChatBuilder
+{
+    public:
+        StaticMonsterChatBuilder(CreatureInfo const* cInfo, ChatMsg msgtype, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid = 0)
+            : i_cInfo(cInfo), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target)
+        {
+            // 0 lowguid not used in core, but accepted fine in this case by client
+            i_senderGuid = i_cInfo->GetObjectGuid(senderLowGuid);
+        }
+        void operator()(WorldPacket& data, int32 loc_idx)
+        {
+            char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+
+            std::string nameForLocale = "";
+            if (loc_idx >= 0)
+            {
+                CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(i_cInfo->Entry);
+                if (cl)
+                {
+                    if (cl->Name.size() > (size_t)loc_idx && !cl->Name[loc_idx].empty())
+                        nameForLocale = cl->Name[loc_idx];
+                }
+            }
+
+            if (nameForLocale.empty())
+                nameForLocale = i_cInfo->Name;
+
+            WorldObject::BuildMonsterChat(&data, i_senderGuid, i_msgtype, text, i_language, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
+        }
+
+    private:
+        ObjectGuid i_senderGuid;
+        CreatureInfo const* i_cInfo;
+        ChatMsg i_msgtype;
+        int32 i_textId;
+        uint32 i_language;
+        Unit* i_target;
+};
+
+
+/**
+ * Function simulates yell of creature
+ *
+ * @param guid must be creature guid of whom to Simulate the yell, non-creature guids not supported at this moment
+ * @param textId Id of the simulated text
+ * @param language language of the text
+ * @param target, can be NULL
+ */
+void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit* target)
+{
+    if (guid.IsAnyTypeCreature())
+    {
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(guid.GetEntry());
+        if (!cInfo)
+        {
+            sLog.outError("Map::MonsterYellToMap: Called for nonexistent creature entry in guid: %s", guid.GetString().c_str());
+            return;
+        }
+
+        MonsterYellToMap(cInfo, textId, language, target, guid.GetCounter());
+    }
+    else
+    {
+        sLog.outError("Map::MonsterYellToMap: Called for non creature guid: %s", guid.GetString().c_str());
+        return;
+    }
+}
+
+
+/**
+ * Function simulates yell of creature
+ *
+ * @param cinfo must be entry of Creature of whom to Simulate the yell
+ * @param textId Id of the simulated text
+ * @param language language of the text
+ * @param target, can be NULL
+ * @param senderLowGuid provide way proper show yell for near spawned creature with known lowguid,
+ *        0 accepted by client else if this not important
+ */
+void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid /*= 0*/)
+{
+    StaticMonsterChatBuilder say_build(cinfo, CHAT_MSG_MONSTER_YELL, textId, language, target, senderLowGuid);
+    MaNGOS::LocalizedPacketDo<StaticMonsterChatBuilder> say_do(say_build);
+
+    Map::PlayerList const& pList = GetPlayers();
+    for (PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+        say_do(itr->getSource());
+}
+
+/**
+ * Function to play sound to all players in map
+ *
+ * @param soundId Played Sound
+ */
+void Map::PlayDirectSoundToMap(uint32 soundId)
+{
+    WorldPacket data(SMSG_PLAY_SOUND, 4);
+    data << uint32(soundId);
+
+    Map::PlayerList const& pList = GetPlayers();
+    for (PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+        itr->getSource()->SendDirectMessage(&data);
+}
