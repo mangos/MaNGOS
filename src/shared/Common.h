@@ -250,4 +250,8 @@ inline char * mangos_strdup(const char * source)
 #  define M_PI_F        float(M_PI)
 #endif
 
+#ifndef countof
+#define countof(array) (sizeof(array) / sizeof((array)[0]))
+#endif
+
 #endif
