@@ -313,6 +313,11 @@ enum AbilytyLearnType
     ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
 };
 
+enum AbilitySkillFlags
+{
+    ABILITY_SKILL_NONTRAINABLE = 0x100
+};
+
 enum ItemEnchantmentType
 {
     ITEM_ENCHANTMENT_TYPE_NONE             = 0,

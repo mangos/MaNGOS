@@ -8041,13 +8041,13 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         SpellEntry const *spellinfo = sSpellStore.LookupEntry(spell);
         if (!spellinfo)
         {
-            sLog.outErrorDb("Table `%s` for trainer (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
+            sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
             continue;
         }
 
         if (!SpellMgr::IsSpellValid(spellinfo))
         {
-            sLog.outErrorDb("Table `%s` for trainer (Entry: %u) has broken learning spell %u, ignore", tableName, entry, spell);
+            sLog.outErrorDb("Table `%s` (Entry: %u) has broken learning spell %u, ignore", tableName, entry, spell);
             continue;
         }
 
@@ -8085,7 +8085,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             {
                 if (tSpells->spellList.find(spell) != tSpells->spellList.end())
                 {
-                    sLog.outErrorDb("Table `%s` for trainer (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainerId);
+                    sLog.outErrorDb("Table `%s` (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainerId);
                     continue;
                 }
             }
@@ -8100,24 +8100,51 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         trainerSpell.reqSkillValue = fields[4].GetUInt32();
         trainerSpell.reqLevel      = fields[5].GetUInt32();
 
-        if(!trainerSpell.reqLevel)
-            trainerSpell.reqLevel = spellinfo->spellLevel;
-
         // calculate learned spell for profession case when stored cast-spell
         trainerSpell.learnedSpell = spell;
         for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if (spellinfo->Effect[i] != SPELL_EFFECT_LEARN_SPELL)
-                continue;
-            if (SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
+            if (spellinfo->Effect[i] == SPELL_EFFECT_LEARN_SPELL &&
+                SpellMgr::IsProfessionOrRidingSpell(spellinfo->EffectTriggerSpell[i]))
             {
-                trainerSpell.learnedSpell = spellinfo->EffectTriggerSpell[i];
+                // prof spells sometime only additions to main spell learn that have level data
+                for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
+                {
+                    if (spellinfo->Effect[j] == SPELL_EFFECT_LEARN_SPELL)
+                    {
+                        trainerSpell.learnedSpell = spellinfo->EffectTriggerSpell[j];
+                        break;
+                    }
+                }
                 break;
             }
         }
 
+        // already checked as valid spell so exist.
+        SpellEntry const *learnSpellinfo = sSpellStore.LookupEntry(trainerSpell.learnedSpell);
+        if (trainerSpell.reqLevel)
+        {
+            if (trainerSpell.reqLevel == learnSpellinfo->spellLevel)
+                ERROR_DB_STRICT_LOG("Table `%s` (Entry: %u) has redundant reqlevel %u (=spell level) for spell %u", tableName, entry, trainerSpell.reqLevel, spell);
+        }
+        else
+            trainerSpell.reqLevel = learnSpellinfo->spellLevel;
+
         if (SpellMgr::IsProfessionSpell(trainerSpell.learnedSpell))
+        {
             data.trainerType = 2;
+
+            uint32 minLevel = sSpellMgr.GetProfessionSpellMinLevel(trainerSpell.learnedSpell);
+            if (trainerSpell.reqLevel)
+            {
+                if (minLevel == trainerSpell.reqLevel)
+                    ERROR_DB_STRICT_LOG("Table `%s` (Entry: %u) has redundant reqlevel %u (=prof reqlevel) for spell %u", tableName, entry, trainerSpell.reqLevel, spell);
+                else
+                    sLog.outErrorDb("Table `%s` (Entry: %u) has wrong redundant reqlevel %u (<>prof reqlevel %u) for spell %u", tableName, entry, trainerSpell.reqLevel, minLevel, spell);
+            }
+            else
+                trainerSpell.reqLevel = minLevel;
+        }
 
         ++count;
 

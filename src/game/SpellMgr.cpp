@@ -2426,6 +2426,42 @@ bool SpellMgr::IsPrimaryProfessionSpell(uint32 spellId)
     return IsPrimaryProfessionSkill(skill);
 }
 
+uint32 SpellMgr::GetProfessionSpellMinLevel(uint32 spellId)
+{
+    uint32 s2l[8][3] =
+    {   // 0 - gather 1 - non-gather 2 - fish
+        /*0*/ { 0,   5,  5 },
+        /*1*/ { 0,   5,  5 },
+        /*2*/ { 0,  10, 10 },
+        /*3*/ { 10, 20, 10 },
+        /*4*/ { 25, 35, 10 },
+        /*5*/ { 40, 50, 10 },
+        /*6*/ { 55, 65, 10 },
+        /*7*/ { 75, 75, 10 },
+    };
+
+    uint32 rank = GetSpellRank(spellId);
+    if (rank >= 8)
+        return 0;
+
+    SkillLineAbilityMapBounds bounds = GetSkillLineAbilityMapBounds(spellId);
+    if (bounds.first == bounds.second)
+        return 0;
+
+    switch (bounds.first->second->skillId)
+    {
+        case SKILL_FISHING:
+            return s2l[rank][2];
+        case SKILL_HERBALISM:
+        case SKILL_MINING:
+        case SKILL_SKINNING:
+            return s2l[rank][0];
+        default:
+            return s2l[rank][1];
+    }
+}
+
+
 bool SpellMgr::IsPrimaryProfessionFirstRankSpell(uint32 spellId) const
 {
     return IsPrimaryProfessionSpell(spellId) && GetSpellRank(spellId)==1;
@@ -3929,6 +3965,33 @@ void SpellMgr::LoadSkillLineAbilityMap()
 
     sLog.outString();
     sLog.outString(">> Loaded %u SkillLineAbility MultiMap Data", count);
+}
+
+void SpellMgr::LoadSkillRaceClassInfoMap()
+{
+    mSkillRaceClassInfoMap.clear();
+
+    barGoLink bar( (int)sSkillRaceClassInfoStore.GetNumRows() );
+    uint32 count = 0;
+
+    for (uint32 i = 0; i < sSkillRaceClassInfoStore.GetNumRows(); ++i)
+    {
+        bar.step();
+        SkillRaceClassInfoEntry const *skillRCInfo = sSkillRaceClassInfoStore.LookupEntry(i);
+        if (!skillRCInfo)
+            continue;
+
+        // not all skills really listed in ability skills list
+        if (!sSkillLineStore.LookupEntry(skillRCInfo->skillId))
+            continue;
+
+        mSkillRaceClassInfoMap.insert(SkillRaceClassInfoMap::value_type(skillRCInfo->skillId,skillRCInfo));
+
+        ++count;
+    }
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u SkillRaceClassInfo MultiMap Data", count);
 }
 
 void SpellMgr::CheckUsedSpells(char const* table)

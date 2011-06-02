@@ -949,8 +949,11 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading InstanceTemplate..." );
     sObjectMgr.LoadInstanceTemplate();
 
-    sLog.outString( "Loading SkillLineAbilityMultiMap Data..." );
+    sLog.outString("Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr.LoadSkillLineAbilityMap();
+
+    sLog.outString("Loading SkillRaceClassInfoMultiMap Data...");
+    sSpellMgr.LoadSkillRaceClassInfoMap();
 
     ///- Clean up and pack instances
     sLog.outString( "Cleaning up instances..." );

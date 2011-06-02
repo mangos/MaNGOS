@@ -20556,7 +20556,16 @@ float Player::GetReputationPriceDiscount( Creature const* pCreature ) const
     return 1.0f - 0.05f* (rank - REP_NEUTRAL);
 }
 
-bool Player::IsSpellFitByClassAndRace( uint32 spell_id ) const
+/**
+ * Check spell availability for training base at SkillLineAbility/SkillRaceClassInfo data.
+ * Checked allowed race/class and dependent from race/class allowed min level
+ *
+ * @param spell_id  checked spell id
+ * @param pReqlevel if arg provided then function work in view mode (level check not applied but detected minlevel returned to var by arg pointer.
+                    if arg not provided then considered train action mode and level checked
+ * @return          true if spell available for show in trainer list (with skip level check) or training.
+ */
+bool Player::IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel /*= NULL*/) const
 {
     uint32 racemask  = getRaceMask();
     uint32 classmask = getClassMask();
@@ -20565,15 +20574,41 @@ bool Player::IsSpellFitByClassAndRace( uint32 spell_id ) const
     if (bounds.first==bounds.second)
         return true;
 
-    for(SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
+    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
+        SkillLineAbilityEntry const* abilityEntry = _spell_idx->second;
         // skip wrong race skills
-        if (_spell_idx->second->racemask && (_spell_idx->second->racemask & racemask) == 0)
+        if (abilityEntry->racemask && (abilityEntry->racemask & racemask) == 0)
             continue;
 
         // skip wrong class skills
-        if (_spell_idx->second->classmask && (_spell_idx->second->classmask & classmask) == 0)
+        if (abilityEntry->classmask && (abilityEntry->classmask & classmask) == 0)
             continue;
+
+        SkillRaceClassInfoMapBounds bounds = sSpellMgr.GetSkillRaceClassInfoMapBounds(abilityEntry->skillId);
+        for (SkillRaceClassInfoMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+        {
+            SkillRaceClassInfoEntry const* skillRCEntry = itr->second;
+            if ((skillRCEntry->raceMask & racemask) && (skillRCEntry->classMask & classmask))
+            {
+                if (skillRCEntry->flags & ABILITY_SKILL_NONTRAINABLE)
+                    return false;
+
+                if (pReqlevel)                              // show trainers list case
+                {
+                    if (skillRCEntry->reqLevel)
+                    {
+                        *pReqlevel = skillRCEntry->reqLevel;
+                        return true;
+                    }
+                }
+                else                                        // check availble case at train
+                {
+                    if (skillRCEntry->reqLevel && getLevel() < skillRCEntry->reqLevel)
+                        return false;
+                }
+            }
+        }
 
         return true;
     }
