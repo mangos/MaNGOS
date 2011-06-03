@@ -8120,14 +8120,6 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
         // already checked as valid spell so exist.
         SpellEntry const *learnSpellinfo = sSpellStore.LookupEntry(trainerSpell.learnedSpell);
-        if (trainerSpell.reqLevel)
-        {
-            if (trainerSpell.reqLevel == learnSpellinfo->spellLevel)
-                ERROR_DB_STRICT_LOG("Table `%s` (Entry: %u) has redundant reqlevel %u (=spell level) for spell %u", tableName, entry, trainerSpell.reqLevel, spell);
-        }
-        else
-            trainerSpell.reqLevel = learnSpellinfo->spellLevel;
-
         if (SpellMgr::IsProfessionSpell(trainerSpell.learnedSpell))
         {
             data.trainerType = 2;
@@ -8142,6 +8134,17 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
             }
             else
                 trainerSpell.reqLevel = minLevel;
+        }
+        // for non-prof. spell use spellLevel if not provided any
+        else
+        {
+            if (trainerSpell.reqLevel)
+            {
+                if (trainerSpell.reqLevel == learnSpellinfo->spellLevel)
+                    ERROR_DB_STRICT_LOG("Table `%s` (Entry: %u) has redundant reqlevel %u (=spell level) for spell %u", tableName, entry, trainerSpell.reqLevel, spell);
+            }
+            else
+                trainerSpell.reqLevel = learnSpellinfo->spellLevel;
         }
 
         ++count;
