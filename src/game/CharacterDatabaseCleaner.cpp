@@ -61,7 +61,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
 
     bool found = false;
     std::ostringstream ss;
-    barGoLink bar( (int)result->GetRowCount() );
+    BarGoLink bar(result->GetRowCount());
     do
     {
         bar.step();
@@ -70,9 +70,9 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
 
         uint32 id = fields[0].GetUInt32();
 
-        if(!check(id))
+        if (!check(id))
         {
-            if(!found)
+            if (!found)
             {
                 ss << "DELETE FROM " << table << " WHERE " << column << " IN (";
                 found = true;
@@ -82,7 +82,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
             ss << id;
         }
     }
-    while( result->NextRow() );
+    while (result->NextRow());
     delete result;
 
     if (found)

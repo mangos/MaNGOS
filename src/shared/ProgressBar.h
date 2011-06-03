@@ -20,17 +20,21 @@
 
 #include "Platform/Define.h"
 
-class MANGOS_DLL_SPEC barGoLink
+class MANGOS_DLL_SPEC BarGoLink
 {
     public:                                                 // constructors
-        barGoLink(int row_count);
-        ~barGoLink();
+        explicit BarGoLink(int row_count);
+        explicit BarGoLink(uint32 row_count);               // row_count < ACE_INT32_MAX
+        explicit BarGoLink(uint64 row_count);               // row_count < ACE_INT32_MAX
+        ~BarGoLink();
 
     public:                                                 // modifiers
-        void step( void );
+        void step();
 
         static void SetOutputState(bool on);
     private:
+        void init(int row_count);
+
         static bool m_showOutput;                           // not recommended change with existed active bar
         static char const * const empty;
         static char const * const full;

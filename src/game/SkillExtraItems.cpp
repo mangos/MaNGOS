@@ -61,7 +61,7 @@ void LoadSkillExtraItemTable()
 
     if (result)
     {
-        barGoLink bar((int)result->GetRowCount());
+        BarGoLink bar(result->GetRowCount());
 
         do
         {
@@ -70,28 +70,28 @@ void LoadSkillExtraItemTable()
 
             uint32 spellId = fields[0].GetUInt32();
 
-            if(!sSpellStore.LookupEntry(spellId))
+            if (!sSpellStore.LookupEntry(spellId))
             {
                 sLog.outError("Skill specialization %u has nonexistent spell id in `skill_extra_item_template`!", spellId);
                 continue;
             }
 
             uint32 requiredSpecialization = fields[1].GetUInt32();
-            if(!sSpellStore.LookupEntry(requiredSpecialization))
+            if (!sSpellStore.LookupEntry(requiredSpecialization))
             {
                 sLog.outError("Skill specialization %u have nonexistent required specialization spell id %u in `skill_extra_item_template`!", spellId,requiredSpecialization);
                 continue;
             }
 
             float additionalCreateChance = fields[2].GetFloat();
-            if(additionalCreateChance <= 0.0f)
+            if (additionalCreateChance <= 0.0f)
             {
                 sLog.outError("Skill specialization %u has too low additional create chance in `skill_extra_item_template`!", spellId);
                 continue;
             }
 
             uint8 additionalMaxNum = fields[3].GetUInt8();
-            if(!additionalMaxNum)
+            if (!additionalMaxNum)
             {
                 sLog.outError("Skill specialization %u has 0 max number of extra items in `skill_extra_item_template`!", spellId);
                 continue;
@@ -109,7 +109,7 @@ void LoadSkillExtraItemTable()
         delete result;
 
         sLog.outString();
-        sLog.outString( ">> Loaded %u spell specialization definitions", count );
+        sLog.outString(">> Loaded %u spell specialization definitions", count);
     }
     else
     {

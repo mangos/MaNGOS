@@ -57,7 +57,7 @@ void LoadRandomEnchantmentsTable()
 
     if (result)
     {
-        barGoLink bar((int)result->GetRowCount());
+        BarGoLink bar(result->GetRowCount());
 
         do
         {

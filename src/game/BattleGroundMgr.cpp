@@ -1612,7 +1612,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
 
         bar.step();
 
@@ -1621,7 +1621,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         return;
     }
 
-    barGoLink bar((int)result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
@@ -2025,15 +2025,15 @@ void BattleGroundMgr::LoadBattleMastersEntry()
 
     if (!result)
     {
-        barGoLink bar( 1 );
+        BarGoLink bar(1);
         bar.step();
 
         sLog.outString();
-        sLog.outString( ">> Loaded 0 battlemaster entries - table is empty!" );
+        sLog.outString(">> Loaded 0 battlemaster entries - table is empty!");
         return;
     }
 
-    barGoLink bar( (int)result->GetRowCount() );
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
@@ -2046,13 +2046,13 @@ void BattleGroundMgr::LoadBattleMastersEntry()
         uint32 bgTypeId  = fields[1].GetUInt32();
         if (!sBattlemasterListStore.LookupEntry(bgTypeId))
         {
-            sLog.outErrorDb("Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.",entry,bgTypeId);
+            sLog.outErrorDb("Table `battlemaster_entry` contain entry %u for nonexistent battleground type %u, ignored.", entry, bgTypeId);
             continue;
         }
 
         mBattleMastersMap[entry] = BattleGroundTypeId(bgTypeId);
 
-    } while( result->NextRow() );
+    } while(result->NextRow());
 
     delete result;
 
@@ -2135,9 +2135,9 @@ void BattleGroundMgr::LoadBattleEventIndexes()
                                     "LEFT OUTER JOIN battleground_events AS description ON data.map = description.map "
                                         "AND data.ev1 = description.event1 AND data.ev2 = description.event2 "
                               "ORDER BY m, ev1, ev2" );
-    if(!result)
+    if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
 
         sLog.outString();
@@ -2145,7 +2145,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
         return;
     }
 
-    barGoLink bar((int)result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
     do
     {

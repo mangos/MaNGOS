@@ -223,8 +223,8 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage &store, bool error_at_empty /*= tr
     memset(newIndex,0,maxi*sizeof(char*));
 
     char * _data= new char[store.RecordCount *recordsize];
-    uint32 count=0;
-    barGoLink bar( store.RecordCount );
+    uint32 count = 0;
+    BarGoLink bar(store.RecordCount);
     do
     {
         fields = result->Fetch();
