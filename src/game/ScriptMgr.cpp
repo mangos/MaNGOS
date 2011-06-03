@@ -561,7 +561,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             }
             case SCRIPT_COMMAND_STAND_STATE:
             {
-                if (tmp.standState.stand_state > UNIT_STAND_STATE_CUSTOM)
+                if (tmp.standState.stand_state >= MAX_UNIT_STAND_STATE)
                 {
                     sLog.outErrorDb("Table `%s` has invalid stand state (datalong = %u) in SCRIPT_COMMAND_STAND_STATE for script id %u", tablename, tmp.standState.stand_state, tmp.id);
                     continue;
