@@ -384,7 +384,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     }
     // Aura added by spell can`t trigger from self (prevent drop charges/do triggers)
     // But except periodic triggers (can triggered from self)
-    if(procSpell && procSpell->Id == spellProto->Id && !(spellProto->procFlags & PROC_FLAG_ON_TAKE_PERIODIC))
+    if(procSpell && procSpell->Id == spellProto->Id && !(EventProcFlag & PROC_FLAG_ON_TAKE_PERIODIC))
         return false;
 
     // Check if current equipment allows aura to proc
@@ -3038,7 +3038,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
         case SPELLFAMILY_WARLOCK:
         {
             // Drain Soul
-            if (auraSpellInfo->SpellFamilyFlags & UI64LIT(0x0000000000004000))
+            if (auraSpellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000004000)))
             {
                 // search for "Improved Drain Soul" dummy aura
                 Unit::AuraList const& mDummyAura = GetAurasByType(SPELL_AURA_DUMMY);
@@ -3055,6 +3055,13 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 // Not remove charge (aura removed on death in any cases)
                 // Need for correct work Drain Soul SPELL_AURA_CHANNEL_DEATH_ITEM aura
                 return SPELL_AURA_PROC_FAILED;
+            }
+            // Consume Shadows
+            else if (auraSpellInfo->IsFitToFamilyMask(UI64LIT(0x0000000002000000)))
+            {
+                Aura* heal = triggeredByAura->GetHolder()->GetAuraByEffectIndex(EFFECT_INDEX_0);
+                if (!heal || heal->GetAuraTicks() > 1)
+                    return SPELL_AURA_PROC_FAILED;
             }
             // Nether Protection
             else if (auraSpellInfo->SpellIconID == 1985)
