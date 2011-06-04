@@ -3201,6 +3201,12 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 if (HasAura(67544))
                     return SPELL_AURA_PROC_FAILED;
             }
+            // Item - Hunter T9 4P Bonus
+            else if (auraSpellInfo->Id == 67151)
+            {
+                trigger_spell_id = 68130;
+                break;
+            }
             break;
         }
         case SPELLFAMILY_PALADIN:
