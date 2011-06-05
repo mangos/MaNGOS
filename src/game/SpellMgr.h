@@ -531,7 +531,7 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
 int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry const* spellproto);
 
-SpellEntry const* GetSpellEntryByDifficulty(uint32 id, Difficulty difficulty);
+SpellEntry const* GetSpellEntryByDifficulty(uint32 id, Difficulty difficulty, bool isRaid);
 
 // Spell proc event related declarations (accessed using SpellMgr functions)
 enum ProcFlags

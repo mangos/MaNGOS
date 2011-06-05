@@ -319,7 +319,7 @@ Spell::Spell( Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid o
 
     if (info->SpellDifficultyId && caster->GetTypeId() != TYPEID_PLAYER && caster->IsInWorld() && caster->GetMap()->IsDungeon())
     {
-        if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(info->SpellDifficultyId, caster->GetMap()->GetDifficulty()))
+        if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(info->SpellDifficultyId, caster->GetMap()->GetDifficulty(), caster->GetMap()->IsRaid()))
             m_spellInfo = spellEntry;
         else
             m_spellInfo = info;
