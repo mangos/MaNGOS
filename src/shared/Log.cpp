@@ -346,31 +346,6 @@ std::string Log::GetTimestampStr()
     return std::string(buf);
 }
 
-void Log::outTitle( const char * str)
-{
-    if (!str)
-        return;
-
-    if (m_colored)
-        SetColor(true,WHITE);
-
-    // not expected utf8 and then send as-is
-    printf("%s", str);
-
-    if (m_colored)
-        ResetColor(true);
-
-    printf("\n");
-    if (logfile)
-    {
-        fprintf(logfile, "%s", str);
-        fprintf(logfile, "\n" );
-        fflush(logfile);
-    }
-
-    fflush(stdout);
-}
-
 void Log::outString()
 {
     if (m_includeTime)

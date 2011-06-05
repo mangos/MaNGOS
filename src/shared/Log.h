@@ -118,7 +118,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
     public:
         void Initialize();
         void InitColors(const std::string& init_str);
-        void outTitle( const char * str);
+
         void outCommand( uint32 account, const char * str, ...) ATTR_PRINTF(3,4);
         void outString();                                   // any log level
                                                             // any log level
