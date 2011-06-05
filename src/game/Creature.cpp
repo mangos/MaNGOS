@@ -248,13 +248,8 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=NULL*/, GameE
         return false;
     }
 
-    // difficulties for dungeons/battleground ordered in normal way
-    // and if more high version not exist must be used lesser version
-    // for raid order different:
-    // 10 man normal version must be used instead nonexistent 10 man heroic version
-    // 25 man normal version must be used instead nonexistent 25 man heroic version
     CreatureInfo const *cinfo = normalInfo;
-    for (uint8 diff = uint8(GetMap()->GetDifficulty()); diff > 0;)
+    for (Difficulty diff = GetMap()->GetDifficulty(); diff > REGULAR_DIFFICULTY; diff = GetPrevDifficulty(diff, GetMap()->IsRaid()))
     {
         // we already have valid Map pointer for current creature!
         if (normalInfo->DifficultyEntry[diff - 1])
@@ -266,13 +261,6 @@ bool Creature::InitEntry(uint32 Entry, CreatureData const* data /*=NULL*/, GameE
             // check and reported at startup, so just ignore (restore normalInfo)
             cinfo = normalInfo;
         }
-
-        // for raid heroic to normal, for other to prev in normal order
-        if ((diff == int(RAID_DIFFICULTY_10MAN_HEROIC) || diff == int(RAID_DIFFICULTY_25MAN_HEROIC)) &&
-            GetMap()->IsRaid())
-            diff -= 2;                                      // to normal raid difficulty cases
-        else
-            --diff;
     }
 
     SetEntry(Entry);                                        // normal entry always

@@ -64,6 +64,28 @@ bool Map2ZoneCoordinates(float& x,float& y,uint32 zone);
 typedef std::map<uint32/*pair32(map,diff)*/,MapDifficulty> MapDifficultyMap;
 MapDifficulty const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty);
 
+// natural order for difficulties up-down iteration
+// difficulties for dungeons/battleground ordered in normal way
+// and if more high version not exist must be used lesser version
+// for raid order different:
+// 10 man normal version must be used instead nonexistent 10 man heroic version
+// 25 man normal version must be used instead nonexistent 25 man heroic version
+inline Difficulty GetPrevDifficulty(Difficulty diff, bool isRaid)
+{
+    switch (diff)
+    {
+        default:
+        case RAID_DIFFICULTY_10MAN_NORMAL:                  // == DUNGEON_DIFFICULTY_NORMAL == REGULAR_DIFFICULTY
+            return REGULAR_DIFFICULTY;                      // return itself, caller code must properly check and not call for this case
+        case RAID_DIFFICULTY_25MAN_NORMAL:                  // == DUNGEON_DIFFICULTY_HEROIC
+            return RAID_DIFFICULTY_10MAN_NORMAL;
+        case RAID_DIFFICULTY_10MAN_HEROIC:
+            return isRaid ? RAID_DIFFICULTY_10MAN_NORMAL : DUNGEON_DIFFICULTY_HEROIC;
+        case RAID_DIFFICULTY_25MAN_HEROIC:
+            return isRaid ? RAID_DIFFICULTY_25MAN_NORMAL : RAID_DIFFICULTY_10MAN_HEROIC;
+    }
+}
+
 uint32 const* /*[3]*/ GetTalentTabPages(uint32 cls);
 
 bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta = 0.0f);
