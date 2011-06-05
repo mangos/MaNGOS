@@ -717,8 +717,9 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
                         return false;
                     break;
                 case SPELL_AURA_MOD_DAMAGE_TAKEN:           // dependent from bas point sign (positive -> negative)
-                    if(spellproto->CalculateSimpleValue(effIndex) > 0)
-                        return false;
+                    if (spellproto->CalculateSimpleValue(effIndex) < 0)
+                        return true;
+                    // let check by target modes (for Amplify Magic cases/etc)
                     break;
                 case SPELL_AURA_MOD_SPELL_CRIT_CHANCE:
                 case SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT:
