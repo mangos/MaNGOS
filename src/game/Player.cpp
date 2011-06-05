@@ -1822,7 +1822,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // If the map is not created, assume it is possible to enter it.
         // It will be created in the WorldPortAck.
-        Map *map = sMapMgr.FindMap(mapid);
+        DungeonPersistentState* state = GetBoundInstanceSaveForSelfOrGroup(mapid);
+        Map *map = sMapMgr.FindMap(mapid, state ? state->GetInstanceId() : 0);
         if (!map ||  map->CanEnter(this))
         {
             //lets reset near teleport flag if it wasn't reset during chained teleports
