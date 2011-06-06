@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11606_01_mangos_spell_proc_event` bit(1) default NULL
+  `required_11613_01_mangos_spell_bonus_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14551,8 +14551,8 @@ INSERT INTO `spell_bonus_data` VALUES
 (9007,  0,      0,       0,     0.03,  'Druid - Pounce Bleed'),
 (1822,  0,      0,       0,     0.06,  'Druid - Rake'),
 (8936,  0.539,  0.188,   0,     0,     'Druid - Regrowth'),
-(50288, 0.05,   0,       0,     0,     'Druid - Starfall'),
-(50294, 0.012,  0,       0,     0,     'Druid - Starfall AOE'),
+(50288, 0.3,    0,       0,     0,     'Druid - Starfall'),
+(50294, 0.13,   0,       0,     0,     'Druid - Starfall AOE'),
 (18562, 0,      0,       0,     0,     'Druid - Swiftmend'),
 (44203, 0.538,  0,       0,     0,     'Druid - Tranquility Triggered'),
 (48438, 0,      0.11505, 0,     0,     'Druid - Wild Growth'),
