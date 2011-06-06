@@ -1045,6 +1045,12 @@ void Aura::HandleAddModifier(bool apply, bool Real)
             m_spellmod->mask = UI64LIT(0x0000010000000002); // Corruption and Unstable Affliction
             m_spellmod->mask2 = 0x00000000;
         }
+        // Improved Flametongue Weapon, overwrite wrong data, maybe time re-add table
+        else if (spellProto->Id == 37212)
+        {
+            m_spellmod->mask = UI64LIT(0x0000000000200000); // Flametongue Weapon (Passive)
+            m_spellmod->mask2 = 0x00000000;
+        }
     }
 
     ((Player*)GetTarget())->AddSpellMod(m_spellmod, apply);
