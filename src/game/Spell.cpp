@@ -2024,6 +2024,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 default:
                     FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
+
+                    // Mind Sear, triggered
+                    if (m_spellInfo->IsFitToFamily(SPELLFAMILY_PRIEST, UI64LIT(0x0008000000000000)))
+                        if (Unit* unitTarget = m_targets.getUnitTarget())
+                            targetUnitMap.remove(unitTarget);
+
                     break;
             }
             break;
