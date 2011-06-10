@@ -502,7 +502,7 @@ bool Item::LoadFromDB(uint32 guidLow, Field* fields, ObjectGuid ownerGuid)
 
         std::ostringstream ss;
         for (uint16 i = 0; i < m_valuesCount; ++i)
-            ss << GetUInt32Value(i) << "";
+            ss << GetUInt32Value(i) << " ";
 
         stmt.addString(ss);
         stmt.addUInt32(GetOwnerGuid().GetCounter());
