@@ -128,7 +128,7 @@ class MANGOS_DLL_SPEC Object
             m_inWorld = true;
 
             // synchronize values mirror with values array (changes will send in updatecreate opcode any way
-            ClearUpdateMask(false);                         // false - we can't have update dat in update queue before adding to world
+            ClearUpdateMask(false);                         // false - we can't have update data in update queue before adding to world
         }
         virtual void RemoveFromWorld()
         {
@@ -138,7 +138,6 @@ class MANGOS_DLL_SPEC Object
         }
 
         ObjectGuid const& GetObjectGuid() const { return GetGuidValue(OBJECT_FIELD_GUID); }
-        const uint64& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); } // DEPRECATED, not use, will removed soon
         uint32 GetGUIDLow() const { return GetObjectGuid().GetCounter(); }
         PackedGuid const& GetPackGUID() const { return m_PackGUID; }
         std::string GetGuidStr() const { return GetObjectGuid().GetString(); }
