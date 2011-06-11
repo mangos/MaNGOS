@@ -852,25 +852,16 @@ void Aura::ApplyModifier(bool apply, bool Real)
 
 bool Aura::isAffectedOnSpell(SpellEntry const *spell) const
 {
-    // Check family name
-    if (spell->SpellFamilyName != GetSpellProto()->SpellFamilyName)
-        return false;
-    // Check EffectClassMask
-    uint32 const *ptr = getAuraSpellClassMask();
-    if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
-        return true;
-    if (ptr[2] & spell->SpellFamilyFlags2)
-        return true;
-    return false;
+    return spell->IsFitToFamily(SpellFamily(GetSpellProto()->SpellFamilyName), GetAuraSpellClassMask());
 }
 
 bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procEx, bool active, bool useClassMask) const
 {
     // Check EffectClassMask
-    uint32 const *ptr = getAuraSpellClassMask();
+    ClassFamilyMask const& mask  = GetAuraSpellClassMask();
 
     // if no class mask defined, or spell_proc_event has SpellFamilyName=0 - allow proc
-    if (!useClassMask || (!((uint64*)ptr)[0] && !ptr[2]))
+    if (!useClassMask || !mask)
     {
         if (!(EventProcEx & PROC_EX_EX_TRIGGER_ALWAYS))
         {
@@ -896,14 +887,8 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 EventProcEx, uint32 procE
     {
         // SpellFamilyName check is performed in SpellMgr::IsSpellProcEventCanTriggeredBy and it is done once for whole holder
         // note: SpellFamilyName is not checked if no spell_proc_event is defined
-
-        if (((uint64*)ptr)[0] & spell->SpellFamilyFlags)
-            return true;
-
-        if (ptr[2] & spell->SpellFamilyFlags2)
-            return true;
+        return mask.IsFitToFamilyMask(spell->SpellFamilyFlags);
     }
-    return false;
 }
 
 void Aura::ReapplyAffectedPassiveAuras( Unit* target, bool owner_mode )
@@ -1042,14 +1027,14 @@ void Aura::HandleAddModifier(bool apply, bool Real)
         // Everlasting Affliction, overwrite wrong data, if will need more better restore support of spell_affect table
         if (spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK && spellProto->SpellIconID == 3169)
         {
-            m_spellmod->mask = UI64LIT(0x0000010000000002); // Corruption and Unstable Affliction
-            m_spellmod->mask2 = 0x00000000;
+            // Corruption and Unstable Affliction
+            m_spellmod->mask = ClassFamilyMask(UI64LIT(0x0000010000000002));
         }
         // Improved Flametongue Weapon, overwrite wrong data, maybe time re-add table
         else if (spellProto->Id == 37212)
         {
-            m_spellmod->mask = UI64LIT(0x0000000000200000); // Flametongue Weapon (Passive)
-            m_spellmod->mask2 = 0x00000000;
+            // Flametongue Weapon (Passive)
+            m_spellmod->mask = ClassFamilyMask(UI64LIT(0x0000000000200000));
         }
     }
 
@@ -6358,19 +6343,13 @@ void Aura::HandleNoReagentUseAura(bool /*Apply*/, bool Real)
     if(target->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    uint32 mask[3] = {0, 0, 0};
+    ClassFamilyMask mask;
     Unit::AuraList const& noReagent = target->GetAurasByType(SPELL_AURA_NO_REAGENT_USE);
-        for(Unit::AuraList::const_iterator i = noReagent.begin(); i !=  noReagent.end(); ++i)
-        {
-            uint32 const *ptr = (*i)->getAuraSpellClassMask();
-            mask[0] |= ptr[0];
-            mask[1] |= ptr[1];
-            mask[2] |= ptr[2];
-        }
+    for(Unit::AuraList::const_iterator i = noReagent.begin(); i !=  noReagent.end(); ++i)
+        mask |= (*i)->GetAuraSpellClassMask();
 
-    target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+0, mask[0]);
-    target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+1, mask[1]);
-    target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+2, mask[2]);
+    target->SetUInt64Value(PLAYER_NO_REAGENT_COST_1+0, mask.Flags);
+    target->SetUInt32Value(PLAYER_NO_REAGENT_COST_1+2, mask.Flags2);
 }
 
 /*********************************************************/
@@ -8626,8 +8605,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         }
 
         uint32 removeState = 0;
-        uint64 removeFamilyFlag = m_spellProto->SpellFamilyFlags;
-        uint32 removeFamilyFlag2 = m_spellProto->SpellFamilyFlags2;
+        ClassFamilyMask removeFamilyFlag = m_spellProto->SpellFamilyFlags;
         switch(m_spellProto->SpellFamilyName)
         {
             case SPELLFAMILY_PALADIN:
@@ -8638,8 +8616,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
                 // Conflagrate aura state on Immolate and Shadowflame,
                 if (m_spellProto->IsFitToFamilyMask(UI64LIT(0x0000000000000004), 0x00000002))
                 {
-                    removeFamilyFlag = UI64LIT(0x0000000000000004);
-                    removeFamilyFlag2 = 0x00000002;
+                    removeFamilyFlag = ClassFamilyMask(UI64LIT(0x0000000000000004), 0x00000002);
                     removeState = AURA_STATE_CONFLAGRATE;
                 }
                 break;
@@ -8648,7 +8625,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
                     removeState = AURA_STATE_FAERIE_FIRE;   // Faerie Fire (druid versions)
                 else if (m_spellProto->IsFitToFamilyMask(UI64LIT(0x0000000000000050)))
                 {
-                    removeFamilyFlag = 0x50;
+                    removeFamilyFlag = ClassFamilyMask(UI64LIT(0x00000000000050));
                     removeState = AURA_STATE_SWIFTMEND;     // Swiftmend aura state
                 }
                 break;
@@ -8673,7 +8650,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             for (Unit::SpellAuraHolderMap::const_iterator i = holders.begin(); i != holders.end(); ++i)
             {
                 SpellEntry const *auraSpellInfo = (*i).second->GetSpellProto();
-                if (auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag, removeFamilyFlag2))
+                if (auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag))
                 {
                     found = true;
                     break;

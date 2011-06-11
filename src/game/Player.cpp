@@ -274,29 +274,21 @@ std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
 
 SpellModifier::SpellModifier( SpellModOp _op, SpellModType _type, int32 _value, SpellEntry const* spellEntry, SpellEffectIndex eff, int16 _charges /*= 0*/ ) : op(_op), type(_type), charges(_charges), value(_value), spellId(spellEntry->Id), lastAffected(NULL)
 {
-    uint32 const* ptr = spellEntry->GetEffectSpellClassMask(eff);
-    mask = uint64(ptr[0]) | (uint64(ptr[1]) << 32);
-    mask2= ptr[2];
+    mask = spellEntry->GetEffectSpellClassMask(eff);
 }
 
 SpellModifier::SpellModifier( SpellModOp _op, SpellModType _type, int32 _value, Aura const* aura, int16 _charges /*= 0*/ ) : op(_op), type(_type), charges(_charges), value(_value), spellId(aura->GetId()), lastAffected(NULL)
 {
-    uint32 const* ptr = aura->getAuraSpellClassMask();
-    mask = uint64(ptr[0]) | (uint64(ptr[1]) << 32);
-    mask2= ptr[2];
+    mask = aura->GetAuraSpellClassMask();
 }
 
 bool SpellModifier::isAffectedOnSpell( SpellEntry const *spell ) const
 {
     SpellEntry const *affect_spell = sSpellStore.LookupEntry(spellId);
     // False if affect_spell == NULL or spellFamily not equal
-    if (!affect_spell || affect_spell->SpellFamilyName != spell->SpellFamilyName)
+    if (!affect_spell)
         return false;
-    if (mask & spell->SpellFamilyFlags)
-        return true;
-    if (mask2 & spell->SpellFamilyFlags2)
-        return true;
-    return false;
+    return affect_spell->IsFitToFamily(SpellFamily(spell->SpellFamilyName), spell->SpellFamilyFlags);
 }
 
 //== TradeData =================================================
@@ -18564,12 +18556,12 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
         else
             _mask2= uint32(1) << (eff - 64);
 
-        if ( mod->mask & _mask || mod->mask2 & _mask2)
+        if (mod->mask.IsFitToFamilyMask(_mask, _mask2))
         {
             int32 val = 0;
             for (SpellModList::const_iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
             {
-                if ((*itr)->type == mod->type && ((*itr)->mask & _mask || (*itr)->mask2 & _mask2))
+                if ((*itr)->type == mod->type && ((*itr)->mask.IsFitToFamilyMask(_mask, _mask2)))
                     val += (*itr)->value;
             }
             val += apply ? mod->value : -(mod->value);
@@ -20832,8 +20824,7 @@ bool Player::CanNoReagentCast(SpellEntry const* spellInfo) const
     // Check no reagent use mask
     uint64 noReagentMask_0_1 = GetUInt64Value(PLAYER_NO_REAGENT_COST_1);
     uint32 noReagentMask_2   = GetUInt32Value(PLAYER_NO_REAGENT_COST_1+2);
-    if (spellInfo->SpellFamilyFlags  & noReagentMask_0_1 ||
-        spellInfo->SpellFamilyFlags2 & noReagentMask_2)
+    if (spellInfo->IsFitToFamilyMask(noReagentMask_0_1, noReagentMask_2))
         return true;
 
     return false;
