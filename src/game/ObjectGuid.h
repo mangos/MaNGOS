@@ -95,7 +95,7 @@ class MANGOS_DLL_SPEC ObjectGuid
 
         operator uint64() const { return m_guid; }
     private:
-        ObjectGuid(uint32 const&);                          // no implementation, used for catch wrong type assign
+        explicit ObjectGuid(uint32 const&);                 // no implementation, used for catch wrong type assign
         ObjectGuid(HighGuid, uint32, uint64 counter);       // no implementation, used for catch wrong type assign
         ObjectGuid(HighGuid, uint64 counter);               // no implementation, used for catch wrong type assign
 
