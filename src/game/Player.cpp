@@ -286,9 +286,9 @@ bool SpellModifier::isAffectedOnSpell( SpellEntry const *spell ) const
 {
     SpellEntry const *affect_spell = sSpellStore.LookupEntry(spellId);
     // False if affect_spell == NULL or spellFamily not equal
-    if (!affect_spell)
+    if (!affect_spell || affect_spell->SpellFamilyName != spell->SpellFamilyName)
         return false;
-    return affect_spell->IsFitToFamily(SpellFamily(spell->SpellFamilyName), spell->SpellFamilyFlags);
+    return spell->IsFitToFamilyMask(mask);
 }
 
 //== TradeData =================================================
