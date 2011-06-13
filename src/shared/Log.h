@@ -118,7 +118,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
     public:
         void Initialize();
         void InitColors(const std::string& init_str);
-        void outTitle( const char * str);
+
         void outCommand( uint32 account, const char * str, ...) ATTR_PRINTF(3,4);
         void outString();                                   // any log level
                                                             // any log level
@@ -130,11 +130,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // log level >= 2
         void outDetail( const char * str, ... )      ATTR_PRINTF(2,3);
                                                             // log level >= 3
-        void outDebugInLine( const char * str, ... ) ATTR_PRINTF(2,3);
-                                                            // log level >= 3
         void outDebug( const char * str, ... )       ATTR_PRINTF(2,3);
-                                                            // any log level
-        void outMenu( const char * str, ... )        ATTR_PRINTF(2,3);
+
         void outErrorDb();                                  // any log level
                                                             // any log level
         void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);

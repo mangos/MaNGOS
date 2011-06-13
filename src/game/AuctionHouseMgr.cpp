@@ -291,14 +291,14 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString(">> Loaded 0 auction items");
         return;
     }
 
-    barGoLink bar((int)result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
     uint32 count = 0;
 
@@ -342,7 +342,7 @@ void AuctionHouseMgr::LoadAuctions()
     QueryResult *result = CharacterDatabase.Query("SELECT COUNT(*) FROM auction");
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
@@ -355,7 +355,7 @@ void AuctionHouseMgr::LoadAuctions()
 
     if (!AuctionCount)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
@@ -365,14 +365,14 @@ void AuctionHouseMgr::LoadAuctions()
     result = CharacterDatabase.Query("SELECT id,houseid,itemguid,item_template,itemowner,buyoutprice,time,moneyTime,buyguid,lastbid,startbid,deposit FROM auction");
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString(">> Loaded 0 auctions. DB table `auction` is empty.");
         return;
     }
 
-    barGoLink bar(AuctionCount);
+    BarGoLink bar(AuctionCount);
 
     typedef std::map<uint32, std::wstring> PlayerNames;
     PlayerNames playerNames;                                // caching for load time

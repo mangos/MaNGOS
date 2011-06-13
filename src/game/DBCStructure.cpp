@@ -27,11 +27,14 @@ int32 SpellEntry::CalculateSimpleValue(SpellEffectIndex eff) const
     return 0;
 }
 
-uint32 const* SpellEntry::GetEffectSpellClassMask(SpellEffectIndex eff) const
+ClassFamilyMask const& SpellEntry::GetEffectSpellClassMask(SpellEffectIndex eff) const
 {
-    if(SpellEffectEntry const* effectEntry = GetSpellEffectEntry(Id, eff))
-        return &effectEntry->EffectSpellClassMaskA[0];
-    return NULL;
+    if (SpellEffectEntry const* effectEntry = GetSpellEffectEntry(Id, eff))
+        return effectEntry->EffectSpellClassMask;
+
+    static ClassFamilyMask const emptyCFM;
+
+    return emptyCFM;
 }
 
 SpellAuraOptionsEntry const* SpellEntry::GetSpellAuraOptions() const

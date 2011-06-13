@@ -67,7 +67,7 @@ void WaypointManager::Load()
 
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString( ">> Loaded 0 paths. DB table `creature_movement` is empty." );
@@ -75,7 +75,7 @@ void WaypointManager::Load()
     else
     {
         total_paths = (uint32)result->GetRowCount();
-        barGoLink bar( total_paths );
+        BarGoLink bar(total_paths);
 
         do
         {
@@ -100,7 +100,7 @@ void WaypointManager::Load()
         //   7        8        9        10       11       12     13     14           15      16
             "textid1, textid2, textid3, textid4, textid5, emote, spell, orientation, model1, model2 FROM creature_movement");
 
-        barGoLink barRow((int)result->GetRowCount());
+        BarGoLink barRow((int)result->GetRowCount());
 
         // error after load, we check if creature guid corresponding to the path id has proper MovementType
         std::set<uint32> creatureNoMoveType;
@@ -243,7 +243,7 @@ void WaypointManager::Load()
 
     if (!result)
     {
-        barGoLink bar(1);
+        BarGoLink bar(1);
         bar.step();
         sLog.outString();
         sLog.outString( ">> Loaded 0 path templates. DB table `creature_movement_template` is empty." );
@@ -253,7 +253,7 @@ void WaypointManager::Load()
         total_nodes = 0;
         total_behaviors = 0;
         total_paths = (uint32)result->GetRowCount();
-        barGoLink barRow(total_paths);
+        BarGoLink barRow(total_paths);
 
         do
         {
@@ -278,7 +278,7 @@ void WaypointManager::Load()
         //   7        8        9        10       11       12     13     14           15      16
             "textid1, textid2, textid3, textid4, textid5, emote, spell, orientation, model1, model2 FROM creature_movement_template");
 
-        barGoLink bar( (int)result->GetRowCount() );
+        BarGoLink bar(result->GetRowCount());
 
         do
         {

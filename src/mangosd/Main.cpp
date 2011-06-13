@@ -174,20 +174,19 @@ extern int main(int argc, char **argv)
 #endif
 
     sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-    sLog.outString( "<Ctrl-C> to stop.\n\n" );
-
-    sLog.outTitle( "MM   MM         MM   MM  MMMMM   MMMM   MMMMM");
-    sLog.outTitle( "MM   MM         MM   MM MMM MMM MM  MM MMM MMM");
-    sLog.outTitle( "MMM MMM         MMM  MM MMM MMM MM  MM MMM");
-    sLog.outTitle( "MM M MM         MMMM MM MMM     MM  MM  MMM");
-    sLog.outTitle( "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM");
-    sLog.outTitle( "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM");
-    sLog.outTitle( "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM");
-    sLog.outTitle( "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM");
-    sLog.outTitle( "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM");
-    sLog.outTitle( "        MM  MMM http://getmangos.com");
-    sLog.outTitle( "        MMMMMM\n\n");
-
+    sLog.outString( "<Ctrl-C> to stop." );
+    sLog.outString("\n\n"
+        "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
+        "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
+        "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
+        "MM M MM         MMMM MM MMM     MM  MM  MMM\n"
+        "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM\n"
+        "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM\n"
+        "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM\n"
+        "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM\n"
+        "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
+        "        MM  MMM http://getmangos.com\n"
+        "        MMMMMM\n\n");
     sLog.outString("Using configuration file %s.", cfg_file);
 
     DETAIL_LOG("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
@@ -200,7 +199,7 @@ extern int main(int argc, char **argv)
     DETAIL_LOG("Using ACE: %s", ACE_VERSION);
 
     ///- Set progress bars show mode
-    barGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));
+    BarGoLink::SetOutputState(sConfig.GetBoolDefault("ShowProgressBars", true));
 
     ///- and run the 'Master'
     /// \todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

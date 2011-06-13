@@ -119,6 +119,12 @@ typedef uint16      WORD;
 typedef uint32      DWORD;
 #endif //COMPILER
 
+#if COMPILER == COMPILER_GNU
+#  if !defined(__GXX_EXPERIMENTAL_CXX0X__) || (__GNUC__ < 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
+#    define override
+#  endif
+#endif
+
 typedef uint64 OBJECT_HANDLE;
 
 #endif //MANGOS_DEFINE_H

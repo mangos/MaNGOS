@@ -219,8 +219,14 @@ spell_scripts
                                             * data_flags =  flag_original_source_as_target  = 0x02
                                                             flag_buddy_as_target            = 0x04 (When this flag is not set, buddy will be the attacker when buddy is defined)
 
+27 SCRIPT_COMMAND_GO_LOCK_STATE             source or target must be WorldObject
+                                            * datalong = flag_go_lock        = 0x01, flag_go_unlock   = 0x02,
+                                                         flag_go_nonInteract = 0x04, flag_go_interact = 0x08
+                                            * datalong2 = go entry (searching closest to source (if worldobject) or target
+                                            * datalong3 = go search radius
 
-
-
-
-
+28 SCRIPT_COMMAND_STAND_STATE               source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
+                                            * datalong = stand state (enum UnitStandStateType)
+                                            * datalong2 = creature entry (searching for a buddy, closest to source)
+                                            * datalong3 = creature search radius
+                                            * data_flags =  flag_target_as_source    = 0x01

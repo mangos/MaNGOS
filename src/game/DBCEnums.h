@@ -264,7 +264,7 @@ enum AreaFlags
     AREA_FLAG_SLAVE_CAPITAL         = 0x00000008,           // city and city subsones
     AREA_FLAG_UNK3                  = 0x00000010,           // can't find common meaning
     AREA_FLAG_SLAVE_CAPITAL2        = 0x00000020,           // slave capital city flag?
-    AREA_FLAG_UNK4                  = 0x00000040,           // many zones have this flag
+    AREA_FLAG_DUEL                  = 0x00000040,           // zones where duels allowed
     AREA_FLAG_ARENA                 = 0x00000080,           // arena, both instanced and world arenas
     AREA_FLAG_CAPITAL               = 0x00000100,           // main capital city flag
     AREA_FLAG_CITY                  = 0x00000200,           // only for one zone named "City" (where it located?)
@@ -309,7 +309,7 @@ enum Difficulty
 
 enum SpawnMask
 {
-    SPAWNMASK_REGULAR           = (1 << REGULAR_DIFFICULTY),// any any maps without spawn modes (continents/subway) or in minimal spawnmode
+    SPAWNMASK_REGULAR           = (1 << REGULAR_DIFFICULTY),// any maps without spawn modes (continents/subway) or in minimal spawnmode
 
     SPAWNMASK_DUNGEON_NORMAL    = (1 << DUNGEON_DIFFICULTY_NORMAL),
     SPAWNMASK_DUNGEON_HEROIC    = (1 << DUNGEON_DIFFICULTY_HEROIC),
@@ -354,6 +354,11 @@ enum AbilytyLearnType
 {
     ABILITY_LEARNED_ON_GET_PROFESSION_SKILL     = 1,
     ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL  = 2
+};
+
+enum AbilitySkillFlags
+{
+    ABILITY_SKILL_NONTRAINABLE = 0x100
 };
 
 enum ItemEnchantmentType

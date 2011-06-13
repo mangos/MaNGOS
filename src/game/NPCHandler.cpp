@@ -96,6 +96,13 @@ void WorldSession::SendShowBank(ObjectGuid guid)
     SendPacket(&data);
 }
 
+void WorldSession::SendShowMailBox(ObjectGuid guid)
+{
+    WorldPacket data(SMSG_SHOW_MAILBOX, 8);
+    data << ObjectGuid(guid);
+    SendPacket(&data);
+}
+
 void WorldSession::HandleTrainerListOpcode( WorldPacket & recv_data )
 {
     ObjectGuid guid;
@@ -112,7 +119,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 }
 
 
-static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell, TrainerSpellState state, float fDiscountMod, bool can_learn_primary_prof)
+static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell, TrainerSpellState state, float fDiscountMod, bool can_learn_primary_prof, uint32 skillReqLevel)
 {
     bool primary_prof_first_rank = sSpellMgr.IsPrimaryProfessionFirstRankSpell(tSpell->learnedSpell);
     SpellChainNode const* chain_node = sSpellMgr.GetSpellChainNode(tSpell->learnedSpell);
@@ -124,7 +131,7 @@ static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell
     data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
     // primary prof. learn confirmation dialog
     data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
-    data << uint8(tSpell->reqLevel);
+    data << uint8(skillReqLevel ? skillReqLevel : tSpell->reqLevel);
     data << uint32(tSpell->reqSkill);
     data << uint32(tSpell->reqSkillValue);
     data << uint32(!tSpell->IsCastable() && chain_node ? (chain_node->prev ? chain_node->prev : chain_node->req) : 0);
@@ -186,12 +193,13 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         {
             TrainerSpell const* tSpell = &itr->second;
 
-            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell))
+            uint32 skillReqLevel = 0;
+            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &skillReqLevel))
                 continue;
 
             TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
 
-            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof);
+            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, skillReqLevel);
 
             ++count;
         }
@@ -203,12 +211,13 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         {
             TrainerSpell const* tSpell = &itr->second;
 
-            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell))
+            uint32 skillReqLevel = 0;
+            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &skillReqLevel))
                 continue;
 
             TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
 
-            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof);
+            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, skillReqLevel);
 
             ++count;
         }

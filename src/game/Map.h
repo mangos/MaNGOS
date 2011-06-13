@@ -40,6 +40,7 @@
 #include <bitset>
 #include <list>
 
+struct CreatureInfo;
 class Creature;
 class Unit;
 class WorldPacket;
@@ -94,6 +95,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
     friend class MapReference;
     friend class ObjectGridLoader;
     friend class ObjectWorldLoader;
+
     protected:
         Map(uint32 id, time_t, uint32 InstanceId, uint8 SpawnMode);
 
@@ -252,6 +254,11 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void CreateInstanceData(bool load);
         InstanceData* GetInstanceData() { return i_data; }
         uint32 GetScriptId() const { return i_script_id; }
+
+        void MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit* target);
+        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid = 0);
+        void PlayDirectSoundToMap(uint32 soundId);
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -289,8 +296,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         void SendObjectUpdates();
         std::set<Object *> i_objectsToClientUpdate;
-    protected:
 
+    protected:
         MapEntry const* i_mapEntry;
         uint8 i_spawnMode;
         uint32 i_id;
@@ -306,6 +313,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         ActiveNonPlayers m_activeNonPlayers;
         ActiveNonPlayers::iterator m_activeNonPlayersIter;
         MapStoredObjectTypesContainer m_objectsStore;
+
     private:
         time_t i_gridExpiry;
 

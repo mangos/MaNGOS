@@ -131,7 +131,7 @@ bool Group::Create(ObjectGuid guid, const char * name)
     m_raidDifficulty = RAID_DIFFICULTY_10MAN_NORMAL;
     if (!isBGGroup())
     {
-        m_Id = sObjectMgr.GenerateGroupId();
+        m_Id = sObjectMgr.GenerateGroupLowGuid();
 
         Player *leader = sObjectMgr.GetPlayer(guid);
         if(leader)
@@ -1021,11 +1021,9 @@ void Group::SendTargetIconList(WorldSession *session)
 
 void Group::SendUpdate()
 {
-    Player *player;
-
     for(member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
-        player = sObjectMgr.GetPlayer(citr->guid);
+        Player* player = sObjectMgr.GetPlayer(citr->guid);
         if(!player || !player->GetSession() || player->GetGroup() != this )
             continue;
                                                             // guess size
@@ -1039,7 +1037,7 @@ void Group::SendUpdate()
             data << uint8(0);
             data << uint32(0);
         }
-        data << uint64(0x50000000FFFFFFFELL);               // related to voice chat?
+        data << GetObjectGuid();                            // group guid
         data << uint32(0);                                  // 3.3, this value increments every time SMSG_GROUP_LIST is sent
         data << uint32(GetMembersCount()-1);
         for(member_citerator citr2 = m_memberSlots.begin(); citr2 != m_memberSlots.end(); ++citr2)

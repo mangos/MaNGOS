@@ -1486,17 +1486,17 @@ struct ScalingStatValuesEntry
     uint32    displayOrder;                               // 2      m_sortIndex
 };*/
 
-/*struct SkillRaceClassInfoEntry
+struct SkillRaceClassInfoEntry
 {
-    uint32    id;                                           // 0        m_ID
+    //uint32    id;                                         // 0        m_ID
     uint32    skillId;                                      // 1        m_skillID
     uint32    raceMask;                                     // 2        m_raceMask
     uint32    classMask;                                    // 3        m_classMask
     uint32    flags;                                        // 4        m_flags
     uint32    reqLevel;                                     // 5        m_minLevel
-    uint32    skillTierId;                                  // 6        m_skillTierID
-    uint32    skillCostID;                                  // 7        m_skillCostIndex
-};*/
+    //uint32    skillTierId;                                // 6        m_skillTierID
+    //uint32    skillCostID;                                // 7        m_skillCostIndex
+};
 
 /*struct SkillTiersEntry{
     uint32    id;                                           // 0        m_ID
@@ -1552,6 +1552,41 @@ struct SoundEntriesEntry
     //unk                                                   // 31       4.0.0
     //unk                                                   // 32       4.0.0
     //unk                                                   // 33       4.0.0
+};
+
+struct ClassFamilyMask
+{
+    uint64 Flags;
+    uint32 Flags2;
+
+    ClassFamilyMask() : Flags(0), Flags2(0) {}
+    explicit ClassFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) : Flags(familyFlags), Flags2(familyFlags2) {}
+
+    bool Empty() const { return Flags == 0 && Flags2 == 0; }
+    bool operator! () const { return Empty(); }
+    operator void const* () const { return Empty() ? NULL : this; }// for allow normal use in if(mask)
+
+    bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
+    {
+        return (Flags & familyFlags) || (Flags2 & familyFlags2);
+    }
+
+    bool IsFitToFamilyMask(ClassFamilyMask const& mask) const
+    {
+        return (Flags & mask.Flags) || (Flags2 & mask.Flags2);
+    }
+
+    uint64 operator& (uint64 mask) const                     // possible will removed at finish convertion code use IsFitToFamilyMask
+    {
+        return Flags & mask;
+    }
+
+    ClassFamilyMask& operator|= (ClassFamilyMask const& mask)
+    {
+        Flags |= mask.Flags;
+        Flags2 |= mask.Flags2;
+        return *this;
+    }
 };
 
 #define MAX_SPELL_REAGENTS 8
@@ -1611,8 +1646,7 @@ struct SpellClassOptionsEntry
 {
     //uint32    Id;                                         // 0        m_ID
     //uint32    modalNextSpell;                             // 50       m_modalNextSpell not used
-    uint64    SpellFamilyFlags;                             // 149-150  m_spellClassMask NOTE: size is 12 bytes!!!
-    uint32    SpellFamilyFlags2;                            // 151      addition to m_spellClassMask
+    ClassFamilyMask SpellFamilyFlags;                       // 149-151  m_spellClassMask NOTE: size is 12 bytes!!!
     uint32    SpellFamilyName;                              // 148      m_spellClassSet
     //char*   Description;                                  // 6 4.0.0
 
@@ -1620,13 +1654,22 @@ struct SpellClassOptionsEntry
 
     bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
     {
-        return (SpellFamilyFlags & familyFlags) || (SpellFamilyFlags2 & familyFlags2);
+        return SpellFamilyFlags.IsFitToFamilyMask(familyFlags, familyFlags2);
     }
 
     bool IsFitToFamily(SpellFamily family, uint64 familyFlags, uint32 familyFlags2 = 0) const
     {
-        return SpellFamily(SpellFamilyName) == family &&
-            ((SpellFamilyFlags & familyFlags) || (SpellFamilyFlags2 & familyFlags2));
+        return SpellFamily(SpellFamilyName) == family && IsFitToFamilyMask(familyFlags, familyFlags2);
+    }
+
+    bool IsFitToFamilyMask(ClassFamilyMask const& mask) const
+    {
+        return SpellFamilyFlags.IsFitToFamilyMask(mask);
+    }
+
+    bool IsFitToFamily(SpellFamily family, ClassFamilyMask const& mask) const
+    {
+        return SpellFamily(SpellFamilyName) == family && IsFitToFamilyMask(mask);
     }
 
     private:
@@ -1665,7 +1708,7 @@ struct SpellEffectEntry
     uint32    EffectRadiusIndex;                            // 94-96    m_effectRadiusIndex - spellradius.dbc
     //uint32   EffectRadiusMaxIndex;                        // 97-99    4.0.0
     float     EffectRealPointsPerLevel;                     // 79-81    m_effectRealPointsPerLevel
-    uint32    EffectSpellClassMaskA[3];                     // 127-129  m_effectSpellClassMaskA, effect 0
+    ClassFamilyMask EffectSpellClassMask;                   // 127-129  m_effectSpellClassMask
     uint32    EffectTriggerSpell;                           // 121-123  m_effectTriggerSpell
     uint32    EffectImplicitTargetA;                        // 88-90    m_implicitTargetA
     uint32    EffectImplicitTargetB;                        // 91-93    m_implicitTargetB
@@ -1822,7 +1865,7 @@ struct MANGOS_DLL_SPEC SpellEntry
 
     // helpers
     int32 CalculateSimpleValue(SpellEffectIndex eff) const;
-    uint32 const* GetEffectSpellClassMask(SpellEffectIndex eff) const;
+    ClassFamilyMask const& GetEffectSpellClassMask(SpellEffectIndex eff) const;
 
     // struct access functions
     SpellAuraOptionsEntry const* GetSpellAuraOptions() const;
@@ -1893,6 +1936,18 @@ struct MANGOS_DLL_SPEC SpellEntry
     {
         SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
         return classOpt && classOpt->IsFitToFamily(family, familyFlags, familyFlags2);
+    }
+
+    bool IsFitToFamilyMask(ClassFamilyMask const& mask) const
+    {
+        SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
+        return classOpt && classOpt->IsFitToFamilyMask(mask);
+    }
+
+    bool IsFitToFamily(SpellFamily family, ClassFamilyMask const& mask) const
+    {
+        SpellClassOptionsEntry const* classOpt = GetSpellClassOptions();
+        return classOpt && classOpt->IsFitToFamily(family, mask);
     }
 
     private:

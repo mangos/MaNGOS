@@ -414,10 +414,16 @@ class ByteBuffer
             if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
                 return;
 
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
-            for(uint32 i = 0; i < size(); ++i)
-                sLog.outDebugInLine("%u - ", read<uint8>(i) );
-            sLog.outDebug(" ");
+            std::ostringstream ss;
+            ss <<  "STORAGE_SIZE: " << size() << "\n";
+
+            if (sLog.IsIncludeTime())
+                ss << "         ";
+
+            for (size_t i = 0; i < size(); ++i)
+                ss << uint32(read<uint8>(i)) << " - ";
+
+            sLog.outDebug(ss.str().c_str());
         }
 
         void textlike() const
@@ -425,10 +431,16 @@ class ByteBuffer
             if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
                 return;
 
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
-            for(uint32 i = 0; i < size(); ++i)
-                sLog.outDebugInLine("%c", read<uint8>(i) );
-            sLog.outDebug(" ");
+            std::ostringstream ss;
+            ss <<  "STORAGE_SIZE: " << size() << "\n";
+
+            if (sLog.IsIncludeTime())
+                ss << "         ";
+
+            for (size_t i = 0; i < size(); ++i)
+                ss << read<uint8>(i);
+
+            sLog.outDebug(ss.str().c_str());
         }
 
         void hexlike() const
@@ -436,37 +448,40 @@ class ByteBuffer
             if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
                 return;
 
-            uint32 j = 1, k = 1;
-            sLog.outDebug("STORAGE_SIZE: %lu", (unsigned long)size() );
+            std::ostringstream ss;
+            ss <<  "STORAGE_SIZE: " << size() << "\n";
 
             if (sLog.IsIncludeTime())
-                sLog.outDebugInLine("         ");
+                ss << "         ";
 
-            for(uint32 i = 0; i < size(); ++i)
+            size_t j = 1, k = 1;
+
+            for (size_t i = 0; i < size(); ++i)
             {
                 if ((i == (j * 8)) && ((i != (k * 16))))
                 {
-                    sLog.outDebugInLine("| %02X ", read<uint8>(i));
+                    ss << "| ";
                     ++j;
                 }
                 else if (i == (k * 16))
                 {
-                    sLog.outDebugInLine("\n");
-                    if(sLog.IsIncludeTime())
-                        sLog.outDebugInLine("         ");
+                    ss << "\n";
 
-                    sLog.outDebugInLine("%02X ", read<uint8>(i));
+                    if (sLog.IsIncludeTime())
+                        ss << "         ";
 
                     ++k;
                     ++j;
                 }
-                else
-                {
-                    sLog.outDebugInLine("%02X ", read<uint8>(i));
-                }
+
+                char buf[4];
+                snprintf(buf, 4, "%02X", read<uint8>(i));
+                ss << buf << " ";
+
             }
-            sLog.outDebugInLine("\n");
+            sLog.outDebug(ss.str().c_str());
         }
+
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem
         template <typename T> void append(T value)

@@ -92,6 +92,7 @@ const char ScalingStatDistributionfmt[]="niiiiiiiiiiiiiiiiiiiixi";
 const char ScalingStatValuesfmt[]="iniiiiiiiiiiiiiiiiiiiixxxxxxxxxxxxxxxxxxxxxxxxx";
 const char SkillLinefmt[]="nixsxixi";
 const char SkillLineAbilityfmt[]="niiiixxiiiiixx";
+const char SkillRaceClassInfofmt[]="diiiiixx";
 const char SoundEntriesfmt[]="nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char SpellCastTimefmt[]="nixx";
 const char SpellDurationfmt[]="niii";
