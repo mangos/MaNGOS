@@ -133,16 +133,4 @@ using std::hash_map;
 using std::hash_set;
 #endif
 
-#if COMPILER != COMPILER_MICROSOFT
-
-// Visual Studio use non standard hash calculation function, so provide fake forward for other
-HASH_NAMESPACE_START
-
-template<class K>
-size_t hash_value(K const&);
-
-HASH_NAMESPACE_END
-
-#endif
-
 #endif
