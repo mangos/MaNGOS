@@ -59,6 +59,9 @@ GameObject::GameObject() : WorldObject(),
     m_cooldownTime = 0;
 
     m_packedRotation = 0;
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
+    m_lootGroupRecipientId = 0;
 }
 
 GameObject::~GameObject()
@@ -352,6 +355,15 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(NULL)))
                         ResetDoorOrButton();
                     break;
+                case GAMEOBJECT_TYPE_CHEST:
+                    if (m_groupLootTimer)
+                    {
+                        if (m_groupLootTimer <= update_diff)
+                            StopGroupLoot();
+                        else
+                            m_groupLootTimer -= update_diff;
+                    }
+                    break;
                 case GAMEOBJECT_TYPE_GOOBER:
                     if (m_cooldownTime < time(NULL))
                     {
@@ -415,6 +427,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             }
 
             loot.clear();
+            SetLootRecipient(NULL);
             SetLootState(GO_READY);
 
             if (!m_respawnDelayTime)
@@ -1802,6 +1815,86 @@ void GameObject::SetDisplayId(uint32 modelId)
 {
     SetUInt32Value(GAMEOBJECT_DISPLAYID, modelId);
     m_displayInfo = sGameObjectDisplayInfoStore.LookupEntry(modelId);
+}
+
+void GameObject::StartGroupLoot(Group* group, uint32 timer)
+{
+    m_groupLootId = group->GetId();
+    m_groupLootTimer = timer;
+}
+
+void GameObject::StopGroupLoot()
+{
+    if (!m_groupLootId)
+        return;
+
+    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
+        group->EndRoll();
+
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
+}
+
+Player* GameObject::GetOriginalLootRecipient() const
+{
+    return m_lootRecipientGuid ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
+}
+
+Group* GameObject::GetGroupLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : NULL;
+}
+
+Player* GameObject::GetLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    Group* group = GetGroupLootRecipient();
+
+    // original recipient player if online
+    Player* player = GetOriginalLootRecipient();
+
+    // if group not set or disbanded return original recipient player if any
+    if (!group)
+        return player;
+
+    // group case
+
+    // return player if it still be in original recipient group
+    if (player && player->GetGroup() == group)
+        return player;
+
+    // find any in group
+    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        if (Player* newPlayer = itr->getSource())
+            return newPlayer;
+
+    return NULL;
+}
+
+void GameObject::SetLootRecipient(Unit* pUnit)
+{
+    // set the player whose group should receive the right
+    // to loot the gameobject after its used
+    // should be set to NULL after the loot disappears
+
+    if (!pUnit)
+    {
+        m_lootRecipientGuid.Clear();
+        m_lootGroupRecipientId = 0;
+        return;
+    }
+
+    Player* player = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (!player)                                            // normal creature, no player involved
+        return;
+
+    // set player for non group case or if group will disbanded
+    m_lootRecipientGuid = player->GetObjectGuid();
+
+    // set group for group existed case including if player will leave group at loot time
+    if (Group* group = player->GetGroup())
+        m_lootGroupRecipientId = group->GetId();
 }
 
 float GameObject::GetObjectBoundingRadius() const
