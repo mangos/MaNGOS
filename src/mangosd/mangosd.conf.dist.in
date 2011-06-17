@@ -665,6 +665,18 @@ LogColors = ""
 #        Default: 2
 #        Max : 10
 #
+#    TradeSkill.GMIgnore.MaxPrimarySkillsCount
+#        GM level starting from max primary skill count requirement ignored.
+#        Default: 4 (Console as noneone)
+#
+#    TradeSkill.GMIgnore.Level
+#        GM level starting from trade skill level requirement ignored.
+#        Default: 4 (Console as noneone)
+#
+#    TradeSkill.GMIgnore.Skill
+#        GM level starting from trade skill skill requirement ignored.
+#        Default: 4 (Console as noneone)
+#
 #    MinPetitionSigns
 #        Min signatures count to creating guild (0..9).
 #        Default: 9
@@ -788,6 +800,9 @@ TimerBar.Breath.Max = 180
 TimerBar.Fire.GMLevel = 4
 TimerBar.Fire.Max = 1
 MaxPrimaryTradeSkill = 2
+TradeSkill.GMIgnore.MaxPrimarySkillsCount = 4
+TradeSkill.GMIgnore.Level = 4
+TradeSkill.GMIgnore.Skill = 4
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
