@@ -1324,7 +1324,11 @@ void Pet::_LoadAuras(uint32 timediff)
             if (spellproto->procCharges == 0)
                 remaincharges = 0;
 
-            if (stackcount == 0)
+            if (!spellproto->StackAmount)
+                stackcount = 1;
+            else if (spellproto->StackAmount < stackcount)
+                stackcount = spellproto->StackAmount;
+            else if (!stackcount)
                 stackcount = 1;
 
             SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, NULL);
