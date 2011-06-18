@@ -1218,18 +1218,18 @@ class MANGOS_DLL_SPEC Player : public Unit
             return _CanStoreItem( bag, slot, dest, pItem->GetEntry(), count, pItem, swap, NULL );
 
         }
-        InventoryResult CanStoreItems( Item **pItem,int count) const;
-        InventoryResult CanEquipNewItem( uint8 slot, uint16 &dest, uint32 item, bool swap ) const;
-        InventoryResult CanEquipItem( uint8 slot, uint16 &dest, Item *pItem, bool swap, bool not_loading = true ) const;
+        InventoryResult CanStoreItems(Item **pItem,int count) const;
+        InventoryResult CanEquipNewItem(uint8 slot, uint16 &dest, uint32 item, bool swap) const;
+        InventoryResult CanEquipItem(uint8 slot, uint16 &dest, Item *pItem, bool swap, bool direct_action = true) const;
 
         InventoryResult CanEquipUniqueItem( Item * pItem, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1 ) const;
         InventoryResult CanEquipUniqueItem( ItemPrototype const* itemProto, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1 ) const;
         InventoryResult CanUnequipItems( uint32 item, uint32 count ) const;
         InventoryResult CanUnequipItem( uint16 src, bool swap ) const;
         InventoryResult CanBankItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, Item *pItem, bool swap, bool not_loading = true ) const;
-        InventoryResult CanUseItem( Item *pItem, bool not_loading = true ) const;
-        bool HasItemTotemCategory( uint32 TotemCategory ) const;
-        InventoryResult CanUseItem( ItemPrototype const *pItem ) const;
+        InventoryResult CanUseItem(Item *pItem, bool direct_action = true) const;
+        bool HasItemTotemCategory(uint32 TotemCategory) const;
+        InventoryResult CanUseItem(ItemPrototype const *pItem) const;
         InventoryResult CanUseAmmo( uint32 item ) const;
         Item* StoreNewItem( ItemPosCountVec const& pos, uint32 item, bool update,int32 randomPropertyId = 0 );
         Item* StoreItem( ItemPosCountVec const& pos, Item *pItem, bool update );
@@ -1241,6 +1241,8 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
         void AutoStoreLoot(Loot& loot, bool broadcast = false, uint8 bag = NULL_BAG, uint8 slot = NULL_SLOT);
+
+        Item* ConvertItem(Item* item, uint32 newItemId);
 
         InventoryResult _CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = NULL) const;
         InventoryResult _CanStoreItem( uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item *pItem = NULL, bool swap = false, uint32* no_space_count = NULL ) const;

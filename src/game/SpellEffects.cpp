@@ -4478,73 +4478,12 @@ void Spell::EffectSummonChangeItem(SpellEffectIndex eff_idx)
     if (!newitemid)
         return;
 
-    uint16 pos = m_CastItem->GetPos();
+    Item* oldItem = m_CastItem;
 
-    Item *pNewItem = Item::CreateItem( newitemid, 1, player);
-    if (!pNewItem)
-        return;
+    // prevent crash at access and unexpected charges counting with item update queue corrupt
+    ClearCastItem();
 
-    for(uint8 j= PERM_ENCHANTMENT_SLOT; j<=TEMP_ENCHANTMENT_SLOT; ++j)
-    {
-        if (m_CastItem->GetEnchantmentId(EnchantmentSlot(j)))
-            pNewItem->SetEnchantment(EnchantmentSlot(j), m_CastItem->GetEnchantmentId(EnchantmentSlot(j)), m_CastItem->GetEnchantmentDuration(EnchantmentSlot(j)), m_CastItem->GetEnchantmentCharges(EnchantmentSlot(j)));
-    }
-
-    if (m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) < m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
-    {
-        double loosePercent = 1 - m_CastItem->GetUInt32Value(ITEM_FIELD_DURABILITY) / double(m_CastItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY));
-        player->DurabilityLoss(pNewItem, loosePercent);
-    }
-
-    if (player->IsInventoryPos(pos))
-    {
-        ItemPosCountVec dest;
-        uint8 msg = player->CanStoreItem( m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true );
-        if (msg == EQUIP_ERR_OK)
-        {
-            player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
-
-            // prevent crash at access and unexpected charges counting with item update queue corrupt
-            ClearCastItem();
-
-            player->StoreItem( dest, pNewItem, true);
-            return;
-        }
-    }
-    else if (player->IsBankPos (pos))
-    {
-        ItemPosCountVec dest;
-        uint8 msg = player->CanBankItem( m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), dest, pNewItem, true );
-        if (msg == EQUIP_ERR_OK)
-        {
-            player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
-
-            // prevent crash at access and unexpected charges counting with item update queue corrupt
-            ClearCastItem();
-
-            player->BankItem( dest, pNewItem, true);
-            return;
-        }
-    }
-    else if (player->IsEquipmentPos (pos))
-    {
-        uint16 dest;
-        uint8 msg = player->CanEquipItem( m_CastItem->GetSlot(), dest, pNewItem, true );
-        if (msg == EQUIP_ERR_OK)
-        {
-            player->DestroyItem(m_CastItem->GetBagSlot(), m_CastItem->GetSlot(), true);
-
-            // prevent crash at access and unexpected charges counting with item update queue corrupt
-            ClearCastItem();
-
-            player->EquipItem( dest, pNewItem, true);
-            player->AutoUnequipOffhandIfNeed();
-            return;
-        }
-    }
-
-    // fail
-    delete pNewItem;
+    player->ConvertItem(oldItem, newitemid);
 }
 
 void Spell::EffectProficiency(SpellEffectIndex /*eff_idx*/)
