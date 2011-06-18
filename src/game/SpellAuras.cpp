@@ -5182,12 +5182,23 @@ void Aura::HandleAuraPeriodicDummy(bool apply, bool Real)
     {
         case SPELLFAMILY_ROGUE:
         {
-            if(!apply)
+            switch(spell->Id)
             {
-                switch(spell->Id)
+                // Master of Subtlety
+                case 31666:
                 {
-                    // Master of Subtlety
-                    case 31666: target->RemoveAurasDueToSpell(31665); break;
+                    if (apply)
+                    {
+                        // for make duration visible
+                        if (SpellAuraHolder* holder = target->GetSpellAuraHolder(31665))
+                        {
+                            holder->SetAuraMaxDuration(GetHolder()->GetAuraDuration());
+                            holder->RefreshHolder();
+                        }
+                    }
+                    else
+                        target->RemoveAurasDueToSpell(31665);
+                    break;
                 }
             }
             break;
