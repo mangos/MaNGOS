@@ -280,7 +280,10 @@ void Item::UpdateDuration(Player* owner, uint32 diff)
 
     if (GetUInt32Value(ITEM_FIELD_DURATION) <= diff)
     {
-        owner->DestroyItem(GetBagSlot(), GetSlot(), true);
+        if (uint32 newItemId = sObjectMgr.GetItemExpireConvert(GetEntry()))
+            owner->ConvertItem(this, newItemId);
+        else
+            owner->DestroyItem(GetBagSlot(), GetSlot(), true);
         return;
     }
 

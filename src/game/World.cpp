@@ -1010,11 +1010,14 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Item Random Enchantments Table..." );
     LoadRandomEnchantmentsTable();
 
-    sLog.outString( "Loading Items..." );                   // must be after LoadRandomEnchantmentsTable and LoadPageTexts
+    sLog.outString("Loading Items...");                     // must be after LoadRandomEnchantmentsTable and LoadPageTexts
     sObjectMgr.LoadItemPrototypes();
 
-    sLog.outString( "Loading Item converts..." );           // must be after LoadItemPrototypes
+    sLog.outString("Loading Item converts...");             // must be after LoadItemPrototypes
     sObjectMgr.LoadItemConverts();
+
+    sLog.outString("Loading Item expire converts...");      // must be after LoadItemPrototypes
+    sObjectMgr.LoadItemExpireConverts();
 
     sLog.outString( "Loading Creature Model Based Info Data..." );
     sObjectMgr.LoadCreatureModelInfo();

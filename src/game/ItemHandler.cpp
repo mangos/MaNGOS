@@ -801,9 +801,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
                     // convert if can use and then buy
                     if (pProto->RequiredReputationFaction && uint32(_player->GetReputationRank(pProto->RequiredReputationFaction)) >= pProto->RequiredReputationRank)
                     {
-                        itemId = sObjectMgr.GetItemConvert(itemId, _player->getRaceMask());
                         // checked at convert data loading as existed
-                        pProto = ObjectMgr::GetItemPrototype(itemId);
+                        if (uint32 newItemId = sObjectMgr.GetItemConvert(itemId, _player->getRaceMask()))
+                            pProto = ObjectMgr::GetItemPrototype(newItemId);
                     }
                 }
 

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11613_01_mangos_spell_bonus_data` bit(1) default NULL
+  `required_11646_01_mangos_item_expire_convert` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2193,7 +2193,7 @@ CREATE TABLE `item_convert` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
   `item` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Npc System';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item Convert System';
 
 --
 -- Dumping data for table `item_convert`
@@ -2223,6 +2223,26 @@ CREATE TABLE `item_enchantment_template` (
 LOCK TABLES `item_enchantment_template` WRITE;
 /*!40000 ALTER TABLE `item_enchantment_template` DISABLE KEYS */;
 /*!40000 ALTER TABLE `item_enchantment_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `item_expire_convert`
+--
+
+DROP TABLE IF EXISTS `item_expire_convert`;
+CREATE TABLE `item_expire_convert` (
+  `entry` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) unsigned NOT NULL default '0',
+  PRIMARY KEY  (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item Convert System';
+
+--
+-- Dumping data for table `item_convert`
+--
+
+LOCK TABLES `item_convert` WRITE;
+/*!40000 ALTER TABLE `item_convert` DISABLE KEYS */;
+/*!40000 ALTER TABLE `item_convert` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
