@@ -19837,35 +19837,28 @@ void Player::ReportedAfkBy(Player* reporter)
 bool Player::IsVisibleInGridForPlayer( Player* pl ) const
 {
     // gamemaster in GM mode see all, including ghosts
-    if(pl->isGameMaster() && GetSession()->GetSecurity() <= pl->GetSession()->GetSecurity())
+    if (pl->isGameMaster() && GetSession()->GetSecurity() <= pl->GetSession()->GetSecurity())
         return true;
 
-    // It seems in battleground everyone sees everyone, except the enemy-faction ghosts
-    if (InBattleGround())
-    {
-        if (!(isAlive() || m_deathTimer > 0) && !IsFriendlyTo(pl) )
-            return false;
+    // player see dead player/ghost from own group/raid
+    if (IsInSameRaidWith(pl))
         return true;
-    }
 
     // Live player see live player or dead player with not realized corpse
-    if(pl->isAlive() || pl->m_deathTimer > 0)
-    {
+    if (pl->isAlive() || pl->m_deathTimer > 0)
         return isAlive() || m_deathTimer > 0;
-    }
 
     // Ghost see other friendly ghosts, that's for sure
-    if(!(isAlive() || m_deathTimer > 0) && IsFriendlyTo(pl))
+    if (!(isAlive() || m_deathTimer > 0) && IsFriendlyTo(pl))
         return true;
 
     // Dead player see live players near own corpse
-    if(isAlive())
+    if (isAlive())
     {
-        Corpse *corpse = pl->GetCorpse();
-        if(corpse)
+        if (Corpse *corpse = pl->GetCorpse())
         {
             // 20 - aggro distance for same level, 25 - max additional distance if player level less that creature level
-            if(corpse->IsWithinDistInMap(this,(20+25)*sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO)))
+            if (corpse->IsWithinDistInMap(this, (20 + 25) * sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO)))
                 return true;
         }
     }
@@ -19876,7 +19869,7 @@ bool Player::IsVisibleInGridForPlayer( Player* pl ) const
 
 bool Player::IsVisibleGloballyFor( Player* u ) const
 {
-    if(!u)
+    if (!u)
         return false;
 
     // Always can see self
