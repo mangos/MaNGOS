@@ -19,6 +19,7 @@
 #include "Common.h"
 #include "DBCStructure.h"
 #include "DBCStores.h"
+#include "SharedDefines.h"
 
 int32 SpellEntry::CalculateSimpleValue(SpellEffectIndex eff) const
 {
