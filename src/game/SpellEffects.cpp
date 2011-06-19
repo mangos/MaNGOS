@@ -7203,6 +7203,26 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 62524:                                 // Attuned to Nature 2 Dose Reduction
+                case 62525:                                 // Attuned to Nature 10 Dose Reduction
+                case 62521:                                 // Attuned to Nature 25 Dose Reduction
+                {
+                    if (!unitTarget)
+                        return;
+
+                    uint32 numStacks = 0;
+
+                    switch(m_spellInfo->Id)
+                    {
+                        case 62524: numStacks = 2;  break;
+                        case 62525: numStacks = 10; break;
+                        case 62521: numStacks = 25; break;
+                    };
+
+                    uint32 spellId = m_spellInfo->CalculateSimpleValue(eff_idx);
+                    unitTarget->RemoveAuraHolderFromStack(spellId, numStacks);
+                    return;
+                }
                 case 66477:                                 // Bountiful Feast
                 {
                     if (!unitTarget)
