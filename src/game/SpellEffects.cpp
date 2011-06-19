@@ -7223,6 +7223,27 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->RemoveAuraHolderFromStack(spellId, numStacks);
                     return;
                 }
+                case 62678:                                 // Summon Allies of Nature
+                {
+                    const uint32 randSpells[] =
+                    {
+                        62685,  // Summon Wave - 1 Mob
+                        62686,  // Summon Wave - 3 Mob
+                        62688,  // Summon Wave - 10 Mob
+                    };
+
+                    m_caster->CastSpell(m_caster, randSpells[urand(0, countof(randSpells)-1)], true);
+                    return;
+                }
+                case 62688:                                 // Summon Wave - 10 Mob
+                {
+                    uint32 spellId = m_spellInfo->CalculateSimpleValue(eff_idx);
+
+                    for (uint32 i = 0; i < 10; ++i)
+                        m_caster->CastSpell(m_caster, spellId, true);
+
+                    return;
+                }
                 case 66477:                                 // Bountiful Feast
                 {
                     if (!unitTarget)
