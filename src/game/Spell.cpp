@@ -6790,6 +6790,14 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
             break;
     }
 
+    switch (m_spellInfo->Id)
+    {
+        case 37433:                                         // Spout (The Lurker Below), only players affected if its not in water
+            if (target->GetTypeId() != TYPEID_PLAYER || target->IsInWater())
+                return false;
+        default: break;
+    }
+
     return true;
 }
 
