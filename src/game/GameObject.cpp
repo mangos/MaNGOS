@@ -1681,7 +1681,6 @@ void GameObject::SetWorldRotation(float qx, float qy, float qz, float qw)
 
     quat.unitize();
     m_rotation = QuaternionCompressed(quat).m_raw;
-    m_rotation = QuaternionCompressed(quat).m_raw;
     m_quatX = quat.x;
     m_quatY = quat.y;
     m_quatZ = quat.z;
