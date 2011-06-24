@@ -3014,6 +3014,12 @@ void Spell::cast(bool skipCheck)
                 if (m_caster->HasAura(58375))               // Glyph of Blocking
                     AddTriggeredSpell(58374);               // Glyph of Blocking
             }
+            // Bloodrage
+            if (m_spellInfo->SpellFamilyFlags & UI64LIT(0x0000000000000100))
+            {
+                if (m_caster->HasAura(70844))               // Item - Warrior T10 Protection 4P Bonus
+                    AddTriggeredSpell(70845);               // Stoicism
+            }
             // Bloodsurge (triggered), Sudden Death (triggered)
             else if (m_spellInfo->Id == 46916 || m_spellInfo->Id == 52437)
                 // Item - Warrior T10 Melee 4P Bonus

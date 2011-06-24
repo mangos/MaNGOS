@@ -6817,6 +6817,11 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
             float DoneActualBenefit = 0.0f;
             switch(spellProto->SpellFamilyName)
             {
+                case SPELLFAMILY_GENERIC:
+                    // Stoicism
+                    if (spellProto->Id == 70845)
+                        DoneActualBenefit = caster->GetMaxHealth() * 0.20f;
+                    break;
                 case SPELLFAMILY_PRIEST:
                     // Power Word: Shield
                     if (spellProto->SpellFamilyFlags & UI64LIT(0x0000000000000001))
