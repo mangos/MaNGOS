@@ -826,9 +826,6 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     sLog.outErrorDb("CreatureEventAI: EventAI not has script for creature entry (%u), but AIName = '%s'.", i, cInfo->AIName);
                 else if (!ainame && hasevent)
                     sLog.outErrorDb("CreatureEventAI: EventAI has script for creature entry (%u), but AIName = '%s' instead 'EventAI'.", i, cInfo->AIName);
-
-                if (hasevent && cInfo->ScriptID && !sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
-                    sLog.outErrorDb("CreatureEventAI:  EventAI has script for creature entry (%u), but it have associated library script: %s.", i, sScriptMgr.GetScriptName(cInfo->ScriptID));
             }
         }
 
