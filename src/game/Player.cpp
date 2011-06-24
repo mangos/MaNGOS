@@ -7541,6 +7541,78 @@ void Player::UpdateEquipSpellsAtFormChange()
     }
 }
 
+/**
+ * (un-)Apply item spells triggered at adding item to inventory ITEM_SPELLTRIGGER_ON_STORE
+ *
+ * @param item  added/removed item to/from inventory
+ * @param apply (un-)apply spell affects.
+ *
+ * Note: item moved from slot to slot in 2 steps RemoveItem and StoreItem/EquipItem
+ * In result function not called in RemoveItem for prevent unexpected re-apply auras from related spells
+ * with duration reset and etc. Instead unapply done in StoreItem/EquipItem and in specialized
+ * functions for item final remove/destroy from inventory. If new RemoveItem calls added need be sure that
+ * function will call after it in some way if need.
+ */
+
+void Player::ApplyItemOnStoreSpell(Item *item, bool apply)
+{
+    if (!item)
+        return;
+
+    ItemPrototype const *proto = item->GetProto();
+    if (!proto)
+        return;
+
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        _Spell const& spellData = proto->Spells[i];
+
+        // no spell
+        if (!spellData.SpellId)
+            continue;
+
+        // apply/unapply only at-store spells
+        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_STORE)
+            continue;
+
+        if (apply)
+        {
+            // can be attempt re-applied at move in inventory slots
+            if (!HasAura(spellData.SpellId))
+                CastSpell(this, spellData.SpellId, true, item);
+        }
+        else
+            RemoveAurasDueToItemSpell(item, spellData.SpellId);
+    }
+}
+
+void Player::DestroyItemWithOnStoreSpell(Item* item)
+{
+    if (!item)
+        return;
+
+    ItemPrototype const *proto = item->GetProto();
+    if (!proto)
+        return;
+
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        _Spell const& spellData = proto->Spells[i];
+
+        // no spell
+        if (!spellData.SpellId)
+            continue;
+
+        // apply/unapply only at-store spells
+        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_STORE)
+            continue;
+
+        DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+        break;
+    }
+}
+
+
 /// handles unique effect of Deadly Poison: apply poison of the other weapon when already at max. stack
 void Player::_HandleDeadlyPoison(Unit* Target, WeaponAttackType attType, SpellEntry const *spellInfo)
 {
@@ -7685,7 +7757,7 @@ void Player::CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 c
 {
     ItemPrototype const* proto = item->GetProto();
     // special learning case
-    if(proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN || proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN_PET)
+    if (proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN || proto->Spells[0].SpellId==SPELL_ID_GENERIC_LEARN_PET)
     {
         uint32 learn_spell_id = proto->Spells[0].SpellId;
         uint32 learning_spell_id = proto->Spells[1].SpellId;
@@ -7715,15 +7787,15 @@ void Player::CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 c
         _Spell const& spellData = proto->Spells[i];
 
         // no spell
-        if(!spellData.SpellId)
+        if (!spellData.SpellId)
             continue;
 
         // wrong triggering type
-        if( spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE && spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+        if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
             continue;
 
         SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellData.SpellId);
-        if(!spellInfo)
+        if (!spellInfo)
         {
             sLog.outError("Player::CastItemUseSpell: Item (Entry: %u) in have wrong spell id %u, ignoring",proto->ItemId, spellData.SpellId);
             continue;
@@ -7739,14 +7811,16 @@ void Player::CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 c
     }
 
     // Item enchantments spells casted at use
-    for(int e_slot = 0; e_slot < MAX_ENCHANTMENT_SLOT; ++e_slot)
+    for (int e_slot = 0; e_slot < MAX_ENCHANTMENT_SLOT; ++e_slot)
     {
         uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(e_slot));
         SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-        if(!pEnchant) continue;
+        if (!pEnchant)
+            continue;
+
         for (int s = 0; s < 3; ++s)
         {
-            if(pEnchant->type[s]!=ITEM_ENCHANTMENT_TYPE_USE_SPELL)
+            if (pEnchant->type[s]!=ITEM_ENCHANTMENT_TYPE_USE_SPELL)
                 continue;
 
             SpellEntry const *spellInfo = sSpellStore.LookupEntry(pEnchant->spellid[s]);
@@ -11143,6 +11217,9 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
         AddEnchantmentDurations(pItem);
         AddItemDurations(pItem);
 
+        // at place into not appropriate slot (bank, for example) remove aura
+        ApplyItemOnStoreSpell(pItem, IsEquipmentPos(pItem->GetBagSlot(), pItem->GetSlot()) || IsInventoryPos(pItem->GetBagSlot(), pItem->GetSlot()));
+
         return pItem;
     }
     else
@@ -11150,7 +11227,7 @@ Item* Player::_StoreItem( uint16 pos, Item *pItem, uint32 count, bool clone, boo
         if (pItem2->GetProto()->Bonding == BIND_WHEN_PICKED_UP ||
             pItem2->GetProto()->Bonding == BIND_QUEST_ITEM ||
             (pItem2->GetProto()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
-            pItem2->SetBinding( true );
+            pItem2->SetBinding(true);
 
         pItem2->SetCount( pItem2->GetCount() + count );
         if (IsInWorld() && update)
@@ -11201,21 +11278,22 @@ Item* Player::EquipItem( uint16 pos, Item *pItem, bool update )
     uint8 bag = pos >> 8;
     uint8 slot = pos & 255;
 
-    Item *pItem2 = GetItemByPos( bag, slot );
-
-    if( !pItem2 )
+    Item *pItem2 = GetItemByPos(bag, slot);
+    if (!pItem2)
     {
         VisualizeItem( slot, pItem);
 
-        if(isAlive())
+        if (isAlive())
         {
             ItemPrototype const *pProto = pItem->GetProto();
 
             // item set bonuses applied only at equip and removed at unequip, and still active for broken items
-            if(pProto && pProto->ItemSet)
+            if (pProto && pProto->ItemSet)
                 AddItemsSetItem(this, pItem);
 
             _ApplyItemMods(pItem, slot, true);
+
+            ApplyItemOnStoreSpell(pItem, true);
 
             // Weapons and also Totem/Relic/Sigil/etc
             if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
@@ -11304,6 +11382,7 @@ void Player::QuickEquipItem( uint16 pos, Item *pItem)
     {
         AddEnchantmentDurations(pItem);
         AddItemDurations(pItem);
+        ApplyItemOnStoreSpell(pItem, true);
 
         uint8 slot = pos & 255;
         VisualizeItem( slot, pItem);
@@ -11368,8 +11447,7 @@ void Player::RemoveItem( uint8 bag, uint8 slot, bool update )
     // note2: if removeitem is to be used for delinking
     // the item must be removed from the player's updatequeue
 
-    Item *pItem = GetItemByPos( bag, slot );
-    if( pItem )
+    if (Item *pItem = GetItemByPos(bag, slot))
     {
         DEBUG_LOG( "STORAGE: RemoveItem bag = %u, slot = %u, item = %u", bag, slot, pItem->GetEntry());
 
@@ -11441,7 +11519,10 @@ void Player::RemoveItem( uint8 bag, uint8 slot, bool update )
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
         // pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid()); not clear owner at remove (it will be set at store). This used in mail and auction code
         pItem->SetSlot( NULL_SLOT );
-        if( IsInWorld() && update )
+
+        //ApplyItemOnStoreSpell, for avoid re-apply will remove at _adding_ to not appropriate slot
+
+        if (IsInWorld() && update)
             pItem->SendCreateUpdateToPlayer( this );
     }
 }
@@ -11453,6 +11534,11 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
     {
         ItemRemovedQuestCheck(it->GetEntry(), it->GetCount());
         RemoveItem(bag, slot, update);
+
+        // item atStore spell not removed in RemoveItem (for avoid reappaly in slots changes), so do it directly
+        if (IsEquipmentPos(bag, slot) || IsInventoryPos(bag, slot))
+            ApplyItemOnStoreSpell(it, false);
+
         it->RemoveFromUpdateQueueOf(this);
         if(it->IsInWorld())
         {
@@ -11509,6 +11595,9 @@ void Player::DestroyItem( uint8 bag, uint8 slot, bool update )
 
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
+
+        if (IsEquipmentPos(bag, slot) || IsInventoryPos(bag, slot))
+            ApplyItemOnStoreSpell(pItem, false);
 
         ItemRemovedQuestCheck( pItem->GetEntry(), pItem->GetCount() );
 

@@ -1259,8 +1259,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         {
             return StoreItem( dest, pItem, update);
         }
-        Item* BankItem( uint16 pos, Item *pItem, bool update );
-        void RemoveItem( uint8 bag, uint8 slot, bool update );
+        Item* BankItem(uint16 pos, Item *pItem, bool update);
+        void RemoveItem(uint8 bag, uint8 slot, bool update);// see ApplyItemOnStoreSpell notes
         void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
                                                             // in trade, auction, guild bank, mail....
         void MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
@@ -2018,6 +2018,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateEquipSpellsAtFormChange();
         void CastItemCombatSpell(Unit* Target, WeaponAttackType attType);
         void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
+
+        void ApplyItemOnStoreSpell(Item *item, bool apply);
+        void DestroyItemWithOnStoreSpell(Item* item);
 
         void SendEquipmentSetList();
         void SetEquipmentSet(uint32 index, EquipmentSet eqset);
