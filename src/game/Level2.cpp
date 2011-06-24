@@ -962,7 +962,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     if (!ExtractFloat(&args, z_rot) || !ExtractOptFloat(&args, y_rot, 0) || !ExtractOptFloat(&args, x_rot, 0))
         return false;         
 
-    obj->SetRotationAngles(z_rot, y_rot, x_rot);
+    obj->SetWorldRotationAngles(z_rot, y_rot, x_rot);
     obj->SaveToDB();
     PSendSysMessage(LANG_COMMAND_TURNOBJMESSAGE, obj->GetGUIDLow(), obj->GetGOInfo()->name, obj->GetGUIDLow());
     return true;
