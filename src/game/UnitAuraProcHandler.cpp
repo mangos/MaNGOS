@@ -2104,6 +2104,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     target = this;
                     break;
                 }
+                // Item - Paladin T8 Holy 2P Bonus
+                case 64890:
+                {
+                    basepoints[0] = int32(triggerAmount * damage / 100);
+                    triggered_spell_id = 64891;             // Holy Mending
+                    break;
+                }
                 // Anger Capacitor
                 case 71406:                                 // normal
                 case 71545:                                 // heroic
