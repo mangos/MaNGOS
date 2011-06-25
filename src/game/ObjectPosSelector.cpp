@@ -54,6 +54,10 @@ void ObjectPosSelector::AddUsedArea(float size, float angle, float dist)
     //  by Law of cosines, angle of searcher/used centers
     float sr_angle = acos((m_searcherDist * m_searcherDist + dist * dist - sr_dist * sr_dist) / (2 * m_searcherDist * dist));
 
+    // skip some unexpected results.
+    if (!finite(sr_angle) || sr_angle <= 0)
+        return;
+
     if (angle >= 0)
         m_UsedAreaLists[USED_POS_PLUS].insert(UsedArea(angle, sr_angle));
     else
