@@ -2388,6 +2388,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggered_spell_id = 71824;
                     break;
                 }
+                // Shaman T10 Restoration 4P Bonus
+                case 70808:
+                {
+                    basepoints[0] = int32(triggerAmount * damage / 100);
+                    triggered_spell_id = 70809;
+                    break;
+                }
             }
             // Storm, Earth and Fire
             if (dummySpell->SpellIconID == 3063)
