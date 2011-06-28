@@ -1977,6 +1977,14 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 51336:                                 // Magic Pull
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 50770, true);
+                    return;
+                }
                 case 51420:                                 // Digging for Treasure Ping
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT)
