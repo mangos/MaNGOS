@@ -88,6 +88,9 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
 
     uint32 bidder_accId = 0;
 
+    ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
+    Player* auction_owner = sObjectMgr.GetPlayer(ownerGuid);
+
     // data for gm.log
     if (sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE))
     {
@@ -113,22 +116,21 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
 
         if (bidder_security > SEC_PLAYER)
         {
-            ObjectGuid owner_guid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
             std::string owner_name;
-            if (!sObjectMgr.GetPlayerNameByGUID(owner_guid, owner_name))
+            if (auction_owner)
+                owner_name = auction_owner->GetName();
+            else if (ownerGuid && !sObjectMgr.GetPlayerNameByGUID(ownerGuid, owner_name))
                 owner_name = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
 
-            uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
+            uint32 owner_accid = ownerGuid ? sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) : 0;
 
             sLog.outCommand(bidder_accId,"GM %s (Account: %u) won item in auction: %s (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
-                bidder_name.c_str(),bidder_accId,pItem->GetProto()->Name1,pItem->GetEntry(),pItem->GetCount(),auction->bid,owner_name.c_str(),owner_accid);
+                bidder_name.c_str(), bidder_accId, pItem->GetProto()->Name1, pItem->GetEntry(), pItem->GetCount(), auction->bid, owner_name.c_str(), owner_accid);
         }
     }
     else if (!bidder)
         bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
 
-    ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
-    Player* auction_owner = sObjectMgr.GetPlayer(ownerGuid);
     if (auction_owner)
         auction_owner->GetSession()->SendAuctionOwnerNotification(auction);
 
@@ -178,7 +180,7 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry * auction)
     Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     // owner exist (online or offline)
-    if (owner || sObjectMgr.GetPlayerAccountIdByGUID(owner_guid))
+    if (owner || owner_guid && sObjectMgr.GetPlayerAccountIdByGUID(owner_guid))
     {
         std::ostringstream msgAuctionSalePendingSubject;
         msgAuctionSalePendingSubject << auction->itemTemplate << ":0:" << AUCTION_SALE_PENDING;
@@ -208,7 +210,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry * auction)
     Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
-    if (!owner)
+    if (!owner && owner_guid)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
     // owner exist
@@ -389,17 +391,21 @@ void AuctionHouseMgr::LoadAuctions()
         auction->itemGuidLow = fields[2].GetUInt32();
         auction->itemTemplate = fields[3].GetUInt32();
         auction->owner = fields[4].GetUInt32();
-        std::wstring& plWName = playerNames[auction->owner];
-        if (plWName.empty())
+
+        if (auction->owner)
         {
-            std::string plName;
-            if (!sObjectMgr.GetPlayerNameByGUID(ObjectGuid(HIGHGUID_PLAYER, auction->owner), plName))
-                plName = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
+            std::wstring& plWName = playerNames[auction->owner];
+            if (plWName.empty())
+            {
+                std::string plName;
+                if (!sObjectMgr.GetPlayerNameByGUID(ObjectGuid(HIGHGUID_PLAYER, auction->owner), plName))
+                    plName = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
 
-            Utf8toWStr(plName, plWName);
+                Utf8toWStr(plName, plWName);
+            }
+
+            auction->ownerName = plWName;
         }
-
-        auction->ownerName = plWName;
 
         auction->buyout = fields[5].GetUInt32();
         auction->expireTime = fields[6].GetUInt32();
@@ -907,6 +913,43 @@ void AuctionHouseObject::BuildListPendingSales(WorldPacket& data, Player* player
             ++count;
         }
     }
+}
+
+AuctionEntry* AuctionHouseObject::AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint32 bid, uint32 buyout, uint32 deposit, Player * pl /*= NULL*/)
+{
+    uint32 auction_time = uint32(etime * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_TIME));
+
+    AuctionEntry *AH = new AuctionEntry;
+    AH->Id = sObjectMgr.GenerateAuctionID();
+    AH->itemGuidLow = newItem->GetObjectGuid().GetCounter();
+    AH->itemTemplate = newItem->GetEntry();
+    AH->owner = pl ? pl->GetGUIDLow() : 0;
+
+    if (pl)
+        Utf8toWStr(pl->GetName(), AH->ownerName);
+
+    AH->startbid = bid;
+    AH->bidder = 0;
+    AH->bid = 0;
+    AH->buyout = buyout;
+    AH->expireTime = time(NULL) + auction_time;
+    AH->moneyDeliveryTime = 0;
+    AH->deposit = deposit;
+    AH->auctionHouseEntry = auctionHouseEntry;
+
+    AddAuction(AH);
+
+    sAuctionMgr.AddAItem(newItem);
+
+    CharacterDatabase.BeginTransaction();
+    newItem->SaveToDB();
+    AH->SaveToDB();
+
+    if (pl)
+        pl->SaveInventoryAndGoldToDB();
+    CharacterDatabase.CommitTransaction();
+
+    return AH;
 }
 
 // this function inserts to WorldPacket auction's data

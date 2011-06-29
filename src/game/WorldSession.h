@@ -610,6 +610,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleAuctionListItems( WorldPacket & recv_data );
         void HandleAuctionListBidderItems( WorldPacket & recv_data );
         void HandleAuctionSellItem( WorldPacket & recv_data );
+
         void HandleAuctionRemoveItem( WorldPacket & recv_data );
         void HandleAuctionListOwnerItems( WorldPacket & recv_data );
         void HandleAuctionPlaceBid( WorldPacket & recv_data );

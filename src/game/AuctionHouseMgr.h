@@ -58,7 +58,7 @@ struct AuctionEntry
     uint32 Id;
     uint32 itemGuidLow;
     uint32 itemTemplate;
-    uint32 owner;
+    uint32 owner;                                           // player low guid, can be 0 for server generated auction
     std::wstring ownerName;                                 // cache name for sorting
     uint32 startbid;                                        // maybe useless
     uint32 bid;
@@ -122,6 +122,7 @@ class AuctionHouseObject
         void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
         void BuildListPendingSales(WorldPacket& data, Player* player, uint32& count);
 
+        AuctionEntry* AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint32 bid, uint32 buyout = 0, uint32 deposit = 0, Player * pl = NULL);
     private:
         AuctionEntryMap AuctionsMap;
 };

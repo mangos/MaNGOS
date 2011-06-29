@@ -145,6 +145,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleAuctionAllianceCommand(char* args);
         bool HandleAuctionGoblinCommand(char* args);
         bool HandleAuctionHordeCommand(char* args);
+        bool HandleAuctionItemCommand(char* args);
         bool HandleAuctionCommand(char* args);
 
         bool HandleAchievementCommand(char* args);

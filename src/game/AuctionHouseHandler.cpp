@@ -371,36 +371,10 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
 
         pl->ModifyMoney(-int32(deposit));
 
-        uint32 auction_time = uint32(etime * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_TIME));
-
-        AuctionEntry *AH = new AuctionEntry;
-        AH->Id = sObjectMgr.GenerateAuctionID();
-        AH->itemGuidLow = newItem->GetObjectGuid().GetCounter();
-        AH->itemTemplate = newItem->GetEntry();
-        AH->owner = pl->GetGUIDLow();
-
-        Utf8toWStr(pl->GetName(), AH->ownerName);
-
-        AH->startbid = bid;
-        AH->bidder = 0;
-        AH->bid = 0;
-        AH->buyout = buyout;
-        AH->expireTime = time(NULL) + auction_time;
-        AH->moneyDeliveryTime = 0;
-        AH->deposit = deposit;
-        AH->auctionHouseEntry = auctionHouseEntry;
+        AuctionEntry* AH = auctionHouse->AddAuction(auctionHouseEntry, newItem, etime, bid, buyout, deposit, pl);
 
         DETAIL_LOG("selling %s to auctioneer %s with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
-            itemGuid.GetString().c_str(), auctioneerGuid.GetString().c_str(), bid, buyout, auction_time, AH->GetHouseId());
-        auctionHouse->AddAuction(AH);
-
-        sAuctionMgr.AddAItem(newItem);
-
-        CharacterDatabase.BeginTransaction();
-        newItem->SaveToDB();
-        AH->SaveToDB();
-        pl->SaveInventoryAndGoldToDB();
-        CharacterDatabase.CommitTransaction();
+            itemGuid.GetString().c_str(), auctioneerGuid.GetString().c_str(), bid, buyout, etime, auctionHouseEntry->houseId);
 
         SendAuctionCommandResult(AH, AUCTION_STARTED, AUCTION_OK);
 
@@ -447,7 +421,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 
     // impossible have online own another character (use this for speedup check in case online owner)
     Player* auction_owner = sObjectMgr.GetPlayer(ownerGuid);
-    if (!auction_owner && sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) == pl->GetSession()->GetAccountId())
+    if (!auction_owner && ownerGuid && sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) == pl->GetSession()->GetAccountId())
     {
         // you cannot bid your another character auction:
         SendAuctionCommandResult(NULL, AUCTION_BID_PLACED, AUCTION_ERR_BID_OWN);
@@ -564,43 +538,38 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     AuctionEntry *auction = auctionHouse->GetAuction(auctionId);
     Player *pl = GetPlayer();
 
-    if (auction && auction->owner == pl->GetGUIDLow())
-    {
-        Item *pItem = sAuctionMgr.GetAItem(auction->itemGuidLow);
-        if (pItem)
-        {
-            if (auction->bidder > 0)                        // If we have a bidder, we have to send him the money he paid
-            {
-                uint32 auctionCut = auction->GetAuctionCut();
-                if (pl->GetMoney() < auctionCut)            // player doesn't have enough money, maybe message needed
-                    return;
-
-                SendAuctionCancelledToBidderMail(auction);
-                pl->ModifyMoney(-int32(auctionCut));
-            }
-            // Return the item by mail
-            std::ostringstream msgAuctionCanceledOwner;
-            msgAuctionCanceledOwner << auction->itemTemplate << ":0:" << AUCTION_CANCELED << ":0:0";
-
-            // item will deleted or added to received mail list
-            MailDraft(msgAuctionCanceledOwner.str(), "")    // TODO: fix body
-                .AddItem(pItem)
-                .SendMailTo(pl, auction, MAIL_CHECK_MASK_COPIED);
-        }
-        else
-        {
-            sLog.outError("Auction id: %u has nonexistent item (item guid : %u)!!!", auction->Id, auction->itemGuidLow);
-            SendAuctionCommandResult(NULL, AUCTION_REMOVED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
-            return;
-        }
-    }
-    else
+    if (!auction || auction->owner != pl->GetGUIDLow())
     {
         SendAuctionCommandResult(NULL, AUCTION_REMOVED, AUCTION_ERR_DATABASE);
-        // this code isn't possible ... maybe there should be ASSERT
         sLog.outError("CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is NULL", pl->GetGUIDLow(), auctionId);
         return;
     }
+
+    Item *pItem = sAuctionMgr.GetAItem(auction->itemGuidLow);
+    if (!pItem)
+    {
+        sLog.outError("Auction id: %u has nonexistent item (item guid : %u)!!!", auction->Id, auction->itemGuidLow);
+        SendAuctionCommandResult(NULL, AUCTION_REMOVED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
+        return;
+    }
+
+    if (auction->bidder > 0)                        // If we have a bidder, we have to send him the money he paid
+    {
+        uint32 auctionCut = auction->GetAuctionCut();
+        if (pl->GetMoney() < auctionCut)            // player doesn't have enough money, maybe message needed
+            return;
+
+        SendAuctionCancelledToBidderMail(auction);
+        pl->ModifyMoney(-int32(auctionCut));
+    }
+    // Return the item by mail
+    std::ostringstream msgAuctionCanceledOwner;
+    msgAuctionCanceledOwner << auction->itemTemplate << ":0:" << AUCTION_CANCELED << ":0:0";
+
+    // item will deleted or added to received mail list
+    MailDraft(msgAuctionCanceledOwner.str(), "")    // TODO: fix body
+        .AddItem(pItem)
+        .SendMailTo(pl, auction, MAIL_CHECK_MASK_COPIED);
 
     // inform player, that auction is removed
     SendAuctionCommandResult(auction, AUCTION_REMOVED, AUCTION_OK);
