@@ -2134,108 +2134,118 @@ void ObjectMgr::LoadItemPrototypes()
             }
         }
 
-        if(proto->Bonding >= MAX_BIND_TYPE)
+        if (proto->Bonding >= MAX_BIND_TYPE)
             sLog.outErrorDb("Item (Entry: %u) has wrong Bonding value (%u)",i,proto->Bonding);
 
-        if(proto->PageText)
+        if (proto->PageText)
         {
-            if(!sPageTextStore.LookupEntry<PageText>(proto->PageText))
+            if (!sPageTextStore.LookupEntry<PageText>(proto->PageText))
                 sLog.outErrorDb("Item (Entry: %u) has non existing first page (Id:%u)", i,proto->PageText);
         }
 
-        if(proto->LockID && !sLockStore.LookupEntry(proto->LockID))
+        if (proto->LockID && !sLockStore.LookupEntry(proto->LockID))
             sLog.outErrorDb("Item (Entry: %u) has wrong LockID (%u)",i,proto->LockID);
 
-        if(proto->Sheath >= MAX_SHEATHETYPE)
+        if (proto->Sheath >= MAX_SHEATHETYPE)
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong Sheath (%u)",i,proto->Sheath);
             const_cast<ItemPrototype*>(proto)->Sheath = SHEATHETYPE_NONE;
         }
 
-        if(proto->RandomProperty && !sItemRandomPropertiesStore.LookupEntry(GetItemEnchantMod(proto->RandomProperty)))
+        if (proto->RandomProperty && !sItemRandomPropertiesStore.LookupEntry(GetItemEnchantMod(proto->RandomProperty)))
         {
             sLog.outErrorDb("Item (Entry: %u) has unknown (wrong or not listed in `item_enchantment_template`) RandomProperty (%u)",i,proto->RandomProperty);
             const_cast<ItemPrototype*>(proto)->RandomProperty = 0;
         }
 
-        if(proto->RandomSuffix && !sItemRandomSuffixStore.LookupEntry(GetItemEnchantMod(proto->RandomSuffix)))
+        if (proto->RandomSuffix && !sItemRandomSuffixStore.LookupEntry(GetItemEnchantMod(proto->RandomSuffix)))
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong RandomSuffix (%u)",i,proto->RandomSuffix);
             const_cast<ItemPrototype*>(proto)->RandomSuffix = 0;
         }
 
-        if(proto->ItemSet && !sItemSetStore.LookupEntry(proto->ItemSet))
+        // item can have not null only one from field values
+        if (proto->RandomProperty && proto->RandomSuffix)
         {
-            sLog.outErrorDb("Item (Entry: %u) have wrong ItemSet (%u)",i,proto->ItemSet);
+            sLog.outErrorDb("Item (Entry: %u) have RandomProperty==%u and RandomSuffix==%u, but must have one from field = 0",
+                proto->ItemId, proto->RandomProperty, proto->RandomSuffix);
+            const_cast<ItemPrototype*>(proto)->RandomSuffix = 0;
+        }
+
+        if (proto->ItemSet && !sItemSetStore.LookupEntry(proto->ItemSet))
+        {
+            sLog.outErrorDb("Item (Entry: %u) have wrong ItemSet (%u)", i, proto->ItemSet);
             const_cast<ItemPrototype*>(proto)->ItemSet = 0;
         }
 
-        if(proto->Area && !GetAreaEntryByAreaID(proto->Area))
-            sLog.outErrorDb("Item (Entry: %u) has wrong Area (%u)",i,proto->Area);
+        if (proto->Area && !GetAreaEntryByAreaID(proto->Area))
+            sLog.outErrorDb("Item (Entry: %u) has wrong Area (%u)", i, proto->Area);
 
-        if(proto->Map && !sMapStore.LookupEntry(proto->Map))
-            sLog.outErrorDb("Item (Entry: %u) has wrong Map (%u)",i,proto->Map);
+        if (proto->Map && !sMapStore.LookupEntry(proto->Map))
+            sLog.outErrorDb("Item (Entry: %u) has wrong Map (%u)", i, proto->Map);
 
-        if(proto->BagFamily)
+        if (proto->BagFamily)
         {
             // check bits
-            for(uint32 j = 0; j < sizeof(proto->BagFamily)*8; ++j)
+            for (uint32 j = 0; j < sizeof(proto->BagFamily) * 8; ++j)
             {
                 uint32 mask = 1 << j;
-                if((proto->BagFamily & mask)==0)
+                if (!(proto->BagFamily & mask))
                     continue;
 
                 ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(j+1);
-                if(!bf)
+                if (!bf)
                 {
-                    sLog.outErrorDb("Item (Entry: %u) has bag family bit set not listed in ItemBagFamily.dbc, remove bit",i);
+                    sLog.outErrorDb("Item (Entry: %u) has bag family bit set not listed in ItemBagFamily.dbc, remove bit", i);
                     const_cast<ItemPrototype*>(proto)->BagFamily &= ~mask;
                     continue;
                 }
 
-                if(BAG_FAMILY_MASK_CURRENCY_TOKENS & mask)
+                if (BAG_FAMILY_MASK_CURRENCY_TOKENS & mask)
                 {
                     CurrencyTypesEntry const* ctEntry = sCurrencyTypesStore.LookupEntry(proto->ItemId);
-                    if(!ctEntry)
+                    if (!ctEntry)
                     {
-                        sLog.outErrorDb("Item (Entry: %u) has currency bag family bit set in BagFamily but not listed in CurrencyTypes.dbc, remove bit",i);
+                        sLog.outErrorDb("Item (Entry: %u) has currency bag family bit set in BagFamily but not listed in CurrencyTypes.dbc, remove bit", i);
                         const_cast<ItemPrototype*>(proto)->BagFamily &= ~mask;
                     }
                 }
             }
         }
 
-        if(proto->TotemCategory && !sTotemCategoryStore.LookupEntry(proto->TotemCategory))
-            sLog.outErrorDb("Item (Entry: %u) has wrong TotemCategory (%u)",i,proto->TotemCategory);
+        if (proto->TotemCategory && !sTotemCategoryStore.LookupEntry(proto->TotemCategory))
+            sLog.outErrorDb("Item (Entry: %u) has wrong TotemCategory (%u)", i, proto->TotemCategory);
 
         for (int j = 0; j < MAX_ITEM_PROTO_SOCKETS; ++j)
         {
-            if(proto->Socket[j].Color && (proto->Socket[j].Color & SOCKET_COLOR_ALL) != proto->Socket[j].Color)
+            if (proto->Socket[j].Color && (proto->Socket[j].Color & SOCKET_COLOR_ALL) != proto->Socket[j].Color)
             {
-                sLog.outErrorDb("Item (Entry: %u) has wrong socketColor_%d (%u)",i,j+1,proto->Socket[j].Color);
+                sLog.outErrorDb("Item (Entry: %u) has wrong socketColor_%d (%u)", i, j+1, proto->Socket[j].Color);
                 const_cast<ItemPrototype*>(proto)->Socket[j].Color = 0;
             }
         }
 
-        if(proto->GemProperties && !sGemPropertiesStore.LookupEntry(proto->GemProperties))
-            sLog.outErrorDb("Item (Entry: %u) has wrong GemProperties (%u)",i,proto->GemProperties);
+        if (proto->GemProperties && !sGemPropertiesStore.LookupEntry(proto->GemProperties))
+            sLog.outErrorDb("Item (Entry: %u) has wrong GemProperties (%u)", i, proto->GemProperties);
 
         if (proto->RequiredDisenchantSkill < -1)
         {
-            sLog.outErrorDb("Item (Entry: %u) has wrong RequiredDisenchantSkill (%i), set to (-1).",i,proto->RequiredDisenchantSkill);
+            sLog.outErrorDb("Item (Entry: %u) has wrong RequiredDisenchantSkill (%i), set to (-1).", i, proto->RequiredDisenchantSkill);
             const_cast<ItemPrototype*>(proto)->RequiredDisenchantSkill = -1;
         }
         else if (proto->RequiredDisenchantSkill != -1)
         {
             if (proto->Quality > ITEM_QUALITY_EPIC || proto->Quality < ITEM_QUALITY_UNCOMMON)
             {
-                ERROR_DB_STRICT_LOG("Item (Entry: %u) has unexpected RequiredDisenchantSkill (%u) for non-disenchantable quality (%u), reset it.",i,proto->RequiredDisenchantSkill,proto->Quality);
+                ERROR_DB_STRICT_LOG("Item (Entry: %u) has unexpected RequiredDisenchantSkill (%u) for non-disenchantable quality (%u), reset it.",
+                    i, proto->RequiredDisenchantSkill, proto->Quality);
                 const_cast<ItemPrototype*>(proto)->RequiredDisenchantSkill = -1;
             }
             else if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
             {
                 // some wrong data in wdb for unused items
-                ERROR_DB_STRICT_LOG("Item (Entry: %u) has unexpected RequiredDisenchantSkill (%u) for non-disenchantable item class (%u), reset it.",i,proto->RequiredDisenchantSkill,proto->Class);
+                ERROR_DB_STRICT_LOG("Item (Entry: %u) has unexpected RequiredDisenchantSkill (%u) for non-disenchantable item class (%u), reset it.",
+                    i, proto->RequiredDisenchantSkill, proto->Class);
                 const_cast<ItemPrototype*>(proto)->RequiredDisenchantSkill = -1;
             }
         }
@@ -2244,17 +2254,17 @@ void ObjectMgr::LoadItemPrototypes()
         {
             if (proto->Quality > ITEM_QUALITY_EPIC || proto->Quality < ITEM_QUALITY_UNCOMMON)
             {
-                sLog.outErrorDb("Item (Entry: %u) has wrong quality (%u) for disenchanting, remove disenchanting loot id.",i,proto->Quality);
+                sLog.outErrorDb("Item (Entry: %u) has wrong quality (%u) for disenchanting, remove disenchanting loot id.", i, proto->Quality);
                 const_cast<ItemPrototype*>(proto)->DisenchantID = 0;
             }
             else if (proto->Class != ITEM_CLASS_WEAPON && proto->Class != ITEM_CLASS_ARMOR)
             {
-                sLog.outErrorDb("Item (Entry: %u) has wrong item class (%u) for disenchanting, remove disenchanting loot id.",i,proto->Class);
+                sLog.outErrorDb("Item (Entry: %u) has wrong item class (%u) for disenchanting, remove disenchanting loot id.", i, proto->Class);
                 const_cast<ItemPrototype*>(proto)->DisenchantID = 0;
             }
             else if (proto->RequiredDisenchantSkill < 0)
             {
-                sLog.outErrorDb("Item (Entry: %u) marked as non-disenchantable by RequiredDisenchantSkill == -1, remove disenchanting loot id.",i);
+                sLog.outErrorDb("Item (Entry: %u) marked as non-disenchantable by RequiredDisenchantSkill == -1, remove disenchanting loot id.", i);
                 const_cast<ItemPrototype*>(proto)->DisenchantID = 0;
             }
         }
@@ -2262,31 +2272,31 @@ void ObjectMgr::LoadItemPrototypes()
         {
             // lot DB cases
             if (proto->RequiredDisenchantSkill >= 0)
-                ERROR_DB_STRICT_LOG("Item (Entry: %u) marked as disenchantable by RequiredDisenchantSkill, but not have disenchanting loot id.",i);
+                ERROR_DB_STRICT_LOG("Item (Entry: %u) marked as disenchantable by RequiredDisenchantSkill, but not have disenchanting loot id.", i);
         }
 
-        if(proto->FoodType >= MAX_PET_DIET)
+        if (proto->FoodType >= MAX_PET_DIET)
         {
-            sLog.outErrorDb("Item (Entry: %u) has wrong FoodType value (%u)",i,proto->FoodType);
+            sLog.outErrorDb("Item (Entry: %u) has wrong FoodType value (%u)", i, proto->FoodType);
             const_cast<ItemPrototype*>(proto)->FoodType = 0;
         }
 
-        if(proto->ItemLimitCategory && !sItemLimitCategoryStore.LookupEntry(proto->ItemLimitCategory))
+        if (proto->ItemLimitCategory && !sItemLimitCategoryStore.LookupEntry(proto->ItemLimitCategory))
         {
-            sLog.outErrorDb("Item (Entry: %u) has wrong LimitCategory value (%u)",i,proto->ItemLimitCategory);
+            sLog.outErrorDb("Item (Entry: %u) has wrong LimitCategory value (%u)", i, proto->ItemLimitCategory);
             const_cast<ItemPrototype*>(proto)->ItemLimitCategory = 0;
         }
 
-        if(proto->HolidayId && !sHolidaysStore.LookupEntry(proto->HolidayId))
+        if (proto->HolidayId && !sHolidaysStore.LookupEntry(proto->HolidayId))
         {
             sLog.outErrorDb("Item (Entry: %u) has wrong HolidayId value (%u)", i, proto->HolidayId);
             const_cast<ItemPrototype*>(proto)->HolidayId = 0;
         }
 
-        if(proto->ExtraFlags)
+        if (proto->ExtraFlags)
         {
             if (proto->ExtraFlags & ~ITEM_EXTRA_ALL)
-                sLog.outErrorDb("Item (Entry: %u) has wrong ExtraFlags (%u) with unused bits set",i,proto->ExtraFlags);
+                sLog.outErrorDb("Item (Entry: %u) has wrong ExtraFlags (%u) with unused bits set", i, proto->ExtraFlags);
 
             if (proto->ExtraFlags & ITEM_EXTRA_NON_CONSUMABLE)
             {
@@ -2326,7 +2336,7 @@ void ObjectMgr::LoadItemPrototypes()
         if (!entry)
             continue;
 
-        for(int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+        for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
         {
             if (entry->ItemId[j] <= 0)
                 continue;
@@ -2339,7 +2349,7 @@ void ObjectMgr::LoadItemPrototypes()
         }
     }
 
-    for(std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
+    for (std::set<uint32>::const_iterator itr = notFoundOutfit.begin(); itr != notFoundOutfit.end(); ++itr)
         sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dbc`", *itr);
 }
 

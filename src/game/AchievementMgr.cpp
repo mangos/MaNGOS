@@ -2093,7 +2093,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     // mail
     if(reward->sender)
     {
-        Item* item = reward->itemId ? Item::CreateItem(reward->itemId,1,GetPlayer ()) : NULL;
+        Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer ()) : NULL;
 
         int loc_idx = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
 
