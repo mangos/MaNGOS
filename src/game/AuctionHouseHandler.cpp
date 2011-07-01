@@ -364,8 +364,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
         if (!pl->HasItemCount(it->GetEntry(), stackSize))   // not enough items
             continue;
 
-        Item *newItem = it->CloneItem(stackSize, pl);
-        newItem->RemoveFromUpdateQueueOf(pl);               // item not planned to adding to inventory
+        Item *newItem = it->CloneItem(stackSize);
 
         pl->DestroyItemCount(it, stackSize, true);
 
