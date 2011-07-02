@@ -176,35 +176,6 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
     }
 }
 
-void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry * auction)
-{
-    ObjectGuid owner_guid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
-    Player *owner = sObjectMgr.GetPlayer(owner_guid);
-
-    // owner exist (online or offline)
-    if (owner || owner_guid && sObjectMgr.GetPlayerAccountIdByGUID(owner_guid))
-    {
-        std::ostringstream msgAuctionSalePendingSubject;
-        msgAuctionSalePendingSubject << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_SALE_PENDING;
-
-        std::ostringstream msgAuctionSalePendingBody;
-        uint32 auctionCut = auction->GetAuctionCut();
-
-        time_t distrTime = time(NULL) + HOUR;
-
-        msgAuctionSalePendingBody.width(16);
-        msgAuctionSalePendingBody << std::right << std::hex << auction->bidder;
-        msgAuctionSalePendingBody << std::dec << ":" << auction->bid << ":" << auction->buyout;
-        msgAuctionSalePendingBody << ":" << auction->deposit << ":" << auctionCut << ":0:";
-        msgAuctionSalePendingBody << secsToTimeBitFields(distrTime);
-
-        DEBUG_LOG("AuctionSalePending body string : %s", msgAuctionSalePendingBody.str().c_str());
-
-        MailDraft(msgAuctionSalePendingSubject.str(), msgAuctionSalePendingBody.str())
-            .SendMailTo(MailReceiver(owner, owner_guid), auction, MAIL_CHECK_MASK_COPIED);
-    }
-}
-
 // call this method to send mail to auction owner, when auction is successful, it does not clear ram
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry * auction)
 {
