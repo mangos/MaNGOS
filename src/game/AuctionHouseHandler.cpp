@@ -162,7 +162,7 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction)
     if (oldBidder || oldBidder_accId)
     {
         std::ostringstream msgAuctionOutbiddedSubject;
-        msgAuctionOutbiddedSubject << auction->itemTemplate << ":0:" << AUCTION_OUTBIDDED << ":0:0";
+        msgAuctionOutbiddedSubject << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_OUTBIDDED << ":" << auction->Id << ":" << auction->itemCount;
 
         if (oldBidder)
             oldBidder->GetSession()->SendAuctionBidderNotification(auction);
@@ -187,7 +187,7 @@ void WorldSession::SendAuctionCancelledToBidderMail(AuctionEntry* auction)
     if (bidder || bidder_accId)
     {
         std::ostringstream msgAuctionCancelledSubject;
-        msgAuctionCancelledSubject << auction->itemTemplate << ":0:" << AUCTION_CANCELLED_TO_BIDDER << ":0:0";
+        msgAuctionCancelledSubject << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_CANCELLED_TO_BIDDER << ":" << auction->Id << ":" << auction->itemCount;
 
         if (bidder)
             bidder->GetSession()->SendAuctionRemovedNotification(auction);
@@ -505,7 +505,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     }
     // Return the item by mail
     std::ostringstream msgAuctionCanceledOwner;
-    msgAuctionCanceledOwner << auction->itemTemplate << ":0:" << AUCTION_CANCELED << ":0:0";
+    msgAuctionCanceledOwner << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_CANCELED << ":" << auction->Id << ":" << auction->itemCount;
 
     // item will deleted or added to received mail list
     MailDraft(msgAuctionCanceledOwner.str(), "")            // TODO: fix body
