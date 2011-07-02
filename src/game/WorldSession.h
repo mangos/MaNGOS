@@ -356,7 +356,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendAuctionBidderNotification(AuctionEntry *auction);
         void SendAuctionOwnerNotification(AuctionEntry *auction);
         void SendAuctionRemovedNotification(AuctionEntry* auction);
-        void SendAuctionOutbiddedMail(AuctionEntry *auction);
+        static void SendAuctionOutbiddedMail(AuctionEntry *auction);
         void SendAuctionCancelledToBidderMail(AuctionEntry *auction);
         void BuildListAuctionItems(std::list<AuctionEntry*> &auctions, WorldPacket& data, std::wstring const& searchedname, uint32 listfrom, uint32 levelmin,
             uint32 levelmax, uint32 usable, uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality, uint32& count, uint32& totalcount, bool isFull);
@@ -614,6 +614,8 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleAuctionRemoveItem( WorldPacket & recv_data );
         void HandleAuctionListOwnerItems( WorldPacket & recv_data );
         void HandleAuctionPlaceBid( WorldPacket & recv_data );
+
+        void AuctionBind( uint32 price, AuctionEntry * auction, Player * pl, Player* auction_owner );
         void HandleAuctionListPendingSales( WorldPacket & recv_data );
 
         void HandleGetMailList( WorldPacket & recv_data );
