@@ -74,13 +74,14 @@ void TargetedMovementGeneratorMedium<T,D>::_setTargetLocation(T &owner)
         if( i_destinationHolder.HasDestination() && i_destinationHolder.GetDestinationDiff(x,y,z) < bothObjectSize )
             return;
     */
-
-    Traveller<T> traveller(owner);
-    i_destinationHolder.SetDestination(traveller, x, y, z);
-
-    D::_addUnitStateMove(owner);
     if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->CanFly())
         ((Creature&)owner).AddSplineFlag(SPLINEFLAG_FLYING);
+
+    i_targetReached = false;
+    i_recalculateTravel = false;
+    D::_addUnitStateMove(owner);
+    Traveller<T> traveller(owner);
+    i_destinationHolder.SetDestination(traveller, x, y, z);
 }
 
 template<>
@@ -140,51 +141,34 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     }
 
     Traveller<T> traveller(owner);
-
-    if (!i_destinationHolder.HasDestination())
-        _setTargetLocation(owner);
-    if (owner.IsStopped() && !i_destinationHolder.HasArrived())
-    {
-        D::_addUnitStateMove(owner);
-        if (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->CanFly())
-            ((Creature&)owner).AddSplineFlag(SPLINEFLAG_FLYING);
-
-        i_destinationHolder.StartTravel(traveller);
-        return true;
-    }
-
     if (i_destinationHolder.UpdateTraveller(traveller, time_diff, false))
     {
         if (!IsActive(owner))                               // force stop processing (movement can move out active zone with cleanup movegens list)
-            return true;                                    // not expire now, but already lost
+            return true;
 
-        // put targeted movement generators on a higher priority
-        if (owner.GetObjectBoundingRadius())
-            i_destinationHolder.ResetUpdate(50);
-
-        float dist = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius() + sWorld.getConfig(CONFIG_FLOAT_RATE_TARGET_POS_RECALCULATION_RANGE);
-
+        i_destinationHolder.ResetUpdate(50);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
+        float dist = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius()
+            + sWorld.getConfig(CONFIG_FLOAT_RATE_TARGET_POS_RECALCULATION_RANGE);
+        if (i_destinationHolder.GetDistance3dFromDestSq(*i_target.getTarget()) > dist * dist)
+            _setTargetLocation(owner);
+    }
 
-        // try to counter precision differences
-        if (i_destinationHolder.GetDistance3dFromDestSq(*i_target.getTarget()) >= dist * dist)
-        {
-            owner.SetInFront(i_target.getTarget());         // Set new Angle For Map::
-            _setTargetLocation(owner);                      //Calculate New Dest and Send data To Player
-        }
-        // Update the Angle of the target only for Map::, no need to send packet for player
-        else if (!i_angle && !owner.HasInArc(0.01f, i_target.getTarget()))
+    if (i_destinationHolder.HasArrived())
+    {
+        if (i_angle == 0.f && !owner.HasInArc(0.01f, i_target.getTarget()))
             owner.SetInFront(i_target.getTarget());
 
-        if ((owner.IsStopped() && !i_destinationHolder.HasArrived()) || i_recalculateTravel)
+        if (!i_targetReached)
         {
-            i_recalculateTravel = false;
-            //Angle update will take place into owner.StopMoving()
-            owner.SetInFront(i_target.getTarget());
-
-            owner.StopMoving();
+            i_targetReached = true;
             static_cast<D*>(this)->_reachTarget(owner);
         }
+    }
+    else
+    {
+        if (i_recalculateTravel)
+            _setTargetLocation(owner);
     }
     return true;
 }

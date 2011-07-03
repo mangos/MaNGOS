@@ -38,12 +38,12 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 : public MovementGeneratorMedium< T, D >, public TargetedMovementGeneratorBase
 {
     protected:
-        TargetedMovementGeneratorMedium()
-            : TargetedMovementGeneratorBase(), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
-        TargetedMovementGeneratorMedium(Unit &target)
-            : TargetedMovementGeneratorBase(target), i_offset(0), i_angle(0), i_recalculateTravel(false) {}
-        TargetedMovementGeneratorMedium(Unit &target, float offset, float angle)
-            : TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle), i_recalculateTravel(false) {}
+        TargetedMovementGeneratorMedium(Unit &target, float offset = 0.f, float angle = 0.f) :
+             TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle),
+             i_recalculateTravel(false), i_targetReached(false)
+        {
+        }
+
         ~TargetedMovementGeneratorMedium() {}
 
     public:
@@ -67,7 +67,8 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
         float i_offset;
         float i_angle;
         DestinationHolder< Traveller<T> > i_destinationHolder;
-        bool i_recalculateTravel;
+        bool i_recalculateTravel : 1;
+        bool i_targetReached : 1;
 };
 
 template<class T>
