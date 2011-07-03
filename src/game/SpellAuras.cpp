@@ -453,15 +453,11 @@ Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, holder,
     {
         case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
             m_areaAuraType = AREA_AURA_PARTY;
-            if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
-                m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
             m_areaAuraType = AREA_AURA_RAID;
-            if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
-                m_modifier.m_auraname = SPELL_AURA_NONE;
             // Light's Beacon not applied to caster itself (TODO: more generic check for another similar spell if any?)
-            else if (target == caster_ptr && spellproto->Id == 53651)
+            if (target == caster_ptr && spellproto->Id == 53651)
                 m_modifier.m_auraname = SPELL_AURA_NONE;
             break;
         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
@@ -485,6 +481,10 @@ Unit *caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, holder,
             MANGOS_ASSERT(false);
             break;
     }
+
+    // totems are immune to any kind of area auras
+    if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
+        m_modifier.m_auraname = SPELL_AURA_NONE;
 }
 
 AreaAura::~AreaAura()
