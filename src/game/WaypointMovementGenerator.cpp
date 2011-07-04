@@ -75,15 +75,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
         }
     }
 
-    // We have to set the destination here (for the first point), right after Initialize. Without, we may not have valid xyz for GetResetPosition
-    CreatureTraveller traveller(creature);
-
-    if (creature.CanFly())
-        creature.AddSplineFlag(SPLINEFLAG_FLYING);
-
-    const WaypointNode &node = i_path->at(i_currentNode);
-    i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
-    i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
+    StartMoveNow(creature);
 }
 
 void WaypointMovementGenerator<Creature>::Initialize(Creature &creature)
@@ -104,16 +96,100 @@ void WaypointMovementGenerator<Creature>::Interrupt(Creature &creature)
 
 void WaypointMovementGenerator<Creature>::Reset(Creature &creature)
 {
-    SetStoppedByPlayer(false);
-    i_nextMoveTime.Reset(0);
     creature.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    StartMoveNow(creature);
+}
+
+void WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
+{
+    if (!i_path || i_path->empty())
+        return;
+
+    if (m_isArrivalDone)
+        return;
+
+    creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+    m_isArrivalDone = true;
+
+    if (i_path->at(i_currentNode).orientation != 100)
+    {
+        creature.SetFacingTo(i_path->at(i_currentNode).orientation);
+    }
+
+    if (i_path->at(i_currentNode).script_id)
+    {
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for %s.", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetGuidStr().c_str());
+        creature.GetMap()->ScriptsStart(sCreatureMovementScripts, i_path->at(i_currentNode).script_id, &creature, &creature);
+    }
+
+    // We have reached the destination and can process behavior
+    if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
+    {
+        if (behavior->emote != 0)
+            creature.HandleEmote(behavior->emote);
+
+        if (behavior->spell != 0)
+            creature.CastSpell(&creature, behavior->spell, false);
+
+        if (behavior->model1 != 0)
+            creature.SetDisplayId(behavior->model1);
+
+        if (behavior->textid[0])
+        {
+            // Not only one text is set
+            if (behavior->textid[1])
+            {
+                // Select one from max 5 texts (0 and 1 already checked)
+                int i = 2;
+                for(; i < MAX_WAYPOINT_TEXT; ++i)
+                {
+                    if (!behavior->textid[i])
+                        break;
+                }
+
+                creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL);
+            }
+            else
+                creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL);
+        }
+    }
+
+    // Inform script
+    MovementInform(creature);
+    Stop(i_path->at(i_currentNode).delay);
+}
+
+void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
+{
+    if (!i_path || i_path->empty())
+        return;
+
+    if (Stopped())
+        return;
+
+    if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
+    {
+        if (behavior->model2 != 0)
+            creature.SetDisplayId(behavior->model2);
+        creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+    }
+
+    if (m_isArrivalDone)
+        i_currentNode = (i_currentNode+1) % i_path->size();
+
+    m_isArrivalDone = false;
+
+    if (creature.CanFly())
+        creature.AddSplineFlag(SPLINEFLAG_FLYING);
+    creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
+
+    const WaypointNode &node = i_path->at(i_currentNode);
+    CreatureTraveller traveller(creature);
+    i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
 }
 
 bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
 {
-    if (!&creature)
-        return true;
-
     // Waypoint movement can be switched on/off
     // This is quite handy for escort quests and other stuff
     if (creature.hasUnitState(UNIT_STAT_NOT_MOVE))
@@ -129,170 +205,26 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
         return true;
     }
 
-    if (i_currentNode >= i_path->size())
+    if (Stopped())
     {
-        sLog.outError("WaypointMovement currentNode (%u) is equal or bigger than path size (creature entry %u)", i_currentNode, creature.GetEntry());
-        i_currentNode = 0;
+        if (CanMove(diff))
+            StartMove(creature);
     }
-
-    CreatureTraveller traveller(creature);
-
-    i_nextMoveTime.Update(diff);
-
-    if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
+    else
     {
-        if (!IsActive(creature))                            // force stop processing (movement can move out active zone with cleanup movegens list)
-            return true;                                    // not expire now, but already lost
-    }
+        CreatureTraveller traveller(creature);
+        if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true) && !IsActive(creature))
+            return true;
 
-    // creature has been stopped in middle of the waypoint segment
-    if (!i_destinationHolder.HasArrived() && creature.IsStopped())
-    {
-        // Timer has elapsed, meaning this part controlled it
-        if (i_nextMoveTime.Passed())
-        {
-            SetStoppedByPlayer(false);
-
-            creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
-
-            if (creature.CanFly())
-                creature.AddSplineFlag(SPLINEFLAG_FLYING);
-
-            // Now we re-set destination to same node and start travel
-            const WaypointNode &node = i_path->at(i_currentNode);
-            i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
-            i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
-        }
-        else // if( !i_nextMoveTime.Passed())
-        {
-            // unexpected end of timer && creature stopped && not at end of segment
-            if (!IsStoppedByPlayer())
-            {
-                // Put 30 seconds delay
-                i_destinationHolder.IncreaseTravelTime(STOP_TIME_FOR_PLAYER);
-                i_nextMoveTime.Reset(STOP_TIME_FOR_PLAYER);
-                SetStoppedByPlayer(true);                   // Mark we did it
-            }
-        }
-        return true;                                        // Abort here this update
-    }
-
-    if (creature.IsStopped())
-    {
-        if (!m_isArrivalDone)
-        {
-            if (i_path->at(i_currentNode).orientation != 100)
-                creature.SetOrientation(i_path->at(i_currentNode).orientation);
-
-            if (i_path->at(i_currentNode).script_id)
-            {
-                DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for %s.", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetGuidStr().c_str());
-                creature.GetMap()->ScriptsStart(sCreatureMovementScripts, i_path->at(i_currentNode).script_id, &creature, &creature);
-            }
-
-            // We have reached the destination and can process behavior
-            if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
-            {
-                if (behavior->emote != 0)
-                    creature.HandleEmote(behavior->emote);
-
-                if (behavior->spell != 0)
-                {
-                    creature.CastSpell(&creature, behavior->spell, false);
-
-                    if (!IsActive(creature))                // force stop processing (cast can change movegens list)
-                        return true;                        // not expire now, but already lost
-                }
-
-                if (behavior->model1 != 0)
-                    creature.SetDisplayId(behavior->model1);
-
-                if (behavior->textid[0])
-                {
-                    // Not only one text is set
-                    if (behavior->textid[1])
-                    {
-                        // Select one from max 5 texts (0 and 1 already checked)
-                        int i = 2;
-                        for(; i < MAX_WAYPOINT_TEXT; ++i)
-                        {
-                            if (!behavior->textid[i])
-                                break;
-                        }
-
-                        creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL);
-                    }
-                    else
-                        creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL);
-                }
-            }                                               // wpBehaviour found
-
-            // Can only do this once for the node
-            m_isArrivalDone = true;
-
-            // Inform script
-            MovementInform(creature);
-
-            if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
-                return true;                                // not expire now, but already lost
-
-            // prevent a crash at empty waypoint path.
-            if (!i_path || i_path->empty() || i_currentNode >= i_path->size())
-            {
-                creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
-                return true;
-            }
-        }
-    }                                                       // i_creature.IsStopped()
-
-    // This is at the end of waypoint segment (incl. was previously stopped by player, extending the time)
-    if (i_nextMoveTime.Passed())
-    {
-        // If stopped then begin a new move segment
         if (creature.IsStopped())
+            Stop(STOP_TIME_FOR_PLAYER);
+
+        if (i_destinationHolder.HasArrived())
         {
-            creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
-
-            if (creature.CanFly())
-                creature.AddSplineFlag(SPLINEFLAG_FLYING);
-
-            if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
-            {
-                if (behavior->model2 != 0)
-                    creature.SetDisplayId(behavior->model2);
-
-                creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-            }
-
-            // behavior for "departure" of the current node is done
-            m_isArrivalDone = false;
-
-            // Proceed with increment current node and then send to the next destination
-            ++i_currentNode;
-
-            // Oops, end of the line so need to start from the beginning
-            if (i_currentNode >= i_path->size())
-                i_currentNode = 0;
-
-            if (i_path->at(i_currentNode).orientation != 100)
-                creature.SetOrientation(i_path->at(i_currentNode).orientation);
-
-            const WaypointNode &node = i_path->at(i_currentNode);
-            i_destinationHolder.SetDestination(traveller, node.x, node.y, node.z);
-            i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
-        }
-        else
-        {
-            // If not stopped then stop it
-            creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
-
-            SetStoppedByPlayer(false);
-
-            // Set TimeTracker to waittime for the current node
-            i_nextMoveTime.Reset(i_path->at(i_currentNode).delay);
+            OnArrived(creature);
+            StartMove(creature);
         }
     }
-
     return true;
 }
 
