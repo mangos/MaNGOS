@@ -51,14 +51,14 @@ AuctionHouseMgr::~AuctionHouseMgr()
 AuctionHouseObject * AuctionHouseMgr::GetAuctionsMap(AuctionHouseEntry const* house)
 {
     if(sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return &mNeutralAuctions;
+        return &mAuctions[AUCTION_HOUSE_NEUTRAL];
 
     // team have linked auction houses
     switch(GetAuctionHouseTeam(house))
     {
-        case ALLIANCE: return &mAllianceAuctions;
-        case HORDE:    return &mHordeAuctions;
-        default:       return &mNeutralAuctions;
+        case ALLIANCE: return &mAuctions[AUCTION_HOUSE_ALLIANCE];
+        case HORDE:    return &mAuctions[AUCTION_HOUSE_HORDE];
+        default:       return &mAuctions[AUCTION_HOUSE_NEUTRAL];
     }
 }
 
@@ -483,9 +483,8 @@ bool AuctionHouseMgr::RemoveAItem(uint32 id)
 
 void AuctionHouseMgr::Update()
 {
-    mHordeAuctions.Update();
-    mAllianceAuctions.Update();
-    mNeutralAuctions.Update();
+    for (int i = 0; i < MAX_AUCTION_HOUSE_TYPE; ++i)
+        mAuctions[i].Update();
 }
 
 uint32 AuctionHouseMgr::GetAuctionHouseTeam(AuctionHouseEntry const* house)
