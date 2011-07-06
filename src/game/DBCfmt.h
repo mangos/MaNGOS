@@ -65,6 +65,7 @@ const char GtRegenMPPerSptfmt[]="f";
 const char Holidaysfmt[]="nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char Itemfmt[]="niiiiiii";
 const char ItemBagFamilyfmt[]="nxxxxxxxxxxxxxxxxx";
+const char ItemClassfmt[]="nxxssssssssssssssssx";
 //const char ItemDisplayTemplateEntryfmt[]="nxxxxxxxxxxixxxxxxxxxxx";
 //const char ItemCondExtCostsEntryfmt[]="xiii";
 const char ItemExtendedCostEntryfmt[]="niiiiiiiiiiiiiix";
