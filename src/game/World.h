@@ -151,8 +151,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY,
     CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY,
     CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF,
-    CONFIG_UINT32_QUEST_LOW_LEVEL_HIDE_DIFF,
-    CONFIG_UINT32_QUEST_HIGH_LEVEL_HIDE_DIFF,
     CONFIG_UINT32_QUEST_DAILY_RESET_HOUR,
     CONFIG_UINT32_QUEST_WEEKLY_RESET_WEEK_DAY,
     CONFIG_UINT32_QUEST_WEEKLY_RESET_HOUR,
@@ -198,6 +196,8 @@ enum eConfigInt32Values
     CONFIG_INT32_DEATH_SICKNESS_LEVEL = 0,
     CONFIG_INT32_ARENA_STARTRATING,
     CONFIG_INT32_ARENA_STARTPERSONALRATING,
+    CONFIG_INT32_QUEST_LOW_LEVEL_HIDE_DIFF,
+    CONFIG_INT32_QUEST_HIGH_LEVEL_HIDE_DIFF,
     CONFIG_INT32_VALUE_COUNT
 };
 
@@ -596,7 +596,6 @@ class World
         void setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue);
         void setConfig(eConfigFloatValues index, char const* fieldname, float defvalue);
         void setConfig(eConfigBoolValues index, char const* fieldname, bool defvalue);
-        void setConfigPos(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);
         void setConfigPos(eConfigFloatValues index, char const* fieldname, float defvalue);
         void setConfigMin(eConfigUInt32Values index, char const* fieldname, uint32 defvalue, uint32 minvalue);
         void setConfigMin(eConfigInt32Values index, char const* fieldname, int32 defvalue, int32 minvalue);

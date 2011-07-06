@@ -13608,7 +13608,7 @@ bool Player::CanSeeStartQuest(Quest const *pQuest) const
         SatisfyQuestMonth(pQuest, false) &&
         pQuest->IsActive())
     {
-        return getLevel() + sWorld.getConfig(CONFIG_UINT32_QUEST_HIGH_LEVEL_HIDE_DIFF) >= pQuest->GetMinLevel();
+        return int32(getLevel()) + sWorld.getConfig(CONFIG_INT32_QUEST_HIGH_LEVEL_HIDE_DIFF) >= int32(pQuest->GetMinLevel());
     }
 
     return false;
