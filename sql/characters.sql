@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_11704_01_characters_auction` bit(1) default NULL
+  `required_11716_10_characters_mail` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -148,8 +148,8 @@ CREATE TABLE `auction` (
   `item_randompropertyid` int(11) NOT NULL default '0',
   `itemowner` int(11) unsigned NOT NULL default '0',
   `buyoutprice` int(11) NOT NULL default '0',
-  `time` bigint(40) NOT NULL default '0',
-  `moneyTime` bigint(40) NOT NULL default '0',
+  `time` bigint(40) unsigned NOT NULL default '0',
+  `moneyTime` bigint(40) unsigned NOT NULL default '0',
   `buyguid` int(11) unsigned NOT NULL default '0',
   `lastbid` int(11) NOT NULL default '0',
   `startbid` int(11) NOT NULL default '0',
@@ -260,7 +260,7 @@ CREATE TABLE `characters` (
   `actionBars` tinyint(3) UNSIGNED NOT NULL default '0',
   `deleteInfos_Account` int(11) UNSIGNED default NULL,
   `deleteInfos_Name` varchar(12) default NULL,
-  `deleteDate` bigint(20) default NULL,
+  `deleteDate` bigint(20) unsigned default NULL,
   PRIMARY KEY  (`guid`),
   KEY `idx_account` (`account`),
   KEY `idx_online` (`online`),
@@ -457,7 +457,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `character_equipmentsets`;
 CREATE TABLE `character_equipmentsets` (
   `guid` int(11) NOT NULL default '0',
-  `setguid` bigint(20) NOT NULL auto_increment,
+  `setguid` bigint(20) unsigned NOT NULL auto_increment,
   `setindex` tinyint(4) NOT NULL default '0',
   `name` varchar(100) NOT NULL,
   `iconname` varchar(100) NOT NULL,
@@ -1049,7 +1049,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `creature_respawn`;
 CREATE TABLE `creature_respawn` (
   `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL default '0',
+  `respawntime` bigint(20) unsigned NOT NULL default '0',
   `instance` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`,`instance`),
   KEY `instance` (`instance`)
@@ -1090,7 +1090,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `gameobject_respawn`;
 CREATE TABLE `gameobject_respawn` (
   `guid` int(10) unsigned NOT NULL default '0' COMMENT 'Global Unique Identifier',
-  `respawntime` bigint(20) NOT NULL default '0',
+  `respawntime` bigint(20) unsigned NOT NULL default '0',
   `instance` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guid`,`instance`),
   KEY `instance` (`instance`)
@@ -1202,8 +1202,8 @@ CREATE TABLE `guild` (
   `BackgroundColor` int(5) NOT NULL default '0',
   `info` text NOT NULL,
   `motd` varchar(255) NOT NULL default '',
-  `createdate` bigint(20) NOT NULL default '0',
-  `BankMoney` bigint(20) NOT NULL default '0',
+  `createdate` bigint(20) unsigned NOT NULL default '0',
+  `BankMoney` bigint(20) unsigned NOT NULL default '0',
   PRIMARY KEY  (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Guild System';
 
@@ -1325,13 +1325,13 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `guild_eventlog`;
 CREATE TABLE `guild_eventlog` (
-  `guildid` int(11) NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` int(11) NOT NULL COMMENT 'Log record identificator - auxiliary column',
-  `EventType` tinyint(1) NOT NULL COMMENT 'Event type',
-  `PlayerGuid1` int(11) NOT NULL COMMENT 'Player 1',
-  `PlayerGuid2` int(11) NOT NULL COMMENT 'Player 2',
-  `NewRank` tinyint(2) NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` bigint(20) NOT NULL COMMENT 'Event UNIX time',
+  `guildid` int(11) unsigned NOT NULL COMMENT 'Guild Identificator',
+  `LogGuid` int(11) unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
+  `EventType` tinyint(1) unsigned NOT NULL COMMENT 'Event type',
+  `PlayerGuid1` int(11) unsigned NOT NULL COMMENT 'Player 1',
+  `PlayerGuid2` int(11) unsigned NOT NULL COMMENT 'Player 2',
+  `NewRank` tinyint(2) unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
+  `TimeStamp` bigint(20) unsigned NOT NULL COMMENT 'Event UNIX time',
   PRIMARY KEY (`guildid`, `LogGuid`),
   INDEX `Idx_PlayerGuid1`(`PlayerGuid1`),
   INDEX `Idx_PlayerGuid2`(`PlayerGuid2`),
@@ -1418,7 +1418,7 @@ DROP TABLE IF EXISTS `instance`;
 CREATE TABLE `instance` (
   `id` int(11) unsigned NOT NULL default '0',
   `map` int(11) unsigned NOT NULL default '0',
-  `resettime` bigint(40) NOT NULL default '0',
+  `resettime` bigint(40) unsigned NOT NULL default '0',
   `difficulty` tinyint(1) unsigned NOT NULL default '0',
   `data` longtext,
   PRIMARY KEY  (`id`),
@@ -1442,7 +1442,7 @@ DROP TABLE IF EXISTS `instance_reset`;
 CREATE TABLE `instance_reset` (
   `mapid` int(11) unsigned NOT NULL default '0',
   `difficulty` tinyint(1) unsigned NOT NULL default '0',
-  `resettime` bigint(40) NOT NULL default '0',
+  `resettime` bigint(40) unsigned NOT NULL default '0',
   PRIMARY KEY  (`mapid`,`difficulty`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -1518,8 +1518,8 @@ CREATE TABLE `mail` (
   `subject` longtext,
   `body` longtext,
   `has_items` tinyint(3) unsigned NOT NULL default '0',
-  `expire_time` bigint(40) NOT NULL default '0',
-  `deliver_time` bigint(40) NOT NULL default '0',
+  `expire_time` bigint(40) unsigned NOT NULL default '0',
+  `deliver_time` bigint(40) unsigned NOT NULL default '0',
   `money` int(11) unsigned NOT NULL default '0',
   `cod` int(11) unsigned NOT NULL default '0',
   `checked` tinyint(3) unsigned NOT NULL default '0',

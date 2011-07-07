@@ -277,7 +277,7 @@ bool Guild::LoadGuildFromDB(QueryResult *guildDataResult)
     m_BackgroundColor = fields[7].GetUInt32();
     GINFO             = fields[8].GetCppString();
     MOTD              = fields[9].GetCppString();
-    m_CreatedDate     = fields[10].GetUInt64();
+    m_CreatedDate     = time_t(fields[10].GetUInt64());
     m_GuildBankMoney  = fields[11].GetUInt64();
 
     uint32 purchasedTabs   = fields[12].GetUInt32();
