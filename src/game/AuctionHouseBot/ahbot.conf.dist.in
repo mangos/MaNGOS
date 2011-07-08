@@ -76,15 +76,15 @@ ConfVersion=2010102201
 #
 #    AuctionHouseBot.Alliance.Price.Ratio
 #        Define the price of selled item here for the Alliance Auction House
-#    Default 100
+#    Default 200
 #
 #    AuctionHouseBot.Horde.Price.Ratio
 #        Define the price of selled item here for the Horde Auction House
-#    Default 100
+#    Default 200
 #
 #    AuctionHouseBot.Alliance.Price.Ratio
 #        Define the price of selled item here for the Neutral Auction House
-#    Default 100
+#    Default 200
 #
 #    AuctionHouseBot.Items.ItemLevel.*
 #        Prevent seller from listing items below/above this item level
@@ -104,7 +104,7 @@ ConfVersion=2010102201
 #        items will be show on Auction House
 #    Default 0, 2000, 2500, 1500, 1000, 0, 0 (grey, white, green, blue, purple, orange, yellow)
 #
-#    AustionHouseBot.Class.*
+#    AuctionHouseBot.Class.*
 #        Here you can set the class of items you prefer to be show on AH
 #        These value is preference value, it's not percentage. So the maximum is 10.
 #        The minimum is 0 (disabled).
