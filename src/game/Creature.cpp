@@ -2487,7 +2487,6 @@ void Creature::SetWalk(bool enable)
     WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, true);
-    UpdateWalkMode(this, false);
 }
 
 void Creature::SetLevitate(bool enable)
