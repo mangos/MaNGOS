@@ -19,9 +19,10 @@
 #include "Creature.h"
 #include "MapManager.h"
 #include "RandomMovementGenerator.h"
-#include "DestinationHolderImp.h"
 #include "Map.h"
 #include "Util.h"
+#include "movement/MoveSplineInit.h"
+#include "movement/MoveSpline.h"
 
 template<>
 void
@@ -91,15 +92,17 @@ RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
         }
     }
 
-    creature.AddSplineFlag(is_air_ok ? SPLINEFLAG_FLYING : SPLINEFLAG_WALKMODE);
-    Traveller<Creature> traveller(creature);
-    i_destinationHolder.SetDestination(traveller, destX, destY, destZ);
+    if (is_air_ok)
+        i_nextMoveTime.Reset(0);
+    else
+        i_nextMoveTime.Reset(urand(500, 10000));
+
     creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
-    if (is_air_ok)
-        i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime());
-    else
-        i_nextMoveTime.Reset(i_destinationHolder.GetTotalTravelTime() + urand(500, 10000));
+    Movement::MoveSplineInit init(creature);
+    init.MoveTo(destX, destY, destZ);
+    init.SetWalk(true);
+    init.Launch();
 }
 
 template<>
@@ -107,11 +110,6 @@ void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
 {
     if (!creature.isAlive())
         return;
-
-    if (creature.CanFly())
-        creature.AddSplineFlag(SPLINEFLAG_FLYING);
-    else
-        creature.AddSplineFlag(SPLINEFLAG_WALKMODE);
 
     creature.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
     _setRandomLocation(creature);
@@ -127,12 +125,14 @@ template<>
 void RandomMovementGenerator<Creature>::Interrupt(Creature &creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.SetWalk(false);
 }
 
 template<>
 void RandomMovementGenerator<Creature>::Finalize(Creature &creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.SetWalk(false);
 }
 
 template<>
@@ -145,17 +145,12 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
         return true;
     }
 
-    CreatureTraveller traveller(creature);
-    if (i_destinationHolder.UpdateTraveller(traveller, diff, false, true))
+    if (creature.movespline->Finalized())
     {
-        if (!IsActive(creature))                        // force stop processing (movement can move out active zone with cleanup movegens list)
-            return true;                                // not expire now, but already lost
+        i_nextMoveTime.Update(diff);
+        if (i_nextMoveTime.Passed())
+            _setRandomLocation(creature);
     }
-
-    i_nextMoveTime.Update(diff);
-    if (i_nextMoveTime.Passed())
-        _setRandomLocation(creature);
-
     return true;
 }
 

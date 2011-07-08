@@ -21,8 +21,9 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "TemporarySummon.h"
-#include "DestinationHolderImp.h"
 #include "World.h"
+#include "movement/MoveSplineInit.h"
+#include "movement/MoveSpline.h"
 
 //----- Point Movement Generator
 template<class T>
@@ -32,12 +33,9 @@ void PointMovementGenerator<T>::Initialize(T &unit)
         unit.StopMoving();
 
     unit.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
-
-    Traveller<T> traveller(unit);
-    i_destinationHolder.SetDestination(traveller, i_x, i_y, i_z);
-
-    if (unit.GetTypeId() == TYPEID_UNIT && ((Creature*)&unit)->CanFly())
-        ((Creature&)unit).AddSplineFlag(SPLINEFLAG_FLYING);
+    Movement::MoveSplineInit init(unit);
+    init.MoveTo(i_x, i_y, i_z);
+    init.Launch();
 }
 
 template<class T>
@@ -45,7 +43,7 @@ void PointMovementGenerator<T>::Finalize(T &unit)
 {
     unit.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 
-    if (i_destinationHolder.HasArrived())
+    if (unit.movespline->Finalized())
         MovementInform(unit);
 }
 
@@ -77,18 +75,7 @@ bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     }
 
     unit.addUnitState(UNIT_STAT_ROAMING_MOVE);
-
-    Traveller<T> traveller(unit);
-    if (i_destinationHolder.UpdateTraveller(traveller, diff, false))
-    {
-        if (!IsActive(unit))                                // force stop processing (movement can move out active zone with cleanup movegens list)
-            return true;                                    // not expire now, but already lost
-    }
-
-    if (i_destinationHolder.HasArrived())
-        return false;
-
-    return true;
+    return !unit.movespline->Finalized();
 }
 
 template<>

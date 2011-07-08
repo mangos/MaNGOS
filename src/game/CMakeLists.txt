@@ -41,7 +41,7 @@ source_group("World/Handlers"
 )
 
 source_group("Motion generators"
-  REGULAR_EXPRESSION Movement|Holder|Motion|Traveller
+  REGULAR_EXPRESSION Generator|MotionMaster
 )
 
 source_group("Server"
@@ -62,6 +62,13 @@ source_group("Tool"
 
 source_group("References"
   REGULAR_EXPRESSION Reference|RefManager|ThreatManager
+)
+
+source_group("Movement"
+  REGULAR_EXPRESSION spline|Spline|packet_builder
+  FILES
+    movement/typedefs.h
+    movement/util.cpp
 )
 
 if(PCH)

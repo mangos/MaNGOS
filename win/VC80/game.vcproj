@@ -1054,18 +1054,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\DestinationHolder.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\DestinationHolder.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\DestinationHolderImp.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\game\FleeingMovementGenerator.cpp"
 				>
 			</File>
@@ -1127,10 +1115,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\TargetedMovementGenerator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\game\Traveller.h"
 				>
 			</File>
 			<File
@@ -1715,6 +1699,62 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\vmap\WorldModel.h"
+				>
+			</File>
+		</Filter>
+				<Filter
+			Name="Movement"
+			>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSpline.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSpline.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSplineFlag.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSplineInit.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSplineInit.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\MoveSplineInitArgs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\packet_builder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\packet_builder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\spline.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\spline.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\spline.impl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\Movement\typedefs.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\movement\util.cpp"
 				>
 			</File>
 		</Filter>

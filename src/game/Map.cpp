@@ -1924,6 +1924,7 @@ void Map::ScriptsProcess()
                 source->SetUInt32Value(step.script->setField.fieldId, step.script->setField.fieldValue);
                 break;
             case SCRIPT_COMMAND_MOVE_TO:
+            {
                 if (!source)
                 {
                     sLog.outError("SCRIPT_COMMAND_MOVE_TO (script id %u) call for NULL creature.", step.script->id);
@@ -1936,8 +1937,16 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                ((Unit*)source)->MonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, step.script->moveTo.travelTime);
+                Unit * unit = (Unit*)source;
+                if (step.script->moveTo.travelTime != 0)
+                {
+                    float speed = unit->GetDistance(step.script->x, step.script->y, step.script->z) / ((float)step.script->moveTo.travelTime * 0.001f);
+                    unit->MonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, speed);
+                }
+                else
+                    unit->NearTeleportTo(step.script->x, step.script->y, step.script->z, unit->GetOrientation());
                 break;
+            }
             case SCRIPT_COMMAND_FLAG_SET:
                 if (!source)
                 {
@@ -2791,10 +2800,7 @@ void Map::ScriptsProcess()
                     break;
                 }
 
-                if (step.script->run.run)
-                    pOwner->RemoveSplineFlag(SPLINEFLAG_WALKMODE);
-                else
-                    pOwner->AddSplineFlag(SPLINEFLAG_WALKMODE);
+                pOwner->SetWalk(!step.script->run.run);
 
                 break;
             }

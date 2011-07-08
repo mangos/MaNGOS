@@ -20,8 +20,6 @@
 #define MANGOS_TARGETEDMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
-#include "DestinationHolder.h"
-#include "Traveller.h"
 #include "FollowerReference.h"
 
 class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
@@ -38,12 +36,11 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 : public MovementGeneratorMedium< T, D >, public TargetedMovementGeneratorBase
 {
     protected:
-        TargetedMovementGeneratorMedium(Unit &target, float offset = 0.f, float angle = 0.f) :
-             TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle),
-             i_recalculateTravel(false), i_targetReached(false)
+        TargetedMovementGeneratorMedium(Unit &target, float offset, float angle) :
+            TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle),
+            i_recalculateTravel(false), i_targetReached(false), i_recheckDistance(0)
         {
         }
-
         ~TargetedMovementGeneratorMedium() {}
 
     public:
@@ -51,22 +48,15 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        bool GetDestination(float &x, float &y, float &z) const
-        {
-            if(!i_destinationHolder.HasDestination()) return false;
-            i_destinationHolder.GetDestination(x,y,z);
-            return true;
-        }
-
         void unitSpeedChanged() { i_recalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
 
     protected:
         void _setTargetLocation(T &);
 
+        ShortTimeTracker i_recheckDistance;
         float i_offset;
         float i_angle;
-        DestinationHolder< Traveller<T> > i_destinationHolder;
         bool i_recalculateTravel : 1;
         bool i_targetReached : 1;
 };

@@ -23,7 +23,6 @@
 #include "Log.h"
 #include "Transports.h"
 #include "GridDefines.h"
-#include "DestinationHolderImp.h"
 #include "World.h"
 #include "CellImpl.h"
 #include "Corpse.h"
