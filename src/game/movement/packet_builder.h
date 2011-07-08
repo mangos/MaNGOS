@@ -24,6 +24,7 @@ class WorldPacket;
 
 namespace Movement
 {
+    class MoveSpline;
     class PacketBuilder
     {
         static void WriteCommonMonsterMovePart(const MoveSpline& mov, WorldPacket& data);

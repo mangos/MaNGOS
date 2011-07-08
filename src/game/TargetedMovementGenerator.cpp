@@ -20,11 +20,10 @@
 #include "TargetedMovementGenerator.h"
 #include "Errors.h"
 #include "Creature.h"
+#include "Player.h"
 #include "World.h"
 #include "movement/MoveSplineInit.h"
 #include "movement/MoveSpline.h"
-
-#define SMALL_ALPHA 0.05f
 
 #include <cmath>
 

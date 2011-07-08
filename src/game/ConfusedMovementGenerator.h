@@ -20,6 +20,7 @@
 #define MANGOS_CONFUSEDMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
+#include "Timer.h"
 
 #define MAX_CONF_WAYPOINTS 24
 
