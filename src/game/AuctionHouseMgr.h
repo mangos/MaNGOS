@@ -100,10 +100,13 @@ class AuctionHouseObject
         }
 
         typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
+        typedef std::pair<AuctionEntryMap::const_iterator, AuctionEntryMap::const_iterator> AuctionEntryMapBounds;
 
         uint32 GetCount() { return AuctionsMap.size(); }
 
         AuctionEntryMap *GetAuctions() { return &AuctionsMap; }
+
+        AuctionEntryMapBounds GetAuctionsBounds() const {return AuctionEntryMapBounds(AuctionsMap.begin(), AuctionsMap.end()); }
 
         void AddAuction(AuctionEntry *ah)
         {
