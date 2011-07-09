@@ -145,6 +145,7 @@ bool TargetedMovementGeneratorMedium<T,D>::Update(T &owner, const uint32 & time_
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())
     {
+        i_recheckDistance.Reset(50);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
         float allowed_dist = i_target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius()
             + sWorld.getConfig(CONFIG_FLOAT_RATE_TARGET_POS_RECALCULATION_RANGE);
