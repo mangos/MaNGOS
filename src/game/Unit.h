@@ -2010,6 +2010,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
     private:
         void CleanupDeletedAuras();
         void UpdateSplineMovement(uint32 t_diff);
+        void DisableSpline();
 
         // player or player's pet
         float GetCombatRatingReduction(CombatRating cr) const;

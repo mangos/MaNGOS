@@ -85,6 +85,7 @@ namespace Movement
         const MySpline& _Spline() const { return spline;}
         int32 _currentSplineIdx() const { return point_Idx;}
         void _Finalize();
+        void _Interrupt() { splineflags.done = true;}
 
         #pragma endregion
     public:
