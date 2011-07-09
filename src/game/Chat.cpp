@@ -2316,6 +2316,14 @@ char* ChatHandler::ExtractLiteralArg(char** args, char const* lit /*= NULL*/)
     if (lit)
     {
         int l = strlen(lit);
+
+        int largs = 0;
+        while(head[largs] && !isWhiteSpace(head[largs]))
+            ++largs;
+
+        if (largs < l)
+            l = largs;
+
         int diff = strncmp(head, lit, l);
 
         if (diff != 0)
