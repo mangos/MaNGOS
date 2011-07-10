@@ -120,6 +120,7 @@ class AuctionBotConfig
 
         uint32 getConfigItemAmountRatio(AuctionHouseType houseType) const;
         bool getConfigBuyerEnabled(AuctionHouseType houseType) const;
+        uint32 getConfigItemQualityAmount(AuctionQuality quality) const;
 
 
         uint32      GetItemPerCycleBoost() const { return m_ItemsPerCycleBoost; }
@@ -181,8 +182,10 @@ class AuctionHouseBot
         void Initialize();
 
         // Followed method is mainly used by level3.cpp for ingame/console command
-        void SetItemsRatio(uint32* al, uint32* ho, uint32* ne);
-        void SetItemsAmount(uint32* grey_i, uint32* white_i, uint32* green_i, uint32* blue_i, uint32* purple_i, uint32* orange_i, uint32* yellow_i);
+        void SetItemsRatio(uint32 al, uint32 ho, uint32 ne);
+        void SetItemsRatioForHouse(AuctionHouseType house, uint32 val);
+        void SetItemsAmount(uint32 (&vals) [MAX_AUCTION_QUALITY]);
+        void SetItemsAmountForQuality(AuctionQuality quality, uint32 val);
         bool ReloadAllConfig();
         void Rebuild(bool all);
 
