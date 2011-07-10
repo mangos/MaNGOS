@@ -155,7 +155,7 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction)
     Player *oldBidder = sObjectMgr.GetPlayer(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
-    if(!oldBidder && oldBidder_guid)
+    if(!oldBidder)
         oldBidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(oldBidder_guid);
 
     // old bidder exist
@@ -180,7 +180,7 @@ void WorldSession::SendAuctionCancelledToBidderMail(AuctionEntry* auction)
     Player *bidder = sObjectMgr.GetPlayer(bidder_guid);
 
     uint32 bidder_accId = 0;
-    if (!bidder && bidder_guid)
+    if (!bidder)
         bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
 
     // bidder exist
@@ -409,7 +409,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 
     // impossible have online own another character (use this for speedup check in case online owner)
     Player* auction_owner = sObjectMgr.GetPlayer(ownerGuid);
-    if (!auction_owner && ownerGuid && sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) == pl->GetSession()->GetAccountId())
+    if (!auction_owner && sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) == pl->GetSession()->GetAccountId())
     {
         // you cannot bid your another character auction:
         SendAuctionCommandResult(NULL, AUCTION_BID_PLACED, AUCTION_ERR_BID_OWN);

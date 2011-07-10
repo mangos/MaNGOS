@@ -1657,6 +1657,9 @@ Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 
 uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
+    if (!guid.IsPlayer())
+        return 0;
+
     // prevent DB access for online player
     if(Player* player = GetPlayer(guid))
         return player->GetSession()->GetAccountId();

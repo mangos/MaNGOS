@@ -104,7 +104,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
         }
         else
         {
-            bidder_accId = bidder_guid ? sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid) : 0;
+            bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
             bidder_security = bidder_accId ? sAccountMgr.GetSecurity(bidder_accId) : SEC_PLAYER;
 
             if (bidder_security > SEC_PLAYER)               // not do redundant DB requests
@@ -122,13 +122,13 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
             else if (ownerGuid && !sObjectMgr.GetPlayerNameByGUID(ownerGuid, owner_name))
                 owner_name = sObjectMgr.GetMangosStringForDBCLocale(LANG_UNKNOWN);
 
-            uint32 owner_accid = ownerGuid ? sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid) : 0;
+            uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid);
 
             sLog.outCommand(bidder_accId,"GM %s (Account: %u) won item in auction (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
                 bidder_name.c_str(), bidder_accId, auction->itemTemplate, auction->itemCount, auction->bid, owner_name.c_str(), owner_accid);
         }
     }
-    else if (!bidder && bidder_guid)
+    else if (!bidder)
         bidder_accId = sObjectMgr.GetPlayerAccountIdByGUID(bidder_guid);
 
     if (auction_owner)
@@ -183,7 +183,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry * auction)
     Player *owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
-    if (!owner && owner_guid)
+    if (!owner)
         owner_accId = sObjectMgr.GetPlayerAccountIdByGUID(owner_guid);
 
     // owner exist
