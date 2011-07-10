@@ -1542,7 +1542,7 @@ bool Creature::FallGround()
 
     // hacky solution: by some reason died creatures not updated, that's why need finalize movement state
     GetMap()->CreatureRelocation(this, GetPositionX(), GetPositionY(), tz, GetOrientation());
-    movespline->_Finalize();
+    DisableSpline();
     return true;
 }
 
