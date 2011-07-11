@@ -358,7 +358,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendAuctionRemovedNotification(AuctionEntry* auction);
         static void SendAuctionOutbiddedMail(AuctionEntry *auction);
         void SendAuctionCancelledToBidderMail(AuctionEntry *auction);
-        void BuildListAuctionItems(std::list<AuctionEntry*> &auctions, WorldPacket& data, std::wstring const& searchedname, uint32 listfrom, uint32 levelmin,
+        void BuildListAuctionItems(std::vector<AuctionEntry*> const& auctions, WorldPacket& data, std::wstring const& searchedname, uint32 listfrom, uint32 levelmin,
             uint32 levelmax, uint32 usable, uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality, uint32& count, uint32& totalcount, bool isFull);
 
         AuctionHouseEntry const* GetCheckedAuctionHouseForAuctioneer(ObjectGuid guid);

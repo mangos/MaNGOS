@@ -658,12 +658,15 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
 
     // Sort
-    AuctionHouseObject::AuctionEntryMap *aucs = auctionHouse->GetAuctions();
-    std::list<AuctionEntry*> auctions;
-    for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = aucs->begin(); itr != aucs->end(); ++itr)
+    AuctionHouseObject::AuctionEntryMap const& aucs = auctionHouse->GetAuctions();
+    std::vector<AuctionEntry*> auctions;
+    auctions.reserve(aucs.size());
+
+    for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = aucs.begin(); itr != aucs.end(); ++itr)
         auctions.push_back(itr->second);
+
     AuctionSorter sorter(Sort, GetPlayer());
-    auctions.sort(sorter);
+    std::sort(auctions.begin(), auctions.end(), sorter);
 
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))

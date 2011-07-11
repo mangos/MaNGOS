@@ -803,12 +803,12 @@ bool AuctionSorter::operator()(const AuctionEntry *auc1, const AuctionEntry *auc
     return false;                                           // "equal" by all sorts
 }
 
-void WorldSession::BuildListAuctionItems(std::list<AuctionEntry*> &auctions, WorldPacket& data, std::wstring const& wsearchedname, uint32 listfrom, uint32 levelmin,
+void WorldSession::BuildListAuctionItems(std::vector<AuctionEntry*> const& auctions, WorldPacket& data, std::wstring const& wsearchedname, uint32 listfrom, uint32 levelmin,
     uint32 levelmax, uint32 usable, uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality, uint32& count, uint32& totalcount, bool isFull)
 {
     int loc_idx = _player->GetSession()->GetSessionDbLocaleIndex();
 
-    for (std::list<AuctionEntry*>::const_iterator itr = auctions.begin(); itr != auctions.end();++itr)
+    for (std::vector<AuctionEntry*>::const_iterator itr = auctions.begin(); itr != auctions.end(); ++itr)
     {
         AuctionEntry *Aentry = *itr;
         if (Aentry->moneyDeliveryTime)
