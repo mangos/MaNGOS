@@ -1226,7 +1226,12 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
             return false;
     }
 
-    return true;
+    // OK, but avoid normal report for hide passwords, but log use command for anyone
+    char msg[100];
+    snprintf( msg, 100, ".account set password %s *** ***", account_name.c_str());
+    LogCommand(msg);
+    SetSentErrorMessage(true);
+    return false;
 }
 
 

@@ -248,7 +248,10 @@ bool ChatHandler::HandleAccountPasswordCommand(char* args)
             return false;
     }
 
-    return true;
+    // OK, but avoid normal report for hide passwords, but log use command for anyone
+    LogCommand(".account password *** *** ***");
+    SetSentErrorMessage(true);
+    return false;
 }
 
 bool ChatHandler::HandleAccountLockCommand(char* args)

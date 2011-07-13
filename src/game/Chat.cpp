@@ -1223,22 +1223,7 @@ void ChatHandler::ExecuteCommand(const char* text)
             if ((this->*(command->Handler))((char*)text))   // text content destroyed at call
             {
                 if (command->SecurityLevel > SEC_PLAYER)
-                {
-                    // chat case
-                    if (m_session)
-                    {
-                        Player* p = m_session->GetPlayer();
-                        ObjectGuid sel_guid = p->GetSelectionGuid();
-                        sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
-                            fullcmd.c_str(),p->GetName(),GetAccountId(),p->GetPositionX(),p->GetPositionY(),p->GetPositionZ(),p->GetMapId(),
-                            sel_guid.GetString().c_str());
-                    }
-                    else                                        // 0 account -> console
-                    {
-                        sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
-                            fullcmd.c_str(),GetAccountId(),GetAccountId() ? "RA-connection" : "Console");
-                    }
-                }
+                    LogCommand(fullcmd.c_str());
             }
             // some commands have custom error messages. Don't send the default one in these cases.
             else if (!HasSentErrorMessage())
@@ -3569,6 +3554,24 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
     }
 
     return str;
+}
+
+void ChatHandler::LogCommand(char const* fullcmd)
+{
+    // chat case
+    if (m_session)
+    {
+        Player* p = m_session->GetPlayer();
+        ObjectGuid sel_guid = p->GetSelectionGuid();
+        sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+            fullcmd, p->GetName(), GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
+            sel_guid.GetString().c_str());
+    }
+    else                                        // 0 account -> console
+    {
+        sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
+            fullcmd, GetAccountId(), GetAccountId() ? "RA-connection" : "Console");
+    }
 }
 
 // Instantiate template for helper function
