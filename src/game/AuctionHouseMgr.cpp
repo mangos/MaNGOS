@@ -426,7 +426,7 @@ void AuctionHouseMgr::LoadAuctions()
 
         auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(houseid);
 
-        if (!houseid)
+        if (!auction->auctionHouseEntry)
         {
             // need for send mail, use goblin auctionhouse
             auction->auctionHouseEntry = sAuctionHouseStore.LookupEntry(7);
@@ -568,13 +568,9 @@ void AuctionHouseObject::Update()
 {
     time_t curTime = sWorld.GetGameTime();
     ///- Handle expired auctions
-    AuctionEntryMap::iterator next;
-    for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); itr = next)
+    for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); )
     {
-        next = itr;
-        ++next;
-
-        if (itr->second->moneyDeliveryTime)
+        if (itr->second->moneyDeliveryTime)                 // pending auction
         {
             if (curTime > itr->second->moneyDeliveryTime)
             {
@@ -583,10 +579,11 @@ void AuctionHouseObject::Update()
                 itr->second->DeleteFromDB();
                 MANGOS_ASSERT(!itr->second->itemGuidLow);   // already removed or send in mail at won
                 delete itr->second;
-                RemoveAuction(itr->first);
+                AuctionsMap.erase(itr++);
+                continue;
             }
         }
-        else
+        else                                                // active auction
         {
             if (curTime > itr->second->expireTime)
             {
@@ -600,10 +597,13 @@ void AuctionHouseObject::Update()
 
                     itr->second->DeleteFromDB();
                     delete itr->second;
-                    RemoveAuction(itr->first);
+                    AuctionsMap.erase(itr++);
+                    continue;
                 }
             }
         }
+
+        ++itr;
     }
 }
 
@@ -612,9 +612,9 @@ void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player,
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin();itr != AuctionsMap.end();++itr)
     {
         AuctionEntry *Aentry = itr->second;
-        if (Aentry->moneyDeliveryTime)
+        if (Aentry->moneyDeliveryTime)                      // skip pending sell auctions
             continue;
-        if (Aentry && Aentry->bidder == player->GetGUIDLow())
+        if (Aentry->bidder == player->GetGUIDLow())
         {
             if (itr->second->BuildAuctionInfo(data))
                 ++count;
@@ -628,9 +628,9 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
     {
         AuctionEntry *Aentry = itr->second;
-        if (Aentry->moneyDeliveryTime)
+        if (Aentry->moneyDeliveryTime)                      // skip pending sell auctions
             continue;
-        if (Aentry && Aentry->owner == player->GetGUIDLow())
+        if (Aentry->owner == player->GetGUIDLow())
         {
             if (Aentry->BuildAuctionInfo(data))
                 ++count;
@@ -878,9 +878,9 @@ void AuctionHouseObject::BuildListPendingSales(WorldPacket& data, Player* player
     for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
     {
         AuctionEntry *Aentry = itr->second;
-        if (!Aentry->moneyDeliveryTime)
+        if (!Aentry->moneyDeliveryTime)                     // skip not pending auctions
             continue;
-        if (Aentry && Aentry->owner == player->GetGUIDLow())
+        if (Aentry->owner == player->GetGUIDLow())
         {
             std::ostringstream str1;
             str1 << Aentry->itemTemplate << ":" << Aentry->itemRandomPropertyId << ":" << AUCTION_SUCCESSFUL << ":" << Aentry->Id << ":" << Aentry->itemCount;

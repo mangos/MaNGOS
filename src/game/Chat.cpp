@@ -136,7 +136,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand ahbotCommandTable[] =
     {
-        { "items",          SEC_GAMEMASTER,     true,  NULL,                                           "", ahbotItemsCommandTable},
+        { "items",          SEC_ADMINISTRATOR,  true,  NULL,                                           "", ahbotItemsCommandTable},
         { "rebuild",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotRebuildCommand,        "", NULL },
         { "reload",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotReloadCommand,         "", NULL },
         { "status",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotStatusCommand,         "", NULL },
