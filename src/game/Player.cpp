@@ -18696,10 +18696,10 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
 
 void Player::RemoveSpellMods(Spell const* spell)
 {
-    if(!spell || (m_SpellModRemoveCount == 0))
+    if (!spell || (m_SpellModRemoveCount == 0))
         return;
 
-    for(int i=0;i<MAX_SPELLMOD;++i)
+    for(int i = 0; i < MAX_SPELLMOD; ++i)
     {
         for (SpellModList::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
         {
@@ -18714,6 +18714,31 @@ void Player::RemoveSpellMods(Spell const* spell)
                 else
                     itr = m_spellMods[i].begin();
             }
+        }
+    }
+}
+
+void Player::ResetSpellModsDueToCanceledSpell (Spell const* spell)
+{
+    for(int i = 0; i < MAX_SPELLMOD; ++i )
+    {
+        for (SpellModList::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
+        {
+            SpellModifier *mod = *itr;
+
+            if (mod->lastAffected != spell)
+                continue;
+
+            mod->lastAffected = NULL;
+
+            if (mod->charges == -1)
+            {
+                mod->charges = 1;
+                if (m_SpellModRemoveCount > 0)
+                    --m_SpellModRemoveCount;
+            }
+            else if (mod->charges > 0)
+                ++mod->charges;
         }
     }
 }
