@@ -3078,13 +3078,8 @@ void ChatHandler::ShowItemListHelper( uint32 itemId, int loc_idx, Player* target
     if(!itemProto)
         return;
 
-    std::string name;
-
-    if(ItemLocale const *il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : NULL)
-        name = il->Name[loc_idx];
-
-    if (name.empty())
-        name = itemProto->Name1;
+    std::string name = itemProto->Name1;
+    sObjectMgr.GetItemLocaleStrings(itemProto->ItemId, loc_idx, &name);
 
     char const* usableStr = "";
 
@@ -3119,41 +3114,21 @@ bool ChatHandler::HandleLookupItemCommand(char* args)
     uint32 counter = 0;
 
     // Search in `item_template`
-    for (uint32 id = 0; id < sItemStorage.MaxEntry; id++)
+    for (uint32 id = 0; id < sItemStorage.MaxEntry; ++id)
     {
         ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
         if(!pProto)
             continue;
 
         int loc_idx = GetSessionDbLocaleIndex();
-        if ( loc_idx >= 0 )
-        {
-            ItemLocale const *il = sObjectMgr.GetItemLocale(pProto->ItemId);
-            if (il)
-            {
-                if ((int32)il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
-                {
-                    std::string name = il->Name[loc_idx];
 
-                    if (Utf8FitTo(name, wnamepart))
-                    {
-                        ShowItemListHelper(pProto->ItemId, loc_idx, pl);
-                        ++counter;
-                        continue;
-                    }
-                }
-            }
-        }
-
-        std::string name = pProto->Name1;
-        if(name.empty())
+        std::string name;                                   // "" for let later only single time check default locale name directly
+        sObjectMgr.GetItemLocaleStrings(id, loc_idx, &name);
+        if ((name.empty() || !Utf8FitTo(name, wnamepart)) && !Utf8FitTo(pProto->Name1, wnamepart))
             continue;
 
-        if (Utf8FitTo(name, wnamepart))
-        {
-            ShowItemListHelper(pProto->ItemId, -1, pl);
-            ++counter;
-        }
+        ShowItemListHelper(id, loc_idx, pl);
+        ++counter;
     }
 
     if (counter==0)
@@ -3413,13 +3388,8 @@ void ChatHandler::ShowQuestListHelper( uint32 questId, int32 loc_idx, Player* ta
     if (!qinfo)
         return;
 
-    std::string title;
-
-    if (QuestLocale const *il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : NULL)
-        title = il->Title[loc_idx];
-
-    if (title.empty())
-        title = qinfo->GetTitle();
+    std::string title = qinfo->GetTitle();
+    sObjectMgr.GetQuestLocaleStrings(questId, loc_idx, &title);
 
     char const* statusStr = "";
 
@@ -3463,40 +3433,21 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
 
     uint32 counter = 0 ;
 
+    int loc_idx = GetSessionDbLocaleIndex();
+
     ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
     {
         Quest * qinfo = iter->second;
 
-        int loc_idx = GetSessionDbLocaleIndex();
-        if ( loc_idx >= 0 )
-        {
-            QuestLocale const *il = sObjectMgr.GetQuestLocale(qinfo->GetQuestId());
-            if (il)
-            {
-                if ((int32)il->Title.size() > loc_idx && !il->Title[loc_idx].empty())
-                {
-                    std::string title = il->Title[loc_idx];
+        std::string title;                                  // "" for avoid repeating check default locale
+        sObjectMgr.GetQuestLocaleStrings(qinfo->GetQuestId(), loc_idx, &title);
 
-                    if (Utf8FitTo(title, wnamepart))
-                    {
-                        ShowQuestListHelper(qinfo->GetQuestId(), loc_idx, target);
-                        ++counter;
-                        continue;
-                    }
-                }
-            }
-        }
-
-        std::string title = qinfo->GetTitle();
-        if(title.empty())
+        if ((title.empty() || !Utf8FitTo(title, wnamepart)) && !Utf8FitTo(qinfo->GetTitle(), wnamepart))
             continue;
 
-        if (Utf8FitTo(title, wnamepart))
-        {
-            ShowQuestListHelper(qinfo->GetQuestId(), -1, target);
-            ++counter;
-        }
+        ShowQuestListHelper(qinfo->GetQuestId(), loc_idx, target);
+        ++counter;
     }
 
     if (counter==0)
@@ -3528,40 +3479,22 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
             continue;
 
         int loc_idx = GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-        {
-            CreatureLocale const *cl = sObjectMgr.GetCreatureLocale (id);
-            if (cl)
-            {
-                if ((int32)cl->Name.size() > loc_idx && !cl->Name[loc_idx].empty ())
-                {
-                    std::string name = cl->Name[loc_idx];
 
-                    if (Utf8FitTo (name, wnamepart))
-                    {
-                        if (m_session)
-                            PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str ());
-                        else
-                            PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str ());
-                        ++counter;
-                        continue;
-                    }
-                }
-            }
+        char const* name = "";                              // "" for avoid repeating check for default locale
+        sObjectMgr.GetCreatureLocaleStrings(id, loc_idx, &name);
+        if (!*name || !Utf8FitTo(name, wnamepart))
+        {
+            name = cInfo->Name;
+            if (!Utf8FitTo(name, wnamepart))
+                continue;
         }
 
-        std::string name = cInfo->Name;
-        if (name.empty ())
-            continue;
+        if (m_session)
+            PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name);
+        else
+            PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name);
 
-        if (Utf8FitTo(name, wnamepart))
-        {
-            if (m_session)
-                PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CHAT, id, id, name.c_str ());
-            else
-                PSendSysMessage (LANG_CREATURE_ENTRY_LIST_CONSOLE, id, name.c_str ());
-            ++counter;
-        }
+        ++counter;
     }
 
     if (counter==0)

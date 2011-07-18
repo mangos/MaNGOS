@@ -181,14 +181,12 @@ void PlayerMenu::SendGossipMenu(uint32 TitleTextId, ObjectGuid objectGuid)
         data << int32(pQuest->GetQuestLevel());
         data << uint32(pQuest->GetQuestFlags());            // 3.3.3 quest flags
         data << uint8(0);                                   // 3.3.3 changes icon: blue question or yellow exclamation
-        std::string Title = pQuest->GetTitle();
 
         int loc_idx = GetMenuSession()->GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-            if (QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID))
-                if (ql->Title.size() > (size_t)loc_idx && !ql->Title[loc_idx].empty())
-                    Title = ql->Title[loc_idx];
-        data << Title;                                      // max 0x200
+        std::string title = pQuest->GetTitle();
+        sObjectMgr.GetQuestLocaleStrings(questID, loc_idx, &title);
+
+        data << title;                                      // max 0x200
     }
 
     GetMenuSession()->SendPacket( &data );
@@ -272,36 +270,27 @@ void PlayerMenu::SendTalking( uint32 textID )
     }
     else
     {
-        std::string Text_0[8], Text_1[8];
-        for (int i = 0; i < 8; ++i)
+        std::string Text_0[MAX_GOSSIP_TEXT_OPTIONS], Text_1[MAX_GOSSIP_TEXT_OPTIONS];
+        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             Text_0[i] = pGossip->Options[i].Text_0;
             Text_1[i] = pGossip->Options[i].Text_1;
         }
+
         int loc_idx = GetMenuSession()->GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-        {
-            if (NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textID))
-            {
-                for (int i = 0; i < 8; ++i)
-                {
-                    if (nl->Text_0[i].size() > (size_t)loc_idx && !nl->Text_0[i][loc_idx].empty())
-                        Text_0[i] = nl->Text_0[i][loc_idx];
-                    if (nl->Text_1[i].size() > (size_t)loc_idx && !nl->Text_1[i][loc_idx].empty())
-                        Text_1[i] = nl->Text_1[i][loc_idx];
-                }
-            }
-        }
-        for (int i = 0; i < 8; ++i)
+
+        sObjectMgr.GetNpcTextLocaleStringsAll(textID, loc_idx, &Text_0, &Text_1);
+
+        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             data << pGossip->Options[i].Probability;
 
-            if ( Text_0[i].empty() )
+            if (Text_0[i].empty())
                 data << Text_1[i];
             else
                 data << Text_0[i];
 
-            if ( Text_1[i].empty() )
+            if (Text_1[i].empty())
                 data << Text_0[i];
             else
                 data << Text_1[i];
@@ -405,17 +394,9 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
 
         if(Quest const *pQuest = sObjectMgr.GetQuestTemplate(questID))
         {
-            std::string title = pQuest->GetTitle();
-
             int loc_idx = GetMenuSession()->GetSessionDbLocaleIndex();
-            if (loc_idx >= 0)
-            {
-                if(QuestLocale const *ql = sObjectMgr.GetQuestLocale(questID))
-                {
-                    if (ql->Title.size() > (size_t)loc_idx && !ql->Title[loc_idx].empty())
-                        title = ql->Title[loc_idx];
-                }
-            }
+            std::string title = pQuest->GetTitle();
+            sObjectMgr.GetQuestLocaleStrings(questID, loc_idx, &title);
 
             data << uint32(questID);
             data << uint32(qmi.m_qIcon);

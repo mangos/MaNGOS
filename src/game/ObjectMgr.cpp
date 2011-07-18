@@ -4692,7 +4692,7 @@ void ObjectMgr::LoadGossipText()
 
         GossipText& gText = mGossipText[Text_ID];
 
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
             gText.Options[i].Text_0           = fields[cic++].GetCppString();
             gText.Options[i].Text_1           = fields[cic++].GetCppString();
@@ -8841,6 +8841,85 @@ void ObjectMgr::AddArenaTeam( ArenaTeam* arenaTeam )
 void ObjectMgr::RemoveArenaTeam( uint32 Id )
 {
     mArenaTeamMap.erase(Id);
+}
+
+
+void ObjectMgr::GetCreatureLocaleStrings(uint32 entry, int32 loc_idx, char const** namePtr, char const** subnamePtr) const
+{
+    if (loc_idx >= 0)
+    {
+        if (CreatureLocale const *il = GetCreatureLocale(entry))
+        {
+            if (namePtr && il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
+                *namePtr = il->Name[loc_idx].c_str();
+
+            if (subnamePtr && il->SubName.size() > size_t(loc_idx) && !il->SubName[loc_idx].empty())
+                *subnamePtr = il->SubName[loc_idx].c_str();
+        }
+    }
+}
+
+void ObjectMgr::GetItemLocaleStrings(uint32 entry, int32 loc_idx, std::string* namePtr, std::string* descriptionPtr) const
+{
+    if (loc_idx >= 0)
+    {
+        if(ItemLocale const *il = GetItemLocale(entry))
+        {
+            if (namePtr && il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
+                *namePtr = il->Name[loc_idx];
+
+            if (descriptionPtr && il->Description.size() > size_t(loc_idx) && !il->Description[loc_idx].empty())
+                *descriptionPtr = il->Description[loc_idx];
+        }
+    }
+}
+
+void ObjectMgr::GetQuestLocaleStrings(uint32 entry, int32 loc_idx, std::string* titlePtr) const
+{
+    if (loc_idx >= 0)
+    {
+        if(QuestLocale const *il = GetQuestLocale(entry))
+        {
+            if (titlePtr && il->Title.size() > size_t(loc_idx) && !il->Title[loc_idx].empty())
+                *titlePtr = il->Title[loc_idx];
+        }
+    }
+}
+
+void ObjectMgr::GetNpcTextLocaleStringsAll(uint32 entry, int32 loc_idx, ObjectMgr::NpcTextArray* text0_Ptr, ObjectMgr::NpcTextArray* text1_Ptr) const
+{
+    if (loc_idx >= 0)
+    {
+        if (NpcTextLocale const *nl = GetNpcTextLocale(entry))
+        {
+            if (text0_Ptr)
+                for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+                    if (nl->Text_0[i].size() > (size_t)loc_idx && !nl->Text_0[i][loc_idx].empty())
+                        (*text0_Ptr)[i] = nl->Text_0[i][loc_idx];
+
+            if (text1_Ptr)
+                for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+                    if (nl->Text_1[i].size() > (size_t)loc_idx && !nl->Text_1[i][loc_idx].empty())
+                        (*text1_Ptr)[i] = nl->Text_1[i][loc_idx];
+        }
+    }
+}
+
+void ObjectMgr::GetNpcTextLocaleStrings0(uint32 entry, int32 loc_idx, std::string* text0_0_Ptr, std::string* text1_0_Ptr) const
+{
+    if (loc_idx >= 0)
+    {
+        if (NpcTextLocale const *nl = GetNpcTextLocale(entry))
+        {
+            if (text0_0_Ptr)
+                if (nl->Text_0[0].size() > (size_t)loc_idx && !nl->Text_0[0][loc_idx].empty())
+                    *text0_0_Ptr = nl->Text_0[0][loc_idx];
+
+            if (text1_0_Ptr)
+                if (nl->Text_1[0].size() > (size_t)loc_idx && !nl->Text_1[0][loc_idx].empty())
+                    *text1_0_Ptr = nl->Text_1[0][loc_idx];
+        }
+    }
 }
 
 // Functions for scripting access

@@ -697,22 +697,18 @@ int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry *auc, Pl
             break;
         case 5:                                             // name = 5
         {
+            ItemPrototype const* itemProto1 = ObjectMgr::GetItemPrototype(itemTemplate);
+            ItemPrototype const* itemProto2 = ObjectMgr::GetItemPrototype(auc->itemTemplate);
+            if (!itemProto2 || !itemProto1)
+                return 0;
+
             int32 loc_idx = viewPlayer->GetSession()->GetSessionDbLocaleIndex();
 
-            std::string name1, name2;
-            if (loc_idx >= 0)
-            {
-                if(ItemLocale const *il = sObjectMgr.GetItemLocale(itemTemplate))
-                    name1 = il->Name[loc_idx];
-                if(ItemLocale const *il = sObjectMgr.GetItemLocale(auc->itemTemplate))
-                    name2 = il->Name[loc_idx];
-            }
-            if (name1.empty())
-                if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemTemplate))
-                    name1 = proto->Name1;
-            if (name2.empty())
-                if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(auc->itemTemplate))
-                    name2 = proto->Name1;
+            std::string name1 = itemProto1->Name1;
+            sObjectMgr.GetItemLocaleStrings(itemProto1->ItemId, loc_idx, &name1);
+
+            std::string name2 = itemProto2->Name1;
+            sObjectMgr.GetItemLocaleStrings(itemProto2->ItemId, loc_idx, &name2);
 
             std::wstring wname1, wname2;
             Utf8toWStr(name1, wname1);
@@ -845,19 +841,7 @@ void WorldSession::BuildListAuctionItems(std::vector<AuctionEntry*> const& aucti
                 continue;
 
             std::string name = proto->Name1;
-            if (name.empty())
-                continue;
-
-            // local name
-            if (loc_idx >= 0)
-            {
-                ItemLocale const *il = sObjectMgr.GetItemLocale(proto->ItemId);
-                if (il)
-                {
-                    if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
-                        name = il->Name[loc_idx];
-                }
-            }
+            sObjectMgr.GetItemLocaleStrings(proto->ItemId, loc_idx, &name);
 
             if (!wsearchedname.empty() && !Utf8FitTo(name, wsearchedname))
                 continue;
