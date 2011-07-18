@@ -82,7 +82,7 @@ ConfVersion=2010102201
 #        Define the price of selled item here for the Horde Auction House
 #    Default 200
 #
-#    AuctionHouseBot.Alliance.Price.Ratio
+#    AuctionHouseBot.Neutral.Price.Ratio
 #        Define the price of selled item here for the Neutral Auction House
 #    Default 200
 #
