@@ -912,21 +912,26 @@ bool AuctionBotSeller::Initialize()
 
     sLog.outString("Loading loot items for filter..");
     if (QueryResult* result = WorldDatabase.PQuery(
-        "SELECT `item` FROM `creature_loot_template` UNION "
-        "SELECT `item` FROM `disenchant_loot_template` UNION "
-        "SELECT `item` FROM `fishing_loot_template` UNION "
-        "SELECT `item` FROM `gameobject_loot_template` UNION "
-        "SELECT `item` FROM `item_loot_template` UNION "
-        "SELECT `item` FROM `milling_loot_template` UNION "
-        "SELECT `item` FROM `pickpocketing_loot_template` UNION "
-        "SELECT `item` FROM `prospecting_loot_template` UNION "
-        "SELECT `item` FROM `skinning_loot_template`"))
+        "SELECT item FROM creature_loot_template UNION "
+        "SELECT item FROM disenchant_loot_template UNION "
+        "SELECT item FROM fishing_loot_template UNION "
+        "SELECT item FROM gameobject_loot_template UNION "
+        "SELECT item FROM item_loot_template UNION "
+        "SELECT item FROM milling_loot_template UNION "
+        "SELECT item FROM pickpocketing_loot_template UNION "
+        "SELECT item FROM prospecting_loot_template UNION "
+        "SELECT item FROM spell_loot_template"))
     {
         BarGoLink bar(result->GetRowCount());
         do
         {
             bar.step();
             Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].GetUInt32();
+            if (!entry)
+                continue;
+
             lootItems.push_back(fields[0].GetUInt32());
         } while (result->NextRow());
         delete result;
