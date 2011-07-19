@@ -240,7 +240,7 @@ AuctionHouseBot.forceExcludeItems = ""
 #    AuctionHouseBot.Buyer.FACTION.Enabled
 #        Enable or disable buyer independently by faction
 #
-#    AuctionHouseBot.BuyPrice.Buyer
+#    AuctionHouseBot.Buyer.BuyPrice
 #        Should the Buyer use BuyPrice or SellPrice to determine Bid Prices
 #    Default 0 (use SellPrice)
 #
@@ -266,7 +266,7 @@ AuctionHouseBot.Buyer.Alliance.Enabled = 1
 AuctionHouseBot.Buyer.Horde.Enabled = 1
 AuctionHouseBot.Buyer.Neutral.Enabled = 1
 
-AuctionHouseBot.Buyer.Buyprice = 1
+AuctionHouseBot.Buyer.BuyPrice = 0
 
 AuctionHouseBot.Buyer.Recheck.Interval = 20
 
