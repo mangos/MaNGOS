@@ -63,7 +63,7 @@ ConfVersion=2010102201
 #    AuctionHouseBot.ItemsPerCycle.Boost
 #        This value is used to fill DB faster than normal when there is more than this value missed items.
 #        Normaly this value is used only first start of the server with empty auction table.
-#    Default 1000
+#    Default 75
 #
 #    AuctionHouseBot.ItemsPerCycle.Normal
 #        This value is used to fill DB normal way with less cpu/db using.
@@ -172,7 +172,7 @@ AuctionHouseBot.Bind.Use = 1
 AuctionHouseBot.Bind.Quest = 0
 AuctionHouseBot.LockBox.Enabled = 0
 
-AuctionHouseBot.ItemsPerCycle.Boost = 1000
+AuctionHouseBot.ItemsPerCycle.Boost = 75
 AuctionHouseBot.ItemsPerCycle.Normal = 20
 AuctionHouseBot.BuyPrice.Seller = 1
 AuctionHouseBot.Alliance.Price.Ratio = 200
