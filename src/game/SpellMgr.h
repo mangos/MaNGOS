@@ -37,7 +37,6 @@ class Player;
 class Spell;
 class Unit;
 struct CreatureInfo;
-struct SpellModifier;
 
 // only used in code
 enum SpellCategories
@@ -596,6 +595,13 @@ enum ProcFlags
                                PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT | \
                                PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT)
 
+#define SPELL_CAST_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT    | \
+                                 PROC_FLAG_SUCCESSFUL_RANGED_HIT         | \
+                                 PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT   | \
+                                 PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT   | \
+                                 PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT      | \
+                                 PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL     | \
+                                 PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)
 enum ProcFlagsEx
 {
     PROC_EX_NONE                = 0x0000000,                // If none can tigger on Hit/Crit only (passive spells MUST defined by SpellFamily flag)
