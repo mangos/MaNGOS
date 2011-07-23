@@ -1030,7 +1030,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
         {
             // Corruption and Unstable Affliction
             // TODO: drop when override will be possible
-            SpellEntry *entry = (SpellEntry*)(&(*spellProto));
+            SpellEntry *entry = const_cast<SpellEntry*>(spellProto);
             entry->EffectSpellClassMask[GetEffIndex()].Flags = UI64LIT(0x0000010000000002);
         }
         // Improved Flametongue Weapon, overwrite wrong data, maybe time re-add table
@@ -1038,7 +1038,7 @@ void Aura::HandleAddModifier(bool apply, bool Real)
         {
             // Flametongue Weapon (Passive)
             // TODO: drop when override will be possible
-            SpellEntry *entry = (SpellEntry*)(&(*spellProto));
+            SpellEntry *entry = const_cast<SpellEntry*>(spellProto);
             entry->EffectSpellClassMask[GetEffIndex()].Flags = UI64LIT(0x0000000000200000);
         }
     }
