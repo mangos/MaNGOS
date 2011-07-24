@@ -211,19 +211,22 @@ INSTANTIATE_SINGLETON_1( AuctionBotConfig );
 
 //== AuctionBotConfig functions ============================
 
+AuctionBotConfig::AuctionBotConfig() : m_configFileName(_AUCTIONHOUSEBOT_CONFIG)
+{
+}
+
 bool AuctionBotConfig::Initialize()
 {
-    char const* cfg_file = _AUCTIONHOUSEBOT_CONFIG;
-    if (!m_AhBotCfg.SetSource(cfg_file))
+    if (!m_AhBotCfg.SetSource(m_configFileName.c_str()))
     {
-        sLog.outString("AHBOT is Disabled. Unable to open configuration file(%s). ", _AUCTIONHOUSEBOT_CONFIG);
+        sLog.outString("AHBOT is Disabled. Unable to open configuration file(%s). ", m_configFileName.c_str());
         setConfig(CONFIG_UINT32_AHBOT_ALLIANCE_ITEM_AMOUNT_RATIO, 0);
         setConfig(CONFIG_UINT32_AHBOT_HORDE_ITEM_AMOUNT_RATIO, 0);
         setConfig(CONFIG_UINT32_AHBOT_NEUTRAL_ITEM_AMOUNT_RATIO, 0);
         return false;
     }
     else
-        sLog.outString("AHBot using configuration file %s",_AUCTIONHOUSEBOT_CONFIG);
+        sLog.outString("AHBot using configuration file %s", m_configFileName.c_str());
 
     GetConfigFromFile();
 
