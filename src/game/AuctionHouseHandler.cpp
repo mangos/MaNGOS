@@ -715,7 +715,11 @@ void WorldSession::HandleAuctionListPendingSales(WorldPacket & recv_data)
 
     WorldPacket data(SMSG_AUCTION_LIST_PENDING_SALES, 4);
     data << uint32(count);                                  // count
-    auctionHouse->BuildListPendingSales(data, _player, count);
+
+    // pending list include all auction house entries for character
+    for (int i = 0; i < MAX_AUCTION_HOUSE_TYPE; ++i)
+        sAuctionMgr.GetAuctionsMap(AuctionHouseType(i))->BuildListPendingSales(data, _player, count);
+
     data.put<uint32>(0, count);
     SendPacket(&data);
 }
