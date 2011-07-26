@@ -465,34 +465,12 @@ void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
         top()->UpdateFinalDistance(fDistance);
 }
 
-// Does almost nothing - just doesn't allows previous movegen interrupt current effect. Can be reused for charge effect
-class EffectMovementGenerator : public MovementGenerator
-{
-public:
-    void Initialize(Unit &) {}
-    void Finalize(Unit &unit)
-    {
-        // Since we have no proper states system need restore previous movement.
-        if (unit.GetTypeId() != TYPEID_PLAYER && unit.isAlive() && !unit.hasUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_FLEEING))
-        {
-            if (Unit * victim = unit.getVictim())
-                unit.GetMotionMaster()->MoveChase(victim);
-            else
-                unit.GetMotionMaster()->Initialize();
-        }
-    }
-    void Interrupt(Unit &) {}
-    void Reset(Unit &) {}
-    bool Update(Unit &u, const uint32 &) { return !u.movespline->Finalized(); }
-    MovementGeneratorType GetMovementGeneratorType() const { return EFFECT_MOTION_TYPE; }
-};
-
-void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, float max_height)
+void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id)
 {
     Movement::MoveSplineInit init(*m_owner);
     init.MoveTo(x,y,z);
     init.SetParabolic(max_height,0,false);
     init.SetVelocity(horizontalSpeed);
     init.Launch();
-    Mutate(new EffectMovementGenerator());
+    Mutate(new EffectMovementGenerator(id));
 }
