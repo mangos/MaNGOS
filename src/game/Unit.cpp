@@ -9629,7 +9629,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage *damageInfo, SpellMissInfo missC
 void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const * procSpell, uint32 damage )
 {
     // For melee/ranged based attack need update skills and set some Aura states
-    if (procFlag & MELEE_BASED_TRIGGER_MASK)
+    if ((damage != 0 || procExtra != PROC_EX_NORMAL_HIT) && procFlag & MELEE_BASED_TRIGGER_MASK)
     {
         // Update skills here for players
         if (GetTypeId() == TYPEID_PLAYER)
