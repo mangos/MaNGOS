@@ -164,6 +164,20 @@ inline bool IsPeriodicRegenerateEffect(SpellEntry const *spellInfo, SpellEffectI
     }
 }
 
+inline bool IsModifierAura(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
+{
+    // modifier auras that can proc on cast end
+    switch (AuraType(spellInfo->EffectApplyAuraName[effecIdx]))
+    {
+        case SPELL_AURA_ADD_FLAT_MODIFIER:
+        case SPELL_AURA_ADD_PCT_MODIFIER:
+        case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+            return true;
+        default:
+            return false;
+    }
+}
+
 inline bool IsSpellHaveAura(SpellEntry const *spellInfo, AuraType aura)
 {
     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -623,7 +637,8 @@ enum ProcFlagsEx
     PROC_EX_RESERVED3           = 0x0008000,
     PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                // If set trigger always ( no matter another flags) used for drop charges
     PROC_EX_EX_ONE_TIME_TRIGGER = 0x0020000,                // If set trigger always but only one time (not used)
-    PROC_EX_PERIODIC_POSITIVE   = 0x0040000                 // For periodic heal
+    PROC_EX_PERIODIC_POSITIVE   = 0x0040000,                // For periodic heal
+    PROC_EX_CAST_END            = 0x0080000                 // procs on end of cast            
 };
 
 struct SpellProcEventEntry

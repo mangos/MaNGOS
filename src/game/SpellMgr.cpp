@@ -1614,8 +1614,8 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
         if (EventProcFlag & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC) && (procExtra & PROC_EX_PERIODIC_POSITIVE))
             return false;
 
-        // No extra req, so can trigger for (damage/healing present) and hit/crit
-        if(procExtra & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT))
+        // No extra req, so can trigger for (damage/healing present) and cast end/hit/crit
+        if (procExtra & (PROC_EX_CAST_END|PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT))
             return true;
     }
     else // all spells hits here only if resist/reflect/immune/evade

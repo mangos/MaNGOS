@@ -865,19 +865,15 @@ bool Aura::CanProcFrom(SpellEntry const *spell, uint32 procFlag, uint32 EventPro
     {
         if (!(EventProcEx & PROC_EX_EX_TRIGGER_ALWAYS))
         {
-            // modifier aura procs by default are not active and only allowed with non zero charges
-            // procEx == PROC_EX_NORMAL_HIT only for real "on cast" cases
-            if (!active && procEx == PROC_EX_NORMAL_HIT && (procFlag & SPELL_CAST_TRIGGER_MASK))
-            {
-                if (GetHolder()->GetAuraCharges() > 0)
-                    return true;
-                else
-                    return false;
-            }
-
             // Check for extra req (if none) and hit/crit
             if (EventProcEx == PROC_EX_NONE)
             {
+                // allow proc for modifier auras with charges
+                if (procEx == PROC_EX_CAST_END
+                    && IsModifierAura(GetSpellProto(), GetEffIndex()) 
+                    && GetHolder()->GetAuraCharges() > 0)
+                    return true;
+
                 // No extra req, so can trigger only for active (damage/healing present) and hit/crit
                 if((procEx & (PROC_EX_NORMAL_HIT|PROC_EX_CRITICAL_HIT)) && active)
                     return true;

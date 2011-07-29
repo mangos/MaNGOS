@@ -3200,6 +3200,10 @@ void Spell::cast(bool skipCheck)
 
     InitializeDamageMultipliers();
 
+    Unit *procTarget = m_targets.getUnitTarget();
+    if (!procTarget)
+        procTarget = m_caster;
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
     if (m_spellInfo->speed > 0.0f)
     {
@@ -3221,11 +3225,11 @@ void Spell::cast(bool skipCheck)
         // critical hit related part is currently done on hit so proc there, 
         // 0 damage since any damage based procs should be on hit
         // 0 victim proc since there is no victim proc dependent on successfull cast for caster
-        m_caster->ProcDamageAndSpell(m_caster, m_procAttacker, 0, PROC_EX_NORMAL_HIT, 0, m_attackType, m_spellInfo);
+        m_caster->ProcDamageAndSpell(procTarget, m_procAttacker, 0, PROC_EX_CAST_END, 0, m_attackType, m_spellInfo);
     }
     else
     {
-        m_caster->ProcDamageAndSpell(m_caster, m_procAttacker, 0, PROC_EX_NORMAL_HIT, 0, m_attackType, m_spellInfo);
+        m_caster->ProcDamageAndSpell(procTarget, m_procAttacker, 0, PROC_EX_CAST_END, 0, m_attackType, m_spellInfo);
 
         // Immediate spell, no big deal
         handle_immediate();

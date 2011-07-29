@@ -9629,7 +9629,7 @@ uint32 createProcExtendMask(SpellNonMeleeDamage *damageInfo, SpellMissInfo missC
 void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const * procSpell, uint32 damage )
 {
     // For melee/ranged based attack need update skills and set some Aura states
-    if ((damage != 0 || procExtra != PROC_EX_NORMAL_HIT) && procFlag & MELEE_BASED_TRIGGER_MASK)
+    if (!(procExtra & PROC_EX_CAST_END) && procFlag & MELEE_BASED_TRIGGER_MASK)
     {
         // Update skills here for players
         if (GetTypeId() == TYPEID_PLAYER)
@@ -9750,9 +9750,11 @@ void Unit::ProcDamageAndSpellFor( bool isVictim, Unit * pTarget, uint32 procFlag
                         if (!procSpell->IsFitToFamilyMask(spellProcEvent->spellFamilyMask[i]))
                             continue;
 
-                        // modifier aura procs by default are not active and only allowed with non zero charges
-                        // procEx == PROC_EX_NORMAL_HIT only for real "on cast" cases
-                        if (!useCharges && damage == 0 && procExtra == PROC_EX_NORMAL_HIT && (procFlag & SPELL_CAST_TRIGGER_MASK))
+                        // don't allow proc from cast end for non modifier spells
+                        // unless they have proc ex defined for that
+                        if (spellProcEvent->procEx == PROC_EX_NONE 
+                            && procExtra == PROC_EX_CAST_END 
+                            && (!IsModifierAura(triggeredByHolder->GetSpellProto(), SpellEffectIndex(i)) || !useCharges))
                             continue;
                     }
                     // don't check dbc FamilyFlags if schoolMask exists
