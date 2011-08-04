@@ -8383,9 +8383,9 @@ void Aura::HandleAuraModAllCritChance(bool apply, bool Real)
     ((Player*)target)->UpdateAllSpellCritChances();
 }
 
-void Aura::HandleAuraStopNaturalManaRegen(bool apply, bool real)
+void Aura::HandleAuraStopNaturalManaRegen(bool apply, bool Real)
 {
-    if (!real)
+    if (!Real)
         return;
 
     GetTarget()->ApplyModFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER, !apply && !GetTarget()->IsUnderLastManaUseEffect());
