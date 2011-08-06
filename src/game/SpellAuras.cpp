@@ -5932,7 +5932,21 @@ void Aura::HandleAuraModIncreaseEnergyPercent(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModIncreaseHealthPercent(bool apply, bool /*Real*/)
 {
-    GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(m_modifier.m_amount), apply);
+    Unit *target = GetTarget();
+
+    target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(m_modifier.m_amount), apply);
+
+    // spell special cases when current health set to max value at apply
+    switch (GetId())
+    {
+        case 60430:                                         // Molten Fury
+        case 64193:                                         // Heartbreak
+        case 65737:                                         // Heartbreak
+            target->SetHealth(target->GetMaxHealth());
+            break;
+        default:
+            break;
+    }
 }
 
 void Aura::HandleAuraIncreaseBaseHealthPercent(bool apply, bool /*Real*/)
