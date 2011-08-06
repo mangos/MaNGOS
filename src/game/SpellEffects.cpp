@@ -1346,6 +1346,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     DoCreateItem(eff_idx, newitemid);
                     return;
                 }
+                case 40962:                                 // Blade's Edge Terrace Demon Boss Summon Branch
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 spell_id = 0;
+                    switch (urand(1,4))
+                    {
+                        case 1: spell_id = 40957; break;    // Blade's Edge Terrace Demon Boss Summon 1
+                        case 2: spell_id = 40959; break;    // Blade's Edge Terrace Demon Boss Summon 2
+                        case 3: spell_id = 40960; break;    // Blade's Edge Terrace Demon Boss Summon 3
+                        case 4: spell_id = 40961; break;    // Blade's Edge Terrace Demon Boss Summon 4
+                    }
+                    unitTarget->CastSpell(unitTarget, spell_id, true);
+                    return;
+                }
                 case 42287:                                 // Salvage Wreckage
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
