@@ -6974,7 +6974,7 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
             }
         }
         // Lifebloom
-        else if (spellProto->IsFitToFamilyMask(0x0000001000000000))
+        else if (spellProto->IsFitToFamilyMask(UI64LIT(0x0000001000000000)))
         {
             AuraList const& dummyList = owner->GetAurasByType(SPELL_AURA_DUMMY);
             for(AuraList::const_iterator i = dummyList.begin(); i != dummyList.end(); ++i)
@@ -9343,7 +9343,7 @@ void Unit::CleanupsBeforeDelete()
         else
             getHostileRefManager().deleteReferences();
         RemoveAllAuras(AURA_REMOVE_BY_DELETE);
-        GetMotionMaster()->Clear(false,true);         // remove all movement generators.           
+        GetMotionMaster()->Clear(false,true);         // remove all movement generators.
     }
     WorldObject::CleanupsBeforeDelete();
 }
@@ -10746,7 +10746,7 @@ public:
         {
             MaNGOS::PlayerRelocationNotifier notify((Player&)m_owner);
             Cell::VisitAllObjects(&m_owner,notify,radius);
-        } 
+        }
         else //if(m_owner.GetTypeId() == TYPEID_UNIT)
         {
             MaNGOS::CreatureRelocationNotifier notify((Creature&)m_owner);
