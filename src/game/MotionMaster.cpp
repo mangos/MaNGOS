@@ -59,8 +59,14 @@ void MotionMaster::Initialize()
 
 MotionMaster::~MotionMaster()
 {
-    // clear ALL movement generators (including default)
-    DirectClean(false,true);
+    // just deallocate movement generator, but do not Finalize since it may access to already deallocated owner's memory
+    while(!empty())
+    {
+        MovementGenerator * m = top();
+        pop();
+        if (!isStatic(m))
+            delete m;
+    }
 }
 
 void MotionMaster::UpdateMotion(uint32 diff)
