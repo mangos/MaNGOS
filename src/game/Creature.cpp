@@ -175,6 +175,8 @@ m_creatureInfo(NULL)
 
     m_CreatureSpellCooldowns.clear();
     m_CreatureCategoryCooldowns.clear();
+
+    SetWalk(true);
 }
 
 Creature::~Creature()
@@ -1485,6 +1487,7 @@ void Creature::SetDeathState(DeathState s)
 
         SetHealth(GetMaxHealth());
         SetLootRecipient(NULL);
+        SetWalk(true);
 
         if (GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_RESPAWN)
             ClearTemporaryFaction();

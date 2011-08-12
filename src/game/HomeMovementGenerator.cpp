@@ -67,6 +67,7 @@ void HomeMovementGenerator<Creature>::Finalize(Creature& owner)
         if (owner.GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_REACH_HOME)
             owner.ClearTemporaryFaction();
 
+        owner.SetWalk(true);
         owner.LoadCreatureAddon(true);
         owner.AI()->JustReachedHome();
     }
