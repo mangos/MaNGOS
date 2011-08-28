@@ -4672,10 +4672,6 @@ bool ChatHandler::HandleLookupPoolCommand(char * args)
         return false;
 
     std::string namepart = args;
-
-    Player* player = m_session ? m_session->GetPlayer() : NULL;
-    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : NULL;
-
     strToLower(namepart);
 
     uint32 counter = 0;
@@ -4719,7 +4715,6 @@ bool ChatHandler::HandlePoolListCommand(char* args)
     // spawn pools for expected map or for not initialized shared pools state for non-instanceable maps
     for(uint16 pool_id = 0; pool_id < sPoolMgr.GetMaxPoolId(); ++pool_id)
     {
-        PoolTemplateData const& pool_template = sPoolMgr.GetPoolTemplate(pool_id);
         if (sPoolMgr.GetPoolTemplate(pool_id).CanBeSpawnedAtMap(mapState->GetMapEntry()))
         {
             ShowPoolListHelper(pool_id);

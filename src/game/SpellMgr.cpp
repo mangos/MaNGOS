@@ -1530,7 +1530,7 @@ void SpellMgr::LoadSpellBonuses()
             need_direct = true;
 
         // Check if direct_bonus is needed in `spell_bonus_data`
-        float direct_calc;
+        float direct_calc = 0.0f;
         float direct_diff = 1000.0f;                        // for have big diff if no DB field value
         if (sbe.direct_damage)
         {
@@ -1550,7 +1550,7 @@ void SpellMgr::LoadSpellBonuses()
         }
 
         // Check if dot_bonus is needed in `spell_bonus_data`
-        float dot_calc;
+        float dot_calc = 0.0f;
         float dot_diff = 1000.0f;                           // for have big diff if no DB field value
         if (sbe.dot_damage)
         {
@@ -1756,7 +1756,6 @@ struct DoSpellThreat
         if (ste.threat || ste.ap_bonus != 0.f)
         {
             const uint32 *targetA = spell->EffectImplicitTargetA;
-            const uint32 *targetB = spell->EffectImplicitTargetB;
             if ((targetA[EFFECT_INDEX_1] && targetA[EFFECT_INDEX_1] != targetA[EFFECT_INDEX_0]) ||
                 (targetA[EFFECT_INDEX_2] && targetA[EFFECT_INDEX_2] != targetA[EFFECT_INDEX_0]))
                 sLog.outErrorDb("Spell %u listed in `spell_threat` has effects with different targets, threat may be assigned incorrectly", spell->Id);

@@ -708,9 +708,6 @@ void WorldSession::HandleAuctionListPendingSales(WorldPacket & recv_data)
     if (!auctionHouseEntry)
         return;
 
-    // always return pointer
-    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
-
     uint32 count = 0;
 
     WorldPacket data(SMSG_AUCTION_LIST_PENDING_SALES, 4);

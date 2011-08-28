@@ -125,7 +125,7 @@ Map* MapManager::CreateMap(uint32 id, const WorldObject* obj)
 
 Map* MapManager::CreateBgMap(uint32 mapid, BattleGround* bg)
 {
-    TerrainInfo * pData = sTerrainMgr.LoadTerrain(mapid);
+    sTerrainMgr.LoadTerrain(mapid);
 
     Guard _guard(*this);
     return CreateBattleGroundMap(mapid, sObjectMgr.GenerateInstanceLowGuid(), bg);

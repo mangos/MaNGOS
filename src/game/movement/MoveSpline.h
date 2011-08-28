@@ -47,7 +47,6 @@ namespace Movement
             Result_NextCycle    = 0x04,
             Result_NextSegment  = 0x08,
         };
-        #pragma region fields
         friend class PacketBuilder;
     protected:
         MySpline        spline;
@@ -87,7 +86,6 @@ namespace Movement
         void _Finalize();
         void _Interrupt() { splineflags.done = true;}
 
-        #pragma endregion
     public:
 
         void Initialize(const MoveSplineInitArgs&);

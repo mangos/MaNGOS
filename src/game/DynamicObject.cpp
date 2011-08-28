@@ -95,7 +95,7 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     SpellEntry const* spellProto = sSpellStore.LookupEntry(spellId);
     if (!spellProto)
     {
-        sLog.outError("DynamicObject (spell %u) not created. Spell not exist!", spellId, GetPositionX(), GetPositionY());
+        sLog.outError("DynamicObject (spell %u) not created. Spell not exist!", spellId);
         return false;
     }
 
