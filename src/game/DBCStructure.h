@@ -799,14 +799,14 @@ struct CurrencyTypesEntry
 
 struct DungeonEncounterEntry
 {
-    uint32 Id;                                              // 0        unique id
-    uint32 mapId;                                           // 1        map id
-    uint32 Difficulty;                                      // 2        instance mode
-    uint32 encounterData;                                   // 3        time to reach?
-    uint32 encounterIndex;                                  // 4        encounter index for creating completed mask
-    char*  encounterName[16];                               // 5-20     encounter name
-    //uint32 nameFlags;                                     // 21       language flags
-    //uint32 unk1;                                          // 22
+    uint32 Id;                                              // 0        m_ID
+    uint32 mapId;                                           // 1        m_mapID
+    uint32 Difficulty;                                      // 2        m_difficulty
+    uint32 encounterData;                                   // 3        m_orderIndex
+    uint32 encounterIndex;                                  // 4        m_Bit
+    char*  encounterName[16];                               // 5-20     m_name_lang
+    //uint32 nameLangFlags;                                 // 21       m_name_lang_flags
+    //uint32 spellIconID;                                   // 22       m_spellIconID
 };
 
 struct DurabilityCostsEntry
