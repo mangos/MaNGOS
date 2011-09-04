@@ -3533,8 +3533,8 @@ void ObjectMgr::LoadGroups()
         "SELECT group_instance.leaderGuid, map, instance, permanent, instance.difficulty, resettime, "
         // 6
         "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
-        // 7
-        " groups.groupId "
+        // 7              8
+        " groups.groupId, instance.encountersMask "
         "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
     );
 
@@ -3583,7 +3583,7 @@ void ObjectMgr::LoadGroups()
                 diff = REGULAR_DIFFICULTY;                  // default for both difficaly types
             }
 
-            DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true);
+            DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), Difficulty(diff), (time_t)fields[5].GetUInt64(), (fields[6].GetUInt32() == 0), true, true, fields[8].GetUInt32());
             group->BindToInstance(state, fields[3].GetBool(), true);
         }while( result->NextRow() );
         delete result;
@@ -4544,6 +4544,79 @@ void ObjectMgr::LoadPageTextLocales()
 
     sLog.outString();
     sLog.outString( ">> Loaded %lu PageText locale strings", (unsigned long)mPageTextLocaleMap.size() );
+}
+
+void ObjectMgr::LoadInstanceEncounters()
+{
+    m_DungeonEncounters.clear();         // need for reload case
+
+    QueryResult* result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
+    
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded 0 Instance Encounters. DB table `instance_encounters` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry(entry);
+        
+        if (!dungeonEncounter)
+        {
+            sLog.outErrorDb("Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);
+            continue;
+        }
+        
+        uint8 creditType = fields[1].GetUInt8();
+        uint32 creditEntry = fields[2].GetUInt32();
+        switch (creditType)
+        {
+            case ENCOUNTER_CREDIT_KILL_CREATURE:
+            {
+                CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creditEntry);
+                if (!cInfo)
+                {
+                    sLog.outErrorDb("Table `instance_encounters` has an invalid creature (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
+                }
+                break;
+            }
+            case ENCOUNTER_CREDIT_CAST_SPELL:
+            {
+                if (!sSpellStore.LookupEntry(creditEntry))
+                {
+                    // skip spells that aren't in dbc for now
+                    //sLog.outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    continue;
+                }
+                break;
+            }
+            default:
+                sLog.outErrorDb("Table `instance_encounters` has an invalid credit type (%u) for encounter %u (%s), skipped!", creditType, entry, dungeonEncounter->encounterName[0]);
+                continue;
+        }
+        uint32 lastEncounterDungeon = fields[3].GetUInt32();
+
+        m_DungeonEncounters.insert(DungeonEncounterMap::value_type(creditEntry, new DungeonEncounter(dungeonEncounter, EncounterCreditType(creditType), creditEntry, lastEncounterDungeon)));
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString( ">> Loaded %lu Instance Encounters", (unsigned long)m_DungeonEncounters.size() );
 }
 
 struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>

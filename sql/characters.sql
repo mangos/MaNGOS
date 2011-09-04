@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_11716_10_characters_mail` bit(1) default NULL
+  `required_11785_02_characters_instance` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1420,6 +1420,7 @@ CREATE TABLE `instance` (
   `map` int(11) unsigned NOT NULL default '0',
   `resettime` bigint(40) unsigned NOT NULL default '0',
   `difficulty` tinyint(1) unsigned NOT NULL default '0',
+  `encountersMask` int(10) unsigned NOT NULL default '0',
   `data` longtext,
   PRIMARY KEY  (`id`),
   KEY `map` (`map`),

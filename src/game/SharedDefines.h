@@ -2925,6 +2925,12 @@ enum TradeStatus
     TRADE_STATUS_ONLY_CONJURED  = 22                        // You can only trade conjured items... (cross realm BG related).
 };
 
+enum EncounterCreditType
+{	
+    ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
+    ENCOUNTER_CREDIT_CAST_SPELL     = 1
+};
+
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
 // will only support WoW, WoW:TBC and WoW:WotLK 3.3.5a client build 12340...

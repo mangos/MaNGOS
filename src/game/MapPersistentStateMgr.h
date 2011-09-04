@@ -180,7 +180,7 @@ class DungeonPersistentState : public MapPersistentState
            - any new instance is being generated
            - the first time a player bound to InstanceId logs in
            - when a group bound to the instance is loaded */
-        DungeonPersistentState(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset);
+        DungeonPersistentState(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, bool canReset, uint32 completedEncountersMask);
 
         ~DungeonPersistentState();
 
@@ -211,6 +211,12 @@ class DungeonPersistentState : public MapPersistentState
         bool CanReset() const { return m_canReset; }
         void SetCanReset(bool canReset) { m_canReset = canReset; }
 
+        // DBC encounter state update at kill/spell cast
+        void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry);
+
+        // mask of completed encounters
+        uint32 GetCompletedEncountersMask() { return m_completedEncountersMask; }
+
         /* Saved when the instance is generated for the first time */
         void SaveToDB();
         /* When the instance is being reset (permanently deleted) */
@@ -236,6 +242,8 @@ class DungeonPersistentState : public MapPersistentState
         GroupListType m_groupList;                          // lock MapPersistentState from unload
 
         SpawnedPoolData m_spawnedPoolData;                  // Pools spawns state for map copy
+
+        uint32 m_completedEncountersMask;                   // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
 };
 
 class BattleGroundPersistentState : public MapPersistentState
@@ -336,7 +344,7 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
 
         // auto select appropriate MapPersistentState (sub)class by MapEntry, and autoselect appropriate way store (by instance/map id)
         // always return != NULL
-        MapPersistentState* AddPersistentState(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false, bool initPools = true);
+        MapPersistentState* AddPersistentState(MapEntry const* mapEntry, uint32 instanceId, Difficulty difficulty, time_t resetTime, bool canReset, bool load = false, bool initPools = true, uint32 completedEncountersMask = 0);
 
         // search stored state, can be NULL in result
         MapPersistentState *GetPersistentState(uint32 mapId, uint32 InstanceId);

@@ -797,6 +797,18 @@ struct CurrencyTypesEntry
     uint32    BitIndex;                                     // 3        m_bitIndex bit index in PLAYER_FIELD_KNOWN_CURRENCIES (1 << (index-1))
 };
 
+struct DungeonEncounterEntry
+{
+    uint32 Id;                                              // 0        unique id
+    uint32 mapId;                                           // 1        map id
+    uint32 Difficulty;                                      // 2        instance mode
+    uint32 encounterData;                                   // 3        time to reach?
+    uint32 encounterIndex;                                  // 4        encounter index for creating completed mask
+    char*  encounterName[16];                               // 5-20     encounter name
+    //uint32 nameFlags;                                     // 21       language flags
+    //uint32 unk1;                                          // 22
+};
+
 struct DurabilityCostsEntry
 {
     uint32    Itemlvl;                                      // 0        m_ID
