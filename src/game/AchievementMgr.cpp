@@ -77,32 +77,27 @@ namespace MaNGOS
 
 bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* criteria)
 {
-    if(requirementType >= MAX_ACHIEVEMENT_CRITERIA_REQUIREMENT_TYPE)
-    {
-        sLog.outErrorDb( "Table `achievement_criteria_requirement` for criteria (Entry: %u) have wrong requirement type (%u), ignore.", criteria->ID,requirementType);
-        return false;
-    }
-
     switch(criteria->requiredType)
     {
         case ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_BG:
         case ACHIEVEMENT_CRITERIA_TYPE_FALL_WITHOUT_DYING:
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:      // only hardcoded list
+        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
+        case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM:
         case ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE:
+        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
         case ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL:
+        case ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN:
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL:
         case ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE:
         case ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2:
-        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET:
-        case ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2:
-        case ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN:
             break;
         default:
-            sLog.outErrorDb( "Table `achievement_criteria_requirement` have data for not supported criteria type (Entry: %u Type: %u), ignore.", criteria->ID, criteria->requiredType);
+            sLog.outErrorDb( "Table `achievement_criteria_requirement` have not supported data for criteria %u (Not supported as of its criteria type: %u), ignore.", criteria->ID, criteria->requiredType);
             return false;
     }
 
@@ -270,7 +265,6 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
             sLog.outErrorDb( "Table `achievement_criteria_requirement` (Entry: %u Type: %u) have data for not supported data type (%u), ignore.", criteria->ID, criteria->requiredType,requirementType);
             return false;
     }
-    return false;
 }
 
 bool AchievementCriteriaRequirement::Meets(uint32 criteria_id, Player const* source, Unit const* target, uint32 miscvalue1 /*= 0*/) const
@@ -1322,14 +1316,20 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 progressType = PROGRESS_ACCUMULATE;
                 break;
             case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
+            {
                 // AchievementMgr::UpdateAchievementCriteria might also be called on login - skip in this case
-                if(!miscvalue1)
+                if (!miscvalue1)
                     continue;
-                if(achievementCriteria->use_item.itemID != miscvalue1)
+                if (achievementCriteria->use_item.itemID != miscvalue1)
+                    continue;
+                // possible additional requirements
+                AchievementCriteriaRequirementSet const* data = sAchievementMgr.GetCriteriaRequirementSet(achievementCriteria);
+                if (data && !data->Meets(GetPlayer(), unit, miscvalue1))
                     continue;
                 change = 1;
                 progressType = PROGRESS_ACCUMULATE;
                 break;
+            }
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM:
                 // You _have_ to loot that item, just owning it when logging in does _not_ count!
                 if(!miscvalue1)
