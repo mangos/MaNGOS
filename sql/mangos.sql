@@ -17991,7 +17991,7 @@ CREATE TABLE `instance_encounters` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `transports`
+-- Dumping data for table `instance_encounters`
 --
 
 LOCK TABLES `instance_encounters` WRITE;
