@@ -7309,6 +7309,26 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (unitTarget)
                         unitTarget->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true);
                     return;
+                case 69048:                                 // Mirrored Soul
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // This is extremely strange!
+                    // The spell should send MSG_CHANNEL_START, SMSG_SPELL_START
+                    // However it has cast time 2s, but should send SMSG_SPELL_GO instantly.
+                    m_caster->CastSpell(unitTarget, 69051, true);
+                    return;
+                }
+                case 69051:                                 // Mirrored Soul
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Actually this spell should be sent with SMSG_SPELL_START
+                    unitTarget->CastSpell(m_caster, 69023, true);
+                    return;
+                }
                 case 69377:                                 // Fortitude
                 {
                     if (!unitTarget)

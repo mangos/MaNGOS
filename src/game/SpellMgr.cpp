@@ -1915,6 +1915,11 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                     if (spellInfo_1->SpellIconID == 2606 && spellInfo_2->SpellIconID == 2606)
                         return false;
 
+                    // Mirrored Soul (FoS - Devourer) - and other Boss spells
+                    if (spellInfo_1->SpellIconID == 3176 && spellInfo_2->SpellIconID == 3176)
+                        return false;
+
+
                     // Brood Affliction: Bronze
                     if ((spellInfo_1->Id == 23170 && spellInfo_2->Id == 23171) ||
                         (spellInfo_2->Id == 23170 && spellInfo_1->Id == 23171))
