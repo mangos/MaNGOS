@@ -1080,18 +1080,11 @@ void Aura::TriggerSpell()
                     {
                         trigger_spell_id = 25779;           // Mana Burn
 
-                        // expected selection current fight target
-                        triggerTarget = GetTarget()->getVictim();
-                        if (!triggerTarget || triggerTarget->GetMaxPower(POWER_MANA) <= 0)
+                        if (GetTarget()->GetTypeId() != TYPEID_UNIT)
                             return;
 
-                        triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
-                        if (!triggeredSpellInfo)
-                            return;
-
-                        SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(triggeredSpellInfo->rangeIndex);
-                        float max_range = GetSpellMaxRange(srange);
-                        if (!triggerTarget->IsWithinDist(GetTarget(),max_range))
+                        triggerTarget = ((Creature*)GetTarget())->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, trigger_spell_id, SELECT_FLAG_POWER_MANA);
+                        if (!triggerTarget)
                             return;
 
                         break;

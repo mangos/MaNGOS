@@ -1304,6 +1304,7 @@ enum SpellRangeIndex
 {
     SPELL_RANGE_IDX_SELF_ONLY = 1,                          // 0.0
     SPELL_RANGE_IDX_COMBAT    = 2,                          // 5.5 (but dynamic)
+    SPELL_RANGE_IDX_ANYWHERE  = 13,                         // 500000 (anywhere)
 };
 
 enum DamageEffectType
