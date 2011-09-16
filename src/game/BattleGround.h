@@ -381,6 +381,8 @@ class BattleGround
 
         void StartBattleGround();
 
+        void StartTimedAchievement(AchievementCriteriaTypes type, uint32 entry);
+
         /* Location */
         void SetMapId(uint32 MapID) { m_MapId = MapID; }
         uint32 GetMapId() const { return m_MapId; }
