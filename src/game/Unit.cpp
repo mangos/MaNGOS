@@ -4849,6 +4849,16 @@ bool Unit::HasAura(uint32 spellId, SpellEffectIndex effIndex) const
     return false;
 }
 
+bool Unit::HasAuraOfDifficulty(uint32 spellId) const
+{
+    SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellId);
+    if (spellEntry && spellEntry->SpellDifficultyId && IsInWorld() && GetMap()->IsDungeon())
+        if (SpellEntry const* spellDiffEntry = GetSpellEntryByDifficulty(spellEntry->SpellDifficultyId, GetMap()->GetDifficulty(), GetMap()->IsRaid()))
+            spellId = spellDiffEntry->Id;
+
+    return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end();
+}
+
 void Unit::AddDynObject(DynamicObject* dynObj)
 {
     m_dynObjGUIDs.push_back(dynObj->GetObjectGuid());

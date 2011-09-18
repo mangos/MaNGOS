@@ -1421,6 +1421,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         {
             return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end();
         }
+        bool HasAuraOfDifficulty(uint32 spellId) const;
 
         bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
 
