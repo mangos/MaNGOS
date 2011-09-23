@@ -199,7 +199,15 @@ void WorldSession::HandleWhoOpcode( WorldPacket & recv_data )
         if (!z_show)
             continue;
 
-        std::string pname = pl->GetName();
+        std::string pname;
+        if (pl->isGameMaster() && pl->isGMVisible())
+        {
+            pname = "<GM>";
+            pname.append(pl->GetName());
+        }
+        else
+            pname = pl->GetName();
+
         std::wstring wpname;
         if(!Utf8toWStr(pname,wpname))
             continue;
