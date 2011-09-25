@@ -549,6 +549,16 @@ enum GOState
 
 #define MAX_GO_STATE              3
 
+struct QuaternionData
+{
+    float x, y, z, w;
+
+    QuaternionData() : x(0.f), y(0.f), z(0.f), w(0.f) {}
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
+
+    bool isUnit() const { return fabs(x*x + y*y + z*z + w*w - 1.f) < 1e-5;}
+};
+
 // from `gameobject`
 struct GameObjectData
 {
@@ -559,10 +569,7 @@ struct GameObjectData
     float posY;
     float posZ;
     float orientation;
-    float rotation0;
-    float rotation1;
-    float rotation2;
-    float rotation3;
+    QuaternionData rotation;
     int32  spawntimesecs;
     uint32 animprogress;
     GOState go_state;
@@ -598,7 +605,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMask, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint8 animprogress, GOState go_state);
+        bool Create(uint32 guidlow, uint32 name_id, Map *map, uint32 phaseMask, float x, float y, float z, float ang,
+            QuaternionData rotation = QuaternionData(), uint8 animprogress = GO_ANIMPROGRESS_DEFAULT, GOState go_state = GO_STATE_READY);
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
@@ -610,7 +618,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
         void SetWorldRotation(float qx, float qy, float qz, float qw);   
         void SetTransportPathRotation(float qx, float qy, float qz, float qw);      // transforms(rotates) transport's path
-        int64 GetRotation() const { return m_rotation; }
+        int64 GetPackedWorldRotation() const { return m_packedRotation; }
 
         // overwrite WorldObject function for proper name localization
         const char* GetNameForLocaleIdx(int32 locale_idx) const;
@@ -746,8 +754,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         GameObjectInfo const* m_goInfo;
         GameObjectDisplayInfoEntry const* m_displayInfo;
-        int64 m_rotation;
-        float m_quatX, m_quatY, m_quatZ, m_quatW;
+        int64 m_packedRotation;
+        QuaternionData m_worldRotation;
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);
 
