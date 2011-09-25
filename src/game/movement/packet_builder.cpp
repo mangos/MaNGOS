@@ -173,16 +173,16 @@ namespace Movement
             data << move_spline.Duration();
             data << move_spline.GetId();
 
-            data << float(1.f);//splineInfo.duration_mod;
-            data << float(1.f);//splineInfo.duration_mod_next;
+            data << float(1.f);                             // splineInfo.duration_mod; added in 3.1
+            data << float(1.f);                             // splineInfo.duration_mod_next; added in 3.1
 
-            data << move_spline.vertical_acceleration;
-            data << move_spline.effect_start_time;
+            data << move_spline.vertical_acceleration;      // added in 3.1
+            data << move_spline.effect_start_time;          // added in 3.1
 
             uint32 nodes = move_spline.getPath().size();
             data << nodes;
             data.append<Vector3>(&move_spline.getPath()[0], nodes);
-            data << uint8(move_spline.spline.mode());
+            data << uint8(move_spline.spline.mode());       // added in 3.1
             data << (move_spline.isCyclic() ? Vector3::zero() : move_spline.FinalDestination());
         }
     }
