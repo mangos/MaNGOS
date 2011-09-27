@@ -7360,14 +7360,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget)
                         return;
 
-                    uint32 count = 0;
-
-                    if (unitTarget->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL || unitTarget->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
-                        count = 5;
-                    else
-                        count = 10;
-
-                    for (uint8 i = 0; i < count; ++i)
+                    for (uint8 i = 0; i < 11; ++i)
                         unitTarget->CastSpell(unitTarget, m_spellInfo->CalculateSimpleValue(eff_idx), true);
 
                     return;
