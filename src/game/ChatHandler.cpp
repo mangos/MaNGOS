@@ -454,41 +454,48 @@ void WorldSession::HandleMessagechatOpcode( WorldPacket & recv_data )
 
             if (!_player->isInCombat())
             {
-                if (!msg.empty() || !_player->isAFK())
+                if (_player->isAFK())                       // Already AFK
                 {
                     if (msg.empty())
-                        _player->afkMsg = GetMangosString(LANG_PLAYER_AFK_DEFAULT);
+                        _player->ToggleAFK();               // Remove AFK
                     else
-                        _player->afkMsg = msg;
+                        _player->autoReplyMsg = msg;        // Update message
                 }
-                if (msg.empty() || !_player->isAFK())
+                else                                        // New AFK mode
                 {
-                    _player->ToggleAFK();
-                    if (_player->isAFK() && _player->isDND())
+                    _player->autoReplyMsg = msg.empty() ? GetMangosString(LANG_PLAYER_AFK_DEFAULT) : msg;
+
+                    if (_player->isDND())
                         _player->ToggleDND();
+
+                    _player->ToggleAFK();
                 }
             }
-        } break;
-
+            break;
+        }
         case CHAT_MSG_DND:
         {
             std::string msg;
             recv_data >> msg;
 
-            if (!msg.empty() || !_player->isDND())
+            if (_player->isDND())                           // Already DND
             {
                 if (msg.empty())
-                    _player->dndMsg = GetMangosString(LANG_PLAYER_DND_DEFAULT);
+                    _player->ToggleDND();                   // Remove DND
                 else
-                    _player->dndMsg = msg;
+                    _player->autoReplyMsg = msg;            // Update message
             }
-            if (msg.empty() || !_player->isDND())
+            else                                            // New DND mode
             {
-                _player->ToggleDND();
-                if (_player->isDND() && _player->isAFK())
+                _player->autoReplyMsg = msg.empty() ? GetMangosString(LANG_PLAYER_DND_DEFAULT) : msg;
+
+                if (_player->isAFK())
                     _player->ToggleAFK();
+
+                _player->ToggleDND();
             }
-        } break;
+            break;
+        }
 
         default:
             sLog.outError("CHAT: unknown message type %u, lang: %u", type, lang);
