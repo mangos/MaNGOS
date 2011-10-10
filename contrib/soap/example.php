@@ -21,10 +21,18 @@
  * MaNGOSsoap client example
  *
  * a simple example how to invoke commands using SOAP
+ *
+ * Make sure you enabled SOAP in your mangosd.conf!
+ *  SOAP.Enabled = 1
  */
 
+/*
+ * $username and $password MUST be uppercase
+ * account $username needs at least SEC_ADMINISTRATOR
+ */
 $username = 'ADMINISTRATOR';
 $password = 'ADMINISTRATOR';
+
 $host = "localhost";
 $soapport = 7878;
 $command = "server info";
