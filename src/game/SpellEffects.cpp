@@ -7312,13 +7312,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 64456:                                 // Feral Essence Application Removal
                 {
-                    if (unitTarget && unitTarget->HasAura(m_spellInfo->CalculateSimpleValue(eff_idx)))
-                    {
-                        if (SpellAuraHolder* pEssenceHolder = unitTarget->GetSpellAuraHolder(m_spellInfo->CalculateSimpleValue(eff_idx)))
-                            if (pEssenceHolder->ModStackAmount(-1))
-                                unitTarget->RemoveAurasDueToSpell(m_spellInfo->CalculateSimpleValue(eff_idx));
-                    }
+                    if (!unitTarget)
+                        return;
 
+                    uint32 spellId = m_spellInfo->CalculateSimpleValue(eff_idx);
+                    unitTarget->RemoveAuraHolderFromStack(spellId);
                     return;
                 }
                 case 66477:                                 // Bountiful Feast
