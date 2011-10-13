@@ -1081,9 +1081,11 @@ bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
 void Map::AddToActive( WorldObject* obj )
 {
     m_activeNonPlayers.insert(obj);
+    Cell cell = Cell(MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY()));
+    EnsureGridLoaded(cell);
 
     // also not allow unloading spawn grid to prevent creating creature clone at load
-    if (obj->GetTypeId()==TYPEID_UNIT)
+    if (obj->GetTypeId() == TYPEID_UNIT)
     {
         Creature* c= (Creature*)obj;
 

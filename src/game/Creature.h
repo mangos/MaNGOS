@@ -682,8 +682,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
 
-        void SetActiveObjectState(bool on);
-
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();
         uint32 GetTemporaryFactionFlags() { return m_temporaryFactionFlags; }

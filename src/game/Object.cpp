@@ -1879,3 +1879,18 @@ bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* d
     sLog.outError("%s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);
     return false;                                           // always false for continue assert fail
 }
+
+void WorldObject::SetActiveObjectState(bool active)
+{
+    if (m_isActiveObject == active || (isType(TYPEMASK_PLAYER) && !active))  // player shouldn't became inactive, never
+        return;
+
+    if (IsInWorld())
+    {
+        if (isActiveObject() && !active)
+            GetMap()->RemoveFromActive(this);
+        else if (!isActiveObject() && active)
+            GetMap()->AddToActive(this);
+    }
+    m_isActiveObject = active;
+}
