@@ -1320,7 +1320,13 @@ class MANGOS_DLL_SPEC Player : public Unit
         void PrepareQuestMenu(ObjectGuid guid );
         void SendPreparedQuest(ObjectGuid guid);
         bool IsActiveQuest( uint32 quest_id ) const;        // can be taken or taken
-        bool IsCurrentQuest( uint32 quest_id ) const;       // taken and not yet rewarded
+
+        // Quest is taken and not yet rewarded
+        // if completed_or_not = 0 (or any other value except 1 or 2) - returns true, if quest is taken and doesn't depend if quest is completed or not
+        // if completed_or_not = 1 - returns true, if quest is taken but not completed
+        // if completed_or_not = 2 - returns true, if quest is taken and already completed
+        bool IsCurrentQuest(uint32 quest_id, uint8 completed_or_not = 0) const; // taken and not yet rewarded
+
         Quest const *GetNextQuest(ObjectGuid guid, Quest const *pQuest );
         bool CanSeeStartQuest( Quest const *pQuest ) const;
         bool CanTakeQuest( Quest const *pQuest, bool msg ) const;
