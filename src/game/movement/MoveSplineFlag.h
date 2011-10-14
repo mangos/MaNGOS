@@ -42,7 +42,7 @@ namespace Movement
             Parabolic    = 0x00000800,           // Affects elevation computation, can't be combined with Falling flag
             Walkmode     = 0x00001000,
             Flying       = 0x00002000,           // Smooth movement(Catmullrom interpolation mode), flying animation
-            Knockback    = 0x00004000,           // Model orientation fixed
+            OrientationFixed = 0x00004000,       // Model orientation fixed
             Final_Point  = 0x00008000,
             Final_Target = 0x00010000,
             Final_Angle  = 0x00020000,
@@ -55,7 +55,7 @@ namespace Movement
             Unknown6     = 0x01000000,
             Unknown7     = 0x02000000,
             Unknown8     = 0x04000000,
-            Backward     = 0x08000000,
+            OrientationInversed = 0x08000000,
             Unknown10    = 0x10000000,
             Unknown11    = 0x20000000,
             Unknown12    = 0x40000000,
@@ -88,6 +88,7 @@ namespace Movement
 
         uint8 getAnimationId() const { return animId;}
         bool hasAllFlags(uint32 f) const { return (raw() & f) == f;}
+        bool hasFlag(uint32 f) const { return (raw() & f) != 0;}
         uint32 operator & (uint32 f) const { return (raw() & f);}
         uint32 operator | (uint32 f) const { return (raw() | f);}
         std::string ToString() const;
@@ -97,9 +98,9 @@ namespace Movement
         void operator &= (uint32 f) { raw() &= f;}
         void operator |= (uint32 f) { raw() |= f;}
 
-        void EnableAnimation(uint8 anim) { raw() = raw() & ~(Mask_Animations|Falling|Parabolic|Knockback) | Animation|anim;}
+        void EnableAnimation(uint8 anim) { raw() = raw() & ~(Mask_Animations|Falling|Parabolic) | Animation|anim;}
         void EnableParabolic() { raw() = raw() & ~(Mask_Animations|Falling|Animation) | Parabolic;}
-        void EnableFalling() { raw() = raw() & ~(Mask_Animations|Parabolic|Knockback|Animation) | Falling;}
+        void EnableFalling() { raw() = raw() & ~(Mask_Animations|Parabolic|Animation) | Falling;}
         void EnableFlying() { raw() = raw() & ~Catmullrom | Flying; }
         void EnableCatmullRom() { raw() = raw() & ~Flying | Catmullrom; }
         void EnableFacingPoint() { raw() = raw() & ~Mask_Final_Facing | Final_Point;}
@@ -113,7 +114,7 @@ namespace Movement
         bool parabolic     : 1;
         bool walkmode      : 1;
         bool flying        : 1;
-        bool knockback     : 1;
+        bool orientationFixed : 1;
         bool final_point   : 1;
         bool final_target  : 1;
         bool final_angle   : 1;
@@ -126,7 +127,7 @@ namespace Movement
         bool unknown6      : 1;
         bool unknown7      : 1;
         bool unknown8      : 1;
-        bool backward      : 1;
+        bool orientationInversed : 1;
         bool unknown10     : 1;
         bool unknown11     : 1;
         bool unknown12     : 1;

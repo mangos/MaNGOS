@@ -46,7 +46,6 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "movement/MoveSplineInit.h"
-#include "movement/MoveSpline.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"

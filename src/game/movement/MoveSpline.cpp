@@ -35,6 +35,7 @@ Location MoveSpline::ComputePosition() const
     if (seg_time > 0)
         u = (time_passed - spline.length(point_Idx)) / (float)seg_time;
     Location c;
+    c.orientation = initialOrientation;
     spline.evaluate_percent(point_Idx, u, c);
 
     if (splineflags.animation)
@@ -54,11 +55,14 @@ Location MoveSpline::ComputePosition() const
     } 
     else
     {
-        Vector3 hermite;
-        spline.evaluate_derivative(point_Idx,u,hermite);
-        c.orientation = atan2(hermite.y, hermite.x);
+        if (!splineflags.hasFlag(MoveSplineFlag::OrientationFixed|MoveSplineFlag::Falling))
+        {
+            Vector3 hermite;
+            spline.evaluate_derivative(point_Idx,u,hermite);
+            c.orientation = atan2(hermite.y, hermite.x);
+        }
 
-        if (splineflags.backward)
+        if (splineflags.orientationInversed)
             c.orientation = -c.orientation;
     }
     return c;
@@ -161,6 +165,7 @@ void MoveSpline::Initialize(const MoveSplineInitArgs& args)
     facing = args.facing;
     m_Id = args.splineId;
     point_Idx_offset = args.path_Idx_offset;
+    initialOrientation = args.initialOrientation;
 
     time_passed = 0;
     vertical_acceleration = 0.f;
@@ -182,7 +187,7 @@ void MoveSpline::Initialize(const MoveSplineInitArgs& args)
 }
 
 MoveSpline::MoveSpline() : m_Id(0), time_passed(0),
-    vertical_acceleration(0.f), effect_start_time(0), point_Idx(0), point_Idx_offset(0)
+    vertical_acceleration(0.f), effect_start_time(0), point_Idx(0), point_Idx_offset(0), initialOrientation(0.f)
 {
     splineflags.done = true;
 }

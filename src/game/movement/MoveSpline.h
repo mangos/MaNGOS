@@ -63,6 +63,7 @@ namespace Movement
         //float           duration_mod;
         //float           duration_mod_next;
         float           vertical_acceleration;
+        float           initialOrientation;
         int32           effect_start_time;
         int32           point_Idx;
         int32           point_Idx_offset;
