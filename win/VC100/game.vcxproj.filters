@@ -502,6 +502,9 @@
     <ClCompile Include="..\..\src\game\movement\MoveSpline.cpp">
       <Filter>Movement</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\game\CreatureLinkingMgr.cpp">
+      <Filter>World/Handlers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
@@ -948,6 +951,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\game\movement\typedefs.h">
       <Filter>Movement</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h">
+      <Filter>World/Handlers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

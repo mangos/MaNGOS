@@ -98,7 +98,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void EnterEvadeMode() {}
 
         /**
-         * Called at reaching home after MoveTargetHome
+         * Called at reaching home after MoveTargetedHome
          */
         virtual void JustReachedHome() {}
 
