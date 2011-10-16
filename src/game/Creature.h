@@ -582,7 +582,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         const char* GetNameForLocaleIdx(int32 locale_idx) const;
 
         void SetDeathState(DeathState s);                   // overwrite virtual Unit::SetDeathState
-        bool FallGround();
 
         bool LoadFromDB(uint32 guid, Map *map);
         void SaveToDB();
