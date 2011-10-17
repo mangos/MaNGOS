@@ -1298,6 +1298,10 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 m_stableSlots;
 
+        uint32 GetEquipGearScore(bool withBags = true, bool withBank = false);
+        void ResetCachedGearScore() { m_cachedGS = 0; }
+        typedef std::vector<uint32/*item level*/> GearScoreVec;
+
         /*********************************************************/
         /***                    GOSSIP SYSTEM                  ***/
         /*********************************************************/
@@ -2590,6 +2594,8 @@ class MANGOS_DLL_SPEC Player : public Unit
                 m_DelayedOperations |= operation;
         }
 
+        void _fillGearScoreData(Item* item, GearScoreVec* gearScore, uint32& twoHandScore);
+
         Unit *m_mover;
         Camera m_camera;
 
@@ -2634,6 +2640,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_timeSyncTimer;
         uint32 m_timeSyncClient;
         uint32 m_timeSyncServer;
+
+        uint32 m_cachedGS;
 };
 
 void AddItemsSetItem(Player*player,Item *item);
