@@ -197,7 +197,7 @@ bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex 
         default:
             break;
     }
-    
+
     if (!IsPositiveSpell(spellInfo))
     {
         // immune to all negative auras

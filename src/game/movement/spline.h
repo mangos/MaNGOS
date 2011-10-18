@@ -113,7 +113,7 @@ public:
     index_type getPointCount() const { return points.size();}
     const Vector3& getPoint(index_type i) const { return points[i];}
 
-    /**	Initializes spline. Don't call other methods while spline not initialized. */
+    /** Initializes spline. Don't call other methods while spline not initialized. */
     void init_spline(const Vector3 * controls, index_type count, EvaluationMode m);
     void init_cyclic_spline(const Vector3 * controls, index_type count, EvaluationMode m, index_type cyclic_point);
 
@@ -159,7 +159,7 @@ public:
 
     /** Calculates the position for given segment Idx, and percent of segment length t
         @param t = partial_segment_length / whole_segment_length
-        @param Idx - spline segment index, should be in range [first, last). */   
+        @param Idx - spline segment index, should be in range [first, last). */
     void evaluate_percent(index_type Idx, float u, Vector3& c) const { SplineBase::evaluate_percent(Idx,u,c);}
 
     /** Caclulates derivation for index Idx, and percent of segment length t
@@ -171,11 +171,11 @@ public:
     index_type computeIndexInBounds(float t) const;
     void computeIndex(float t, index_type& out_idx, float& out_u) const;
 
-    /**	Initializes spline. Don't call other methods while spline not initialized. */
+    /** Initializes spline. Don't call other methods while spline not initialized. */
     void init_spline(const Vector3 * controls, index_type count, EvaluationMode m) { SplineBase::init_spline(controls,count,m);}
     void init_cyclic_spline(const Vector3 * controls, index_type count, EvaluationMode m, index_type cyclic_point) { SplineBase::init_cyclic_spline(controls,count,m,cyclic_point);}
 
-    /**  Initializes lengths with SplineBase::SegLength method. */    
+    /**  Initializes lengths with SplineBase::SegLength method. */
     void initLengths();
 
     /** Initializes lengths in some custom way

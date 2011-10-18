@@ -174,7 +174,7 @@ namespace Movement
         STR(Final_Target ),// 0x00010000,
         STR(Final_Angle  ),// 0x00020000,
         STR(Catmullrom   ),// 0x00040000,           // Used Catmullrom Interpolation Mode
-        STR(Cyclic       ),// 0x00080000,           // Movement By Cycled Spline 
+        STR(Cyclic       ),// 0x00080000,           // Movement By Cycled Spline
         STR(Enter_Cycle  ),// 0x00100000,           // Everytime Appears With Cyclic Flag In Monster Move Packet
         STR(Animation    ),// 0x00200000,           // Animationid (0...3), Uint32 Time, Not Compartible With Trajectory And Fall Movement
         STR(Unknown4     ),// 0x00400000,           // Disables Movement By Path
@@ -193,7 +193,7 @@ namespace Movement
     void print_flags(Flags t, const char* (&names)[N], std::string& str)
     {
         for (int i = 0; i < N; ++i)
-        { 
+        {
             if ((t & (Flags)(1 << i)) && names[i] != NULL)
                 str.append(" ").append(names[i]);
         }

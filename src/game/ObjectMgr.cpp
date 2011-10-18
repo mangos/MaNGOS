@@ -4571,7 +4571,7 @@ void ObjectMgr::LoadInstanceEncounters()
     m_DungeonEncounters.clear();         // need for reload case
 
     QueryResult* result = WorldDatabase.Query("SELECT entry, creditType, creditEntry, lastEncounterDungeon FROM instance_encounters");
-    
+
     if (!result)
     {
         BarGoLink bar(1);
@@ -4592,13 +4592,13 @@ void ObjectMgr::LoadInstanceEncounters()
 
         uint32 entry = fields[0].GetUInt32();
         DungeonEncounterEntry const* dungeonEncounter = sDungeonEncounterStore.LookupEntry(entry);
-        
+
         if (!dungeonEncounter)
         {
             sLog.outErrorDb("Table `instance_encounters` has an invalid encounter id %u, skipped!", entry);
             continue;
         }
-        
+
         uint8 creditType = fields[1].GetUInt8();
         uint32 creditEntry = fields[2].GetUInt32();
         switch (creditType)

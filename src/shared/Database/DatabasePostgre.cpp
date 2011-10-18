@@ -226,7 +226,7 @@ bool PostgreSQLConnection::CommitTransaction()
 }
 
 bool PostgreSQLConnection::RollbackTransaction()
-{  
+{
     return _TransactionCmd("ROLLBACK");
 }
 

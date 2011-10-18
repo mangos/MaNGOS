@@ -141,7 +141,7 @@ namespace Movement
                 WriteCatmullRomCyclicPath(spline, data);
             else
                 WriteCatmullRomPath(spline, data);
-        } 
+        }
         else
             WriteLinearPath(spline, data);
     }

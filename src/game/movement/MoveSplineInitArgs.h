@@ -46,7 +46,7 @@ namespace Movement
         {
             path.reserve(path_capacity);
         }
-       
+
         PointsArray path;
         FacingInfo facing;
         MoveSplineFlag flags;
@@ -57,7 +57,7 @@ namespace Movement
         uint32 splineId;
         float initialOrientation;
 
-        /**	Returns true to show that the arguments were configured correctly and MoveSpline initialization will succeed. */
+        /** Returns true to show that the arguments were configured correctly and MoveSpline initialization will succeed. */
         bool Validate() const;
     private:
         bool _checkPathBounds() const;

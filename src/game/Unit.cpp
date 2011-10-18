@@ -873,7 +873,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                         if (save->GetResetTime() < resettime)
                             save->SetResetTime(resettime);
                     }
-                    
+
                     // update encounter state if needed
                     ((DungeonMap*)m)->GetPersistanceState()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, ((Creature*)cVictim)->GetEntry());
                 }

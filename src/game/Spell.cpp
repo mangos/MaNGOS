@@ -2923,7 +2923,7 @@ void Spell::cancel()
                         unit->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid());
 
                     // prevent other effects applying if spell is already interrupted
-                    // i.e. if effects have different targets and it was interrupted on one of them when 
+                    // i.e. if effects have different targets and it was interrupted on one of them when
                     // haven't yet applied to another
                     ihit->processed = true;
                 }
@@ -3238,8 +3238,8 @@ void Spell::cast(bool skipCheck)
         m_spellState = SPELL_STATE_DELAYED;
         SetDelayStart(0);
 
-        // on spell cast end proc, 
-        // critical hit related part is currently done on hit so proc there, 
+        // on spell cast end proc,
+        // critical hit related part is currently done on hit so proc there,
         // 0 damage since any damage based procs should be on hit
         // 0 victim proc since there is no victim proc dependent on successfull cast for caster
         m_caster->ProcDamageAndSpell(procTarget, m_procAttacker, 0, PROC_EX_CAST_END, 0, m_attackType, m_spellInfo);
@@ -4675,9 +4675,9 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         // totem immunity for channeled spells(needs to be before spell cast)
         // spell attribs for player channeled spells
-        if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_UNK14) 
-            && (m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_UNK13) 
-            && target->GetTypeId() == TYPEID_UNIT 
+        if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_UNK14)
+            && (m_spellInfo->AttributesEx5 & SPELL_ATTR_EX5_UNK13)
+            && target->GetTypeId() == TYPEID_UNIT
             && ((Creature*)target)->IsTotem())
             return SPELL_FAILED_IMMUNE;
 

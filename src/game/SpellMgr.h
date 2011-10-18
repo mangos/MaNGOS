@@ -626,7 +626,7 @@ enum ProcFlagsEx
     PROC_EX_EX_TRIGGER_ALWAYS   = 0x0010000,                // If set trigger always ( no matter another flags) used for drop charges
     PROC_EX_EX_ONE_TIME_TRIGGER = 0x0020000,                // If set trigger always but only one time (not used)
     PROC_EX_PERIODIC_POSITIVE   = 0x0040000,                // For periodic heal
-    PROC_EX_CAST_END            = 0x0080000                 // procs on end of cast            
+    PROC_EX_CAST_END            = 0x0080000                 // procs on end of cast
 };
 
 struct SpellProcEventEntry

@@ -1021,7 +1021,7 @@ class ObjectMgr
         {
             return m_ItemRequiredTarget.equal_range(uiItemEntry);
         }
-        
+
         DungeonEncounterMapBounds GetDungeonEncounterBounds(uint32 creditEntry) const
         {
             return m_DungeonEncounters.equal_range(creditEntry);
