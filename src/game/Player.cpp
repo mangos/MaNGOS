@@ -23012,7 +23012,7 @@ uint32 Player::GetEquipGearScore(bool withBags, bool withBank)
     uint32 sum = 0;
 
     // check if 2h hand is higher level than main hand + off hand
-    if ((gearScore[EQUIPMENT_SLOT_MAINHAND] + gearScore[EQUIPMENT_SLOT_OFFHAND]) / 2 < twoHandScore)
+    if (gearScore[EQUIPMENT_SLOT_MAINHAND] + gearScore[EQUIPMENT_SLOT_OFFHAND] < twoHandScore * 2)
     {
         gearScore[EQUIPMENT_SLOT_OFFHAND] = 0;  // off hand is ignored in calculations if 2h weapon has higher score
         --count;
