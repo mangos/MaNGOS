@@ -23028,13 +23028,13 @@ uint32 Player::GetEquipGearScore(bool withBags, bool withBank)
     {
         uint32 res = uint32(sum / count);
         DEBUG_LOG("Player: calculating gear score for %u. Result is %u", GetObjectGuid().GetCounter(), res);
-        
+
         if (withBags && withBank)
             m_cachedGS = res;
-       
+
         return res;
     }
-    else 
+    else
         return 0;
 }
 
@@ -23101,7 +23101,7 @@ void Player::_fillGearScoreData(Item* item, GearScoreVec* gearScore, uint32& two
             break;
         // equipped gear score check uses both rings and trinkets for calculation, assume that for bags/banks it is the same
         // with keeping second highest score at second slot
-        case INVTYPE_FINGER:    
+        case INVTYPE_FINGER:
         {
             if ((*gearScore)[EQUIPMENT_SLOT_FINGER1] < level)
             {
