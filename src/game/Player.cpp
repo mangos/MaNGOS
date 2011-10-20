@@ -22951,11 +22951,6 @@ uint32 Player::GetEquipGearScore(bool withBags, bool withBank)
 
     for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
     {
-        gearScore[i] = 0;
-    }
-
-    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-    {
         if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             _fillGearScoreData(item, &gearScore, twoHandScore);
     }
