@@ -481,9 +481,10 @@ enum_field_types MySqlPreparedStatement::ToMySQLType( const SqlStmtFieldData &da
     switch (data.type())
     {
     case FIELD_NONE:    dataType = MYSQL_TYPE_NULL;                     break;
-    case FIELD_BOOL:    dataType = MYSQL_TYPE_BIT;      bUnsigned = 1;  break;
-    case FIELD_I8:      dataType = MYSQL_TYPE_TINY;                     break;
+    // MySQL does not support MYSQL_TYPE_BIT as input type
+    case FIELD_BOOL:    //dataType = MYSQL_TYPE_BIT;      bUnsigned = 1;  break;
     case FIELD_UI8:     dataType = MYSQL_TYPE_TINY;     bUnsigned = 1;  break;
+    case FIELD_I8:      dataType = MYSQL_TYPE_TINY;                     break;
     case FIELD_I16:     dataType = MYSQL_TYPE_SHORT;                    break;
     case FIELD_UI16:    dataType = MYSQL_TYPE_SHORT;    bUnsigned = 1;  break;
     case FIELD_I32:     dataType = MYSQL_TYPE_LONG;                     break;
