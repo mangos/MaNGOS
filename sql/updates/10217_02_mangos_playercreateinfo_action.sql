@@ -29,7 +29,7 @@ INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) V
  (2, 1, 1, 78, 0),
  (2, 1, 2, 20572, 0);
 
-DELETE FROM playercreateinfo_action where race=2 AND class=9;
+DELETE FROM playercreateinfo_action WHERE race=2 AND class=9;
 INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) VALUES
  (2, 9, 0, 686, 0),
  (2, 9, 1, 687, 0),
@@ -90,19 +90,19 @@ INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) V
  (5, 1, 1, 78, 0),
  (5, 1, 2, 20577, 0);
 
-DELETE FROM playercreateinfo_action where race=5 AND class=8;
+DELETE FROM playercreateinfo_action WHERE race=5 AND class=8;
 INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) VALUES
  (5, 8, 0, 133, 0),
  (5, 8, 1, 168, 0),
  (5, 8, 2, 20577, 0);
 
-DELETE FROM playercreateinfo_action where race=5 AND class=9;
+DELETE FROM playercreateinfo_action WHERE race=5 AND class=9;
 INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) VALUES
  (5, 9, 0, 686, 0),
  (5, 9, 1, 687, 0),
  (5, 9, 2, 20577, 0);
 
-DELETE FROM playercreateinfo_action where race=5 AND class=5;
+DELETE FROM playercreateinfo_action WHERE race=5 AND class=5;
 INSERT IGNORE INTO playercreateinfo_action (race, class, button, action, type) VALUES
  (5, 5, 0, 585, 0),
  (5, 5, 1, 2050, 0),
