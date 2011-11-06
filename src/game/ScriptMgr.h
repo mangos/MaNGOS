@@ -314,10 +314,9 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
         {
             uint32 flag;                                    // datalong
-            uint32 creatureEntry;                           // datalong1
-            uint32 searchRadius;                            // datalong2
-            uint32 empty1;                                  // datalong3
-            uint32 empty2;                                  // datalong4
+            uint32 creatureEntry;                           // datalong2
+            uint32 searchRadius;                            // datalong3
+            uint32 empty1;                                  // datalong4
             uint32 data_flags;                              // data_flags
         } npcFlag;
 
