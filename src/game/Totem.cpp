@@ -64,7 +64,7 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
     if (InstanceData* iData = GetMap()->GetInstanceData())
         iData->OnCreatureCreate(this);
 
-    LoadCreatureAddon();
+    LoadCreatureAddon(false, cPos.GetMap());
 
     return true;
 }
