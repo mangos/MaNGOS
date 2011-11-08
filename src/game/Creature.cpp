@@ -784,7 +784,7 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
         cPos.GetMap()->GetCreatureLinkingHolder()->AddMasterToHolder(this);
     }
 
-    LoadCreatureAddon(false, cPos.GetMap());
+    LoadCreatureAddon(false);
 
     return true;
 }
@@ -1911,7 +1911,7 @@ CreatureDataAddon const* Creature::GetCreatureAddon() const
 }
 
 //creature_addon table
-bool Creature::LoadCreatureAddon(bool reload /*= false*/, Map* map /*= NULL*/)
+bool Creature::LoadCreatureAddon(bool reload)
 {
     CreatureDataAddon const *cainfo = GetCreatureAddon();
     if(!cainfo)
@@ -1957,7 +1957,7 @@ bool Creature::LoadCreatureAddon(bool reload /*= false*/, Map* map /*= NULL*/)
     {
         for (uint32 const* cAura = cainfo->auras; *cAura; ++cAura)
         {
-            if (HasAura(*cAura))
+            if (HasAuraOfDifficulty(*cAura))
             {
                 if (!reload)
                     sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u) has spell %u in `auras` field, but aura is already applied.", GetGUIDLow(), GetEntry(), *cAura);
@@ -1967,9 +1967,9 @@ bool Creature::LoadCreatureAddon(bool reload /*= false*/, Map* map /*= NULL*/)
 
             SpellEntry const* spellInfo = sSpellStore.LookupEntry(*cAura);  // Already checked on load
 
-            // Get Difficulty mode for initial case (npc not yet added to map)
-            if (spellInfo->SpellDifficultyId && !reload && map && map->IsDungeon())
-                if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(spellInfo->SpellDifficultyId, map->GetDifficulty(), map->IsRaid()))
+            // Get Difficulty mode for initial case (npc not yet added to world)
+            if (spellInfo->SpellDifficultyId && !reload && GetMap()->IsDungeon())
+                if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(spellInfo->SpellDifficultyId, GetMap()->GetDifficulty(), GetMap()->IsRaid()))
                     spellInfo = spellEntry;
 
             CastSpell(this, spellInfo, true);
