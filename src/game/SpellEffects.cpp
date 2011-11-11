@@ -6703,6 +6703,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 45141:                                 // Burn
                 {
+                    if (!unitTarget)
+                        return;
+
                     unitTarget->CastSpell(unitTarget, 46394, true, NULL, NULL, m_caster->GetObjectGuid());
                     return;
                 }
@@ -6717,10 +6720,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 45185:                                 // Stomp
                 {
-                    // Remove the burn effect
-                    if (unitTarget->HasAura(46394))
-                        unitTarget->RemoveAurasDueToSpell(46394);
+                    if (!unitTarget)
+                        return;
 
+                    // Remove the burn effect
+                    unitTarget->RemoveAurasDueToSpell(46394);
                     return;
                 }
                 case 45206:                                 // Copy Off-hand Weapon
