@@ -352,8 +352,8 @@ struct ScriptAction
     ScriptInfo const* script;                               // pointer to static script data
 };
 
-typedef std::multimap<uint32, ScriptInfo> ScriptMap;
-typedef std::map<uint32, ScriptMap > ScriptMapMap;
+typedef std::multimap<uint32 /*delay*/, ScriptInfo> ScriptMap;
+typedef std::map<uint32 /*id*/, ScriptMap > ScriptMapMap;
 
 extern ScriptMapMap sQuestEndScripts;
 extern ScriptMapMap sQuestStartScripts;
