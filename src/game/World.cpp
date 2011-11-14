@@ -1195,11 +1195,7 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Gossip scripts..." );
     sScriptMgr.LoadGossipScripts();                         // must be before gossip menu options
 
-    sLog.outString( "Loading Gossip menus..." );
-    sObjectMgr.LoadGossipMenu();
-
-    sLog.outString( "Loading Gossip menu options..." );
-    sObjectMgr.LoadGossipMenuItems();
+    sObjectMgr.LoadGossipMenus();
 
     sLog.outString( "Loading Vendors..." );
     sObjectMgr.LoadVendorTemplates();                       // must be after load ItemTemplate

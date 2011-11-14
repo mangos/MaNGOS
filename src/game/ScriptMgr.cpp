@@ -755,7 +755,7 @@ void ScriptMgr::LoadGossipScripts()
 {
     LoadScripts(sGossipScripts, "gossip_scripts");
 
-    // checks are done in LoadGossipMenuItems
+    // checks are done in LoadGossipMenuItems and LoadGossipMenu
 }
 
 void ScriptMgr::LoadCreatureMovementScripts()

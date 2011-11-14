@@ -342,10 +342,9 @@ bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllGossipsCommand(char* args)
 {
-    HandleReloadGossipMenuCommand((char*)"a");
-    HandleReloadGossipMenuOptionCommand((char*)"a");
     if (*args!='a')                                         // already reload from all_scripts
         HandleReloadGossipScriptsCommand((char*)"a");
+    HandleReloadGossipMenuCommand((char*)"a");
     HandleReloadNpcGossipCommand((char*)"a");
     HandleReloadPointsOfInterestCommand((char*)"a");
     return true;
@@ -440,17 +439,8 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
-    sLog.outString( "Re-Loading `gossip_menu` Table!" );
-    sObjectMgr.LoadGossipMenu();
-    SendGlobalSysMessage("DB table `gossip_menu` reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadGossipMenuOptionCommand(char* /*args*/)
-{
-    sLog.outString( "Re-Loading `gossip_menu_option` Table!" );
-    sObjectMgr.LoadGossipMenuItems();
-    SendGlobalSysMessage("DB table `gossip_menu_option` reloaded.");
+    sObjectMgr.LoadGossipMenus();
+    SendGlobalSysMessage("DB tables `gossip_menu` and `gossip_menu_option` reloaded.");
     return true;
 }
 
