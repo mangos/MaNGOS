@@ -1619,6 +1619,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 45989:                                 // Summon Void Sentinel Summoner Visual
                 {
+                    if (!unitTarget)
+                        return;
+
                     // summon void sentinel
                     unitTarget->CastSpell(unitTarget, 45988, true);
 
