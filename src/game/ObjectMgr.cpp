@@ -7654,6 +7654,11 @@ bool PlayerCondition::Meets(Player const * player) const
 
             return false;
         }
+        case CONDITION_SKILL_BELOW:
+            if (value2 == 1)
+                return !player->HasSkill(value1);
+            else
+                return player->HasSkill(value1) && player->GetBaseSkillValue(value1) < value2;
         default:
             return false;
     }
@@ -7744,6 +7749,7 @@ bool PlayerCondition::IsValid(ConditionType condition, uint32 value1, uint32 val
             break;
         }
         case CONDITION_SKILL:
+        case CONDITION_SKILL_BELOW:
         {
             SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(value1);
             if (!pSkill)
