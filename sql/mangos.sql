@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11831_02_mangos_command` bit(1) default NULL
+  `required_11851_01_mangos_string` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -3845,6 +3845,7 @@ INSERT INTO `mangos_string` VALUES
 (813,'Veteran',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (814,'Member',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (815,'Initiate',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(816,'Your body is too exhausted to travel to the Spectral Realm.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1000,'Exiting daemon...',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1001,'Account deleted: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1002,'Account %s NOT deleted (probably sql file format was updated)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
