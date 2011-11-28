@@ -298,13 +298,14 @@ enum AttackingTarget
 
 enum SelectFlags
 {
-    SELECT_FLAG_IN_LOS          = 0x001,                    // Default Selection Requirement for Spell-targets
-    SELECT_FLAG_PLAYER          = 0x002,
-    SELECT_FLAG_POWER_MANA      = 0x004,                    // For Energy based spells, like manaburn
-    SELECT_FLAG_POWER_RAGE      = 0x008,
-    SELECT_FLAG_POWER_ENERGY    = 0x010,
-    SELECT_FLAG_POWER_RUNIC     = 0x020,
-    SELECT_FLAG_IN_MELEE_RANGE  = 0x040,
+    SELECT_FLAG_IN_LOS              = 0x001,                // Default Selection Requirement for Spell-targets
+    SELECT_FLAG_PLAYER              = 0x002,
+    SELECT_FLAG_POWER_MANA          = 0x004,                // For Energy based spells, like manaburn
+    SELECT_FLAG_POWER_RAGE          = 0x008,
+    SELECT_FLAG_POWER_ENERGY        = 0x010,
+    SELECT_FLAG_POWER_RUNIC         = 0x020,
+    SELECT_FLAG_IN_MELEE_RANGE      = 0x040,
+    SELECT_FLAG_NOT_IN_MELEE_RANGE  = 0x080,
 };
 
 // Vendors
