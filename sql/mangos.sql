@@ -2115,7 +2115,7 @@ DROP TABLE IF EXISTS gossip_menu;
 CREATE TABLE gossip_menu (
   entry smallint(6) unsigned NOT NULL default '0',
   text_id mediumint(8) unsigned NOT NULL default '0',
-  script_id mediumint(8) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'script in `gossip_scripts` - will be executed on GossipHello'
+  script_id mediumint(8) UNSIGNED NOT NULL DEFAULT 0 COMMENT 'script in `gossip_scripts` - will be executed on GossipHello',
   cond_1 tinyint(3) unsigned NOT NULL default '0',
   cond_1_val_1 mediumint(8) unsigned NOT NULL default '0',
   cond_1_val_2 mediumint(8) unsigned NOT NULL default '0',
