@@ -119,7 +119,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 }
 
 
-static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell, TrainerSpellState state, float fDiscountMod, bool can_learn_primary_prof, uint32 skillReqLevel)
+static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell, TrainerSpellState state, float fDiscountMod, bool can_learn_primary_prof, uint32 reqLevel)
 {
     bool primary_prof_first_rank = sSpellMgr.IsPrimaryProfessionFirstRankSpell(tSpell->learnedSpell);
     SpellChainNode const* chain_node = sSpellMgr.GetSpellChainNode(tSpell->learnedSpell);
@@ -131,7 +131,7 @@ static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell
     data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
     // primary prof. learn confirmation dialog
     data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
-    data << uint8(skillReqLevel ? skillReqLevel : tSpell->reqLevel);
+    data << uint8(reqLevel);
     data << uint32(tSpell->reqSkill);
     data << uint32(tSpell->reqSkillValue);
     data << uint32(!tSpell->IsCastable() && chain_node ? (chain_node->prev ? chain_node->prev : chain_node->req) : 0);
@@ -193,13 +193,15 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         {
             TrainerSpell const* tSpell = &itr->second;
 
-            uint32 skillReqLevel = 0;
-            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &skillReqLevel))
+            uint32 reqLevel = 0;
+            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &reqLevel))
                 continue;
 
-            TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+            reqLevel = tSpell->isProvidedReqLevel ? tSpell->reqLevel : std::max(reqLevel, tSpell->reqLevel);
 
-            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, skillReqLevel);
+            TrainerSpellState state = _player->GetTrainerSpellState(tSpell, reqLevel);
+
+            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, reqLevel);
 
             ++count;
         }
@@ -211,13 +213,15 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         {
             TrainerSpell const* tSpell = &itr->second;
 
-            uint32 skillReqLevel = 0;
-            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &skillReqLevel))
+            uint32 reqLevel = 0;
+            if(!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell, &reqLevel))
                 continue;
 
-            TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+            reqLevel = tSpell->isProvidedReqLevel ? tSpell->reqLevel : std::max(reqLevel, tSpell->reqLevel);
 
-            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, skillReqLevel);
+            TrainerSpellState state = _player->GetTrainerSpellState(tSpell, reqLevel);
+
+            SendTrainerSpellHelper(data, tSpell, state, fDiscountMod, can_learn_primary_prof, reqLevel);
 
             ++count;
         }
@@ -270,7 +274,12 @@ void WorldSession::HandleTrainerBuySpellOpcode( WorldPacket & recv_data )
         return;
 
     // can't be learn, cheat? Or double learn with lags...
-    if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
+    uint32 reqLevel = 0;
+    if(!_player->IsSpellFitByClassAndRace(trainer_spell->learnedSpell, &reqLevel))
+        return;
+
+    reqLevel = trainer_spell->isProvidedReqLevel ? trainer_spell->reqLevel : std::max(reqLevel, trainer_spell->reqLevel);
+    if (_player->GetTrainerSpellState(trainer_spell, reqLevel) != TRAINER_SPELL_GREEN)
         return;
 
     // apply reputation discount
