@@ -112,8 +112,9 @@ spell_scripts
                                             * datalong2 = field value
 
  3 SCRIPT_COMMAND_MOVE_TO                   source = Creature
+                                            If position is very near to current position, or x=y=z=0, then only orientation is changed
                                             * datalong2 = travel time
-                                            * x/y/z
+                                            * x/y/z/o
 
  4 SCRIPT_COMMAND_FLAG_SET                  source = any
                                             * datalong = field_id
