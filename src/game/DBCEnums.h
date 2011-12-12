@@ -34,6 +34,7 @@
 
 enum BattleGroundBracketId                                  // bracketId for level ranges
 {
+    BG_BRACKET_ID_TEMPLATE       = -1,                      // used to mark bg as template
     BG_BRACKET_ID_FIRST          = 0,
     BG_BRACKET_ID_LAST           = 15
 };
