@@ -1977,7 +1977,9 @@ void Guild::SwapItems(Player * pl, uint8 BankTab, uint8 BankTabSlot, uint8 BankT
         }
 
         CharacterDatabase.BeginTransaction();
-        LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab, pl->GetGUIDLow(), pItemSrc->GetEntry(), SplitedAmount, BankTabDst);
+
+        if (BankTab != BankTabDst)
+            LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab, pl->GetGUIDLow(), pItemSrc->GetEntry(), SplitedAmount, BankTabDst);
 
         pl->ItemRemovedQuestCheck( pItemSrc->GetEntry(), SplitedAmount );
         pItemSrc->SetCount( pItemSrc->GetCount() - SplitedAmount );
@@ -1993,7 +1995,9 @@ void Guild::SwapItems(Player * pl, uint8 BankTab, uint8 BankTabSlot, uint8 BankT
         if (msg == EQUIP_ERR_OK)                            // merge to
         {
             CharacterDatabase.BeginTransaction();
-            LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab, pl->GetGUIDLow(), pItemSrc->GetEntry(), pItemSrc->GetCount(), BankTabDst);
+
+            if (BankTab != BankTabDst)
+                LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab, pl->GetGUIDLow(), pItemSrc->GetEntry(), pItemSrc->GetCount(), BankTabDst);
 
             RemoveItem(BankTab, BankTabSlot);
             StoreItem(BankTabDst, gDest, pItemSrc);
@@ -2030,8 +2034,12 @@ void Guild::SwapItems(Player * pl, uint8 BankTab, uint8 BankTabSlot, uint8 BankT
             }
 
             CharacterDatabase.BeginTransaction();
-            LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab,    pl->GetGUIDLow(), pItemSrc->GetEntry(), pItemSrc->GetCount(), BankTabDst);
-            LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTabDst, pl->GetGUIDLow(), pItemDst->GetEntry(), pItemDst->GetCount(), BankTab);
+
+            if (BankTab != BankTabDst)
+            {
+                LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTab,    pl->GetGUIDLow(), pItemSrc->GetEntry(), pItemSrc->GetCount(), BankTabDst);
+                LogBankEvent(GUILD_BANK_LOG_MOVE_ITEM, BankTabDst, pl->GetGUIDLow(), pItemDst->GetEntry(), pItemDst->GetCount(), BankTab);
+            }
 
             RemoveItem(BankTab, BankTabSlot);
             RemoveItem(BankTabDst, BankTabSlotDst);
