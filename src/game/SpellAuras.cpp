@@ -2509,7 +2509,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
-            case 43681:                                     // Idle
+            case 43681:                                     // Inactive
             {
                 if (m_removeMode == AURA_REMOVE_BY_EXPIRE && target->GetTypeId() == TYPEID_PLAYER)
                     ((Player*)target)->ToggleAFK();
