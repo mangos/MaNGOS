@@ -7110,6 +7110,16 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     unitTarget->RemoveAurasDueToSpell(47636);
                     return;
                 }
+                case 47703:                                 // Unholy Union
+                {
+                    m_caster->CastSpell(m_caster, 50254, true);
+                    return;
+                }
+                case 47724:                                 // Frost Draw
+                {
+                    m_caster->CastSpell(m_caster, 50239, true);
+                    return;
+                }
                 case 48603:                                 // High Executor's Branding Iron
                     // Torture the Torturer: High Executor's Branding Iron Impact
                     unitTarget->CastSpell(unitTarget, 48614, true);
@@ -7275,6 +7285,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         }
                     }
 
+                    return;
+                }
+                case 50252:                                 // Blood Draw
+                {
+                    m_caster->CastSpell(m_caster, 50250, true);
                     return;
                 }
                 case 50439:                                 // Script Cast Summon Image of Drakuru 05
