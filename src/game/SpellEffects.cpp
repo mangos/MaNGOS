@@ -7491,6 +7491,37 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     return;
                 }                                           // random spell learn instead placeholder
+                case 59789:                                 // Oracle Ablutions
+                {
+                    if (!unitTarget)
+                        return;
+
+                    switch (unitTarget->getPowerType())
+                    {
+                        case POWER_RUNIC_POWER:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59812, true);
+                            break;
+                        }
+                        case POWER_MANA:
+                        {
+                            int32 manapool = unitTarget->GetMaxPower(POWER_MANA) * 0.05;
+                            unitTarget->CastCustomSpell(unitTarget, 59813, &manapool, NULL, NULL, true);
+                            break;
+                        }
+                        case POWER_RAGE:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59814, true);
+                            break;
+                        }
+                        case POWER_ENERGY:
+                        {
+                            unitTarget->CastSpell(unitTarget, 59815, true);
+                            break;
+                        }
+                    }
+                    return;
+                }
                 case 60893:                                 // Northrend Alchemy Research
                 case 61177:                                 // Northrend Inscription Research
                 case 61288:                                 // Minor Inscription Research
