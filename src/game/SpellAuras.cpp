@@ -7812,7 +7812,7 @@ void Aura::PeriodicDummyTick()
                 {
                     if (GetAuraTicks() == 3 && target->GetTypeId() == TYPEID_UNIT)
                         ((Creature*)target)->ForcedDespawn();
-                    else if (GetAuraTicks() != 2)
+                    if (GetAuraTicks() != 2)
                         return;
 
                     if (Unit* pCaster = GetCaster())
