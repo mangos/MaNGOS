@@ -7807,7 +7807,19 @@ void Aura::PeriodicDummyTick()
 //              case 49313: break; // Proximity Mine Area Aura
 //              // Mole Machine Portal Schedule
 //              case 49466: break;
-//              case 49555: break; // Corpse Explode
+                case 49555:                                 // Corpse Explode (Drak'tharon Keep - Trollgore)
+                case 59807:                                 // Corpse Explode (heroic)
+                {
+                    if (GetAuraTicks() == 3 && target->GetTypeId() == TYPEID_UNIT)
+                        ((Creature*)target)->ForcedDespawn();
+                    else if (GetAuraTicks() != 2)
+                        return;
+
+                    if (Unit* pCaster = GetCaster())
+                        pCaster->CastSpell(target, spell->Id == 49555 ? 49618 : 59809, true);
+
+                    return;
+                }
 //              case 49592: break; // Temporal Rift
 //              case 49957: break; // Cutting Laser
 //              case 50085: break; // Slow Fall
