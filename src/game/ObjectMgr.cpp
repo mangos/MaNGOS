@@ -8754,12 +8754,6 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
 
         if (gMenuItem.action_script_id)
         {
-            if (gMenuItem.option_id != GOSSIP_OPTION_GOSSIP)
-            {
-                sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u have action_script_id %u but option_id is not GOSSIP_OPTION_GOSSIP, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
-                continue;
-            }
-
             if (sGossipScripts.find(gMenuItem.action_script_id) == sGossipScripts.end())
             {
                 sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u have action_script_id %u that does not exist in `gossip_scripts`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_script_id);
