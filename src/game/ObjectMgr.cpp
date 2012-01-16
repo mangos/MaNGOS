@@ -3782,17 +3782,6 @@ void ObjectMgr::LoadQuests()
                     qinfo->GetQuestId(),qinfo->ZoneOrSort);
                 // no changes, quest not dependent from this value but can have problems at client (note some may be 0, we must allow this so no check)
             }
-
-            //check for proper RequiredSkill value (skill case)
-            if (uint32 skill_id = SkillByQuestSort(-int32(qinfo->ZoneOrSort)))
-            {
-                if (qinfo->RequiredSkill != skill_id)
-                {
-                    sLog.outErrorDb("Quest %u has `ZoneOrSort` = %i but `RequiredSkill` does not have a corresponding value (%u).",
-                        qinfo->GetQuestId(),qinfo->ZoneOrSort,skill_id);
-                    //override, and force proper value here?
-                }
-            }
         }
 
         // RequiredClasses, can be 0/CLASSMASK_ALL_PLAYABLE to allow any class
