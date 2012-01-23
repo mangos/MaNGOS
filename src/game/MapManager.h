@@ -119,7 +119,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         {
             // fmod only supports positive numbers. Thus we have
             // to emulate negative numbers
-            if(o < 0)
+            if (o < 0)
             {
                 float mod = o *-1;
                 mod = fmod(mod, 2.0f*M_PI_F);
