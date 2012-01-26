@@ -7482,7 +7482,7 @@ bool PlayerCondition::Meets(Player const * player) const
         case CONDITION_REPUTATION_RANK:
         {
             FactionEntry const* faction = sFactionStore.LookupEntry(value1);
-            return faction && player->GetReputationMgr().GetRank(faction) >= ReputationRank(value2);
+            return faction && player->GetReputationMgr().GetRank(faction, false) >= ReputationRank(value2);
         }
         case CONDITION_TEAM:
             return uint32(player->GetTeam()) == value1;

@@ -1361,7 +1361,7 @@ void ChatHandler::ShowFactionListHelper( FactionEntry const * factionEntry, Loca
 
     if (repState)                               // and then target!=NULL also
     {
-        ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
+        ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry, false);
         std::string rankName = GetMangosString(ReputationRankStrIndex[rank]);
 
         ss << " " << rankName << "|h|r (" << target->GetReputationMgr().GetReputation(factionEntry) << ")";
