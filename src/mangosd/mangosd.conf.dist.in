@@ -168,6 +168,15 @@ BindIP = "0.0.0.0"
 #        More distance let have better performence, less distance let have more sensitive reaction at target move.
 #        Default: 1.5
 #
+#    mmap.enabled
+#        Enable/Disable pathfinding using mmaps
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+#    mmap.ignoreMapIds
+#        Disable mmap pathfinding on the listed maps.
+#        List of map ids with delimiter ','
+#
 #    UpdateUptimeInterval
 #        Update realm uptime period in minutes (for save data in 'uptime' table). Must be > 0
 #        Default: 10 (minutes)
@@ -209,6 +218,8 @@ vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 DetectPosCollision = 1
 TargetPosRecalculateRange = 1.5
+mmap.enabled = 1
+mmap.ignoreMapIds = ""
 UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
 AddonChannel = 1
