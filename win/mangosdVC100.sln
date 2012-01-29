@@ -3,6 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "game", "VC100\game.vcxproj", "{1DC6C4DA-A028-41F3-877D-D5400C594F88}"
 	ProjectSection(ProjectDependencies) = postProject
 		{90297C34-F231-4DF4-848E-A74BCC0E40ED} = {90297C34-F231-4DF4-848E-A74BCC0E40ED}
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6} = {72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}
 		{8072769E-CF10-48BF-B9E1-12752A5DAC6E} = {8072769E-CF10-48BF-B9E1-12752A5DAC6E}
 	EndProjectSection
 EndProject
@@ -46,6 +47,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbbmalloc", "VC100\tbbmallo
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tbb", "VC100\tbb.vcxproj", "{F62787DD-1327-448B-9818-030062BCFAA5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Detour", "..\dep\recastnavigation\Detour\win\VC100\Detour.vcxproj", "{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +192,17 @@ Global
 		{F62787DD-1327-448B-9818-030062BCFAA5}.Release|Win32.Build.0 = Release|Win32
 		{F62787DD-1327-448B-9818-030062BCFAA5}.Release|x64.ActiveCfg = Release|x64
 		{F62787DD-1327-448B-9818-030062BCFAA5}.Release|x64.Build.0 = Release|x64
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug_NoPCH|Win32.ActiveCfg = Debug|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug_NoPCH|Win32.Build.0 = Debug|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug_NoPCH|x64.ActiveCfg = Debug|x64
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug|Win32.Build.0 = Debug|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug|x64.ActiveCfg = Debug|x64
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Debug|x64.Build.0 = Debug|x64
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Release|Win32.ActiveCfg = Release|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Release|Win32.Build.0 = Release|Win32
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Release|x64.ActiveCfg = Release|x64
+		{72BDF975-4D4A-42C7-B2C4-F9ED90A2ABB6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
