@@ -5448,7 +5448,7 @@ bool Unit::IsHostileTo(Unit const* unit) const
         if (tester_faction->faction)
         {
             // forced reaction
-            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force = ((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force <= REP_HOSTILE;
 
             // apply reputation state
@@ -5560,7 +5560,7 @@ bool Unit::IsFriendlyTo(Unit const* unit) const
         if (tester_faction->faction)
         {
             // forced reaction
-            if (ReputationRank const* force =((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force =((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force >= REP_FRIENDLY;
 
             // apply reputation state
