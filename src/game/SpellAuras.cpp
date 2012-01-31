@@ -7459,12 +7459,21 @@ void Aura::PeriodicTick()
             switch (GetId())
             {
                 case 21056:                                 // Mark of Kazzak
+                case 31447:                                 // Mark of Kaz'rogal
+                {
+                    uint32 triggerSpell = 0;
+                    switch (GetId())
+                    {
+                        case 21056: triggerSpell = 21058; break;
+                        case 31447: triggerSpell = 31463; break;
+                    }
                     if (target->GetTypeId() == TYPEID_PLAYER && target->GetPower(power) == 0)
                     {
-                        target->CastSpell(target, 21058, true, NULL, this);
+                        target->CastSpell(target, triggerSpell, true, NULL, this);
                         target->RemoveAurasDueToSpell(GetId());
                     }
                     break;
+                }
             }
             break;
         }
