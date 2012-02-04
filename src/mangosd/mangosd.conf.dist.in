@@ -947,11 +947,11 @@ TalentsInspecting = 1
 #
 #    ListenRange.Say
 #        Distance from player to listen text that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.TextEmote
 #        Distance from player to listen textemote that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.Yell
 #        Distance from player to listen text that creature (or other world object) yell
