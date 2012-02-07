@@ -73,21 +73,19 @@ Corpse* ObjectAccessor::GetCorpseInMap(ObjectGuid guid, uint32 mapid)
     return ret;
 }
 
-Player*
-ObjectAccessor::FindPlayer(ObjectGuid guid)
+Player* ObjectAccessor::FindPlayer(ObjectGuid guid, bool inWorld /*= true*/)
 {
     if (!guid)
         return NULL;
 
-    Player * plr = HashMapHolder<Player>::Find(guid);;
-    if (!plr || !plr->IsInWorld())
+    Player* plr = HashMapHolder<Player>::Find(guid);;
+    if (!plr || (!plr->IsInWorld() && inWorld))
         return NULL;
 
     return plr;
 }
 
-Player*
-ObjectAccessor::FindPlayerByName(const char *name)
+Player* ObjectAccessor::FindPlayerByName(const char *name)
 {
     HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();

@@ -472,7 +472,7 @@ class ObjectMgr
         typedef UNORDERED_MAP<uint32, WeatherZoneChances> WeatherZoneMap;
 
         static Player* GetPlayer(const char* name) { return ObjectAccessor::FindPlayerByName(name);}
-        static Player* GetPlayer(ObjectGuid guid) { return ObjectAccessor::FindPlayer(guid); }
+        static Player* GetPlayer(ObjectGuid guid, bool inWorld = true) { return ObjectAccessor::FindPlayer(guid, inWorld); }
 
         static GameObjectInfo const *GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
 

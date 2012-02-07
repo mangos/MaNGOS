@@ -310,7 +310,7 @@ bool Group::AddMember(ObjectGuid guid, const char* name)
 
     SendUpdate();
 
-    if (Player *player = sObjectMgr.GetPlayer(guid))
+    if (Player* player = sObjectMgr.GetPlayer(guid))
     {
         if (!IsLeader(player->GetObjectGuid()) && !isBGGroup())
         {
@@ -1155,20 +1155,26 @@ bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant)
 
 bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant, uint8 group)
 {
-    if(IsFull())
+    if (IsFull())
         return false;
 
     if (!guid)
         return false;
 
-    Player *player = sObjectMgr.GetPlayer(guid);
+    Player* player = sObjectMgr.GetPlayer(guid, false);
+
+    uint32 lastMap = 0;
+    if (player && player->IsInWorld())
+        player->GetMapId();
+    else if (player && player->IsBeingTeleported())
+        player->GetTeleportDest().mapid;
 
     MemberSlot member;
     member.guid      = guid;
     member.name      = name;
     member.group     = group;
     member.assistant = isAssistant;
-    member.lastMap   = player->GetMapId();
+    member.lastMap   = lastMap;
     m_memberSlots.push_back(member);
 
     SubGroupCounterIncrease(group);
@@ -1180,16 +1186,19 @@ bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant, uint
         if (player->GetGroup() && isBGGroup())
             player->SetBattleGroundRaid(this, group);
         //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
-        else if ( player->GetGroup() )
+        else if (player->GetGroup())
             player->SetOriginalGroup(this, group);
         //if player is not in group, then call set group
         else
             player->SetGroup(this, group);
 
-        // if the same group invites the player back, cancel the homebind timer
-        if (InstanceGroupBind *bind = GetBoundInstance(player->GetMapId(), player))
-            if (bind->state->GetInstanceId() == player->GetInstanceId())
-                player->m_InstanceValid = true;
+        if (player->IsInWorld())
+        {
+            // if the same group invites the player back, cancel the homebind timer
+            if (InstanceGroupBind* bind = GetBoundInstance(player->GetMapId(), player))
+                if (bind->state->GetInstanceId() == player->GetInstanceId())
+                    player->m_InstanceValid = true;
+        }
     }
 
     if (!isRaidGroup())                                     // reset targetIcons for non-raid-groups
