@@ -100,7 +100,16 @@ createHeader()
   echo "Used params: $PARAMS $OFFMESH" | tee -a $LOG_FILE
   echo "Detailed log can be found in $DETAIL_LOG_FILE" | tee -a $LOG_FILE
   echo "Start creating MoveMaps" | tee -a $DETAIL_LOG_FILE
+  echo
+  echo "Be PATIENT - This will take a long time and might also have gaps between visible changes on the console."
+  echo "WAIT until you are informed that 'creating MoveMaps' is 'finished'!"
 }
+
+# Create mmaps directory if not exist
+if [ ! -d mmaps ]
+then
+  mkdir mmaps
+fi
 
 # Param control
 case "$1" in
