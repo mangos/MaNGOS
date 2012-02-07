@@ -883,6 +883,15 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
+bool Object::PrintEntryError(char const* descr) const
+{
+    sLog.outError("Object Type %u, Entry %u (lowguid %u) with invalid call for %s", GetTypeId(), GetEntry(), GetObjectGuid().GetCounter(), descr);
+
+    // always false for continue assert fail
+    return false;
+}
+
+
 void Object::BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players)
 {
     UpdateDataMapType::iterator iter = update_players.find(pl);
@@ -1190,7 +1199,7 @@ float WorldObject::GetAngle(const WorldObject* obj) const
     if (!obj)
         return 0.0f;
 
-    MANGOS_ASSERT(obj != this);
+    MANGOS_ASSERT(obj != this || PrintEntryError("GetAngle (for self)"));
 
     return GetAngle(obj->GetPositionX(), obj->GetPositionY());
 }

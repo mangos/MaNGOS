@@ -942,6 +942,9 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 
 void GameObject::Use(Unit* user)
 {
+    // user must be provided
+    MANGOS_ASSERT(user || PrintEntryError("GameObject::Use (without user)"));
+
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;

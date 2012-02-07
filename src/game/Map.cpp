@@ -3214,11 +3214,9 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
         case HIGHGUID_VEHICLE:
             return m_VehicleGuids.Generate();
         default:
-            MANGOS_ASSERT(0);
+            MANGOS_ASSERT(false);
+            return 0;
     }
-
-    MANGOS_ASSERT(0);
-    return 0;
 }
 
 /**

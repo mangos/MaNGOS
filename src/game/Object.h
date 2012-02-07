@@ -359,7 +359,6 @@ class MANGOS_DLL_SPEC Object
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
 
     protected:
-
         Object ( );
 
         void _InitValues();
@@ -396,10 +395,13 @@ class MANGOS_DLL_SPEC Object
 
         PackedGuid m_PackGUID;
 
-        // for output helpfull error messages from ASSERTs
-        bool PrintIndexError(uint32 index, bool set) const;
         Object(const Object&);                              // prevent generation copy constructor
         Object& operator=(Object const&);                   // prevent generation assigment operator
+
+    public:
+        // for output helpfull error messages from ASSERTs
+        bool PrintIndexError(uint32 index, bool set) const;
+        bool PrintEntryError(char const* descr) const;
 };
 
 struct WorldObjectChangeAccumulator;
