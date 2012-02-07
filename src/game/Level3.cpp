@@ -7123,18 +7123,11 @@ bool ChatHandler::HandleMmapTestArea(char* args)
     float radius = 40.0f;
     ExtractFloat(&args, radius);
 
-    CellPair pair(MaNGOS::ComputeCellPair( m_session->GetPlayer()->GetPositionX(), m_session->GetPlayer()->GetPositionY()) );
-    Cell cell(pair);
-    cell.SetNoCreate();
-
     std::list<Creature*> creatureList;
-
     MaNGOS::AnyUnitInObjectRangeCheck go_check(m_session->GetPlayer(), radius);
     MaNGOS::CreatureListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> go_search(creatureList, go_check);
-    TypeContainerVisitor<MaNGOS::CreatureListSearcher<MaNGOS::AnyUnitInObjectRangeCheck>, GridTypeMapContainer> go_visit(go_search);
-
     // Get Creatures
-    cell.Visit(pair, go_visit, *(m_session->GetPlayer()->GetMap()), *(m_session->GetPlayer()), radius);
+    Cell::VisitGridObjects(m_session->GetPlayer(), go_search, radius);
 
     if (!creatureList.empty())
     {
