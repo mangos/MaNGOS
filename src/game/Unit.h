@@ -158,6 +158,9 @@ enum UnitStandFlags
     UNIT_STAND_FLAGS_ALL          = 0xFF
 };
 
+// byte flags value (UNIT_FIELD_BYTES_1,2)
+// This corresponds to free talent points (pet case)
+
 // byte flags value (UNIT_FIELD_BYTES_1,3)
 enum UnitBytes1_Flags
 {
