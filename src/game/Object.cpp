@@ -1199,8 +1199,13 @@ float WorldObject::GetAngle(const WorldObject* obj) const
     if (!obj)
         return 0.0f;
 
-    MANGOS_ASSERT(obj != this || PrintEntryError("GetAngle (for self)"));
-
+    // Rework the assert, when more cases where such a call can happen have been fixed
+    //MANGOS_ASSERT(obj != this || PrintEntryError("GetAngle (for self)"));
+    if (obj == this)
+    {
+        sLog.outError("INVALID CALL for GetAngle for %s", obj->GetGuidStr().c_str());
+        return 0.0f;
+    }
     return GetAngle(obj->GetPositionX(), obj->GetPositionY());
 }
 
