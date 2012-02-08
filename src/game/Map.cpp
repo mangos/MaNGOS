@@ -339,7 +339,7 @@ Map::Add(T *obj)
     if(obj->isActiveObject())
         AddToActive(obj);
 
-    DEBUG_LOG("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
+    DEBUG_LOG("%s enters grid[%u,%u]", obj->GetGuidStr().c_str(), cell.GridX(), cell.GridY());
 
     obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(obj,cell,p);
