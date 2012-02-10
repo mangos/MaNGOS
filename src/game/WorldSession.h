@@ -679,7 +679,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleQuestLogRemoveQuest(WorldPacket& recv_data);
         void HandleQuestConfirmAccept(WorldPacket& recv_data);
         void HandleQuestgiverCompleteQuest(WorldPacket& recv_data);
-        bool CanInteractWithQuestGiver(ObjectGuid& guid, char const* descr);
+        bool CanInteractWithQuestGiver(ObjectGuid guid, char const* descr);
 
         void HandleQuestgiverQuestAutoLaunch(WorldPacket& recvPacket);
         void HandlePushQuestToParty(WorldPacket& recvPacket);
