@@ -644,7 +644,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
     SendPacket(&data);
 }
 
-bool WorldSession::CanInteractWithQuestGiver(ObjectGuid& guid, char const* descr)
+bool WorldSession::CanInteractWithQuestGiver(ObjectGuid guid, char const* descr)
 {
     if (guid.IsCreatureOrVehicle())
     {
