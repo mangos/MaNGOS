@@ -1677,7 +1677,7 @@ bool Group::InCombatToInstance(uint32 instanceId)
     return false;
 }
 
-bool Group::SetPlayerMap(const ObjectGuid guid, uint32 mapid)
+bool Group::SetPlayerMap(ObjectGuid guid, uint32 mapid)
 {
     member_witerator slot = _getMemberWSlot(guid);
     if (slot != m_memberSlots.end())

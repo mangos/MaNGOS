@@ -337,7 +337,7 @@ bool MySqlPreparedStatement::prepare()
     m_stmt = mysql_stmt_init(m_pMySQLConn);
     if (!m_stmt)
     {
-        sLog.outError("SQL: mysql_stmt_init()() failed ");
+        sLog.outError("SQL: mysql_stmt_init() failed ");
         return false;
     }
 
