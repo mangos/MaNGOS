@@ -143,8 +143,8 @@
 		</Configuration>
 		<Configuration
 			Name="Debug|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)\..\..\..\..\lib\$(PlatformName)_$(ConfigurationName)\"
+			IntermediateDirectory=".\$(ProjectName)__$(PlatformName)_$(ConfigurationName)\"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -205,8 +205,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)\..\..\..\..\lib\$(PlatformName)_$(ConfigurationName)\"
+			IntermediateDirectory=".\$(ProjectName)__$(PlatformName)_$(ConfigurationName)\"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
