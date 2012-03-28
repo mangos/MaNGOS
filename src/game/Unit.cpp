@@ -5686,6 +5686,10 @@ void Unit::AttackedBy(Unit* attacker)
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackedBy(attacker);
 
+    // do not pet reaction for self inflicted damage (like environmental)
+    if (attacker == this)
+        return;
+
     // trigger pet AI reaction
     if (Pet* pet = GetPet())
         pet->AttackedBy(attacker);
