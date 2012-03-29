@@ -1117,24 +1117,40 @@ void Aura::TriggerSpell()
                     }
                     case 23184:                             // Mark of Frost
                     case 25041:                             // Mark of Nature
+                    case 37125:                             // Mark of Death
                     {
                         std::list<Player*> targets;
 
                         // spells existed in 1.x.x; 23183 - mark of frost; 25042 - mark of nature; both had radius of 100.0 yards in 1.x.x DBC
                         // spells are used by Azuregos and the Emerald dragons in order to put a stun debuff on the players which resurrect during the encounter
                         // in order to implement the missing spells we need to make a grid search for hostile players and check their auras; if they are marked apply debuff
+                        // spell 37127 used for the Mark of Death, is used server side, so it needs to be implemented here
 
-                        // Mark of Frost or Mark of Nature
-                        uint32 markSpellId = auraId == 23184 ? 23182 : 25040;
-                        // Aura of Frost or Aura of Nature
-                        uint32 debufSpellId = auraId == 23184 ? 23186 : 25043;
+                        uint32 markSpellId = 0;
+                        uint32 debuffSpellId = 0;
+
+                        switch (auraId)
+                        {
+                            case 23184:
+                                markSpellId = 23182;
+                                debuffSpellId = 23186;
+                                break;
+                            case 25041:
+                                markSpellId = 25040;
+                                debuffSpellId = 25043;
+                                break;
+                            case 37125:
+                                markSpellId = 37128;
+                                debuffSpellId = 37131;
+                                break;
+                        }
 
                         MaNGOS::AnyPlayerInObjectRangeWithAuraCheck u_check(GetTarget(), 100.0f, markSpellId);
                         MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeWithAuraCheck > checker(targets, u_check);
                         Cell::VisitWorldObjects(GetTarget(), checker, 100.0f);
 
                         for (std::list<Player*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                            (*itr)->CastSpell((*itr), debufSpellId, true, NULL, NULL, casterGUID);
+                            (*itr)->CastSpell((*itr), debuffSpellId, true, NULL, NULL, casterGUID);
 
                         return;
                     }
