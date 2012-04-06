@@ -78,7 +78,7 @@ fi
 if [ "$USE_MMAPS_OFFMESH" = "1" ]
 then
   echo "Only extracting offmesh meshes"
-  MovemapGen.sh offmesh $LOG_FILE $DETAIL_LOG_FILE
+  MoveMapGen.sh offmesh $LOG_FILE $DETAIL_LOG_FILE
   exit 0
 fi
 
@@ -158,5 +158,5 @@ fi
 ## Extract mmaps
 if [ "$USE_MMAPS" = "1" ]
 then
-  MovemapGen.sh $NUM_CPU $LOG_FILE $DETAIL_LOG_FILE
+  MoveMapGen.sh $NUM_CPU $LOG_FILE $DETAIL_LOG_FILE
 fi
