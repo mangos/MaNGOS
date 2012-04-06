@@ -2155,7 +2155,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     Creature* pTargetDummy = NULL;
                     float fRange = GetSpellMaxRange(sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex));
 
-                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, 28523, true, fRange*2);
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, 28523, true, false, fRange*2);
                     MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTargetDummy, u_check);
 
                     Cell::VisitGridObjects(m_caster, searcher, fRange*2);
@@ -6778,7 +6778,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     float range = 20.0f;
 
                     // search for a reef cow nearby
-                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, 24797, true, range);
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, 24797, true, false, range);
                     MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pQuestCow, u_check);
 
                     Cell::VisitGridObjects(m_caster, searcher, range);

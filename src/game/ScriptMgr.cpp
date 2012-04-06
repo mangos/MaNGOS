@@ -827,7 +827,7 @@ bool ScriptAction::GetScriptProcessTargets(WorldObject* pOrigSource, WorldObject
         {
             Creature* pCreatureBuddy = NULL;
 
-            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSearcher, m_script->buddyEntry, true, m_script->searchRadius);
+            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSearcher, m_script->buddyEntry, true, false, m_script->searchRadius);
             MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureBuddy, u_check);
 
             Cell::VisitGridObjects(pSearcher, searcher, m_script->searchRadius);

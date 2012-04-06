@@ -5105,7 +5105,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             // no target provided or it was not valid, so use closest in range
                             if (!targetExplicit)
                             {
-                                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
+                                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, i_spellST->second.type == SPELL_TARGET_TYPE_DEAD, range);
                                 MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(p_Creature, u_check);
 
                                 // Visit all, need to find also Pet* objects
