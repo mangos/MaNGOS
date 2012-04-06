@@ -54,11 +54,11 @@ badParam()
   echo
 }
 
-if [ "$#" == "3" ]
+if [ "$#" = "3" ]
 then
   LOG_FILE=$2
   DETAIL_LOG_FILE=$3
-elif [ "$#" == "2" ]
+elif [ "$#" = "2" ]
 then
   LOG_FILE=$2
 fi
@@ -84,7 +84,7 @@ createMMaps()
   do
     for j in $EXCLUDE_MAPS
     do
-      if [ "$i" == "$j" ]
+      if [ "$i" = "$j" ]
       then
         continue 2
       fi

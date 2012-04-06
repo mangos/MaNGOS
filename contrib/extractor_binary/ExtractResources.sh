@@ -27,7 +27,7 @@ USE_VMAPS="0"
 USE_MMAPS="0"
 USE_MMAPS_OFFMESH="0"
 
-if [ "$1" == "a" ]
+if [ "$1" = "a" ]
 then
   ## extract all
   USE_AD="1"
@@ -39,7 +39,7 @@ else
   echo "Welcome to helper script to extract required dataz for MaNGOS!"
   echo "Should all dataz (dbc, maps, vmaps and mmaps be extracted? (y/n)"
   read line
-  if [ "$line" == "y" ]
+  if [ "$line" = "y" ]
   then
     ## extract all
     USE_AD="1"
@@ -49,24 +49,24 @@ else
     echo
     echo "Should dbc and maps be extracted? (y/n)"
     read line
-    if [ "$line" == "y" ]; then USE_AD="1"; fi
+    if [ "$line" = "y" ]; then USE_AD="1"; fi
 
     echo
     echo "Should vmaps be extracted? (y/n)"
     read line
-    if [ "$line" == "y" ]; then USE_VMAPS="1"; fi
+    if [ "$line" = "y" ]; then USE_VMAPS="1"; fi
 
     echo
     echo "Should mmaps be extracted? (y/n)"
     echo "WARNING! This will take several hours!"
     read line
-    if [ "$line" == "y" ]
+    if [ "$line" = "y" ]
     then
       USE_MMAPS="1";
     else
       echo "Only reextract offmesh tiles for mmaps?"
       read line
-      if [ "$line" == "y" ]
+      if [ "$line" = "y" ]
       then
         USE_MMAPS_OFFMESH="1";
       fi
@@ -75,7 +75,7 @@ else
 fi
 
 ## Special case: Only reextract offmesh tiles
-if [ "$USE_MMAPS_OFFMESH" == "1" ]
+if [ "$USE_MMAPS_OFFMESH" = "1" ]
 then
   echo "Only extracting offmesh meshes"
   MovemapGen.sh offmesh $LOG_FILE $DETAIL_LOG_FILE
@@ -83,7 +83,7 @@ then
 fi
 
 ## Obtain numbe ob processes
-if [ "$USE_MMAPS" == "1" ]
+if [ "$USE_MMAPS" = "1" ]
 then
   echo "How many CPUs should be used for extracting mmaps? (1-4)"
   read line
@@ -107,19 +107,19 @@ fi
 echo "`date`: Start extracting dataz for MaNGOS" | tee $LOG_FILE
 
 ## Handle log messages
-if [ "$USE_AD" == "1" ];
+if [ "$USE_AD" = "1" ];
 then
   echo "DBC and map files will be extracted" | tee -a $LOG_FILE
 else
   echo "DBC and map files won't be extracted!" | tee -a $LOG_FILE
 fi
-if [ "$USE_VMAPS" == "1" ]
+if [ "$USE_VMAPS" = "1" ]
 then
   echo "Vmaps will be extracted" | tee -a $LOG_FILE
 else
   echo "Vmaps won't be extracted!" | tee -a $LOG_FILE
 fi
-if [ "$USE_MMAPS" == "1" ]
+if [ "$USE_MMAPS" = "1" ]
 then
   echo "Mmaps will be extracted with $NUM_CPU processes" | tee -a $LOG_FILE
 else
@@ -131,7 +131,7 @@ echo "`date`: Start extracting dataz for MaNGOS, DBCs/maps $USE_AD, vmaps $USE_V
 echo | tee -a $DETAIL_LOG_FILE
 
 ## Extract dbcs and maps
-if [ "$USE_AD" == "1" ]
+if [ "$USE_AD" = "1" ]
 then
  echo "`date`: Start extraction of DBCs and map files..." | tee -a $LOG_FILE
  ad | tee -a $DETAIL_LOG_FILE
@@ -141,7 +141,7 @@ then
 fi
 
 ## Extract vmaps
-if [ "$USE_VMAPS" == "1" ]
+if [ "$USE_VMAPS" = "1" ]
 then
   echo "`date`: Start extraction of vmaps..." | tee -a $LOG_FILE
   vmapExtractor3 | tee -a $DETAIL_LOG_FILE
@@ -156,7 +156,7 @@ then
 fi
 
 ## Extract mmaps
-if [ "$USE_MMAPS" == "1" ]
+if [ "$USE_MMAPS" = "1" ]
 then
   MovemapGen.sh $NUM_CPU $LOG_FILE $DETAIL_LOG_FILE
 fi
