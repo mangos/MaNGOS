@@ -1243,7 +1243,7 @@ void ChatHandler::ShowAchievementCriteriaListHelper(AchievementCriteriaEntry con
         ss << GetMangosString(LANG_COUNTER);
     else
     {
-        ss << " [" << AchievementMgr::GetCriteriaProgressMaxCounter(criEntry) << "]";
+        ss << " [" << AchievementMgr::GetCriteriaProgressMaxCounter(criEntry, achEntry) << "]";
 
         if (target && target->GetAchievementMgr().IsCompletedCriteria(criEntry, achEntry))
             ss << GetMangosString(LANG_COMPLETE);
@@ -1323,7 +1323,9 @@ bool ChatHandler::HandleAchievementAddCommand(char* args)
             if (mgr.IsCompletedCriteria(*itr, achEntry))
                 continue;
 
-            uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(*itr);
+            uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(*itr, achEntry);
+            if (maxValue == std::numeric_limits<uint32>::max())
+                maxValue = 1;                               // Exception for counter like achievements, set them only to 1
             mgr.SetCriteriaProgress(*itr, achEntry, maxValue, AchievementMgr::PROGRESS_SET);
         }
     }
@@ -1398,7 +1400,9 @@ bool ChatHandler::HandleAchievementCriteriaAddCommand(char* args)
 
     LocaleConstant loc = GetSessionDbcLocale();
 
-    uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(criEntry);
+    uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(criEntry, achEntry);
+    if (maxValue == std::numeric_limits<uint32>::max())
+        maxValue = 1;                                       // Exception for counter like achievements, set them only to 1
 
     AchievementMgr& mgr = target->GetAchievementMgr();
 
@@ -1463,7 +1467,9 @@ bool ChatHandler::HandleAchievementCriteriaRemoveCommand(char* args)
 
     LocaleConstant loc = GetSessionDbcLocale();
 
-    uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(criEntry);
+    uint32 maxValue = AchievementMgr::GetCriteriaProgressMaxCounter(criEntry, achEntry);
+    if (maxValue == std::numeric_limits<uint32>::max())
+        maxValue = 1;                                       // Exception for counter like achievements, set them only to 1
 
     AchievementMgr& mgr = target->GetAchievementMgr();
 
