@@ -593,7 +593,7 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
                 }
             }
 
-            // check intergiry with max allowed counter value
+            // check integrity with max allowed counter value
             if (uint32 maxcounter = GetCriteriaProgressMaxCounter(criteria, achievement))
             {
                 if (progress.counter > maxcounter)
@@ -678,14 +678,16 @@ void AchievementMgr::CheckAllAchievementCriteria()
 }
 
 static const uint32 achievIdByArenaSlot[MAX_ARENA_SLOT] = { 1057, 1107, 1108 };
-static const uint32 achievIdForDangeon[][4] =
+static const uint32 achievIdForDungeon[][4] =
 {
     // ach_cr_id,is_dungeon,is_raid,is_heroic_dungeon
-    { 321,       true,      true,   true  },
-    { 916,       false,     true,   false },
-    { 917,       false,     true,   false },
-    { 918,       true,      false,  false },
-    { 2219,      false,     false,  true  },
+    { 321,       true,      true,   true  },                // Total raid and dungeon deaths
+    //323                                                   // Total deaths to Lich King 10-player raid bosses
+    //324                                                   // Total deaths to Lich King 25-player raid bosses
+    { 916,       false,     true,   false },                // Total deaths in 25-player raids
+    { 917,       false,     true,   false },                // Total deaths in 10-player raids
+    { 918,       true,      false,  false },                // Total deaths in 5-player dungeons
+    { 2219,      false,     false,  true  },                // Total deaths in 5-player heroic dungeons
     { 0,         false,     false,  false }
 };
 
@@ -1091,26 +1093,26 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 // search case
                 bool found = false;
-                for(int j = 0; achievIdForDangeon[j][0]; ++j)
+                for(int j = 0; achievIdForDungeon[j][0]; ++j)
                 {
-                    if(achievIdForDangeon[j][0] == achievement->ID)
+                    if(achievIdForDungeon[j][0] == achievement->ID)
                     {
                         if(map->IsRaid())
                         {
                             // if raid accepted (ignore difficulty)
-                            if(!achievIdForDangeon[j][2])
+                            if(!achievIdForDungeon[j][2])
                                 break;                      // for
                         }
                         else if(GetPlayer()->GetDungeonDifficulty()==DUNGEON_DIFFICULTY_NORMAL)
                         {
                             // dungeon in normal mode accepted
-                            if(!achievIdForDangeon[j][1])
+                            if(!achievIdForDungeon[j][1])
                                 break;                      // for
                         }
                         else
                         {
                             // dungeon in heroic mode accepted
-                            if(!achievIdForDangeon[j][3])
+                            if(!achievIdForDungeon[j][3])
                                 break;                      // for
                         }
 
