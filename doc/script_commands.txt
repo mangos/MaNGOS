@@ -150,7 +150,8 @@ Where "A  ->  B" means that the command is executed from A with B as target.
 
  3 SCRIPT_COMMAND_MOVE_TO                   resultingSource = Creature
                                             If position is very near to current position, or x=y=z=0, then only orientation is changed
-                                            * datalong2 = travel time
+                                            * datalong2 = travel_speed*100 (use 0 for creature default movement)
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: teleport unit to position
                                             * x/y/z/o
 
  4 SCRIPT_COMMAND_FLAG_SET                  source = any

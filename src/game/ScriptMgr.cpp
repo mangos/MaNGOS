@@ -1036,13 +1036,21 @@ void ScriptAction::HandleScriptStep()
                 break;
             }
 
-            if (m_script->moveTo.travelTime != 0)
+            // For command additional teleport the unit
+            if (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL)
             {
-                float speed = ((Unit*)pSource)->GetDistance(m_script->x, m_script->y, m_script->z) / ((float)m_script->moveTo.travelTime * 0.001f);
-                ((Unit*)pSource)->MonsterMoveWithSpeed(m_script->x, m_script->y, m_script->z, speed);
-            }
-            else
                 ((Unit*)pSource)->NearTeleportTo(m_script->x, m_script->y, m_script->z, m_script->o != 0.0f ? m_script->o : ((Unit*)pSource)->GetOrientation());
+                break;
+            }
+
+            // Normal Movement
+            if (m_script->moveTo.travelSpeed)
+                ((Unit*)pSource)->MonsterMoveWithSpeed(m_script->x, m_script->y, m_script->z, m_script->moveTo.travelSpeed * 0.01f);
+            else
+            {
+                ((Unit*)pSource)->GetMotionMaster()->Clear();
+                ((Unit*)pSource)->GetMotionMaster()->MovePoint(0, m_script->x, m_script->y, m_script->z);
+            }
             break;
         }
         case SCRIPT_COMMAND_FLAG_SET:
@@ -1175,8 +1183,7 @@ void ScriptAction::HandleScriptStep()
 
             pGo->SetLootState(GO_READY);
             pGo->SetRespawnTime(time_to_despawn);       //despawn object in ? seconds
-
-            pGo->GetMap()->Add(pGo);
+            pGo->Refresh();
             break;
         }
         case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:

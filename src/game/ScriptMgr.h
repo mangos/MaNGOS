@@ -48,7 +48,8 @@ enum ScriptCommand                                          // resSource, resTar
     SCRIPT_COMMAND_EMOTE                    = 1,            // resSource = Unit, resTarget = Unit/none
                                                             // datalong1 = emote_id
     SCRIPT_COMMAND_FIELD_SET                = 2,            // source = any, datalong3 = field_id, datalong2 = value
-    SCRIPT_COMMAND_MOVE_TO                  = 3,            // resSource = Creature, datalong2 = time, x/y/z
+    SCRIPT_COMMAND_MOVE_TO                  = 3,            // resSource = Creature, datalong2 = travel_speed*100, x/y/z
+                                                            // data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: teleport unit to position
     SCRIPT_COMMAND_FLAG_SET                 = 4,            // source = any, datalong3 = field_id, datalong2 = bitmask
     SCRIPT_COMMAND_FLAG_REMOVE              = 5,            // source = any, datalong3 = field_id, datalong2 = bitmask
     SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source or target with Player, datalong2 = map_id, x/y/z
@@ -128,7 +129,7 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_MOVE_TO (3)
         {
             uint32 unused1;                                 // datalong
-            uint32 travelTime;                              // datalong2
+            uint32 travelSpeed;                             // datalong2
         } moveTo;
 
         struct                                              // SCRIPT_COMMAND_FLAG_SET (4)
@@ -334,6 +335,7 @@ struct ScriptInfo
     {
         switch (command)
         {
+            case SCRIPT_COMMAND_MOVE_TO:
             case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
             case SCRIPT_COMMAND_CAST_SPELL:
             case SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL:
