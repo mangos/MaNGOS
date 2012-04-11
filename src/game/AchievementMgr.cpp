@@ -436,8 +436,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaTypes type, uin
         AchievementCriteriaEntry const *achievementCriteria = (*i);
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
-        if (!achievement)
-            continue;
+        // Checked in LoadAchievementCriteriaList
 
         // don't update already completed criteria
         if (IsCompletedCriteria(achievementCriteria,achievement))
@@ -578,6 +577,7 @@ void AchievementMgr::LoadFromDB(QueryResult *achievementResult, QueryResult *cri
             progress.timedCriteriaFailed = false;
 
             AchievementEntry const* achievement = sAchievementStore.LookupEntry(criteria->referredAchievement);
+            // Checked in LoadAchievementCriteriaList
 
             // A failed achievement will be removed on next tick - TODO: Possible that timer 2 is reseted
             if (criteria->timeLimit)
@@ -717,8 +717,7 @@ void AchievementMgr::StartTimedAchievementCriteria(AchievementCriteriaTypes type
             continue;
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
-        if (!achievement)
-            continue;
+        // Checked in LoadAchievementCriteriaList
 
         if ((achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_HORDE    && GetPlayer()->GetTeam() != HORDE) ||
             (achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_ALLIANCE && GetPlayer()->GetTeam() != ALLIANCE))
@@ -778,6 +777,7 @@ void AchievementMgr::DoFailedTimedAchievementCriterias()
         // Possible failed achievement criteria found
         AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(iter->first);
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(criteria->referredAchievement);
+        // Checked in LoadAchievementCriteriaList
 
         // Send Fail for failed criterias
         if (!IsCompletedCriteria(criteria, achievement))
@@ -817,8 +817,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
         AchievementCriteriaEntry const *achievementCriteria = *itr;
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry(achievementCriteria->referredAchievement);
-        if (!achievement)
-            continue;
+        // Checked in LoadAchievementCriteriaList
 
         if ((achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_HORDE    && GetPlayer()->GetTeam() != HORDE) ||
             (achievement->factionFlag == ACHIEVEMENT_FACTION_FLAG_ALLIANCE && GetPlayer()->GetTeam() != ALLIANCE))
@@ -2269,10 +2268,19 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         bar.step();
 
         AchievementCriteriaEntry const* criteria = sAchievementCriteriaStore.LookupEntry(entryId);
-        if(!criteria)
+        if (!criteria)
             continue;
 
         MANGOS_ASSERT(criteria->requiredType < ACHIEVEMENT_CRITERIA_TYPE_TOTAL && "Not updated ACHIEVEMENT_CRITERIA_TYPE_TOTAL?");
+
+        // check if referredAchievement exists!
+        AchievementEntry const* achiev = sAchievementStore.LookupEntry(criteria->referredAchievement);
+        if (!achiev)
+        {
+            sLog.outDetail("Removed achievement-criteria %u, because referred achievement does not exist", entryId);
+            sAchievementCriteriaStore.EraseEntry(entryId);
+            continue;
+        }
 
         m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
         m_AchievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);
@@ -2303,6 +2311,15 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
         AchievementEntry const* achievement = sAchievementStore.LookupEntry(entryId);
         if (!achievement || !achievement->refAchievement)
             continue;
+
+        // Check refAchievement exists
+        AchievementEntry const* refAchiev = sAchievementStore.LookupEntry(achievement->refAchievement);
+        if (!refAchiev)
+        {
+            sLog.outDetail("Removed achieviement %u, because referred achievement does not exist", entryId);
+            sAchievementStore.EraseEntry(entryId);
+            continue;
+        }
 
         m_AchievementListByReferencedId[achievement->refAchievement].push_back(achievement);
         ++count;
@@ -2388,8 +2405,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaRequirements()
             case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST:
             {
                 AchievementEntry const* achievement = sAchievementStore.LookupEntry(criteria->referredAchievement);
-                if(!achievement)
-                    continue;
+                // Checked in LoadAchievementCriteriaList
 
                 // exist many achievements with this criteria, use at this moment hardcoded check to skil simple case
                 switch(achievement->ID)

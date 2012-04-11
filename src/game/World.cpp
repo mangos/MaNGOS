@@ -1185,8 +1185,8 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Skill Fishing base level requirements..." );
     sObjectMgr.LoadFishingBaseSkillLevel();
 
-    sLog.outString( "Loading Achievements..." );
     sLog.outString();
+    sLog.outString( "Loading Achievements..." );
     sAchievementMgr.LoadAchievementReferenceList();
     sAchievementMgr.LoadAchievementCriteriaList();
     sAchievementMgr.LoadAchievementCriteriaRequirements();
