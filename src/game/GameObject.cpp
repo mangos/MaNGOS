@@ -356,7 +356,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         ResetDoorOrButton();
                     break;
                 case GAMEOBJECT_TYPE_CHEST:
-                    if (m_groupLootTimer)
+                    if (m_groupLootId)
                     {
                         if (m_groupLootTimer <= update_diff)
                             StopGroupLoot();
@@ -1820,14 +1820,13 @@ void GameObject::SetDisplayId(uint32 modelId)
 void GameObject::StartGroupLoot(Group* group, uint32 timer)
 {
     m_groupLootId = group->GetId();
-    m_groupLootTimer = timer;
+
+    if (m_groupLootId)
+        m_groupLootTimer = timer;
 }
 
 void GameObject::StopGroupLoot()
 {
-    if (!m_groupLootId)
-        return;
-
     if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
         group->EndRoll();
 
