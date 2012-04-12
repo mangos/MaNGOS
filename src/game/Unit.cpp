@@ -8419,14 +8419,6 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
     CallForAllControlledUnits(SetSpeedRateHelper(mtype,forced), CONTROLLED_PET|CONTROLLED_GUARDIANS|CONTROLLED_CHARM|CONTROLLED_MINIPET);
 }
 
-void Unit::SetHover(bool on)
-{
-    if(on)
-        CastSpell(this, 11010, true);
-    else
-        RemoveAurasDueToSpell(11010);
-}
-
 void Unit::SetDeathState(DeathState s)
 {
     if (s != ALIVE && s!= JUST_ALIVED)
