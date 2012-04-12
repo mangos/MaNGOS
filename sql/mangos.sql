@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11947_01_mangos_dbscripts` bit(1) default NULL
+  `required_11953_01_mangos_playercreateinfo_spell` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -12134,6 +12134,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (4,6,20582,'Quickness'),
 (4,6,20583,'Nature Resistance'),
 (4,6,20585,'Wisp Spirit'),
+(4,6,21009,'Elusiveness'),
 (4,6,21651,'Opening'),
 (4,6,21652,'Closing'),
 (4,6,22027,'Remove Insignia'),
@@ -12185,6 +12186,7 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (4,11,20582,'Quickness'),
 (4,11,20583,'Nature Resistance'),
 (4,11,20585,'Wisp Spirit'),
+(4,11,21009,'Elusiveness'),
 (4,11,21651,'Opening'),
 (4,11,21652,'Closing'),
 (4,11,22027,'Remove Insignia'),
