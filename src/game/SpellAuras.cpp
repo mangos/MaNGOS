@@ -1254,8 +1254,15 @@ void Aura::TriggerSpell()
                         triggerTarget->CastCustomSpell(triggerTarget, 29879, &bpDamage, NULL, NULL, true, NULL, this, casterGUID);
                         return;
                     }
-//                    // Detonate Mana
-//                    case 27819: break;
+                    // Detonate Mana
+                    case 27819:
+                    {
+                        // 33% Mana Burn on normal mode, 50% on heroic mode
+                        int32 bpDamage = (int32)triggerTarget->GetPower(POWER_MANA) / (triggerTarget->GetMap()->GetDifficulty() ? 2 : 3);
+                        triggerTarget->ModifyPower(POWER_MANA, -bpDamage);
+                        triggerTarget->CastCustomSpell(triggerTarget, 27820, &bpDamage, NULL, NULL, true, NULL, this, triggerTarget->GetObjectGuid());
+                        return;
+                    }
 //                    // Controller Timer
 //                    case 28095: break;
                     // Stalagg Chain and Feugen Chain
