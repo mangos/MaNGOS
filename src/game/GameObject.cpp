@@ -1820,13 +1820,14 @@ void GameObject::SetDisplayId(uint32 modelId)
 void GameObject::StartGroupLoot(Group* group, uint32 timer)
 {
     m_groupLootId = group->GetId();
-
-    if (m_groupLootId)
-        m_groupLootTimer = timer;
+    m_groupLootTimer = timer;
 }
 
 void GameObject::StopGroupLoot()
 {
+    if (!m_groupLootId)
+        return;
+
     if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
         group->EndRoll();
 
