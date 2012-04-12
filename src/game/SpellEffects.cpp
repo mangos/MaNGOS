@@ -7617,6 +7617,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72588, true);
                     return;
                 }
+				case 71123:// Decimate (Stinky & Precious in ICC)
+                {   
+                    if (!unitTarget || unitTarget->GetHealthPercent() <= 15.0f)
+                       return;
+
+                    int32 damage =(unitTarget->GetHealth() - unitTarget->GetMaxHealth() * 0.15);
+                    unitTarget->CastCustomSpell(unitTarget, 28375, &damage, NULL, NULL, true, NULL, NULL, m_originalCasterGUID);
+                    return;
+                }
                 case 72034:                                 // Whiteout
                 case 72096:                                 // Whiteout (heroic)
                 {
