@@ -7617,7 +7617,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, 72588, true);
                     return;
                 }
-				case 71123:// Decimate (Stinky & Precious in ICC)
+				case 71123:                                // Decimate (Stinky & Precious in ICC)
                 {   
                     if (!unitTarget || unitTarget->GetHealthPercent() <= 15.0f)
                        return;
