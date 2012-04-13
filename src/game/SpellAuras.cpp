@@ -2897,7 +2897,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             target->PlayDirectSound(14972, (Player *)target);
                     }
                     return;
-                case 10848:
                 case 27978:
                 case 40131:
                     if (apply)
