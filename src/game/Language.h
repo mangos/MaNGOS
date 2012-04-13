@@ -810,7 +810,8 @@ enum MangosStrings
     LANG_GUILD_MEMBER                   = 814,
     LANG_GUILD_INITIATE                 = 815,
     LANG_FAIL_ENTER_SPECTRAL_REALM      = 816,
-    // Room for in-game strings           817-999 not used
+    LANG_NO_FLY_ZONE                    = 817,
+    // Room for in-game strings           818-999 not used
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
