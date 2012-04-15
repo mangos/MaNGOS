@@ -257,6 +257,7 @@ struct GossipMenuItems
     uint16          cond_1;
     uint16          cond_2;
     uint16          cond_3;
+    uint16          conditionId;
 };
 
 struct GossipMenus
@@ -266,6 +267,7 @@ struct GossipMenus
     uint32          script_id;
     uint16          cond_1;
     uint16          cond_2;
+    uint16          conditionId;
 };
 
 typedef std::multimap<uint32,GossipMenus> GossipMenusMap;
@@ -336,6 +338,8 @@ typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> Gr
 
 enum ConditionType
 {                                                           // value1       value2  for the Condition enumed
+    CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2  returns cond-id-1 OR cond-id-2
+    CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2  returns cond-id-1 AND cond-id-2
     CONDITION_NONE                  = 0,                    // 0            0
     CONDITION_AURA                  = 1,                    // spell_id     effindex
     CONDITION_ITEM                  = 2,                    // item_id      count   check present req. amount items in inventory
@@ -373,22 +377,32 @@ enum ConditionType
                                                             // If skill_value == 1, then true if player has not skill skill_id
 };
 
-struct PlayerCondition
+class PlayerCondition
 {
-    ConditionType condition;                                // additional condition type
-    uint32  value1;                                         // data for the condition - see ConditionType definition
-    uint32  value2;
+    public:
+        // Default constructor, required for SQL Storage (Will give errors if used elsewise)
+        PlayerCondition() : m_entry(0), m_condition(CONDITION_AND), m_value1(0), m_value2(0) {}
 
-    PlayerCondition(uint8 _condition = 0, uint32 _value1 = 0, uint32 _value2 = 0)
-        : condition(ConditionType(_condition)), value1(_value1), value2(_value2) {}
+        PlayerCondition(uint16 _entry, int16 _condition, uint32 _value1, uint32 _value2)
+            : m_entry(_entry), m_condition(ConditionType(_condition)), m_value1(_value1), m_value2(_value2) {}
 
-    static bool IsValid(ConditionType condition, uint32 value1, uint32 value2);
-    // Checks correctness of values
-    bool Meets(Player const * APlayer) const;               // Checks if the player meets the condition
-    bool operator == (PlayerCondition const& lc) const
-    {
-        return (lc.condition == condition && lc.value1 == value1 && lc.value2 == value2);
-    }
+        // Checks correctness of values
+        bool IsValid() const { return IsValid(m_entry, m_condition, m_value1, m_value2); }
+        static bool IsValid(uint16 entry, ConditionType condition, uint32 value1, uint32 value2);
+
+        bool Meets(Player const* pPlayer) const;            // Checks if the player meets the condition
+
+        // TODO: old system, remove soon!
+        bool operator == (PlayerCondition const& lc) const
+        {
+            return (lc.m_condition == m_condition && lc.m_value1 == m_value1 && lc.m_value2 == m_value2);
+        }
+
+    private:
+        uint16 m_entry;                                     // entry of the condition
+        ConditionType m_condition;                          // additional condition type
+        uint32 m_value1;                                    // data for the condition - see ConditionType definition
+        uint32 m_value2;
 };
 
 // NPC gossip text id
@@ -673,6 +687,7 @@ class ObjectMgr
         void LoadInstanceEncounters();
         void LoadInstanceTemplate();
         void LoadWorldTemplate();
+        void LoadConditions();
         void LoadMailLevelRewards();
 
         void LoadGossipText();
@@ -927,6 +942,7 @@ class ObjectMgr
         int GetIndexForLocale(LocaleConstant loc);
         LocaleConstant GetLocaleForIndex(int i);
 
+        // TODO: Outdated version, rename NEW and remove soon
         uint16 GetConditionId(ConditionType condition, uint32 value1, uint32 value2);
         bool IsPlayerMeetToCondition(Player const* player, uint16 condition_id) const
         {
@@ -934,6 +950,18 @@ class ObjectMgr
                 return false;
 
             return mConditions[condition_id].Meets(player);
+        }
+
+        // Check if a player meets condition conditionId
+        bool IsPlayerMeetToNEWCondition(Player const* pPlayer, uint16 conditionId) const
+        {
+            if (!pPlayer)
+                return false;                               // player not present, return false
+
+            if (const PlayerCondition* condition = sConditionStorage.LookupEntry<PlayerCondition>(conditionId))
+                return condition->Meets(pPlayer);
+
+            return false;
         }
 
         GameTele const* GetGameTele(uint32 id) const

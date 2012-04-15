@@ -445,7 +445,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         continue;
                     }
 
-                    if (!PlayerCondition::IsValid(ConditionType(temp.receive_emote.condition), temp.receive_emote.conditionValue1, temp.receive_emote.conditionValue2))
+                    if (!PlayerCondition::IsValid(0, ConditionType(temp.receive_emote.condition), temp.receive_emote.conditionValue1, temp.receive_emote.conditionValue2))
                     {
                         sLog.outErrorDb("CreatureEventAI: Creature %u using event %u: param2 (Condition: %u) are not valid.",temp.creature_id, i, temp.receive_emote.condition);
                         continue;

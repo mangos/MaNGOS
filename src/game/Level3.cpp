@@ -438,6 +438,14 @@ bool ChatHandler::HandleReloadCreatureQuestInvRelationsCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleReloadConditionsCommand(char* /*args*/)
+{
+    sLog.outString( "Re-Loading `conditions`... " );
+    sObjectMgr.LoadConditions();
+    SendGlobalSysMessage("DB table `conditions` reloaded.");
+    return true;
+}
+
 bool ChatHandler::HandleReloadGossipMenuCommand(char* /*args*/)
 {
     sObjectMgr.LoadGossipMenus();
