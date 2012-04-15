@@ -142,8 +142,8 @@ BindIP = "0.0.0.0"
 #    vmap.enableHeight
 #        Enable/Disable VMaps support for line of sight and height calculation
 #        You need to extract the VMaps in order to enable those options
-#        Default: 0 (disable)
-#                 1 (enable)
+#        Default: 1 (enable)
+#                 0 (disable)
 #
 #    vmap.ignoreSpellIds
 #        These spells are ignored for LoS calculation
