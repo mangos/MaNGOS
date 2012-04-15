@@ -146,17 +146,23 @@ void GameEventMgr::LoadFromDB()
             pGameEvent.holiday_id   = HolidayIds(fields[5].GetUInt32());
 
 
-            if(pGameEvent.length==0)                            // length>0 is validity check
+            if (pGameEvent.length == 0)                     // length>0 is validity check
             {
-                sLog.outErrorDb("`game_event` game event id (%i) have length 0 and can't be used.",event_id);
+                sLog.outErrorDb("`game_event` game event id (%i) have length 0 and can't be used.", event_id);
                 continue;
             }
 
-            if(pGameEvent.holiday_id != HOLIDAY_NONE)
+            if (pGameEvent.occurence < pGameEvent.length)   // occurence < length is useless. This also asserts that occurence > 0!
             {
-                if(!sHolidaysStore.LookupEntry(pGameEvent.holiday_id))
+                sLog.outErrorDb("`game_event` game event id (%i) has occurence %u  < length %u and can't be used.", event_id, pGameEvent.occurence, pGameEvent.length);
+                continue;
+            }
+
+            if (pGameEvent.holiday_id != HOLIDAY_NONE)
+            {
+                if (!sHolidaysStore.LookupEntry(pGameEvent.holiday_id))
                 {
-                    sLog.outErrorDb("`game_event` game event id (%i) have nonexistent holiday id %u.",event_id,pGameEvent.holiday_id);
+                    sLog.outErrorDb("`game_event` game event id (%i) have nonexistent holiday id %u.", event_id, pGameEvent.holiday_id);
                     pGameEvent.holiday_id = HOLIDAY_NONE;
                 }
             }
