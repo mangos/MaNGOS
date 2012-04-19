@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ void WaypointManager::Load()
 
     std::set<uint32> movementScriptSet;
 
-    for(ScriptMapMap::const_iterator itr = sCreatureMovementScripts.begin(); itr != sCreatureMovementScripts.end(); ++itr)
+    for(ScriptMapMap::const_iterator itr = sCreatureMovementScripts.second.begin(); itr != sCreatureMovementScripts.second.end(); ++itr)
         movementScriptSet.insert(itr->first);
 
     // creature_movement
@@ -162,7 +162,7 @@ void WaypointManager::Load()
 
             if (node.script_id)
             {
-                if (sCreatureMovementScripts.find(node.script_id) == sCreatureMovementScripts.end())
+                if (sCreatureMovementScripts.second.find(node.script_id) == sCreatureMovementScripts.second.end())
                 {
                     sLog.outErrorDb("Table creature_movement for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, node.script_id);
                     continue;
@@ -327,7 +327,7 @@ void WaypointManager::Load()
 
             if (node.script_id)
             {
-                if (sCreatureMovementScripts.find(node.script_id) == sCreatureMovementScripts.end())
+                if (sCreatureMovementScripts.second.find(node.script_id) == sCreatureMovementScripts.second.end())
                 {
                     sLog.outErrorDb("Table creature_movement_template for entry %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", entry, point, node.script_id);
                     continue;

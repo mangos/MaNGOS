@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,6 +59,9 @@ GameObject::GameObject() : WorldObject(),
     m_cooldownTime = 0;
 
     m_packedRotation = 0;
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
+    m_lootGroupRecipientId = 0;
 }
 
 GameObject::~GameObject()
@@ -352,6 +355,15 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     if (GetGOInfo()->GetAutoCloseTime() && (m_cooldownTime < time(NULL)))
                         ResetDoorOrButton();
                     break;
+                case GAMEOBJECT_TYPE_CHEST:
+                    if (m_groupLootId)
+                    {
+                        if (m_groupLootTimer <= update_diff)
+                            StopGroupLoot();
+                        else
+                            m_groupLootTimer -= update_diff;
+                    }
+                    break;
                 case GAMEOBJECT_TYPE_GOOBER:
                     if (m_cooldownTime < time(NULL))
                     {
@@ -415,6 +427,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
             }
 
             loot.clear();
+            SetLootRecipient(NULL);
             SetLootState(GO_READY);
 
             if (!m_respawnDelayTime)
@@ -929,6 +942,9 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 
 void GameObject::Use(Unit* user)
 {
+    // user must be provided
+    MANGOS_ASSERT(user || PrintEntryError("GameObject::Use (without user)"));
+
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;
@@ -1494,11 +1510,8 @@ void GameObject::Use(Unit* user)
                     switch(info->id)
                     {
                         case 179785:                        // Silverwing Flag
-                            // check if it's correct bg
-                            if (bg->GetTypeID() == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
                         case 179786:                        // Warsong Flag
+                            // check if it's correct bg
                             if (bg->GetTypeID() == BATTLEGROUND_WS)
                                 bg->EventPlayerClickedOnFlag(player, this);
                             break;
@@ -1715,7 +1728,7 @@ void GameObject::SetWorldRotationAngles(float z_rot, float y_rot, float x_rot)
 bool GameObject::IsHostileTo(Unit const* unit) const
 {
     // always non-hostile to GM in GM mode
-    if(unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+    if (unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
         return false;
 
     // test owner instead if have
@@ -1726,27 +1739,27 @@ bool GameObject::IsHostileTo(Unit const* unit) const
         return IsHostileTo(targetOwner);
 
     // for not set faction case (wild object) use hostile case
-    if(!GetGOInfo()->faction)
+    if (!GetGOInfo()->faction)
         return true;
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sFactionTemplateStore.LookupEntry(GetGOInfo()->faction);
     FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
-    if(!tester_faction || !target_faction)
+    if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if(unit->GetTypeId()==TYPEID_PLAYER)
+    if (unit->GetTypeId() == TYPEID_PLAYER)
     {
-        // forced reaction
-        if(tester_faction->faction)
+        if (tester_faction->faction)
         {
-            if(ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            // forced reaction
+            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force <= REP_HOSTILE;
 
             // apply reputation state
             FactionEntry const* raw_tester_faction = sFactionStore.LookupEntry(tester_faction->faction);
-            if(raw_tester_faction && raw_tester_faction->reputationListID >=0 )
+            if (raw_tester_faction && raw_tester_faction->reputationListID >= 0)
                 return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
         }
     }
@@ -1758,7 +1771,7 @@ bool GameObject::IsHostileTo(Unit const* unit) const
 bool GameObject::IsFriendlyTo(Unit const* unit) const
 {
     // always friendly to GM in GM mode
-    if(unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+    if (unit->GetTypeId()==TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
         return true;
 
     // test owner instead if have
@@ -1769,27 +1782,27 @@ bool GameObject::IsFriendlyTo(Unit const* unit) const
         return IsFriendlyTo(targetOwner);
 
     // for not set faction case (wild object) use hostile case
-    if(!GetGOInfo()->faction)
+    if (!GetGOInfo()->faction)
         return false;
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sFactionTemplateStore.LookupEntry(GetGOInfo()->faction);
     FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
-    if(!tester_faction || !target_faction)
+    if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if(unit->GetTypeId()==TYPEID_PLAYER)
+    if (unit->GetTypeId() == TYPEID_PLAYER)
     {
-        // forced reaction
-        if(tester_faction->faction)
+        if (tester_faction->faction)
         {
-            if(ReputationRank const* force =((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            // forced reaction
+            if (ReputationRank const* force =((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force >= REP_FRIENDLY;
 
             // apply reputation state
-            if(FactionEntry const* raw_tester_faction = sFactionStore.LookupEntry(tester_faction->faction))
-                if(raw_tester_faction->reputationListID >=0 )
+            if (FactionEntry const* raw_tester_faction = sFactionStore.LookupEntry(tester_faction->faction))
+                if (raw_tester_faction->reputationListID >= 0)
                     return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
         }
     }
@@ -1802,6 +1815,86 @@ void GameObject::SetDisplayId(uint32 modelId)
 {
     SetUInt32Value(GAMEOBJECT_DISPLAYID, modelId);
     m_displayInfo = sGameObjectDisplayInfoStore.LookupEntry(modelId);
+}
+
+void GameObject::StartGroupLoot(Group* group, uint32 timer)
+{
+    m_groupLootId = group->GetId();
+    m_groupLootTimer = timer;
+}
+
+void GameObject::StopGroupLoot()
+{
+    if (!m_groupLootId)
+        return;
+
+    if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
+        group->EndRoll();
+
+    m_groupLootTimer = 0;
+    m_groupLootId = 0;
+}
+
+Player* GameObject::GetOriginalLootRecipient() const
+{
+    return m_lootRecipientGuid ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : NULL;
+}
+
+Group* GameObject::GetGroupLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : NULL;
+}
+
+Player* GameObject::GetLootRecipient() const
+{
+    // original recipient group if set and not disbanded
+    Group* group = GetGroupLootRecipient();
+
+    // original recipient player if online
+    Player* player = GetOriginalLootRecipient();
+
+    // if group not set or disbanded return original recipient player if any
+    if (!group)
+        return player;
+
+    // group case
+
+    // return player if it still be in original recipient group
+    if (player && player->GetGroup() == group)
+        return player;
+
+    // find any in group
+    for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        if (Player* newPlayer = itr->getSource())
+            return newPlayer;
+
+    return NULL;
+}
+
+void GameObject::SetLootRecipient(Unit* pUnit)
+{
+    // set the player whose group should receive the right
+    // to loot the gameobject after its used
+    // should be set to NULL after the loot disappears
+
+    if (!pUnit)
+    {
+        m_lootRecipientGuid.Clear();
+        m_lootGroupRecipientId = 0;
+        return;
+    }
+
+    Player* player = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (!player)                                            // normal creature, no player involved
+        return;
+
+    // set player for non group case or if group will disbanded
+    m_lootRecipientGuid = player->GetObjectGuid();
+
+    // set group for group existed case including if player will leave group at loot time
+    if (Group* group = player->GetGroup())
+        m_lootGroupRecipientId = group->GetId();
 }
 
 float GameObject::GetObjectBoundingRadius() const

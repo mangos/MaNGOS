@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -401,15 +401,16 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadAchievementRewardCommand(char* args);
         bool HandleReloadAreaTriggerTavernCommand(char* args);
         bool HandleReloadAreaTriggerTeleportCommand(char* args);
+        bool HandleReloadBattleEventCommand(char* args);
+        bool HandleReloadCommandCommand(char* args);
+        bool HandleReloadConditionsCommand(char* args);
+        bool HandleReloadCreatureQuestRelationsCommand(char* args);
+        bool HandleReloadCreatureQuestInvRelationsCommand(char* args);
+        bool HandleReloadDbScriptStringCommand(char* args);
         bool HandleReloadEventScriptsCommand(char* args);
         bool HandleReloadEventAITextsCommand(char* args);
         bool HandleReloadEventAISummonsCommand(char* args);
         bool HandleReloadEventAIScriptsCommand(char* args);
-        bool HandleReloadCommandCommand(char* args);
-        bool HandleReloadBattleEventCommand(char* args);
-        bool HandleReloadCreatureQuestRelationsCommand(char* args);
-        bool HandleReloadCreatureQuestInvRelationsCommand(char* args);
-        bool HandleReloadDbScriptStringCommand(char* args);
         bool HandleReloadGameGraveyardZoneCommand(char* args);
         bool HandleReloadGameObjectScriptsCommand(char* args);
         bool HandleReloadGameTeleCommand(char* args);
@@ -572,7 +573,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLinkGraveCommand(char* args);
         bool HandleNearGraveCommand(char* args);
         bool HandleExploreCheatCommand(char* args);
-        bool HandleHoverCommand(char* args);
         bool HandleLevelUpCommand(char* args);
         bool HandleShowAreaCommand(char* args);
         bool HandleHideAreaCommand(char* args);
@@ -597,6 +597,13 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleWaterwalkCommand(char* args);
         bool HandleQuitCommand(char* args);
         bool HandleShowGearScoreCommand(char* args);
+
+        bool HandleMmapPathCommand(char* args);
+        bool HandleMmapLocCommand(char* args);
+        bool HandleMmapLoadedTilesCommand(char* args);
+        bool HandleMmapStatsCommand(char* args);
+        bool HandleMmap(char* args);
+        bool HandleMmapTestArea(char* args);
 
         //! Development Commands
         bool HandleSaveAllCommand(char* args);

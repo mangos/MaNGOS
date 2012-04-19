@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ enum CreatureLinkingFlags
     FLAG_TO_AGGRO_ON_AGGRO          = 0x0002,
     FLAG_RESPAWN_ON_EVADE           = 0x0004,
     FLAG_TO_RESPAWN_ON_EVADE        = 0x0008,
+    FLAG_DESPAWN_ON_EVADE           = 0x1000,
     FLAG_DESPAWN_ON_DEATH           = 0x0010,
     FLAG_SELFKILL_ON_DEATH          = 0x0020,
     FLAG_RESPAWN_ON_DEATH           = 0x0040,
@@ -75,7 +76,7 @@ enum CreatureLinkingFlags
     FLAG_CANT_SPAWN_IF_BOSS_DEAD    = 0x0400,
     FLAG_CANT_SPAWN_IF_BOSS_ALIVE   = 0x0800,
 
-    LINKING_FLAG_INVALID            = 0x1000,               // TODO adjust when other flags are implemented
+    LINKING_FLAG_INVALID            = 0x2000,               // TODO adjust when other flags are implemented
 };
 
 // Structure holding the information for an entry

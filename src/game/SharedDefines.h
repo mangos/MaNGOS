@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -702,7 +702,7 @@ enum SpellEffects
     SPELL_EFFECT_APPLY_AREA_AURA_FRIEND    = 128,
     SPELL_EFFECT_APPLY_AREA_AURA_ENEMY     = 129,
     SPELL_EFFECT_REDIRECT_THREAT           = 130,
-    SPELL_EFFECT_131                       = 131,
+    SPELL_EFFECT_PLAY_SOUND                = 131,
     SPELL_EFFECT_PLAY_MUSIC                = 132,
     SPELL_EFFECT_UNLEARN_SPECIALIZATION    = 133,
     SPELL_EFFECT_KILL_CREDIT_GROUP         = 134,
@@ -2384,25 +2384,6 @@ inline SkillType SkillByLockType(LockType locktype)
         default: break;
     }
     return SKILL_NONE;
-}
-
-inline uint32 SkillByQuestSort(int32 QuestSort)
-{
-    switch(QuestSort)
-    {
-        case QUEST_SORT_HERBALISM:      return SKILL_HERBALISM;
-        case QUEST_SORT_FISHING:        return SKILL_FISHING;
-        case QUEST_SORT_BLACKSMITHING:  return SKILL_BLACKSMITHING;
-        case QUEST_SORT_ALCHEMY:        return SKILL_ALCHEMY;
-        case QUEST_SORT_LEATHERWORKING: return SKILL_LEATHERWORKING;
-        case QUEST_SORT_ENGINEERING:    return SKILL_ENGINEERING;
-        case QUEST_SORT_TAILORING:      return SKILL_TAILORING;
-        case QUEST_SORT_COOKING:        return SKILL_COOKING;
-        case QUEST_SORT_FIRST_AID:      return SKILL_FIRST_AID;
-        case QUEST_SORT_JEWELCRAFTING:  return SKILL_JEWELCRAFTING;
-        case QUEST_SORT_INSCRIPTION:    return SKILL_INSCRIPTION;
-    }
-    return 0;
 }
 
 enum SkillCategory

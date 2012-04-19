@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,6 +72,8 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         MySQLConnection(Database& db) : SqlConnection(db), mMysql(NULL) {}
         ~MySQLConnection();
 
+        //! Initializes Mysql and connects to a server.
+        /*! infoString should be formated like hostname;username;password;database. */
         bool Initialize(const char *infoString);
 
         QueryResult* Query(const char *sql);
@@ -101,9 +103,6 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
     public:
         DatabaseMysql();
         ~DatabaseMysql();
-
-        //! Initializes Mysql and connects to a server.
-        /*! infoString should be formated like hostname;username;password;database. */
 
         // must be call before first query in thread
         void ThreadStart();

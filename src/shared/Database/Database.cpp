@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -307,7 +307,7 @@ QueryResult* Database::PQuery(const char *format,...)
     if(res==-1)
     {
         sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
-        return false;
+        return NULL;
     }
 
     return Query(szQuery);
@@ -326,7 +326,7 @@ QueryNamedResult* Database::PQueryNamed(const char *format,...)
     if(res==-1)
     {
         sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
-        return false;
+        return NULL;
     }
 
     return QueryNamed(szQuery);

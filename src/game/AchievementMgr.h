@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -287,7 +287,7 @@ class AchievementMgr
             return iter != m_criteriaProgress.end() ? iter->second.counter : 0;
         }
 
-        static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry);
+        static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry, AchievementEntry const* achievement);
 
         // Use PROGRESS_SET only for reset/downgrade criteria progress
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };

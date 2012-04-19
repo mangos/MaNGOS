@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,6 @@ namespace Movement
         UpdateResult _updateState(int32& ms_time_diff);
         int32 next_timestamp() const { return spline.length(point_Idx+1);}
         int32 segment_time_elapsed() const { return next_timestamp()-time_passed;}
-        int32 Duration() const { return spline.length();}
         int32 timeElapsed() const { return Duration() - time_passed;}
         int32 timePassed() const { return time_passed;}
 
@@ -120,6 +119,8 @@ namespace Movement
         const Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
         const Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx+1) : Vector3();}
         int32 currentPathIdx() const;
+
+        int32 Duration() const { return spline.length();}
 
         std::string ToString() const;
     };

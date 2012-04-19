@@ -1,0 +1,6 @@
+
+*__Win32_Release
+*__Win32_Debug
+*__x64_Release
+*__x64_Debug
+*.user

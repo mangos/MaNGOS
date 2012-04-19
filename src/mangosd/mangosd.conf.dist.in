@@ -142,8 +142,8 @@ BindIP = "0.0.0.0"
 #    vmap.enableHeight
 #        Enable/Disable VMaps support for line of sight and height calculation
 #        You need to extract the VMaps in order to enable those options
-#        Default: 0 (disable)
-#                 1 (enable)
+#        Default: 1 (enable)
+#                 0 (disable)
 #
 #    vmap.ignoreSpellIds
 #        These spells are ignored for LoS calculation
@@ -167,6 +167,15 @@ BindIP = "0.0.0.0"
 #        after that new target movement point calculated. Max: melee attack range (5), min: contact range (0.5)
 #        More distance let have better performence, less distance let have more sensitive reaction at target move.
 #        Default: 1.5
+#
+#    mmap.enabled
+#        Enable/Disable pathfinding using mmaps
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+#    mmap.ignoreMapIds
+#        Disable mmap pathfinding on the listed maps.
+#        List of map ids with delimiter ','
 #
 #    UpdateUptimeInterval
 #        Update realm uptime period in minutes (for save data in 'uptime' table). Must be > 0
@@ -209,6 +218,8 @@ vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 DetectPosCollision = 1
 TargetPosRecalculateRange = 1.5
+mmap.enabled = 1
+mmap.ignoreMapIds = ""
 UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
 AddonChannel = 1
@@ -260,6 +271,7 @@ CleanCharacterDB = 1
 #    LogFilter_VisibilityChanges
 #    LogFilter_Weather
 #    LogFilter_DbStrictedCheck
+#    LogFilter_Pathfinding
 #        Log filters (active by default)
 #        Default: 1 - not include with any log level
 #                 0 - include in log if log level permit
@@ -350,6 +362,7 @@ LogFilter_TransportMoves = 1
 LogFilter_VisibilityChanges = 1
 LogFilter_Weather = 1
 LogFilter_DbStrictedCheck = 1
+LogFilter_Pathfinding = 1
 LogFilter_PeriodicAffects = 0
 LogFilter_PlayerMoves = 0
 LogFilter_SQLText = 0
@@ -947,11 +960,11 @@ TalentsInspecting = 1
 #
 #    ListenRange.Say
 #        Distance from player to listen text that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.TextEmote
 #        Distance from player to listen textemote that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.Yell
 #        Distance from player to listen text that creature (or other world object) yell

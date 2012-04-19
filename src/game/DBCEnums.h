@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+* Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
 *
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 
 enum BattleGroundBracketId                                  // bracketId for level ranges
 {
+    BG_BRACKET_ID_TEMPLATE       = -1,                      // used to mark bg as template
     BG_BRACKET_ID_FIRST          = 0,
     BG_BRACKET_ID_LAST           = 15
 };

@@ -2,7 +2,7 @@
 EventAI Documentation: (Last Updated: January 8, 2010)
 ======================================================
 
-Copyright (c) 2009-2011 MaNGOS <http://getmangos.com/>
+Copyright (C) 2009-2012 MaNGOS <http://getmangos.com/>
 
 EventAI allows users to create new creature scripts entirely within the database.
 
@@ -65,7 +65,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 #   Internal name                Param usage                                             Description
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 0    EVENT_T_TIMER                  InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY IN COMBAT.
-1    EVENT_T_TIMER_OOC              InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY OUT OF COMBAT.
+1    EVENT_T_TIMER_OOC              InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY OUT OF COMBAT WHILE NOT EVADING.
 2    EVENT_T_HP                     HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when the Creature's HP is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
 3    EVENT_T_MANA                   ManaMax%,ManaMin% RepeatMin, RepeatMax                  Expires once the Creature's Mana% is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4).
 4    EVENT_T_AGGRO                  NONE                                                    Expires ONLY upon the Creature's INITIAL Aggro at the Start of Combat (Does NOT Repeat).
@@ -180,7 +180,7 @@ Parameter 2: InitialMax - Maximum Time used to calculate Random Initial Expire
 Parameter 3: RepeatMin - Minimum Time used to calculate Random Repeat Expire
 Parameter 4: RepeatMax - Maximum Time used to calculate Random Repeat Expire
 
-OUT OF COMBAT ONLY! - Expires first between (Param1) and (Param2) and then between every (Param3) and (Param4) from then on.
+OUT OF COMBAT ONLY! NOT WHILE EVADING. - Expires first between (Param1) and (Param2) and then between every (Param3) and (Param4) from then on.
 This is commonly used for events that occur and repeat outside of combat.
 
 ---------------

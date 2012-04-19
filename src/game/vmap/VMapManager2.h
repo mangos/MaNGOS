@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +106,11 @@ namespace VMAP
                 return getMapFileName(pMapId);
             }
             virtual bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y);
+
+#ifdef MMAP_GENERATOR
+        public:
+            void getInstanceMapTree(InstanceTreeMap &instanceMapTree);
+#endif
     };
 }
 #endif

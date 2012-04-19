@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
 enum EventMask
 {
     EVENT_MASK_ON_AGGRO     = FLAG_AGGRO_ON_AGGRO,
-    EVENT_MASK_ON_EVADE     = FLAG_RESPAWN_ON_EVADE,
+    EVENT_MASK_ON_EVADE     = FLAG_RESPAWN_ON_EVADE | FLAG_DESPAWN_ON_EVADE,
     EVENT_MASK_ON_DIE       = FLAG_DESPAWN_ON_DEATH | FLAG_SELFKILL_ON_DEATH | FLAG_RESPAWN_ON_DEATH | FLAG_FOLLOW,
     EVENT_MASK_ON_RESPAWN   = FLAG_RESPAWN_ON_RESPAWN | FLAG_DESPAWN_ON_RESPAWN | FLAG_FOLLOW,
     EVENT_MASK_TRIGGER_TO   = FLAG_TO_AGGRO_ON_AGGRO | FLAG_TO_RESPAWN_ON_EVADE | FLAG_FOLLOW,
@@ -374,6 +374,8 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
             }
             break;
         case LINKING_EVENT_EVADE:
+            if (flag & FLAG_DESPAWN_ON_EVADE && pSlave->isAlive())
+                pSlave->ForcedDespawn();
             if (flag & FLAG_RESPAWN_ON_EVADE && !pSlave->isAlive())
                 pSlave->Respawn();
             break;

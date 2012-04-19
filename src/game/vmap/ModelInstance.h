@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,6 +75,11 @@ namespace VMAP
             G3D::Matrix3 iInvRot;
             float iInvScale;
             WorldModel *iModel;
+
+#ifdef MMAP_GENERATOR
+        public:
+            WorldModel* const getWorldModel();
+#endif
     };
 } // namespace VMAP
 

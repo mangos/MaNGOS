@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 #include "MovementGenerator.h"
 #include "FollowerReference.h"
+#include "PathFinder.h"
 #include "Unit.h"
 
 class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
@@ -39,13 +40,19 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
     protected:
         TargetedMovementGeneratorMedium(Unit &target, float offset, float angle) :
             TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle),
-            i_recalculateTravel(false), i_targetReached(false), i_recheckDistance(0)
+            i_recalculateTravel(false), i_targetReached(false), i_recheckDistance(0),
+            i_path(NULL)
         {
         }
-        ~TargetedMovementGeneratorMedium() {}
+        ~TargetedMovementGeneratorMedium() { delete i_path; }
 
     public:
         bool Update(T &, const uint32 &);
+
+        bool IsReachable() const
+        {
+            return (i_path) ? (i_path->getPathType() & PATHFIND_NORMAL) : true;
+        }
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
@@ -60,6 +67,8 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
         float i_angle;
         bool i_recalculateTravel : 1;
         bool i_targetReached : 1;
+
+        PathFinder* i_path;
 };
 
 template<class T>

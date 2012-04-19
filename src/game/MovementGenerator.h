@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@ class MANGOS_DLL_SPEC MovementGenerator
 
         // used by Evade code for select point to evade with expected restart default movement
         virtual bool GetResetPosition(Unit &, float& /*x*/, float& /*y*/, float& /*z*/) { return false; }
+
+        // given destination unreachable? due to pathfinsing or other
+        virtual bool IsReachable() const { return true; }
 
         // used for check from Update call is movegen still be active (top movement generator)
         // after some not safe for this calls

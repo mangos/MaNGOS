@@ -431,6 +431,7 @@
     <ClCompile Include="..\..\src\game\MassMailMgr.cpp" />
     <ClCompile Include="..\..\src\game\MiscHandler.cpp" />
     <ClCompile Include="..\..\src\game\MotionMaster.cpp" />
+    <ClCompile Include="..\..\src\game\MoveMap.cpp" />
     <ClCompile Include="..\..\src\game\MovementGenerator.cpp" />
     <ClCompile Include="..\..\src\game\MovementHandler.cpp" />
     <ClCompile Include="..\..\src\game\movement\MoveSpline.cpp" />
@@ -447,6 +448,7 @@
     <ClCompile Include="..\..\src\game\ObjectGuid.cpp" />
     <ClCompile Include="..\..\src\game\ObjectPosSelector.cpp" />
     <ClCompile Include="..\..\src\game\Opcodes.cpp" />
+    <ClCompile Include="..\..\src\game\PathFinder.cpp" />
     <ClCompile Include="..\..\src\game\pchdef.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pchdef.h</PrecompiledHeaderFile>
@@ -593,6 +595,8 @@
     <ClInclude Include="..\..\src\game\MapRefManager.h" />
     <ClInclude Include="..\..\src\game\MassMailMgr.h" />
     <ClInclude Include="..\..\src\game\MotionMaster.h" />
+    <ClInclude Include="..\..\src\game\MoveMap.h" />
+    <ClInclude Include="..\..\src\game\MoveMapSharedDefines.h" />
     <ClInclude Include="..\..\src\game\MovementGenerator.h" />
     <ClInclude Include="..\..\src\game\movement\MoveSpline.h" />
     <ClInclude Include="..\..\src\game\movement\MoveSplineFlag.h" />
@@ -612,6 +616,7 @@
     <ClInclude Include="..\..\src\game\ObjectPosSelector.h" />
     <ClInclude Include="..\..\src\game\Opcodes.h" />
     <ClInclude Include="..\..\src\game\Path.h" />
+    <ClInclude Include="..\..\src\game\PathFinder.h" />
     <ClInclude Include="..\..\src\game\pchdef.h" />
     <ClInclude Include="..\..\src\game\Pet.h" />
     <ClInclude Include="..\..\src\game\PetAI.h" />
@@ -664,6 +669,9 @@
     <ClInclude Include="..\..\src\game\vmap\WorldModel.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\dep\recastnavigation\Detour\win\VC100\Detour.vcxproj">
+      <Project>{72bdf975-4d4a-42c7-b2c4-f9ed90a2abb6}</Project>
+    </ProjectReference>
     <ProjectReference Include="shared.vcxproj">
       <Project>{90297c34-f231-4df4-848e-a74bcc0e40ed}</Project>
     </ProjectReference>
