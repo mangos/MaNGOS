@@ -84,8 +84,9 @@ struct CreatureLinkingInfo
 {
     uint32 mapId;
     uint32 masterId;
-    uint16 linkingFlag;
     uint32 masterDBGuid;
+    uint16 linkingFlag;
+    uint16 searchRange;
 };
 
 /**
@@ -118,7 +119,7 @@ class CreatureLinkingMgr
         typedef std::multimap<uint32 /*slaveEntry*/, CreatureLinkingInfo> CreatureLinkingMap;
         typedef std::pair<CreatureLinkingMap::const_iterator, CreatureLinkingMap::const_iterator> CreatureLinkingMapBounds;
 
-        // Storage of Data: npc_entry_slave, (map, npc_entry_master, flag, master_db_guid[If Unique])
+        // Storage of Data: npc_entry_slave, (map, npc_entry_master, flag, master_db_guid[If Unique], search_range)
         CreatureLinkingMap m_creatureLinkingMap;
 
         // Lookup Storage for fast access:
@@ -158,22 +159,26 @@ class CreatureLinkingHolder
     private:
         typedef std::list<ObjectGuid> GuidList;
         // Structure associated to a master
-        struct FlagAndGuids
+        struct InfoAndGuids
         {
             uint16 linkingFlag;
+            uint16 searchRange;
             GuidList linkedGuids;
         };
 
-        typedef std::multimap<uint32 /*masterEntry*/, FlagAndGuids> HolderMap;
+        typedef std::multimap<uint32 /*masterEntry*/, InfoAndGuids> HolderMap;
         typedef std::pair<HolderMap::iterator, HolderMap::iterator> HolderMapBounds;
-        typedef UNORDERED_MAP<uint32 /*Entry*/, ObjectGuid> BossGuidMap;
+        typedef std::multimap<uint32 /*Entry*/, ObjectGuid> BossGuidMap;
+        typedef std::pair<BossGuidMap::iterator, BossGuidMap::iterator> BossGuidMapBounds;
 
         // Helper function, to process a slave list
-        void ProcessSlaveGuidList(CreatureLinkingEvent eventType, Creature* pSource, uint32 flag, GuidList& slaveGuidList, Unit* pEnemy);
+        void ProcessSlaveGuidList(CreatureLinkingEvent eventType, Creature* pSource, uint32 flag, uint16 searchRange, GuidList& slaveGuidList, Unit* pEnemy);
         // Helper function, to process a single slave
         void ProcessSlave(CreatureLinkingEvent eventType, Creature* pSource, uint32 flag, Creature* pSlave, Unit* pEnemy);
         // Helper function to set following
         void SetFollowing(Creature* pWho, Creature* pWhom);
+        // Helper function to return if a slave is in range of a boss
+        bool IsSlaveInRangeOfBoss(Creature* pSlave, Creature* pBoss, uint16 searchRange);
 
         // Storage of Data (boss, flag) GuidList for action triggering
         HolderMap m_holderMap;
