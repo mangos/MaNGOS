@@ -1173,8 +1173,22 @@ void Aura::TriggerSpell()
 //                    case 23792: break;
 //                    // Axe Flurry
 //                    case 24018: break;
-//                    // Mark of Arlokk
-//                    case 24210: break;
+                    case 24210:                             // Mark of Arlokk
+                    {
+                        // Replacement for (classic) spell 24211 (doesn't exist anymore)
+                        std::list<Creature*> lList;
+
+                        // Search for all Zulian Prowler in range
+                        MaNGOS::AllCreaturesOfEntryInRangeCheck check(triggerTarget, 15101, 15.0f);
+                        MaNGOS::CreatureListSearcher<MaNGOS::AllCreaturesOfEntryInRangeCheck> searcher(lList, check);
+                        Cell::VisitGridObjects(triggerTarget, searcher, 15.0f);
+
+                        for (std::list<Creature*>::const_iterator itr = lList.begin(); itr != lList.end(); ++itr)
+                            if ((*itr)->isAlive())
+                                (*itr)->AddThreat(triggerTarget, float(5000));
+
+                        return;
+                    }
 //                    // Restoration
 //                    case 24379: break;
 //                    // Happy Pet
