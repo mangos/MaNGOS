@@ -268,7 +268,7 @@ void CreatureLinkingHolder::AddMasterToHolder(Creature* pCreature)
         if (itr->second == pCreature->GetObjectGuid())
             return;                                         // Already added
 
-    m_masterGuid.emplace(BossGuidMap::value_type(pCreature->GetEntry(), pCreature->GetObjectGuid()));
+    m_masterGuid.insert(BossGuidMap::value_type(pCreature->GetEntry(), pCreature->GetObjectGuid()));
 }
 
 // Function to process actions for linked NPCs
