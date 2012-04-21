@@ -23,6 +23,7 @@
 #include "DBCEnums.h"
 #include "Path.h"
 #include "Platform/Define.h"
+#include "SharedDefines.h"
 
 #include <map>
 #include <set>
@@ -1521,7 +1522,6 @@ struct SoundEntriesEntry
                                                             // 29       m_soundEntriesAdvancedID
 };
 
-
 struct ClassFamilyMask
 {
     uint64 Flags;
@@ -1699,6 +1699,15 @@ struct SpellEntry
     {
         return SpellFamily(SpellFamilyName) == family && IsFitToFamilyMask(mask);
     }
+
+    inline bool HasAttribute(SpellAttributes attribute) const { return Attributes & attribute; }
+    inline bool HasAttribute(SpellAttributesEx attribute) const { return AttributesEx & attribute; }
+    inline bool HasAttribute(SpellAttributesEx2 attribute) const { return AttributesEx2 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx3 attribute) const { return AttributesEx3 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx4 attribute) const { return AttributesEx4 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx5 attribute) const { return AttributesEx5 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx6 attribute) const { return AttributesEx6 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx7 attribute) const { return AttributesEx7 & attribute; }
 
     private:
         // prevent creating custom entries (copy data from original in fact)
