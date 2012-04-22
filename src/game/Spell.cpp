@@ -585,7 +585,7 @@ void Spell::FillTargetMap()
                                 SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             }
                             break;
-                        case 0:
+                        case TARGET_NONE:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             tmpUnitLists[i /*==effToIndex[i]*/].push_back(m_caster);
                             break;
@@ -598,7 +598,7 @@ void Spell::FillTargetMap()
                 case TARGET_TABLE_X_Y_Z_COORDINATES:
                     switch(m_spellInfo->EffectImplicitTargetB[i])
                     {
-                        case 0:
+                        case TARGET_NONE:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
 
                             // need some target for processing
@@ -616,7 +616,7 @@ void Spell::FillTargetMap()
                 case TARGET_SELF2:
                     switch(m_spellInfo->EffectImplicitTargetB[i])
                     {
-                        case 0:
+                        case TARGET_NONE:
                         case TARGET_EFFECT_SELECT:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             break;
@@ -629,7 +629,7 @@ void Spell::FillTargetMap()
                 case TARGET_DUELVSPLAYER_COORDINATES:
                     switch(m_spellInfo->EffectImplicitTargetB[i])
                     {
-                        case 0:
+                        case TARGET_NONE:
                         case TARGET_EFFECT_SELECT:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             if (Unit* currentTarget = m_targets.getUnitTarget())
@@ -644,7 +644,7 @@ void Spell::FillTargetMap()
                 default:
                     switch(m_spellInfo->EffectImplicitTargetB[i])
                     {
-                        case 0:
+                        case TARGET_NONE:
                         case TARGET_EFFECT_SELECT:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             break;

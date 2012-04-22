@@ -3575,7 +3575,7 @@ bool SpellMgr::IsSpellValid(SpellEntry const* spellInfo, Player* pl, bool msg)
     {
         switch(spellInfo->Effect[i])
         {
-            case 0:
+            case SPELL_EFFECT_NONE:
                 continue;
 
             // craft spell for crafting nonexistent item (break client recipes list show)
