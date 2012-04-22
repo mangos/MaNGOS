@@ -285,7 +285,6 @@ void WorldSession::HandleGameObjectUseOpcode( WorldPacket & recv_data )
         return;
 
     GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
-
     if(!obj)
         return;
 

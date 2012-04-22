@@ -440,7 +440,6 @@ void Pet::SavePetToDB(PetSaveMode mode)
         savePet.Execute();
         CharacterDatabase.CommitTransaction();
     }
-    // delete
     else
     {
         RemoveAllAuras(AURA_REMOVE_BY_DELETE);
@@ -1691,7 +1690,6 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 
     return true;
 }
-
 
 void Pet::CleanupActionBar()
 {

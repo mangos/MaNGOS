@@ -90,6 +90,7 @@ void WorldSession::HandleChannelSetOwnerOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
     //recvPacket.hexlike();
+
     std::string channelname, newp;
     recvPacket >> channelname;
 

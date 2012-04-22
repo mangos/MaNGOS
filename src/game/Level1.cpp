@@ -245,8 +245,6 @@ bool ChatHandler::HandleGMVisibleCommand(char* args)
     return true;
 }
 
-
-
 bool ChatHandler::HandleGPSCommand(char* args)
 {
     WorldObject *obj = NULL;

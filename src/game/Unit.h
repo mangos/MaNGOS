@@ -815,7 +815,7 @@ struct CalcDamageInfo
     uint32 blocked_amount;
     uint32 HitInfo;
     uint32 TargetState;
-// Helper
+    // Helper
     WeaponAttackType attackType; //
     uint32 procAttacker;
     uint32 procVictim;
@@ -1088,7 +1088,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::set<uint32> ComboPointHolderSet;
         typedef std::map<uint8, uint32> VisibleAuraMap;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
-
 
         virtual ~Unit ( );
 

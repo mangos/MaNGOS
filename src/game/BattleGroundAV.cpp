@@ -236,6 +236,7 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points )
 void BattleGroundAV::Update(uint32 diff)
 {
     BattleGround::Update(diff);
+
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 

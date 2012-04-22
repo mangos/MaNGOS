@@ -4365,7 +4365,7 @@ bool ChatHandler::HandleExploreCheatCommand(char* args)
             ChatHandler(chr).PSendSysMessage(LANG_YOURS_EXPLORE_SET_NOTHING,GetNameLink().c_str());
     }
 
-    for (uint8 i=0; i<PLAYER_EXPLORED_ZONES_SIZE; ++i)
+    for (uint8 i=0; i < PLAYER_EXPLORED_ZONES_SIZE; ++i)
     {
         if (flag != 0)
         {
@@ -4515,7 +4515,7 @@ bool ChatHandler::HandleShowAreaCommand(char* args)
     int offset = area / 32;
     uint32 val = (uint32)(1 << (area % 32));
 
-    if(area<0 || offset >= PLAYER_EXPLORED_ZONES_SIZE)
+    if (area < 0 || offset >= PLAYER_EXPLORED_ZONES_SIZE)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
@@ -5076,6 +5076,7 @@ bool ChatHandler::HandleResetSpecsCommand(char* args)
     {
         target->resetTalents(true,true);
         target->SendTalentsInfoData(false);
+
         ChatHandler(target).SendSysMessage(LANG_RESET_TALENTS);
         if (!m_session || m_session->GetPlayer() != target)
             PSendSysMessage(LANG_RESET_TALENTS_ONLINE,GetNameLink(target).c_str());
@@ -6119,6 +6120,7 @@ bool ChatHandler::HandleMovegensCommand(char* /*args*/)
             case RANDOM_MOTION_TYPE:        SendSysMessage(LANG_MOVEGENS_RANDOM);        break;
             case WAYPOINT_MOTION_TYPE:      SendSysMessage(LANG_MOVEGENS_WAYPOINT);      break;
             case CONFUSED_MOTION_TYPE:      SendSysMessage(LANG_MOVEGENS_CONFUSED);      break;
+
             case CHASE_MOTION_TYPE:
             {
                 Unit* target = NULL;
@@ -6510,7 +6512,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
                 ++itr;
                 continue;
             }
-            if(itr->first != player->GetMapId())
+            if (itr->first != player->GetMapId())
             {
                 DungeonPersistentState *save = itr->second.state;
                 std::string timeleft = secsToTimeString(save->GetResetTime() - time(NULL), true);
@@ -6531,6 +6533,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
         }
     }
     PSendSysMessage("instances unbound: %d", counter);
+
     return true;
 }
 

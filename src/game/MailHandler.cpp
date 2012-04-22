@@ -293,8 +293,8 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data )
 
                 pl->MoveItemFromInventory(items[i]->GetBagSlot(), item->GetSlot(), true);
                 CharacterDatabase.BeginTransaction();
-                item->DeleteFromInventoryDB();     // deletes item from character's inventory
-                item->SaveToDB();                  // recursive and not have transaction guard into self, item not in inventory and can be save standalone
+                item->DeleteFromInventoryDB();              // deletes item from character's inventory
+                item->SaveToDB();                           // recursive and not have transaction guard into self, item not in inventory and can be save standalone
                 // owner in data will set at mail receive and item extracting
                 CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'", rc.GetCounter(), item->GetGUIDLow());
                 CharacterDatabase.CommitTransaction();
@@ -556,6 +556,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
     else
         pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
 }
+
 /**
  * Handles the packet sent by the client when taking money from the mail.
  */

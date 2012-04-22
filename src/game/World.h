@@ -628,7 +628,6 @@ class World
         uint32 m_maxActiveSessionCount;
         uint32 m_maxQueuedSessionCount;
 
-
         uint32 m_configUint32Values[CONFIG_UINT32_VALUE_COUNT];
         int32 m_configInt32Values[CONFIG_INT32_VALUE_COUNT];
         float m_configFloatValues[CONFIG_FLOAT_VALUE_COUNT];

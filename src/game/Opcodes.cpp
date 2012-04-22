@@ -25,7 +25,7 @@
 
 /// Correspondence between opcodes and their names
 OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
-{                                                                            /*thread-safe*/
+{
     /*0x000*/ { "MSG_NULL_ACTION",                              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
     /*0x001*/ { "CMSG_BOOTME",                                  STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },
     /*0x002*/ { "CMSG_DBLOOKUP",                                STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     },

@@ -124,12 +124,12 @@ void ReputationMgr::SendState(FactionState const* faction)
 {
     uint32 count = 1;
 
-    WorldPacket data(SMSG_SET_FACTION_STANDING, (16));  // last check 2.4.0
-    data << (float) 0;                                  // unk 2.4.0
-    data << (uint8) 0;                                  // wotlk 8634
+    WorldPacket data(SMSG_SET_FACTION_STANDING, (16));      // last check 2.4.0
+    data << (float) 0;                                      // unk 2.4.0
+    data << (uint8) 0;                                      // wotlk 8634
 
     size_t p_count = data.wpos();
-    data << (uint32) count;                             // placeholder
+    data << (uint32) count;                                 // placeholder
 
     data << (uint32) faction->ReputationListID;
     data << (uint32) faction->Standing;

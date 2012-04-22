@@ -721,7 +721,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
                 opcode, GetRemoteAddress().c_str(), m_Session?m_Session->GetAccountId():-1);
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
-            sLog.outDebug("Dumping error-causing packet:");
+            DEBUG_LOG("Dumping error-causing packet:");
             new_pct->hexlike();
         }
 
@@ -983,7 +983,7 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
                 if (m_Session && m_Session->GetSecurity () == SEC_PLAYER)
                 {
                     sLog.outError  ("WorldSocket::HandlePing: Player kicked for "
-                                    "over-speed pings address = %s",
+                                    "overspeeded pings address = %s",
                                     GetRemoteAddress ().c_str ());
 
                     return -1;

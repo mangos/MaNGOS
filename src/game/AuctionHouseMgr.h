@@ -81,7 +81,6 @@ struct AuctionEntry
     void SaveToDB() const;
     void AuctionBidWinning(Player* bidder = NULL);
 
-
     // -1,0,+1 order result
     int CompareAuctionEntry(uint32 column, const AuctionEntry *auc, Player* viewPlayer) const;
 
