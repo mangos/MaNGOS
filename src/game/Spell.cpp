@@ -2815,6 +2815,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                                 targetUnitMap.push_back(m_targets.getUnitTarget());
                             break;
                     }
+                    // Add AoE target-mask to self, if no target-dest provided already
+                    if ((m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) == 0)
+                        m_targets.setDestination(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
                     break;
                 }
                 case SPELL_EFFECT_BIND:
