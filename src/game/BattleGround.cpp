@@ -446,14 +446,14 @@ void BattleGround::Update(uint32 diff)
             SetStatus(STATUS_IN_PROGRESS);
             SetStartDelayTime(m_StartDelayTimes[BG_STARTING_EVENT_FOURTH]);
 
-            //remove preparation
+            // remove preparation
             if (isArena())
             {
-                //TODO : add arena sound PlaySoundToAll(SOUND_ARENA_START);
-
-                for(BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-                    if (Player *plr = sObjectMgr.GetPlayer(itr->first))
-                        plr->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+                for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+                {
+                    if (Player* player = sObjectMgr.GetPlayer(itr->first))
+                        player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
+                }
 
                 CheckArenaWinConditions();
             }
