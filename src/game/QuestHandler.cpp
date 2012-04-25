@@ -320,22 +320,32 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
     uint8 slot;
     recv_data >> slot;
 
-    DEBUG_LOG( "WORLD: Received CMSG_QUESTLOG_REMOVE_QUEST slot = %u",slot );
+    DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_REMOVE_QUEST slot = %u", slot);
 
-    if( slot < MAX_QUEST_LOG_SIZE )
+    if (slot < MAX_QUEST_LOG_SIZE)
     {
-        if(uint32 quest = _player->GetQuestSlotQuestId(slot))
+        if (uint32 quest = _player->GetQuestSlotQuestId(slot))
         {
-            if(!_player->TakeQuestSourceItem( quest, true ))
+            if (!_player->TakeQuestSourceItem(quest, true))
                 return;                                     // can't un-equip some items, reject quest cancel
 
-            if (const Quest *pQuest = sObjectMgr.GetQuestTemplate(quest))
+            if (const Quest* pQuest = sObjectMgr.GetQuestTemplate(quest))
             {
                 if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
                     _player->RemoveTimedQuest(quest);
+
+                for (int i = 0; i < QUEST_SOURCE_ITEM_IDS_COUNT; ++i)
+                {
+                    if (pQuest->ReqSourceId[i])
+                    {
+                        ItemPrototype const* iProto = ObjectMgr::GetItemPrototype(pQuest->ReqSourceId[i]);
+                        if (iProto && iProto->Bonding == BIND_QUEST_ITEM)
+                            _player->DestroyItemCount(pQuest->ReqSourceId[i], pQuest->ReqSourceCount[i], true, false, true);
+                    }
+                }
             }
 
-            _player->SetQuestStatus( quest, QUEST_STATUS_NONE);
+            _player->SetQuestStatus(quest, QUEST_STATUS_NONE);
         }
 
         _player->SetQuestSlot(slot, 0);

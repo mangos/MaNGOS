@@ -1240,7 +1240,7 @@ class MANGOS_DLL_SPEC Player : public Unit
                                                             // in trade, guild bank, mail....
         void RemoveItemDependentAurasAndCasts( Item * pItem );
         void DestroyItem( uint8 bag, uint8 slot, bool update );
-        void DestroyItemCount( uint32 item, uint32 count, bool update, bool unequip_check = false);
+        void DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check = false, bool inBankAlso = false);
         void DestroyItemCount( Item* item, uint32& count, bool update );
         void DestroyConjuredItems( bool update );
         void DestroyZoneLimitedItem( bool update, uint32 new_zone );
@@ -1342,7 +1342,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddQuest( Quest const *pQuest, Object *questGiver );
         void CompleteQuest( uint32 quest_id );
         void IncompleteQuest( uint32 quest_id );
-        void RewardQuest( Quest const *pQuest, uint32 reward, Object* questGiver, bool announce = true );
+        void RewardQuest(Quest const *pQuest, uint32 reward, Object* questGiver, bool announce = true);
 
         void FailQuest( uint32 quest_id );
         bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
