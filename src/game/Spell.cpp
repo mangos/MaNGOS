@@ -4920,17 +4920,20 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         // check pet presents
-        for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
+        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if(m_spellInfo->EffectImplicitTargetA[j] == TARGET_PET)
+            if (m_spellInfo->EffectImplicitTargetA[j] == TARGET_PET)
             {
-                if(!m_caster->GetPet())
+                Pet* pet = m_caster->GetPet();
+                if (!pet)
                 {
-                    if(m_triggeredByAuraSpell)              // not report pet not existence for triggered spells
+                    if (m_triggeredByAuraSpell)             // not report pet not existence for triggered spells
                         return SPELL_FAILED_DONT_REPORT;
                     else
                         return SPELL_FAILED_NO_PET;
                 }
+                else if (!pet->isAlive())
+                    return SPELL_FAILED_TARGETS_DEAD;
                 break;
             }
         }
