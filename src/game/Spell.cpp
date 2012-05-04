@@ -1834,6 +1834,27 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         case TARGET_TOTEM_WATER:
         case TARGET_TOTEM_AIR:
         case TARGET_TOTEM_FIRE:
+        {
+            float angle = m_caster->GetOrientation();
+            switch (targetMode)
+            {
+                case TARGET_TOTEM_EARTH:                         break;
+                case TARGET_TOTEM_WATER: angle += M_PI_F;        break;
+                case TARGET_TOTEM_AIR:   angle += M_PI_F * 0.5f; break;
+                case TARGET_TOTEM_FIRE:  angle += M_PI_F * 1.5f; break;
+            }
+
+            float x, y;
+            float z = m_caster->GetPositionZ();
+            // Ignore the BOUNDING_RADIUS for spells with radius (add a small value to prevent < 0 rounding errors)
+            m_caster->GetNearPoint2D(x, y, radius > 0.001f ? radius - m_caster->GetObjectBoundingRadius() + 0.01f : 2.0f, angle);
+            m_caster->UpdateAllowedPositionZ(x, y, z);
+            m_targets.setDestination(x, y, z);
+
+            // Add Summoner
+            targetUnitMap.push_back(m_caster);
+            break;
+        }
         case TARGET_SELF:
         case TARGET_SELF2:
             targetUnitMap.push_back(m_caster);
