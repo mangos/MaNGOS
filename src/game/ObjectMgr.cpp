@@ -8681,7 +8681,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             if (itr->first)
                 menu_ids.insert(itr->first);
 
-        for(uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+        for (uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
             if (GameObjectInfo const* gInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
                 if (uint32 menuid = gInfo->GetGossipMenuId())
                     menu_ids.erase(menuid);
@@ -8695,10 +8695,16 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
     // prepare menuid -> CreatureInfo map for fast access
     typedef  std::multimap<uint32, const CreatureInfo*> Menu2CInfoMap;
     Menu2CInfoMap menu2CInfoMap;
-    for(uint32 i = 1;  i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1;  i < sCreatureStorage.MaxEntry; ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             if (cInfo->GossipMenuId)
+            {
                 menu2CInfoMap.insert(Menu2CInfoMap::value_type(cInfo->GossipMenuId, cInfo));
+
+                // unused check data preparing part
+                if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
+                    menu_ids.erase(cInfo->GossipMenuId);
+            }
 
     do
     {
@@ -8777,7 +8783,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
         if (gMenuItem.option_id >= GOSSIP_OPTION_MAX)
             sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown option id %u. Option will not be used", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_id);
 
-        if (gMenuItem.menu_id && (gMenuItem.npc_option_npcflag || !sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK)))
+        if (gMenuItem.menu_id && gMenuItem.npc_option_npcflag)
         {
             bool found_menu_uses = false;
             bool found_flags_uses = false;
@@ -8792,10 +8798,6 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
                 // some from creatures with gossip menu can use gossip option base at npc_flags
                 if (gMenuItem.npc_option_npcflag & cInfo->npcflag)
                     found_flags_uses = true;
-
-                // unused check data preparing part
-                if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
-                    menu_ids.erase(gMenuItem.menu_id);
             }
 
             if (found_menu_uses && !found_flags_uses)
