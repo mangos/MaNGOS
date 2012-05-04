@@ -536,6 +536,38 @@ void ScriptMgr::LoadScripts(ScriptMapMapName& scripts, const char* tablename)
             {
                 break;
             }
+            case SCRIPT_COMMAND_SEND_TAXI_PATH:
+            {
+                if (!sTaxiPathStore.LookupEntry(tmp.sendTaxiPath.taxiPathId))
+                {
+                    sLog.outErrorDb("Table `%s` has datalong = %u in SCRIPT_COMMAND_SEND_TAXI_PATH for script id %u, but this taxi path does not exist.", tablename, tmp.sendTaxiPath.taxiPathId, tmp.id);
+                    continue;
+                }
+                // Check if this taxi path can be triggered with a spell
+                if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
+                {
+                    uint32 taxiSpell = 0;
+                    for (uint32 i = 1; i < sSpellStore.GetNumRows() && taxiSpell == 0; ++i)
+                    {
+                        if (SpellEntry const* spell = sSpellStore.LookupEntry(i))
+                            for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+                            {
+                                if (spell->Effect[j] == SPELL_EFFECT_SEND_TAXI && spell->EffectMiscValue[j] == tmp.sendTaxiPath.taxiPathId)
+                                {
+                                    taxiSpell = i;
+                                    break;
+                                }
+                            }
+                    }
+
+                    if (taxiSpell)
+                    {
+                        sLog.outErrorDb("Table `%s` has datalong = %u in SCRIPT_COMMAND_SEND_TAXI_PATH for script id %u, but this taxi path can be triggered by spell %u.", tablename, tmp.sendTaxiPath.taxiPathId, tmp.id, taxiSpell);
+                        continue;
+                    }
+                }
+                break;
+            }
         }
 
         if (scripts.second.find(tmp.id) == scripts.second.end())
@@ -1521,6 +1553,16 @@ void ScriptAction::HandleScriptStep()
                     pSource->SetFlag(UNIT_NPC_FLAGS, m_script->npcFlag.flag);
             }
 
+            break;
+        }
+        case SCRIPT_COMMAND_SEND_TAXI_PATH:
+        {
+            // only Player
+            Player* pPlayer = GetPlayerTargetOrSourceAndLog(pSource, pTarget);
+            if (!pPlayer)
+                break;
+
+            pPlayer->ActivateTaxiPathTo(m_script->sendTaxiPath.taxiPathId);
             break;
         }
         default:

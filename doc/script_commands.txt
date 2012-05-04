@@ -251,3 +251,5 @@ Where "A  ->  B" means that the command is executed from A with B as target.
 29 SCRIPT_COMMAND_MODIFY_NPC_FLAGS          resultingSource = Creature
                                             * datalong=NPCFlags
                                             * datalong2= 0x00=toggle, 0x01=add, 0x02=remove
+30 SCRIPT_COMMAND_SEND_TAXI_PATH            resultingTarget or Source must be Player
+                                            * datalong = taxi path id
