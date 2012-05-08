@@ -822,7 +822,7 @@ bool ScriptAction::GetScriptCommandObject(const ObjectGuid guid, bool includeIte
             resultObject = m_map->GetPet(guid);
             break;
         case HIGHGUID_PLAYER:
-            resultObject = ObjectAccessor::FindPlayer(guid, false);
+            resultObject = m_map->GetPlayer(guid);
             break;
         case HIGHGUID_GAMEOBJECT:
             resultObject = m_map->GetGameObject(guid);
@@ -835,7 +835,7 @@ bool ScriptAction::GetScriptCommandObject(const ObjectGuid guid, bool includeIte
         {
             if (includeItem)
             {
-                if (Player* player = ObjectAccessor::FindPlayer(m_ownerGuid, false))
+                if (Player* player = m_map->GetPlayer(m_ownerGuid))
                     resultObject = player->GetItemByGuid(guid);
                 break;
             }
@@ -1245,7 +1245,7 @@ void ScriptAction::HandleScriptStep()
             float z = m_script->z;
             float o = m_script->o;
 
-            Creature* pCreature = pSource->SummonCreature(m_script->summonCreature.creatureEntry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, m_script->summonCreature.despawnDelay, (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL) ? true: false);
+            Creature* pCreature = pSource->SummonCreature(m_script->summonCreature.creatureEntry, x, y, z, o, m_script->summonCreature.despawnDelay ? TEMPSUMMON_TIMED_OR_DEAD_DESPAWN : TEMPSUMMON_DEAD_DESPAWN, m_script->summonCreature.despawnDelay, (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL) ? true: false);
             if (!pCreature)
             {
                 sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u failed for creature (entry: %u).", m_table, m_script->id, m_script->command, m_script->summonCreature.creatureEntry);
