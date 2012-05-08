@@ -85,6 +85,43 @@ ScriptMgr::~ScriptMgr()
 // /////////////////////////////////////////////////////////
 //              DB SCRIPTS (loaders of static data)
 // /////////////////////////////////////////////////////////
+// returns priority (0 == cannot start script)
+uint8 GetSpellStartDBScriptPriority(SpellEntry const* spellinfo, SpellEffectIndex effIdx)
+{
+    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_SCRIPT_EFFECT)
+        return 10;
+
+    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_DUMMY)
+        return 9;
+
+    // NonExisting triggered spells can also start DB-Spell-Scripts
+    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_TRIGGER_SPELL && !sSpellStore.LookupEntry(spellinfo->EffectTriggerSpell[effIdx]))
+        return 5;
+
+    // Can not start script
+    return 0;
+}
+
+// Priorize: SCRIPT_EFFECT before DUMMY before Non-Existing triggered spell, for same priority the first effect with the priority triggers
+bool ScriptMgr::CanSpellEffectStartDBScript(SpellEntry const* spellinfo, SpellEffectIndex effIdx)
+{
+    uint8 priority = GetSpellStartDBScriptPriority(spellinfo, effIdx);
+    if (!priority)
+        return false;
+
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        uint8 currentPriority = GetSpellStartDBScriptPriority(spellinfo, SpellEffectIndex(i));
+        if (currentPriority < priority)                     // lower priority, continue checking
+            continue;
+        if (currentPriority > priority)                     // take other index with higher priority
+            return false;
+        if (i < effIdx)                                     // same priority at lower index
+            return false;
+    }
+
+    return true;
+}
 
 void ScriptMgr::LoadScripts(ScriptMapMapName& scripts, const char* tablename)
 {
@@ -640,25 +677,20 @@ void ScriptMgr::LoadSpellScripts()
     LoadScripts(sSpellScripts, "spell_scripts");
 
     // check ids
-    for(ScriptMapMap::const_iterator itr = sSpellScripts.second.begin(); itr != sSpellScripts.second.end(); ++itr)
+    for (ScriptMapMap::const_iterator itr = sSpellScripts.second.begin(); itr != sSpellScripts.second.end(); ++itr)
     {
         SpellEntry const* spellInfo = sSpellStore.LookupEntry(itr->first);
-
         if (!spellInfo)
         {
             sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", itr->first);
             continue;
         }
 
-        //check for correct spellEffect
+        // check for correct spellEffect
         bool found = false;
-        for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            // skip empty effects
-            if (!spellInfo->Effect[i])
-                continue;
-
-            if (spellInfo->Effect[i] == SPELL_EFFECT_SCRIPT_EFFECT)
+            if (GetSpellStartDBScriptPriority(spellInfo, SpellEffectIndex(i)))
             {
                 found =  true;
                 break;
@@ -666,7 +698,7 @@ void ScriptMgr::LoadSpellScripts()
         }
 
         if (!found)
-            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect", itr->first, SPELL_EFFECT_SCRIPT_EFFECT);
+            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u)", itr->first);
     }
 }
 

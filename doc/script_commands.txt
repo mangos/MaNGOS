@@ -11,6 +11,7 @@ Copyright (C) 2010-2012 MaNGOS <http://getmangos.com/>
 creature_movement_scripts       DB project self defined id
 event_scripts                   Event id. Several sources: spell effect 61, taxi/transport nodes, gameobject_template data
 gameobject_scripts              Gameobject guid
+gameobject_template_scripts     Gameobject entry
 gossip_scripts                  DB project self defined id
 quest_end_scripts               DB project self defined id (generally quest entry)
 quest_start_scripts             DB project self defined id (generally quest entry)
@@ -90,6 +91,7 @@ event_scripts
                             Spell (effect 61)
                                 Source: caster. Target: Target
 gameobject_scripts
+gameobject_template_scripts
                             Gameobject use
                                 Source: user: Target: GO
 gossip_scripts
@@ -103,7 +105,9 @@ quest_start_scripts
                             `quest_template`
                                 Source: quest giver (creature/GO). Target: player
 spell_scripts
-                            Spell (effect 77)
+                            Spell (effect 77 - SCRIPT_EFFECT)
+                            Spell (effect  3 - DUMMY)
+                            Spell (effect 64 - TRIGGER_SPELL, with non-existing triggered spell)
                                 Source: caster: Target: target of spell (Unit)
 
 -- --------------------------
