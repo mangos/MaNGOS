@@ -175,7 +175,7 @@ Where "A  ->  B" means that the command is executed from A with B as target.
                                             * datalong2 = distance or 0
 
  8 SCRIPT_COMMAND_KILL_CREDIT               source or target with Player
-                                            * datalong = creature entry
+                                            * datalong = creature entry, or 0; If 0 the entry of the creature source or target is used
                                             * datalong2 = bool (0=personal credit, 1=group credit)
 
  9 SCRIPT_COMMAND_RESPAWN_GAMEOBJECT        source = any, target = any

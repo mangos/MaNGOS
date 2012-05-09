@@ -1620,20 +1620,14 @@ bool Map::ScriptsStart(ScriptMapMapName const& scripts, uint32 id, Object* sourc
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const *s2 = &(s->second);
-    bool immedScript = false;
     for (ScriptMap::const_iterator iter = s2->begin(); iter != s2->end(); ++iter)
     {
         ScriptAction sa(scripts.first, this, sourceGuid, targetGuid, ownerGuid, &iter->second);
 
         m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + iter->first), sa));
-        if (iter->first == 0)
-            immedScript = true;
 
         sScriptMgr.IncreaseScheduledScriptsCount();
     }
-    ///- If one of the effects should be immediate, launch the script execution
-    if (immedScript)
-        ScriptsProcess();
 
     return true;
 }
@@ -1652,10 +1646,6 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + delay), sa));
 
     sScriptMgr.IncreaseScheduledScriptsCount();
-
-    ///- If effects should be immediate, launch the script execution
-    if(delay == 0)
-        ScriptsProcess();
 }
 
 /// Process queued scripts

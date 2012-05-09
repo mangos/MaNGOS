@@ -21080,7 +21080,7 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 
 void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource)
 {
-    ObjectGuid creature_guid = pRewardSource->GetTypeId()==TYPEID_UNIT ? pRewardSource->GetObjectGuid() : ObjectGuid();
+    ObjectGuid creature_guid = pRewardSource && pRewardSource->GetTypeId() == TYPEID_UNIT ? pRewardSource->GetObjectGuid() : ObjectGuid();
 
     // prepare data for near group iteration
     if (Group *pGroup = GetGroup())
