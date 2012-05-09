@@ -1790,6 +1790,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         unMaxTargets += (*m)->GetModifier()->m_amount;
     }
 
+    std::list<GameObject*> tempTargetGOList;
+
     switch (targetMode)
     {
         case TARGET_RANDOM_NEARBY_LOC:
@@ -2184,8 +2186,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
             SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
 
-            std::list<GameObject*> tempTargetGOList;
-
             for(SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
             {
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
@@ -2195,12 +2195,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
                     Cell::VisitGridObjects(m_caster, checker, radius);
                 }
-            }
-
-            if (!tempTargetGOList.empty())
-            {
-                for(std::list<GameObject*>::iterator iter = tempTargetGOList.begin(); iter != tempTargetGOList.end(); ++iter)
-                    AddGOTarget(*iter, effIndex);
             }
 
             break;
@@ -2979,6 +2973,44 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         // the player's target will always be added to the map
         if (removed_utarget && m_targets.getUnitTarget())
             targetUnitMap.push_back(m_targets.getUnitTarget());
+    }
+    if (!tempTargetGOList.empty())                          // GO CASE
+    {
+        if (unMaxTargets && tempTargetGOList.size() > unMaxTargets)
+        {
+            // make sure one go is always removed per iteration
+            uint32 removed_utarget = 0;
+            for (std::list<GameObject*>::iterator itr = tempTargetGOList.begin(), next; itr != tempTargetGOList.end(); itr = next)
+            {
+                next = itr;
+                ++next;
+                if (!*itr) continue;
+                if ((*itr) == m_targets.getGOTarget())
+                {
+                    tempTargetGOList.erase(itr);
+                    removed_utarget = 1;
+                    //        break;
+                }
+            }
+            // remove random units from the map
+            while (tempTargetGOList.size() > unMaxTargets - removed_utarget)
+            {
+                uint32 poz = urand(0, tempTargetGOList.size()-1);
+                for (std::list<GameObject*>::iterator itr = tempTargetGOList.begin(); itr != tempTargetGOList.end(); ++itr, --poz)
+                {
+                    if (!*itr) continue;
+
+                    if (!poz)
+                    {
+                        tempTargetGOList.erase(itr);
+                        break;
+                    }
+                }
+            }
+        }
+        // Add resulting GOs as GOTargets
+        for (std::list<GameObject*>::iterator iter = tempTargetGOList.begin(); iter != tempTargetGOList.end(); ++iter)
+            AddGOTarget(*iter, effIndex);
     }
 }
 
