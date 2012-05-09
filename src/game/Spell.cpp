@@ -1627,6 +1627,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 68950:                                 // Fear (FoS)
                 case 68912:                                 // Wailing Souls (FoS)
                 case 69048:                                 // Mirrored Soul (FoS)
+                case 69140:                                 // Coldflame (ICC, Marrowgar)
                 case 69674:                                 // Mutated Infection (ICC, Rotface)
                 case 70882:                                 // Slime Spray Summon Trigger (ICC, Rotface)
                 case 70920:                                 // Unbound Plague Search Effect (ICC, Putricide)
