@@ -26,6 +26,7 @@
 #include "ace/Atomic_Op.h"
 
 struct AreaTriggerEntry;
+struct SpellEntry;
 class Aura;
 class Creature;
 class CreatureAI;
