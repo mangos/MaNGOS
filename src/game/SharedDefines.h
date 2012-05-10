@@ -1249,6 +1249,7 @@ enum Targets
     TARGET_DYNAMIC_OBJECT_BEHIND       = 48,
     TARGET_DYNAMIC_OBJECT_LEFT_SIDE    = 49,
     TARGET_DYNAMIC_OBJECT_RIGHT_SIDE   = 50,
+    TARGET_AREAEFFECT_GO_AROUND_SOURCE = 51,
     TARGET_AREAEFFECT_GO_AROUND_DEST   = 52,                // gameobject around destination, select by spell_script_target
     TARGET_CURRENT_ENEMY_COORDINATES   = 53,                // set unit coordinates as dest, only 16 target B imlemented
     TARGET_LARGE_FRONTAL_CONE          = 54,

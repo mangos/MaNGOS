@@ -2177,8 +2177,28 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
             break;
         }
+        case TARGET_AREAEFFECT_GO_AROUND_SOURCE:
         case TARGET_AREAEFFECT_GO_AROUND_DEST:
         {
+            float x, y, z;
+            if (targetMode == TARGET_AREAEFFECT_GO_AROUND_SOURCE)
+            {
+                if (m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
+                {
+                    x = m_targets.m_srcX;
+                    y = m_targets.m_srcY;
+                    z = m_targets.m_srcZ;
+                }
+                else
+                    m_caster->GetPosition(x, y, z);
+            }
+            else
+            {
+                x = m_targets.m_destX;
+                y = m_targets.m_destY;
+                z = m_targets.m_destZ;
+            }
+
             // It may be possible to fill targets for some spell effects
             // automatically (SPELL_EFFECT_WMO_REPAIR(88) for example) but
             // for some/most spells we clearly need/want to limit with spell_target_script
@@ -2186,13 +2206,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             // Some spells untested, for affected GO type 33. May need further adjustments for spells related.
 
             SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(m_spellInfo->Id);
-
-            for(SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
+            for (SpellScriptTarget::const_iterator i_spellST = bounds.first; i_spellST != bounds.second; ++i_spellST)
             {
                 if (i_spellST->second.type == SPELL_TARGET_TYPE_GAMEOBJECT)
                 {
                     // search all GO's with entry, within range of m_destN
-                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, radius);
+                    MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, x, y, z, radius);
                     MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
                     Cell::VisitGridObjects(m_caster, checker, radius);
                 }
