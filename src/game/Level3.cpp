@@ -4664,8 +4664,6 @@ bool ChatHandler::HandleAuctionItemCommand(char* args)
         return false;
     }
 
-    Player* pl = m_session ? m_session->GetPlayer() : NULL;
-
     do
     {
         uint32 item_stack = item_count > item_proto->GetMaxStackSize() ? item_proto->GetMaxStackSize() : item_count;
