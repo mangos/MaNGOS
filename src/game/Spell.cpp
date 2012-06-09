@@ -2717,10 +2717,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_DYNAMIC_OBJECT_COORDINATES:
             // if parent spell create dynamic object extract area from it
-            if(DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell ? m_triggeredByAuraSpell->Id : m_spellInfo->Id))
+            if (DynamicObject* dynObj = m_caster->GetDynObject(m_triggeredByAuraSpell ? m_triggeredByAuraSpell->Id : m_spellInfo->Id))
                 m_targets.setDestination(dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ());
+            // else use destination of target if no destination set (ie for Mind Sear - 53022)
+            else if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) && m_targets.m_targetMask & TARGET_FLAG_UNIT)
+                m_targets.setDestination(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ);
             break;
-
         case TARGET_DYNAMIC_OBJECT_FRONT:
         case TARGET_DYNAMIC_OBJECT_BEHIND:
         case TARGET_DYNAMIC_OBJECT_LEFT_SIDE:
