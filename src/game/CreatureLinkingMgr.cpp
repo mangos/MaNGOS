@@ -644,15 +644,28 @@ bool CreatureLinkingHolder::TryFollowMaster(Creature* pCreature)
     if (!pInfo || !(pInfo->linkingFlag & FLAG_FOLLOW))
         return false;
 
-    BossGuidMapBounds finds = m_masterGuid.equal_range(pInfo->masterId);
-    for (BossGuidMap::iterator itr = finds.first; itr != finds.second; ++itr)
+    Creature* pMaster = NULL;
+    if (pInfo->mapId != INVALID_MAP_ID)                     // entry case
     {
-        Creature* pMaster = pCreature->GetMap()->GetCreature(itr->second);
-        if (pMaster && pMaster->isAlive() && IsSlaveInRangeOfBoss(pCreature, pMaster, pInfo->searchRange))
+        BossGuidMapBounds finds = m_masterGuid.equal_range(pInfo->masterId);
+        for (BossGuidMap::iterator itr = finds.first; itr != finds.second; ++itr)
         {
-            SetFollowing(pCreature, pMaster);
-            return true;
+            pMaster = pCreature->GetMap()->GetCreature(itr->second);
+            if (pMaster && IsSlaveInRangeOfBoss(pCreature, pMaster, pInfo->searchRange))
+                break;
         }
+    }
+    else                                                    // guid case
+    {
+        CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->id);
+        pMaster = pCreature->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->Entry, pInfo->masterDBGuid));
+    }
+
+    if (pMaster && pMaster->isAlive())
+    {
+        SetFollowing(pCreature, pMaster);
+        return true;
     }
 
     return false;
