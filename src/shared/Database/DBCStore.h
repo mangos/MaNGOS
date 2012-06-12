@@ -29,7 +29,7 @@ class DBCStorage
         explicit DBCStorage(const char *f) : nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL) { }
         ~DBCStorage() { Clear(); }
 
-        T const* LookupEntry(uint32 id) const { return (id>=nCount)?NULL:indexTable[id]; }
+        T const* LookupEntry(uint32 id) const { return (id >= nCount) ? NULL : indexTable[id]; }
         uint32  GetNumRows() const { return nCount; }
         char const* GetFormat() const { return fmt; }
         uint32 GetFieldCount() const { return fieldCount; }
@@ -88,7 +88,8 @@ class DBCStorage
             nCount = 0;
         }
 
-        void EraseEntry(uint32 id) { indexTable[id] = NULL; }
+        void EraseEntry(uint32 id) { assert(id < nCount && "To be erased entry must be in bounds!") ; indexTable[id] = NULL; }
+        void InsertEntry(T* entry, uint32 id) { assert(id < nCount && "To be inserted entry must be in bounds!"); indexTable[id] = entry; }
 
     private:
         uint32 nCount;
