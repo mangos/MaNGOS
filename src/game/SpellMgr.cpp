@@ -714,6 +714,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
                         case 27201:
                         case 27202:
                         case 27203:
+                        case 47669:
                             return true;
                         default:
                             break;

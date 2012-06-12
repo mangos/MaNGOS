@@ -1592,6 +1592,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 38794:                                 // Murmur's Touch (h)
                 case 44869:                                 // Spectral Blast
                 case 45976:                                 // Open Portal
+                case 47669:                                 // Awaken Subboss
                 case 48278:                                 // Paralyze (Utgarde Pinnacle)
                 case 50988:                                 // Glare of the Tribunal (Halls of Stone)
                 case 54148:                                 // Ritual of the Sword (Utgarde Pinnacle, Svala)
