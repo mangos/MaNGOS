@@ -7120,6 +7120,20 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, 50239, true);
                     return;
                 }
+                case 48590:                                 // Avenging Spirits
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Summon 4 spirits at near point positions
+                    float x, y, z;
+                    for (uint8 i = 0; i < 4; ++i)
+                    {
+                        unitTarget->GetNearPoint(unitTarget, x, y, z, 0, 3.0f, M_PI_F/2*i+M_PI_F/4);
+                        unitTarget->CastSpell(x, y, z, 48592, true);
+                    }
+                    return;
+                }
                 case 48603:                                 // High Executor's Branding Iron
                     // Torture the Torturer: High Executor's Branding Iron Impact
                     unitTarget->CastSpell(unitTarget, 48614, true);
