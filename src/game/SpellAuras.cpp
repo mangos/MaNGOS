@@ -2097,6 +2097,96 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                         return;
                     }
+                    // Summon random Silithus Templar
+                    case 24734:
+                        switch(urand(0, 3))
+                        {
+                            case 0:
+                                target->SummonCreature(15307, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 1:
+                                target->SummonCreature(15209, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 2:
+                                target->SummonCreature(15212, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 3:
+                                target->SummonCreature(15211, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                        }
+                    // Summon random Silithus Duke
+                    case 24763:
+                        switch(urand(0, 3))
+                        {
+                            case 0:
+                                target->SummonCreature(15206, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 1:
+                                target->SummonCreature(15207, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 2:
+                                target->SummonCreature(15208, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 3:
+                                target->SummonCreature(15220, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                        }
+                    // Summon random Silithus Royal
+                    case 24784:
+                        switch(urand(0, 3))
+                        {
+                            case 0:
+                                target->SummonCreature(15305, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 1:
+                                target->SummonCreature(15203, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 2:
+                                target->SummonCreature(15205, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                            case 3:
+                                target->SummonCreature(15204, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                                return;
+                        }
+                    // Summon Templars
+                    case 24758:
+                        target->SummonCreature(15307, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24744:
+                        target->SummonCreature(15209, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24756:
+                        target->SummonCreature(15212, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24760:
+                        target->SummonCreature(15211, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    // Summon Dukes
+                    case 24765:
+                        target->SummonCreature(15206, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24770:
+                        target->SummonCreature(15208, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24768:
+                        target->SummonCreature(15220, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24772:
+                        target->SummonCreature(15207, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    // Summon Royals
+                    case 24790:
+                        target->SummonCreature(15305, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24786:
+                        target->SummonCreature(15203, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24789:
+                        target->SummonCreature(15205, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
+                    case 24788:
+                        target->SummonCreature(15204, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, -1);
+                        return;
                     case 32045:                             // Soul Charge
                     case 32051:
                     case 32052:
