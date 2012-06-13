@@ -345,7 +345,7 @@ enum ConditionType
     CONDITION_ITEM                  = 2,                    // item_id      count   check present req. amount items in inventory
     CONDITION_ITEM_EQUIPPED         = 3,                    // item_id      0
     CONDITION_AREAID                = 4,                    // area_id      0, 1 (0: in (sub)area, 1: not in (sub)area)
-    CONDITION_REPUTATION_RANK       = 5,                    // faction_id   min_rank
+    CONDITION_REPUTATION_RANK_MIN   = 5,                    // faction_id   min_rank
     CONDITION_TEAM                  = 6,                    // player_team  0,      (469 - Alliance 67 - Horde)
     CONDITION_SKILL                 = 7,                    // skill_id     skill_value
     CONDITION_QUESTREWARDED         = 8,                    // quest_id     0
@@ -375,6 +375,7 @@ enum ConditionType
     CONDITION_SKILL_BELOW           = 29,                   // skill_id     skill_value
                                                             // True if player has skill skill_id and skill less than (and not equal) skill_value (for skill_value > 1)
                                                             // If skill_value == 1, then true if player has not skill skill_id
+    CONDITION_REPUTATION_RANK_MAX   = 30,                   // faction_id   max_rank
 };
 
 class PlayerCondition
