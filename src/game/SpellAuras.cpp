@@ -2131,6 +2131,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         GetHolder()->SetAuraDuration(urand(1, 30)*IN_MILLISECONDS);
                         return;
                     }
+                    case 33326:                             // Stolen Soul Dispel
+                    {
+                        target->RemoveAurasDueToSpell(32346);
+                        return;
+                    }
                     // Gender spells
                     case 38224:                             // Illidari Agent Illusion
                     case 37096:                             // Blood Elf Illusion
