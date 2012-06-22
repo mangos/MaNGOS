@@ -201,13 +201,6 @@ enum BattleGroundType
     TYPE_ARENA            = 4
 };
 
-enum BattleGroundWinner
-{
-    WINNER_HORDE            = 0,
-    WINNER_ALLIANCE         = 1,
-    WINNER_NONE             = 2
-};
-
 enum BattleGroundTeamIndex
 {
     BG_TEAM_ALLIANCE        = 0,
@@ -323,7 +316,7 @@ class BattleGround
 
         int32 GetStartDelayTime() const     { return m_StartDelayTime; }
         ArenaType GetArenaType() const          { return m_ArenaType; }
-        uint8 GetWinner() const             { return m_Winner; }
+        Team GetWinner() const              { return m_Winner; }
         uint32 GetBattlemasterEntry() const;
         uint32 GetBonusHonorFromKill(uint32 kills) const;
 
@@ -342,7 +335,7 @@ class BattleGround
         void SetRated(bool state)           { m_IsRated = state; }
         void SetArenaType(ArenaType type)   { m_ArenaType = type; }
         void SetArenaorBGType(bool _isArena) { m_IsArena = _isArena; }
-        void SetWinner(uint8 winner)        { m_Winner = winner; }
+        void SetWinner(Team winner)         { m_Winner = winner; }
 
         void ModifyStartDelayTime(int diff) { m_StartDelayTime -= diff; }
         void SetStartDelayTime(int Time)    { m_StartDelayTime = Time; }
@@ -580,7 +573,7 @@ class BattleGround
         ArenaType  m_ArenaType;                             // 2=2v2, 3=3v3, 5=5v5
         bool   m_InBGFreeSlotQueue;                         // used to make sure that BG is only once inserted into the BattleGroundMgr.BGFreeSlotQueue[bgTypeId] deque
         bool   m_IsArena;
-        uint8  m_Winner;                                    // 0=alliance, 1=horde, 2=none
+        Team   m_Winner;
         int32  m_StartDelayTime;
         bool   m_IsRated;                                   // is this battle rated?
         bool   m_PrematureCountDown;

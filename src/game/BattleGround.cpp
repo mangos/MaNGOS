@@ -217,7 +217,7 @@ BattleGround::BattleGround()
     m_InvitedHorde      = 0;
     m_ArenaType         = ARENA_TYPE_NONE;
     m_IsArena           = false;
-    m_Winner            = 2;
+    m_Winner            = TEAM_NONE;
     m_StartTime         = 0;
     m_Events            = 0;
     m_IsRated           = false;
@@ -687,21 +687,15 @@ void BattleGround::EndBattleGround(Team winner)
         winmsg_id = isBattleGround() ? LANG_BG_A_WINS : LANG_ARENA_GOLD_WINS;
 
         PlaySoundToAll(SOUND_ALLIANCE_WINS);                // alliance wins sound
-
-        SetWinner(WINNER_ALLIANCE);
     }
     else if (winner == HORDE)
     {
         winmsg_id = isBattleGround() ? LANG_BG_H_WINS : LANG_ARENA_GREEN_WINS;
 
         PlaySoundToAll(SOUND_HORDE_WINS);                   // horde wins sound
+    }
 
-        SetWinner(WINNER_HORDE);
-    }
-    else
-    {
-        SetWinner(3);
-    }
+    SetWinner(winner);
 
     SetStatus(STATUS_WAIT_LEAVE);
     //we must set it this way, because end time is sent in packet!
@@ -1125,7 +1119,7 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
 // this method is called when no players remains in battleground
 void BattleGround::Reset()
 {
-    SetWinner(WINNER_NONE);
+    SetWinner(TEAM_NONE);
     SetStatus(STATUS_WAIT_QUEUE);
     SetStartTime(0);
     SetEndTime(0);
