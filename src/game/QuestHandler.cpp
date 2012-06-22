@@ -123,10 +123,10 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recv_data)
 
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
 
-    // no or incorrect quest giver
-    if(!pObject
-        || (pObject->GetTypeId()!=TYPEID_PLAYER && !pObject->HasQuest(quest))
-        || (pObject->GetTypeId()==TYPEID_PLAYER && !((Player*)pObject)->CanShareQuest(quest))
+    // no or incorrect quest giver (player himself is questgiver for SPELL_EFFECT_QUEST_OFFER)
+    if (!pObject
+        || (pObject->GetTypeId() != TYPEID_PLAYER && !pObject->HasQuest(quest))
+        || (pObject->GetTypeId() == TYPEID_PLAYER && pObject != _player && !((Player*)pObject)->CanShareQuest(quest))
         )
     {
         _player->PlayerTalkClass->CloseGossip();
