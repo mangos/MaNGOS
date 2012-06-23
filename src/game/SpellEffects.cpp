@@ -1199,6 +1199,27 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 29126:                                 // Cleansing Flames (Darnassus)
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 29099, true);
+                    return;
+                }
+                case 29135:                                 // Cleansing Flames (Ironforge)
+                case 29136:                                 // Cleansing Flames (Orgrimmar)
+                case 29137:                                 // Cleansing Flames (Stormwind)
+                case 29138:                                 // Cleansing Flames (Thunder Bluff)
+                case 29139:                                 // Cleansing Flames (Undercity)
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 spellIDs[] = {29102, 29130, 29101, 29132, 29133};
+                    unitTarget->CastSpell(unitTarget, spellIDs[m_spellInfo->Id - 29135], true);
+                    return;
+                }
                 case 29200:                                 // Purify Helboar Meat
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1608,10 +1629,31 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 45685:                                 // Magnataur On Death 2
+                {
+                    m_caster->RemoveAurasDueToSpell(45673);
+                    m_caster->RemoveAurasDueToSpell(45672);
+                    m_caster->RemoveAurasDueToSpell(45677);
+                    m_caster->RemoveAurasDueToSpell(45681);
+                    m_caster->RemoveAurasDueToSpell(45683);
+                    return;
+                }
                 case 45958:                                 // Signal Alliance
                 {
                     m_caster->CastSpell(m_caster, m_spellInfo->CalculateSimpleValue(eff_idx), true);
                     return;
+                }
+                case 45976:                                 // Open Portal
+                case 46177:                                 // Open All Portals
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // portal visual
+                    unitTarget->CastSpell(unitTarget, 45977, true);
+
+                    // break in case additional procressing in scripting library required
+                    break;
                 }
                 case 45980:                                 // Re-Cursive Transmatter Injection
                 {
@@ -1628,27 +1670,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
 
                     return;
-                }
-                case 45685:                                 // Magnataur On Death 2
-                {
-                    m_caster->RemoveAurasDueToSpell(45673);
-                    m_caster->RemoveAurasDueToSpell(45672);
-                    m_caster->RemoveAurasDueToSpell(45677);
-                    m_caster->RemoveAurasDueToSpell(45681);
-                    m_caster->RemoveAurasDueToSpell(45683);
-                    return;
-                }
-                case 45976:                                 // Open Portal
-                case 46177:                                 // Open All Portals
-                {
-                    if (!unitTarget)
-                        return;
-
-                    // portal visual
-                    unitTarget->CastSpell(unitTarget, 45977, true);
-
-                    // break in case additional procressing in scripting library required
-                    break;
                 }
                 case 45989:                                 // Summon Void Sentinel Summoner Visual
                 {
@@ -1762,6 +1783,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(m_caster, 43160, true);
                     unitTarget->SetDeathState(JUST_DIED);
                     unitTarget->SetHealth(0);
+                    return;
+                }
+                case 46671:                                 // Cleansing Flames (Exodar)
+                case 46672:                                 // Cleansing Flames (Silvermoon)
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, m_spellInfo->Id == 46671 ? 46690 : 46689, true);
                     return;
                 }
                 case 46797:                                 // Quest - Borean Tundra - Set Explosives Cart
@@ -6652,6 +6682,27 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     m_caster->SummonCreature(16474, unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    return;
+                }
+                case 28859:                                 // Cleansing Flames
+                case 29126:                                 // Cleansing Flames (Darnassus)
+                case 29135:                                 // Cleansing Flames (Ironforge)
+                case 29136:                                 // Cleansing Flames (Orgrimmar)
+                case 29137:                                 // Cleansing Flames (Stormwind)
+                case 29138:                                 // Cleansing Flames (Thunder Bluff)
+                case 29139:                                 // Cleansing Flames (Undercity)
+                case 46671:                                 // Cleansing Flames (Exodar)
+                case 46672:                                 // Cleansing Flames (Silvermoon)
+                {
+                    // Cleanse all magic, curse, disease and poison
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->RemoveAurasWithDispelType(DISPEL_MAGIC);
+                    unitTarget->RemoveAurasWithDispelType(DISPEL_CURSE);
+                    unitTarget->RemoveAurasWithDispelType(DISPEL_DISEASE);
+                    unitTarget->RemoveAurasWithDispelType(DISPEL_POISON);
+
                     return;
                 }
                 case 29395:                                 // Break Kaliri Egg
