@@ -3681,10 +3681,8 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 case 65528:                                 // Gossip NPC Appearance - Pirates' Day
                 {
                     // expecting npc's using this spell to have models with race info.
-                    uint32 race = GetCreatureModelRace(target->GetNativeDisplayId());
-
                     // random gender, regardless of current gender
-                    switch(race)
+                    switch (target->getRace())
                     {
                         case RACE_HUMAN:
                             target->SetDisplayId(roll_chance_i(50) ? 25037 : 25048);
@@ -8426,7 +8424,9 @@ void Aura::HandleAuraMirrorImage(bool apply, bool Real)
         // Caster can be player or creature, the unit who pCreature will become an clone of.
         Unit* caster = GetCaster();
 
-        pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 0, caster->getRace());
+        if (caster->GetTypeId() == TYPEID_PLAYER)           // TODO - Verify! Does it take a 'pseudo-race' (from display-id) for creature-mirroring, and what is sent in SMSG_MIRRORIMAGE_DATA
+            pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 0, caster->getRace());
+
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 1, caster->getClass());
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 2, caster->getGender());
         pCreature->SetByteValue(UNIT_FIELD_BYTES_0, 3, caster->getPowerType());
