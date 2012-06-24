@@ -338,6 +338,7 @@ typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> Gr
 
 enum ConditionType
 {                                                           // value1       value2  for the Condition enumed
+    CONDITION_NOT                   = -3,                   // cond-id-1    0          returns !cond-id-1
     CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2  returns cond-id-1 OR cond-id-2
     CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2  returns cond-id-1 AND cond-id-2
     CONDITION_NONE                  = 0,                    // 0            0
