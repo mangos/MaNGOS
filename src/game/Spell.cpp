@@ -620,6 +620,13 @@ void Spell::FillTargetMap()
                         case TARGET_EFFECT_SELECT:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitLists[i /*==effToIndex[i]*/]);
                             break;
+                        case TARGET_AREAEFFECT_CUSTOM:
+                            // triggered spells get dest point from default target set, ignore it
+                            if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION) || m_IsTriggeredSpell)
+                                if (WorldObject* castObject = GetCastingObject())
+                                    m_targets.setDestination(castObject->GetPositionX(), castObject->GetPositionY(), castObject->GetPositionZ());
+                            SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitLists[i /*==effToIndex[i]*/]);
+                            break;
                         // most A/B target pairs is self->negative and not expect adding caster to target list
                         default:
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitLists[i /*==effToIndex[i]*/]);
