@@ -2170,7 +2170,8 @@ bool Creature::HasSpellCooldown(uint32 spell_id) const
 
 uint8 Creature::getRace() const
 {
-    return Unit::getRace() ? Unit::getRace() : GetCreatureModelRace(GetNativeDisplayId());
+    uint8 race = Unit::getRace();
+    return race ? race : GetCreatureModelRace(GetNativeDisplayId());
 }
 
 bool Creature::IsInEvadeMode() const
