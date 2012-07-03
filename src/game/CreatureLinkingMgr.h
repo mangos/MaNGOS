@@ -160,7 +160,6 @@ class CreatureLinkingHolder
         bool TryFollowMaster(Creature* pCreature);
 
     private:
-        typedef std::list<ObjectGuid> GuidList;
         // Structure associated to a master (entry case)
         struct InfoAndGuids
         {

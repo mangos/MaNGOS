@@ -237,7 +237,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
 
     ObjectGuid auctioneerGuid;
     uint32 etime, bid, buyout, itemCount;
-    std::vector<ObjectGuid> guids;
+    GuidVector guids;
     std::vector<uint32> stackSizes;
 
     recv_data >> auctioneerGuid;

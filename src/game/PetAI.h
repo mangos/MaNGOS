@@ -51,8 +51,7 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
         TimeTracker i_tracker;
         bool inCombat;
 
-        typedef std::set<ObjectGuid> AllySet;
-        AllySet m_AllySet;
+        GuidSet m_AllySet;
         uint32 m_updateAlliesTimer;
 };
 #endif

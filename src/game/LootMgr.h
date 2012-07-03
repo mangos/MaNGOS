@@ -303,8 +303,7 @@ struct Loot
 
         LootItemList m_questItems;
 
-        typedef std::set<ObjectGuid> PlayersLooting;
-        PlayersLooting m_playersLooting;
+        GuidSet m_playersLooting;
 
         QuestItemMap m_playerQuestItems;
         QuestItemMap m_playerFFAItems;

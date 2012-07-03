@@ -155,7 +155,7 @@ void DynamicObject::Delete()
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
-    for(AffectedSet::iterator iter = m_affected.begin(); iter != m_affected.end(); )
+    for (GuidSet::iterator iter = m_affected.begin(); iter != m_affected.end(); )
     {
         Unit *target = GetMap()->GetUnit((*iter));
         if (target)

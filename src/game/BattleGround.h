@@ -497,11 +497,8 @@ class BattleGround
 
         void HandleTriggerBuff(ObjectGuid go_guid);
 
-        // TODO: make this protected:
-        typedef std::vector<ObjectGuid> BGObjects;
-        typedef std::vector<ObjectGuid> BGCreatures;
         // TODO drop m_BGObjects
-        BGObjects m_BgObjects;
+        GuidVector m_BgObjects;
         void SpawnBGObject(ObjectGuid guid, uint32 respawntime);
         bool AddObject(uint32 type, uint32 entry, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime = 0);
         void SpawnBGCreature(ObjectGuid guid, uint32 respawntime);
@@ -523,8 +520,8 @@ class BattleGround
 
         struct EventObjects
         {
-            BGObjects gameobjects;
-            BGCreatures creatures;
+            GuidVector gameobjects;
+            GuidVector creatures;
         };
 
         // cause we create it dynamicly i use a map - to avoid resizing when

@@ -317,8 +317,7 @@ class BattleGroundEY : public BattleGround
         Team m_PointOwnedByTeam[BG_EY_NODES_MAX];
         uint8 m_PointState[BG_EY_NODES_MAX];
         int32 m_PointBarStatus[BG_EY_NODES_MAX];
-        typedef std::vector<ObjectGuid> PlayersNearPointType;
-        PlayersNearPointType m_PlayersNearPoint[BG_EY_NODES_MAX_WITH_SPEIAL];
+        GuidVector m_PlayersNearPoint[BG_EY_NODES_MAX_WITH_SPEIAL];
         uint8 m_CurrentPointPlayersCount[2*BG_EY_NODES_MAX];
 
         int32 m_PointAddingTimer;

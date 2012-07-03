@@ -59,7 +59,7 @@ VisibleNotifier::Notify()
 
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
-    for(ObjectGuidSet::iterator itr = i_clientGUIDs.begin();itr!=i_clientGUIDs.end();++itr)
+    for(GuidSet::iterator itr = i_clientGUIDs.begin();itr!=i_clientGUIDs.end();++itr)
     {
         player.m_clientGUIDs.erase(*itr);
 
@@ -75,8 +75,8 @@ VisibleNotifier::Notify()
         player.GetSession()->SendPacket(&packet);
 
         // send out of range to other players if need
-        ObjectGuidSet const& oor = i_data.GetOutOfRangeGUIDs();
-        for(ObjectGuidSet::const_iterator iter = oor.begin(); iter != oor.end(); ++iter)
+        GuidSet const& oor = i_data.GetOutOfRangeGUIDs();
+        for(GuidSet::const_iterator iter = oor.begin(); iter != oor.end(); ++iter)
         {
             if (!iter->IsPlayer())
                 continue;
