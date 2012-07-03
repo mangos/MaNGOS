@@ -4514,47 +4514,47 @@ DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group)
 
 bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32 newArea) const
 {
-    if(gender!=GENDER_NONE)
+    if (gender != GENDER_NONE)
     {
         // not in expected gender
-        if(!player || gender != player->getGender())
+        if (!player || gender != player->getGender())
             return false;
     }
 
     if (raceMask)
     {
         // not in expected race
-        if (!(raceMask & player->getRaceMask()))
+        if (!player || !(raceMask & player->getRaceMask()))
             return false;
     }
 
-    if(areaId)
+    if (areaId)
     {
         // not in expected zone
-        if(newZone!=areaId && newArea!=areaId)
+        if (newZone != areaId && newArea != areaId)
             return false;
     }
 
-    if(questStart)
+    if (questStart)
     {
         // not in expected required quest state
-        if(!player || (!questStartCanActive || !player->IsActiveQuest(questStart)) && !player->GetQuestRewardStatus(questStart))
+        if (!player || (!questStartCanActive || !player->IsActiveQuest(questStart)) && !player->GetQuestRewardStatus(questStart))
             return false;
     }
 
-    if(questEnd)
+    if (questEnd)
     {
         // not in expected forbidden quest state
-        if(!player || player->GetQuestRewardStatus(questEnd))
+        if (!player || player->GetQuestRewardStatus(questEnd))
             return false;
     }
 
-    if(auraSpell)
+    if (auraSpell)
     {
         // not have expected aura
-        if(!player)
+        if (!player)
             return false;
-        if(auraSpell > 0)
+        if (auraSpell > 0)
             // have expected aura
             return player->HasAura(auraSpell, EFFECT_INDEX_0);
         else
