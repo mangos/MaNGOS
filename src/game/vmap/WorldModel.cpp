@@ -28,7 +28,6 @@ template<> struct BoundsTrait<VMAP::GroupModel>
     static void getBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
 };
 
-
 namespace VMAP
 {
     bool IntersectTriangle(const MeshTriangle& tri, std::vector<Vector3>::const_iterator points, const G3D::Ray& ray, float& distance)
@@ -42,7 +41,7 @@ namespace VMAP
         const Vector3 p(ray.direction().cross(e2));
         const float a = e1.dot(p);
 
-        if (abs(a) < EPS)
+        if (fabs(a) < EPS)
         {
             // Determinant is ill-conditioned; abort early
             return false;
@@ -508,9 +507,8 @@ namespace VMAP
         if (!wf)
             return false;
 
-        bool result = true;
         uint32 chunkSize, count;
-        result = fwrite(VMAP_MAGIC, 1, 8, wf) == 8;
+        bool result = fwrite(VMAP_MAGIC, 1, 8, wf) == 8;
         if (result && fwrite("WMOD", 1, 4, wf) != 4) result = false;
         chunkSize = sizeof(uint32) + sizeof(uint32);
         if (result && fwrite(&chunkSize, sizeof(uint32), 1, wf) != 1) result = false;
