@@ -1935,3 +1935,22 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/)
         if (!zoneId || itr->getSource()->GetZoneId() == zoneId)
             itr->getSource()->SendDirectMessage(&data);
 }
+
+/**
+ * Function to check if a point is in line of sight from an other point
+ */
+bool Map::IsInLineOfSight(float srcX, float srcY, float srcZ, float destX, float destY, float destZ)
+{
+    VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
+    return vMapManager->isInLineOfSight(GetId(), srcX, srcY, srcZ, destX, destY, destZ);
+}
+
+/**
+ * get the hit position and return true if we hit something
+ * otherwise the result pos will be the dest pos
+ */
+bool Map::GetObjectHitPos(float srcX, float srcY, float srcZ, float destX, float destY, float destZ, float& resX, float &resY, float& resZ, float pModifyDist)
+{
+    VMAP::IVMapManager* vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
+    return vMapManager->getObjectHitPos(GetId(), srcX, srcY, srcZ, destX, destY, destZ, resX, resY, resZ, pModifyDist);
+}
