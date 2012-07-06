@@ -141,7 +141,7 @@ void BattleGroundEY::CheckSomeoneJoinedPoint()
                 ++j;
                 continue;
             }
-            if (plr->CanCaptureTowerPoint() &&
+            if (plr->CanUseCapturePoint() &&
                 plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
             {
                 //player joined point!
@@ -180,7 +180,7 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
                 ++j;
                 continue;
             }
-            if (!plr->CanCaptureTowerPoint() ||
+            if (!plr->CanUseCapturePoint() ||
                 !plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
                 //move player out of point (add him to players that are out of points
             {

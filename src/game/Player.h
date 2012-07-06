@@ -2145,7 +2145,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool GetBGAccessByLevel(BattleGroundTypeId bgTypeId) const;
         bool CanUseBattleGroundObject();
         bool isTotalImmune();
-        bool CanCaptureTowerPoint();
+        bool CanUseCapturePoint();
+
+        /*********************************************************/
+        /***                 WORLD PVP SYSTEM                  ***/
+        /*********************************************************/
+
+        // returns true if the player is in active state for outdoor pvp objective capturing
+        bool CanUseOutdoorCapturePoint();
 
         /*********************************************************/
         /***                    REST SYSTEM                    ***/
