@@ -310,7 +310,7 @@ struct GameObjectInfo
             uint32 radius;                                  //0
             uint32 spell;                                   //1
             uint32 worldState1;                             //2
-            uint32 worldstate2;                             //3
+            uint32 worldState2;                             //3
             uint32 winEventID1;                             //4
             uint32 winEventID2;                             //5
             uint32 contestedEventID1;                       //6
@@ -320,7 +320,7 @@ struct GameObjectInfo
             uint32 neutralEventID1;                         //10
             uint32 neutralEventID2;                         //11
             uint32 neutralPercent;                          //12
-            uint32 worldstate3;                             //13
+            uint32 worldState3;                             //13
             uint32 minSuperiority;                          //14
             uint32 maxSuperiority;                          //15
             uint32 minTime;                                 //16
@@ -595,6 +595,34 @@ enum LootState
     GO_JUST_DEACTIVATED
 };
 
+// TODO: Move this somewhere else
+enum WorldStateType
+{
+    WORLD_STATE_REMOVE              = 0,
+    WORLD_STATE_ADD                 = 1
+};
+
+enum CapturePointState
+{
+    CAPTURE_STATE_NEUTRAL = 0,
+    CAPTURE_STATE_PROGRESS_ALLIANCE,
+    CAPTURE_STATE_PROGRESS_HORDE,
+    CAPTURE_STATE_CONTEST_ALLIANCE,
+    CAPTURE_STATE_CONTEST_HORDE,
+    CAPTURE_STATE_WIN_ALLIANCE,
+    CAPTURE_STATE_WIN_HORDE
+};
+
+enum CapturePointSlider
+{
+    CAPTURE_SLIDER_ALLIANCE         = 100,                  // full alliance
+    CAPTURE_SLIDER_HORDE            = 0,                    // full horde
+    CAPTURE_SLIDER_NEUTRAL          = 50,                   // middle
+
+    CAPTURE_SLIDER_ALLIANCE_LOCKED  = -1,                   // used to store additional information
+    CAPTURE_SLIDER_HORDE_LOCKED     = -2
+};
+
 class Unit;
 struct GameObjectDisplayInfoEntry;
 
@@ -749,6 +777,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         GameObject* LookupFishingHoleAround(float range);
 
+        void SetCapturePointSlider(int8 value);
+
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
 
     protected:
@@ -759,6 +789,10 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool        m_spawnedByDefault;
         time_t      m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
                                                             // For traps/goober this: spell casting cooldown, for doors/buttons: reset time.
+
+        uint32      m_captureTimer;                         // (msecs) timer used for capture points
+        float       m_captureSlider;
+        CapturePointState m_captureState;
 
         GuidSet m_SkillupSet;                               // players that already have skill-up at GO use
 
@@ -782,6 +816,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);
+        void TickCapturePoint();
 
         GridReference<GameObject> m_gridRef;
 };
