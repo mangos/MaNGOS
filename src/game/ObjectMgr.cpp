@@ -5937,6 +5937,18 @@ inline void CheckGOConsumable(GameObjectInfo const* goInfo,uint32 dataN,uint32 N
         goInfo->id,goInfo->type,N,dataN);
 }
 
+inline void CheckAndFixGOCaptureMinTime(GameObjectInfo const* goInfo, uint32 const& dataN, uint32 N)
+{
+    if (dataN > 0)
+        return;
+
+    sLog.outErrorDb("Gameobject (Entry: %u GoType: %u) has data%d=%u but minTime field value must be > 0.",
+        goInfo->id, goInfo->type, N, dataN);
+
+    // prevent division through 0 exception
+    const_cast<uint32&>(dataN) = 1;
+}
+
 void ObjectMgr::LoadGameobjectInfo()
 {
     SQLGameObjectLoader loader;
@@ -6097,6 +6109,11 @@ void ObjectMgr::LoadGameobjectInfo()
                 if (goInfo->flagdrop.lockId)
                     CheckGOLockId(goInfo,goInfo->flagdrop.lockId,0);
                 CheckGONoDamageImmuneId(goInfo,goInfo->flagdrop.noDamageImmune,3);
+                break;
+            }
+            case GAMEOBJECT_TYPE_CAPTURE_POINT:             //29
+            {
+                CheckAndFixGOCaptureMinTime(goInfo, goInfo->capturePoint.minTime, 16);
                 break;
             }
             case GAMEOBJECT_TYPE_BARBER_CHAIR:              //32
