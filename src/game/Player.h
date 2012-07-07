@@ -870,6 +870,13 @@ struct InstancePlayerBind
     InstancePlayerBind() : state(NULL), perm(false) {}
 };
 
+enum PlayerRestState
+{
+    REST_STATE_RESTED       = 0x01,
+    REST_STATE_NORMAL       = 0x02,
+    REST_STATE_RAF_LINKED   = 0x04                          // Exact use unknown
+};
+
 class MANGOS_DLL_SPEC PlayerTaxi
 {
     public:
