@@ -25,17 +25,28 @@
 #include "movement/MoveSpline.h"
 
 template<>
-void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
+RandomMovementGenerator<Creature>::RandomMovementGenerator(const Creature & creature)
 {
     float respX, respY, respZ, respO, wander_distance;
     creature.GetRespawnCoord(respX, respY, respZ, &respO, &wander_distance);
+    i_nextMoveTime = ShortTimeTracker(0);
+    i_x = respX;
+    i_y = respY;
+    i_z = respZ;
+    i_radius = wander_distance;
+    // TODO - add support for flying mobs using some distance
+    i_verticalZ = 0.0f;
+}
 
+template<>
+void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
+{
     const float angle = rand_norm_f() * (M_PI_F*2.0f);
-    const float range = rand_norm_f() * wander_distance;
+    const float range = rand_norm_f() * i_radius;
 
-    float destX = respX + range * cos(angle);
-    float destY = respY + range * sin(angle);
-    float destZ = creature.GetPositionZ();
+    float destX = i_x + range * cos(angle);
+    float destY = i_y + range * sin(angle);
+    float destZ = i_z + frand(-1,1) * i_verticalZ;
     creature.UpdateAllowedPositionZ(destX, destY, destZ);
 
     creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
@@ -97,18 +108,5 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
         if (i_nextMoveTime.Passed())
             _setRandomLocation(creature);
     }
-    return true;
-}
-
-template<>
-bool RandomMovementGenerator<Creature>::GetResetPosition(Creature& c, float& x, float& y, float& z)
-{
-    float radius;
-    c.GetRespawnCoord(x, y, z, NULL, &radius);
-
-    // use current if in range
-    if (c.IsWithinDist2d(x,y,radius))
-        c.GetPosition(x,y,z);
-
     return true;
 }

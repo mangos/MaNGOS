@@ -1477,7 +1477,15 @@ void ScriptAction::HandleScriptStep()
                     ((Creature*)pSource)->GetMotionMaster()->MoveIdle();
                     break;
                 case RANDOM_MOTION_TYPE:
-                    ((Creature*)pSource)->GetMotionMaster()->MoveRandom();
+                    if (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL)
+                        ((Creature*)pSource)->GetMotionMaster()->MoveRandomAroundPoint(pSource->GetPositionX(), pSource->GetPositionY(), pSource->GetPositionZ(), float(m_script->movement.wanderDistance));
+                    else
+                    {
+                        float respX, respY, respZ, respO, wander_distance;
+                        ((Creature*)pSource)->GetRespawnCoord(respX, respY, respZ, &respO, &wander_distance);
+                        wander_distance = m_script->movement.wanderDistance ? m_script->movement.wanderDistance : wander_distance;
+                        ((Creature*)pSource)->GetMotionMaster()->MoveRandomAroundPoint(respX, respY, respZ, wander_distance);
+                    }
                     break;
                 case WAYPOINT_MOTION_TYPE:
                     ((Creature*)pSource)->GetMotionMaster()->MoveWaypoint();

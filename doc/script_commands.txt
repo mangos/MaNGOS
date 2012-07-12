@@ -220,6 +220,8 @@ Where "A  ->  B" means that the command is executed from A with B as target.
 
 20 SCRIPT_COMMAND_MOVEMENT                  resultingSource = Creature
                                             * datalong = MovementType (0:idle, 1:random or 2:waypoint)
+                                            * datalong2 = wanderDistance (for random movement)
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: RandomMovement around current position
 
 21 SCRIPT_COMMAND_SET_ACTIVEOBJECT          resultingSource = Creature
                                             * datalong=bool 0=off, 1=on

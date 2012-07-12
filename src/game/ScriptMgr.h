@@ -70,7 +70,8 @@ enum ScriptCommand                                          // resSource, resTar
     SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source or target must be player, datalong = item entry, datalong2 = amount
     SCRIPT_COMMAND_DESPAWN_SELF             = 18,           // resSource = Creature, datalong = despawn delay
     SCRIPT_COMMAND_PLAY_MOVIE               = 19,           // target can only be a player, datalog = movie id
-    SCRIPT_COMMAND_MOVEMENT                 = 20,           // resSource = Creature. datalong = MovementType (0:idle, 1:random or 2:waypoint)
+    SCRIPT_COMMAND_MOVEMENT                 = 20,           // resSource = Creature. datalong = MovementType (0:idle, 1:random or 2:waypoint), datalong2 = wander-distance
+                                                            // data_flags &  SCRIPT_FLAG_COMMAND_ADDITIONAL = Random-movement around current position
     SCRIPT_COMMAND_SET_ACTIVEOBJECT         = 21,           // resSource = Creature
                                                             // datalong=bool 0=off, 1=on
     SCRIPT_COMMAND_SET_FACTION              = 22,           // resSource = Creature
@@ -228,7 +229,7 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_MOVEMENT (20)
         {
             uint32 movementType;                            // datalong
-            uint32 empty;                                   // datalong2
+            uint32 wanderDistance;                          // datalong2
         } movement;
 
         struct                                              // SCRIPT_COMMAND_SET_ACTIVEOBJECT (21)
@@ -346,6 +347,7 @@ struct ScriptInfo
             case SCRIPT_COMMAND_MOVE_TO:
             case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
             case SCRIPT_COMMAND_CAST_SPELL:
+            case SCRIPT_COMMAND_MOVEMENT:
             case SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL:
             case SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL:
                 return true;
