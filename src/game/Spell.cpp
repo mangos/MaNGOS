@@ -2872,6 +2872,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
                 case SPELL_EFFECT_CREATE_ITEM:
+                case SPELL_EFFECT_WEAPON:
                 case SPELL_EFFECT_TRIGGER_SPELL:
                 case SPELL_EFFECT_TRIGGER_MISSILE:
                 case SPELL_EFFECT_LEARN_SPELL:
