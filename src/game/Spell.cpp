@@ -2308,9 +2308,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         case TARGET_CASTER_COORDINATES:
         {
-            // Check original caster is GO - set its coordinates as dst cast
+            // Check original caster is GO - set its coordinates as src cast
             if (WorldObject *caster = GetCastingObject())
-                m_targets.setDestination(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+                m_targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
             break;
         }
         case TARGET_ALL_HOSTILE_UNITS_AROUND_CASTER:
@@ -2673,19 +2673,17 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         }
         case TARGET_TABLE_X_Y_Z_COORDINATES:
         {
-            SpellTargetPosition const* st = sSpellMgr.GetSpellTargetPosition(m_spellInfo->Id);
-            if(st)
+            if (SpellTargetPosition const* st = sSpellMgr.GetSpellTargetPosition(m_spellInfo->Id))
             {
-                // teleport spells are handled in another way
-                if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TELEPORT_UNITS)
-                    break;
-                if (st->target_mapId == m_caster->GetMapId())
-                    m_targets.setDestination(st->target_X, st->target_Y, st->target_Z);
-                else
-                    sLog.outError( "SPELL: wrong map (%u instead %u) target coordinates for spell ID %u", st->target_mapId, m_caster->GetMapId(), m_spellInfo->Id );
+                m_targets.setDestination(st->target_X, st->target_Y, st->target_Z);
+                // TODO - maybe use an (internal) value for the map for neat far teleport handling
+
+                // far-teleport spells are handled in SpellEffect, elsewise report an error about an unexpected map (spells are always locally)
+                if (st->target_mapId != m_caster->GetMapId() && m_spellInfo->Effect[effIndex] != SPELL_EFFECT_TELEPORT_UNITS)
+                    sLog.outError( "SPELL: wrong map (%u instead %u) target coordinates for spell ID %u", st->target_mapId, m_caster->GetMapId(), m_spellInfo->Id);
             }
             else
-                sLog.outError( "SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id );
+                sLog.outError("SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id);
             break;
         }
         case TARGET_INFRONT_OF_VICTIM:

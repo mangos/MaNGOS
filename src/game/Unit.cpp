@@ -1124,6 +1124,13 @@ void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, 
 
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
+
+    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
+    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        if (WorldObject* caster = spell->GetCastingObject())
+            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+
     spell->m_CastItem = castItem;
     spell->prepare(&targets, triggeredByAura);
 }
@@ -1180,6 +1187,13 @@ void Unit::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 cons
     SpellCastTargets targets;
     targets.setUnitTarget( Victim );
     spell->m_CastItem = castItem;
+
+    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
+    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        if (WorldObject* caster = spell->GetCastingObject())
+            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+
     spell->prepare(&targets, triggeredByAura);
 }
 
@@ -1226,7 +1240,16 @@ void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, boo
     Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy);
 
     SpellCastTargets targets;
-    targets.setDestination(x, y, z);
+
+    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(x, y, z);
+    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        targets.setSource(x, y, z);
+
+    // Spell cast with x,y,z but without dbc target-mask, set destination
+    if (!(targets.m_targetMask & (TARGET_FLAG_DEST_LOCATION | TARGET_FLAG_SOURCE_LOCATION)))
+        targets.setDestination(x, y, z);
+
     spell->m_CastItem = castItem;
     spell->prepare(&targets, triggeredByAura);
 }
