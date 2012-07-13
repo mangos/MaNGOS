@@ -1299,6 +1299,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 33923:                                 // Sonic Boom
+                case 38796:                                 // Sonic Boom (heroic)
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, m_spellInfo->Id == 33923 ? 33666 : 38795, true);
+                    return;
+                }
                 case 35745:                                 // Socrethar's Stone
                 {
                     uint32 spell_id;
