@@ -4772,7 +4772,10 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
         ItemPrototype const* proto = m_CastItem->GetProto();
         if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
             if (uint16 engineeringSkill = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING))
+            {
                 level = engineeringSkill / 5;
+                amount = 1;                                 // TODO HACK (needs a neat way of doing)
+            }
     }
 
     CreatureSummonPositions summonPositions;
