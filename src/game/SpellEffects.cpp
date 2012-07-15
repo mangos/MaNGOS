@@ -8518,8 +8518,8 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
     uint32 gameobject_id = m_spellInfo->EffectMiscValue[eff_idx];
 
     Map* map = m_caster->GetMap();
-    float x = m_caster->GetPositionX() + unitTarget->GetPositionX() * 0.5f;
-    float y = m_caster->GetPositionY() + unitTarget->GetPositionY() * 0.5f;
+    float x = (m_caster->GetPositionX() + unitTarget->GetPositionX()) * 0.5f;
+    float y = (m_caster->GetPositionY() + unitTarget->GetPositionY()) * 0.5f;
     float z = m_caster->GetPositionZ();
     m_caster->UpdateAllowedPositionZ(x, y, z);
     if (!pGameObj->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map, m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation()))
