@@ -38,6 +38,7 @@
 #include "Util.h"
 #include "ArenaTeam.h"
 #include "Language.h"
+#include "SpellMgr.h"
 
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
@@ -792,7 +793,12 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         SendNotification(LANG_GM_ON);
 
     if (!pCurrChar->isGMVisible())
+    {
         SendNotification(LANG_INVISIBLE_INVISIBLE);
+        SpellEntry const* invisibleAuraInfo = sSpellStore.LookupEntry(sWorld.getConfig(CONFIG_UINT32_GM_INVISIBLE_AURA));
+        if (!invisibleAuraInfo || !IsSpellAppliesAura(invisibleAuraInfo))
+            pCurrChar->CastSpell(pCurrChar, invisibleAuraInfo, true);
+    }
 
     std::string IP_str = GetRemoteAddress();
     sLog.outChar("Account: %d (IP: %s) Login Character:[%s] (guid: %u)",

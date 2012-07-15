@@ -33,6 +33,7 @@
 #include "MapPersistentStateMgr.h"
 #include "Mail.h"
 #include "Util.h"
+#include "SpellMgr.h"
 #ifdef _DEBUG_VMAPS
 #include "VMapFactory.h"
 #endif
@@ -231,15 +232,24 @@ bool ChatHandler::HandleGMVisibleCommand(char* args)
         return false;
     }
 
+    Player* player = m_session->GetPlayer();
+    SpellEntry const* invisibleAuraInfo = sSpellStore.LookupEntry(sWorld.getConfig(CONFIG_UINT32_GM_INVISIBLE_AURA));
+    if (!invisibleAuraInfo || !IsSpellAppliesAura(invisibleAuraInfo))
+        invisibleAuraInfo = NULL;
+
     if (value)
     {
-        m_session->GetPlayer()->SetGMVisible(true);
+        player->SetGMVisible(true);
         m_session->SendNotification(LANG_INVISIBLE_VISIBLE);
+        if (invisibleAuraInfo)
+            player->RemoveAurasDueToSpell(invisibleAuraInfo->Id);
     }
     else
     {
         m_session->SendNotification(LANG_INVISIBLE_INVISIBLE);
-        m_session->GetPlayer()->SetGMVisible(false);
+        player->SetGMVisible(false);
+        if (invisibleAuraInfo)
+            player->CastSpell(player, invisibleAuraInfo, true);
     }
 
     return true;
