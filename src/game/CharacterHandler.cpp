@@ -796,7 +796,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     {
         SendNotification(LANG_INVISIBLE_INVISIBLE);
         SpellEntry const* invisibleAuraInfo = sSpellStore.LookupEntry(sWorld.getConfig(CONFIG_UINT32_GM_INVISIBLE_AURA));
-        if (!invisibleAuraInfo || !IsSpellAppliesAura(invisibleAuraInfo))
+        if (invisibleAuraInfo && IsSpellAppliesAura(invisibleAuraInfo))
             pCurrChar->CastSpell(pCurrChar, invisibleAuraInfo, true);
     }
 
