@@ -1010,6 +1010,20 @@ void Unit::JustKilledCreature(Creature* victim)
             ((Player*)this)->KilledMonster(normalInfo, victim->GetObjectGuid());
     }
 
+    // Interrupt channeling spell when a Possessed Summoned is killed
+    SpellEntry const* spellInfo = sSpellStore.LookupEntry(victim->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+    if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR_EX_FARSIGHT) && spellInfo->HasAttribute(SPELL_ATTR_EX_CHANNELED_1))
+    {
+        Unit* creator = GetMap()->GetUnit(victim->GetCreatorGuid());
+        if (creator && creator->GetCharmGuid() == victim->GetObjectGuid())
+        {
+            Spell* channeledSpell = creator->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+            if (channeledSpell && channeledSpell->m_spellInfo->Id == spellInfo->Id)
+                creator->InterruptNonMeleeSpells(false);
+        }
+    }
+    
+    /* ******************************* Inform various hooks ************************************ */
     // Inform victim's AI
     if (victim->AI())
         victim->AI()->JustDied(this);
@@ -3676,7 +3690,6 @@ void Unit::FinishSpell(CurrentSpellTypes spellType, bool ok /*= true*/)
 
     spell->finish(ok);
 }
-
 
 bool Unit::IsNonMeleeSpellCasted(bool withDelayed, bool skipChanneled, bool skipAutorepeat) const
 {
