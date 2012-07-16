@@ -4911,9 +4911,9 @@ void Spell::EffectSummonType(SpellEffectIndex eff_idx)
         }
         case SUMMON_PROP_GROUP_CONTROLLABLE:
         {
-            // no type here
-            // maybe wrong - but thats the handler currently used for those
-            summonResult = DoSummonGuardian(summonPositions, summon_prop, eff_idx, level);
+            // TODO: Fix spell 46619
+            if (m_spellInfo->Id != 46619)
+                summonResult = DoSummonPossessed(summonPositions, summon_prop, eff_idx, level);
             break;
         }
         case SUMMON_PROP_GROUP_VEHICLE:
@@ -5206,6 +5206,64 @@ bool Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
     pTotem->Summon(m_caster);
 
     return false;
+}
+
+bool Spell::DoSummonPossessed(CreatureSummonPositions& list, SummonPropertiesEntry const* prop, SpellEffectIndex effIdx, uint32 level)
+{
+    MANGOS_ASSERT(!list.empty() && prop);
+
+    uint32 creatureEntry = m_spellInfo->EffectMiscValue[effIdx];
+    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creatureEntry);
+    if (!cInfo)
+    {
+        sLog.outErrorDb("Spell::DoSummonPossessed: creature entry %u not found for spell %u.", creatureEntry, m_spellInfo->Id);
+        return false;
+    }
+
+    Creature* spawnCreature = m_caster->SummonCreature(creatureEntry, list[0].x, list[0].y, list[0].z, m_caster->GetOrientation(), TEMPSUMMON_CORPSE_DESPAWN, 0);
+    if (!spawnCreature)
+    {
+        sLog.outError("Spell::DoSummonPossessed: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
+        return false;
+    }
+
+    list[0].creature = spawnCreature;
+
+    // Changes to be sent
+    spawnCreature->SetCharmerGuid(m_caster->GetObjectGuid());
+    spawnCreature->SetCreatorGuid(m_caster->GetObjectGuid());
+    spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
+    spawnCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+    spawnCreature->SetLevel(level);
+
+    spawnCreature->SetWalk(m_caster->IsWalking());
+    // TODO: Set Fly (ie glyph dependend)
+
+    // Internal changes
+    spawnCreature->addUnitState(UNIT_STAT_CONTROLLED);
+
+    // Changes to owner
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        Player* player = (Player*)m_caster;
+
+        player->GetCamera().SetView(spawnCreature);
+
+        player->SetCharm(spawnCreature);
+        player->SetClientControl(spawnCreature, 1);
+        player->SetMover(spawnCreature);
+
+        if (CharmInfo* charmInfo = spawnCreature->InitCharmInfo(spawnCreature))
+            charmInfo->InitPossessCreateSpells();
+        player->PossessSpellInitialize();
+    }
+
+    // Notify Summoner
+    if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_originalCaster)->AI())
+        ((Creature*)m_originalCaster)->AI()->JustSummoned(spawnCreature);
+
+    return true;
 }
 
 bool Spell::DoSummonPet(SpellEffectIndex eff_idx)
