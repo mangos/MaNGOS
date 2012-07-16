@@ -1021,8 +1021,8 @@ struct CharmInfo
         CharmSpellEntry* GetCharmSpell(uint8 index) { return &(m_charmspells[index]); }
 
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-    private:
 
+    private:
         Unit* m_unit;
         UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
         CharmSpellEntry m_charmspells[CREATURE_MAX_SPELLS];
@@ -1971,6 +1971,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Unit* _GetTotem(TotemSlot slot) const;              // for templated function without include need
         Pet* _GetPet(ObjectGuid guid) const;                // for templated function without include need
+
+        void JustKilledCreature(Creature* victim);          // Wrapper called by DealDamage when a creature is killed
 
         uint32 m_state;                                     // Even derived shouldn't modify
         uint32 m_CombatTimer;

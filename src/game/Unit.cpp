@@ -561,26 +561,14 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // If (this) is TYPEID_PLAYER, (this) will enter combat w/victim, but after some time, automatically leave combat.
         // It is unclear how it should work for other cases.
 
-        ((Creature*)pVictim)->SetLootRecipient(this);
+        DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage critter, critter dies");
 
         pVictim->SetDeathState(JUST_DIED);
         pVictim->SetHealth(0);
 
-        // allow loot only if has loot_id in creature_template
-        ((Creature*)pVictim)->PrepareBodyLootState();
-        ((Creature*)pVictim)->AllLootRemovedFromCorpse();
+        ((Creature*)pVictim)->SetLootRecipient(this);
 
-        // some critters required for quests (need normal entry instead possible heroic in any cases)
-        if (GetTypeId() == TYPEID_PLAYER)
-        {
-            if (CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(pVictim->GetEntry()))
-                ((Player*)this)->KilledMonster(normalInfo, pVictim->GetObjectGuid());
-        }
-
-        if (InstanceData* mapInstance = pVictim->GetInstanceData())
-            mapInstance->OnCreatureDeath(((Creature*)pVictim));
-
-        DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage critter, critter dies");
+        JustKilledCreature((Creature*)pVictim);
 
         return damage;
     }
@@ -676,9 +664,6 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         // for loot will be sued only if group_tap==NULL
         Player *player_tap = GetCharmerOrOwnerPlayerOrPlayerItself();
         Group *group_tap = NULL;
-
-        // find owner of pVictim, used for creature cases, AI calls
-        Unit* pOwner = pVictim->GetCharmerOrOwner();
 
         // in creature kill case group/player tap stored for creature
         if (pVictim->GetTypeId() == TYPEID_UNIT)
@@ -814,70 +799,8 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         }
         else                                                // creature died
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"DealDamageNotPlayer");
-            Creature *cVictim = (Creature*)pVictim;
-
-            if(!cVictim->IsPet())
-            {
-                cVictim->DeleteThreatList();
-                // only lootable if it has loot or can drop gold
-                cVictim->PrepareBodyLootState();
-                // may have no loot, so update death timer if allowed
-                cVictim->AllLootRemovedFromCorpse();
-            }
-
-            // Call creature just died function
-            if (cVictim->AI())
-                cVictim->AI()->JustDied(this);
-
-            if (cVictim->IsTemporarySummon())
-            {
-                TemporarySummon* pSummon = (TemporarySummon*)cVictim;
-                if (pSummon->GetSummonerGuid().IsCreatureOrVehicle())
-                    if(Creature* pSummoner = cVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
-                        if (pSummoner->AI())
-                            pSummoner->AI()->SummonedCreatureJustDied(cVictim);
-            }
-            else if (pOwner && pOwner->GetTypeId() == TYPEID_UNIT)
-            {
-                if (((Creature*)pOwner)->AI())
-                    ((Creature*)pOwner)->AI()->SummonedCreatureJustDied(cVictim);
-            }
-
-            if (InstanceData* mapInstance = cVictim->GetInstanceData())
-                mapInstance->OnCreatureDeath(cVictim);
-
-            if (cVictim->IsLinkingEventTrigger())
-                cVictim->GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_DIE, cVictim);
-
-            // Dungeon specific stuff, only applies to players killing creatures
-            if(cVictim->GetInstanceId())
-            {
-                Map *m = cVictim->GetMap();
-                Player *creditedPlayer = GetCharmerOrOwnerPlayerOrPlayerItself();
-                // TODO: do instance binding anyway if the charmer/owner is offline
-
-                if(m->IsDungeon() && creditedPlayer)
-                {
-                    if (m->IsRaidOrHeroicDungeon())
-                    {
-                        if(cVictim->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
-                            ((DungeonMap *)m)->PermBindAllPlayers(creditedPlayer);
-                    }
-                    else
-                    {
-                        DungeonPersistentState* save = ((DungeonMap*)m)->GetPersistanceState();
-                        // the reset time is set but not added to the scheduler
-                        // until the players leave the instance
-                        time_t resettime = cVictim->GetRespawnTimeEx() + 2 * HOUR;
-                        if (save->GetResetTime() < resettime)
-                            save->SetResetTime(resettime);
-                    }
-
-                    // update encounter state if needed
-                    ((DungeonMap*)m)->GetPersistanceState()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, ((Creature*)cVictim)->GetEntry());
-                }
-            }
+            DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE,"DealDamage Killed NPC");
+            JustKilledCreature((Creature*)pVictim);
         }
 
         // last damage from non duel opponent or opponent controlled creature
@@ -1068,6 +991,81 @@ struct PetOwnerKilledUnitHelper
 
     Unit* m_victim;
 };
+
+void Unit::JustKilledCreature(Creature* victim)
+{
+    if (!victim->IsPet())                                   // Prepare loot if can
+    {
+        victim->DeleteThreatList();
+        // only lootable if it has loot or can drop gold
+        victim->PrepareBodyLootState();
+        // may have no loot, so update death timer if allowed
+        victim->AllLootRemovedFromCorpse();
+    }
+
+    // some critters required for quests (need normal entry instead possible heroic in any cases)
+    if (victim->GetCreatureType() == CREATURE_TYPE_CRITTER && GetTypeId() == TYPEID_PLAYER)
+    {
+        if (CreatureInfo const* normalInfo =  sCreatureStorage.LookupEntry<CreatureInfo>(victim->GetEntry()))
+            ((Player*)this)->KilledMonster(normalInfo, victim->GetObjectGuid());
+    }
+
+    // Inform victim's AI
+    if (victim->AI())
+        victim->AI()->JustDied(this);
+
+    // Inform Owner
+    Unit* pOwner = victim->GetCharmerOrOwner();
+    if (victim->IsTemporarySummon())
+    {
+        TemporarySummon* pSummon = (TemporarySummon*)victim;
+        if (pSummon->GetSummonerGuid().IsCreatureOrVehicle())
+            if(Creature* pSummoner = victim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
+                if (pSummoner->AI())
+                    pSummoner->AI()->SummonedCreatureJustDied(victim);
+    }
+    else if (pOwner && pOwner->GetTypeId() == TYPEID_UNIT)
+    {
+        if (((Creature*)pOwner)->AI())
+            ((Creature*)pOwner)->AI()->SummonedCreatureJustDied(victim);
+    }
+
+    // Inform Instance Data and Linking
+    if (InstanceData* mapInstance = victim->GetInstanceData())
+        mapInstance->OnCreatureDeath(victim);
+
+    if (victim->IsLinkingEventTrigger())
+        victim->GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_DIE, victim);
+
+    // Dungeon specific stuff
+    if (victim->GetInstanceId())
+    {
+        Map* m = victim->GetMap();
+        Player* creditedPlayer = GetCharmerOrOwnerPlayerOrPlayerItself();
+        // TODO: do instance binding anyway if the charmer/owner is offline
+
+        if (m->IsDungeon() && creditedPlayer)
+        {
+            if (m->IsRaidOrHeroicDungeon())
+            {
+                if (victim->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+                    ((DungeonMap*)m)->PermBindAllPlayers(creditedPlayer);
+            }
+            else
+            {
+                DungeonPersistentState* save = ((DungeonMap*)m)->GetPersistanceState();
+                // the reset time is set but not added to the scheduler
+                // until the players leave the instance
+                time_t resettime = victim->GetRespawnTimeEx() + 2 * HOUR;
+                if (save->GetResetTime() < resettime)
+                    save->SetResetTime(resettime);
+            }
+
+            // update encounter state if needed
+            ((DungeonMap*)m)->GetPersistanceState()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, victim->GetEntry());
+        }
+    }
+}
 
 void Unit::PetOwnerKilledUnit(Unit* pVictim)
 {
