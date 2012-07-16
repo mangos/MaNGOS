@@ -1620,6 +1620,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 64531:                                 // Rapid Burst (h)
                 case 65121:                                 // Searing Light (h)
                 case 65301:                                 // Psychosis (Ulduar, Yogg-Saron)
+                case 65872:                                 // Pursuing Spikes
                 case 65950:                                 // Touch of Light (ToCrusader, Val'kyr Twins)
                 case 66001:                                 // Touch of Darkness (ToCrusader, Val'kyr Twins)
                 case 66152:                                 // Bullet Controller Summon Periodic Trigger Light (ToCrusader)
