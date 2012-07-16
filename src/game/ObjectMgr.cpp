@@ -5267,7 +5267,7 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        if (team != TEAM_NONE && team != HORDE && team != ALLIANCE)
+        if (team != TEAM_BOTH_ALLOWED && team != HORDE && team != ALLIANCE)
         {
             sLog.outErrorDb("Table `game_graveyard_zone` has record for non player faction (%u), skipped.", team);
             continue;
@@ -5286,7 +5286,7 @@ void ObjectMgr::LoadGraveyardZones()
 WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team)
 {
     // search for zone associated closest graveyard
-    uint32 zoneId = sTerrainMgr.GetZoneId(MapId,x,y,z);
+    uint32 zoneId = sTerrainMgr.GetZoneId(MapId, x, y, z);
 
     // Simulate std. algorithm:
     //   found some graveyard associated to (ghost_zone,ghost_map)
@@ -5322,16 +5322,13 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
     {
         GraveYardData const& data = itr->second;
 
+        // Checked on load
         WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(data.safeLocId);
-        if(!entry)
-        {
-            sLog.outErrorDb("Table `game_graveyard_zone` has record for not existing graveyard (WorldSafeLocs.dbc id) %u, skipped.",data.safeLocId);
-            continue;
-        }
 
         // skip enemy faction graveyard
-        // team == 0 case can be at call from .neargrave
-        if (data.team != TEAM_NONE && team != TEAM_NONE && data.team != team)
+        // team == TEAM_BOTH_ALLOWED case can be at call from .neargrave
+        // TEAM_INVALID != team for all teams
+        if (data.team != TEAM_BOTH_ALLOWED && data.team != team && team != TEAM_BOTH_ALLOWED)
             continue;
 
         // find now nearest graveyard at other (continent) map
@@ -5411,7 +5408,7 @@ GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId) cons
 
 bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
 {
-    if(FindGraveYardData(id,zoneId))
+    if (FindGraveYardData(id, zoneId))                      // This ensures that (safeLoc)Id,  zoneId is unique in mGraveYardMap
         return false;
 
     // add link to loaded data
@@ -5419,16 +5416,37 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
     data.safeLocId = id;
     data.team = team;
 
-    mGraveYardMap.insert(GraveYardMap::value_type(zoneId,data));
+    mGraveYardMap.insert(GraveYardMap::value_type(zoneId, data));
 
     // add link to DB
-    if(inDB)
-    {
-        WorldDatabase.PExecuteLog("INSERT INTO game_graveyard_zone ( id,ghost_zone,faction) "
-            "VALUES ('%u', '%u','%u')", id, zoneId, uint32(team));
-    }
+    if (inDB)
+        WorldDatabase.PExecuteLog("INSERT INTO game_graveyard_zone ( id,ghost_zone,faction) VALUES ('%u', '%u','%u')", id, zoneId, uint32(team));
 
     return true;
+}
+
+void ObjectMgr::SetGraveYardLinkTeam(uint32 id, uint32 zoneId, Team team)
+{
+    std::pair<GraveYardMap::iterator, GraveYardMap::iterator> bounds = mGraveYardMap.equal_range(zoneId);
+
+    for (GraveYardMap::iterator itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        GraveYardData& data = itr->second;
+
+        // skip not matching safezone id
+        if (data.safeLocId != id)
+            continue;
+
+        data.team = team;                                   // Validate link
+        return;
+    }
+
+    if (team == TEAM_INVALID)
+        return;
+
+    // Link expected but not exist.
+    sLog.outErrorDb("ObjectMgr::SetGraveYardLinkTeam called for safeLoc %u, zoneId &u, but no graveyard link for this found in database.", id, zoneId);
+    AddGraveYardLink(id, zoneId, team);                     // Add to prevent further error message and correct mechanismn
 }
 
 void ObjectMgr::LoadAreaTriggerTeleports()

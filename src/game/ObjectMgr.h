@@ -333,7 +333,7 @@ struct GraveYardData
     uint32 safeLocId;
     Team team;
 };
-typedef std::multimap<uint32, GraveYardData> GraveYardMap;
+typedef std::multimap<uint32 /*zoneId*/, GraveYardData> GraveYardMap;
 typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> GraveYardMapBounds;
 
 enum ConditionType
@@ -591,8 +591,9 @@ class ObjectMgr
 
         GossipText const* GetGossipText(uint32 Text_ID) const;
 
-        WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
+        WorldSafeLocsEntry const* GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
         bool AddGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = true);
+        void SetGraveYardLinkTeam(uint32 id, uint32 zoneId, Team team);
         void LoadGraveyardZones();
         GraveYardData const* FindGraveYardData(uint32 id, uint32 zone) const;
 
