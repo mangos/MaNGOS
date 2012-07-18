@@ -27,6 +27,7 @@
 #include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "SQLStorages.h"
 
 #include "revision_nr.h"
 

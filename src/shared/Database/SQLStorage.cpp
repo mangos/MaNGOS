@@ -17,7 +17,6 @@
  */
 
 #include "SQLStorage.h"
-#include "SQLStorageImpl.h"
 
 void SQLStorage::EraseEntry(uint32 id)
 {

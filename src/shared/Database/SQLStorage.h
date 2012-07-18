@@ -124,4 +124,6 @@ struct SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader>
 {
 };
 
+#include "SQLStorageImpl.h"
+
 #endif

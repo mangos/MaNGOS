@@ -17,9 +17,6 @@
  */
 
 #include "SQLStorages.h"
-#include "Database/SQLStorage.h"
-#include "Database/SQLStorageImpl.h"
-#include "Database/DatabaseEnv.h"
 
 const char CreatureInfosrcfmt[]="iiiiiiiiiisssiiiiiiiiiiifffiffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiisiiffliiiiiiiliiiiiis";
 const char CreatureInfodstfmt[]="iiiiiiiiiisssiiiiiiiiiiifffiffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiisiiffliiiiiiiliiiiiii";

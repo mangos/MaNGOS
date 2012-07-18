@@ -32,6 +32,7 @@
 #include "NPCHandler.h"
 #include "Pet.h"
 #include "MapManager.h"
+#include "SQLStorages.h"
 
 void WorldSession::SendNameQueryOpcode(Player *p)
 {
