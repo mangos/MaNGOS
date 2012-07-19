@@ -20,7 +20,7 @@
 
 #include "../../../game/Player.h"
 
-uint32 GetSkillLevel(Player *player,uint32 trskill)
+uint32 GetSkillLevel(Player* player,uint32 trskill)
 {
     // Returns the level of some tradetrskill known by player
     // Need to add missing spells
@@ -32,7 +32,7 @@ uint32 GetSkillLevel(Player *player,uint32 trskill)
     uint32 spell_master       = 0;
     uint32 spell_grand_master = 0;
 
-    switch(trskill)
+    switch (trskill)
     {
         case TRADESKILL_ALCHEMY:
             spell_apprentice   = 2259;

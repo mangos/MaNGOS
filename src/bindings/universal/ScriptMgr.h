@@ -50,32 +50,32 @@ struct Script
     std::string Name;
 
     // -- Quest/gossip Methods to be scripted --
-    bool (*pGossipHello         )(Player *player, Creature *_Creature);
-    bool (*pGOGossipHello       )(Player *player, GameObject *_GO);
-    bool (*pQuestAccept         )(Player *player, Creature *_Creature, Quest const*_Quest );
-    bool (*pGossipSelect        )(Player *player, Creature *_Creature, uint32 sender, uint32 action );
-    bool (*pGOGossipSelect      )(Player *player, GameObject *_GO, uint32 sender, uint32 action );
-    bool (*pGossipSelectWithCode)(Player *player, Creature *_Creature, uint32 sender, uint32 action, const char* sCode );
-    bool (*pGOGossipSelectWithCode)(Player *player, GameObject *_GO, uint32 sender, uint32 action, const char* sCode );
-    bool (*pQuestSelect         )(Player *player, Creature *_Creature, Quest const*_Quest );
-    bool (*pQuestComplete       )(Player *player, Creature *_Creature, Quest const*_Quest );
-    uint32 (*pNPCDialogStatus   )(Player *player, Creature *_Creature );
-    uint32 (*pGODialogStatus    )(Player *player, GameObject * _GO );
-    bool (*pChooseReward        )(Player *player, Creature *_Creature, Quest const*_Quest, uint32 opt );
-    bool (*pItemHello           )(Player *player, Item *_Item, Quest const*_Quest );
-    bool (*pGOHello             )(Player *player, GameObject *_GO );
-    bool (*pAreaTrigger         )(Player *player, AreaTriggerEntry const* at);
-    bool (*pProcessEventId      )(uint32 eventId, Object* source, Object* target, bool isStart);
-    bool (*pItemQuestAccept     )(Player *player, Item *_Item, Quest const*_Quest );
-    bool (*pGOQuestAccept       )(Player *player, GameObject *_GO, Quest const*_Quest );
-    bool (*pGOChooseReward      )(Player *player, GameObject *_GO, Quest const*_Quest, uint32 opt );
-    bool (*pItemUse             )(Player *player, Item* _Item, SpellCastTargets const& targets);
-    bool (*pEffectDummyGameObj  )(Unit*, uint32, SpellEffectIndex, GameObject* );
-    bool (*pEffectDummyCreature )(Unit*, uint32, SpellEffectIndex, Creature* );
-    bool (*pEffectDummyItem     )(Unit*, uint32, SpellEffectIndex, Item* );
-    bool (*pEffectAuraDummy     )(const Aura*, bool);
+    bool (*pGossipHello)(Player* player, Creature* _Creature);
+    bool (*pGOGossipHello)(Player* player, GameObject* _GO);
+    bool (*pQuestAccept)(Player* player, Creature* _Creature, Quest const* _Quest);
+    bool (*pGossipSelect)(Player* player, Creature* _Creature, uint32 sender, uint32 action);
+    bool (*pGOGossipSelect)(Player* player, GameObject* _GO, uint32 sender, uint32 action);
+    bool (*pGossipSelectWithCode)(Player* player, Creature* _Creature, uint32 sender, uint32 action, const char* sCode);
+    bool (*pGOGossipSelectWithCode)(Player* player, GameObject* _GO, uint32 sender, uint32 action, const char* sCode);
+    bool (*pQuestSelect)(Player* player, Creature* _Creature, Quest const* _Quest);
+    bool (*pQuestComplete)(Player* player, Creature* _Creature, Quest const* _Quest);
+    uint32(*pNPCDialogStatus)(Player* player, Creature* _Creature);
+    uint32(*pGODialogStatus)(Player* player, GameObject* _GO);
+    bool (*pChooseReward)(Player* player, Creature* _Creature, Quest const* _Quest, uint32 opt);
+    bool (*pItemHello)(Player* player, Item* _Item, Quest const* _Quest);
+    bool (*pGOHello)(Player* player, GameObject* _GO);
+    bool (*pAreaTrigger)(Player* player, AreaTriggerEntry const* at);
+    bool (*pProcessEventId)(uint32 eventId, Object* source, Object* target, bool isStart);
+    bool (*pItemQuestAccept)(Player* player, Item* _Item, Quest const* _Quest);
+    bool (*pGOQuestAccept)(Player* player, GameObject* _GO, Quest const* _Quest);
+    bool (*pGOChooseReward)(Player* player, GameObject* _GO, Quest const* _Quest, uint32 opt);
+    bool (*pItemUse)(Player* player, Item* _Item, SpellCastTargets const& targets);
+    bool (*pEffectDummyGameObj)(Unit*, uint32, SpellEffectIndex, GameObject*);
+    bool (*pEffectDummyCreature)(Unit*, uint32, SpellEffectIndex, Creature*);
+    bool (*pEffectDummyItem)(Unit*, uint32, SpellEffectIndex, Item*);
+    bool (*pEffectAuraDummy)(const Aura*, bool);
 
-    CreatureAI* (*GetAI)(Creature *_Creature);
+    CreatureAI* (*GetAI)(Creature* _Creature);
     InstanceData* (*GetInstanceData)(Map*);
     // -----------------------------------------
 
@@ -116,7 +116,7 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
         m_creature->CastSpell(victim,spelId,true);
     }
 
-    void DoCastSpell(Unit* who,SpellEntry *spellInfo)
+    void DoCastSpell(Unit* who,SpellEntry* spellInfo)
     {
         m_creature->CastSpell(who,spellInfo,true);
     }
