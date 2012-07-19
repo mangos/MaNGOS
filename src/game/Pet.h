@@ -149,9 +149,9 @@ class MANGOS_DLL_SPEC Pet : public Creature
 
         bool IsPermanentPetFor(Player* owner);              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-        bool Create (uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
         bool CreateBaseAtCreature(Creature* creature);
-        bool LoadPetFromDB( Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false );
+        bool LoadPetFromDB(Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
         void Unsummon(PetSaveMode mode, Unit* owner = NULL);
         static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
@@ -256,7 +256,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
         uint64  m_auraUpdateMask;
         bool    m_loading;
 
-        DeclinedName *m_declinedname;
+        DeclinedName* m_declinedname;
 
     private:
         PetModeFlags m_petModeFlags;

@@ -27,7 +27,7 @@
 
 //----- Point Movement Generator
 template<class T>
-void PointMovementGenerator<T>::Initialize(T &unit)
+void PointMovementGenerator<T>::Initialize(T& unit)
 {
     if (!unit.IsStopped())
         unit.StopMoving();
@@ -39,7 +39,7 @@ void PointMovementGenerator<T>::Initialize(T &unit)
 }
 
 template<class T>
-void PointMovementGenerator<T>::Finalize(T &unit)
+void PointMovementGenerator<T>::Finalize(T& unit)
 {
     unit.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 
@@ -48,13 +48,13 @@ void PointMovementGenerator<T>::Finalize(T &unit)
 }
 
 template<class T>
-void PointMovementGenerator<T>::Interrupt(T &unit)
+void PointMovementGenerator<T>::Interrupt(T& unit)
 {
     unit.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 }
 
 template<class T>
-void PointMovementGenerator<T>::Reset(T &unit)
+void PointMovementGenerator<T>::Reset(T& unit)
 {
     if (!unit.IsStopped())
         unit.StopMoving();
@@ -63,12 +63,12 @@ void PointMovementGenerator<T>::Reset(T &unit)
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
+bool PointMovementGenerator<T>::Update(T& unit, const uint32& diff)
 {
-    if(!&unit)
+    if (!&unit)
         return false;
 
-    if(unit.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (unit.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         unit.clearUnitState(UNIT_STAT_ROAMING_MOVE);
         return true;
@@ -84,7 +84,7 @@ void PointMovementGenerator<Player>::MovementInform(Player&)
 }
 
 template <>
-void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
+void PointMovementGenerator<Creature>::MovementInform(Creature& unit)
 {
     if (unit.AI())
         unit.AI()->MovementInform(POINT_MOTION_TYPE, id);
@@ -93,7 +93,7 @@ void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
     {
         TemporarySummon* pSummon = (TemporarySummon*)(&unit);
         if (pSummon->GetSummonerGuid().IsCreatureOrVehicle())
-            if(Creature* pSummoner = unit.GetMap()->GetCreature(pSummon->GetSummonerGuid()))
+            if (Creature* pSummoner = unit.GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                 if (pSummoner->AI())
                     pSummoner->AI()->SummonedMovementInform(&unit, POINT_MOTION_TYPE, id);
     }
@@ -107,10 +107,10 @@ template void PointMovementGenerator<Player>::Interrupt(Player&);
 template void PointMovementGenerator<Creature>::Interrupt(Creature&);
 template void PointMovementGenerator<Player>::Reset(Player&);
 template void PointMovementGenerator<Creature>::Reset(Creature&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
+template bool PointMovementGenerator<Player>::Update(Player&, const uint32& diff);
+template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32& diff);
 
-void AssistanceMovementGenerator::Finalize(Unit &unit)
+void AssistanceMovementGenerator::Finalize(Unit& unit)
 {
     unit.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
 
@@ -120,12 +120,12 @@ void AssistanceMovementGenerator::Finalize(Unit &unit)
         unit.GetMotionMaster()->MoveSeekAssistanceDistract(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY));
 }
 
-bool EffectMovementGenerator::Update(Unit &unit, const uint32 &)
+bool EffectMovementGenerator::Update(Unit& unit, const uint32&)
 {
     return !unit.movespline->Finalized();
 }
 
-void EffectMovementGenerator::Finalize(Unit &unit)
+void EffectMovementGenerator::Finalize(Unit& unit)
 {
     if (unit.GetTypeId() != TYPEID_UNIT)
         return;
@@ -135,7 +135,7 @@ void EffectMovementGenerator::Finalize(Unit &unit)
     // Need restore previous movement since we have no proper states system
     if (unit.isAlive() && !unit.hasUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_FLEEING))
     {
-        if (Unit * victim = unit.getVictim())
+        if (Unit* victim = unit.getVictim())
             unit.GetMotionMaster()->MoveChase(victim);
         else
             unit.GetMotionMaster()->Initialize();

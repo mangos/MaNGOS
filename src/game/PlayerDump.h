@@ -28,11 +28,11 @@ enum DumpTableType
     DTT_CHARACTER,      //    -> guid, name                 // characters
 
     DTT_CHAR_TABLE,     //                                  // character_account_data, character_achievement,
-                                                            // character_achievement_progress, character_action,
-                                                            // character_aura, character_glyphs,
-                                                            // character_homebind, character_queststatus,
-                                                            // character_reputation, character_skills, character_spell,
-                                                            // character_spell_cooldown, character_talent, character_ticket
+    // character_achievement_progress, character_action,
+    // character_aura, character_glyphs,
+    // character_homebind, character_queststatus,
+    // character_reputation, character_skills, character_spell,
+    // character_spell_cooldown, character_talent, character_ticket
 
     DTT_CHAR_NAME_TABLE,// <- guid, name                    // character_declinedname
 
@@ -41,10 +41,10 @@ enum DumpTableType
     DTT_INVENTORY,      //    -> item guids collection      // character_inventory
 
     DTT_MAIL,           //    -> mail ids collection        // mail
-                        //    -> item_text
+    //    -> item_text
 
     DTT_MAIL_ITEM,      // <- mail ids                      // mail_items
-                        //    -> item guids collection
+    //    -> item guids collection
 
     DTT_ITEM,           // <- item guids                    // item_instance
 
@@ -82,7 +82,7 @@ class PlayerDumpWriter : public PlayerDump
     private:
         typedef std::set<uint32> GUIDs;
 
-        void DumpTableContent(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type);
+        void DumpTableContent(std::string& dump, uint32 guid, char const* tableFrom, char const* tableTo, DumpTableType type);
         std::string GenerateWhereStr(char const* field, GUIDs const& guids, GUIDs::const_iterator& itr);
         std::string GenerateWhereStr(char const* field, uint32 guid);
 

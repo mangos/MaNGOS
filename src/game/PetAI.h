@@ -30,19 +30,19 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 {
     public:
 
-        explicit PetAI(Creature *c);
+        explicit PetAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
+        void MoveInLineOfSight(Unit*);
+        void AttackStart(Unit*);
         void EnterEvadeMode();
         void AttackedBy(Unit*);
-        bool IsVisible(Unit *) const;
+        bool IsVisible(Unit*) const;
 
         void UpdateAI(const uint32);
-        static int Permissible(const Creature *);
+        static int Permissible(const Creature*);
 
     private:
-        bool _isVisible(Unit *) const;
+        bool _isVisible(Unit*) const;
         bool _needToStop(void) const;
         void _stopAttack(void);
 

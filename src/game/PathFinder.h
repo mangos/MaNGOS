@@ -106,16 +106,16 @@ class PathFinder
             m_pathPoints.clear();
         }
 
-        bool inRange(const Vector3 &p1, const Vector3 &p2, float r, float h) const;
-        float dist3DSqr(const Vector3 &p1, const Vector3 &p2) const;
+        bool inRange(const Vector3& p1, const Vector3& p2, float r, float h) const;
+        float dist3DSqr(const Vector3& p1, const Vector3& p2) const;
         bool inRangeYZX(const float* v1, const float* v2, float r, float h) const;
 
-        dtPolyRef getPathPolyByPosition(const dtPolyRef *polyPath, uint32 polyPathSize, const float* point, float *distance = NULL) const;
-        dtPolyRef getPolyByLocation(const float* point, float *distance) const;
-        bool HaveTile(const Vector3 &p) const;
+        dtPolyRef getPathPolyByPosition(const dtPolyRef* polyPath, uint32 polyPathSize, const float* point, float* distance = NULL) const;
+        dtPolyRef getPolyByLocation(const float* point, float* distance) const;
+        bool HaveTile(const Vector3& p) const;
 
-        void BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos);
-        void BuildPointPath(const float *startPoint, const float *endPoint);
+        void BuildPolyPath(const Vector3& startPos, const Vector3& endPos);
+        void BuildPointPath(const float* startPoint, const float* endPoint);
         void BuildShortcut();
 
         NavTerrain getNavTerrain(float x, float y, float z);
@@ -129,8 +129,8 @@ class PathFinder
                             const dtPolyRef* path, uint32 pathSize, float* steerPos,
                             unsigned char& steerPosFlag, dtPolyRef& steerPosRef);
         dtStatus findSmoothPath(const float* startPos, const float* endPos,
-                              const dtPolyRef* polyPath, uint32 polyPathSize,
-                              float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize);
+                                const dtPolyRef* polyPath, uint32 polyPathSize,
+                                float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize);
 };
 
 #endif
