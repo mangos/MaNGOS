@@ -6864,7 +6864,7 @@ void ObjectMgr::LoadSpellTemplate()
         // insert serverside spell data
         if (sSpellStore.GetNumRows() <= i)
         {
-            sLog.outErrorDb("Loading Spell Template for spell %u, index out of bounds (max = %)", i, sSpellStore.GetNumRows());
+            sLog.outErrorDb("Loading Spell Template for spell %u, index out of bounds (max = %u)", i, sSpellStore.GetNumRows());
             continue;
         }
         else
