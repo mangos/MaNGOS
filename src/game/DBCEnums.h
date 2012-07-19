@@ -296,7 +296,7 @@ enum FactionMasks
     FACTION_MASK_ALLIANCE = 2,                              // player or creature from alliance team
     FACTION_MASK_HORDE    = 4,                              // player or creature from horde team
     FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
-    // if none flags set then non-aggressive creature
+                            // if none flags set then non-aggressive creature
 };
 
 enum MapTypes                                               // Lua_IsInInstance

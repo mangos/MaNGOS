@@ -563,7 +563,7 @@ typedef UNORDERED_MAP<uint32, CreatureEventAI_Summon> CreatureEventAI_Summon_Map
 
 struct CreatureEventAIHolder
 {
-    CreatureEventAIHolder(CreatureEventAI_Event p) : Event(p), Time(0), Enabled(true){}
+    CreatureEventAIHolder(CreatureEventAI_Event p) : Event(p), Time(0), Enabled(true) {}
 
     CreatureEventAI_Event Event;
     uint32 Time;
@@ -576,7 +576,7 @@ struct CreatureEventAIHolder
 class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
 {
     public:
-        explicit CreatureEventAI(Creature *c);
+        explicit CreatureEventAI(Creature* c);
         ~CreatureEventAI()
         {
             m_CreatureEventAIList.clear();
@@ -587,22 +587,22 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void JustRespawned();
         void Reset();
         void JustReachedHome();
-        void EnterCombat(Unit *enemy);
+        void EnterCombat(Unit* enemy);
         void EnterEvadeMode();
         void JustDied(Unit* killer);
         void KilledUnit(Unit* victim);
         void JustSummoned(Creature* pUnit);
-        void AttackStart(Unit *who);
-        void MoveInLineOfSight(Unit *who);
+        void AttackStart(Unit* who);
+        void MoveInLineOfSight(Unit* who);
         void SpellHit(Unit* pUnit, const SpellEntry* pSpell);
         void DamageTaken(Unit* done_by, uint32& damage);
         void UpdateAI(const uint32 diff);
-        bool IsVisible(Unit *) const;
+        bool IsVisible(Unit*) const;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote);
         void SummonedCreatureJustDied(Creature* unit);
         void SummonedCreatureDespawn(Creature* unit);
 
-        static int Permissible(const Creature *);
+        static int Permissible(const Creature*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = NULL);
         void ProcessAction(CreatureEventAI_Action const& action, uint32 rnd, uint32 EventId, Unit* pActionInvoker);
@@ -611,7 +611,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         inline Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker);
 
         void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target);
-        bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);
+        bool CanCast(Unit* Target, SpellEntry const* Spell, bool Triggered);
 
         bool SpawnedEventConditionsCheck(CreatureEventAI_Event const& event);
 

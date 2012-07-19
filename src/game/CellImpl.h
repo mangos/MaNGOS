@@ -43,15 +43,15 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
     }
 
     return CellArea
-    (
-        MaNGOS::ComputeCellPair(x - radius, y - radius).normalize(),
-        MaNGOS::ComputeCellPair(x + radius, y + radius).normalize()
-    );
+           (
+               MaNGOS::ComputeCellPair(x - radius, y - radius).normalize(),
+               MaNGOS::ComputeCellPair(x + radius, y + radius).normalize()
+           );
 }
 
 template<class T, class CONTAINER>
 inline void
-Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const WorldObject& obj, float radius) const
+Cell::Visit(const CellPair& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& m, const WorldObject& obj, float radius) const
 {
     Cell::Visit(standing_cell, visitor, m, obj.GetPositionX(), obj.GetPositionY(), radius + obj.GetObjectBoundingRadius());
 }
@@ -59,7 +59,7 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
 
 template<class T, class CONTAINER>
 inline void
-Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, float x, float y, float radius) const
+Cell::Visit(const CellPair& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& m, float x, float y, float radius) const
 {
     if (standing_cell.x_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP || standing_cell.y_coord >= TOTAL_NUMBER_OF_CELLS_PER_MAP)
         return;
@@ -67,31 +67,31 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
     //no jokes here... Actually placing ASSERT() here was good idea, but
     //we had some problems with DynamicObjects, which pass radius = 0.0f (DB issue?)
     //maybe it is better to just return when radius <= 0.0f?
-    if(radius <= 0.0f)
+    if (radius <= 0.0f)
     {
         m.Visit(*this, visitor);
         return;
     }
     //lets limit the upper value for search radius
-    if(radius > 333.0f)
+    if (radius > 333.0f)
         radius = 333.0f;
 
     //lets calculate object coord offsets from cell borders.
     CellArea area = Cell::CalculateCellArea(x, y, radius);
     //if radius fits inside standing cell
-    if(!area)
+    if (!area)
     {
         m.Visit(*this, visitor);
         return;
     }
 
-    CellPair &begin_cell = area.low_bound;
-    CellPair &end_cell = area.high_bound;
+    CellPair& begin_cell = area.low_bound;
+    CellPair& end_cell = area.high_bound;
     //visit all cells, found in CalculateCellArea()
     //if radius is known to reach cell area more than 4x4 then we should call optimized VisitCircle
     //currently this technique works with MAX_NUMBER_OF_CELLS 16 and higher, with lower values
     //there are nothing to optimize because SIZE_OF_GRID_CELL is too big...
-    if(((end_cell.x_coord - begin_cell.x_coord) > 4) && ((end_cell.y_coord - begin_cell.y_coord) > 4))
+    if (((end_cell.x_coord - begin_cell.x_coord) > 4) && ((end_cell.y_coord - begin_cell.y_coord) > 4))
     {
         VisitCircle(visitor, m, begin_cell, end_cell);
         return;
@@ -102,13 +102,13 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
     m.Visit(*this, visitor);
 
     // loop the cell range
-    for(uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; x++)
+    for (uint32 x = begin_cell.x_coord; x <= end_cell.x_coord; x++)
     {
-        for(uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; y++)
+        for (uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; y++)
         {
             CellPair cell_pair(x,y);
             //lets skip standing cell since we already visited it
-            if(cell_pair != standing_cell)
+            if (cell_pair != standing_cell)
             {
                 Cell r_zone(cell_pair);
                 r_zone.data.Part.nocreate = data.Part.nocreate;
@@ -120,7 +120,7 @@ Cell::Visit(const CellPair &standing_cell, TypeContainerVisitor<T, CONTAINER> &v
 
 template<class T, class CONTAINER>
 inline void
-Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const CellPair& begin_cell, const CellPair& end_cell) const
+Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER>& visitor, Map& m, const CellPair& begin_cell, const CellPair& end_cell) const
 {
     //here is an algorithm for 'filling' circum-squared octagon
     uint32 x_shift = (uint32)ceilf((end_cell.x_coord - begin_cell.x_coord) * 0.3f - 0.5f);
@@ -129,9 +129,9 @@ Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const Cel
     const uint32 x_end = end_cell.x_coord - x_shift;
 
     //visit central strip with constant width...
-    for(uint32 x = x_start; x <= x_end; ++x)
+    for (uint32 x = x_start; x <= x_end; ++x)
     {
-        for(uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; ++y)
+        for (uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; ++y)
         {
             CellPair cell_pair(x,y);
             Cell r_zone(cell_pair);
@@ -142,7 +142,7 @@ Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const Cel
 
     //if x_shift == 0 then we have too small cell area, which were already
     //visited at previous step, so just return from procedure...
-    if(x_shift == 0)
+    if (x_shift == 0)
         return;
 
     uint32 y_start = end_cell.y_coord;
@@ -172,7 +172,7 @@ Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER> &visitor, Map &m, const Cel
 }
 
 template<class T>
-inline void Cell::VisitGridObjects(const WorldObject *center_obj, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitGridObjects(const WorldObject* center_obj, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
@@ -183,7 +183,7 @@ inline void Cell::VisitGridObjects(const WorldObject *center_obj, T &visitor, fl
 }
 
 template<class T>
-inline void Cell::VisitWorldObjects(const WorldObject *center_obj, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitWorldObjects(const WorldObject* center_obj, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
@@ -194,7 +194,7 @@ inline void Cell::VisitWorldObjects(const WorldObject *center_obj, T &visitor, f
 }
 
 template<class T>
-inline void Cell::VisitAllObjects(const WorldObject *center_obj, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitAllObjects(const WorldObject* center_obj, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
@@ -207,7 +207,7 @@ inline void Cell::VisitAllObjects(const WorldObject *center_obj, T &visitor, flo
 }
 
 template<class T>
-inline void Cell::VisitGridObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitGridObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(x, y));
     Cell cell(p);
@@ -218,7 +218,7 @@ inline void Cell::VisitGridObjects(float x, float y, Map *map, T &visitor, float
 }
 
 template<class T>
-inline void Cell::VisitWorldObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(x, y));
     Cell cell(p);
@@ -229,7 +229,7 @@ inline void Cell::VisitWorldObjects(float x, float y, Map *map, T &visitor, floa
 }
 
 template<class T>
-inline void Cell::VisitAllObjects(float x, float y, Map *map, T &visitor, float radius, bool dont_load)
+inline void Cell::VisitAllObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load)
 {
     CellPair p(MaNGOS::ComputeCellPair(x, y));
     Cell cell(p);

@@ -242,7 +242,7 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
         if (pTmp->searchRange == 0 && pTmp->linkingFlag & (FLAG_FOLLOW | FLAG_CANT_SPAWN_IF_BOSS_DEAD | FLAG_CANT_SPAWN_IF_BOSS_ALIVE))
         {
             // Painfully slow, needs better idea
-            QueryResult *result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id=%u AND map=%u", pTmp->masterId, pTmp->mapId);
+            QueryResult* result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id=%u AND map=%u", pTmp->masterId, pTmp->mapId);
             if (result)
             {
                 if ((*result)[0].GetUInt32() > 1)

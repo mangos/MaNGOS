@@ -210,4 +210,5 @@ MANGOS_DLL_SPEC DBCStorage <ItemEntry>                  const* GetItemDisplaySto
 MANGOS_DLL_SPEC DBCStorage <CreatureDisplayInfoEntry>   const* GetCreatureDisplayStore();
 MANGOS_DLL_SPEC DBCStorage <EmotesEntry>                const* GetEmotesStore();
 MANGOS_DLL_SPEC DBCStorage <EmotesTextEntry>            const* GetEmotesTextStore();
+
 #endif

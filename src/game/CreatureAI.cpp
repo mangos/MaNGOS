@@ -25,13 +25,13 @@ CreatureAI::~CreatureAI()
 {
 }
 
-void CreatureAI::AttackedBy( Unit* attacker )
+void CreatureAI::AttackedBy(Unit* attacker)
 {
-    if(!m_creature->getVictim())
+    if (!m_creature->getVictim())
         AttackStart(attacker);
 }
 
-CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered)
+CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry* pSpell, bool isTriggered)
 {
     // If not triggered, we check
     if (!isTriggered)
@@ -51,7 +51,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
             return CAST_FAIL_POWER;
     }
 
-    if (const SpellRangeEntry *pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
+    if (const SpellRangeEntry* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
     {
         if (pTarget != m_creature)
         {

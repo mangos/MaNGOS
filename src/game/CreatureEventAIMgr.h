@@ -25,8 +25,8 @@
 class CreatureEventAIMgr
 {
     public:
-        CreatureEventAIMgr(){};
-        ~CreatureEventAIMgr(){};
+        CreatureEventAIMgr() {};
+        ~CreatureEventAIMgr() {};
 
         void LoadCreatureEventAI_Texts(bool check_entry_use);
         void LoadCreatureEventAI_Summons(bool check_entry_use);

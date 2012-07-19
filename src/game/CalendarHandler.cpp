@@ -24,7 +24,7 @@
 #include "Opcodes.h"
 #include "MapPersistentStateMgr.h"
 
-void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
+void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_GET_CALENDAR");         // empty
 
@@ -44,13 +44,13 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // instance state count
 
-    for(int i = 0; i < MAX_DIFFICULTY; ++i)
+    for (int i = 0; i < MAX_DIFFICULTY; ++i)
     {
         for (Player::BoundInstancesMap::const_iterator itr = _player->m_boundInstances[i].begin(); itr != _player->m_boundInstances[i].end(); ++itr)
         {
-            if(itr->second.perm)
+            if (itr->second.perm)
             {
-                DungeonPersistentState *state = itr->second.state;
+                DungeonPersistentState* state = itr->second.state;
                 data << uint32(state->GetMapId());
                 data << uint32(state->GetDifficulty());
                 data << uint32(state->GetResetTime() - cur_time);
@@ -64,40 +64,40 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket &/*recv_data*/)
     data << (uint32) 1135753200;                            // base date (28.12.2005 12:00)
     data << (uint32) 0;                                     // raid reset count
     data << (uint32) 0;                                     // holidays count
-/*
-    for(uint32 i = 0; i < holidays_count; ++i)
-    {
-        data << uint32(0);                                  // Holidays.dbc ID
-        data << uint32(0);                                  // Holidays.dbc region
-        data << uint32(0);                                  // Holidays.dbc looping
-        data << uint32(0);                                  // Holidays.dbc priority
-        data << uint32(0);                                  // Holidays.dbc calendarFilterType
+    /*
+        for(uint32 i = 0; i < holidays_count; ++i)
+        {
+            data << uint32(0);                                  // Holidays.dbc ID
+            data << uint32(0);                                  // Holidays.dbc region
+            data << uint32(0);                                  // Holidays.dbc looping
+            data << uint32(0);                                  // Holidays.dbc priority
+            data << uint32(0);                                  // Holidays.dbc calendarFilterType
 
-        for(uint32 j = 0; j < 26; j++)
-            data << uint32(0);                              // Holidays.dbc date
+            for(uint32 j = 0; j < 26; j++)
+                data << uint32(0);                              // Holidays.dbc date
 
-        for(uint32 j = 0; j < 10; j++)
-            data << uint32(0);                              // Holidays.dbc duration
+            for(uint32 j = 0; j < 10; j++)
+                data << uint32(0);                              // Holidays.dbc duration
 
-        for(uint32 j = 0; j < 10; j++)
-            data << uint32(0);                              // Holidays.dbc calendarFlags
+            for(uint32 j = 0; j < 10; j++)
+                data << uint32(0);                              // Holidays.dbc calendarFlags
 
-        data << "";                                         // Holidays.dbc textureFilename
-    }
-*/
+            data << "";                                         // Holidays.dbc textureFilename
+        }
+    */
     //DEBUG_LOG("Sending calendar");
     //data.hexlike();
     SendPacket(&data);
 }
 
-void WorldSession::HandleCalendarGetEvent(WorldPacket &recv_data)
+void WorldSession::HandleCalendarGetEvent(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_GET_EVENT");
     recv_data.hexlike();
     recv_data.read_skip<uint64>();                          // unk
 }
 
-void WorldSession::HandleCalendarGuildFilter(WorldPacket &recv_data)
+void WorldSession::HandleCalendarGuildFilter(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_GUILD_FILTER");
     recv_data.hexlike();
@@ -106,14 +106,14 @@ void WorldSession::HandleCalendarGuildFilter(WorldPacket &recv_data)
     recv_data.read_skip<uint32>();                          // unk3
 }
 
-void WorldSession::HandleCalendarArenaTeam(WorldPacket &recv_data)
+void WorldSession::HandleCalendarArenaTeam(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_ARENA_TEAM");
     recv_data.hexlike();
     recv_data.read_skip<uint32>();                          // unk
 }
 
-void WorldSession::HandleCalendarAddEvent(WorldPacket &recv_data)
+void WorldSession::HandleCalendarAddEvent(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_ADD_EVENT");
     recv_data.hexlike();
@@ -149,7 +149,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket &recv_data)
     //}
 }
 
-void WorldSession::HandleCalendarUpdateEvent(WorldPacket &recv_data)
+void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_UPDATE_EVENT");
     recv_data.hexlike();
@@ -168,7 +168,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket &recv_data)
     //recv_data >> uint32
 }
 
-void WorldSession::HandleCalendarRemoveEvent(WorldPacket &recv_data)
+void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_REMOVE_EVENT");
     recv_data.hexlike();
@@ -180,7 +180,7 @@ void WorldSession::HandleCalendarRemoveEvent(WorldPacket &recv_data)
 
 }
 
-void WorldSession::HandleCalendarCopyEvent(WorldPacket &recv_data)
+void WorldSession::HandleCalendarCopyEvent(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_COPY_EVENT");
     recv_data.hexlike();
@@ -192,7 +192,7 @@ void WorldSession::HandleCalendarCopyEvent(WorldPacket &recv_data)
 
 }
 
-void WorldSession::HandleCalendarEventInvite(WorldPacket &recv_data)
+void WorldSession::HandleCalendarEventInvite(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_EVENT_INVITE");
     recv_data.hexlike();
@@ -206,7 +206,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket &recv_data)
 
 }
 
-void WorldSession::HandleCalendarEventRsvp(WorldPacket &recv_data)
+void WorldSession::HandleCalendarEventRsvp(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_EVENT_RSVP");
     recv_data.hexlike();
@@ -217,7 +217,7 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket &recv_data)
     //recv_data >> uint32
 }
 
-void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket &recv_data)
+void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_EVENT_REMOVE_INVITE");
     recv_data.hexlike();
@@ -229,7 +229,7 @@ void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket &recv_data)
     //recv_data >> uint64
 }
 
-void WorldSession::HandleCalendarEventStatus(WorldPacket &recv_data)
+void WorldSession::HandleCalendarEventStatus(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_EVENT_STATUS");
     recv_data.hexlike();
@@ -242,7 +242,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket &recv_data)
     //recv_data >> uint32
 }
 
-void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket &recv_data)
+void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_EVENT_MODERATOR_STATUS");
     recv_data.hexlike();
@@ -255,7 +255,7 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket &recv_data)
     //recv_data >> uint32
 }
 
-void WorldSession::HandleCalendarComplain(WorldPacket &recv_data)
+void WorldSession::HandleCalendarComplain(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_COMPLAIN");
     recv_data.hexlike();
@@ -266,7 +266,7 @@ void WorldSession::HandleCalendarComplain(WorldPacket &recv_data)
     //recv_data >> uint64
 }
 
-void WorldSession::HandleCalendarGetNumPending(WorldPacket & /*recv_data*/)
+void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: CMSG_CALENDAR_GET_NUM_PENDING");      // empty
 

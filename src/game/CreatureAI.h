@@ -272,17 +272,17 @@ class MANGOS_DLL_SPEC CreatureAI
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>
 {
-    SelectableAI(const char *id) : FactoryHolder<CreatureAI>(id) {}
+    SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) {}
 };
 
 template<class REAL_AI>
 struct CreatureAIFactory : public SelectableAI
 {
-    CreatureAIFactory(const char *name) : SelectableAI(name) {}
+    CreatureAIFactory(const char* name) : SelectableAI(name) {}
 
-    CreatureAI* Create(void *) const;
+    CreatureAI* Create(void*) const;
 
-    int Permit(const Creature *c) const { return REAL_AI::Permissible(c); }
+    int Permit(const Creature* c) const { return REAL_AI::Permissible(c); }
 };
 
 enum Permitions

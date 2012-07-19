@@ -29,16 +29,16 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     ObjectGuid guid;
     recvPacket >> guid;
 
-    if(!GetPlayer()->duel)                                  // ignore accept from duel-sender
+    if (!GetPlayer()->duel)                                 // ignore accept from duel-sender
         return;
 
-    Player *pl       = GetPlayer();
-    Player *plTarget = pl->duel->opponent;
+    Player* pl       = GetPlayer();
+    Player* plTarget = pl->duel->opponent;
 
-    if(pl == pl->duel->initiator || !plTarget || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
+    if (pl == pl->duel->initiator || !plTarget || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
 
-    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: received CMSG_DUEL_ACCEPTED" );
+    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "WORLD: received CMSG_DUEL_ACCEPTED");
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 1 is: %u (%s)", pl->GetGUIDLow(), pl->GetName());
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
 
@@ -55,14 +55,14 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
     //DEBUG_LOG( "WORLD: received CMSG_DUEL_CANCELLED" );
 
     // no duel requested
-    if(!GetPlayer()->duel)
+    if (!GetPlayer()->duel)
         return;
 
     // player surrendered in a duel using /forfeit
-    if(GetPlayer()->duel->startTime != 0)
+    if (GetPlayer()->duel->startTime != 0)
     {
         GetPlayer()->CombatStopWithPets(true);
-        if(GetPlayer()->duel->opponent)
+        if (GetPlayer()->duel->opponent)
             GetPlayer()->duel->opponent->CombatStopWithPets(true);
 
         GetPlayer()->CastSpell(GetPlayer(), 7267, true);    // beg
