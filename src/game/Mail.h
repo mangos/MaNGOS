@@ -115,15 +115,15 @@ class MailSender
     public:                                                 // Constructors
         MailSender() : m_messageType(MAIL_NORMAL), m_senderId(0), m_stationery(MAIL_STATIONERY_DEFAULT) {}
 
-       /**
-        * Creates a new MailSender object.
-        *
-        * @param messageType the type of the mail.
-        * @param sender_guidlow_or_entry The lower part of the GUID of the player sending
-        *                                                                this mail, or the Entry of the non-player object.
-        * @param stationery The stationary associated with this MailSender.
-        *
-        */
+        /**
+         * Creates a new MailSender object.
+         *
+         * @param messageType the type of the mail.
+         * @param sender_guidlow_or_entry The lower part of the GUID of the player sending
+         *                                                                this mail, or the Entry of the non-player object.
+         * @param stationery The stationary associated with this MailSender.
+         *
+         */
         MailSender(MailMessageType messageType, uint32 sender_guidlow_or_entry, MailStationery stationery = MAIL_STATIONERY_DEFAULT)
             : m_messageType(messageType), m_senderId(sender_guidlow_or_entry), m_stationery(stationery)
         {
@@ -185,19 +185,19 @@ class MailDraft
         typedef std::map<uint32, Item*> MailItemMap;
 
     public:                                                 // Constructors
-       /**
-        * Creates a new blank MailDraft object
-        *
-        */
+        /**
+         * Creates a new blank MailDraft object
+         *
+         */
         MailDraft()
             : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_money(0), m_COD(0) {}
-       /**
-        * Creates a new MailDraft object using mail template id.
-        *
-        * @param mailTemplateId The ID of the Template to be used.
-        * @param a boolean specifying whether the mail needs items or not.
-        *
-        */
+        /**
+         * Creates a new MailDraft object using mail template id.
+         *
+         * @param mailTemplateId The ID of the Template to be used.
+         * @param a boolean specifying whether the mail needs items or not.
+         *
+         */
         explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
             : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
         {}
@@ -348,9 +348,9 @@ struct Mail
      */
     bool RemoveItem(uint32 item_guid)
     {
-        for(MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
+        for (MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
-            if(itr->item_guid == item_guid)
+            if (itr->item_guid == item_guid)
             {
                 items.erase(itr);
                 return true;

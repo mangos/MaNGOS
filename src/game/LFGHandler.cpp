@@ -23,7 +23,7 @@
 #include "ObjectMgr.h"
 #include "World.h"
 
-void WorldSession::HandleLfgJoinOpcode( WorldPacket & recv_data )
+void WorldSession::HandleLfgJoinOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_LFG_JOIN");
 
@@ -53,14 +53,14 @@ void WorldSession::HandleLfgJoinOpcode( WorldPacket & recv_data )
     //SendLfgUpdate(false, LFG_UPDATE_JOIN, dungeons[0]);
 }
 
-void WorldSession::HandleLfgLeaveOpcode( WorldPacket & /*recv_data*/ )
+void WorldSession::HandleLfgLeaveOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("CMSG_LFG_LEAVE");
 
     //SendLfgUpdate(false, LFG_UPDATE_LEAVE, 0);
 }
 
-void WorldSession::HandleSearchLfgJoinOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSearchLfgJoinOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_LFG_SEARCH_JOIN");
 
@@ -73,14 +73,14 @@ void WorldSession::HandleSearchLfgJoinOpcode( WorldPacket & recv_data )
     //SendLfgSearchResults(type, entry);
 }
 
-void WorldSession::HandleSearchLfgLeaveOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSearchLfgLeaveOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_LFG_SEARCH_LEAVE");
 
     recv_data >> Unused<uint32>();                          // join id?
 }
 
-void WorldSession::HandleSetLfgCommentOpcode( WorldPacket & recv_data )
+void WorldSession::HandleSetLfgCommentOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_SET_LFG_COMMENT");
 
@@ -97,11 +97,11 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
 
     uint8 isGuidsPresent = 0;
     data << uint8(isGuidsPresent);
-    if(isGuidsPresent)
+    if (isGuidsPresent)
     {
         uint32 guids_count = 0;
         data << uint32(guids_count);
-        for(uint32 i = 0; i < guids_count; ++i)
+        for (uint32 i = 0; i < guids_count; ++i)
         {
             data << uint64(0);                              // player/group guid
         }
@@ -111,25 +111,25 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
     data << uint32(groups_count);                           // groups count
     data << uint32(groups_count);                           // groups count (total?)
 
-    for(uint32 i = 0; i < groups_count; ++i)
+    for (uint32 i = 0; i < groups_count; ++i)
     {
         data << uint64(1);                                  // group guid
 
         uint32 flags = 0x92;
         data << uint32(flags);                              // flags
 
-        if(flags & 0x2)
+        if (flags & 0x2)
         {
             data << uint8(0);                               // comment string, max len 256
         }
 
-        if(flags & 0x10)
+        if (flags & 0x10)
         {
-            for(uint32 j = 0; j < 3; ++j)
+            for (uint32 j = 0; j < 3; ++j)
                 data << uint8(0);                           // roles
         }
 
-        if(flags & 0x80)
+        if (flags & 0x80)
         {
             data << uint64(0);                              // instance guid
             data << uint32(0);                              // completed encounters
@@ -144,7 +144,7 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
 
     for (HashMapHolder<Player>::MapType::const_iterator iter = players.begin(); iter != players.end(); ++iter)
     {
-        Player *plr = iter->second;
+        Player* plr = iter->second;
 
         if (!plr || plr->GetTeam() != _player->GetTeam())
             continue;
@@ -163,7 +163,7 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
             data << uint8(plr->getClass());
             data << uint8(plr->getRace());
 
-            for(uint32 i = 0; i < 3; ++i)
+            for (uint32 i = 0; i < 3; ++i)
                 data << uint8(0);                           // talent spec x/x/x
 
             data << uint32(0);                              // armor
@@ -222,15 +222,15 @@ void WorldSession::SendLfgJoinResult(LfgJoinResult result)
     data << uint32(result);
     data << uint32(0); // ERR_LFG_ROLE_CHECK_FAILED_TIMEOUT = 3, ERR_LFG_ROLE_CHECK_FAILED_NOT_VIABLE = (value - 3 == result)
 
-    if(result == ERR_LFG_NO_SLOTS_PARTY)
+    if (result == ERR_LFG_NO_SLOTS_PARTY)
     {
         uint8 count1 = 0;
         data << uint8(count1);                              // players count?
-        for(uint32 i = 0; i < count1; ++i)
+        for (uint32 i = 0; i < count1; ++i)
         {
             data << uint64(0);                              // player guid?
             uint32 count2 = 0;
-            for(uint32 j = 0; j < count2; ++j)
+            for (uint32 j = 0; j < count2; ++j)
             {
                 data << uint32(0);                          // dungeon id/type
                 data << uint32(0);                          // lock status?
@@ -249,22 +249,22 @@ void WorldSession::SendLfgUpdate(bool isGroup, LfgUpdateType updateType, uint32 
     uint8 extra = updateType == LFG_UPDATE_JOIN ? 1 : 0;
     data << uint8(extra);
 
-    if(extra)
+    if (extra)
     {
         data << uint8(0);
         data << uint8(0);
         data << uint8(0);
 
-        if(isGroup)
+        if (isGroup)
         {
             data << uint8(0);
-            for(uint32 i = 0; i < 3; ++i)
+            for (uint32 i = 0; i < 3; ++i)
                 data << uint8(0);
         }
 
         uint8 count = 1;
         data << uint8(count);
-        for(uint32 i = 0; i < count; ++i)
+        for (uint32 i = 0; i < count; ++i)
             data << uint32(id);
         data << "";
     }

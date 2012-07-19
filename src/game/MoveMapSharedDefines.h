@@ -34,7 +34,7 @@ struct MmapTileHeader
     bool usesLiquids : 1;
 
     MmapTileHeader() : mmapMagic(MMAP_MAGIC), dtVersion(DT_NAVMESH_VERSION),
-                       mmapVersion(MMAP_VERSION), size(0), usesLiquids(true) {}
+        mmapVersion(MMAP_VERSION), size(0), usesLiquids(true) {}
 };
 
 enum NavTerrain
@@ -48,7 +48,7 @@ enum NavTerrain
     NAV_UNUSED2 = 0x20,
     NAV_UNUSED3 = 0x40,
     NAV_UNUSED4 = 0x80
-    // we only have 8 bits
+                  // we only have 8 bits
 };
 
 #endif  // _MOVE_MAP_SHARED_DEFINES_H
