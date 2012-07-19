@@ -23,7 +23,7 @@
 
 INSTANTIATE_SINGLETON_1(Config);
 
-static bool GetValueHelper(ACE_Configuration_Heap *mConf, const char *name, ACE_TString &result)
+static bool GetValueHelper(ACE_Configuration_Heap* mConf, const char* name, ACE_TString& result)
 {
     if (!mConf)
         return false;
@@ -45,7 +45,7 @@ static bool GetValueHelper(ACE_Configuration_Heap *mConf, const char *name, ACE_
 }
 
 Config::Config()
-: mConf(NULL)
+    : mConf(NULL)
 {
 }
 
@@ -54,7 +54,7 @@ Config::~Config()
     delete mConf;
 }
 
-bool Config::SetSource(const char *file)
+bool Config::SetSource(const char* file)
 {
     mFilename = file;
 
@@ -92,8 +92,8 @@ bool Config::GetBoolDefault(const char* name, bool def)
 
     const char* str = val.c_str();
     if (strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
-        strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
-        strcmp(str, "1") == 0)
+            strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
+            strcmp(str, "1") == 0)
         return true;
     else
         return false;

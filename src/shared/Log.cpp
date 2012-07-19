@@ -30,7 +30,7 @@
 
 #include "ace/OS_NS_unistd.h"
 
-INSTANTIATE_SINGLETON_1( Log );
+INSTANTIATE_SINGLETON_1(Log);
 
 LogFilterData logFilterData[LOG_FILTER_COUNT] =
 {
@@ -82,18 +82,18 @@ void Log::InitColors(const std::string& str)
 
     std::istringstream ss(str);
 
-    for(int i = 0; i < LogType_count; ++i)
+    for (int i = 0; i < LogType_count; ++i)
     {
         ss >> color[i];
 
-        if(!ss)
+        if (!ss)
             return;
 
-        if(color[i] < 0 || color[i] >= Color_count)
+        if (color[i] < 0 || color[i] >= Color_count)
             return;
     }
 
-    for(int i = 0; i < LogType_count; ++i)
+    for (int i = 0; i < LogType_count; ++i)
         m_colors[i] = Color(color[i]);
 
     m_colored = true;
@@ -101,7 +101,7 @@ void Log::InitColors(const std::string& str)
 
 void Log::SetColor(bool stdout_stream, Color color)
 {
-    #if PLATFORM == PLATFORM_WINDOWS
+#if PLATFORM == PLATFORM_WINDOWS
 
     static WORD WinColorFG[Color_count] =
     {
@@ -113,24 +113,24 @@ void Log::SetColor(bool stdout_stream, Color color)
         FOREGROUND_RED |                    FOREGROUND_BLUE,// MAGENTA
         FOREGROUND_GREEN | FOREGROUND_BLUE,                 // CYAN
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,// WHITE
-                                                            // YELLOW
+        // YELLOW
         FOREGROUND_RED | FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
-                                                            // RED_BOLD
+        // RED_BOLD
         FOREGROUND_RED |                                      FOREGROUND_INTENSITY,
-                                                            // GREEN_BOLD
+        // GREEN_BOLD
         FOREGROUND_GREEN |                   FOREGROUND_INTENSITY,
         FOREGROUND_BLUE | FOREGROUND_INTENSITY,             // BLUE_BOLD
-                                                            // MAGENTA_BOLD
+        // MAGENTA_BOLD
         FOREGROUND_RED |                    FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-                                                            // CYAN_BOLD
+        // CYAN_BOLD
         FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-                                                            // WHITE_BOLD
+        // WHITE_BOLD
         FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY
     };
 
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE );
+    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
     SetConsoleTextAttribute(hConsole, WinColorFG[color]);
-    #else
+#else
 
     enum ANSITextAttr
     {
@@ -172,17 +172,17 @@ void Log::SetColor(bool stdout_stream, Color color)
     };
 
     fprintf((stdout_stream? stdout : stderr), "\x1b[%d%sm",UnixColorFG[color],(color>=YELLOW&&color<Color_count ?";1":""));
-    #endif
+#endif
 }
 
 void Log::ResetColor(bool stdout_stream)
 {
-    #if PLATFORM == PLATFORM_WINDOWS
-    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE );
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED );
-    #else
-    fprintf(( stdout_stream ? stdout : stderr ), "\x1b[0m");
-    #endif
+#if PLATFORM == PLATFORM_WINDOWS
+    HANDLE hConsole = GetStdHandle(stdout_stream ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+#else
+    fprintf((stdout_stream ? stdout : stderr), "\x1b[0m");
+#endif
 }
 
 void Log::SetLogLevel(char* level)
@@ -271,7 +271,7 @@ void Log::Initialize()
     InitColors(sConfig.GetStringDefault("LogColors", ""));
 
     m_logFilter = 0;
-    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+    for (int i = 0; i < LOG_FILTER_COUNT; ++i)
         if (*logFilterData[i].name)
             if (sConfig.GetBoolDefault(logFilterData[i].configName, logFilterData[i].defaultState))
                 m_logFilter |= (1 << i);
@@ -353,18 +353,18 @@ void Log::outString()
 {
     if (m_includeTime)
         outTime();
-    printf( "\n" );
+    printf("\n");
     if (logfile)
     {
         outTimestamp(logfile);
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         fflush(logfile);
     }
 
     fflush(stdout);
 }
 
-void Log::outString( const char * str, ... )
+void Log::outString(const char* str, ...)
 {
     if (!str)
         return;
@@ -384,7 +384,7 @@ void Log::outString( const char * str, ... )
     if (m_colored)
         ResetColor(true);
 
-    printf( "\n" );
+    printf("\n");
 
     if (logfile)
     {
@@ -392,7 +392,7 @@ void Log::outString( const char * str, ... )
 
         va_start(ap, str);
         vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         va_end(ap);
 
         fflush(logfile);
@@ -401,7 +401,7 @@ void Log::outString( const char * str, ... )
     fflush(stdout);
 }
 
-void Log::outError( const char * err, ... )
+void Log::outError(const char* err, ...)
 {
     if (!err)
         return;
@@ -421,17 +421,17 @@ void Log::outError( const char * err, ... )
     if (m_colored)
         ResetColor(false);
 
-    fprintf( stderr, "\n" );
+    fprintf(stderr, "\n");
     if (logfile)
     {
         outTimestamp(logfile);
-        fprintf(logfile, "ERROR:" );
+        fprintf(logfile, "ERROR:");
 
         va_start(ap, err);
         vfprintf(logfile, err, ap);
         va_end(ap);
 
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         fflush(logfile);
     }
 
@@ -443,26 +443,26 @@ void Log::outErrorDb()
     if (m_includeTime)
         outTime();
 
-    fprintf( stderr, "\n" );
+    fprintf(stderr, "\n");
 
     if (logfile)
     {
         outTimestamp(logfile);
-        fprintf(logfile, "ERROR:\n" );
+        fprintf(logfile, "ERROR:\n");
         fflush(logfile);
     }
 
     if (dberLogfile)
     {
         outTimestamp(dberLogfile);
-        fprintf(dberLogfile, "\n" );
+        fprintf(dberLogfile, "\n");
         fflush(dberLogfile);
     }
 
     fflush(stderr);
 }
 
-void Log::outErrorDb( const char * err, ... )
+void Log::outErrorDb(const char* err, ...)
 {
     if (!err)
         return;
@@ -482,18 +482,18 @@ void Log::outErrorDb( const char * err, ... )
     if (m_colored)
         ResetColor(false);
 
-    fprintf( stderr, "\n" );
+    fprintf(stderr, "\n");
 
     if (logfile)
     {
         outTimestamp(logfile);
-        fprintf(logfile, "ERROR:" );
+        fprintf(logfile, "ERROR:");
 
         va_start(ap, err);
         vfprintf(logfile, err, ap);
         va_end(ap);
 
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         fflush(logfile);
     }
 
@@ -506,14 +506,14 @@ void Log::outErrorDb( const char * err, ... )
         vfprintf(dberLogfile, err, ap);
         va_end(ap);
 
-        fprintf(dberLogfile, "\n" );
+        fprintf(dberLogfile, "\n");
         fflush(dberLogfile);
     }
 
     fflush(stderr);
 }
 
-void Log::outBasic( const char * str, ... )
+void Log::outBasic(const char* str, ...)
 {
     if (!str)
         return;
@@ -534,7 +534,7 @@ void Log::outBasic( const char * str, ... )
         if (m_colored)
             ResetColor(true);
 
-        printf( "\n" );
+        printf("\n");
     }
 
     if (logfile && m_logFileLevel >= LOG_LVL_BASIC)
@@ -543,7 +543,7 @@ void Log::outBasic( const char * str, ... )
         outTimestamp(logfile);
         va_start(ap, str);
         vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         va_end(ap);
         fflush(logfile);
     }
@@ -551,7 +551,7 @@ void Log::outBasic( const char * str, ... )
     fflush(stdout);
 }
 
-void Log::outDetail( const char * str, ... )
+void Log::outDetail(const char* str, ...)
 {
     if (!str)
         return;
@@ -573,7 +573,7 @@ void Log::outDetail( const char * str, ... )
         if (m_colored)
             ResetColor(true);
 
-        printf( "\n" );
+        printf("\n");
     }
 
     if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
@@ -585,14 +585,14 @@ void Log::outDetail( const char * str, ... )
         vfprintf(logfile, str, ap);
         va_end(ap);
 
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         fflush(logfile);
     }
 
     fflush(stdout);
 }
 
-void Log::outDebug( const char * str, ... )
+void Log::outDebug(const char* str, ...)
 {
     if (!str)
         return;
@@ -613,7 +613,7 @@ void Log::outDebug( const char * str, ... )
         if (m_colored)
             ResetColor(true);
 
-        printf( "\n" );
+        printf("\n");
     }
 
     if (logfile && m_logFileLevel >= LOG_LVL_DEBUG)
@@ -625,14 +625,14 @@ void Log::outDebug( const char * str, ... )
         vfprintf(logfile, str, ap);
         va_end(ap);
 
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         fflush(logfile);
     }
 
     fflush(stdout);
 }
 
-void Log::outCommand( uint32 account, const char * str, ... )
+void Log::outCommand(uint32 account, const char* str, ...)
 {
     if (!str)
         return;
@@ -653,7 +653,7 @@ void Log::outCommand( uint32 account, const char * str, ... )
         if (m_colored)
             ResetColor(true);
 
-        printf( "\n" );
+        printf("\n");
     }
 
     if (logfile && m_logFileLevel >= LOG_LVL_DETAIL)
@@ -662,20 +662,20 @@ void Log::outCommand( uint32 account, const char * str, ... )
         outTimestamp(logfile);
         va_start(ap, str);
         vfprintf(logfile, str, ap);
-        fprintf(logfile, "\n" );
+        fprintf(logfile, "\n");
         va_end(ap);
         fflush(logfile);
     }
 
     if (m_gmlog_per_account)
     {
-        if (FILE* per_file = openGmlogPerAccount (account))
+        if (FILE* per_file = openGmlogPerAccount(account))
         {
             va_list ap;
             outTimestamp(per_file);
             va_start(ap, str);
             vfprintf(per_file, str, ap);
-            fprintf(per_file, "\n" );
+            fprintf(per_file, "\n");
             va_end(ap);
             fclose(per_file);
         }
@@ -686,7 +686,7 @@ void Log::outCommand( uint32 account, const char * str, ... )
         outTimestamp(gmLogfile);
         va_start(ap, str);
         vfprintf(gmLogfile, str, ap);
-        fprintf(gmLogfile, "\n" );
+        fprintf(gmLogfile, "\n");
         va_end(ap);
         fflush(gmLogfile);
     }
@@ -694,7 +694,7 @@ void Log::outCommand( uint32 account, const char * str, ... )
     fflush(stdout);
 }
 
-void Log::outChar(const char * str, ... )
+void Log::outChar(const char* str, ...)
 {
 
     if (!str)
@@ -706,13 +706,13 @@ void Log::outChar(const char * str, ... )
         outTimestamp(charLogfile);
         va_start(ap, str);
         vfprintf(charLogfile, str, ap);
-        fprintf(charLogfile, "\n" );
+        fprintf(charLogfile, "\n");
         va_end(ap);
         fflush(charLogfile);
     }
 }
 
-void Log::outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming )
+void Log::outWorldPacketDump(uint32 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming)
 {
     if (!worldLogfile)
         return;
@@ -720,8 +720,8 @@ void Log::outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeNa
     outTimestamp(worldLogfile);
 
     fprintf(worldLogfile,"\n%s:\nSOCKET: %u\nLENGTH: " SIZEFMTD "\nOPCODE: %s (0x%.4X)\nDATA:\n",
-        incoming ? "CLIENT" : "SERVER",
-        socket, packet->size(), opcodeName, opcode);
+            incoming ? "CLIENT" : "SERVER",
+            socket, packet->size(), opcodeName, opcode);
 
     size_t p = 0;
     while (p < packet->size())
@@ -736,16 +736,16 @@ void Log::outWorldPacketDump( uint32 socket, uint32 opcode, char const* opcodeNa
     fflush(worldLogfile);
 }
 
-void Log::outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name )
+void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name)
 {
     if (charLogfile)
     {
-        fprintf(charLogfile, "== START DUMP == (account: %u guid: %u name: %s )\n%s\n== END DUMP ==\n",account_id,guid,name,str );
+        fprintf(charLogfile, "== START DUMP == (account: %u guid: %u name: %s )\n%s\n== END DUMP ==\n",account_id,guid,name,str);
         fflush(charLogfile);
     }
 }
 
-void Log::outRALog(    const char * str, ... )
+void Log::outRALog(const char* str, ...)
 {
     if (!str)
         return;
@@ -756,7 +756,7 @@ void Log::outRALog(    const char * str, ... )
         outTimestamp(raLogfile);
         va_start(ap, str);
         vfprintf(raLogfile, str, ap);
-        fprintf(raLogfile, "\n" );
+        fprintf(raLogfile, "\n");
         va_end(ap);
         fflush(raLogfile);
     }
@@ -773,13 +773,13 @@ void Log::WaitBeforeContinueIfNeed()
         printf("\nPress <Enter> for continue\n");
 
         std::string line;
-        std::getline (std::cin, line);
+        std::getline(std::cin, line);
     }
     else if (mode > 0)
     {
         printf("\nWait %u secs for continue.\n",mode);
         BarGoLink bar(mode);
-        for(int i = 0; i < mode; ++i)
+        for (int i = 0; i < mode; ++i)
         {
             bar.step();
             ACE_OS::sleep(1);
@@ -787,7 +787,7 @@ void Log::WaitBeforeContinueIfNeed()
     }
 }
 
-void outstring_log(const char * str, ...)
+void outstring_log(const char* str, ...)
 {
     if (!str)
         return;
@@ -801,7 +801,7 @@ void outstring_log(const char * str, ...)
     sLog.outString("%s", buf);
 }
 
-void detail_log(const char * str, ...)
+void detail_log(const char* str, ...)
 {
     if (!str)
         return;
@@ -815,7 +815,7 @@ void detail_log(const char * str, ...)
     sLog.outDetail("%s", buf);
 }
 
-void debug_log(const char * str, ...)
+void debug_log(const char* str, ...)
 {
     if (!str)
         return;
@@ -829,7 +829,7 @@ void debug_log(const char * str, ...)
     DEBUG_LOG("%s", buf);
 }
 
-void error_log(const char * str, ...)
+void error_log(const char* str, ...)
 {
     if (!str)
         return;
@@ -843,7 +843,7 @@ void error_log(const char * str, ...)
     sLog.outError("%s", buf);
 }
 
-void error_db_log(const char * str, ...)
+void error_db_log(const char* str, ...)
 {
     if (!str)
         return;

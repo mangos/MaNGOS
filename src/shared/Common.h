@@ -226,9 +226,9 @@ struct LocaleNameStr
 extern LocaleNameStr const fullLocaleNameList[];
 
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
-inline char * mangos_strdup(const char * source)
+inline char* mangos_strdup(const char* source)
 {
-    char * dest = new char[strlen(source) + 1];
+    char* dest = new char[strlen(source) + 1];
     strcpy(dest, source);
     return dest;
 }

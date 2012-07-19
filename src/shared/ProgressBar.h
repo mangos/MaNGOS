@@ -36,8 +36,8 @@ class MANGOS_DLL_SPEC BarGoLink
         void init(int row_count);
 
         static bool m_showOutput;                           // not recommended change with existed active bar
-        static char const * const empty;
-        static char const * const full;
+        static char const* const empty;
+        static char const* const full;
 
         int rec_no;
         int rec_pos;

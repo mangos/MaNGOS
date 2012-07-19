@@ -28,16 +28,16 @@
 namespace ACE_Based
 {
     template <class T, class LockType, typename StorageType=std::deque<T> >
-        class LockedQueue
+    class LockedQueue
     {
-        //! Lock access to the queue.
-        LockType _lock;
+            //! Lock access to the queue.
+            LockType _lock;
 
-        //! Storage backing the queue.
-        StorageType _queue;
+            //! Storage backing the queue.
+            StorageType _queue;
 
-        //! Cancellation flag.
-        /*volatile*/ bool _canceled;
+            //! Cancellation flag.
+            /*volatile*/ bool _canceled;
 
         public:
 
@@ -62,7 +62,7 @@ namespace ACE_Based
             //! Gets the next result in the queue, if any.
             bool next(T& result)
             {
-                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
+                ACE_GUARD_RETURN(LockType, g, this->_lock, false);
 
                 if (_queue.empty())
                     return false;
@@ -76,13 +76,13 @@ namespace ACE_Based
             template<class Checker>
             bool next(T& result, Checker& check)
             {
-                ACE_GUARD_RETURN (LockType, g, this->_lock, false);
+                ACE_GUARD_RETURN(LockType, g, this->_lock, false);
 
                 if (_queue.empty())
                     return false;
 
                 result = _queue.front();
-                if(!check.Process(result))
+                if (!check.Process(result))
                     return false;
 
                 _queue.pop_front();

@@ -39,7 +39,7 @@ void utf8print(void* arg, const char* str)
 #if PLATFORM == PLATFORM_WINDOWS
     wchar_t wtemp_buf[6000];
     size_t wtemp_len = 6000-1;
-    if(!Utf8toWStr(str,strlen(str),wtemp_buf,wtemp_len))
+    if (!Utf8toWStr(str,strlen(str),wtemp_buf,wtemp_len))
         return;
 
     char temp_buf[6000];
@@ -71,11 +71,11 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
     /// Commands not recommended call from chat, but support anyway
     /// can delete only for account with less security
     /// This is also reject self apply in fact
-    if (HasLowerSecurityAccount (NULL, account_id, true))
+    if (HasLowerSecurityAccount(NULL, account_id, true))
         return false;
 
     AccountOpResult result = sAccountMgr.DeleteAccount(account_id);
-    switch(result)
+    switch (result)
     {
         case AOR_OK:
             PSendSysMessage(LANG_ACCOUNT_DELETED,account_name.c_str());
@@ -115,7 +115,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::s
         // search by name
         else
         {
-            if(!normalizePlayerName(searchString))
+            if (!normalizePlayerName(searchString))
                 return false;
 
             resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), searchString.c_str());
@@ -137,12 +137,13 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::s
             info.accountId  = fields[2].GetUInt32();
 
             // account name will be empty for nonexistent account
-            sAccountMgr.GetName (info.accountId, info.accountName);
+            sAccountMgr.GetName(info.accountId, info.accountName);
 
             info.deleteDate = time_t(fields[3].GetUInt64());
 
             foundList.push_back(info);
-        } while (resultChar->NextRow());
+        }
+        while (resultChar->NextRow());
 
         delete resultChar;
     }
@@ -161,7 +162,7 @@ std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::
 {
     std::ostringstream wherestr;
     wherestr << "guid IN ('";
-    for(; itr != itr_end; ++itr)
+    for (; itr != itr_end; ++itr)
     {
         wherestr << itr->lowguid;
 
@@ -172,7 +173,7 @@ std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::
         }
 
         DeletedInfoList::const_iterator itr2 = itr;
-        if(++itr2 != itr_end)
+        if (++itr2 != itr_end)
             wherestr << "','";
     }
     wherestr << "')";
@@ -204,12 +205,12 @@ void ChatHandler::HandleCharacterDeletedListHelper(DeletedInfoList const& foundL
 
         if (!m_session)
             PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
-                itr->accountId, dateStr.c_str());
+                            itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
+                            itr->accountId, dateStr.c_str());
         else
             PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
-                itr->accountId, dateStr.c_str());
+                            itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
+                            itr->accountId, dateStr.c_str());
     }
 
     if (!m_session)
@@ -276,7 +277,7 @@ void ChatHandler::HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo
     }
 
     CharacterDatabase.PExecute("UPDATE characters SET name='%s', account='%u', deleteDate=NULL, deleteInfos_Name=NULL, deleteInfos_Account=NULL WHERE deleteDate IS NOT NULL AND guid = %u",
-        delInfo.name.c_str(), delInfo.accountId, delInfo.lowguid);
+                               delInfo.name.c_str(), delInfo.accountId, delInfo.lowguid);
 }
 
 /**
@@ -334,7 +335,7 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
         if (newAccount && newAccount != delInfo.accountId)
         {
             delInfo.accountId = newAccount;
-            sAccountMgr.GetName (newAccount, delInfo.accountName);
+            sAccountMgr.GetName(newAccount, delInfo.accountName);
         }
 
         HandleCharacterDeletedRestoreHelper(delInfo);
@@ -375,7 +376,7 @@ bool ChatHandler::HandleCharacterDeletedDeleteCommand(char* args)
     HandleCharacterDeletedListHelper(foundList);
 
     // Call the appropriate function to delete them (current account for deleted characters is 0)
-    for(DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
+    for (DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
         Player::DeleteFromDB(ObjectGuid(HIGHGUID_PLAYER, itr->lowguid), 0, false, true);
 
     return true;
@@ -429,7 +430,7 @@ bool ChatHandler::HandleCharacterEraseCommand(char* args)
         account_id = sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
 
     std::string account_name;
-    sAccountMgr.GetName (account_id,account_name);
+    sAccountMgr.GetName(account_id,account_name);
 
     Player::DeleteFromDB(target_guid, account_id, true, true);
     PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), target_guid.GetCounter(), account_name.c_str(), account_id);
@@ -461,7 +462,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE active_realm_id = %u", realmID);
+    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE active_realm_id = %u", realmID);
 
     return ShowAccountListHelper(result,&limit);
 }
@@ -470,9 +471,9 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 bool ChatHandler::HandleAccountCreateCommand(char* args)
 {
     ///- %Parse the command line arguments
-    char *szAcc = ExtractQuotedOrLiteralArg(&args);
-    char *szPassword = ExtractQuotedOrLiteralArg(&args);
-    if(!szAcc || !szPassword)
+    char* szAcc = ExtractQuotedOrLiteralArg(&args);
+    char* szPassword = ExtractQuotedOrLiteralArg(&args);
+    if (!szAcc || !szPassword)
         return false;
 
     // normalized in accmgr.CreateAccount
@@ -480,7 +481,7 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
     std::string password = szPassword;
 
     AccountOpResult result = sAccountMgr.CreateAccount(account_name, password);
-    switch(result)
+    switch (result)
     {
         case AOR_OK:
             PSendSysMessage(LANG_ACCOUNT_CREATED,account_name.c_str());
@@ -512,13 +513,13 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
     if (!*args)
     {
         SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
-        for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+        for (int i = 0; i < LOG_FILTER_COUNT; ++i)
             if (*logFilterData[i].name)
                 PSendSysMessage("  %-20s = %s",logFilterData[i].name, GetOnOffStr(sLog.HasLogFilter(1 << i)));
         return true;
     }
 
-    char *filtername = ExtractLiteralArg(&args);
+    char* filtername = ExtractLiteralArg(&args);
     if (!filtername)
         return false;
 
@@ -537,7 +538,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
         return true;
     }
 
-    for(int i = 0; i < LOG_FILTER_COUNT; ++i)
+    for (int i = 0; i < LOG_FILTER_COUNT; ++i)
     {
         if (!*logFilterData[i].name)
             continue;
@@ -554,7 +555,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
 }
 
 /// Set the level of logging
-bool ChatHandler::HandleServerLogLevelCommand(char *args)
+bool ChatHandler::HandleServerLogLevelCommand(char* args)
 {
     if (!*args)
     {
@@ -605,32 +606,32 @@ void CliRunnable::run()
     while (!World::IsStopped())
     {
         fflush(stdout);
-        #ifdef linux
+#ifdef linux
         while (!kb_hit_return() && !World::IsStopped())
             // With this, we limit CLI to 10commands/second
             usleep(100);
         if (World::IsStopped())
             break;
-        #endif
-        char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
+#endif
+        char* command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
         if (command_str != NULL)
         {
-            for(int x=0;command_str[x];x++)
-                if(command_str[x]=='\r'||command_str[x]=='\n')
-            {
-                command_str[x]=0;
-                break;
-            }
+            for (int x=0; command_str[x]; x++)
+                if (command_str[x]=='\r'||command_str[x]=='\n')
+                {
+                    command_str[x]=0;
+                    break;
+                }
 
 
-            if(!*command_str)
+            if (!*command_str)
             {
                 printf("mangos>");
                 continue;
             }
 
             std::string command;
-            if(!consoleToUtf8(command_str,command))         // convert from console encoding to utf8
+            if (!consoleToUtf8(command_str,command))        // convert from console encoding to utf8
             {
                 printf("mangos>");
                 continue;

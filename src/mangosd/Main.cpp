@@ -58,33 +58,33 @@ DatabaseType LoginDatabase;                                 ///< Accessor to the
 uint32 realmID;                                             ///< Id of the realm
 
 /// Print out the usage string for this program on the console.
-void usage(const char *prog)
+void usage(const char* prog)
 {
     sLog.outString("Usage: \n %s [<options>]\n"
-        "    -v, --version            print version and exist\n\r"
-        "    -c config_file           use config_file as configuration file\n\r"
-        "    -a, --ahbot config_file  use config_file as ahbot configuration file\n\r"
-        #ifdef WIN32
-        "    Running as service functions:\n\r"
-        "    -s run                   run as service\n\r"
-        "    -s install               install service\n\r"
-        "    -s uninstall             uninstall service\n\r"
-        #else
-        "    Running as daemon functions:\n\r"
-        "    -s run                   run as daemon\n\r"
-        "    -s stop                  stop daemon\n\r"
-        #endif
-        ,prog);
+                   "    -v, --version            print version and exist\n\r"
+                   "    -c config_file           use config_file as configuration file\n\r"
+                   "    -a, --ahbot config_file  use config_file as ahbot configuration file\n\r"
+#ifdef WIN32
+                   "    Running as service functions:\n\r"
+                   "    -s run                   run as service\n\r"
+                   "    -s install               install service\n\r"
+                   "    -s uninstall             uninstall service\n\r"
+#else
+                   "    Running as daemon functions:\n\r"
+                   "    -s run                   run as daemon\n\r"
+                   "    -s stop                  stop daemon\n\r"
+#endif
+                   ,prog);
 }
 
 /// Launch the mangos server
-extern int main(int argc, char **argv)
+extern int main(int argc, char** argv)
 {
     ///- Command line parsing
     char const* cfg_file = _MANGOSD_CONFIG;
 
 
-    char const *options = ":a:c:s:";
+    char const* options = ":a:c:s:";
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
     cmd_opts.long_option("version", 'v', ACE_Get_Opt::NO_ARG);
@@ -108,7 +108,7 @@ extern int main(int argc, char **argv)
                 return 0;
             case 's':
             {
-                const char *mode = cmd_opts.opt_arg();
+                const char* mode = cmd_opts.opt_arg();
 
                 if (!strcmp(mode, "run"))
                     serviceDaemonMode = 'r';
@@ -170,33 +170,33 @@ extern int main(int argc, char **argv)
 #ifndef WIN32                                               // posix daemon commands need apply after config read
     switch (serviceDaemonMode)
     {
-    case 'r':
-        startDaemon();
-        break;
-    case 's':
-        stopDaemon();
-        break;
+        case 'r':
+            startDaemon();
+            break;
+        case 's':
+            stopDaemon();
+            break;
     }
 #endif
 
-    sLog.outString( "%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-    sLog.outString( "<Ctrl-C> to stop." );
+    sLog.outString("%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+    sLog.outString("<Ctrl-C> to stop.");
     sLog.outString("\n\n"
-        "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
-        "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
-        "MM M MM         MMMM MM MMM     MM  MM  MMM\n"
-        "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM\n"
-        "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM\n"
-        "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM\n"
-        "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM\n"
-        "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
-        "        MM  MMM http://getmangos.com\n"
-        "        MMMMMM\n\n");
+                   "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"
+                   "MM   MM         MM   MM MMM MMM MM  MM MMM MMM\n"
+                   "MMM MMM         MMM  MM MMM MMM MM  MM MMM\n"
+                   "MM M MM         MMMM MM MMM     MM  MM  MMM\n"
+                   "MM M MM  MMMMM  MM MMMM MMM     MM  MM   MMM\n"
+                   "MM M MM M   MMM MM  MMM MMMMMMM MM  MM    MMM\n"
+                   "MM   MM     MMM MM   MM MM  MMM MM  MM     MMM\n"
+                   "MM   MM MMMMMMM MM   MM MMM MMM MM  MM MMM MMM\n"
+                   "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
+                   "        MM  MMM http://getmangos.com\n"
+                   "        MMMMMM\n\n");
     sLog.outString("Using configuration file %s.", cfg_file);
 
     DETAIL_LOG("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    if (SSLeay() < 0x009080bfL )
+    if (SSLeay() < 0x009080bfL)
     {
         DETAIL_LOG("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         DETAIL_LOG("WARNING: Minimal required version [OpenSSL 0.9.8k]");

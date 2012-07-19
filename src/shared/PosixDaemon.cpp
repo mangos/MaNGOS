@@ -37,7 +37,8 @@ void daemonSignal(int s)
         exit(EXIT_SUCCESS);
     }
 
-    if (sid) {
+    if (sid)
+    {
         kill(sid, s);
     }
 
@@ -57,11 +58,13 @@ void startDaemon(uint32_t timeout)
 
     sid = pid = fork();
 
-    if (pid < 0) {
-      exit(EXIT_FAILURE);
+    if (pid < 0)
+    {
+        exit(EXIT_FAILURE);
     }
 
-    if (pid > 0) {
+    if (pid > 0)
+    {
         alarm(timeout);
         pause();
         exit(EXIT_FAILURE);
@@ -71,12 +74,14 @@ void startDaemon(uint32_t timeout)
 
     sid = setsid();
 
-    if (sid < 0) {
-      exit(EXIT_FAILURE);
+    if (sid < 0)
+    {
+        exit(EXIT_FAILURE);
     }
 
-    if ((chdir("/")) < 0) {
-      exit(EXIT_FAILURE);
+    if ((chdir("/")) < 0)
+    {
+        exit(EXIT_FAILURE);
     }
 
     freopen("/dev/null", "rt", stdin);
@@ -87,7 +92,7 @@ void startDaemon(uint32_t timeout)
 void stopDaemon()
 {
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
-    if(!pidfile.empty())
+    if (!pidfile.empty())
     {
         std::fstream pf(pidfile.c_str(), std::ios::in);
         uint32_t pid = 0;

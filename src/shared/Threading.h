@@ -35,7 +35,7 @@ namespace ACE_Based
             void incReference() { ++m_refs; }
             void decReference()
             {
-                if(!--m_refs)
+                if (!--m_refs)
                     delete this;
             }
         private:
@@ -84,17 +84,17 @@ namespace ACE_Based
             static void Sleep(unsigned long msecs);
             static ACE_thread_t currentId();
             static ACE_hthread_t currentHandle();
-            static Thread * current();
+            static Thread* current();
 
         private:
             Thread(const Thread&);
             Thread& operator=(const Thread&);
 
-            static ACE_THR_FUNC_RETURN ThreadTask(void * param);
+            static ACE_THR_FUNC_RETURN ThreadTask(void* param);
 
             ACE_thread_t m_iThreadId;
             ACE_hthread_t m_hThreadHandle;
-            Runnable * m_task;
+            Runnable* m_task;
 
             typedef ACE_TSS<Thread> ThreadStorage;
             //global object - container for Thread class representation of every thread

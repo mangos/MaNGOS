@@ -30,9 +30,9 @@ class AuthCrypt
         AuthCrypt();
         ~AuthCrypt();
 
-        void Init(BigNumber *K);
-        void DecryptRecv(uint8 *, size_t);
-        void EncryptSend(uint8 *, size_t);
+        void Init(BigNumber* K);
+        void DecryptRecv(uint8*, size_t);
+        void EncryptSend(uint8*, size_t);
 
         bool IsInitialized() { return _initialized; }
 

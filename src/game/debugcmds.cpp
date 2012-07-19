@@ -65,7 +65,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
 
 bool ChatHandler::HandleDebugSendPoiCommand(char* args)
 {
-    Player *pPlayer = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
     Unit* target = getSelectedUnit();
     if (!target)
     {
@@ -118,7 +118,7 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
 
 bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
 {
-    Unit *unit = getSelectedUnit();
+    Unit* unit = getSelectedUnit();
     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
         unit = m_session->GetPlayer();
 
@@ -131,51 +131,51 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
 
     WorldPacket data(opcode, 0);
 
-    while(!ifs.eof())
+    while (!ifs.eof())
     {
         std::string type;
         ifs >> type;
 
-        if(type == "")
+        if (type == "")
             break;
 
-        if(type == "uint8")
+        if (type == "uint8")
         {
             uint16 val1;
             ifs >> val1;
             data << uint8(val1);
         }
-        else if(type == "uint16")
+        else if (type == "uint16")
         {
             uint16 val2;
             ifs >> val2;
             data << val2;
         }
-        else if(type == "uint32")
+        else if (type == "uint32")
         {
             uint32 val3;
             ifs >> val3;
             data << val3;
         }
-        else if(type == "uint64")
+        else if (type == "uint64")
         {
             uint64 val4;
             ifs >> val4;
             data << val4;
         }
-        else if(type == "float")
+        else if (type == "float")
         {
             float val5;
             ifs >> val5;
             data << val5;
         }
-        else if(type == "string")
+        else if (type == "string")
         {
             std::string val6;
             ifs >> val6;
             data << val6;
         }
-        else if(type == "pguid")
+        else if (type == "pguid")
         {
             data << unit->GetPackGUID();
         }
@@ -281,7 +281,7 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
 //Send notification in channel
 bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 {
-    const char *name = "test";
+    const char* name = "test";
 
     uint32 code;
     if (!ExtractUInt32(&args, code) || code > 255)
@@ -299,7 +299,7 @@ bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 //Send notification in chat
 bool ChatHandler::HandleDebugSendChatMsgCommand(char* args)
 {
-    const char *msg = "testtest";
+    const char* msg = "testtest";
 
     uint32 type;
     if (!ExtractUInt32(&args, type) || type > 255)
@@ -329,11 +329,11 @@ bool ChatHandler::HandleDebugGetLootRecipientCommand(char* /*args*/)
 
     if (!target->HasLootRecipient())
         SendSysMessage("loot recipient: no loot recipient");
-    else if(Player* recipient = target->GetLootRecipient())
+    else if (Player* recipient = target->GetLootRecipient())
         PSendSysMessage("loot recipient: %s with raw data %s from group %u",
-            recipient->GetGuidStr().c_str(),
-            target->GetLootRecipientGuid().GetString().c_str(),
-            target->GetLootGroupRecipientId());
+                        recipient->GetGuidStr().c_str(),
+                        target->GetLootRecipientGuid().GetString().c_str(),
+                        target->GetLootGroupRecipientId());
     else
         SendSysMessage("loot recipient: offline ");
 
@@ -393,27 +393,27 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
         SendSysMessage(state_str.c_str());
         for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
         {
-            if(i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
+            if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                 continue;
 
-            Item *item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
             if (!item) continue;
             if (!item->IsBag())
             {
                 if (item->GetState() == state)
                     PSendSysMessage("%s bag: 255 slot: %u owner: %s",
-                        item->GetGuidStr().c_str(),  item->GetSlot(), item->GetOwnerGuid().GetString().c_str());
+                                    item->GetGuidStr().c_str(),  item->GetSlot(), item->GetOwnerGuid().GetString().c_str());
             }
             else
             {
-                Bag *bag = (Bag*)item;
+                Bag* bag = (Bag*)item;
                 for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                 {
                     Item* item2 = bag->GetItemByPos(j);
                     if (item2 && item2->GetState() == state)
                         PSendSysMessage("%s bag: %u slot: %u owner: %s",
-                            item2->GetGuidStr().c_str(), item2->GetBagSlot(), item2->GetSlot(),
-                            item2->GetOwnerGuid().GetString().c_str());
+                                        item2->GetGuidStr().c_str(), item2->GetBagSlot(), item2->GetSlot(),
+                                        item2->GetOwnerGuid().GetString().c_str());
                 }
             }
         }
@@ -421,17 +421,17 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
 
     if (list_queue)
     {
-        std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
-        for(size_t i = 0; i < updateQueue.size(); ++i)
+        std::vector<Item*>& updateQueue = player->GetItemUpdateQueue();
+        for (size_t i = 0; i < updateQueue.size(); ++i)
         {
-            Item *item = updateQueue[i];
-            if(!item) continue;
+            Item* item = updateQueue[i];
+            if (!item) continue;
 
-            Bag *container = item->GetContainer();
+            Bag* container = item->GetContainer();
             uint8 bag_slot = container ? container->GetSlot() : uint8(INVENTORY_SLOT_BAG_0);
 
             std::string st;
-            switch(item->GetState())
+            switch (item->GetState())
             {
                 case ITEM_UNCHANGED: st = "unchanged"; break;
                 case ITEM_CHANGED: st = "changed"; break;
@@ -440,7 +440,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
             }
 
             PSendSysMessage("%s bag: %u slot: %u - state: %s",
-                item->GetGuidStr().c_str(), bag_slot, item->GetSlot(), st.c_str());
+                            item->GetGuidStr().c_str(), bag_slot, item->GetSlot(), st.c_str());
         }
         if (updateQueue.empty())
             PSendSysMessage("updatequeue empty");
@@ -449,35 +449,35 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
     if (check_all)
     {
         bool error = false;
-        std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
+        std::vector<Item*>& updateQueue = player->GetItemUpdateQueue();
         for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
         {
-            if(i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
+            if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                 continue;
 
-            Item *item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
             if (!item) continue;
 
             if (item->GetSlot() != i)
             {
                 PSendSysMessage("%s at slot %u has an incorrect slot value: %d",
-                    item->GetGuidStr().c_str(), i, item->GetSlot());
+                                item->GetGuidStr().c_str(), i, item->GetSlot());
                 error = true; continue;
             }
 
             if (item->GetOwnerGuid() != player->GetObjectGuid())
             {
                 PSendSysMessage("%s at slot %u owner (%s) and inventory owner (%s) don't match!",
-                    item->GetGuidStr().c_str(), item->GetSlot(),
-                    item->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
+                                item->GetGuidStr().c_str(), item->GetSlot(),
+                                item->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
                 error = true; continue;
             }
 
-            if (Bag *container = item->GetContainer())
+            if (Bag* container = item->GetContainer())
             {
                 PSendSysMessage("%s at slot %u has a container %s from slot %u but shouldnt!",
-                    item->GetGuidStr().c_str(), item->GetSlot(),
-                    container->GetGuidStr().c_str(), container->GetSlot());
+                                item->GetGuidStr().c_str(), item->GetSlot(),
+                                container->GetGuidStr().c_str(), container->GetSlot());
                 error = true; continue;
             }
 
@@ -487,35 +487,35 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                 if (qp > updateQueue.size())
                 {
                     PSendSysMessage("%s at slot %u has a queuepos (%d) larger than the update queue size! ",
-                        item->GetGuidStr().c_str(), item->GetSlot(), qp);
+                                    item->GetGuidStr().c_str(), item->GetSlot(), qp);
                     error = true; continue;
                 }
 
                 if (updateQueue[qp] == NULL)
                 {
                     PSendSysMessage("%s at slot %u has a queuepos (%d) that points to NULL in the queue!",
-                        item->GetGuidStr().c_str(), item->GetSlot(), qp);
+                                    item->GetGuidStr().c_str(), item->GetSlot(), qp);
                     error = true; continue;
                 }
 
                 if (updateQueue[qp] != item)
                 {
                     PSendSysMessage("%s at slot %u has a queuepos (%d) that points to %s in the queue (bag %u, slot %u)",
-                        item->GetGuidStr().c_str(), item->GetSlot(), qp,
-                        updateQueue[qp]->GetGuidStr().c_str(), updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot());
+                                    item->GetGuidStr().c_str(), item->GetSlot(), qp,
+                                    updateQueue[qp]->GetGuidStr().c_str(), updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot());
                     error = true; continue;
                 }
             }
             else if (item->GetState() != ITEM_UNCHANGED)
             {
                 PSendSysMessage("%s at slot %u is not in queue but should be (state: %d)!",
-                    item->GetGuidStr().c_str(), item->GetSlot(), item->GetState());
+                                item->GetGuidStr().c_str(), item->GetSlot(), item->GetState());
                 error = true; continue;
             }
 
-            if(item->IsBag())
+            if (item->IsBag())
             {
-                Bag *bag = (Bag*)item;
+                Bag* bag = (Bag*)item;
                 for (uint8 j = 0; j < bag->GetBagSize(); ++j)
                 {
                     Item* item2 = bag->GetItemByPos(j);
@@ -524,31 +524,31 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                     if (item2->GetSlot() != j)
                     {
                         PSendSysMessage("%s in bag %u at slot %u has an incorrect slot value: %u",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), j, item2->GetSlot());
+                                        item2->GetGuidStr().c_str(), bag->GetSlot(), j, item2->GetSlot());
                         error = true; continue;
                     }
 
                     if (item2->GetOwnerGuid() != player->GetObjectGuid())
                     {
                         PSendSysMessage("%s in bag %u at slot %u owner (%s) and inventory owner (%s) don't match!",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(),
-                            item2->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
+                                        item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(),
+                                        item2->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
                         error = true; continue;
                     }
 
-                    Bag *container = item2->GetContainer();
+                    Bag* container = item2->GetContainer();
                     if (!container)
                     {
                         PSendSysMessage("%s in bag %u at slot %u has no container!",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot());
+                                        item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot());
                         error = true; continue;
                     }
 
                     if (container != bag)
                     {
                         PSendSysMessage("%s in bag %u at slot %u has a different container %s from slot %u!",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(),
-                            container->GetGuidStr().c_str(), container->GetSlot());
+                                        item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(),
+                                        container->GetGuidStr().c_str(), container->GetSlot());
                         error = true; continue;
                     }
 
@@ -558,70 +558,70 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                         if (qp > updateQueue.size())
                         {
                             PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) larger than the update queue size! ",
-                                item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
+                                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
                             error = true; continue;
                         }
 
                         if (updateQueue[qp] == NULL)
                         {
                             PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to NULL in the queue!",
-                                item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
+                                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
                             error = true; continue;
                         }
 
                         if (updateQueue[qp] != item2)
                         {
                             PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to %s in the queue (bag %u slot %u)",
-                                item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp,
-                                updateQueue[qp]->GetGuidStr().c_str(), updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot());
+                                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp,
+                                            updateQueue[qp]->GetGuidStr().c_str(), updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot());
                             error = true; continue;
                         }
                     }
                     else if (item2->GetState() != ITEM_UNCHANGED)
                     {
                         PSendSysMessage("%s in bag %u at slot %u is not in queue but should be (state: %d)!",
-                            item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), item2->GetState());
+                                        item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), item2->GetState());
                         error = true; continue;
                     }
                 }
             }
         }
 
-        for(size_t i = 0; i < updateQueue.size(); ++i)
+        for (size_t i = 0; i < updateQueue.size(); ++i)
         {
-            Item *item = updateQueue[i];
-            if(!item) continue;
+            Item* item = updateQueue[i];
+            if (!item) continue;
 
             if (item->GetOwnerGuid() != player->GetObjectGuid())
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has the owner (%s) and inventory owner (%s) don't match!",
-                    i, item->GetGuidStr().c_str(),
-                    item->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
+                                i, item->GetGuidStr().c_str(),
+                                item->GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
                 error = true; continue;
             }
 
             if (item->GetQueuePos() != i)
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has queuepos doesn't match it's position in the queue!",
-                    i, item->GetGuidStr().c_str());
+                                i, item->GetGuidStr().c_str());
                 error = true; continue;
             }
 
             if (item->GetState() == ITEM_REMOVED) continue;
-            Item *test = player->GetItemByPos( item->GetBagSlot(), item->GetSlot());
+            Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
             if (test == NULL)
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has incorrect (bag %u slot %u) values, the player doesn't have an item at that position!",
-                    i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
+                                i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
                 error = true; continue;
             }
 
             if (test != item)
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has incorrect (bag %u slot %u) values, the %s is there instead!",
-                    i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot(),
-                    test->GetGuidStr().c_str());
+                                i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot(),
+                                test->GetGuidStr().c_str());
                 error = true; continue;
             }
         }
@@ -646,7 +646,7 @@ bool ChatHandler::HandleDebugArenaCommand(char* /*args*/)
 
 bool ChatHandler::HandleDebugSpellCheckCommand(char* /*args*/)
 {
-    sLog.outString( "Check expected in code spell properties base at table 'spell_check' content...");
+    sLog.outString("Check expected in code spell properties base at table 'spell_check' content...");
     sSpellMgr.CheckUsedSpells("spell_check");
     return true;
 }
@@ -655,7 +655,7 @@ bool ChatHandler::HandleDebugSendLargePacketCommand(char* /*args*/)
 {
     const char* stuffingString = "This is a dummy string to push the packet's size beyond 128000 bytes. ";
     std::ostringstream ss;
-    while(ss.str().size() < 128000)
+    while (ss.str().size() < 128000)
         ss << stuffingString;
     SendSysMessage(ss.str().c_str());
     return true;
@@ -699,7 +699,7 @@ bool ChatHandler::HandleDebugSetAuraStateCommand(char* args)
     if (!state)
     {
         // reset all states
-        for(int i = 1; i <= 32; ++i)
+        for (int i = 1; i <= 32; ++i)
             unit->ModifyAuraState(AuraState(i),false);
         return true;
     }
@@ -733,7 +733,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
     else
         return false;
 
-    if(base)
+    if (base)
     {
         uint32 iValue;
         if (!ExtractUInt32Base(&valStr, iValue, base))
@@ -750,7 +750,7 @@ bool ChatHandler::HandleSetValueHelper(Object* target, uint32 field, char* typeS
             return false;
 
         DEBUG_LOG(GetMangosString(LANG_SET_FLOAT), guid.GetString().c_str(), field, fValue);
-        target->SetFloatValue(field , fValue );
+        target->SetFloatValue(field , fValue);
         PSendSysMessage(LANG_SET_FLOAT_FIELD, guid.GetString().c_str(), field, fValue);
     }
 
@@ -775,7 +775,7 @@ bool ChatHandler::HandleDebugSetItemValueCommand(char* args)
     if (!valStr)
         return false;
 
-    Item *item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
+    Item* item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
     if (!item)
         return false;
 
@@ -785,7 +785,7 @@ bool ChatHandler::HandleDebugSetItemValueCommand(char* args)
 bool ChatHandler::HandleDebugSetValueCommand(char* args)
 {
     Unit* target = getSelectedUnit();
-    if(!target)
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
@@ -835,7 +835,7 @@ bool ChatHandler::HandleGetValueHelper(Object* target, uint32 field, char* typeS
     {
         uint32 iValue = target->GetUInt32Value(field);
 
-        switch(base)
+        switch (base)
         {
             case 2:
             {
@@ -893,7 +893,7 @@ bool ChatHandler::HandleDebugGetItemValueCommand(char* args)
 bool ChatHandler::HandleDebugGetValueCommand(char* args)
 {
     Unit* target = getSelectedUnit();
-    if(!target)
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
@@ -911,7 +911,7 @@ bool ChatHandler::HandleDebugGetValueCommand(char* args)
     return HandleGetValueHelper(target, field, typeStr);
 }
 
-bool ChatHandler::HandlerDebugModValueHelper( Object* target, uint32 field, char* typeStr, char* valStr )
+bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr)
 {
     ObjectGuid guid = target->GetObjectGuid();
 
@@ -944,7 +944,7 @@ bool ChatHandler::HandlerDebugModValueHelper( Object* target, uint32 field, char
 
         uint32 value = target->GetUInt32Value(field);
 
-        switch(type)
+        switch (type)
         {
             default:
             case 1:                                         // int +
@@ -1008,7 +1008,7 @@ bool ChatHandler::HandleDebugModItemValueCommand(char* args)
     if (!valStr)
         return false;
 
-    Item *item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
+    Item* item = m_session->GetPlayer()->GetItemByGuid(ObjectGuid(HIGHGUID_ITEM, guid));
     if (!item)
         return false;
 
@@ -1018,7 +1018,7 @@ bool ChatHandler::HandleDebugModItemValueCommand(char* args)
 bool ChatHandler::HandleDebugModValueCommand(char* args)
 {
     Unit* target = getSelectedUnit();
-    if(!target)
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
@@ -1046,7 +1046,7 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     if (!spellid)
         return false;
 
-    SpellEntry const * spellEntry = sSpellStore.LookupEntry(spellid);
+    SpellEntry const* spellEntry = sSpellStore.LookupEntry(spellid);
     if (!spellEntry)
         return false;
 
@@ -1056,11 +1056,11 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     float dot_calc = CalculateDefaultCoefficient(spellEntry, DOT);
 
     bool isDirectHeal = false;
-    for(int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         // Heals (Also count Mana Shield and Absorb effects as heals)
         if (spellEntry->Effect[i] == SPELL_EFFECT_HEAL || spellEntry->Effect[i] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-            (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spellEntry->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)) )
+                (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spellEntry->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)))
         {
             isDirectHeal = true;
             break;
@@ -1068,7 +1068,7 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     }
 
     bool isDotHeal = false;
-    for(int i = 0; i < 3; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         // Periodic Heals
         if (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
@@ -1084,9 +1084,9 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     char const* dotDamageStr = GetMangosString(LANG_DOT_DAMAGE);
 
     PSendSysMessage(LANG_SPELLCOEFS, spellid, isDirectHeal ? directHealStr : directDamageStr,
-        direct_calc, direct_calc * 1.88f, bonus ? bonus->direct_damage : 0.0f, bonus ? bonus->ap_bonus : 0.0f);
+                    direct_calc, direct_calc * 1.88f, bonus ? bonus->direct_damage : 0.0f, bonus ? bonus->ap_bonus : 0.0f);
     PSendSysMessage(LANG_SPELLCOEFS, spellid, isDotHeal ? dotHealStr : dotDamageStr,
-        dot_calc, dot_calc * 1.88f, bonus ? bonus->dot_damage : 0.0f, bonus ? bonus->ap_dot_bonus : 0.0f);
+                    dot_calc, dot_calc * 1.88f, bonus ? bonus->dot_damage : 0.0f, bonus ? bonus->ap_dot_bonus : 0.0f);
 
     return true;
 }
@@ -1117,7 +1117,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     if (!ExtractInt32(&args, value))
         return false;
 
-    Player *chr = getSelectedPlayer();
+    Player* chr = getSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1130,10 +1130,10 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
         return false;
 
     PSendSysMessage(LANG_YOU_CHANGE_SPELLMODS, opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct",
-        spellmodop, value, effidx, GetNameLink(chr).c_str());
+                    spellmodop, value, effidx, GetNameLink(chr).c_str());
     if (needReportToTarget(chr))
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
-            opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
+                                         opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
     WorldPacket data(opcode, (1+1+2+2));
     data << uint8(effidx);

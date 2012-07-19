@@ -52,7 +52,7 @@ class WorldTimer
 
     private:
         WorldTimer();
-        WorldTimer(const WorldTimer& );
+        WorldTimer(const WorldTimer&);
 
         //analogue to getMSTime() but it persists m_SystemTickTime
         static uint32 getMSTime_internal(bool savetime = false);

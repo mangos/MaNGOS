@@ -49,29 +49,29 @@ class MaNGOSsoapRunnable: public ACE_Based::Runnable
 class SOAPWorkingThread : public ACE_Task<ACE_MT_SYNCH>
 {
     public:
-        SOAPWorkingThread ()
+        SOAPWorkingThread()
         { }
 
-        virtual int svc (void)
+        virtual int svc(void)
         {
             while (1)
             {
-                ACE_Message_Block *mb = 0;
-                if (this->getq (mb) == -1)
+                ACE_Message_Block* mb = 0;
+                if (this->getq(mb) == -1)
                 {
-                    ACE_DEBUG ((LM_INFO,
-                                ACE_TEXT ("(%t) Shutting down\n")));
+                    ACE_DEBUG((LM_INFO,
+                               ACE_TEXT("(%t) Shutting down\n")));
                     break;
                 }
 
                 // Process the message.
-                process_message (mb);
+                process_message(mb);
             }
 
             return 0;
         }
     private:
-        void process_message (ACE_Message_Block *mb);
+        void process_message(ACE_Message_Block* mb);
 };
 
 

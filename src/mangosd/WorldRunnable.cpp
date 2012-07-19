@@ -57,7 +57,7 @@ void WorldRunnable::run()
 
         uint32 diff = WorldTimer::tick();
 
-        sWorld.Update( diff );
+        sWorld.Update(diff);
         realPrevTime = realCurrTime;
 
         // diff (D0) include time of previous sleep (d0) + tick time (t0)
@@ -72,14 +72,14 @@ void WorldRunnable::run()
         else
             prevSleepTime = 0;
 
-        #ifdef WIN32
-            if (m_ServiceStatus == 0) World::StopNow(SHUTDOWN_EXIT_CODE);
-            while (m_ServiceStatus == 2) Sleep(1000);
-        #endif
+#ifdef WIN32
+        if (m_ServiceStatus == 0) World::StopNow(SHUTDOWN_EXIT_CODE);
+        while (m_ServiceStatus == 2) Sleep(1000);
+#endif
     }
 
     sWorld.KickAll();                                       // save and kick all players
-    sWorld.UpdateSessions( 1 );                             // real players unload required UpdateSessions call
+    sWorld.UpdateSessions(1);                               // real players unload required UpdateSessions call
 
     // unload battleground templates before different singletons destroyed
     sBattleGroundMgr.DeleteAllBattleGrounds();

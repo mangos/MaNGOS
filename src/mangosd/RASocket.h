@@ -51,20 +51,20 @@ class RASocket: protected RAHandler
         virtual ~RASocket(void);
 
         /// Called on open ,the void* is the acceptor.
-        virtual int open (void *);
+        virtual int open(void*);
 
         /// Called on failures inside of the acceptor, don't call from your code.
-        virtual int close (int);
+        virtual int close(int);
 
         /// Called when we can read from the socket.
-        virtual int handle_input (ACE_HANDLE = ACE_INVALID_HANDLE);
+        virtual int handle_input(ACE_HANDLE = ACE_INVALID_HANDLE);
 
         /// Called when the socket can write.
-        virtual int handle_output (ACE_HANDLE = ACE_INVALID_HANDLE);
+        virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE);
 
         /// Called when connection is closed or error happens.
-        virtual int handle_close (ACE_HANDLE = ACE_INVALID_HANDLE,
-            ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
+        virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE,
+                                 ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
     private:
         bool outActive;
@@ -87,9 +87,9 @@ class RASocket: protected RAHandler
             NONE,                                           //initial value
             LG,                                             //only login was entered
             OK,                                             //both login and pass were given, they were correct and user has enough priv.
-        }stage;
+        } stage;
 
-        static void zprint(void* callbackArg, const char * szText );
+        static void zprint(void* callbackArg, const char* szText);
         static void commandFinished(void* callbackArg, bool success);
 };
 #endif

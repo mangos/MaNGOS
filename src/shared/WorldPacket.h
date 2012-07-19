@@ -27,13 +27,13 @@
 class WorldPacket : public ByteBuffer
 {
     public:
-                                                            // just container for later use
+        // just container for later use
         WorldPacket()                                       : ByteBuffer(0), m_opcode(0)
         {
         }
         explicit WorldPacket(uint16 opcode, size_t res=200) : ByteBuffer(res), m_opcode(opcode) { }
-                                                            // copy constructor
-        WorldPacket(const WorldPacket &packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
+        // copy constructor
+        WorldPacket(const WorldPacket& packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
         {
         }
 

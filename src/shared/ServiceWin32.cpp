@@ -32,7 +32,7 @@
 #endif
 #endif
 
-extern int main(int argc, char ** argv);
+extern int main(int argc, char** argv);
 extern char serviceLongName[];
 extern char serviceName[];
 extern char serviceDescription[];
@@ -43,7 +43,7 @@ SERVICE_STATUS serviceStatus;
 
 SERVICE_STATUS_HANDLE serviceStatusHandle = 0;
 
-typedef WINADVAPI BOOL (WINAPI *CSD_T)(SC_HANDLE, DWORD, LPCVOID);
+typedef WINADVAPI BOOL (WINAPI* CSD_T)(SC_HANDLE, DWORD, LPCVOID);
 
 bool WinServiceInstall()
 {
@@ -58,7 +58,7 @@ bool WinServiceInstall()
     }
 
     char path[_MAX_PATH + 10];
-    if (!GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0])))
+    if (!GetModuleFileName(0, path, sizeof(path)/sizeof(path[0])))
     {
         CloseServiceHandle(serviceControlManager);
         sLog.outError("SERVICE: Can't get service binary filename.");
@@ -68,19 +68,19 @@ bool WinServiceInstall()
     std::strcat(path, " -s run");
 
     SC_HANDLE service = CreateService(serviceControlManager,
-        serviceName,                                // name of service
-        serviceLongName,                            // service name to display
-        SERVICE_ALL_ACCESS,                         // desired access
-                                                    // service type
-        SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
-        SERVICE_AUTO_START,                         // start type
-        SERVICE_ERROR_IGNORE,                       // error control type
-        path,                                       // service's binary
-        0,                                          // no load ordering group
-        0,                                          // no tag identifier
-        0,                                          // no dependencies
-        0,                                          // LocalSystem account
-        0);                                         // no password
+                                      serviceName,                                // name of service
+                                      serviceLongName,                            // service name to display
+                                      SERVICE_ALL_ACCESS,                         // desired access
+                                      // service type
+                                      SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
+                                      SERVICE_AUTO_START,                         // start type
+                                      SERVICE_ERROR_IGNORE,                       // error control type
+                                      path,                                       // service's binary
+                                      0,                                          // no load ordering group
+                                      0,                                          // no tag identifier
+                                      0,                                          // no dependencies
+                                      0,                                          // LocalSystem account
+                                      0);                                         // no password
 
     if (!service)
     {
@@ -90,7 +90,7 @@ bool WinServiceInstall()
     }
 
     advapi32 = GetModuleHandle("ADVAPI32.DLL");
-    if(!advapi32)
+    if (!advapi32)
     {
         sLog.outError("SERVICE: Can't access ADVAPI32.DLL");
         CloseServiceHandle(service);
@@ -143,7 +143,7 @@ bool WinServiceUninstall()
     }
 
     SC_HANDLE service = OpenService(serviceControlManager,
-        serviceName, SERVICE_QUERY_STATUS | DELETE);
+                                    serviceName, SERVICE_QUERY_STATUS | DELETE);
 
     if (!service)
     {
@@ -192,7 +192,7 @@ void WINAPI ServiceControlHandler(DWORD controlCode)
             break;
 
         default:
-            if ( controlCode >= 128 && controlCode <= 255 )
+            if (controlCode >= 128 && controlCode <= 255)
                 // user defined control code
                 break;
             else
@@ -203,7 +203,7 @@ void WINAPI ServiceControlHandler(DWORD controlCode)
     SetServiceStatus(serviceStatusHandle, &serviceStatus);
 }
 
-void WINAPI ServiceMain(DWORD argc, char *argv[])
+void WINAPI ServiceMain(DWORD argc, char* argv[])
 {
     // initialise service status
     serviceStatus.dwServiceType = SERVICE_WIN32;
@@ -216,7 +216,7 @@ void WINAPI ServiceMain(DWORD argc, char *argv[])
 
     serviceStatusHandle = RegisterServiceCtrlHandler(serviceName, ServiceControlHandler);
 
-    if ( serviceStatusHandle )
+    if (serviceStatusHandle)
     {
         char path[_MAX_PATH + 1];
         unsigned int i, last_slash = 0;
@@ -240,7 +240,7 @@ void WINAPI ServiceMain(DWORD argc, char *argv[])
         // running
         serviceStatus.dwControlsAccepted |= (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
         serviceStatus.dwCurrentState = SERVICE_RUNNING;
-        SetServiceStatus( serviceStatusHandle, &serviceStatus );
+        SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
         ////////////////////////
         // service main cycle //
