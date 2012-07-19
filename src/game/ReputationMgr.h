@@ -63,7 +63,7 @@ class ReputationMgr
         ~ReputationMgr() {}
 
         void SaveToDB();
-        void LoadFromDB(QueryResult *result);
+        void LoadFromDB(QueryResult* result);
     public:                                                 // statics
         static const int32 PointsInRank[MAX_REPUTATION_RANK];
         static const int32 Reputation_Cap    =  42999;
@@ -85,7 +85,7 @@ class ReputationMgr
 
         FactionState const* GetState(RepListID id) const
         {
-            FactionStateList::const_iterator repItr = m_factions.find (id);
+            FactionStateList::const_iterator repItr = m_factions.find(id);
             return repItr != m_factions.end() ? &repItr->second : NULL;
         }
 
@@ -126,14 +126,14 @@ class ReputationMgr
 
     private:                                                // internal helper functions
         void Initialize();
-        uint32 GetDefaultStateFlags(const FactionEntry *factionEntry) const;
+        uint32 GetDefaultStateFlags(const FactionEntry* factionEntry) const;
         bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);
         void SetAtWar(FactionState* faction, bool atWar);
         void SetInactive(FactionState* faction, bool inactive);
         void SendVisible(FactionState const* faction) const;
-        void UpdateRankCounters( ReputationRank old_rank, ReputationRank new_rank );
+        void UpdateRankCounters(ReputationRank old_rank, ReputationRank new_rank);
     private:
         Player* m_player;
         FactionStateList m_factions;

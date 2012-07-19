@@ -25,7 +25,7 @@
 #include "movement/MoveSpline.h"
 
 template<>
-RandomMovementGenerator<Creature>::RandomMovementGenerator(const Creature & creature)
+RandomMovementGenerator<Creature>::RandomMovementGenerator(const Creature& creature)
 {
     float respX, respY, respZ, respO, wander_distance;
     creature.GetRespawnCoord(respX, respY, respZ, &respO, &wander_distance);
@@ -39,7 +39,7 @@ RandomMovementGenerator<Creature>::RandomMovementGenerator(const Creature & crea
 }
 
 template<>
-void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
+void RandomMovementGenerator<Creature>::_setRandomLocation(Creature& creature)
 {
     const float angle = rand_norm_f() * (M_PI_F*2.0f);
     const float range = rand_norm_f() * i_radius;
@@ -63,7 +63,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
 }
 
 template<>
-void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
+void RandomMovementGenerator<Creature>::Initialize(Creature& creature)
 {
     if (!creature.isAlive())
         return;
@@ -73,27 +73,27 @@ void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
 }
 
 template<>
-void RandomMovementGenerator<Creature>::Reset(Creature &creature)
+void RandomMovementGenerator<Creature>::Reset(Creature& creature)
 {
     Initialize(creature);
 }
 
 template<>
-void RandomMovementGenerator<Creature>::Interrupt(Creature &creature)
+void RandomMovementGenerator<Creature>::Interrupt(Creature& creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 
 template<>
-void RandomMovementGenerator<Creature>::Finalize(Creature &creature)
+void RandomMovementGenerator<Creature>::Finalize(Creature& creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 
 template<>
-bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
+bool RandomMovementGenerator<Creature>::Update(Creature& creature, const uint32& diff)
 {
     if (creature.hasUnitState(UNIT_STAT_NOT_MOVE))
     {
