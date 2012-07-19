@@ -56,23 +56,23 @@ namespace Movement
         data << move_spline.spline.getPoint(move_spline.spline.first());
         data << move_spline.GetId();
 
-        switch(splineflags & MoveSplineFlag::Mask_Final_Facing)
+        switch (splineflags & MoveSplineFlag::Mask_Final_Facing)
         {
-        default:
-            data << uint8(MonsterMoveNormal);
-            break;
-        case MoveSplineFlag::Final_Target:
-            data << uint8(MonsterMoveFacingTarget);
-            data << move_spline.facing.target;
-            break;
-        case MoveSplineFlag::Final_Angle:
-            data << uint8(MonsterMoveFacingAngle);
-            data << move_spline.facing.angle;
-            break;
-        case MoveSplineFlag::Final_Point:
-            data << uint8(MonsterMoveFacingSpot);
-            data << move_spline.facing.f.x << move_spline.facing.f.y << move_spline.facing.f.z;
-            break;
+            default:
+                data << uint8(MonsterMoveNormal);
+                break;
+            case MoveSplineFlag::Final_Target:
+                data << uint8(MonsterMoveFacingTarget);
+                data << move_spline.facing.target;
+                break;
+            case MoveSplineFlag::Final_Angle:
+                data << uint8(MonsterMoveFacingAngle);
+                data << move_spline.facing.angle;
+                break;
+            case MoveSplineFlag::Final_Point:
+                data << uint8(MonsterMoveFacingSpot);
+                data << move_spline.facing.f.x << move_spline.facing.f.y << move_spline.facing.f.z;
+                break;
         }
 
         // add fake Enter_Cycle flag - needed for client-side cyclic movement (client will erase first spline vertex after first cycle done)
@@ -97,7 +97,7 @@ namespace Movement
     void WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data)
     {
         uint32 last_idx = spline.getPointCount() - 3;
-        const Vector3 * real_path = &spline.getPoint(1);
+        const Vector3* real_path = &spline.getPoint(1);
 
         data << last_idx;
         data << real_path[last_idx];   // destination
@@ -106,7 +106,7 @@ namespace Movement
             Vector3 middle = (real_path[0] + real_path[last_idx]) / 2.f;
             Vector3 offset;
             // first and last points already appended
-            for(uint32 i = 1; i < last_idx; ++i)
+            for (uint32 i = 1; i < last_idx; ++i)
             {
                 offset = middle - real_path[i];
                 data.appendPackXYZ(offset.x, offset.y, offset.z);
@@ -164,7 +164,7 @@ namespace Movement
             {
                 data << move_spline.facing.target;
             }
-            else if(splineFlags.final_point)
+            else if (splineFlags.final_point)
             {
                 data << move_spline.facing.f.x << move_spline.facing.f.y << move_spline.facing.f.z;
             }
