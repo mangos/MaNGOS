@@ -48,7 +48,7 @@ void BattleGroundIC::StartingEventOpenDoors()
 {
 }
 
-void BattleGroundIC::AddPlayer(Player *plr)
+void BattleGroundIC::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in constructor
@@ -62,7 +62,7 @@ void BattleGroundIC::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 
 }
 
-void BattleGroundIC::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
+void BattleGroundIC::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
@@ -74,7 +74,7 @@ void BattleGroundIC::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
 
     BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
 
-    if(itr == m_PlayerScores.end())                         // player not found...
+    if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
     BattleGround::UpdatePlayerScore(Source,type,value);

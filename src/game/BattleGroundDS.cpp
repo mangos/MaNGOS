@@ -53,7 +53,7 @@ void BattleGroundDS::StartingEventOpenDoors()
 {
 }
 
-void BattleGroundDS::AddPlayer(Player *plr)
+void BattleGroundDS::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in constructor
@@ -62,7 +62,7 @@ void BattleGroundDS::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundDS::RemovePlayer(Player * /*plr*/, ObjectGuid /*guid*/)
+void BattleGroundDS::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
@@ -71,7 +71,7 @@ void BattleGroundDS::HandleKillPlayer(Player* player, Player* killer)
     BattleGround::HandleKillPlayer(player, killer);
 }
 
-void BattleGroundDS::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
+void BattleGroundDS::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
 {
 }
 

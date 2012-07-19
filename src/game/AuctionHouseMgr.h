@@ -76,13 +76,13 @@ struct AuctionEntry
     uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
     uint32 GetAuctionCut() const;
     uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket & data) const;
+    bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB() const;
     void SaveToDB() const;
     void AuctionBidWinning(Player* bidder = NULL);
 
     // -1,0,+1 order result
-    int CompareAuctionEntry(uint32 column, const AuctionEntry *auc, Player* viewPlayer) const;
+    int CompareAuctionEntry(uint32 column, const AuctionEntry* auc, Player* viewPlayer) const;
 
     bool UpdateBid(uint32 newbid, Player* newbidder = NULL);// true if normal bid, false if buyout, bidder==NULL for generated bid
 };
@@ -106,15 +106,15 @@ class AuctionHouseObject
         AuctionEntryMap const& GetAuctions() const { return AuctionsMap; }
         AuctionEntryMapBounds GetAuctionsBounds() const {return AuctionEntryMapBounds(AuctionsMap.begin(), AuctionsMap.end()); }
 
-        void AddAuction(AuctionEntry *ah)
+        void AddAuction(AuctionEntry* ah)
         {
-            MANGOS_ASSERT( ah );
+            MANGOS_ASSERT(ah);
             AuctionsMap[ah->Id] = ah;
         }
 
         AuctionEntry* GetAuction(uint32 id) const
         {
-            AuctionEntryMap::const_iterator itr = AuctionsMap.find( id );
+            AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
             return itr != AuctionsMap.end() ? itr->second : NULL;
         }
 
@@ -129,7 +129,7 @@ class AuctionHouseObject
         void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
         void BuildListPendingSales(WorldPacket& data, Player* player, uint32& count);
 
-        AuctionEntry* AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint32 bid, uint32 buyout = 0, uint32 deposit = 0, Player * pl = NULL);
+        AuctionEntry* AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint32 bid, uint32 buyout = 0, uint32 deposit = 0, Player* pl = NULL);
     private:
         AuctionEntryMap AuctionsMap;
 };
@@ -138,8 +138,8 @@ class AuctionSorter
 {
     public:
         AuctionSorter(AuctionSorter const& sorter) : m_sort(sorter.m_sort), m_viewPlayer(sorter.m_viewPlayer) {}
-        AuctionSorter(uint8 *sort, Player* viewPlayer) : m_sort(sort), m_viewPlayer(viewPlayer) {}
-        bool operator()(const AuctionEntry *auc1, const AuctionEntry *auc2) const;
+        AuctionSorter(uint8* sort, Player* viewPlayer) : m_sort(sort), m_viewPlayer(viewPlayer) {}
+        bool operator()(const AuctionEntry* auc1, const AuctionEntry* auc2) const;
 
     private:
         uint8* m_sort;
@@ -177,10 +177,10 @@ class AuctionHouseMgr
         }
 
         //auction messages
-        void SendAuctionWonMail( AuctionEntry * auction );
-        void SendAuctionSuccessfulMail( AuctionEntry * auction );
-        void SendAuctionExpiredMail( AuctionEntry * auction );
-        static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
+        void SendAuctionWonMail(AuctionEntry* auction);
+        void SendAuctionSuccessfulMail(AuctionEntry* auction);
+        void SendAuctionExpiredMail(AuctionEntry* auction);
+        static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem);
 
         static uint32 GetAuctionHouseTeam(AuctionHouseEntry const* house);
         static AuctionHouseEntry const* GetAuctionHouseEntry(Unit* unit);

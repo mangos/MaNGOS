@@ -47,7 +47,8 @@ struct CriteriaProgress
 };
 
 enum AchievementCriteriaRequirementType
-{                                                           // value1         value2        comment
+{
+    // value1         value2        comment
     ACHIEVEMENT_CRITERIA_REQUIRE_NONE                = 0,   // 0              0
     ACHIEVEMENT_CRITERIA_REQUIRE_T_CREATURE          = 1,   // creature_id    0
     ACHIEVEMENT_CRITERIA_REQUIRE_T_PLAYER_CLASS_RACE = 2,   // class_id       race_id
@@ -261,12 +262,12 @@ class AchievementMgr
 
         void Reset();
         static void DeleteFromDB(ObjectGuid guid);
-        void LoadFromDB(QueryResult *achievementResult, QueryResult *criteriaResult);
+        void LoadFromDB(QueryResult* achievementResult, QueryResult* criteriaResult);
         void SaveToDB();
         void ResetAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0);
         void StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime = 0);
         void DoFailedTimedAchievementCriterias();
-        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit *unit=NULL, uint32 time=0);
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit* unit=NULL, uint32 time=0);
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
         void SendRespondInspectAchievements(Player* player);
@@ -298,7 +299,7 @@ class AchievementMgr
         void IncompletedAchievement(AchievementEntry const* entry);
         bool IsCompletedAchievement(AchievementEntry const* entry);
         void CompleteAchievementsWithRefs(AchievementEntry const* entry);
-        void BuildAllDataPacket(WorldPacket *data);
+        void BuildAllDataPacket(WorldPacket* data);
 
         Player* m_player;
         CriteriaProgressMap m_criteriaProgress;

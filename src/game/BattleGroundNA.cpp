@@ -61,7 +61,7 @@ void BattleGroundNA::StartingEventOpenDoors()
     OpenDoorEvent(BG_EVENT_DOOR);
 }
 
-void BattleGroundNA::AddPlayer(Player *plr)
+void BattleGroundNA::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in constructor
@@ -84,7 +84,7 @@ void BattleGroundNA::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
     CheckArenaWinConditions();
 }
 
-void BattleGroundNA::HandleKillPlayer(Player *player, Player *killer)
+void BattleGroundNA::HandleKillPlayer(Player* player, Player* killer)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -103,20 +103,20 @@ void BattleGroundNA::HandleKillPlayer(Player *player, Player *killer)
     CheckArenaWinConditions();
 }
 
-bool BattleGroundNA::HandlePlayerUnderMap(Player *player)
+bool BattleGroundNA::HandlePlayerUnderMap(Player* player)
 {
     player->TeleportTo(GetMapId(),4055.504395f,2919.660645f,13.611241f,player->GetOrientation(),false);
     return true;
 }
 
-void BattleGroundNA::HandleAreaTrigger(Player *Source, uint32 Trigger)
+void BattleGroundNA::HandleAreaTrigger(Player* Source, uint32 Trigger)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
     //uint32 SpellId = 0;
     //uint64 buff_guid = 0;
-    switch(Trigger)
+    switch (Trigger)
     {
         case 4536:                                          // buff trigger?
         case 4537:                                          // buff trigger?
@@ -131,7 +131,7 @@ void BattleGroundNA::HandleAreaTrigger(Player *Source, uint32 Trigger)
     //    HandleTriggerBuff(buff_guid,Source);
 }
 
-void BattleGroundNA::FillInitialWorldStates(WorldPacket &data, uint32& count)
+void BattleGroundNA::FillInitialWorldStates(WorldPacket& data, uint32& count)
 {
     FillInitialWorldState(data, count, 0xa0f, GetAlivePlayersCountByTeam(ALLIANCE));
     FillInitialWorldState(data, count, 0xa10, GetAlivePlayersCountByTeam(HORDE));

@@ -186,7 +186,7 @@ class AuctionHouseBot
         // Followed method is mainly used by level3.cpp for ingame/console command
         void SetItemsRatio(uint32 al, uint32 ho, uint32 ne);
         void SetItemsRatioForHouse(AuctionHouseType house, uint32 val);
-        void SetItemsAmount(uint32 (&vals) [MAX_AUCTION_QUALITY]);
+        void SetItemsAmount(uint32(&vals) [MAX_AUCTION_QUALITY]);
         void SetItemsAmountForQuality(AuctionQuality quality, uint32 val);
         bool ReloadAllConfig();
         void Rebuild(bool all);

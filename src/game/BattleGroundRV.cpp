@@ -53,7 +53,7 @@ void BattleGroundRV::StartingEventOpenDoors()
 {
 }
 
-void BattleGroundRV::AddPlayer(Player *plr)
+void BattleGroundRV::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in constructor
@@ -62,7 +62,7 @@ void BattleGroundRV::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundRV::RemovePlayer(Player * /*plr*/, ObjectGuid /*guid*/)
+void BattleGroundRV::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
@@ -71,7 +71,7 @@ void BattleGroundRV::HandleKillPlayer(Player* player, Player* killer)
     BattleGround::HandleKillPlayer(player, killer);
 }
 
-void BattleGroundRV::HandleAreaTrigger(Player * /*Source*/, uint32 /*Trigger*/)
+void BattleGroundRV::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
 {
 }
 

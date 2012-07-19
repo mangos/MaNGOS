@@ -127,7 +127,8 @@ enum BG_EY_Nodes
 
 // x, y, z
 // used to check, when player is in range of a node
-const float BG_EY_NodePositions[BG_EY_NODES_MAX][3] = {
+const float BG_EY_NodePositions[BG_EY_NODES_MAX][3] =
+{
     {2024.600708f, 1742.819580f, 1195.157715f},             // BG_EY_NODE_FEL_REAVER
     {2050.493164f, 1372.235962f, 1194.563477f},             // BG_EY_NODE_BLOOD_ELF
     {2301.010498f, 1386.931641f, 1197.183472f},             // BG_EY_NODE_DRAENEI_RUINS
@@ -235,14 +236,14 @@ const BattleGroundEYCapturingPointStruct CapturingPointTypes[BG_EY_NODES_MAX] =
 class BattleGroundEYScore : public BattleGroundScore
 {
     public:
-        BattleGroundEYScore () : FlagCaptures(0) {};
+        BattleGroundEYScore() : FlagCaptures(0) {};
         virtual ~BattleGroundEYScore() {};
         uint32 FlagCaptures;
 };
 
 class BattleGroundEY : public BattleGround
 {
-    friend class BattleGroundMgr;
+        friend class BattleGroundMgr;
 
     public:
         BattleGroundEY();
@@ -250,7 +251,7 @@ class BattleGroundEY : public BattleGround
         void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player *plr);
+        virtual void AddPlayer(Player* plr);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
 
@@ -263,31 +264,31 @@ class BattleGroundEY : public BattleGround
         void RespawnFlag(bool send_message);
         void RespawnFlagAfterDrop();
 
-        void RemovePlayer(Player *plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player *Source, uint32 Trigger);
-        void HandleKillPlayer(Player *player, Player *killer);
+        void RemovePlayer(Player* plr, ObjectGuid guid);
+        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleKillPlayer(Player* player, Player* killer);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
         virtual bool SetupBattleGround();
         virtual void Reset();
         void UpdateTeamScore(Team team);
         void EndBattleGround(Team winner);
-        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
         void SetDroppedFlagGuid(ObjectGuid guid)     { m_DroppedFlagGuid = guid;}
         void ClearDroppedFlagGuid()                  { m_DroppedFlagGuid.Clear();}
         ObjectGuid const& GetDroppedFlagGuid() const { return m_DroppedFlagGuid;}
 
         /* Battleground Events */
-        virtual void EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj);
-        virtual void EventPlayerDroppedFlag(Player *Source);
+        virtual void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
+        virtual void EventPlayerDroppedFlag(Player* Source);
 
         /* achievement req. */
         bool IsAllNodesConrolledByTeam(Team team) const;
 
     private:
-        void EventPlayerCapturedFlag(Player *Source, BG_EY_Nodes node);
-        void EventTeamCapturedPoint(Player *Source, uint32 Point);
-        void EventTeamLostPoint(Player *Source, uint32 Point);
+        void EventPlayerCapturedFlag(Player* Source, BG_EY_Nodes node);
+        void EventTeamCapturedPoint(Player* Source, uint32 Point);
+        void EventTeamLostPoint(Player* Source, uint32 Point);
         void UpdatePointsCount(Team team);
         void UpdatePointsIcons(Team team, uint32 Point);
 

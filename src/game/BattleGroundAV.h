@@ -175,7 +175,8 @@ enum BG_AV_Graveyards
     BG_AV_GRAVE_MAIN_HORDE         = 610
 };
 
-const uint32 BG_AV_GraveyardIds[9]= {
+const uint32 BG_AV_GraveyardIds[9]=
+{
     BG_AV_GRAVE_STORM_AID,
     BG_AV_GRAVE_STORM_GRAVE,
     BG_AV_GRAVE_STONE_GRAVE,
@@ -216,13 +217,15 @@ enum BattleGroundAVTeamIndex
 #define BG_AV_TEAMS_COUNT 3
 
 // alliance_control horde_control neutral_control
-const uint32 BG_AV_MineWorldStates[2][BG_AV_TEAMS_COUNT] = {
+const uint32 BG_AV_MineWorldStates[2][BG_AV_TEAMS_COUNT] =
+{
     {1358, 1359, 1360},
     {1355, 1356, 1357}
 };
 
 // alliance_control alliance_assault h_control h_assault
-const uint32 BG_AV_NodeWorldStates[BG_AV_NODES_MAX][4] = {
+const uint32 BG_AV_NodeWorldStates[BG_AV_NODES_MAX][4] =
+{
     // Stormpike first aid station
     {1326,1325,1328,1327},
     // Stormpike Graveyard
@@ -294,7 +297,7 @@ struct BG_AV_NodeInfo
     bool         Tower;
 };
 
-inline BG_AV_Nodes &operator++(BG_AV_Nodes &i)
+inline BG_AV_Nodes& operator++(BG_AV_Nodes& i)
 {
     return i = BG_AV_Nodes(i + 1);
 }
@@ -313,7 +316,7 @@ class BattleGroundAVScore : public BattleGroundScore
 
 class BattleGroundAV : public BattleGround
 {
-    friend class BattleGroundMgr;
+        friend class BattleGroundMgr;
 
     public:
         BattleGroundAV();
@@ -321,31 +324,31 @@ class BattleGroundAV : public BattleGround
         void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player *plr);
+        virtual void AddPlayer(Player* plr);
 
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
         // world states
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
-        void RemovePlayer(Player *plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player *Source, uint32 Trigger);
+        void RemovePlayer(Player* plr, ObjectGuid guid);
+        void HandleAreaTrigger(Player* Source, uint32 Trigger);
         virtual void Reset();
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
 
         /*handle stuff*/ // these are functions which get called from extern scripts
-        virtual void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj);
-        void HandleKillPlayer(Player* player, Player *killer);
-        void HandleKillUnit(Creature *creature, Player *killer);
-        void HandleQuestComplete(uint32 questid, Player *player);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+        void HandleKillPlayer(Player* player, Player* killer);
+        void HandleKillUnit(Creature* creature, Player* killer);
+        void HandleQuestComplete(uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
         void EndBattleGround(Team winner);
 
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player *plr);
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* plr);
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
     private:

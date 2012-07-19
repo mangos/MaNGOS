@@ -103,7 +103,7 @@ void BattleGroundEY::StartingEventOpenDoors()
     // eye-doors are despawned, not opened
     SpawnEvent(BG_EVENT_DOOR, 0, false);
 
-    for(uint32 i = 0; i < BG_EY_NODES_MAX; ++i)
+    for (uint32 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
         //randomly spawn buff
         uint8 buff = urand(0, 2);
@@ -119,7 +119,7 @@ void BattleGroundEY::AddPoints(Team team, uint32 Points)
     BattleGroundTeamIndex team_index = GetTeamIndexByTeamId(team);
     m_TeamScores[team_index] += Points;
     m_HonorScoreTics[team_index] += Points;
-    if (m_HonorScoreTics[team_index] >= m_HonorTics )
+    if (m_HonorScoreTics[team_index] >= m_HonorTics)
     {
         RewardHonorToTeam(GetBonusHonorFromKill(1), team);
         m_HonorScoreTics[team_index] -= m_HonorTics;
@@ -134,7 +134,7 @@ void BattleGroundEY::CheckSomeoneJoinedPoint()
         uint8 j = 0;
         while (j < m_PlayersNearPoint[BG_EY_PLAYERS_OUT_OF_POINTS].size())
         {
-            Player *plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[BG_EY_PLAYERS_OUT_OF_POINTS][j]);
+            Player* plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[BG_EY_PLAYERS_OUT_OF_POINTS][j]);
             if (!plr)
             {
                 sLog.outError("BattleGroundEY:CheckSomeoneJoinedPoint: %s not found!", m_PlayersNearPoint[BG_EY_PLAYERS_OUT_OF_POINTS][j].GetString().c_str());
@@ -142,7 +142,7 @@ void BattleGroundEY::CheckSomeoneJoinedPoint()
                 continue;
             }
             if (plr->CanUseCapturePoint() &&
-                plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
+                    plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
             {
                 //player joined point!
                 //show progress bar
@@ -165,12 +165,12 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
     //reset current point counts
     for (uint8 i = 0; i < 2*BG_EY_NODES_MAX; ++i)
         m_CurrentPointPlayersCount[i] = 0;
-    for(uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
+    for (uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
         uint8 j = 0;
         while (j < m_PlayersNearPoint[i].size())
         {
-            Player *plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[i][j]);
+            Player* plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[i][j]);
             if (!plr)
             {
                 sLog.outError("BattleGroundEY:CheckSomeoneLeftPoint %s not found!", m_PlayersNearPoint[i][j].GetString().c_str());
@@ -181,7 +181,7 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
                 continue;
             }
             if (!plr->CanUseCapturePoint() ||
-                !plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
+                    !plr->IsWithinDist3d(BG_EY_NodePositions[i][0], BG_EY_NodePositions[i][1], BG_EY_NodePositions[i][2], BG_EY_POINT_RADIUS))
                 //move player out of point (add him to players that are out of points
             {
                 m_PlayersNearPoint[BG_EY_PLAYERS_OUT_OF_POINTS].push_back(m_PlayersNearPoint[i][j]);
@@ -200,7 +200,7 @@ void BattleGroundEY::CheckSomeoneLeftPoint()
 
 void BattleGroundEY::UpdatePointStatuses()
 {
-    for(uint8 point = 0; point < BG_EY_NODES_MAX; ++point)
+    for (uint8 point = 0; point < BG_EY_NODES_MAX; ++point)
     {
         if (m_PlayersNearPoint[point].empty())
             continue;
@@ -225,10 +225,10 @@ void BattleGroundEY::UpdatePointStatuses()
 
         for (uint8 i = 0; i < m_PlayersNearPoint[point].size(); ++i)
         {
-            if (Player *plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[point][i]))
+            if (Player* plr = sObjectMgr.GetPlayer(m_PlayersNearPoint[point][i]))
             {
                 UpdateWorldStateForPlayer(PROGRESS_BAR_STATUS, m_PointBarStatus[point], plr);
-                                                            //if point owner changed we must evoke event!
+                //if point owner changed we must evoke event!
                 if (pointOwnerTeamId != m_PointOwnedByTeam[point])
                 {
                     //point was uncontrolled and player is from team which captured point
@@ -303,7 +303,7 @@ void BattleGroundEY::UpdatePointsIcons(Team team, uint32 Point)
     }
 }
 
-void BattleGroundEY::AddPlayer(Player *plr)
+void BattleGroundEY::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map
@@ -314,12 +314,12 @@ void BattleGroundEY::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundEY::RemovePlayer(Player *plr, ObjectGuid guid)
+void BattleGroundEY::RemovePlayer(Player* plr, ObjectGuid guid)
 {
     // sometimes flag aura not removed :(
     for (int j = BG_EY_NODES_MAX; j >= 0; --j)
     {
-        for(size_t i = 0; i < m_PlayersNearPoint[j].size(); ++i)
+        for (size_t i = 0; i < m_PlayersNearPoint[j].size(); ++i)
             if (m_PlayersNearPoint[j][i] == guid)
                 m_PlayersNearPoint[j].erase(m_PlayersNearPoint[j].begin() + i);
     }
@@ -338,15 +338,15 @@ void BattleGroundEY::RemovePlayer(Player *plr, ObjectGuid guid)
     }
 }
 
-void BattleGroundEY::HandleAreaTrigger(Player *Source, uint32 Trigger)
+void BattleGroundEY::HandleAreaTrigger(Player* Source, uint32 Trigger)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    if(!Source->isAlive())                                  //hack code, must be removed later
+    if (!Source->isAlive())                                 //hack code, must be removed later
         return;
 
-    switch(Trigger)
+    switch (Trigger)
     {
         case TR_BLOOD_ELF_POINT:
             if (m_PointState[BG_EY_NODE_BLOOD_ELF] == EY_POINT_UNDER_CONTROL && m_PointOwnedByTeam[BG_EY_NODE_BLOOD_ELF] == Source->GetTeam())
@@ -399,9 +399,9 @@ bool BattleGroundEY::SetupBattleGround()
             continue;
         }
         if (!AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3, Buff_Entries[0], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-            || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 1, Buff_Entries[1], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-            || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
-            )
+                || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 1, Buff_Entries[1], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
+                || !AddObject(BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER + i * 3 + 2, Buff_Entries[2], at->x, at->y, at->z, 0.907571f, 0, 0, 0.438371f, 0.898794f, RESPAWN_ONE_DAY)
+           )
             sLog.outError("BattleGroundEY: Cannot spawn buff");
     }
 
@@ -427,7 +427,7 @@ void BattleGroundEY::Reset()
     bool isBGWeekend = BattleGroundMgr::IsBGWeekend(GetTypeID());
     m_HonorTics = (isBGWeekend) ? BG_EY_EYWeekendHonorTicks : BG_EY_NotEYWeekendHonorTicks;
 
-    for(uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
+    for (uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
         m_PointOwnedByTeam[i] = TEAM_NONE;
         m_PointState[i] = EY_POINT_STATE_UNCONTROLLED;
@@ -462,7 +462,7 @@ void BattleGroundEY::RespawnFlagAfterDrop()
 {
     RespawnFlag(true);
 
-    GameObject *obj = GetBgMap()->GetGameObject(GetDroppedFlagGuid());
+    GameObject* obj = GetBgMap()->GetGameObject(GetDroppedFlagGuid());
     if (obj)
         obj->Delete();
     else
@@ -471,7 +471,7 @@ void BattleGroundEY::RespawnFlagAfterDrop()
     ClearDroppedFlagGuid();
 }
 
-void BattleGroundEY::HandleKillPlayer(Player *player, Player *killer)
+void BattleGroundEY::HandleKillPlayer(Player* player, Player* killer)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -480,7 +480,7 @@ void BattleGroundEY::HandleKillPlayer(Player *player, Player *killer)
     EventPlayerDroppedFlag(player);
 }
 
-void BattleGroundEY::EventPlayerDroppedFlag(Player *Source)
+void BattleGroundEY::EventPlayerDroppedFlag(Player* Source)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
     {
@@ -516,7 +516,7 @@ void BattleGroundEY::EventPlayerDroppedFlag(Player *Source)
         SendMessageToAll(LANG_BG_EY_DROPPED_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, NULL);
 }
 
-void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj)
+void BattleGroundEY::EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj)
 {
     if (GetStatus() != STATUS_IN_PROGRESS || IsFlagPickedup() || !Source->IsWithinDistInMap(target_obj, 10))
         return;
@@ -550,7 +550,7 @@ void BattleGroundEY::EventPlayerClickedOnFlag(Player *Source, GameObject* target
         PSendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG, CHAT_MSG_BG_SYSTEM_HORDE, NULL, Source->GetName());
 }
 
-void BattleGroundEY::EventTeamLostPoint(Player *Source, uint32 Point)
+void BattleGroundEY::EventTeamLostPoint(Player* Source, uint32 Point)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -584,7 +584,7 @@ void BattleGroundEY::EventTeamLostPoint(Player *Source, uint32 Point)
     UpdatePointsCount(team);
 }
 
-void BattleGroundEY::EventTeamCapturedPoint(Player *Source, uint32 Point)
+void BattleGroundEY::EventTeamCapturedPoint(Player* Source, uint32 Point)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -608,7 +608,7 @@ void BattleGroundEY::EventTeamCapturedPoint(Player *Source, uint32 Point)
     UpdatePointsCount(team);
 }
 
-void BattleGroundEY::EventPlayerCapturedFlag(Player *Source, BG_EY_Nodes node)
+void BattleGroundEY::EventPlayerCapturedFlag(Player* Source, BG_EY_Nodes node)
 {
     if (GetStatus() != STATUS_IN_PROGRESS || GetFlagPickerGuid() != Source->GetObjectGuid())
         return;
@@ -646,13 +646,13 @@ void BattleGroundEY::EventPlayerCapturedFlag(Player *Source, BG_EY_Nodes node)
     UpdatePlayerScore(Source, SCORE_FLAG_CAPTURES, 1);
 }
 
-void BattleGroundEY::UpdatePlayerScore(Player *Source, uint32 type, uint32 value)
+void BattleGroundEY::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
     BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
-    if(itr == m_PlayerScores.end())                         // player not found
+    if (itr == m_PlayerScores.end())                        // player not found
         return;
 
-    switch(type)
+    switch (type)
     {
         case SCORE_FLAG_CAPTURES:                           // flags captured
             ((BattleGroundEYScore*)itr->second)->FlagCaptures += value;
@@ -700,11 +700,11 @@ void BattleGroundEY::FillInitialWorldStates(WorldPacket& data, uint32& count)
     FillInitialWorldState(data, count, 0xc0d, 0x17b);
 }
 
-WorldSafeLocsEntry const *BattleGroundEY::GetClosestGraveYard(Player* player)
+WorldSafeLocsEntry const* BattleGroundEY::GetClosestGraveYard(Player* player)
 {
     uint32 g_id = 0;
 
-    switch(player->GetTeam())
+    switch (player->GetTeam())
     {
         case ALLIANCE: g_id = EY_GRAVEYARD_MAIN_ALLIANCE; break;
         case HORDE:    g_id = EY_GRAVEYARD_MAIN_HORDE;    break;
@@ -732,7 +732,7 @@ WorldSafeLocsEntry const *BattleGroundEY::GetClosestGraveYard(Player* player)
     distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
     nearestDistance = distance;
 
-    for(uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
+    for (uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
         if (m_PointOwnedByTeam[i]==player->GetTeam() && m_PointState[i]==EY_POINT_UNDER_CONTROL)
         {
@@ -756,7 +756,7 @@ WorldSafeLocsEntry const *BattleGroundEY::GetClosestGraveYard(Player* player)
 
 bool BattleGroundEY::IsAllNodesConrolledByTeam(Team team) const
 {
-    for(int i = 0; i < BG_EY_NODES_MAX; ++i)
+    for (int i = 0; i < BG_EY_NODES_MAX; ++i)
         if (m_PointState[i] != EY_POINT_UNDER_CONTROL || m_PointOwnedByTeam[i] != team)
             return false;
 

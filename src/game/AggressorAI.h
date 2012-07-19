@@ -27,23 +27,23 @@ class Creature;
 
 class MANGOS_DLL_DECL AggressorAI : public CreatureAI
 {
-    enum AggressorState
-    {
-        STATE_NORMAL = 1,
-        STATE_LOOK_AT_VICTIM = 2
-    };
+        enum AggressorState
+        {
+            STATE_NORMAL = 1,
+            STATE_LOOK_AT_VICTIM = 2
+        };
 
     public:
 
-        explicit AggressorAI(Creature *c);
+        explicit AggressorAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
+        void MoveInLineOfSight(Unit*);
+        void AttackStart(Unit*);
         void EnterEvadeMode();
-        bool IsVisible(Unit *) const;
+        bool IsVisible(Unit*) const;
 
         void UpdateAI(const uint32);
-        static int Permissible(const Creature *);
+        static int Permissible(const Creature*);
 
     private:
         ObjectGuid i_victimGuid;
