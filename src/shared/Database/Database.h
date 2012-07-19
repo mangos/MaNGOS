@@ -44,16 +44,16 @@ class MANGOS_DLL_SPEC SqlConnection
         virtual ~SqlConnection() {}
 
         //method for initializing DB connection
-        virtual bool Initialize(const char *infoString) = 0;
+        virtual bool Initialize(const char* infoString) = 0;
         //public methods for making queries
-        virtual QueryResult* Query(const char *sql) = 0;
-        virtual QueryNamedResult* QueryNamed(const char *sql) = 0;
+        virtual QueryResult* Query(const char* sql) = 0;
+        virtual QueryNamedResult* QueryNamed(const char* sql) = 0;
 
         //public methods for making requests
-        virtual bool Execute(const char *sql) = 0;
+        virtual bool Execute(const char* sql) = 0;
 
         //escape string generation
-        virtual unsigned long escape_string(char *to, const char *from, unsigned long length) { strncpy(to,from,length); return length; }
+        virtual unsigned long escape_string(char* to, const char* from, unsigned long length) { strncpy(to,from,length); return length; }
 
         // nothing do if DB not support transactions
         virtual bool BeginTransaction() { return true; }
@@ -68,13 +68,13 @@ class MANGOS_DLL_SPEC SqlConnection
         class Lock
         {
             public:
-                Lock(SqlConnection * conn) : m_pConn(conn) { m_pConn->m_mutex.acquire(); }
+                Lock(SqlConnection* conn) : m_pConn(conn) { m_pConn->m_mutex.acquire(); }
                 ~Lock() { m_pConn->m_mutex.release(); }
 
-                SqlConnection * operator->() const { return m_pConn; }
+                SqlConnection* operator->() const { return m_pConn; }
 
             private:
-                SqlConnection * const m_pConn;
+                SqlConnection* const m_pConn;
         };
 
         //get DB object
@@ -83,9 +83,9 @@ class MANGOS_DLL_SPEC SqlConnection
     protected:
         SqlConnection(Database& db) : m_db(db) {}
 
-        virtual SqlPreparedStatement * CreateStatement(const std::string& fmt);
+        virtual SqlPreparedStatement* CreateStatement(const std::string& fmt);
         //allocate prepared statement and return statement ID
-        SqlPreparedStatement * GetStmt(int nIndex);
+        SqlPreparedStatement* GetStmt(int nIndex);
 
         Database& m_db;
 
@@ -96,7 +96,7 @@ class MANGOS_DLL_SPEC SqlConnection
         typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
         LOCK_TYPE m_mutex;
 
-        typedef std::vector<SqlPreparedStatement * > StmtHolder;
+        typedef std::vector<SqlPreparedStatement* > StmtHolder;
         StmtHolder m_holder;
 };
 
@@ -105,84 +105,84 @@ class MANGOS_DLL_SPEC Database
     public:
         virtual ~Database();
 
-        virtual bool Initialize(const char *infoString, int nConns = 1);
+        virtual bool Initialize(const char* infoString, int nConns = 1);
         //start worker thread for async DB request execution
         virtual void InitDelayThread();
         //stop worker thread
         virtual void HaltDelayThread();
 
         /// Synchronous DB queries
-        inline QueryResult* Query(const char *sql)
+        inline QueryResult* Query(const char* sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->Query(sql);
         }
 
-        inline QueryNamedResult* QueryNamed(const char *sql)
+        inline QueryNamedResult* QueryNamed(const char* sql)
         {
             SqlConnection::Lock guard(getQueryConnection());
             return guard->QueryNamed(sql);
         }
 
-        QueryResult* PQuery(const char *format,...) ATTR_PRINTF(2,3);
-        QueryNamedResult* PQueryNamed(const char *format,...) ATTR_PRINTF(2,3);
+        QueryResult* PQuery(const char* format,...) ATTR_PRINTF(2,3);
+        QueryNamedResult* PQueryNamed(const char* format,...) ATTR_PRINTF(2,3);
 
         inline bool DirectExecute(const char* sql)
         {
-            if(!m_pAsyncConn)
+            if (!m_pAsyncConn)
                 return false;
 
             SqlConnection::Lock guard(m_pAsyncConn);
             return guard->Execute(sql);
         }
 
-        bool DirectPExecute(const char *format,...) ATTR_PRINTF(2,3);
+        bool DirectPExecute(const char* format,...) ATTR_PRINTF(2,3);
 
         /// Async queries and query holders, implemented in DatabaseImpl.h
 
         // Query / member
         template<class Class>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*), const char *sql);
+        bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*), const char* sql);
         template<class Class, typename ParamType1>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql);
+        bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char* sql);
         template<class Class, typename ParamType1, typename ParamType2>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql);
+        bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* sql);
         template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *sql);
+        bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* sql);
         // Query / static
         template<typename ParamType1>
-            bool AsyncQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql);
+        bool AsyncQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char* sql);
         template<typename ParamType1, typename ParamType2>
-            bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql);
+        bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* sql);
         template<typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *sql);
+        bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* sql);
         // PQuery / member
         template<class Class>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*), const char *format,...) ATTR_PRINTF(4,5);
+        bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), const char* format,...) ATTR_PRINTF(4,5);
         template<class Class, typename ParamType1>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char *format,...) ATTR_PRINTF(5,6);
+        bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format,...) ATTR_PRINTF(5,6);
         template<class Class, typename ParamType1, typename ParamType2>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *format,...) ATTR_PRINTF(6,7);
+        bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format,...) ATTR_PRINTF(6,7);
         template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *format,...) ATTR_PRINTF(7,8);
+        bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format,...) ATTR_PRINTF(7,8);
         // PQuery / static
         template<typename ParamType1>
-            bool AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *format,...) ATTR_PRINTF(4,5);
+        bool AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format,...) ATTR_PRINTF(4,5);
         template<typename ParamType1, typename ParamType2>
-            bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *format,...) ATTR_PRINTF(5,6);
+        bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format,...) ATTR_PRINTF(5,6);
         template<typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *format,...) ATTR_PRINTF(6,7);
+        bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format,...) ATTR_PRINTF(6,7);
         template<class Class>
         // QueryHolder
-            bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder);
+        bool DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder);
         template<class Class, typename ParamType1>
-            bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+        bool DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1);
 
-        bool Execute(const char *sql);
-        bool PExecute(const char *format,...) ATTR_PRINTF(2,3);
+        bool Execute(const char* sql);
+        bool PExecute(const char* format,...) ATTR_PRINTF(2,3);
 
         // Writes SQL commands to a LOG file (see mangosd.conf "LogSQL")
-        bool PExecuteLog(const char *format,...) ATTR_PRINTF(2,3);
+        bool PExecuteLog(const char* format,...) ATTR_PRINTF(2,3);
 
         bool BeginTransaction();
         bool CommitTransaction();
@@ -193,7 +193,7 @@ class MANGOS_DLL_SPEC Database
         //PREPARED STATEMENT API
 
         //allocate index for prepared statement with SQL request 'fmt'
-        SqlStatement CreateStatement(SqlStatementID& index, const char * fmt);
+        SqlStatement CreateStatement(SqlStatementID& index, const char* fmt);
         //get prepared statement format string
         std::string GetStmtString(const int stmtId) const;
 
@@ -231,9 +231,9 @@ class MANGOS_DLL_SPEC Database
         void StopServer();
 
         //factory method to create SqlConnection objects
-        virtual SqlConnection * CreateConnection() = 0;
+        virtual SqlConnection* CreateConnection() = 0;
         //factory method to create SqlDelayThread objects
-        virtual SqlDelayThread * CreateDelayThread();
+        virtual SqlDelayThread* CreateDelayThread();
 
         class MANGOS_DLL_SPEC TransHelper
         {
@@ -242,18 +242,18 @@ class MANGOS_DLL_SPEC Database
                 ~TransHelper();
 
                 //initializes new SqlTransaction object
-                SqlTransaction * init();
+                SqlTransaction* init();
                 //gets pointer on current transaction object. Returns NULL if transaction was not initiated
-                SqlTransaction * get() const { return m_pTrans; }
+                SqlTransaction* get() const { return m_pTrans; }
                 //detaches SqlTransaction object allocated by init() function
                 //next call to get() function will return NULL!
                 //do not forget to destroy obtained SqlTransaction object!
-                SqlTransaction * detach();
+                SqlTransaction* detach();
                 //destroyes SqlTransaction allocated by init() function
                 void reset();
 
             private:
-                SqlTransaction * m_pTrans;
+                SqlTransaction* m_pTrans;
         };
 
         //per-thread based storage for SqlTransaction object initialization - no locking is required
@@ -263,30 +263,30 @@ class MANGOS_DLL_SPEC Database
         ///< DB connections
 
         //round-robin connection selection
-        SqlConnection * getQueryConnection();
+        SqlConnection* getQueryConnection();
         //for now return one single connection for async requests
-        SqlConnection * getAsyncConnection() const { return m_pAsyncConn; }
+        SqlConnection* getAsyncConnection() const { return m_pAsyncConn; }
 
         friend class SqlStatement;
         //PREPARED STATEMENT API
         //query function for prepared statements
-        bool ExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params);
-        bool DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params);
+        bool ExecuteStmt(const SqlStatementID& id, SqlStmtParameters* params);
+        bool DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters* params);
 
         //connection helper counters
         int m_nQueryConnPoolSize;                               //current size of query connection pool
         ACE_Atomic_Op<ACE_Thread_Mutex, long> m_nQueryCounter;  //counter for connection selection
 
         //lets use pool of connections for sync queries
-        typedef std::vector< SqlConnection * > SqlConnectionContainer;
+        typedef std::vector< SqlConnection* > SqlConnectionContainer;
         SqlConnectionContainer m_pQueryConnections;
 
         //only one single DB connection for transactions
-        SqlConnection * m_pAsyncConn;
+        SqlConnection* m_pAsyncConn;
 
-        SqlResultQueue *    m_pResultQueue;                  ///< Transaction queues from diff. threads
-        SqlDelayThread *    m_threadBody;                    ///< Pointer to delay sql executer (owned by m_delayThread)
-        ACE_Based::Thread * m_delayThread;                   ///< Pointer to executer thread
+        SqlResultQueue*     m_pResultQueue;                  ///< Transaction queues from diff. threads
+        SqlDelayThread*     m_threadBody;                    ///< Pointer to delay sql executer (owned by m_delayThread)
+        ACE_Based::Thread* m_delayThread;                    ///< Pointer to executer thread
 
         bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
 

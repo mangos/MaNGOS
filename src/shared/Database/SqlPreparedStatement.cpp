@@ -18,36 +18,36 @@
 
 #include "DatabaseEnv.h"
 
-SqlStmtParameters::SqlStmtParameters( int nParams )
+SqlStmtParameters::SqlStmtParameters(int nParams)
 {
     //reserve memory if needed
-    if(nParams > 0)
+    if (nParams > 0)
         m_params.reserve(nParams);
 }
 
-void SqlStmtParameters::reset( const SqlStatement& stmt )
+void SqlStmtParameters::reset(const SqlStatement& stmt)
 {
     m_params.clear();
     //reserve memory if needed
-    if(stmt.arguments() > 0)
+    if (stmt.arguments() > 0)
         m_params.reserve(stmt.arguments());
 }
 
 //////////////////////////////////////////////////////////////////////////
-SqlStatement& SqlStatement::operator=( const SqlStatement& index )
+SqlStatement& SqlStatement::operator=(const SqlStatement& index)
 {
-    if(this != &index)
+    if (this != &index)
     {
         m_index = index.m_index;
         m_pDB = index.m_pDB;
 
-        if(m_pParams)
+        if (m_pParams)
         {
             delete m_pParams;
             m_pParams = NULL;
         }
 
-        if(index.m_pParams)
+        if (index.m_pParams)
             m_pParams = new SqlStmtParameters(*(index.m_pParams));
     }
 
@@ -56,9 +56,9 @@ SqlStatement& SqlStatement::operator=( const SqlStatement& index )
 
 bool SqlStatement::Execute()
 {
-    SqlStmtParameters * args = detach();
+    SqlStmtParameters* args = detach();
     //verify amount of bound parameters
-    if(args->boundParams() != arguments())
+    if (args->boundParams() != arguments())
     {
         sLog.outError("SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
         sLog.outError("SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
@@ -71,9 +71,9 @@ bool SqlStatement::Execute()
 
 bool SqlStatement::DirectExecute()
 {
-    SqlStmtParameters * args = detach();
+    SqlStmtParameters* args = detach();
     //verify amount of bound parameters
-    if(args->boundParams() != arguments())
+    if (args->boundParams() != arguments())
     {
         sLog.outError("SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
         sLog.outError("SQL ERROR: statement: %s", m_pDB->GetStmtString(ID()).c_str());
@@ -85,17 +85,17 @@ bool SqlStatement::DirectExecute()
 }
 
 //////////////////////////////////////////////////////////////////////////
-SqlPlainPreparedStatement::SqlPlainPreparedStatement( const std::string& fmt, SqlConnection& conn ) : SqlPreparedStatement(fmt, conn)
+SqlPlainPreparedStatement::SqlPlainPreparedStatement(const std::string& fmt, SqlConnection& conn) : SqlPreparedStatement(fmt, conn)
 {
     m_bPrepared = true;
     m_nParams = std::count(m_szFmt.begin(), m_szFmt.end(), '?');
     m_bIsQuery = strnicmp(m_szFmt.c_str(), "select", 6) == 0;
 }
 
-void SqlPlainPreparedStatement::bind( const SqlStmtParameters& holder )
+void SqlPlainPreparedStatement::bind(const SqlStmtParameters& holder)
 {
     //verify if we bound all needed input parameters
-    if(m_nParams != holder.boundParams())
+    if (m_nParams != holder.boundParams())
     {
         MANGOS_ASSERT(false);
         return;
@@ -117,7 +117,7 @@ void SqlPlainPreparedStatement::bind( const SqlStmtParameters& holder )
         DataToString(data, fmt);
 
         nLastPos = m_szPlainRequest.find('?', nLastPos);
-        if(nLastPos != std::string::npos)
+        if (nLastPos != std::string::npos)
         {
             std::string tmp = fmt.str();
             m_szPlainRequest.replace(nLastPos, 1, tmp);
@@ -128,13 +128,13 @@ void SqlPlainPreparedStatement::bind( const SqlStmtParameters& holder )
 
 bool SqlPlainPreparedStatement::execute()
 {
-    if(m_szPlainRequest.empty())
+    if (m_szPlainRequest.empty())
         return false;
 
     return m_pConn.Execute(m_szPlainRequest.c_str());
 }
 
-void SqlPlainPreparedStatement::DataToString( const SqlStmtFieldData& data, std::ostringstream& fmt )
+void SqlPlainPreparedStatement::DataToString(const SqlStmtFieldData& data, std::ostringstream& fmt)
 {
     switch (data.type())
     {

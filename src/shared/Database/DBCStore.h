@@ -24,9 +24,9 @@
 template<class T>
 class DBCStorage
 {
-    typedef std::list<char*> StringPoolList;
+        typedef std::list<char*> StringPoolList;
     public:
-        explicit DBCStorage(const char *f) : nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL) { }
+        explicit DBCStorage(const char* f) : nCount(0), fieldCount(0), fmt(f), indexTable(NULL), m_dataTable(NULL) { }
         ~DBCStorage() { Clear(); }
 
         T const* LookupEntry(uint32 id) const { return (id >= nCount) ? NULL : indexTable[id]; }
@@ -38,7 +38,7 @@ class DBCStorage
         {
             DBCFileLoader dbc;
             // Check if load was sucessful, only then continue
-            if(!dbc.Load(fn, fmt))
+            if (!dbc.Load(fn, fmt))
                 return false;
 
             fieldCount = dbc.GetCols();
@@ -56,12 +56,12 @@ class DBCStorage
         bool LoadStringsFrom(char const* fn)
         {
             // DBC must be already loaded using Load
-            if(!indexTable)
+            if (!indexTable)
                 return false;
 
             DBCFileLoader dbc;
             // Check if load was successful, only then continue
-            if(!dbc.Load(fn, fmt))
+            if (!dbc.Load(fn, fmt))
                 return false;
 
             // load strings from another locale dbc data
@@ -75,12 +75,12 @@ class DBCStorage
             if (!indexTable)
                 return;
 
-            delete[] ((char*)indexTable);
+            delete[]((char*)indexTable);
             indexTable = NULL;
-            delete[] ((char*)m_dataTable);
+            delete[]((char*)m_dataTable);
             m_dataTable = NULL;
 
-            while(!m_stringPoolList.empty())
+            while (!m_stringPoolList.empty())
             {
                 delete[] m_stringPoolList.front();
                 m_stringPoolList.pop_front();

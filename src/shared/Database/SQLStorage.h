@@ -24,8 +24,8 @@
 
 class SQLStorage
 {
-    template<class T>
-    friend struct SQLStorageLoaderBase;
+        template<class T>
+        friend struct SQLStorageLoaderBase;
 
     public:
         SQLStorage(const char* fmt, const char* _entry_field, const char* sqlname)
@@ -48,7 +48,7 @@ class SQLStorage
         }
 
         template<class T>
-            T const* LookupEntry(uint32 id) const
+        T const* LookupEntry(uint32 id) const
         {
             if (id >= MaxEntry)
                 return NULL;
@@ -96,24 +96,24 @@ struct SQLStorageLoaderBase
         void Load(SQLStorage& storage, bool error_at_empty = true);
 
         template<class S, class D>
-            void convert(uint32 field_pos, S src, D& dst);
+        void convert(uint32 field_pos, S src, D& dst);
         template<class S>
-            void convert_to_str(uint32 field_pos, S src, char*& dst);
+        void convert_to_str(uint32 field_pos, S src, char*& dst);
         template<class D>
-            void convert_from_str(uint32 field_pos, char const* src, D& dst);
+        void convert_from_str(uint32 field_pos, char const* src, D& dst);
         void convert_str_to_str(uint32 field_pos, char const* src, char*& dst);
         template<class S, class D>
-            void default_fill(uint32 field_pos, S src, D& dst);
+        void default_fill(uint32 field_pos, S src, D& dst);
         void default_fill_to_str(uint32 field_pos, char const* src, char*& dst);
 
         // trap, no body
         template<class D>
-            void convert_from_str(uint32 field_pos, char* src, D& dst);
+        void convert_from_str(uint32 field_pos, char* src, D& dst);
         void convert_str_to_str(uint32 field_pos, char* src, char*& dst);
 
     private:
         template<class V>
-            void storeValue(V value, SQLStorage& store, char* p, uint32 x, uint32& offset);
+        void storeValue(V value, SQLStorage& store, char* p, uint32 x, uint32& offset);
         void storeValue(char const* value, SQLStorage& store, char* p, uint32 x, uint32& offset);
 
         // trap, no body

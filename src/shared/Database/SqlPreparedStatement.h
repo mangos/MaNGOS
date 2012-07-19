@@ -86,12 +86,12 @@ class MANGOS_DLL_SPEC SqlStmtFieldData
         int64 toInt64() const { MANGOS_ASSERT(m_type == FIELD_I64); return m_binaryData.i64; }
         float toFloat() const { MANGOS_ASSERT(m_type == FIELD_FLOAT); return m_binaryData.f; }
         double toDouble() const { MANGOS_ASSERT(m_type == FIELD_DOUBLE); return m_binaryData.d; }
-        const char * toStr() const { MANGOS_ASSERT(m_type == FIELD_STRING); return m_szStringData.c_str(); }
+        const char* toStr() const { MANGOS_ASSERT(m_type == FIELD_STRING); return m_szStringData.c_str(); }
 
         //get type of data
         SqlStmtFieldType type() const { return m_type; }
         //get underlying buffer type
-        void * buff() const { return m_type == FIELD_STRING ? (void * )m_szStringData.c_str() : (void *)&m_binaryData; }
+        void* buff() const { return m_type == FIELD_STRING ? (void*)m_szStringData.c_str() : (void*)&m_binaryData; }
 
         //get size of data
         size_t size() const
@@ -135,7 +135,7 @@ template<> inline void SqlStmtFieldData::set(uint64 val) { m_type = FIELD_UI64; 
 template<> inline void SqlStmtFieldData::set(int64 val) { m_type = FIELD_I64; m_binaryData.i64 = val; }
 template<> inline void SqlStmtFieldData::set(float val) { m_type = FIELD_FLOAT; m_binaryData.f = val; }
 template<> inline void SqlStmtFieldData::set(double val) { m_type = FIELD_DOUBLE; m_binaryData.d = val; }
-template<> inline void SqlStmtFieldData::set(const char * val) { m_type = FIELD_STRING; m_szStringData = val; }
+template<> inline void SqlStmtFieldData::set(const char* val) { m_type = FIELD_STRING; m_szStringData = val; }
 
 class SqlStatement;
 //prepared statement executor
@@ -195,7 +195,7 @@ class MANGOS_DLL_SPEC SqlStatement
 
         SqlStatement(const SqlStatement& index) : m_index(index.m_index), m_pDB(index.m_pDB), m_pParams(NULL)
         {
-            if(index.m_pParams)
+            if (index.m_pParams)
                 m_pParams = new SqlStmtParameters(*(index.m_pParams));
         }
 
@@ -254,7 +254,7 @@ class MANGOS_DLL_SPEC SqlStatement
         void addInt64(int64 var) { arg(var); }
         void addFloat(float var) { arg(var); }
         void addDouble(double var) { arg(var); }
-        void addString(const char * var) { arg(var); }
+        void addString(const char* var) { arg(var); }
         void addString(const std::string& var) { arg(var.c_str()); }
         void addString(std::ostringstream& ss) { arg(ss.str().c_str()); ss.str(std::string()); }
 
@@ -265,17 +265,17 @@ class MANGOS_DLL_SPEC SqlStatement
 
     private:
 
-        SqlStmtParameters * get()
+        SqlStmtParameters* get()
         {
-            if(!m_pParams)
+            if (!m_pParams)
                 m_pParams = new SqlStmtParameters(arguments());
 
             return m_pParams;
         }
 
-        SqlStmtParameters * detach()
+        SqlStmtParameters* detach()
         {
-            SqlStmtParameters * p = m_pParams ? m_pParams : new SqlStmtParameters(0);
+            SqlStmtParameters* p = m_pParams ? m_pParams : new SqlStmtParameters(0);
             m_pParams = NULL;
             return p;
         }
@@ -285,13 +285,13 @@ class MANGOS_DLL_SPEC SqlStatement
         template<typename ParamType>
         void arg(ParamType val)
         {
-            SqlStmtParameters * p = get();
+            SqlStmtParameters* p = get();
             p->addParam(SqlStmtFieldData(val));
         }
 
         SqlStatementID m_index;
-        Database * m_pDB;
-        SqlStmtParameters * m_pParams;
+        Database* m_pDB;
+        SqlStmtParameters* m_pParams;
 };
 
 //base prepared statement class

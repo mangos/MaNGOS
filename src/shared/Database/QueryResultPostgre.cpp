@@ -20,7 +20,7 @@
 
 #include "DatabaseEnv.h"
 
-QueryResultPostgre::QueryResultPostgre(PGresult *result, uint64 rowCount, uint32 fieldCount) :
+QueryResultPostgre::QueryResultPostgre(PGresult* result, uint64 rowCount, uint32 fieldCount) :
     QueryResult(rowCount, fieldCount), mResult(result),  mTableIndex(0)
 {
 
@@ -28,7 +28,7 @@ QueryResultPostgre::QueryResultPostgre(PGresult *result, uint64 rowCount, uint32
     MANGOS_ASSERT(mCurrentRow);
 
     for (uint32 i = 0; i < mFieldCount; i++)
-        mCurrentRow[i].SetType(ConvertNativeType(PQftype( result, i )));
+        mCurrentRow[i].SetType(ConvertNativeType(PQftype(result, i)));
 }
 
 QueryResultPostgre::~QueryResultPostgre()
@@ -51,7 +51,7 @@ bool QueryResultPostgre::NextRow()
     for (int j = 0; j < mFieldCount; j++)
     {
         pPQgetvalue = PQgetvalue(mResult, mTableIndex, j);
-        if(pPQgetvalue && !(*pPQgetvalue))
+        if (pPQgetvalue && !(*pPQgetvalue))
             pPQgetvalue = NULL;
 
         mCurrentRow[j].SetValue(pPQgetvalue);
@@ -77,7 +77,7 @@ void QueryResultPostgre::EndQuery()
 }
 
 // see types in #include <postgre/pg_type.h>
-enum Field::DataTypes QueryResultPostgre::ConvertNativeType(Oid  pOid ) const
+enum Field::DataTypes QueryResultPostgre::ConvertNativeType(Oid  pOid) const
 {
     switch (pOid)
     {
@@ -112,12 +112,12 @@ enum Field::DataTypes QueryResultPostgre::ConvertNativeType(Oid  pOid ) const
             return Field::DB_TYPE_INTEGER;
         case BOOLOID:
             return Field::DB_TYPE_BOOL;                     // Bool
-/*
-        case BOXOID:    Rect;
-        case LINEOID:   Rect;
-        case VARBITOID: BitArray;
-        case BYTEAOID:  ByteArray;
-*/
+            /*
+                    case BOXOID:    Rect;
+                    case LINEOID:   Rect;
+                    case VARBITOID: BitArray;
+                    case BYTEAOID:  ByteArray;
+            */
         case LSEGOID:
         case OIDVECTOROID:
         case PATHOID:
