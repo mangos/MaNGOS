@@ -58,7 +58,7 @@ Guild* GuildMgr::GetGuildById(uint32 guildId) const
 
 Guild* GuildMgr::GetGuildByName(std::string const& name) const
 {
-    for(GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
+    for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
         if (itr->second->GetName() == name)
             return itr->second;
 
@@ -67,7 +67,7 @@ Guild* GuildMgr::GetGuildByName(std::string const& name) const
 
 Guild* GuildMgr::GetGuildByLeader(ObjectGuid const& guid) const
 {
-    for(GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
+    for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
         if (itr->second->GetLeaderGuid() == guid)
             return itr->second;
 
@@ -89,9 +89,9 @@ void GuildMgr::LoadGuilds()
 
     //                                                    0             1          2          3           4           5           6
     QueryResult* result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
-    //   7               8    9    10         11        12
-        "BackgroundColor,info,motd,createdate,BankMoney,(SELECT COUNT(guild_bank_tab.guildid) FROM guild_bank_tab WHERE guild_bank_tab.guildid = guild.guildid) "
-        "FROM guild ORDER BY guildid ASC");
+                          //   7               8    9    10         11        12
+                          "BackgroundColor,info,motd,createdate,BankMoney,(SELECT COUNT(guild_bank_tab.guildid) FROM guild_bank_tab WHERE guild_bank_tab.guildid = guild.guildid) "
+                          "FROM guild ORDER BY guildid ASC");
 
     if (!result)
     {
@@ -111,13 +111,13 @@ void GuildMgr::LoadGuilds()
     // load guild members
     //                                                                0       1                 2    3     4       5                  6
     QueryResult* guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,BankResetTimeMoney,BankRemMoney,"
-    //   7                 8                9                 10               11                12
-        "BankResetTimeTab0,BankRemSlotsTab0,BankResetTimeTab1,BankRemSlotsTab1,BankResetTimeTab2,BankRemSlotsTab2,"
-    //   13                14               15                16               17                18
-        "BankResetTimeTab3,BankRemSlotsTab3,BankResetTimeTab4,BankRemSlotsTab4,BankResetTimeTab5,BankRemSlotsTab5,"
-    //   19               20                21                22               23                      24
-        "characters.name, characters.level, characters.class, characters.zone, characters.logout_time, characters.account "
-        "FROM guild_member LEFT JOIN characters ON characters.guid = guild_member.guid ORDER BY guildid ASC");
+                                      //   7                 8                9                 10               11                12
+                                      "BankResetTimeTab0,BankRemSlotsTab0,BankResetTimeTab1,BankRemSlotsTab1,BankResetTimeTab2,BankRemSlotsTab2,"
+                                      //   13                14               15                16               17                18
+                                      "BankResetTimeTab3,BankRemSlotsTab3,BankResetTimeTab4,BankRemSlotsTab4,BankResetTimeTab5,BankRemSlotsTab5,"
+                                      //   19               20                21                22               23                      24
+                                      "characters.name, characters.level, characters.class, characters.zone, characters.logout_time, characters.account "
+                                      "FROM guild_member LEFT JOIN characters ON characters.guid = guild_member.guid ORDER BY guildid ASC");
 
     // load guild bank tab rights
     //                                                                      0       1     2   3       4
@@ -134,11 +134,11 @@ void GuildMgr::LoadGuilds()
 
         Guild* newGuild = new Guild;
         if (!newGuild->LoadGuildFromDB(result) ||
-            !newGuild->LoadRanksFromDB(guildRanksResult) ||
-            !newGuild->LoadMembersFromDB(guildMembersResult) ||
-            !newGuild->LoadBankRightsFromDB(guildBankTabRightsResult) ||
-            !newGuild->CheckGuildStructure()
-            )
+                !newGuild->LoadRanksFromDB(guildRanksResult) ||
+                !newGuild->LoadMembersFromDB(guildMembersResult) ||
+                !newGuild->LoadBankRightsFromDB(guildBankTabRightsResult) ||
+                !newGuild->CheckGuildStructure()
+           )
         {
             newGuild->Disband();
             delete newGuild;
@@ -149,7 +149,8 @@ void GuildMgr::LoadGuilds()
         newGuild->LoadGuildBankEventLogFromDB();
         newGuild->LoadGuildBankFromDB();
         AddGuild(newGuild);
-    } while(result->NextRow());
+    }
+    while (result->NextRow());
 
     delete result;
     delete guildRanksResult;

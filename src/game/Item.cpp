@@ -715,7 +715,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
         if (item_rand)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != -int32(item_rand->ID) ||
-                !GetItemSuffixFactor())
+                    !GetItemSuffixFactor())
             {
                 SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, -int32(item_rand->ID));
                 UpdateItemSuffixFactor();
@@ -776,7 +776,7 @@ void Item::AddToUpdateQueueOf(Player* player)
         if (!player)
         {
             sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) not in world!",
-                GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
+                          GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
     }
@@ -784,7 +784,7 @@ void Item::AddToUpdateQueueOf(Player* player)
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
         sLog.outError("Item::AddToUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
-            GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
+                      GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
 
@@ -806,7 +806,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
         if (!player)
         {
             sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) not in world!",
-                GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
+                          GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str());
             return;
         }
     }
@@ -814,7 +814,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
     if (player->GetObjectGuid() != GetOwnerGuid())
     {
         sLog.outError("Item::RemoveFromUpdateQueueOf - %s current owner (%s) and inventory owner (%s) don't match!",
-            GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
+                      GetGuidStr().c_str(), GetOwnerGuid().GetString().c_str(), player->GetGuidStr().c_str());
         return;
     }
 
@@ -840,12 +840,12 @@ bool Item::CanBeTraded(bool mail) const
     if ((!mail || !IsBoundAccountWide()) && IsSoulBound())
         return false;
 
-    if (IsBag() && (Player::IsBagPos(GetPos()) || !((Bag const*)this)->IsEmpty()) )
+    if (IsBag() && (Player::IsBagPos(GetPos()) || !((Bag const*)this)->IsEmpty()))
         return false;
 
     if (Player* owner = GetOwner())
     {
-        if (owner->CanUnequipItem(GetPos(), false) !=  EQUIP_ERR_OK )
+        if (owner->CanUnequipItem(GetPos(), false) !=  EQUIP_ERR_OK)
             return false;
         if (owner->GetLootGuid() == GetObjectGuid())
             return false;
@@ -1078,7 +1078,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->GetSession()->SendPacket(&data);
 }
 
-Item* Item::CreateItem( uint32 item, uint32 count, Player const* player, uint32 randomPropertyId)
+Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, uint32 randomPropertyId)
 {
     if (count < 1)
         return NULL;                                        //don't create item at zero count
@@ -1238,8 +1238,8 @@ void Item::SetLootState(ItemLootUpdateState state)
     {
         case ITEM_LOOT_NONE:
         case ITEM_LOOT_NEW:
-             assert(false);                                 // not used in state change calls
-             return;
+            assert(false);                                 // not used in state change calls
+            return;
         case ITEM_LOOT_TEMPORARY:
             assert(m_lootState == ITEM_LOOT_NONE);          // called only for not generated yet loot case
             m_lootState = ITEM_LOOT_TEMPORARY;

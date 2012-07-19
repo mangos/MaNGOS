@@ -22,7 +22,7 @@
 #include "Player.h"
 #include "World.h"
 
-int GuardAI::Permissible(const Creature *creature)
+int GuardAI::Permissible(const Creature* creature)
 {
     if (creature->IsGuard())
         return PERMIT_BASE_SPECIAL;
@@ -30,19 +30,19 @@ int GuardAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-GuardAI::GuardAI(Creature *c) : CreatureAI(c), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
+GuardAI::GuardAI(Creature* c) : CreatureAI(c), i_state(STATE_NORMAL), i_tracker(TIME_INTERVAL_LOOK)
 {
 }
 
-void GuardAI::MoveInLineOfSight(Unit *u)
+void GuardAI::MoveInLineOfSight(Unit* u)
 {
     // Ignore Z for flying creatures
     if (!m_creature->CanFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE)
         return;
 
     if (!m_creature->getVictim() && u->isTargetableForAttack() &&
-        ( u->IsHostileToPlayers() || m_creature->IsHostileTo(u) /*|| u->getVictim() && m_creature->IsFriendlyTo(u->getVictim())*/ ) &&
-        u->isInAccessablePlaceFor(m_creature))
+            (u->IsHostileToPlayers() || m_creature->IsHostileTo(u) /*|| u->getVictim() && m_creature->IsFriendlyTo(u->getVictim())*/) &&
+            u->isInAccessablePlaceFor(m_creature))
     {
         float attackRadius = m_creature->GetAttackDistance(u);
         if (m_creature->IsWithinDistInMap(u,attackRadius))
@@ -115,18 +115,18 @@ void GuardAI::UpdateAI(const uint32 /*diff*/)
     DoMeleeAttackIfReady();
 }
 
-bool GuardAI::IsVisible(Unit *pl) const
+bool GuardAI::IsVisible(Unit* pl) const
 {
     return m_creature->IsWithinDist(pl,sWorld.getConfig(CONFIG_FLOAT_SIGHT_GUARDER))
-        && pl->isVisibleForOrDetect(m_creature,m_creature,true);
+           && pl->isVisibleForOrDetect(m_creature,m_creature,true);
 }
 
-void GuardAI::AttackStart(Unit *u)
+void GuardAI::AttackStart(Unit* u)
 {
-    if( !u )
+    if (!u)
         return;
 
-    if(m_creature->Attack(u,true))
+    if (m_creature->Attack(u,true))
     {
         i_victimGuid = u->GetObjectGuid();
         m_creature->AddThreat(u);
@@ -137,8 +137,8 @@ void GuardAI::AttackStart(Unit *u)
     }
 }
 
-void GuardAI::JustDied(Unit *killer)
+void GuardAI::JustDied(Unit* killer)
 {
-    if(Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+    if (Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
         m_creature->SendZoneUnderAttackMessage(pkiller);
 }

@@ -78,10 +78,10 @@ template<const unsigned int LIMIT>
 struct MANGOS_DLL_DECL CoordPair
 {
     CoordPair(uint32 x=0, uint32 y=0) : x_coord(x), y_coord(y) {}
-    CoordPair(const CoordPair<LIMIT> &obj) : x_coord(obj.x_coord), y_coord(obj.y_coord) {}
-    bool operator==(const CoordPair<LIMIT> &obj) const { return (obj.x_coord == x_coord && obj.y_coord == y_coord); }
-    bool operator!=(const CoordPair<LIMIT> &obj) const { return !operator==(obj); }
-    CoordPair<LIMIT>& operator=(const CoordPair<LIMIT> &obj)
+    CoordPair(const CoordPair<LIMIT>& obj) : x_coord(obj.x_coord), y_coord(obj.y_coord) {}
+    bool operator==(const CoordPair<LIMIT>& obj) const { return (obj.x_coord == x_coord && obj.y_coord == y_coord); }
+    bool operator!=(const CoordPair<LIMIT>& obj) const { return !operator==(obj); }
+    CoordPair<LIMIT>& operator=(const CoordPair<LIMIT>& obj)
     {
         x_coord = obj.x_coord;
         y_coord = obj.y_coord;
@@ -90,7 +90,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator<<(const uint32 val)
     {
-        if( x_coord > val )
+        if (x_coord > val)
             x_coord -= val;
         else
             x_coord = 0;
@@ -98,7 +98,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator>>(const uint32 val)
     {
-        if( x_coord+val < LIMIT )
+        if (x_coord+val < LIMIT)
             x_coord += val;
         else
             x_coord = LIMIT - 1;
@@ -106,7 +106,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator-=(const uint32 val)
     {
-        if( y_coord > val )
+        if (y_coord > val)
             y_coord -= val;
         else
             y_coord = 0;
@@ -114,7 +114,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator+=(const uint32 val)
     {
-        if( y_coord+val < LIMIT )
+        if (y_coord+val < LIMIT)
             y_coord += val;
         else
             y_coord = LIMIT - 1;
@@ -137,7 +137,7 @@ typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellPair;
 namespace MaNGOS
 {
     template<class RET_TYPE, int CENTER_VAL>
-        inline RET_TYPE Compute(float x, float y, float center_offset, float size)
+    inline RET_TYPE Compute(float x, float y, float center_offset, float size)
     {
         // calculate and store temporary values in double format for having same result as same mySQL calculations
         double x_offset = (double(x) - center_offset)/size;
@@ -158,11 +158,11 @@ namespace MaNGOS
         return Compute<CellPair, CENTER_GRID_CELL_ID>(x, y, CENTER_GRID_CELL_OFFSET, SIZE_OF_GRID_CELL);
     }
 
-    inline void NormalizeMapCoord(float &c)
+    inline void NormalizeMapCoord(float& c)
     {
-        if(c > MAP_HALFSIZE - 0.5)
+        if (c > MAP_HALFSIZE - 0.5)
             c = MAP_HALFSIZE - 0.5;
-        else if(c < -(MAP_HALFSIZE - 0.5))
+        else if (c < -(MAP_HALFSIZE - 0.5))
             c = -(MAP_HALFSIZE - 0.5);
     }
 

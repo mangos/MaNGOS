@@ -28,22 +28,22 @@ class MANGOS_DLL_SPEC HomeMovementGenerator;
 
 template <>
 class MANGOS_DLL_SPEC HomeMovementGenerator<Creature>
-: public MovementGeneratorMedium< Creature, HomeMovementGenerator<Creature> >
+    : public MovementGeneratorMedium< Creature, HomeMovementGenerator<Creature> >
 {
     public:
 
         HomeMovementGenerator() : arrived(false) {}
         ~HomeMovementGenerator() {}
 
-        void Initialize(Creature &);
-        void Finalize(Creature &);
-        void Interrupt(Creature &) {}
-        void Reset(Creature &);
-        bool Update(Creature &, const uint32 &);
+        void Initialize(Creature&);
+        void Finalize(Creature&);
+        void Interrupt(Creature&) {}
+        void Reset(Creature&);
+        bool Update(Creature&, const uint32&);
         MovementGeneratorType GetMovementGeneratorType() const { return HOME_MOTION_TYPE; }
 
     private:
-        void _setTargetLocation(Creature &);
+        void _setTargetLocation(Creature&);
         bool arrived;
 };
 #endif

@@ -81,7 +81,7 @@ class GameEventMgr
         void Initialize(MapPersistentState* state);         // called at new MapPersistentState object create
         uint32 Update(ActiveEvents const* activeAtShutdown = NULL);
         bool IsValidEvent(uint16 event_id) const { return event_id < mGameEvent.size() && mGameEvent[event_id].isValid(); }
-        bool IsActiveEvent(uint16 event_id) const { return ( m_ActiveEvents.find(event_id)!=m_ActiveEvents.end()); }
+        bool IsActiveEvent(uint16 event_id) const { return (m_ActiveEvents.find(event_id)!=m_ActiveEvents.end()); }
         bool IsActiveHoliday(HolidayIds id);
         uint32 Initialize();
         void StartEvent(uint16 event_id, bool overwrite = false, bool resume = false);
