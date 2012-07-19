@@ -38,6 +38,7 @@
 #include "BattleGroundAV.h"
 #include "Util.h"
 #include "ScriptMgr.h"
+#include "SQLStorages.h"
 #include <G3D/Quat.h>
 
 GameObject::GameObject() : WorldObject(),

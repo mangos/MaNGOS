@@ -26,6 +26,7 @@
 #include "CellImpl.h"
 #include "GridNotifiersImpl.h"
 #include "SpellMgr.h"
+#include "DBCStores.h"
 
 DynamicObject::DynamicObject() : WorldObject()
 {

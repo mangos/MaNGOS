@@ -1006,7 +1006,7 @@ void Unit::JustKilledCreature(Creature* victim)
     // some critters required for quests (need normal entry instead possible heroic in any cases)
     if (victim->GetCreatureType() == CREATURE_TYPE_CRITTER && GetTypeId() == TYPEID_PLAYER)
     {
-        if (CreatureInfo const* normalInfo =  sCreatureStorage.LookupEntry<CreatureInfo>(victim->GetEntry()))
+        if (CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(victim->GetEntry()))
             ((Player*)this)->KilledMonster(normalInfo, victim->GetObjectGuid());
     }
 

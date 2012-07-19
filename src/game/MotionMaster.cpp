@@ -30,6 +30,7 @@
 #include "movement/MoveSpline.h"
 #include "movement/MoveSplineInit.h"
 #include "CreatureLinkingMgr.h"
+#include "DBCStores.h"
 
 #include <cassert>
 

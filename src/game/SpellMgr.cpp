@@ -21,6 +21,7 @@
 #include "SpellAuraDefines.h"
 #include "ProgressBar.h"
 #include "DBCStores.h"
+#include "SQLStorages.h"
 #include "World.h"
 #include "Chat.h"
 #include "Spell.h"

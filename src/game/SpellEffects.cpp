@@ -4963,7 +4963,7 @@ bool Spell::DoSummonWild(CreatureSummonPositions& list, SummonPropertiesEntry co
     MANGOS_ASSERT(!list.empty() && prop);
 
     uint32 creature_entry = m_spellInfo->EffectMiscValue[effIdx];
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creature_entry);
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creature_entry);
     if (!cInfo)
     {
         sLog.outErrorDb("Spell::DoSummonWild: creature entry %u not found for spell %u.", creature_entry, m_spellInfo->Id);
@@ -4999,7 +4999,7 @@ bool Spell::DoSummonCritter(CreatureSummonPositions& list, SummonPropertiesEntry
 
     // ATM only first position is supported for summoning
     uint32 pet_entry = m_spellInfo->EffectMiscValue[effIdx];
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(pet_entry);
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(pet_entry);
     if (!cInfo)
     {
         sLog.outErrorDb("Spell::DoSummonCritter: creature entry %u not found for spell %u.", pet_entry, m_spellInfo->Id);
@@ -5064,7 +5064,7 @@ bool Spell::DoSummonGuardian(CreatureSummonPositions& list, SummonPropertiesEntr
     MANGOS_ASSERT(!list.empty() && prop);
 
     uint32 pet_entry = m_spellInfo->EffectMiscValue[effIdx];
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(pet_entry);
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(pet_entry);
     if (!cInfo)
     {
         sLog.outErrorDb("Spell::DoSummonGuardian: creature entry %u not found for spell %u.", pet_entry, m_spellInfo->Id);
@@ -5149,7 +5149,7 @@ bool Spell::DoSummonTotem(SpellEffectIndex eff_idx, uint8 slot_dbc)
 
     CreatureCreatePos pos(m_caster, m_caster->GetOrientation(), 2.0f, angle);
 
-    CreatureInfo const* cinfo = sCreatureStorage.LookupEntry<CreatureInfo>(m_spellInfo->EffectMiscValue[eff_idx]);
+    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(m_spellInfo->EffectMiscValue[eff_idx]);
     if (!cinfo)
     {
         sLog.outErrorDb("Creature entry %u does not exist but used in spell %u totem summon.", m_spellInfo->Id, m_spellInfo->EffectMiscValue[eff_idx]);
@@ -5213,7 +5213,7 @@ bool Spell::DoSummonPossessed(CreatureSummonPositions& list, SummonPropertiesEnt
     MANGOS_ASSERT(!list.empty() && prop);
 
     uint32 creatureEntry = m_spellInfo->EffectMiscValue[effIdx];
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creatureEntry);
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creatureEntry);
     if (!cInfo)
     {
         sLog.outErrorDb("Spell::DoSummonPossessed: creature entry %u not found for spell %u.", creatureEntry, m_spellInfo->Id);
@@ -5275,7 +5275,7 @@ bool Spell::DoSummonPet(SpellEffectIndex eff_idx)
         return false;
 
     uint32 pet_entry = m_spellInfo->EffectMiscValue[eff_idx];
-    CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(pet_entry);
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(pet_entry);
     if (!cInfo)
     {
         sLog.outErrorDb("Spell::DoSummonPet: creature entry %u not found for spell %u.", pet_entry, m_spellInfo->Id);
@@ -5995,7 +5995,7 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
             return;
     }
 
-    CreatureInfo const* cInfo = petentry ? sCreatureStorage.LookupEntry<CreatureInfo>(petentry) : NULL;
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(petentry);
 
     // == 0 in case call current pet, check only real summon case
     if (petentry && !cInfo)

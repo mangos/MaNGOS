@@ -28,6 +28,7 @@
 #include "Spell.h"
 #include "SocialMgr.h"
 #include "Language.h"
+#include "DBCStores.h"
 
 void WorldSession::SendTradeStatus(TradeStatus status)
 {

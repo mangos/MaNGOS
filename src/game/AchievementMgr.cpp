@@ -18,6 +18,7 @@
 
 #include "Common.h"
 #include "AchievementMgr.h"
+#include "DBCStores.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "DBCEnums.h"
@@ -39,6 +40,7 @@
 #include "BattleGroundAB.h"
 #include "Map.h"
 #include "InstanceData.h"
+#include "DBCStructure.h"
 
 #include "Policies/SingletonImp.h"
 
@@ -1700,6 +1702,12 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
     }
 }
 
+uint32 AchievementMgr::GetCriteriaProgressCounter(AchievementCriteriaEntry const* entry) const
+{
+    CriteriaProgressMap::const_iterator iter = m_criteriaProgress.find(entry->ID);
+    return iter != m_criteriaProgress.end() ? iter->second.counter : 0;
+}
+
 uint32 AchievementMgr::GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement)
 {
     uint32 resultValue = 0;
@@ -2248,6 +2256,54 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket *data)
 AchievementCriteriaEntryList const& AchievementGlobalMgr::GetAchievementCriteriaByType(AchievementCriteriaTypes type)
 {
     return m_AchievementCriteriasByType[type];
+}
+
+AchievementCriteriaEntryList const* AchievementGlobalMgr::GetAchievementCriteriaByAchievement(uint32 id)
+{
+    AchievementCriteriaListByAchievement::const_iterator itr = m_AchievementCriteriaListByAchievement.find(id);
+    return itr != m_AchievementCriteriaListByAchievement.end() ? &itr->second : NULL;
+}
+
+AchievementEntryList const* AchievementGlobalMgr::GetAchievementByReferencedId(uint32 id) const
+{
+    AchievementListByReferencedId::const_iterator itr = m_AchievementListByReferencedId.find(id);
+    return itr != m_AchievementListByReferencedId.end() ? &itr->second : NULL;
+}
+
+AchievementReward const* AchievementGlobalMgr::GetAchievementReward(AchievementEntry const* achievement, uint8 gender) const
+{
+    AchievementRewardsMapBounds bounds = m_achievementRewards.equal_range(achievement->ID);
+    for (AchievementRewardsMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
+        if(iter->second.gender == GENDER_NONE || uint8(iter->second.gender) == gender)
+            return &iter->second;
+
+    return NULL;
+}
+
+AchievementRewardLocale const* AchievementGlobalMgr::GetAchievementRewardLocale(AchievementEntry const* achievement, uint8 gender) const
+{
+    AchievementRewardLocalesMapBounds bounds = m_achievementRewardLocales.equal_range(achievement->ID);
+    for (AchievementRewardLocalesMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
+        if(iter->second.gender == GENDER_NONE || uint8(iter->second.gender) == gender)
+            return &iter->second;
+
+    return NULL;
+}
+
+AchievementCriteriaRequirementSet const* AchievementGlobalMgr::GetCriteriaRequirementSet(AchievementCriteriaEntry const* achievementCriteria)
+{
+    AchievementCriteriaRequirementMap::const_iterator iter = m_criteriaRequirementMap.find(achievementCriteria->ID);
+    return iter!=m_criteriaRequirementMap.end() ? &iter->second : NULL;
+}
+
+bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement) const
+{
+    return m_allCompletedAchievements.find(achievement->ID) != m_allCompletedAchievements.end();
+}
+
+void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement)
+{
+    m_allCompletedAchievements.insert(achievement->ID);
 }
 
 void AchievementGlobalMgr::LoadAchievementCriteriaList()
