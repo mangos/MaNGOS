@@ -107,12 +107,12 @@ class SpellCastTargets
         SpellCastTargets();
         ~SpellCastTargets();
 
-        void read( ByteBuffer& data, Unit *caster );
-        void write( ByteBuffer& data ) const;
+        void read(ByteBuffer& data, Unit* caster);
+        void write(ByteBuffer& data) const;
 
         SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this,caster); }
 
-        SpellCastTargets& operator=(const SpellCastTargets &target)
+        SpellCastTargets& operator=(const SpellCastTargets& target)
         {
             m_unitTarget = target.m_unitTarget;
             m_itemTarget = target.m_itemTarget;
@@ -143,14 +143,14 @@ class SpellCastTargets
         }
 
         ObjectGuid getUnitTargetGuid() const { return m_unitTargetGUID; }
-        Unit *getUnitTarget() const { return m_unitTarget; }
-        void setUnitTarget(Unit *target);
+        Unit* getUnitTarget() const { return m_unitTarget; }
+        void setUnitTarget(Unit* target);
         void setDestination(float x, float y, float z);
         void setSource(float x, float y, float z);
 
         ObjectGuid getGOTargetGuid() const { return m_GOTargetGUID; }
-        GameObject *getGOTarget() const { return m_GOTarget; }
-        void setGOTarget(GameObject *target);
+        GameObject* getGOTarget() const { return m_GOTarget; }
+        void setGOTarget(GameObject* target);
 
         ObjectGuid getCorpseTargetGuid() const { return m_CorpseTargetGUID; }
         void setCorpseTarget(Corpse* corpse);
@@ -162,7 +162,7 @@ class SpellCastTargets
         void setTradeItemTarget(Player* caster);
         void updateTradeSlotItem()
         {
-            if(m_itemTarget && (m_targetMask & TARGET_FLAG_TRADE_ITEM))
+            if (m_itemTarget && (m_targetMask & TARGET_FLAG_TRADE_ITEM))
             {
                 m_itemTargetGUID = m_itemTarget->GetObjectGuid();
                 m_itemTargetEntry = m_itemTarget->GetEntry();
@@ -180,9 +180,9 @@ class SpellCastTargets
         uint32 m_targetMask;
     private:
         // objects (can be used at spell creating and after Update at casting
-        Unit *m_unitTarget;
-        GameObject *m_GOTarget;
-        Item *m_itemTarget;
+        Unit* m_unitTarget;
+        GameObject* m_GOTarget;
+        Item* m_itemTarget;
 
         // object GUID/etc, can be used always
         ObjectGuid m_unitTargetGUID;
@@ -228,9 +228,9 @@ typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
 
 class Spell
 {
-    friend struct MaNGOS::SpellNotifierPlayer;
-    friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
-    friend void Unit::SetCurrentCastedSpell( Spell * pSpell );
+        friend struct MaNGOS::SpellNotifierPlayer;
+        friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
+        friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
 
     public:
         void EffectEmpty(SpellEffectIndex eff_idx);
@@ -322,7 +322,7 @@ class Spell
         void EffectDispelMechanic(SpellEffectIndex eff_idx);
         void EffectSummonDeadPet(SpellEffectIndex eff_idx);
         void EffectSummonAllTotems(SpellEffectIndex eff_idx);
-        void EffectBreakPlayerTargeting (SpellEffectIndex eff_idx);
+        void EffectBreakPlayerTargeting(SpellEffectIndex eff_idx);
         void EffectDestroyAllTotems(SpellEffectIndex eff_idx);
         void EffectDurabilityDamage(SpellEffectIndex eff_idx);
         void EffectSkill(SpellEffectIndex eff_idx);
@@ -353,7 +353,7 @@ class Spell
         void EffectActivateSpec(SpellEffectIndex eff_idx);
         void EffectCancelAura(SpellEffectIndex eff_idx);
 
-        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL);
+        Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL);
         ~Spell();
 
         void prepare(SpellCastTargets const* targets, Aura* triggeredByAura = NULL);
@@ -399,16 +399,16 @@ class Spell
 
         typedef std::list<Unit*> UnitList;
         void FillTargetMap();
-        void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList &targetUnitMap);
+        void SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList& targetUnitMap);
 
-        void FillAreaTargets(UnitList &targetUnitMap, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);
-        void FillRaidOrPartyTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster);
-        void FillRaidOrPartyManaPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
-        void FillRaidOrPartyHealthPriorityTargets(UnitList &targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
+        void FillAreaTargets(UnitList& targetUnitMap, float radius, SpellNotifyPushType pushType, SpellTargets spellTargets, WorldObject* originalCaster = NULL);
+        void FillRaidOrPartyTargets(UnitList& targetUnitMap, Unit* member, Unit* center, float radius, bool raid, bool withPets, bool withcaster);
+        void FillRaidOrPartyManaPriorityTargets(UnitList& targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
+        void FillRaidOrPartyHealthPriorityTargets(UnitList& targetUnitMap, Unit* member, Unit* center, float radius, uint32 count, bool raid, bool withPets, bool withcaster);
 
         template<typename T> WorldObject* FindCorpseUsing();
 
-        bool CheckTarget( Unit* target, SpellEffectIndex eff );
+        bool CheckTarget(Unit* target, SpellEffectIndex eff);
         bool CanAutoCast(Unit* target);
 
         static void MANGOS_DLL_SPEC SendCastResult(Player* caster, SpellEntry const* spellInfo, uint8 cast_count, SpellCastResult result);
@@ -423,7 +423,7 @@ class Spell
         void SendResurrectRequest(Player* target);
         void SendPlaySpellVisual(uint32 SpellID);
 
-        void HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
+        void HandleEffects(Unit* pUnitTarget,Item* pItemTarget,GameObject* pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
         void HandleThreatSpells();
         //void HandleAddAura(Unit* Target);
 
@@ -504,7 +504,7 @@ class Spell
         Unit* m_caster;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
-                                                            // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster
+        // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster
         Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
         Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
@@ -523,7 +523,7 @@ class Spell
         uint8 m_delayAtDamageCount;
         bool isDelayableNoMore()
         {
-            if(m_delayAtDamageCount >= 2)
+            if (m_delayAtDamageCount >= 2)
                 return true;
 
             m_delayAtDamageCount++;
@@ -597,7 +597,7 @@ class Spell
 
         struct ItemTargetInfo
         {
-            Item  *item;
+            Item*  item;
             uint8 effectMask;
         };
 
@@ -614,13 +614,13 @@ class Spell
         void AddGOTarget(GameObject* target, SpellEffectIndex effIndex);
         void AddGOTarget(ObjectGuid goGuid, SpellEffectIndex effIndex);
         void AddItemTarget(Item* target, SpellEffectIndex effIndex);
-        void DoAllEffectOnTarget(TargetInfo *target);
-        void HandleDelayedSpellLaunch(TargetInfo *target);
+        void DoAllEffectOnTarget(TargetInfo* target);
+        void HandleDelayedSpellLaunch(TargetInfo* target);
         void InitializeDamageMultipliers();
         void ResetEffectDamageAndHeal();
-        void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
-        void DoAllEffectOnTarget(GOTargetInfo *target);
-        void DoAllEffectOnTarget(ItemTargetInfo *target);
+        void DoSpellHitOnUnit(Unit* unit, uint32 effectMask);
+        void DoAllEffectOnTarget(GOTargetInfo* target);
+        void DoAllEffectOnTarget(ItemTargetInfo* target);
         bool IsAliveUnitPresentInTargetList();
         SpellCastResult CanOpenLock(SpellEffectIndex effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);
         // -------------------------------------------
@@ -679,43 +679,43 @@ namespace MaNGOS
 {
     struct MANGOS_DLL_DECL SpellNotifierPlayer              // Currently unused. When put to use this one requires handling for source-location (smilar to below)
     {
-        Spell::UnitList &i_data;
-        Spell &i_spell;
+        Spell::UnitList& i_data;
+        Spell& i_spell;
         const uint32& i_index;
         float i_radius;
         WorldObject* i_originalCaster;
 
-        SpellNotifierPlayer(Spell &spell, Spell::UnitList &data, const uint32 &i, float radius)
+        SpellNotifierPlayer(Spell& spell, Spell::UnitList& data, const uint32& i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)
         {
             i_originalCaster = i_spell.GetAffectiveCasterObject();
         }
 
-        void Visit(PlayerMapType &m)
+        void Visit(PlayerMapType& m)
         {
-            if(!i_originalCaster)
+            if (!i_originalCaster)
                 return;
 
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
             {
-                Player * pPlayer = itr->getSource();
-                if( !pPlayer->isAlive() || pPlayer->IsTaxiFlying())
+                Player* pPlayer = itr->getSource();
+                if (!pPlayer->isAlive() || pPlayer->IsTaxiFlying())
                     continue;
 
-                if( i_originalCaster->IsFriendlyTo(pPlayer) )
+                if (i_originalCaster->IsFriendlyTo(pPlayer))
                     continue;
 
-                if( pPlayer->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
+                if (pPlayer->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
                     i_data.push_back(pPlayer);
             }
         }
-        template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
     };
 
     struct MANGOS_DLL_DECL SpellNotifierCreatureAndPlayer
     {
-        Spell::UnitList *i_data;
-        Spell &i_spell;
+        Spell::UnitList* i_data;
+        Spell& i_spell;
         SpellNotifyPushType i_push_type;
         float i_radius;
         SpellTargets i_TargetType;
@@ -729,16 +729,16 @@ namespace MaNGOS
         float GetCenterX() const { return i_centerX; }
         float GetCenterY() const { return i_centerY; }
 
-        SpellNotifierCreatureAndPlayer(Spell &spell, Spell::UnitList &data, float radius, SpellNotifyPushType type,
-            SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY, WorldObject* originalCaster = NULL)
+        SpellNotifierCreatureAndPlayer(Spell& spell, Spell::UnitList& data, float radius, SpellNotifyPushType type,
+                                       SpellTargets TargetType = SPELL_TARGETS_NOT_FRIENDLY, WorldObject* originalCaster = NULL)
             : i_data(&data), i_spell(spell), i_push_type(type), i_radius(radius), i_TargetType(TargetType),
-            i_originalCaster(originalCaster), i_castingObject(i_spell.GetCastingObject())
+              i_originalCaster(originalCaster), i_castingObject(i_spell.GetCastingObject())
         {
             if (!i_originalCaster)
                 i_originalCaster = i_spell.GetAffectiveCasterObject();
             i_playerControlled = i_originalCaster  ? i_originalCaster->IsControlledByPlayer() : false;
 
-            switch(i_push_type)
+            switch (i_push_type)
             {
                 case PUSH_IN_FRONT:
                 case PUSH_IN_FRONT_90:
@@ -778,38 +778,38 @@ namespace MaNGOS
             }
         }
 
-        template<class T> inline void Visit(GridRefManager<T>  &m)
+        template<class T> inline void Visit(GridRefManager<T>&  m)
         {
             MANGOS_ASSERT(i_data);
 
             if (!i_originalCaster || !i_castingObject)
                 return;
 
-            for(typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
+            for (typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
             {
                 // there are still more spells which can be casted on dead, but
                 // they are no AOE and don't have such a nice SPELL_ATTR flag
                 if ((i_TargetType != SPELL_TARGETS_ALL && !itr->getSource()->isTargetableForAttack(i_spell.m_spellInfo->HasAttribute(SPELL_ATTR_EX3_CAST_ON_DEAD)))
-                    // mostly phase check
-                    || !itr->getSource()->IsInMap(i_originalCaster))
+                        // mostly phase check
+                        || !itr->getSource()->IsInMap(i_originalCaster))
                     continue;
 
                 switch (i_TargetType)
                 {
                     case SPELL_TARGETS_HOSTILE:
-                        if (!i_originalCaster->IsHostileTo( itr->getSource() ))
+                        if (!i_originalCaster->IsHostileTo(itr->getSource()))
                             continue;
                         break;
                     case SPELL_TARGETS_NOT_FRIENDLY:
-                        if (i_originalCaster->IsFriendlyTo( itr->getSource() ))
+                        if (i_originalCaster->IsFriendlyTo(itr->getSource()))
                             continue;
                         break;
                     case SPELL_TARGETS_NOT_HOSTILE:
-                        if (i_originalCaster->IsHostileTo( itr->getSource() ))
+                        if (i_originalCaster->IsHostileTo(itr->getSource()))
                             continue;
                         break;
                     case SPELL_TARGETS_FRIENDLY:
-                        if (!i_originalCaster->IsFriendlyTo( itr->getSource() ))
+                        if (!i_originalCaster->IsFriendlyTo(itr->getSource()))
                             continue;
                         break;
                     case SPELL_TARGETS_AOE_DAMAGE:
@@ -819,12 +819,12 @@ namespace MaNGOS
 
                         if (i_playerControlled)
                         {
-                            if (i_originalCaster->IsFriendlyTo( itr->getSource() ))
+                            if (i_originalCaster->IsFriendlyTo(itr->getSource()))
                                 continue;
                         }
                         else
                         {
-                            if (!i_originalCaster->IsHostileTo( itr->getSource() ))
+                            if (!i_originalCaster->IsHostileTo(itr->getSource()))
                                 continue;
                         }
                     }
@@ -835,26 +835,26 @@ namespace MaNGOS
                 }
 
                 // we don't need to check InMap here, it's already done some lines above
-                switch(i_push_type)
+                switch (i_push_type)
                 {
                     case PUSH_IN_FRONT:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_90:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/2 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/2))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_30:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/6 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/6))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_15:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/12 ))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/12))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_BACK:
-                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3 ))
+                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_SELF_CENTER:
@@ -873,20 +873,20 @@ namespace MaNGOS
             }
         }
 
-        #ifdef WIN32
-        template<> inline void Visit(CorpseMapType & ) {}
-        template<> inline void Visit(GameObjectMapType & ) {}
-        template<> inline void Visit(DynamicObjectMapType & ) {}
-        template<> inline void Visit(CameraMapType & ) {}
-        #endif
+#ifdef WIN32
+        template<> inline void Visit(CorpseMapType&) {}
+        template<> inline void Visit(GameObjectMapType&) {}
+        template<> inline void Visit(DynamicObjectMapType&) {}
+        template<> inline void Visit(CameraMapType&) {}
+#endif
     };
 
-    #ifndef WIN32
-    template<> inline void SpellNotifierCreatureAndPlayer::Visit(CorpseMapType& ) {}
-    template<> inline void SpellNotifierCreatureAndPlayer::Visit(GameObjectMapType& ) {}
-    template<> inline void SpellNotifierCreatureAndPlayer::Visit(DynamicObjectMapType& ) {}
-    template<> inline void SpellNotifierCreatureAndPlayer::Visit(CameraMapType& ) {}
-    #endif
+#ifndef WIN32
+    template<> inline void SpellNotifierCreatureAndPlayer::Visit(CorpseMapType&) {}
+    template<> inline void SpellNotifierCreatureAndPlayer::Visit(GameObjectMapType&) {}
+    template<> inline void SpellNotifierCreatureAndPlayer::Visit(DynamicObjectMapType&) {}
+    template<> inline void SpellNotifierCreatureAndPlayer::Visit(CameraMapType&) {}
+#endif
 }
 
 typedef void(Spell::*pEffect)(SpellEffectIndex eff_idx);
