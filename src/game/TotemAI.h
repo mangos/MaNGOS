@@ -30,15 +30,15 @@ class MANGOS_DLL_DECL TotemAI : public CreatureAI
 {
     public:
 
-        explicit TotemAI(Creature *c);
+        explicit TotemAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
+        void MoveInLineOfSight(Unit*);
+        void AttackStart(Unit*);
         void EnterEvadeMode();
-        bool IsVisible(Unit *) const;
+        bool IsVisible(Unit*) const;
 
         void UpdateAI(const uint32);
-        static int Permissible(const Creature *);
+        static int Permissible(const Creature*);
     protected:
         Totem& getTotem();
 

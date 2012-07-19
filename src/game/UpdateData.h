@@ -55,9 +55,9 @@ class UpdateData
         UpdateData();
 
         void AddOutOfRangeGUID(GuidSet& guids);
-        void AddOutOfRangeGUID(ObjectGuid const &guid);
-        void AddUpdateBlock(const ByteBuffer &block);
-        bool BuildPacket(WorldPacket *packet);
+        void AddOutOfRangeGUID(ObjectGuid const& guid);
+        void AddUpdateBlock(const ByteBuffer& block);
+        bool BuildPacket(WorldPacket* packet);
         bool HasData() { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 
@@ -68,6 +68,6 @@ class UpdateData
         GuidSet m_outOfRangeGUIDs;
         ByteBuffer m_data;
 
-        void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
+        void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 #endif

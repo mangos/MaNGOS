@@ -27,20 +27,20 @@
 #include "CellImpl.h"
 
 int
-TotemAI::Permissible(const Creature *creature)
+TotemAI::Permissible(const Creature* creature)
 {
-    if( creature->IsTotem() )
+    if (creature->IsTotem())
         return PERMIT_BASE_PROACTIVE;
 
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature *c) : CreatureAI(c)
+TotemAI::TotemAI(Creature* c) : CreatureAI(c)
 {
 }
 
 void
-TotemAI::MoveInLineOfSight(Unit *)
+TotemAI::MoveInLineOfSight(Unit*)
 {
 }
 
@@ -59,7 +59,7 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
         return;
 
     // Search spell
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(getTotem().GetSpell());
+    SpellEntry const* spellInfo = sSpellStore.LookupEntry(getTotem().GetSpell());
     if (!spellInfo)
         return;
 
@@ -73,9 +73,9 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
     Unit* victim = m_creature->GetMap()->GetUnit(i_victimGuid);
 
     // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
-    if( !victim ||
-        !victim->isTargetableForAttack() || !m_creature->IsWithinDistInMap(victim, max_range) ||
-        m_creature->IsFriendlyTo(victim) || !victim->isVisibleForOrDetect(m_creature,m_creature,false) )
+    if (!victim ||
+            !victim->isTargetableForAttack() || !m_creature->IsWithinDistInMap(victim, max_range) ||
+            m_creature->IsFriendlyTo(victim) || !victim->isVisibleForOrDetect(m_creature,m_creature,false))
     {
         victim = NULL;
 
@@ -99,13 +99,13 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
 }
 
 bool
-TotemAI::IsVisible(Unit *) const
+TotemAI::IsVisible(Unit*) const
 {
     return false;
 }
 
 void
-TotemAI::AttackStart(Unit *)
+TotemAI::AttackStart(Unit*)
 {
 }
 

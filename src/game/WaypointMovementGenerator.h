@@ -44,7 +44,7 @@ class MANGOS_DLL_SPEC PathMovementBase
         virtual ~PathMovementBase() {};
 
         // template pattern, not defined .. override required
-        void LoadPath(T &);
+        void LoadPath(T&);
         uint32 GetCurrentNode() const { return i_currentNode; }
 
     protected:
@@ -62,24 +62,24 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator;
 
 template<>
 class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
-: public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
-public PathMovementBase<Creature, WaypointPath const*>
+    : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
+  public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), m_isArrivalDone(false) {}
+        WaypointMovementGenerator(Creature&) : i_nextMoveTime(0), m_isArrivalDone(false) {}
         ~WaypointMovementGenerator() { i_path = NULL; }
-        void Initialize(Creature &u);
-        void Interrupt(Creature &);
-        void Finalize(Creature &);
-        void Reset(Creature &u);
-        bool Update(Creature &u, const uint32 &diff);
+        void Initialize(Creature& u);
+        void Interrupt(Creature&);
+        void Finalize(Creature&);
+        void Reset(Creature& u);
+        bool Update(Creature& u, const uint32& diff);
 
-        void MovementInform(Creature &);
+        void MovementInform(Creature&);
 
         MovementGeneratorType GetMovementGeneratorType() const { return WAYPOINT_MOTION_TYPE; }
 
         // now path movement implmementation
-        void LoadPath(Creature &c);
+        void LoadPath(Creature& c);
 
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
@@ -112,8 +112,8 @@ public PathMovementBase<Creature, WaypointPath const*>
  * and hence generates ground and activities for the player.
  */
 class MANGOS_DLL_SPEC FlightPathMovementGenerator
-: public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
-public PathMovementBase<Player,TaxiPathNodeList const*>
+    : public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
+  public PathMovementBase<Player,TaxiPathNodeList const*>
 {
     public:
         explicit FlightPathMovementGenerator(TaxiPathNodeList const& pathnodes, uint32 startNode = 0)
@@ -121,11 +121,11 @@ public PathMovementBase<Player,TaxiPathNodeList const*>
             i_path = &pathnodes;
             i_currentNode = startNode;
         }
-        void Initialize(Player &);
-        void Finalize(Player &);
-        void Interrupt(Player &);
-        void Reset(Player &);
-        bool Update(Player &, const uint32 &);
+        void Initialize(Player&);
+        void Finalize(Player&);
+        void Interrupt(Player&);
+        void Reset(Player&);
+        bool Update(Player&, const uint32&);
         MovementGeneratorType GetMovementGeneratorType() const { return FLIGHT_MOTION_TYPE; }
 
         TaxiPathNodeList const& GetPath() { return *i_path; }

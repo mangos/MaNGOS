@@ -31,7 +31,7 @@ class Transport : public GameObject
         explicit Transport();
 
         bool Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint8 animprogress, uint16 dynamicHighValue);
-        bool GenerateWaypoints(uint32 pathid, std::set<uint32> &mapids);
+        bool GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids);
         void Update(uint32 update_diff, uint32 p_time) override;
         bool AddPassenger(Player* passenger);
         bool RemovePassenger(Player* passenger);
@@ -45,7 +45,7 @@ class Transport : public GameObject
             WayPoint() : mapid(0), x(0), y(0), z(0), teleport(false) {}
             WayPoint(uint32 _mapid, float _x, float _y, float _z, bool _teleport, uint32 _arrivalEventID = 0, uint32 _departureEventID = 0)
                 : mapid(_mapid), x(_x), y(_y), z(_z), teleport(_teleport),
-                arrivalEventID(_arrivalEventID), departureEventID(_departureEventID)
+                  arrivalEventID(_arrivalEventID), departureEventID(_departureEventID)
             {
             }
 
