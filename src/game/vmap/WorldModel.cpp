@@ -31,7 +31,7 @@ template<> struct BoundsTrait<VMAP::GroupModel>
 
 namespace VMAP
 {
-    bool IntersectTriangle(const MeshTriangle &tri, std::vector<Vector3>::const_iterator points, const G3D::Ray &ray, float &distance)
+    bool IntersectTriangle(const MeshTriangle& tri, std::vector<Vector3>::const_iterator points, const G3D::Ray& ray, float& distance)
     {
         static const float EPS = 1e-5f;
 
@@ -42,7 +42,8 @@ namespace VMAP
         const Vector3 p(ray.direction().cross(e2));
         const float a = e1.dot(p);
 
-        if (abs(a) < EPS) {
+        if (abs(a) < EPS)
+        {
             // Determinant is ill-conditioned; abort early
             return false;
         }
@@ -51,7 +52,8 @@ namespace VMAP
         const Vector3 s(ray.origin() - points[tri.idx0]);
         const float u = f * s.dot(p);
 
-        if ((u < 0.0f) || (u > 1.0f)) {
+        if ((u < 0.0f) || (u > 1.0f))
+        {
             // We hit the plane of the m_geometry, but outside the m_geometry
             return false;
         }
@@ -59,7 +61,8 @@ namespace VMAP
         const Vector3 q(s.cross(e1));
         const float v = f * ray.direction().dot(q);
 
-        if ((v < 0.0f) || ((u + v) > 1.0f)) {
+        if ((v < 0.0f) || ((u + v) > 1.0f))
+        {
             // We hit the plane of the triangle, but outside the triangle
             return false;
         }
@@ -84,8 +87,8 @@ namespace VMAP
     class TriBoundFunc
     {
         public:
-            TriBoundFunc(std::vector<Vector3> &vert): vertices(vert.begin()) {}
-            void operator()(const MeshTriangle &tri, G3D::AABox &out) const
+            TriBoundFunc(std::vector<Vector3>& vert): vertices(vert.begin()) {}
+            void operator()(const MeshTriangle& tri, G3D::AABox& out) const
             {
                 G3D::Vector3 lo = vertices[tri.idx0];
                 G3D::Vector3 hi = lo;
@@ -101,14 +104,14 @@ namespace VMAP
 
     // ===================== WmoLiquid ==================================
 
-    WmoLiquid::WmoLiquid(uint32 width, uint32 height, const Vector3 &corner, uint32 type):
+    WmoLiquid::WmoLiquid(uint32 width, uint32 height, const Vector3& corner, uint32 type):
         iTilesX(width), iTilesY(height), iCorner(corner), iType(type)
     {
         iHeight = new float[(width+1)*(height+1)];
         iFlags = new uint8[width*height];
     }
 
-    WmoLiquid::WmoLiquid(const WmoLiquid &other): iHeight(0), iFlags(0)
+    WmoLiquid::WmoLiquid(const WmoLiquid& other): iHeight(0), iFlags(0)
     {
         *this = other; // use assignment operator...
     }
@@ -119,7 +122,7 @@ namespace VMAP
         delete[] iFlags;
     }
 
-    WmoLiquid& WmoLiquid::operator=(const WmoLiquid &other)
+    WmoLiquid& WmoLiquid::operator=(const WmoLiquid& other)
     {
         if (this == &other)
             return *this;
@@ -146,7 +149,7 @@ namespace VMAP
         return *this;
     }
 
-    bool WmoLiquid::GetLiquidHeight(const Vector3 &pos, float &liqHeight) const
+    bool WmoLiquid::GetLiquidHeight(const Vector3& pos, float& liqHeight) const
     {
         float tx_f = (pos.x - iCorner.x)/LIQUID_TILE_SIZE;
         uint32 tx = uint32(tx_f);
@@ -197,12 +200,12 @@ namespace VMAP
     uint32 WmoLiquid::GetFileSize()
     {
         return 2 * sizeof(uint32) +
-                sizeof(Vector3) +
-                (iTilesX + 1)*(iTilesY + 1) * sizeof(float) +
-                iTilesX * iTilesY;
+               sizeof(Vector3) +
+               (iTilesX + 1)*(iTilesY + 1) * sizeof(float) +
+               iTilesX * iTilesY;
     }
 
-    bool WmoLiquid::writeToFile(FILE *wf)
+    bool WmoLiquid::writeToFile(FILE* wf)
     {
         bool result = true;
         if (result && fwrite(&iTilesX, sizeof(uint32), 1, wf) != 1) result = false;
@@ -216,10 +219,10 @@ namespace VMAP
         return result;
     }
 
-    bool WmoLiquid::readFromFile(FILE *rf, WmoLiquid *&out)
+    bool WmoLiquid::readFromFile(FILE* rf, WmoLiquid*& out)
     {
         bool result = true;
-        WmoLiquid *liquid = new WmoLiquid();
+        WmoLiquid* liquid = new WmoLiquid();
         if (result && fread(&liquid->iTilesX, sizeof(uint32), 1, rf) != 1) result = false;
         if (result && fread(&liquid->iTilesY, sizeof(uint32), 1, rf) != 1) result = false;
         if (result && fread(&liquid->iCorner, sizeof(Vector3), 1, rf) != 1) result = false;
@@ -238,7 +241,7 @@ namespace VMAP
 
     // ===================== GroupModel ==================================
 
-    GroupModel::GroupModel(const GroupModel &other):
+    GroupModel::GroupModel(const GroupModel& other):
         iBound(other.iBound), iMogpFlags(other.iMogpFlags), iGroupWMOID(other.iGroupWMOID),
         vertices(other.vertices), triangles(other.triangles), meshTree(other.meshTree), iLiquid(0)
     {
@@ -246,7 +249,7 @@ namespace VMAP
             iLiquid = new WmoLiquid(*other.iLiquid);
     }
 
-    void GroupModel::setMeshData(std::vector<Vector3> &vert, std::vector<MeshTriangle> &tri)
+    void GroupModel::setMeshData(std::vector<Vector3>& vert, std::vector<MeshTriangle>& tri)
     {
         vertices.swap(vert);
         triangles.swap(tri);
@@ -254,7 +257,7 @@ namespace VMAP
         meshTree.build(triangles, bFunc);
     }
 
-    bool GroupModel::writeToFile(FILE *wf)
+    bool GroupModel::writeToFile(FILE* wf)
     {
         bool result = true;
         uint32 chunkSize, count;
@@ -300,7 +303,7 @@ namespace VMAP
         return result;
     }
 
-    bool GroupModel::readFromFile(FILE *rf)
+    bool GroupModel::readFromFile(FILE* rf)
     {
         char chunk[8];
         bool result = true;
@@ -344,7 +347,7 @@ namespace VMAP
 
     struct GModelRayCallback
     {
-        GModelRayCallback(const std::vector<MeshTriangle> &tris, const std::vector<Vector3> &vert):
+        GModelRayCallback(const std::vector<MeshTriangle>& tris, const std::vector<Vector3>& vert):
             vertices(vert.begin()), triangles(tris.begin()), hit(false) {}
         bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit)
         {
@@ -357,7 +360,7 @@ namespace VMAP
         bool hit;
     };
 
-    bool GroupModel::IntersectRay(const G3D::Ray &ray, float &distance, bool stopAtFirstHit) const
+    bool GroupModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const
     {
         if (!triangles.size())
             return false;
@@ -366,7 +369,7 @@ namespace VMAP
         return callback.hit;
     }
 
-    bool GroupModel::IsInsideObject(const Vector3 &pos, const Vector3 &down, float &z_dist) const
+    bool GroupModel::IsInsideObject(const Vector3& pos, const Vector3& down, float& z_dist) const
     {
         if (!triangles.size() || !iBound.contains(pos))
             return false;
@@ -380,7 +383,7 @@ namespace VMAP
         return hit;
     }
 
-    bool GroupModel::GetLiquidLevel(const Vector3 &pos, float &liqHeight) const
+    bool GroupModel::GetLiquidLevel(const Vector3& pos, float& liqHeight) const
     {
         if (iLiquid)
             return iLiquid->GetLiquidHeight(pos, liqHeight);
@@ -397,7 +400,7 @@ namespace VMAP
 
     // ===================== WorldModel ==================================
 
-    void WorldModel::setGroupModels(std::vector<GroupModel> &models)
+    void WorldModel::setGroupModels(std::vector<GroupModel>& models)
     {
         groupModels.swap(models);
         groupTree.build(groupModels, BoundsTrait<GroupModel>::getBounds, 1);
@@ -405,7 +408,7 @@ namespace VMAP
 
     struct WModelRayCallBack
     {
-        WModelRayCallBack(const std::vector<GroupModel> &mod): models(mod.begin()), hit(false) {}
+        WModelRayCallBack(const std::vector<GroupModel>& mod): models(mod.begin()), hit(false) {}
         bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit)
         {
             bool result = models[entry].IntersectRay(ray, distance, pStopAtFirstHit);
@@ -416,7 +419,7 @@ namespace VMAP
         bool hit;
     };
 
-    bool WorldModel::IntersectRay(const G3D::Ray &ray, float &distance, bool stopAtFirstHit) const
+    bool WorldModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const
     {
         // small M2 workaround, maybe better make separate class with virtual intersection funcs
         // in any case, there's no need to use a bound tree if we only have one submodel
@@ -428,9 +431,10 @@ namespace VMAP
         return isc.hit;
     }
 
-    class WModelAreaCallback {
+    class WModelAreaCallback
+    {
         public:
-            WModelAreaCallback(const std::vector<GroupModel> &vals, const Vector3 &down):
+            WModelAreaCallback(const std::vector<GroupModel>& vals, const Vector3& down):
                 prims(vals.begin()), hit(vals.end()), minVol(G3D::inf()), zDist(G3D::inf()), zVec(down) {}
             std::vector<GroupModel>::const_iterator prims;
             std::vector<GroupModel>::const_iterator hit;
@@ -443,29 +447,29 @@ namespace VMAP
                 //float pVol = prims[entry].GetBound().volume();
                 //if(pVol < minVol)
                 //{
-                    /* if (prims[entry].iBound.contains(point)) */
-                    if (prims[entry].IsInsideObject(point, zVec, group_Z))
+                /* if (prims[entry].iBound.contains(point)) */
+                if (prims[entry].IsInsideObject(point, zVec, group_Z))
+                {
+                    //minVol = pVol;
+                    //hit = prims + entry;
+                    if (group_Z < zDist)
                     {
-                        //minVol = pVol;
-                        //hit = prims + entry;
-                        if (group_Z < zDist)
-                        {
-                            zDist = group_Z;
-                            hit = prims + entry;
-                        }
-#ifdef VMAP_DEBUG
-                        const GroupModel &gm = prims[entry];
-                        printf("%10u %8X %7.3f,%7.3f,%7.3f | %7.3f,%7.3f,%7.3f | z=%f, p_z=%f\n", gm.GetWmoID(), gm.GetMogpFlags(),
-                        gm.GetBound().low().x, gm.GetBound().low().y, gm.GetBound().low().z,
-                        gm.GetBound().high().x, gm.GetBound().high().y, gm.GetBound().high().z, group_Z, point.z);
-#endif
+                        zDist = group_Z;
+                        hit = prims + entry;
                     }
+#ifdef VMAP_DEBUG
+                    const GroupModel& gm = prims[entry];
+                    printf("%10u %8X %7.3f,%7.3f,%7.3f | %7.3f,%7.3f,%7.3f | z=%f, p_z=%f\n", gm.GetWmoID(), gm.GetMogpFlags(),
+                           gm.GetBound().low().x, gm.GetBound().low().y, gm.GetBound().low().z,
+                           gm.GetBound().high().x, gm.GetBound().high().y, gm.GetBound().high().z, group_Z, point.z);
+#endif
+                }
                 //}
                 //std::cout << "trying to intersect '" << prims[entry].name << "'\n";
             }
     };
 
-    bool WorldModel::IntersectPoint(const G3D::Vector3 &p, const G3D::Vector3 &down, float &dist, AreaInfo &info) const
+    bool WorldModel::IntersectPoint(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, AreaInfo& info) const
     {
         if (!groupModels.size())
             return false;
@@ -483,7 +487,7 @@ namespace VMAP
         return false;
     }
 
-    bool WorldModel::GetLocationInfo(const G3D::Vector3 &p, const G3D::Vector3 &down, float &dist, LocationInfo &info) const
+    bool WorldModel::GetLocationInfo(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, LocationInfo& info) const
     {
         if (!groupModels.size())
             return false;
@@ -498,9 +502,9 @@ namespace VMAP
         return false;
     }
 
-    bool WorldModel::writeFile(const std::string &filename)
+    bool WorldModel::writeFile(const std::string& filename)
     {
-        FILE *wf = fopen(filename.c_str(), "wb");
+        FILE* wf = fopen(filename.c_str(), "wb");
         if (!wf)
             return false;
 
@@ -532,9 +536,9 @@ namespace VMAP
         return result;
     }
 
-    bool WorldModel::readFile(const std::string &filename)
+    bool WorldModel::readFile(const std::string& filename)
     {
-        FILE *rf = fopen(filename.c_str(), "rb");
+        FILE* rf = fopen(filename.c_str(), "rb");
         if (!rf)
             return false;
 

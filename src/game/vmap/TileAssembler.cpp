@@ -34,12 +34,12 @@ using std::pair;
 
 template<> struct BoundsTrait<VMAP::ModelSpawn*>
 {
-    static void getBounds(const VMAP::ModelSpawn* const &obj, G3D::AABox& out) { out = obj->getBounds(); }
+    static void getBounds(const VMAP::ModelSpawn* const& obj, G3D::AABox& out) { out = obj->getBounds(); }
 };
 
 namespace VMAP
 {
-    bool readChunk(FILE *rf, char *dest, const char *compare, uint32 len)
+    bool readChunk(FILE* rf, char* dest, const char* compare, uint32 len)
     {
         if (fread(dest, sizeof(char), len, rf) != len) return false;
         return memcmp(dest, compare, len) == 0;
@@ -113,7 +113,7 @@ namespace VMAP
             // write map tree file
             std::stringstream mapfilename;
             mapfilename << iDestDir << "/" << std::setfill('0') << std::setw(3) << map_iter->first << ".vmtree";
-            FILE *mapfile = fopen(mapfilename.str().c_str(), "wb");
+            FILE* mapfile = fopen(mapfilename.str().c_str(), "wb");
             if (!mapfile)
             {
                 success = false;
@@ -143,11 +143,11 @@ namespace VMAP
             // <====
 
             // write map tile files, similar to ADT files, only with extra BSP tree node info
-            TileMap &tileEntries = map_iter->second->TileEntries;
+            TileMap& tileEntries = map_iter->second->TileEntries;
             TileMap::iterator tile;
             for (tile = tileEntries.begin(); tile != tileEntries.end(); ++tile)
             {
-                const ModelSpawn &spawn = map_iter->second->UniqueEntries[tile->second];
+                const ModelSpawn& spawn = map_iter->second->UniqueEntries[tile->second];
                 if (spawn.flags & MOD_WORLDSPAWN) // WDT spawn, saved as tile 65/65 currently...
                     continue;
                 uint32 nSpawns = tileEntries.count(tile->first);
@@ -157,7 +157,7 @@ namespace VMAP
                 uint32 x, y;
                 StaticMapTree::unpackTileID(tile->first, x, y);
                 tilefilename << std::setw(2) << x << "_" << std::setw(2) << y << ".vmtile";
-                FILE *tilefile = fopen(tilefilename.str().c_str(), "wb");
+                FILE* tilefile = fopen(tilefilename.str().c_str(), "wb");
                 // file header
                 if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
                 // write number of tile spawns
@@ -167,7 +167,7 @@ namespace VMAP
                 {
                     if (s)
                         ++tile;
-                    const ModelSpawn &spawn2 = map_iter->second->UniqueEntries[tile->second];
+                    const ModelSpawn& spawn2 = map_iter->second->UniqueEntries[tile->second];
                     success = success && ModelSpawn::writeToFile(tilefile, spawn2);
                     // MapTree nodes to update when loading tile:
                     std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
@@ -202,7 +202,7 @@ namespace VMAP
     bool TileAssembler::readMapSpawns()
     {
         std::string fname = iSrcDir + "/dir_bin";
-        FILE *dirf = fopen(fname.c_str(), "rb");
+        FILE* dirf = fopen(fname.c_str(), "rb");
         if (!dirf)
         {
             printf("Could not read dir_bin file!\n");
@@ -224,7 +224,7 @@ namespace VMAP
             if (!ModelSpawn::readFromFile(dirf, spawn))
                 break;
 
-            MapSpawns *current;
+            MapSpawns* current;
             MapData::iterator map_iter = mapData.find(mapID);
             if (map_iter == mapData.end())
             {
@@ -240,7 +240,7 @@ namespace VMAP
         return success;
     }
 
-    bool TileAssembler::calculateTransformedBound(ModelSpawn &spawn)
+    bool TileAssembler::calculateTransformedBound(ModelSpawn& spawn)
     {
         std::string modelFilename = iSrcDir + "/" + spawn.name;
         ModelPosition modelPosition;
@@ -248,7 +248,7 @@ namespace VMAP
         modelPosition.iScale = spawn.iScale;
         modelPosition.init();
 
-        FILE *rf = fopen(modelFilename.c_str(), "rb");
+        FILE* rf = fopen(modelFilename.c_str(), "rb");
         if (!rf)
         {
             printf("ERROR: Can't open model file: %s\n", modelFilename.c_str());
@@ -262,9 +262,9 @@ namespace VMAP
         int readOperation = 1;
 
         // temporary use defines to simplify read/check code (close file and return at fail)
-        #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
+#define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
                                         fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
-        #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
+#define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
@@ -278,7 +278,7 @@ namespace VMAP
         char blockId[5];
         blockId[4] = 0;
         int blocksize;
-        float *vectorarray = 0;
+        float* vectorarray = 0;
 
         READ_OR_RETURN(&groups, sizeof(uint32));
         READ_OR_RETURN(&wmoRootId, sizeof(uint32));
@@ -329,8 +329,8 @@ namespace VMAP
             }
             delete[] vectorarray;
             // drop of temporary use defines
-            #undef READ_OR_RETURN
-            #undef CMP_OR_RETURN
+#undef READ_OR_RETURN
+#undef CMP_OR_RETURN
         }
         spawn.iBound = modelBound + spawn.iPos;
         spawn.flags |= MOD_HAS_BOUND;
@@ -354,12 +354,12 @@ namespace VMAP
         if (filename.length() >0)
             filename.append("/");
         filename.append(pModelFilename);
-        FILE *rf = fopen(filename.c_str(), "rb");
+        FILE* rf = fopen(filename.c_str(), "rb");
 
         if (!rf)
         {
             printf("ERROR: Can't open model file in form: %s",pModelFilename.c_str());
-            printf("...                          or form: %s",filename.c_str() );
+            printf("...                          or form: %s",filename.c_str());
             return false;
         }
 
@@ -368,9 +368,9 @@ namespace VMAP
         int readOperation = 1;
 
         // temporary use defines to simplify read/check code (close file and return at fail)
-        #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
+#define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
                                         fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
-        #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
+#define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
@@ -428,7 +428,7 @@ namespace VMAP
             READ_OR_RETURN(&nindexes, sizeof(uint32));
             if (nindexes >0)
             {
-                uint16 *indexarray = new uint16[nindexes];
+                uint16* indexarray = new uint16[nindexes];
                 READ_OR_RETURN(indexarray, nindexes*sizeof(uint16));
                 for (uint32 i=0; i<nindexes; i+=3)
                 {
@@ -446,16 +446,16 @@ namespace VMAP
 
             if (nvectors >0)
             {
-                float *vectorarray = new float[nvectors*3];
+                float* vectorarray = new float[nvectors*3];
                 READ_OR_RETURN(vectorarray, nvectors*sizeof(float)*3);
                 for (uint32 i=0; i<nvectors; ++i)
                 {
-                    vertexArray.push_back( Vector3(vectorarray + 3*i) );
+                    vertexArray.push_back(Vector3(vectorarray + 3*i));
                 }
                 delete[] vectorarray;
             }
             // ----- liquid
-            WmoLiquid *liquid = 0;
+            WmoLiquid* liquid = 0;
             if (liquidflags& 1)
             {
                 WMOLiquidHeader hlq;
@@ -475,8 +475,8 @@ namespace VMAP
             groupsArray.back().setLiquidData(liquid);
 
             // drop of temporary use defines
-            #undef READ_OR_RETURN
-            #undef CMP_OR_RETURN
+#undef READ_OR_RETURN
+#undef CMP_OR_RETURN
 
         }
         fclose(rf);
