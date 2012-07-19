@@ -27,7 +27,7 @@
 #include "Policies/SingletonImp.h"
 #include "Database/DatabaseEnv.h"
 
-INSTANTIATE_SINGLETON_1( RealmList );
+INSTANTIATE_SINGLETON_1(RealmList);
 
 extern DatabaseType LoginDatabase;
 
@@ -35,7 +35,8 @@ extern DatabaseType LoginDatabase;
 // if you need more from old build then add it in cases in realmd sources code
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 
-static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
+static RealmBuildInfo ExpectedRealmdClientBuilds[] =
+{
     {12340, 3, 3, 5, 'a'},                                  // highest supported build, also auto accept all above for simplify future supported builds testing
     {11723, 3, 3, 3, 'a'},
     {11403, 3, 3, 2, ' '},
@@ -54,15 +55,15 @@ RealmBuildInfo const* FindBuildInfo(uint16 _build)
         return &ExpectedRealmdClientBuilds[0];
 
     // continue from 1 with explicit equal check
-    for(int i = 1; ExpectedRealmdClientBuilds[i].build; ++i)
-        if(_build == ExpectedRealmdClientBuilds[i].build)
+    for (int i = 1; ExpectedRealmdClientBuilds[i].build; ++i)
+        if (_build == ExpectedRealmdClientBuilds[i].build)
             return &ExpectedRealmdClientBuilds[i];
 
     // none appropriate build
     return NULL;
 }
 
-RealmList::RealmList( ) : m_UpdateInterval(0), m_NextUpdateTime(time(NULL))
+RealmList::RealmList() : m_UpdateInterval(0), m_NextUpdateTime(time(NULL))
 {
 }
 
@@ -81,7 +82,7 @@ void RealmList::Initialize(uint32 updateInterval)
     UpdateRealms(true);
 }
 
-void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds)
+void RealmList::UpdateRealm(uint32 ID, const std::string& name, const std::string& address, uint32 port, uint8 icon, RealmFlags realmflags, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, const std::string& builds)
 {
     ///- Create new if not exist or update existed
     Realm& realm = m_realms[name];
@@ -124,7 +125,7 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
 void RealmList::UpdateIfNeed()
 {
     // maybe disabled or updated recently
-    if(!m_UpdateInterval || m_NextUpdateTime > time(NULL))
+    if (!m_UpdateInterval || m_NextUpdateTime > time(NULL))
         return;
 
     m_NextUpdateTime = time(NULL) + m_UpdateInterval;
@@ -141,14 +142,14 @@ void RealmList::UpdateRealms(bool init)
     DETAIL_LOG("Updating Realm List...");
 
     ////                                               0   1     2        3     4     5           6         7                     8           9
-    QueryResult *result = LoginDatabase.Query( "SELECT id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE (realmflags & 1) = 0 ORDER BY name" );
+    QueryResult* result = LoginDatabase.Query("SELECT id, name, address, port, icon, realmflags, timezone, allowedSecurityLevel, population, realmbuilds FROM realmlist WHERE (realmflags & 1) = 0 ORDER BY name");
 
     ///- Circle through results and add them to the realm map
-    if(result)
+    if (result)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             uint8 allowedSecurityLevel = fields[7].GetUInt8();
 
@@ -166,9 +167,10 @@ void RealmList::UpdateRealms(bool init)
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
                 fields[8].GetFloat(), fields[9].GetCppString());
 
-            if(init)
+            if (init)
                 sLog.outString("Added realm \"%s\"", fields[1].GetString());
-        } while( result->NextRow() );
+        }
+        while (result->NextRow());
         delete result;
     }
 }

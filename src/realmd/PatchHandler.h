@@ -63,7 +63,7 @@ class PatchCache
         }
 
         void LoadPatchMD5(const char*);
-        bool GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH]);
+        bool GetHash(const char* pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH]);
 
     private:
         void LoadPatchesInfo();

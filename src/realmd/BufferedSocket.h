@@ -46,15 +46,15 @@ class BufferedSocket: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
         virtual ~BufferedSocket(void);
 
         size_t recv_len(void) const;
-        bool recv_soft(char *buf, size_t len);
-        bool recv(char *buf, size_t len);
+        bool recv_soft(char* buf, size_t len);
+        bool recv(char* buf, size_t len);
         void recv_skip(size_t len);
 
-        bool send(const char *buf, size_t len);
+        bool send(const char* buf, size_t len);
 
         const std::string& get_remote_address(void) const;
 
-        virtual int open(void *);
+        virtual int open(void*);
 
         void close_connection(void);
 
@@ -62,10 +62,10 @@ class BufferedSocket: public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
         virtual int handle_output(ACE_HANDLE = ACE_INVALID_HANDLE);
 
         virtual int handle_close(ACE_HANDLE = ACE_INVALID_HANDLE,
-                ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
+                                 ACE_Reactor_Mask = ACE_Event_Handler::ALL_EVENTS_MASK);
 
     private:
-        ssize_t noblk_send(ACE_Message_Block &message_block);
+        ssize_t noblk_send(ACE_Message_Block& message_block);
 
     private:
         ACE_Message_Block input_buffer_;

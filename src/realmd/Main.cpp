@@ -67,31 +67,31 @@ bool stopEvent = false;                                     ///< Setting it to t
 DatabaseType LoginDatabase;                                 ///< Accessor to the realm server database
 
 /// Print out the usage string for this program on the console.
-void usage(const char *prog)
+void usage(const char* prog)
 {
     sLog.outString("Usage: \n %s [<options>]\n"
-        "    -v, --version            print version and exist\n\r"
-        "    -c config_file           use config_file as configuration file\n\r"
-        #ifdef WIN32
-        "    Running as service functions:\n\r"
-        "    -s run                   run as service\n\r"
-        "    -s install               install service\n\r"
-        "    -s uninstall             uninstall service\n\r"
-        #else
-        "    Running as daemon functions:\n\r"
-        "    -s run                   run as daemon\n\r"
-        "    -s stop                  stop daemon\n\r"
-        #endif
-        ,prog);
+                   "    -v, --version            print version and exist\n\r"
+                   "    -c config_file           use config_file as configuration file\n\r"
+#ifdef WIN32
+                   "    Running as service functions:\n\r"
+                   "    -s run                   run as service\n\r"
+                   "    -s install               install service\n\r"
+                   "    -s uninstall             uninstall service\n\r"
+#else
+                   "    Running as daemon functions:\n\r"
+                   "    -s run                   run as daemon\n\r"
+                   "    -s stop                  stop daemon\n\r"
+#endif
+                   ,prog);
 }
 
 /// Launch the realm server
-extern int main(int argc, char **argv)
+extern int main(int argc, char** argv)
 {
     ///- Command line parsing
     char const* cfg_file = _REALMD_CONFIG;
 
-    char const *options = ":c:s:";
+    char const* options = ":c:s:";
 
     ACE_Get_Opt cmd_opts(argc, argv, options);
     cmd_opts.long_option("version", 'v');
@@ -112,7 +112,7 @@ extern int main(int argc, char **argv)
 
             case 's':
             {
-                const char *mode = cmd_opts.opt_arg();
+                const char* mode = cmd_opts.opt_arg();
 
                 if (!strcmp(mode, "run"))
                     serviceDaemonMode = 'r';
@@ -185,8 +185,8 @@ extern int main(int argc, char **argv)
 
     sLog.Initialize();
 
-    sLog.outString( "%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID) );
-    sLog.outString( "<Ctrl-C> to stop.\n" );
+    sLog.outString("%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+    sLog.outString("<Ctrl-C> to stop.\n");
     sLog.outString("Using configuration file %s.", cfg_file);
 
     ///- Check the version of the configuration file
@@ -202,7 +202,7 @@ extern int main(int argc, char **argv)
     }
 
     DETAIL_LOG("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    if (SSLeay() < 0x009080bfL )
+    if (SSLeay() < 0x009080bfL)
     {
         DETAIL_LOG("WARNING: Outdated version of OpenSSL lib. Logins to server may not work!");
         DETAIL_LOG("WARNING: Minimal required version [OpenSSL 0.9.8k]");
@@ -220,21 +220,21 @@ extern int main(int argc, char **argv)
 
     /// realmd PID file creation
     std::string pidfile = sConfig.GetStringDefault("PidFile", "");
-    if(!pidfile.empty())
+    if (!pidfile.empty())
     {
         uint32 pid = CreatePIDFile(pidfile);
-        if( !pid )
+        if (!pid)
         {
-            sLog.outError( "Cannot create PID file %s.\n", pidfile.c_str() );
+            sLog.outError("Cannot create PID file %s.\n", pidfile.c_str());
             Log::WaitBeforeContinueIfNeed();
             return 1;
         }
 
-        sLog.outString( "Daemon PID: %u\n", pid );
+        sLog.outString("Daemon PID: %u\n", pid);
     }
 
     ///- Initialize the database connection
-    if(!StartDB())
+    if (!StartDB())
     {
         Log::WaitBeforeContinueIfNeed();
         return 1;
@@ -264,7 +264,7 @@ extern int main(int argc, char **argv)
 
     ACE_INET_Addr bind_addr(rmport, bind_ip.c_str());
 
-    if(acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
+    if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
         sLog.outError("MaNGOS realmd can not bind to %s:%d", bind_ip.c_str(), rmport);
         Log::WaitBeforeContinueIfNeed();
@@ -275,27 +275,27 @@ extern int main(int argc, char **argv)
     HookSignals();
 
     ///- Handle affinity for multiple processors and process priority on Windows
-    #ifdef WIN32
+#ifdef WIN32
     {
         HANDLE hProcess = GetCurrentProcess();
 
         uint32 Aff = sConfig.GetIntDefault("UseProcessors", 0);
-        if(Aff > 0)
+        if (Aff > 0)
         {
             ULONG_PTR appAff;
             ULONG_PTR sysAff;
 
-            if(GetProcessAffinityMask(hProcess,&appAff,&sysAff))
+            if (GetProcessAffinityMask(hProcess,&appAff,&sysAff))
             {
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
-                if(!curAff )
+                if (!curAff)
                 {
                     sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x",Aff,appAff);
                 }
                 else
                 {
-                    if(SetProcessAffinityMask(hProcess,curAff))
+                    if (SetProcessAffinityMask(hProcess,curAff))
                         sLog.outString("Using processors (bitmask, hex): %x", curAff);
                     else
                         sLog.outError("Can't set used processors (hex): %x", curAff);
@@ -306,27 +306,27 @@ extern int main(int argc, char **argv)
 
         bool Prio = sConfig.GetBoolDefault("ProcessPriority", false);
 
-        if(Prio)
+        if (Prio)
         {
-            if(SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
+            if (SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
                 sLog.outString("realmd process priority class set to HIGH");
             else
                 sLog.outError("Can't set realmd process priority class.");
             sLog.outString();
         }
     }
-    #endif
+#endif
 
     //server has started up successfully => enable async DB requests
     LoginDatabase.AllowAsyncTransactions();
 
     // maximum counter for next ping
-    uint32 numLoops = (sConfig.GetIntDefault( "MaxPingTime", 30 ) * (MINUTE * 1000000 / 100000));
+    uint32 numLoops = (sConfig.GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
 
-    #ifndef WIN32
+#ifndef WIN32
     detachDaemon();
-    #endif
+#endif
     ///- Wait for termination signal
     while (!stopEvent)
     {
@@ -336,7 +336,7 @@ extern int main(int argc, char **argv)
         if (ACE_Reactor::instance()->run_reactor_event_loop(interval) == -1)
             break;
 
-        if( (++loopCounter) == numLoops )
+        if ((++loopCounter) == numLoops)
         {
             loopCounter = 0;
             DETAIL_LOG("Ping MySQL to keep connection alive");
@@ -354,7 +354,7 @@ extern int main(int argc, char **argv)
     ///- Remove signal handling before leaving
     UnhookSignals();
 
-    sLog.outString( "Halting process..." );
+    sLog.outString("Halting process...");
     return 0;
 }
 
@@ -368,11 +368,11 @@ void OnSignal(int s)
         case SIGTERM:
             stopEvent = true;
             break;
-        #ifdef _WIN32
+#ifdef _WIN32
         case SIGBREAK:
             stopEvent = true;
             break;
-        #endif
+#endif
     }
 
     signal(s, OnSignal);
@@ -382,7 +382,7 @@ void OnSignal(int s)
 bool StartDB()
 {
     std::string dbstring = sConfig.GetStringDefault("LoginDatabaseInfo", "");
-    if(dbstring.empty())
+    if (dbstring.empty())
     {
         sLog.outError("Database not specified");
         return false;
@@ -390,13 +390,13 @@ bool StartDB()
 
     sLog.outString("Login Database total connections: %i", 1 + 1);
 
-    if(!LoginDatabase.Initialize(dbstring.c_str()))
+    if (!LoginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to database");
         return false;
     }
 
-    if(!LoginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    if (!LoginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
     {
         ///- Wait for already started DB delay threads to end
         LoginDatabase.HaltDelayThread();
@@ -411,9 +411,9 @@ void HookSignals()
 {
     signal(SIGINT, OnSignal);
     signal(SIGTERM, OnSignal);
-    #ifdef _WIN32
+#ifdef _WIN32
     signal(SIGBREAK, OnSignal);
-    #endif
+#endif
 }
 
 /// Unhook the signals before leaving
@@ -421,9 +421,9 @@ void UnhookSignals()
 {
     signal(SIGINT, 0);
     signal(SIGTERM, 0);
-    #ifdef _WIN32
+#ifdef _WIN32
     signal(SIGBREAK, 0);
-    #endif
+#endif
 }
 
 /// @}

@@ -64,20 +64,20 @@ PatchHandler::PatchHandler(ACE_HANDLE socket, ACE_HANDLE patch)
 
 PatchHandler::~PatchHandler()
 {
-    if(patch_fd_ != ACE_INVALID_HANDLE)
+    if (patch_fd_ != ACE_INVALID_HANDLE)
         ACE_OS::close(patch_fd_);
 }
 
 int PatchHandler::open(void*)
 {
-    if(get_handle() == ACE_INVALID_HANDLE || patch_fd_ == ACE_INVALID_HANDLE)
+    if (get_handle() == ACE_INVALID_HANDLE || patch_fd_ == ACE_INVALID_HANDLE)
         return -1;
 
     int nodelay = 0;
     if (-1 == peer().set_option(ACE_IPPROTO_TCP,
-                TCP_NODELAY,
-                &nodelay,
-                sizeof(nodelay)))
+                                TCP_NODELAY,
+                                &nodelay,
+                                sizeof(nodelay)))
     {
         return -1;
     }
@@ -85,9 +85,9 @@ int PatchHandler::open(void*)
 #if defined(TCP_CORK)
     int cork = 1;
     if (-1 == peer().set_option(ACE_IPPROTO_TCP,
-                TCP_CORK,
-                &cork,
-                sizeof(cork)))
+                                TCP_CORK,
+                                &cork,
+                                sizeof(cork)))
     {
         return -1;
     }
@@ -111,19 +111,19 @@ int PatchHandler::svc(void)
 
     ssize_t r;
 
-    while((r = ACE_OS::read(patch_fd_, data.data, sizeof(data.data))) > 0)
+    while ((r = ACE_OS::read(patch_fd_, data.data, sizeof(data.data))) > 0)
     {
         data.data_size = (ACE_UINT16)r;
 
-        if(peer().send((const char*)&data,
-                    ((size_t) r) + sizeof(data) - sizeof(data.data),
-                    flags) == -1)
+        if (peer().send((const char*)&data,
+                        ((size_t) r) + sizeof(data) - sizeof(data.data),
+                        flags) == -1)
         {
             return -1;
         }
     }
 
-    if(r == -1)
+    if (r == -1)
     {
         return -1;
     }
@@ -133,7 +133,7 @@ int PatchHandler::svc(void)
 
 PatchCache::~PatchCache()
 {
-    for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); i++)
         delete i->second;
 }
 
@@ -152,10 +152,10 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     // Try to open the patch file
     std::string path = "./patches/";
     path += szFileName;
-    FILE * pPatch = fopen(path.c_str (), "rb");
+    FILE* pPatch = fopen(path.c_str(), "rb");
     sLog.outDebug("Loading patch info from %s", path.c_str());
 
-    if(!pPatch)
+    if (!pPatch)
         return;
 
     // Calculate the MD5 hash
@@ -166,7 +166,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
 
     ACE_UINT8 buf[check_chunk_size];
 
-    while(!feof (pPatch))
+    while (!feof(pPatch))
     {
         size_t read = fread(buf, 1, check_chunk_size, pPatch);
         MD5_Update(&ctx, buf, read);
@@ -176,13 +176,13 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
 
     // Store the result in the internal patch hash map
     patches_[path] = new PATCH_INFO;
-    MD5_Final((ACE_UINT8 *) & patches_[path]->md5, &ctx);
+    MD5_Final((ACE_UINT8*) & patches_[path]->md5, &ctx);
 }
 
-bool PatchCache::GetHash(const char * pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
+bool PatchCache::GetHash(const char* pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
 {
-    for (Patches::iterator i = patches_.begin (); i != patches_.end (); i++)
-        if (!stricmp(pat, i->first.c_str ()))
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); i++)
+        if (!stricmp(pat, i->first.c_str()))
         {
             memcpy(mymd5, i->second->md5, MD5_DIGEST_LENGTH);
             return true;
@@ -195,18 +195,18 @@ void PatchCache::LoadPatchesInfo()
 {
     ACE_DIR* dirp = ACE_OS::opendir(ACE_TEXT("./patches/"));
 
-    if(!dirp)
+    if (!dirp)
         return;
 
     ACE_DIRENT* dp;
 
-    while((dp = ACE_OS::readdir(dirp)) != NULL)
+    while ((dp = ACE_OS::readdir(dirp)) != NULL)
     {
         int l = strlen(dp->d_name);
         if (l < 8)
             continue;
 
-        if(!memcmp(&dp->d_name[l - 4], ".mpq", 4))
+        if (!memcmp(&dp->d_name[l - 4], ".mpq", 4))
             LoadPatchMD5(dp->d_name);
     }
 
