@@ -29,7 +29,7 @@
 struct PageText
 {
     uint32 Page_ID;
-    char * Text;
+    char* Text;
 
     uint32 Next_Page;
 };

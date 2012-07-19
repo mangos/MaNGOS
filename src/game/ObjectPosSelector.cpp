@@ -103,7 +103,7 @@ bool ObjectPosSelector::CheckOriginalAngle() const
 {
     // check first left/right used angles if exists
     return (m_UsedAreaLists[USED_POS_PLUS].empty()  || CheckAngle(*m_UsedAreaLists[USED_POS_PLUS].begin(), USED_POS_PLUS, 0.0f)) &&
-        (m_UsedAreaLists[USED_POS_MINUS].empty() || CheckAngle(*m_UsedAreaLists[USED_POS_MINUS].begin(), USED_POS_MINUS, 0.0f));
+           (m_UsedAreaLists[USED_POS_MINUS].empty() || CheckAngle(*m_UsedAreaLists[USED_POS_MINUS].begin(), USED_POS_MINUS, 0.0f));
 }
 
 /**
@@ -180,7 +180,7 @@ void ObjectPosSelector::UpdateNextAreaStart(UsedAreaSide side)
 bool ObjectPosSelector::NextAngle(float& angle)
 {
     // loop until both side fail and leave 0..PI
-    for(;;)
+    for (;;)
     {
         // ++ direction less updated
         if (m_stepAngle[USED_POS_PLUS] < M_PI_F && m_stepAngle[USED_POS_PLUS] <= m_stepAngle[USED_POS_MINUS])
@@ -212,7 +212,7 @@ bool ObjectPosSelector::NextAngle(float& angle)
  * @return true, if angle found
  *
  */
-bool ObjectPosSelector::NextSideAngle(UsedAreaSide side, float &angle )
+bool ObjectPosSelector::NextSideAngle(UsedAreaSide side, float& angle)
 {
     // next possible angle
     m_stepAngle[side] += (m_searcherHalfSize + 0.01);
@@ -254,13 +254,13 @@ bool ObjectPosSelector::NextSideAngle(UsedAreaSide side, float &angle )
 bool ObjectPosSelector::NextUsedAngle(float& angle)
 {
     if (m_nextUsedAreaItr[USED_POS_PLUS] == m_UsedAreaLists[USED_POS_PLUS].end() &&
-        m_nextUsedAreaItr[USED_POS_MINUS] == m_UsedAreaLists[USED_POS_MINUS].end())
+            m_nextUsedAreaItr[USED_POS_MINUS] == m_UsedAreaLists[USED_POS_MINUS].end())
         return false;
 
     // ++ direction less updated
     if (m_nextUsedAreaItr[USED_POS_PLUS] != m_UsedAreaLists[USED_POS_PLUS].end() &&
-        (m_nextUsedAreaItr[USED_POS_MINUS] == m_UsedAreaLists[USED_POS_MINUS].end() ||
-        m_nextUsedAreaItr[USED_POS_PLUS]->first <= m_nextUsedAreaItr[USED_POS_MINUS]->first))
+            (m_nextUsedAreaItr[USED_POS_MINUS] == m_UsedAreaLists[USED_POS_MINUS].end() ||
+             m_nextUsedAreaItr[USED_POS_PLUS]->first <= m_nextUsedAreaItr[USED_POS_MINUS]->first))
     {
         angle = m_nextUsedAreaItr[USED_POS_PLUS]->first * SignOf(USED_POS_PLUS);
         ++m_nextUsedAreaItr[USED_POS_PLUS];

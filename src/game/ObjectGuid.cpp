@@ -25,7 +25,7 @@
 
 char const* ObjectGuid::GetTypeName(HighGuid high)
 {
-    switch(high)
+    switch (high)
     {
         case HIGHGUID_ITEM:         return "Item";
         case HIGHGUID_PLAYER:       return "Player";
@@ -80,7 +80,7 @@ ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid)
     return buf;
 }
 
-ByteBuffer &operator>>(ByteBuffer& buf, ObjectGuid& guid)
+ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid)
 {
     guid.Set(buf.read<uint64>());
     return buf;
@@ -92,7 +92,7 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid)
     return buf;
 }
 
-ByteBuffer &operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
+ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 {
     guid.m_guidPtr->Set(buf.readPackGUID());
     return buf;

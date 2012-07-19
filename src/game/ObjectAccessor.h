@@ -85,12 +85,12 @@ class HashMapHolder
 
 class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex> >
 {
-    friend class MaNGOS::OperatorNew<ObjectAccessor>;
+        friend class MaNGOS::OperatorNew<ObjectAccessor>;
 
-    ObjectAccessor();
-    ~ObjectAccessor();
-    ObjectAccessor(const ObjectAccessor &);
-    ObjectAccessor& operator=(const ObjectAccessor &);
+        ObjectAccessor();
+        ~ObjectAccessor();
+        ObjectAccessor(const ObjectAccessor&);
+        ObjectAccessor& operator=(const ObjectAccessor&);
 
     public:
         typedef UNORDERED_MAP<ObjectGuid, Corpse*> Player2CorpsesMapType;
@@ -101,7 +101,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
 
         // Player access
         static Player* FindPlayer(ObjectGuid guid, bool inWorld = true);// if need player at specific map better use Map::GetPlayer
-        static Player* FindPlayerByName(const char *name);
+        static Player* FindPlayerByName(const char* name);
         static void KickPlayer(ObjectGuid guid);
 
         HashMapHolder<Player>::MapType& GetPlayers()
@@ -114,17 +114,17 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         // Corpse access
         Corpse* GetCorpseForPlayerGUID(ObjectGuid guid);
         static Corpse* GetCorpseInMap(ObjectGuid guid, uint32 mapid);
-        void RemoveCorpse(Corpse *corpse);
+        void RemoveCorpse(Corpse* corpse);
         void AddCorpse(Corpse* corpse);
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
         Corpse* ConvertCorpseForPlayer(ObjectGuid player_guid, bool insignia = false);
         void RemoveOldCorpses();
 
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only
-        void AddObject(Corpse *object) { HashMapHolder<Corpse>::Insert(object); }
-        void AddObject(Player *object) { HashMapHolder<Player>::Insert(object); }
-        void RemoveObject(Corpse *object) { HashMapHolder<Corpse>::Remove(object); }
-        void RemoveObject(Player *object) { HashMapHolder<Player>::Remove(object); }
+        void AddObject(Corpse* object) { HashMapHolder<Corpse>::Insert(object); }
+        void AddObject(Player* object) { HashMapHolder<Player>::Insert(object); }
+        void RemoveObject(Corpse* object) { HashMapHolder<Corpse>::Remove(object); }
+        void RemoveObject(Player* object) { HashMapHolder<Player>::Remove(object); }
 
     private:
 

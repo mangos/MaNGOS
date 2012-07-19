@@ -28,14 +28,14 @@ class MANGOS_DLL_DECL NullCreatureAI : public CreatureAI
         explicit NullCreatureAI(Creature* c) : CreatureAI(c) {}
         ~NullCreatureAI();
 
-        void MoveInLineOfSight(Unit *) {}
-        void AttackStart(Unit *) {}
-        void AttackedBy( Unit *) {}
+        void MoveInLineOfSight(Unit*) {}
+        void AttackStart(Unit*) {}
+        void AttackedBy(Unit*) {}
         void EnterEvadeMode() {}
 
-        bool IsVisible(Unit *) const { return false;  }
+        bool IsVisible(Unit*) const { return false;  }
 
         void UpdateAI(const uint32) {}
-        static int Permissible(const Creature *) { return PERMIT_BASE_IDLE;  }
+        static int Permissible(const Creature*) { return PERMIT_BASE_IDLE;  }
 };
 #endif
