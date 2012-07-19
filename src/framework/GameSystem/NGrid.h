@@ -37,7 +37,7 @@ class GridInfo
         {
         }
 
-        GridInfo(time_t expiry, bool unload = true )
+        GridInfo(time_t expiry, bool unload = true)
             : i_timer(expiry), i_unloadActiveLockCount(0), i_unloadExplicitLock(!unload)
         {
         }
@@ -49,7 +49,7 @@ class GridInfo
             return i_unloadActiveLockCount || i_unloadExplicitLock;
         }
 
-        void setUnloadExplicitLock( bool on ) { i_unloadExplicitLock = on; }
+        void setUnloadExplicitLock(bool on) { i_unloadExplicitLock = on; }
         void incUnloadActiveLock() { ++i_unloadActiveLockCount; }
         void decUnloadActiveLock() { if (i_unloadActiveLockCount) --i_unloadActiveLockCount; }
 
@@ -76,10 +76,10 @@ typedef enum
 template
 <
 uint32 N,
-class ACTIVE_OBJECT,
-class WORLD_OBJECT_TYPES,
-class GRID_OBJECT_TYPES
->
+       class ACTIVE_OBJECT,
+       class WORLD_OBJECT_TYPES,
+       class GRID_OBJECT_TYPES
+       >
 class MANGOS_DLL_DECL NGrid
 {
     public:
@@ -131,19 +131,19 @@ class MANGOS_DLL_DECL NGrid
         void UpdateTimeTracker(time_t diff) { i_GridInfo.UpdateTimeTracker(diff); }
 
         template<class SPECIFIC_OBJECT>
-        void AddWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        void AddWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT* obj)
         {
             getGridType(x, y).AddWorldObject(obj);
         }
 
         template<class SPECIFIC_OBJECT>
-        void RemoveWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        void RemoveWorldObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT* obj)
         {
             getGridType(x, y).RemoveWorldObject(obj);
         }
 
         template<class T, class TT>
-        void Visit(TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
+        void Visit(TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
         {
             for (uint32 x = 0; x < N; ++x)
                 for (uint32 y = 0; y < N; ++y)
@@ -151,7 +151,7 @@ class MANGOS_DLL_DECL NGrid
         }
 
         template<class T, class TT>
-        void Visit(const uint32 &x, const uint32 &y, TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
+        void Visit(const uint32& x, const uint32& y, TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
         {
             getGridType(x, y).Visit(visitor);
         }
@@ -167,13 +167,13 @@ class MANGOS_DLL_DECL NGrid
         }
 
         template<class SPECIFIC_OBJECT>
-        bool AddGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        bool AddGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT* obj)
         {
             return getGridType(x, y).AddGridObject(obj);
         }
 
         template<class SPECIFIC_OBJECT>
-        bool RemoveGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT *obj)
+        bool RemoveGridObject(const uint32 x, const uint32 y, SPECIFIC_OBJECT* obj)
         {
             return getGridType(x, y).RemoveGridObject(obj);
         }

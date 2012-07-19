@@ -27,10 +27,10 @@
 template
 <
 typename T,
-class ThreadingModel,
-class CreatePolicy,
-class LifeTimePolicy
->
+         class ThreadingModel,
+         class CreatePolicy,
+         class LifeTimePolicy
+         >
 T& MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::Instance()
 {
     if (!si_instance)
@@ -57,10 +57,10 @@ T& MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::Instance(
 template
 <
 typename T,
-class ThreadingModel,
-class CreatePolicy,
-class LifeTimePolicy
->
+         class ThreadingModel,
+         class CreatePolicy,
+         class LifeTimePolicy
+         >
 void MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::DestroySingleton()
 {
     CreatePolicy::Destroy(si_instance);

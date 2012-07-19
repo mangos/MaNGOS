@@ -215,7 +215,7 @@ class MANGOS_DLL_DECL TypeMapContainer
 
         /// inserts a specific object into the container
         template<class SPECIFIC_TYPE>
-        bool insert(SPECIFIC_TYPE *obj)
+        bool insert(SPECIFIC_TYPE* obj)
         {
             SPECIFIC_TYPE* t = MaNGOS::Insert(i_elements, obj);
             return (t != NULL);
@@ -229,8 +229,8 @@ class MANGOS_DLL_DECL TypeMapContainer
             return (t != NULL);
         }
 
-        ContainerMapList<OBJECT_TYPES> & GetElements() { return i_elements; }
-        const ContainerMapList<OBJECT_TYPES> & GetElements() const { return i_elements;}
+        ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
+        const ContainerMapList<OBJECT_TYPES>& GetElements() const { return i_elements;}
 
     private:
 

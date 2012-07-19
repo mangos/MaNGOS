@@ -33,9 +33,9 @@ class RefManager : public LinkedListHead
         RefManager() {}
         virtual ~RefManager() { clearReferences(); }
 
-        Reference<TO, FROM>*       getFirst()       { return ((Reference<TO, FROM>      *) LinkedListHead::getFirst()); }
+        Reference<TO, FROM>*       getFirst()       { return ((Reference<TO, FROM>*) LinkedListHead::getFirst()); }
         Reference<TO, FROM> const* getFirst() const { return ((Reference<TO, FROM> const*) LinkedListHead::getFirst()); }
-        Reference<TO, FROM>*       getLast()       { return ((Reference<TO, FROM>      *) LinkedListHead::getLast()); }
+        Reference<TO, FROM>*       getLast()       { return ((Reference<TO, FROM>*) LinkedListHead::getLast()); }
         Reference<TO, FROM> const* getLast() const { return ((Reference<TO, FROM> const*) LinkedListHead::getLast()); }
 
         iterator begin() { return iterator(getFirst()); }

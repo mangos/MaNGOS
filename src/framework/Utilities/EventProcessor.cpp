@@ -76,7 +76,7 @@ void EventProcessor::KillAllEvents(bool force)
             delete i_old->second;
 
             if (!force)                                      // need per-element cleanup
-                m_events.erase (i_old);
+                m_events.erase(i_old);
         }
     }
 

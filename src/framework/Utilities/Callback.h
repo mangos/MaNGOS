@@ -54,7 +54,7 @@ namespace MaNGOS
         protected:
 
             typedef void (Class::*Method)(ParamType1, ParamType2, ParamType3, ParamType4);
-            Class *m_object;
+            Class* m_object;
             Method m_method;
             ParamType1 m_param1;
             ParamType2 m_param2;
@@ -64,15 +64,15 @@ namespace MaNGOS
 
         public:
 
-            _Callback(Class *object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3, ParamType4 param4)
+            _Callback(Class* object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3, ParamType4 param4)
                 : m_object(object), m_method(method),
-                m_param1(param1), m_param2(param2), m_param3(param3), m_param4(param4)
+                  m_param1(param1), m_param2(param2), m_param3(param3), m_param4(param4)
             {
             }
 
             _Callback(_Callback<Class, ParamType1, ParamType2, ParamType3, ParamType4> const& cb)
                 : m_object(cb.m_object), m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3), m_param4(cb.m_param4)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3), m_param4(cb.m_param4)
             {
             }
     };
@@ -83,7 +83,7 @@ namespace MaNGOS
         protected:
 
             typedef void (Class::*Method)(ParamType1, ParamType2, ParamType3);
-            Class *m_object;
+            Class* m_object;
             Method m_method;
             ParamType1 m_param1;
             ParamType2 m_param2;
@@ -91,15 +91,15 @@ namespace MaNGOS
             void _Execute() { (m_object->*m_method)(m_param1, m_param2, m_param3); }
 
         public:
-            _Callback(Class *object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
+            _Callback(Class* object, Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : m_object(object), m_method(method),
-                m_param1(param1), m_param2(param2), m_param3(param3)
+                  m_param1(param1), m_param2(param2), m_param3(param3)
             {
             }
 
             _Callback(_Callback<Class, ParamType1, ParamType2, ParamType3> const& cb)
                 : m_object(cb.m_object), m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3)
             {
             }
     };
@@ -110,7 +110,7 @@ namespace MaNGOS
         protected:
 
             typedef void (Class::*Method)(ParamType1, ParamType2);
-            Class *m_object;
+            Class* m_object;
             Method m_method;
             ParamType1 m_param1;
             ParamType2 m_param2;
@@ -118,15 +118,15 @@ namespace MaNGOS
 
         public:
 
-            _Callback(Class *object, Method method, ParamType1 param1, ParamType2 param2)
+            _Callback(Class* object, Method method, ParamType1 param1, ParamType2 param2)
                 : m_object(object), m_method(method),
-                m_param1(param1), m_param2(param2)
+                  m_param1(param1), m_param2(param2)
             {
             }
 
             _Callback(_Callback<Class, ParamType1, ParamType2> const& cb)
                 : m_object(cb.m_object), m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2)
             {
             }
     };
@@ -137,22 +137,22 @@ namespace MaNGOS
         protected:
 
             typedef void (Class::*Method)(ParamType1);
-            Class *m_object;
+            Class* m_object;
             Method m_method;
             ParamType1 m_param1;
             void _Execute() { (m_object->*m_method)(m_param1); }
 
         public:
 
-            _Callback(Class *object, Method method, ParamType1 param1)
+            _Callback(Class* object, Method method, ParamType1 param1)
                 : m_object(object), m_method(method),
-                m_param1(param1)
+                  m_param1(param1)
             {
             }
 
             _Callback(_Callback<Class, ParamType1> const& cb)
                 : m_object(cb.m_object), m_method(cb.m_method),
-                m_param1(cb.m_param1)
+                  m_param1(cb.m_param1)
             {
             }
     };
@@ -163,12 +163,12 @@ namespace MaNGOS
         protected:
 
             typedef void (Class::*Method)();
-            Class *m_object;
+            Class* m_object;
             Method m_method;
             void _Execute() { (m_object->*m_method)(); }
 
         public:
-            _Callback(Class *object, Method method)
+            _Callback(Class* object, Method method)
                 : m_object(object), m_method(method)
             {
             }
@@ -197,13 +197,13 @@ namespace MaNGOS
 
             _SCallback(Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3, ParamType4 param4)
                 : m_method(method),
-                m_param1(param1), m_param2(param2), m_param3(param3), m_param4(param4)
+                  m_param1(param1), m_param2(param2), m_param3(param3), m_param4(param4)
             {
             }
 
             _SCallback(_SCallback<ParamType1, ParamType2, ParamType3, ParamType4> const& cb)
                 : m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3), m_param4(cb.m_param4)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3), m_param4(cb.m_param4)
             {
             }
     };
@@ -223,12 +223,12 @@ namespace MaNGOS
         public:
             _SCallback(Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : m_method(method),
-                m_param1(param1), m_param2(param2), m_param3(param3)
+                  m_param1(param1), m_param2(param2), m_param3(param3)
             {
             }
             _SCallback(_SCallback<ParamType1, ParamType2, ParamType3> const& cb)
                 : m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2), m_param3(cb.m_param3)
             {
             }
     };
@@ -247,13 +247,13 @@ namespace MaNGOS
         public:
             _SCallback(Method method, ParamType1 param1, ParamType2 param2)
                 : m_method(method),
-                m_param1(param1), m_param2(param2)
+                  m_param1(param1), m_param2(param2)
             {
             }
 
             _SCallback(_SCallback<ParamType1, ParamType2> const& cb)
                 : m_method(cb.m_method),
-                m_param1(cb.m_param1), m_param2(cb.m_param2)
+                  m_param1(cb.m_param1), m_param2(cb.m_param2)
             {
             }
     };
@@ -271,13 +271,13 @@ namespace MaNGOS
         public:
             _SCallback(Method method, ParamType1 param1)
                 : m_method(method),
-                m_param1(param1)
+                  m_param1(param1)
             {
             }
 
             _SCallback(_SCallback<ParamType1> const& cb)
                 : m_method(cb.m_method),
-                m_param1(cb.m_param1)
+                  m_param1(cb.m_param1)
             {
             }
     };
@@ -337,7 +337,7 @@ namespace MaNGOS
             typedef _Callback<Class, ParamType1, ParamType2, ParamType3, ParamType4> C4;
         public:
 
-            Callback(Class *object, typename C4::Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3, ParamType4 param4)
+            Callback(Class* object, typename C4::Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3, ParamType4 param4)
                 : _ICallback<C4>(C4(object, method, param1, param2, param3, param4))
             {
             }
@@ -351,7 +351,7 @@ namespace MaNGOS
             typedef _Callback<Class, ParamType1, ParamType2, ParamType3> C3;
         public:
 
-            Callback(Class *object, typename C3::Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
+            Callback(Class* object, typename C3::Method method, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : _ICallback<C3>(C3(object, method, param1, param2, param3))
             {
             }
@@ -365,7 +365,7 @@ namespace MaNGOS
             typedef _Callback<Class, ParamType1, ParamType2> C2;
 
         public:
-            Callback(Class *object, typename C2::Method method, ParamType1 param1, ParamType2 param2)
+            Callback(Class* object, typename C2::Method method, ParamType1 param1, ParamType2 param2)
                 : _ICallback<C2>(C2(object, method, param1, param2))
             {
             }
@@ -380,7 +380,7 @@ namespace MaNGOS
 
         public:
 
-            Callback(Class *object, typename C1::Method method, ParamType1 param1)
+            Callback(Class* object, typename C1::Method method, ParamType1 param1)
                 : _ICallback<C1>(C1(object, method, param1))
             {
             }
@@ -395,7 +395,7 @@ namespace MaNGOS
 
         public:
 
-            Callback(Class *object, typename C0::Method method)
+            Callback(Class* object, typename C0::Method method)
                 : _ICallback<C0>(C0(object, method))
             {
             }
@@ -441,7 +441,7 @@ namespace MaNGOS
 
         public:
 
-            QueryCallback(Class *object, typename QC3::Method method, QueryResult* result, ParamType1 param1, ParamType2 param2, ParamType3 param3)
+            QueryCallback(Class* object, typename QC3::Method method, QueryResult* result, ParamType1 param1, ParamType2 param2, ParamType3 param3)
                 : _IQueryCallback<QC3>(QC3(object, method, result, param1, param2, param3))
             {
             }
@@ -456,7 +456,7 @@ namespace MaNGOS
 
         public:
 
-            QueryCallback(Class *object, typename QC2::Method method, QueryResult* result, ParamType1 param1, ParamType2 param2)
+            QueryCallback(Class* object, typename QC2::Method method, QueryResult* result, ParamType1 param1, ParamType2 param2)
                 : _IQueryCallback<QC2>(QC2(object, method, result, param1, param2))
             {
             }
@@ -471,7 +471,7 @@ namespace MaNGOS
 
         public:
 
-            QueryCallback(Class *object, typename QC1::Method method, QueryResult* result, ParamType1 param1)
+            QueryCallback(Class* object, typename QC1::Method method, QueryResult* result, ParamType1 param1)
                 : _IQueryCallback<QC1>(QC1(object, method, result, param1))
             {
             }
@@ -485,7 +485,7 @@ namespace MaNGOS
             typedef _Callback<Class, QueryResult*> QC0;
 
         public:
-            QueryCallback(Class *object, typename QC0::Method method, QueryResult* result)
+            QueryCallback(Class* object, typename QC0::Method method, QueryResult* result)
                 : _IQueryCallback<QC0>(QC0(object, method, result))
             {
             }
