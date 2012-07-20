@@ -41,7 +41,7 @@ namespace MaNGOS
 
         explicit VisibleNotifier(Camera& c) : i_camera(c), i_clientGUIDs(c.GetOwner()->m_clientGUIDs) {}
         template<class T> void Visit(GridRefManager<T>& m);
-        void Visit(CameraMapType& m) {}
+        void Visit(CameraMapType& /*m*/) {}
         void Notify(void);
     };
 
@@ -704,7 +704,7 @@ namespace MaNGOS
     {
         public:
             NearestGameObjectEntryInPosRangeCheck(WorldObject const& obj, uint32 entry, float x, float y, float z, float range)
-                : i_obj(obj), i_x(x), i_y(y), i_z(z), i_entry(entry), i_range(range) {}
+                : i_obj(obj), i_entry(entry), i_x(x), i_y(y), i_z(z), i_range(range) {}
 
             WorldObject const& GetFocusObject() const { return i_obj; }
 
@@ -737,7 +737,7 @@ namespace MaNGOS
     {
         public:
             GameObjectEntryInPosRangeCheck(WorldObject const& obj, uint32 entry, float x, float y, float z, float range)
-                : i_obj(obj), i_x(x), i_y(y), i_z(z), i_entry(entry), i_range(range) {}
+                : i_obj(obj), i_entry(entry), i_x(x), i_y(y), i_z(z), i_range(range) {}
 
             WorldObject const& GetFocusObject() const { return i_obj; }
 
@@ -1096,7 +1096,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(Creature* u)
             {
-                if (u->GetEntry() == i_entry && (i_onlyAlive && u->isAlive() || i_onlyDead && u->IsCorpse() || !i_onlyAlive && !i_onlyDead) && i_obj.IsWithinDistInMap(u, i_range))
+                if (u->GetEntry() == i_entry && ((i_onlyAlive && u->isAlive()) || (i_onlyDead && u->IsCorpse()) || (!i_onlyAlive && !i_onlyDead)) && i_obj.IsWithinDistInMap(u, i_range))
                 {
                     i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
                     return true;

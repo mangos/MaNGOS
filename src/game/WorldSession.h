@@ -193,7 +193,7 @@ class PacketFilter
         explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
         virtual ~PacketFilter() {}
 
-        virtual bool Process(WorldPacket* packet) { return true; }
+        virtual bool Process(WorldPacket* /*packet*/) { return true; }
         virtual bool ProcessLogout() const { return true; }
 
     protected:

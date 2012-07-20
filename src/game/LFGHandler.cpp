@@ -68,7 +68,7 @@ void WorldSession::HandleSearchLfgJoinOpcode(WorldPacket& recv_data)
     recv_data >> temp;
 
     entry = (temp & 0x00FFFFFF);
-    LfgType type = LfgType((temp >> 24) & 0x000000FF);
+    // LfgType type = LfgType((temp >> 24) & 0x000000FF);
 
     //SendLfgSearchResults(type, entry);
 }

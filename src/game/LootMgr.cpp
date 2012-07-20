@@ -404,17 +404,17 @@ LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Play
 
     switch (permission)
     {
-        case GROUP_PERMISSION:
-            return (is_blocked || is_underthreshold) ? LOOT_SLOT_NORMAL : LOOT_SLOT_VIEW;
         case ALL_PERMISSION:
             return LOOT_SLOT_NORMAL;
-        case OWNER_PERMISSION:
-            return LOOT_SLOT_OWNER;
+        case GROUP_PERMISSION:
+            return (is_blocked || is_underthreshold) ? LOOT_SLOT_NORMAL : LOOT_SLOT_VIEW;
         case MASTER_PERMISSION:
             return !is_underthreshold ? LOOT_SLOT_MASTER : LOOT_SLOT_NORMAL;
+        case OWNER_PERMISSION:
+            return LOOT_SLOT_OWNER;
+        default:
+            return MAX_LOOT_SLOT_TYPE;
     }
-
-    return MAX_LOOT_SLOT_TYPE;
 }
 
 //

@@ -204,6 +204,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
         newmember.ZoneId = fields[3].GetUInt32();
         newmember.accountId = fields[4].GetInt32();
         delete result;
+
         if (newmember.Level < 1 || newmember.Level > STRONG_MAX_LEVEL ||
                 !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {

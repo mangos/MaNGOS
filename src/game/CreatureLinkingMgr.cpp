@@ -471,6 +471,9 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
                     case LINKING_EVENT_RESPAWN:
                         if (pMaster->isAlive())
                             SetFollowing(pSource, pMaster);
+                        break;
+                    case LINKING_EVENT_DIE:                 // Nothing linked for this case
+                        break;
                 }
             }
         }

@@ -44,6 +44,7 @@ INSTANTIATE_SINGLETON_1(ScriptMgr);
 
 ScriptMgr::ScriptMgr() :
     m_hScriptLib(NULL),
+    m_scheduledScripts(0),
 
     m_pOnInitScriptLibrary(NULL),
     m_pOnFreeScriptLibrary(NULL),
@@ -72,9 +73,7 @@ ScriptMgr::ScriptMgr() :
     m_pOnEffectDummyCreature(NULL),
     m_pOnEffectDummyGO(NULL),
     m_pOnEffectDummyItem(NULL),
-    m_pOnAuraDummy(NULL),
-
-    m_scheduledScripts(0)
+    m_pOnAuraDummy(NULL)
 {
 }
 
@@ -599,7 +598,7 @@ void ScriptMgr::LoadScripts(ScriptMapMapName& scripts, const char* tablename)
                         if (SpellEntry const* spell = sSpellStore.LookupEntry(i))
                             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
                             {
-                                if (spell->Effect[j] == SPELL_EFFECT_SEND_TAXI && spell->EffectMiscValue[j] == tmp.sendTaxiPath.taxiPathId)
+                                if (spell->Effect[j] == SPELL_EFFECT_SEND_TAXI && spell->EffectMiscValue[j] == int32(tmp.sendTaxiPath.taxiPathId))
                                 {
                                     taxiSpell = i;
                                     break;
@@ -1121,7 +1120,7 @@ void ScriptAction::HandleScriptStep()
                 break;
 
             // Just turn around
-            if (m_script->x == 0.0f && m_script->y == 0.0f && m_script->z == 0.0f ||
+            if ((m_script->x == 0.0f && m_script->y == 0.0f && m_script->z == 0.0f) ||
                     // Check point-to-point distance, hence revert effect of bounding radius
                     ((Unit*)pSource)->IsWithinDist3d(m_script->x, m_script->y, m_script->z, 0.01f - ((Unit*)pSource)->GetObjectBoundingRadius()))
             {
@@ -1351,8 +1350,8 @@ void ScriptAction::HandleScriptStep()
                 break;
             }
 
-            if (m_script->command == SCRIPT_COMMAND_OPEN_DOOR && pDoor->GetGoState() != GO_STATE_READY ||
-                    m_script->command == SCRIPT_COMMAND_CLOSE_DOOR && pDoor->GetGoState() == GO_STATE_READY)
+            if ((m_script->command == SCRIPT_COMMAND_OPEN_DOOR && pDoor->GetGoState() != GO_STATE_READY) ||
+                    (m_script->command == SCRIPT_COMMAND_CLOSE_DOOR && pDoor->GetGoState() == GO_STATE_READY))
                 break;                                      // to be opened door already open, or to be closed door already closed
 
             pDoor->UseDoorOrButton(time_to_reset);

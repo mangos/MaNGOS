@@ -591,7 +591,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // ASSERT print helper
         bool PrintCoordinatesError(float x, float y, float z, char const* descr) const;
 
-        virtual void StartGroupLoot(Group* group, uint32 timer) {}
+        virtual void StartGroupLoot(Group* /*group*/, uint32 /*timer*/) {}
 
     protected:
         explicit WorldObject();

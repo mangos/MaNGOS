@@ -42,7 +42,7 @@ struct PoolTemplateData
     // helpers
     bool CanBeSpawnedAtMap(MapEntry const* entry) const
     {
-        return mapEntry && (mapEntry == entry || !entry->Instanceable() && !mapEntry->Instanceable());
+        return mapEntry && (mapEntry == entry || (!entry->Instanceable() && !mapEntry->Instanceable()));
     }
 };
 

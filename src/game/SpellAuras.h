@@ -160,12 +160,12 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         ~SpellAuraHolder();
     private:
+        SpellEntry const* m_spellProto;
+
         Unit* m_target;
         ObjectGuid m_casterGuid;
         ObjectGuid m_castItemGuid;                          // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
-
-        SpellEntry const* m_spellProto;
 
         uint8 m_auraSlot;                                   // Aura slot on unit (for show in client)
         uint8 m_auraFlags;                                  // Aura info flag (for send data to client)
@@ -447,9 +447,8 @@ class MANGOS_DLL_SPEC Aura
         bool isAffectedOnSpell(SpellEntry const* spell) const;
         bool CanProcFrom(SpellEntry const* spell, uint32 procFlag, uint32 EventProcEx, uint32 procEx, bool active, bool useClassMask) const;
 
-        //SpellAuraHolder const* GetHolder() const { return m_spellHolder; }
         SpellAuraHolder* GetHolder() { return m_spellAuraHolder; }
-        SpellAuraHolder* const GetHolder() const { return m_spellAuraHolder; }
+        SpellAuraHolder const* GetHolder() const { return m_spellAuraHolder; }
 
         bool IsLastAuraOnHolder();
 
