@@ -132,12 +132,12 @@ namespace Movement
     inline void MoveSplineInit::MovebyPath(const PointsArray& controls, int32 path_offset)
     {
         args.path_Idx_offset = path_offset;
-        args.path.assign(controls.begin(),controls.end());
+        args.path.assign(controls.begin(), controls.end());
     }
 
     inline void MoveSplineInit::MoveTo(float x, float y, float z, bool generatePath, bool forceDestination)
     {
-        Vector3 v(x,y,z);
+        Vector3 v(x, y, z);
         MoveTo(v, generatePath, forceDestination);
     }
 

@@ -84,7 +84,7 @@ void WorldSession::SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Act
             data << uint32(invError);
             break;
         case AUCTION_ERR_HIGHER_BID:
-            data << ObjectGuid(HIGHGUID_PLAYER,auc->bidder);// new bidder guid
+            data << ObjectGuid(HIGHGUID_PLAYER, auc->bidder); // new bidder guid
             data << uint32(auc->bid);                       // new bid
             data << uint32(auc->GetAuctionOutBid());        // new AuctionOutBid?
             break;
@@ -98,7 +98,7 @@ void WorldSession::SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Act
 // this function sends notification, if bidder is online
 void WorldSession::SendAuctionBidderNotification(AuctionEntry* auction)
 {
-    WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8*4));
+    WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
     data << uint32(auction->GetHouseId());
     data << uint32(auction->Id);
     data << ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
@@ -115,7 +115,7 @@ void WorldSession::SendAuctionBidderNotification(AuctionEntry* auction)
 // this void causes on client to display: "Your auction sold"
 void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 {
-    WorldPacket data(SMSG_AUCTION_OWNER_NOTIFICATION, (7*4));
+    WorldPacket data(SMSG_AUCTION_OWNER_NOTIFICATION, (7 * 4));
     data << uint32(auction->Id);
     data << uint32(auction->bid);                           // if 0, client shows ERR_AUCTION_EXPIRED_S, else ERR_AUCTION_SOLD_S (works only when guid==0)
     data << uint32(auction->GetAuctionOutBid());            // AuctionOutBid?
@@ -140,7 +140,7 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 // shows ERR_AUCTION_REMOVED_S
 void WorldSession::SendAuctionRemovedNotification(AuctionEntry* auction)
 {
-    WorldPacket data(SMSG_AUCTION_REMOVED_NOTIFICATION, (3*4));
+    WorldPacket data(SMSG_AUCTION_REMOVED_NOTIFICATION, (3 * 4));
     data << uint32(auction->Id);
     data << uint32(auction->itemTemplate);
     data << uint32(auction->itemRandomPropertyId);
@@ -207,7 +207,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
     {
         // command case will return only if player have real access to command
         // using special access modes (1,-1) done at mode set in command, so not need recheck
-        if (GetPlayer()->GetAuctionAccessMode()==0 && !ChatHandler(GetPlayer()).FindCommand("auction"))
+        if (GetPlayer()->GetAuctionAccessMode() == 0 && !ChatHandler(GetPlayer()).FindCommand("auction"))
         {
             DEBUG_LOG("%s attempt open auction in cheating way.", guid.GetString().c_str());
             return NULL;
@@ -340,7 +340,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 
         if (GetSecurity() > SEC_PLAYER && sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE))
         {
-            sLog.outCommand(GetAccountId(),"GM %s (Account: %u) create auction: %s (Entry: %u Count: %u)",
+            sLog.outCommand(GetAccountId(), "GM %s (Account: %u) create auction: %s (Entry: %u Count: %u)",
                             GetPlayerName(), GetAccountId(), it->GetProto()->Name1, it->GetEntry(), it->GetCount());
         }
 
@@ -553,7 +553,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4+4+4));
+    WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4));
     Player* pl = GetPlayer();
     data << uint32(0);                                      // add 0 as count
     uint32 count = 0;
@@ -600,7 +600,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4+4+4));
+    WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4 + 4));
     data << uint32(0);                                      // amount place holder
 
     uint32 count = 0;
@@ -675,7 +675,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
     //DEBUG_LOG("Auctionhouse search %s list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
     //  auctioneerGuid.GetString().c_str(), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
 
-    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4+4+4));
+    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4));
     uint32 count = 0;
     uint32 totalcount = 0;
     data << uint32(0);

@@ -359,7 +359,7 @@ class Guild
                         _do(player);
         }
 
-        void CreateRank(std::string name,uint32 rights);
+        void CreateRank(std::string name, uint32 rights);
         void DelRank();
         std::string GetRankName(uint32 rankId);
         uint32 GetRankRights(uint32 rankId);
@@ -418,7 +418,7 @@ class Guild
         void   SetGuildBankTabInfo(uint8 TabId, std::string name, std::string icon);
         uint8  GetPurchasedTabs() const { return m_TabListMap.size(); }
         uint32 GetBankRights(uint32 rankId, uint8 TabId) const;
-        bool   IsMemberHaveRights(uint32 LowGuid, uint8 TabId,uint32 rights) const;
+        bool   IsMemberHaveRights(uint32 LowGuid, uint8 TabId, uint32 rights) const;
         bool   CanMemberViewTab(uint32 LowGuid, uint8 TabId) const;
         // Load
         void   LoadGuildBankFromDB();
@@ -440,11 +440,11 @@ class Guild
         // Guild Bank Event Logs
         void   LoadGuildBankEventLogFromDB();
         void   DisplayGuildBankLogs(WorldSession* session, uint8 TabId);
-        void   LogBankEvent(uint8 EventType, uint8 TabId, uint32 PlayerGuidLow, uint32 ItemOrMoney, uint8 ItemStackCount=0, uint8 DestTabId=0);
+        void   LogBankEvent(uint8 EventType, uint8 TabId, uint32 PlayerGuidLow, uint32 ItemOrMoney, uint8 ItemStackCount = 0, uint8 DestTabId = 0);
         bool   AddGBankItemToDB(uint32 GuildId, uint32 BankTab , uint32 BankTabSlot , uint32 GUIDLow, uint32 Entry);
 
     protected:
-        void AddRank(const std::string& name,uint32 rights,uint32 money);
+        void AddRank(const std::string& name, uint32 rights, uint32 money);
 
         uint32 m_Id;
         std::string m_Name;

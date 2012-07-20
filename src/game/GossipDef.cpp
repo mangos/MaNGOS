@@ -204,7 +204,7 @@ void PlayerMenu::CloseGossip()
 // Outdated
 void PlayerMenu::SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, char const* locName)
 {
-    WorldPacket data(SMSG_GOSSIP_POI, (4+4+4+4+4+10));      // guess size
+    WorldPacket data(SMSG_GOSSIP_POI, (4 + 4 + 4 + 4 + 4 + 10)); // guess size
     data << uint32(Flags);
     data << float(X);
     data << float(Y);
@@ -221,7 +221,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poi_id)
     PointOfInterest const* poi = sObjectMgr.GetPointOfInterest(poi_id);
     if (!poi)
     {
-        sLog.outErrorDb("Requested send nonexistent POI (Id: %u), ignore.",poi_id);
+        sLog.outErrorDb("Requested send nonexistent POI (Id: %u), ignore.", poi_id);
         return;
     }
 
@@ -233,7 +233,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poi_id)
             if (pl->IconName.size() > size_t(loc_idx) && !pl->IconName[loc_idx].empty())
                 icon_name = pl->IconName[loc_idx];
 
-    WorldPacket data(SMSG_GOSSIP_POI, (4+4+4+4+4+10));      // guess size
+    WorldPacket data(SMSG_GOSSIP_POI, (4 + 4 + 4 + 4 + 4 + 10)); // guess size
     data << uint32(poi->flags);
     data << float(poi->x);
     data << float(poi->y);
@@ -669,7 +669,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* pQuest)
         if (pQuest->ReqCreatureOrGOId[iI] < 0)
         {
             // client expected gameobject template id in form (id|0x80000000)
-            data << uint32((pQuest->ReqCreatureOrGOId[iI]*(-1))|0x80000000);
+            data << uint32((pQuest->ReqCreatureOrGOId[iI] * (-1)) | 0x80000000);
         }
         else
         {
@@ -776,7 +776,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << uint32(pQuest->XPValue(GetMenuSession()->GetPlayer()));
 
     // TODO: fixme. rewarded honor points. Multiply with 10 to satisfy client
-    data << uint32(10*MaNGOS::Honor::hk_honor_at_level(GetMenuSession()->GetPlayer()->getLevel(), pQuest->GetRewHonorAddition()));
+    data << uint32(10 * MaNGOS::Honor::hk_honor_at_level(GetMenuSession()->GetPlayer()->getLevel(), pQuest->GetRewHonorAddition()));
     data << float(pQuest->GetRewHonorMultiplier());
 
     data << uint32(0x08);                                   // unused by client?

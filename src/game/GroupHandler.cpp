@@ -42,7 +42,7 @@
 
 void WorldSession::SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res)
 {
-    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4+member.size()+1+4+4));
+    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4 + member.size() + 1 + 4 + 4));
     data << uint32(operation);
     data << member;                                         // max len 48
     data << uint32(res);
@@ -432,7 +432,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
     /********************/
 
     // everything is fine, do it
-    WorldPacket data(MSG_MINIMAP_PING, (8+4+4));
+    WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
     data << GetPlayer()->GetObjectGuid();
     data << float(x);
     data << float(y);
@@ -455,7 +455,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
 
     //DEBUG_LOG("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
 
-    WorldPacket data(MSG_RANDOM_ROLL, 4+4+4+8);
+    WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
     data << uint32(minimum);
     data << uint32(maximum);
     data << uint32(roll);
@@ -567,7 +567,7 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket& recv_data)
     /********************/
 
     // everything is fine, do it
-    group->SetAssistant(guid, (flag==0?false:true));
+    group->SetAssistant(guid, (flag == 0 ? false : true));
 }
 
 void WorldSession::HandlePartyAssignmentOpcode(WorldPacket& recv_data)
@@ -814,7 +814,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     Player* player = ObjectAccessor::FindPlayer(guid, false);
     if (!player)
     {
-        WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3+4+2);
+        WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 2);
         data << uint8(0);                                   // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
         data << guid.WriteAsPacked();
         data << uint32(GROUP_UPDATE_FLAG_STATUS);
@@ -825,7 +825,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
 
     Pet* pet = player->GetPet();
 
-    WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4+2+2+2+1+2*6+8+1+8);
+    WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
     data << player->GetPackGUID();
 

@@ -95,7 +95,7 @@ namespace VMAP
                 {
                     // TODO: remove extractor hack and uncomment below line:
                     //entry->second.iPos += Vector3(533.33333f*32, 533.33333f*32, 0.f);
-                    entry->second.iBound = entry->second.iBound + Vector3(533.33333f*32, 533.33333f*32, 0.f);
+                    entry->second.iBound = entry->second.iBound + Vector3(533.33333f * 32, 533.33333f * 32, 0.f);
                 }
                 mapSpawns.push_back(&(entry->second));
                 spawnedModelFiles.insert(entry->second.name);
@@ -107,7 +107,7 @@ namespace VMAP
 
             // ===> possibly move this code to StaticMapTree class
             std::map<uint32, uint32> modelNodeIdx;
-            for (uint32 i=0; i<mapSpawns.size(); ++i)
+            for (uint32 i = 0; i < mapSpawns.size(); ++i)
                 modelNodeIdx.insert(pair<uint32, uint32>(mapSpawns[i]->ID, i));
 
             // write map tree file
@@ -133,7 +133,7 @@ namespace VMAP
             // global map spawns (WDT), if any (most instances)
             if (success && fwrite("GOBJ", 4, 1, mapfile) != 1) success = false;
 
-            for (TileMap::iterator glob=globalRange.first; glob != globalRange.second && success; ++glob)
+            for (TileMap::iterator glob = globalRange.first; glob != globalRange.second && success; ++glob)
             {
                 success = ModelSpawn::writeToFile(mapfile, map_iter->second->UniqueEntries[glob->second]);
             }
@@ -163,7 +163,7 @@ namespace VMAP
                 // write number of tile spawns
                 if (success && fwrite(&nSpawns, sizeof(uint32), 1, tilefile) != 1) success = false;
                 // write tile spawns
-                for (uint32 s=0; s<nSpawns; ++s)
+                for (uint32 s = 0; s < nSpawns; ++s)
                 {
                     if (s)
                         ++tile;
@@ -209,7 +209,7 @@ namespace VMAP
             return false;
         }
         printf("Read coordinate mapping...\n");
-        uint32 mapID, tileX, tileY, check=0;
+        uint32 mapID, tileX, tileY, check = 0;
         G3D::Vector3 v1, v2;
         ModelSpawn spawn;
         while (!feof(dirf))
@@ -256,7 +256,7 @@ namespace VMAP
         }
 
         AABox modelBound;
-        bool boundEmpty=true;
+        bool boundEmpty = true;
         char ident[8];
 
         int readOperation = 1;
@@ -284,9 +284,9 @@ namespace VMAP
         READ_OR_RETURN(&wmoRootId, sizeof(uint32));
         if (groups != 1) printf("Warning: '%s' does not seem to be a M2 model!\n", modelFilename.c_str());
 
-        for (uint32 g=0; g<groups; ++g) // should be only one for M2 files...
+        for (uint32 g = 0; g < groups; ++g) // should be only one for M2 files...
         {
-            fseek(rf, 3*sizeof(uint32) + 6*sizeof(float), SEEK_CUR);
+            fseek(rf, 3 * sizeof(uint32) + 6 * sizeof(float), SEEK_CUR);
 
             READ_OR_RETURN(&blockId, 4);
             CMP_OR_RETURN(blockId, "GRP ");
@@ -306,10 +306,10 @@ namespace VMAP
             uint32 nvectors;
             READ_OR_RETURN(&nvectors, sizeof(uint32));
 
-            if (nvectors >0)
+            if (nvectors > 0)
             {
-                vectorarray = new float[nvectors*3];
-                READ_OR_RETURN(vectorarray, nvectors*sizeof(float)*3);
+                vectorarray = new float[nvectors * 3];
+                READ_OR_RETURN(vectorarray, nvectors * sizeof(float) * 3);
             }
             else
             {
@@ -317,13 +317,13 @@ namespace VMAP
                 return false;
             }
 
-            for (uint32 i=0, indexNo=0; indexNo<nvectors; indexNo++, i+=3)
+            for (uint32 i = 0, indexNo = 0; indexNo < nvectors; indexNo++, i += 3)
             {
-                Vector3 v = Vector3(vectorarray[i+0], vectorarray[i+1], vectorarray[i+2]);
+                Vector3 v = Vector3(vectorarray[i + 0], vectorarray[i + 1], vectorarray[i + 2]);
                 v = modelPosition.transform(v);
 
                 if (boundEmpty)
-                    modelBound = AABox(v, v), boundEmpty=false;
+                    modelBound = AABox(v, v), boundEmpty = false;
                 else
                     modelBound.merge(v);
             }
@@ -351,15 +351,15 @@ namespace VMAP
     {
         bool success = true;
         std::string filename = iSrcDir;
-        if (filename.length() >0)
+        if (filename.length() > 0)
             filename.append("/");
         filename.append(pModelFilename);
         FILE* rf = fopen(filename.c_str(), "rb");
 
         if (!rf)
         {
-            printf("ERROR: Can't open model file in form: %s",pModelFilename.c_str());
-            printf("...                          or form: %s",filename.c_str());
+            printf("ERROR: Can't open model file in form: %s", pModelFilename.c_str());
+            printf("...                          or form: %s", filename.c_str());
             return false;
         }
 
@@ -391,7 +391,7 @@ namespace VMAP
 
         std::vector<GroupModel> groupsArray;
 
-        for (uint32 g=0; g<groups; ++g)
+        for (uint32 g = 0; g < groups; ++g)
         {
             std::vector<MeshTriangle> triangles;
             std::vector<Vector3> vertexArray;
@@ -401,8 +401,8 @@ namespace VMAP
             READ_OR_RETURN(&GroupWMOID, sizeof(uint32));
 
             float bbox1[3], bbox2[3];
-            READ_OR_RETURN(bbox1, sizeof(float)*3);
-            READ_OR_RETURN(bbox2, sizeof(float)*3);
+            READ_OR_RETURN(bbox1, sizeof(float) * 3);
+            READ_OR_RETURN(bbox2, sizeof(float) * 3);
 
             uint32 liquidflags;
             READ_OR_RETURN(&liquidflags, sizeof(uint32));
@@ -413,7 +413,7 @@ namespace VMAP
             CMP_OR_RETURN(blockId, "GRP ");
             READ_OR_RETURN(&blocksize, sizeof(int));
             READ_OR_RETURN(&branches, sizeof(uint32));
-            for (uint32 b=0; b<branches; ++b)
+            for (uint32 b = 0; b < branches; ++b)
             {
                 uint32 indexes;
                 // indexes for each branch (not used jet)
@@ -426,13 +426,13 @@ namespace VMAP
             READ_OR_RETURN(&blocksize, sizeof(int));
             uint32 nindexes;
             READ_OR_RETURN(&nindexes, sizeof(uint32));
-            if (nindexes >0)
+            if (nindexes > 0)
             {
                 uint16* indexarray = new uint16[nindexes];
-                READ_OR_RETURN(indexarray, nindexes*sizeof(uint16));
-                for (uint32 i=0; i<nindexes; i+=3)
+                READ_OR_RETURN(indexarray, nindexes * sizeof(uint16));
+                for (uint32 i = 0; i < nindexes; i += 3)
                 {
-                    triangles.push_back(MeshTriangle(indexarray[i], indexarray[i+1], indexarray[i+2]));
+                    triangles.push_back(MeshTriangle(indexarray[i], indexarray[i + 1], indexarray[i + 2]));
                 }
                 delete[] indexarray;
             }
@@ -444,19 +444,19 @@ namespace VMAP
             uint32 nvectors;
             READ_OR_RETURN(&nvectors, sizeof(uint32));
 
-            if (nvectors >0)
+            if (nvectors > 0)
             {
-                float* vectorarray = new float[nvectors*3];
-                READ_OR_RETURN(vectorarray, nvectors*sizeof(float)*3);
-                for (uint32 i=0; i<nvectors; ++i)
+                float* vectorarray = new float[nvectors * 3];
+                READ_OR_RETURN(vectorarray, nvectors * sizeof(float) * 3);
+                for (uint32 i = 0; i < nvectors; ++i)
                 {
-                    vertexArray.push_back(Vector3(vectorarray + 3*i));
+                    vertexArray.push_back(Vector3(vectorarray + 3 * i));
                 }
                 delete[] vectorarray;
             }
             // ----- liquid
             WmoLiquid* liquid = 0;
-            if (liquidflags& 1)
+            if (liquidflags & 1)
             {
                 WMOLiquidHeader hlq;
                 READ_OR_RETURN(&blockId, 4);
@@ -464,9 +464,9 @@ namespace VMAP
                 READ_OR_RETURN(&blocksize, sizeof(int));
                 READ_OR_RETURN(&hlq, sizeof(WMOLiquidHeader));
                 liquid = new WmoLiquid(hlq.xtiles, hlq.ytiles, Vector3(hlq.pos_x, hlq.pos_y, hlq.pos_z), hlq.type);
-                uint32 size = hlq.xverts*hlq.yverts;
-                READ_OR_RETURN(liquid->GetHeightStorage(), size*sizeof(float));
-                size = hlq.xtiles*hlq.ytiles;
+                uint32 size = hlq.xverts * hlq.yverts;
+                READ_OR_RETURN(liquid->GetHeightStorage(), size * sizeof(float));
+                size = hlq.xtiles * hlq.ytiles;
                 READ_OR_RETURN(liquid->GetFlagsStorage(), size);
             }
 

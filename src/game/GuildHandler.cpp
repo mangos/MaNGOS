@@ -126,7 +126,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     // Put record into guildlog
     guild->LogGuildEvent(GUILD_EVENT_LOG_INVITE_PLAYER, GetPlayer()->GetObjectGuid(), player->GetObjectGuid());
 
-    WorldPacket data(SMSG_GUILD_INVITE, (8+10));            // guess size
+    WorldPacket data(SMSG_GUILD_INVITE, (8 + 10));          // guess size
     data << GetPlayer()->GetName();
     data << guild->GetName();
     player->GetSession()->SendPacket(&data);
@@ -206,7 +206,7 @@ void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeam() != sObjectMgr.GetPlayerTeamByGUID(guild->GetLeaderGuid()))
         return;
 
-    if (!guild->AddMember(GetPlayer()->GetObjectGuid(),guild->GetLowestRank()))
+    if (!guild->AddMember(GetPlayer()->GetObjectGuid(), guild->GetLowestRank()))
         return;
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_JOIN_GUILD, GetPlayer()->GetObjectGuid());
@@ -503,7 +503,7 @@ void WorldSession::HandleGuildSetPublicNoteOpcode(WorldPacket& recvPacket)
 {
     DEBUG_LOG("WORLD: Received CMSG_GUILD_SET_PUBLIC_NOTE");
 
-    std::string name,PNOTE;
+    std::string name, PNOTE;
     recvPacket >> name;
 
     if (!normalizePlayerName(name))
@@ -678,9 +678,9 @@ void WorldSession::HandleGuildDelRankOpcode(WorldPacket& /*recvPacket*/)
     guild->Roster();                                        // broadcast for tab rights update
 }
 
-void WorldSession::SendGuildCommandResult(uint32 typecmd, const std::string& str,uint32 cmdresult)
+void WorldSession::SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult)
 {
-    WorldPacket data(SMSG_GUILD_COMMAND_RESULT, (8+str.size()+1));
+    WorldPacket data(SMSG_GUILD_COMMAND_RESULT, (8 + str.size() + 1));
     data << typecmd;
     data << str;
     data << cmdresult;
@@ -750,14 +750,14 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (GetPlayer()->GetMoney() < 10*GOLD)
+    if (GetPlayer()->GetMoney() < 10 * GOLD)
     {
         //"You can't afford to do that."
         SendSaveGuildEmblem(ERR_GUILDEMBLEM_NOTENOUGHMONEY);
         return;
     }
 
-    GetPlayer()->ModifyMoney(-10*GOLD);
+    GetPlayer()->ModifyMoney(-10 * GOLD);
     guild->SetEmblem(EmblemStyle, EmblemColor, BorderStyle, BorderColor, BackgroundColor);
 
     //"Guild Emblem saved."
@@ -797,7 +797,7 @@ void WorldSession::HandleGuildPermissions(WorldPacket& /* recv_data */)
         {
             uint32 rankId = GetPlayer()->GetRank();
 
-            WorldPacket data(MSG_GUILD_PERMISSIONS, 4*15+1);
+            WorldPacket data(MSG_GUILD_PERMISSIONS, 4 * 15 + 1);
             data << uint32(rankId);                                 // guild rank id
             data << uint32(pGuild->GetRankRights(rankId));          // rank rights
             // money per day left
@@ -898,7 +898,7 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recv_data)
 
     CharacterDatabase.BeginTransaction();
 
-    pGuild->SetBankMoney(pGuild->GetGuildBankMoney()+money);
+    pGuild->SetBankMoney(pGuild->GetGuildBankMoney() + money);
     GetPlayer()->ModifyMoney(-int(money));
     GetPlayer()->SaveGoldToDB();
 
@@ -907,8 +907,8 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recv_data)
     // logging money
     if (_player->GetSession()->GetSecurity() > SEC_PLAYER && sWorld.getConfig(CONFIG_BOOL_GM_LOG_TRADE))
     {
-        sLog.outCommand(_player->GetSession()->GetAccountId(),"GM %s (Account: %u) deposit money (Amount: %u) to guild bank (Guild ID %u)",
-                        _player->GetName(),_player->GetSession()->GetAccountId(),money,GuildId);
+        sLog.outCommand(_player->GetSession()->GetAccountId(), "GM %s (Account: %u) deposit money (Amount: %u) to guild bank (Guild ID %u)",
+                        _player->GetName(), _player->GetSession()->GetAccountId(), money, GuildId);
     }
 
     // log
@@ -944,7 +944,7 @@ void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recv_data)
     if (!pGuild->GetPurchasedTabs())
         return;
 
-    if (pGuild->GetGuildBankMoney()<money)                  // not enough money in bank
+    if (pGuild->GetGuildBankMoney() < money)                // not enough money in bank
         return;
 
     if (!pGuild->HasRankRight(GetPlayer()->GetRank(), GR_RIGHT_WITHDRAW_GOLD))

@@ -384,8 +384,8 @@ class ScriptAction
         Player* GetPlayerTargetOrSourceAndLog(WorldObject* pSource, WorldObject* pTarget);
 };
 
-typedef std::multimap<uint32 /*delay*/, ScriptInfo> ScriptMap;
-typedef std::map<uint32 /*id*/, ScriptMap > ScriptMapMap;
+typedef std::multimap < uint32 /*delay*/, ScriptInfo > ScriptMap;
+typedef std::map < uint32 /*id*/, ScriptMap > ScriptMapMap;
 typedef std::pair<const char*, ScriptMapMap> ScriptMapMapName;
 
 extern ScriptMapMapName sQuestEndScripts;

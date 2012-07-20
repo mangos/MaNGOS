@@ -82,7 +82,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 
 /// WorldSession constructor
 WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale) :
-    m_muteTime(mute_time), _player(NULL), m_Socket(sock),_security(sec), _accountId(id), m_expansion(expansion), _logoutTime(0),
+    m_muteTime(mute_time), _player(NULL), m_Socket(sock), _security(sec), _accountId(id), m_expansion(expansion), _logoutTime(0),
     m_inQueue(false), m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false),
     m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)), m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)),
     m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED)
@@ -118,7 +118,7 @@ WorldSession::~WorldSession()
 void WorldSession::SizeError(WorldPacket const& packet, uint32 size) const
 {
     sLog.outError("Client (account %u) send packet %s (%u) with size " SIZEFMTD " but expected %u (attempt crash server?), skipped",
-                  GetAccountId(),LookupOpcodeName(packet.GetOpcode()),packet.GetOpcode(),packet.size(),size);
+                  GetAccountId(), LookupOpcodeName(packet.GetOpcode()), packet.GetOpcode(), packet.size(), size);
 }
 
 /// Get the player name
@@ -149,18 +149,18 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 
     if ((cur_time - lastTime) < 60)
     {
-        sendPacketCount+=1;
-        sendPacketBytes+=packet->size();
+        sendPacketCount += 1;
+        sendPacketBytes += packet->size();
 
-        sendLastPacketCount+=1;
-        sendLastPacketBytes+=packet->size();
+        sendLastPacketCount += 1;
+        sendLastPacketBytes += packet->size();
     }
     else
     {
         uint64 minTime = uint64(cur_time - lastTime);
         uint64 fullTime = uint64(lastTime - firstTime);
-        DETAIL_LOG("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u",sendPacketCount,sendPacketBytes,float(sendPacketCount)/fullTime,float(sendPacketBytes)/fullTime,uint32(fullTime));
-        DETAIL_LOG("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f",sendLastPacketCount,sendLastPacketBytes,float(sendLastPacketCount)/minTime,float(sendLastPacketBytes)/minTime);
+        DETAIL_LOG("Send all time packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f time: %u", sendPacketCount, sendPacketBytes, float(sendPacketCount) / fullTime, float(sendPacketBytes) / fullTime, uint32(fullTime));
+        DETAIL_LOG("Send last min packets count: " UI64FMTD " bytes: " UI64FMTD " avr.count/sec: %f avr.bytes/sec: %f", sendLastPacketCount, sendLastPacketBytes, float(sendLastPacketCount) / minTime, float(sendLastPacketBytes) / minTime);
 
         lastTime = cur_time;
         sendLastPacketCount = 1;
@@ -194,7 +194,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket* packet)
     sLog.outError("SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
                   LookupOpcodeName(packet->GetOpcode()),
                   packet->GetOpcode(),
-                  packet->rpos(),packet->wpos());
+                  packet->rpos(), packet->wpos());
 }
 
 /// Update the WorldSession (triggered by World update)
@@ -334,7 +334,7 @@ void WorldSession::LogoutPlayer(bool Save)
 
     if (_player)
     {
-        sLog.outChar("Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() ,_player->GetGUIDLow());
+        sLog.outChar("Account: %d (IP: %s) Logout Character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
 
         if (ObjectGuid lootGuid = GetPlayer()->GetLootGuid())
             DoLootRelease(lootGuid);
@@ -360,10 +360,10 @@ void WorldSession::LogoutPlayer(bool Save)
                 Unit* owner = (*itr)->GetOwner();           // including player controlled case
                 if (owner)
                 {
-                    if (owner->GetTypeId()==TYPEID_PLAYER)
+                    if (owner->GetTypeId() == TYPEID_PLAYER)
                         aset.insert((Player*)owner);
                 }
-                else if ((*itr)->GetTypeId()==TYPEID_PLAYER)
+                else if ((*itr)->GetTypeId() == TYPEID_PLAYER)
                     aset.insert((Player*)(*itr));
             }
 
@@ -374,13 +374,13 @@ void WorldSession::LogoutPlayer(bool Save)
 
             // give honor to all attackers from set like group case
             for (std::set<Player*>::const_iterator itr = aset.begin(); itr != aset.end(); ++itr)
-                (*itr)->RewardHonor(_player,aset.size());
+                (*itr)->RewardHonor(_player, aset.size());
 
             // give bg rewards and update counters like kill by first from attackers
             // this can't be called for all attackers.
             if (!aset.empty())
                 if (BattleGround* bg = _player->GetBattleGround())
-                    bg->HandleKillPlayer(_player,*aset.begin());
+                    bg->HandleKillPlayer(_player, *aset.begin());
         }
         else if (_player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         {
@@ -408,7 +408,7 @@ void WorldSession::LogoutPlayer(bool Save)
         while (_player->IsBeingTeleportedFar())
             HandleMoveWorldportAckOpcode();
 
-        for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+        for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
         {
             if (BattleGroundQueueTypeId bgQueueTypeId = _player->GetBattleGroundQueueTypeId(i))
             {
@@ -521,14 +521,14 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     vsnprintf(szStr, 1024, Text, ap);
     va_end(ap);
 
-    uint32 length = strlen(szStr)+1;
-    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4+length);
+    uint32 length = strlen(szStr) + 1;
+    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
     data << length;
     data << szStr;
     SendPacket(&data);
 }
 
-void WorldSession::SendNotification(const char* format,...)
+void WorldSession::SendNotification(const char* format, ...)
 {
     if (format)
     {
@@ -539,13 +539,13 @@ void WorldSession::SendNotification(const char* format,...)
         vsnprintf(szStr, 1024, format, ap);
         va_end(ap);
 
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr)+1));
+        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
         SendPacket(&data);
     }
 }
 
-void WorldSession::SendNotification(int32 string_id,...)
+void WorldSession::SendNotification(int32 string_id, ...)
 {
     char const* format = GetMangosString(string_id);
     if (format)
@@ -557,7 +557,7 @@ void WorldSession::SendNotification(int32 string_id,...)
         vsnprintf(szStr, 1024, format, ap);
         va_end(ap);
 
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr)+1));
+        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
         SendPacket(&data);
     }
@@ -572,7 +572,7 @@ void WorldSession::SendSetPhaseShift(uint32 PhaseShift)
 
 const char* WorldSession::GetMangosString(int32 entry) const
 {
-    return sObjectMgr.GetMangosString(entry,GetSessionDbLocaleIndex());
+    return sObjectMgr.GetMangosString(entry, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& recvPacket)
@@ -613,7 +613,7 @@ void WorldSession::SendAuthWaitQue(uint32 position)
     }
     else
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1+4+1);
+        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1);
         packet << uint8(AUTH_WAIT_QUEUE);
         packet << uint32(position);
         packet << uint8(0);                                 // unk 3.3.0
@@ -650,7 +650,7 @@ void WorldSession::LoadAccountData(QueryResult* result, uint32 mask)
             continue;
         }
 
-        if ((mask & (1 << type))==0)
+        if ((mask & (1 << type)) == 0)
         {
             sLog.outError("Table `%s` have non appropriate for table  account data type (%u), ignore.",
                           mask == GLOBAL_CACHE_MASK ? "account_data" : "character_account_data", type);
@@ -711,7 +711,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t time_, std::strin
 
 void WorldSession::SendAccountDataTimes(uint32 mask)
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4+1+4+8*4);   // changed in WotLK
+    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + 8 * 4); // changed in WotLK
     data << uint32(time(NULL));                             // unix time of something
     data << uint8(1);
     data << uint32(mask);                                   // type mask
@@ -750,7 +750,7 @@ void WorldSession::LoadTutorialsData()
 
 void WorldSession::SendTutorialsData()
 {
-    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4*8);
+    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * 8);
     for (uint32 i = 0; i < 8; ++i)
         data << m_Tutorials[i];
     SendPacket(&data);
@@ -827,7 +827,7 @@ void WorldSession::ReadAddonsInfo(WorldPacket& data)
             uint32 crc, unk1;
 
             // check next addon data format correctness
-            if (addonInfo.rpos()+1 > addonInfo.size())
+            if (addonInfo.rpos() + 1 > addonInfo.size())
                 return;
 
             addonInfo >> addonName;

@@ -175,7 +175,7 @@ enum BG_AV_Graveyards
     BG_AV_GRAVE_MAIN_HORDE         = 610
 };
 
-const uint32 BG_AV_GraveyardIds[9]=
+const uint32 BG_AV_GraveyardIds[9] =
 {
     BG_AV_GRAVE_STORM_AID,
     BG_AV_GRAVE_STORM_GRAVE,
@@ -227,35 +227,35 @@ const uint32 BG_AV_MineWorldStates[2][BG_AV_TEAMS_COUNT] =
 const uint32 BG_AV_NodeWorldStates[BG_AV_NODES_MAX][4] =
 {
     // Stormpike first aid station
-    {1326,1325,1328,1327},
+    {1326, 1325, 1328, 1327},
     // Stormpike Graveyard
-    {1335,1333,1336,1334},
+    {1335, 1333, 1336, 1334},
     // Stoneheart Grave
-    {1304,1302,1303,1301},
+    {1304, 1302, 1303, 1301},
     // Snowfall Grave
-    {1343,1341,1344,1342},
+    {1343, 1341, 1344, 1342},
     // Iceblood grave
-    {1348,1346,1349,1347},
+    {1348, 1346, 1349, 1347},
     // Frostwolf Grave
-    {1339,1337,1340,1338},
+    {1339, 1337, 1340, 1338},
     // Frostwolf Hut
-    {1331,1329,1332,1330},
+    {1331, 1329, 1332, 1330},
     // Dunbaldar South Bunker
-    {1375,1361,1378,1370},
+    {1375, 1361, 1378, 1370},
     // Dunbaldar North Bunker
-    {1374,1362,1379,1371},
+    {1374, 1362, 1379, 1371},
     // Icewing Bunker
-    {1376,1363,1380,1372},
+    {1376, 1363, 1380, 1372},
     // Stoneheart Bunker
-    {1377,1364,1381,1373},
+    {1377, 1364, 1381, 1373},
     // Iceblood Tower
-    {1390,1368,1395,1385},
+    {1390, 1368, 1395, 1385},
     // Tower Point
-    {1389,1367,1394,1384},
+    {1389, 1367, 1394, 1384},
     // Frostwolf East
-    {1388,1366,1393,1383},
+    {1388, 1366, 1393, 1383},
     // Frostwolf West
-    {1387,1365,1392,1382},
+    {1387, 1365, 1392, 1382},
 };
 
 // through the armorscap-quest 4 different gravedefender exist
@@ -365,8 +365,8 @@ class BattleGroundAV : public BattleGround
         void PopulateNode(BG_AV_Nodes node);
 
         uint32 GetNodeName(BG_AV_Nodes node);
-        const bool IsTower(BG_AV_Nodes node) { return (node == BG_AV_NODES_ERROR)? false : m_Nodes[node].Tower; }
-        const bool IsGrave(BG_AV_Nodes node) { return (node == BG_AV_NODES_ERROR)? false : !m_Nodes[node].Tower; }
+        const bool IsTower(BG_AV_Nodes node) { return (node == BG_AV_NODES_ERROR) ? false : m_Nodes[node].Tower; }
+        const bool IsGrave(BG_AV_Nodes node) { return (node == BG_AV_NODES_ERROR) ? false : !m_Nodes[node].Tower; }
 
         /*mine*/
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);

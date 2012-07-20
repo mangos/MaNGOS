@@ -218,7 +218,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 
         //TODO: move all terrain/vmaps data info query functions
         //from 'Map' class into this class
-        float GetHeight(float x, float y, float z, bool pCheckVMap=true, float maxSearchDist=DEFAULT_HEIGHT_SEARCH) const;
+        float GetHeight(float x, float y, float z, bool pCheckVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         float GetWaterLevel(float x, float y, float z, float* pGround = NULL) const;
         float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = NULL, bool swim = false) const;
         bool IsInWater(float x, float y, float z, GridMapLiquidData* data = 0) const;
@@ -226,7 +226,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 
         GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData* data = 0) const;
 
-        uint16 GetAreaFlag(float x, float y, float z, bool* isOutdoors=0) const;
+        uint16 GetAreaFlag(float x, float y, float z, bool* isOutdoors = 0) const;
         uint8 GetTerrainType(float x, float y) const;
 
         uint32 GetAreaId(float x, float y, float z) const;
@@ -293,20 +293,20 @@ class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, 
         }
         uint32 GetAreaId(uint32 mapid, float x, float y, float z) const
         {
-            return TerrainManager::GetAreaIdByAreaFlag(GetAreaFlag(mapid, x, y, z),mapid);
+            return TerrainManager::GetAreaIdByAreaFlag(GetAreaFlag(mapid, x, y, z), mapid);
         }
         uint32 GetZoneId(uint32 mapid, float x, float y, float z) const
         {
-            return TerrainManager::GetZoneIdByAreaFlag(GetAreaFlag(mapid, x, y, z),mapid);
+            return TerrainManager::GetZoneIdByAreaFlag(GetAreaFlag(mapid, x, y, z), mapid);
         }
         void GetZoneAndAreaId(uint32& zoneid, uint32& areaid, uint32 mapid, float x, float y, float z)
         {
-            TerrainManager::GetZoneAndAreaIdByAreaFlag(zoneid,areaid,GetAreaFlag(mapid, x, y, z),mapid);
+            TerrainManager::GetZoneAndAreaIdByAreaFlag(zoneid, areaid, GetAreaFlag(mapid, x, y, z), mapid);
         }
 
-        static uint32 GetAreaIdByAreaFlag(uint16 areaflag,uint32 map_id);
-        static uint32 GetZoneIdByAreaFlag(uint16 areaflag,uint32 map_id);
-        static void GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 areaflag,uint32 map_id);
+        static uint32 GetAreaIdByAreaFlag(uint16 areaflag, uint32 map_id);
+        static uint32 GetZoneIdByAreaFlag(uint16 areaflag, uint32 map_id);
+        static void GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 areaflag, uint32 map_id);
 
     private:
         TerrainManager();

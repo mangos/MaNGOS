@@ -56,23 +56,23 @@ struct ServerPktHeader
      */
     ServerPktHeader(uint32 size, uint16 cmd) : size(size)
     {
-        uint8 headerIndex=0;
+        uint8 headerIndex = 0;
         if (isLargePacket())
         {
             DEBUG_LOG("initializing large server to client packet. Size: %u, cmd: %u", size, cmd);
-            header[headerIndex++] = 0x80|(0xFF &(size>>16));
+            header[headerIndex++] = 0x80 | (0xFF & (size >> 16));
         }
-        header[headerIndex++] = 0xFF &(size>>8);
-        header[headerIndex++] = 0xFF &size;
+        header[headerIndex++] = 0xFF & (size >> 8);
+        header[headerIndex++] = 0xFF & size;
 
         header[headerIndex++] = 0xFF & cmd;
-        header[headerIndex++] = 0xFF & (cmd>>8);
+        header[headerIndex++] = 0xFF & (cmd >> 8);
     }
 
     uint8 getHeaderLength()
     {
         // cmd = 2 bytes, size= 2||3bytes
-        return 2+(isLargePacket()?3:2);
+        return 2 + (isLargePacket() ? 3 : 2);
     }
 
     bool isLargePacket()
@@ -111,8 +111,8 @@ WorldSocket::WorldSocket(void) :
 {
     reference_counting_policy().value(ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
-    msg_queue()->high_water_mark(8*1024*1024);
-    msg_queue()->low_water_mark(8*1024*1024);
+    msg_queue()->high_water_mark(8 * 1024 * 1024);
+    msg_queue()->low_water_mark(8 * 1024 * 1024);
 }
 
 WorldSocket::~WorldSocket(void)
@@ -167,7 +167,7 @@ int WorldSocket::SendPacket(const WorldPacket& pct)
     // Dump outgoing packet.
     sLog.outWorldPacketDump(uint32(get_handle()), pct.GetOpcode(), LookupOpcodeName(pct.GetOpcode()), &pct, false);
 
-    ServerPktHeader header(pct.size()+2, pct.GetOpcode());
+    ServerPktHeader header(pct.size() + 2, pct.GetOpcode());
     m_Crypt.EncryptSend((uint8*)header.header, header.getHeaderLength());
 
     if (m_OutBuffer->space() >= pct.size() + header.getHeaderLength() && msg_queue()->is_empty())
@@ -192,7 +192,7 @@ int WorldSocket::SendPacket(const WorldPacket& pct)
         if (!pct.empty())
             mb->copy((const char*)pct.contents(), pct.size());
 
-        if (msg_queue()->enqueue_tail(mb,(ACE_Time_Value*)&ACE_Time_Value::zero) == -1)
+        if (msg_queue()->enqueue_tail(mb, (ACE_Time_Value*)&ACE_Time_Value::zero) == -1)
         {
             sLog.outError("WorldSocket::SendPacket enqueue_tail");
             mb->release();
@@ -718,7 +718,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     catch (ByteBufferException&)
     {
         sLog.outError("WorldSocket::ProcessIncoming ByteBufferException occured while parsing an instant handled packet (opcode: %u) from client %s, accountid=%i.",
-                      opcode, GetRemoteAddress().c_str(), m_Session?m_Session->GetAccountId():-1);
+                      opcode, GetRemoteAddress().c_str(), m_Session ? m_Session->GetAccountId() : -1);
         if (sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))
         {
             DEBUG_LOG("Dumping error-causing packet:");
@@ -728,7 +728,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         if (sWorld.getConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET))
         {
             DETAIL_LOG("Disconnecting session [account id %i / address %s] for badly formatted packet.",
-                       m_Session?m_Session->GetAccountId():-1, GetRemoteAddress().c_str());
+                       m_Session ? m_Session->GetAccountId() : -1, GetRemoteAddress().c_str());
 
             return -1;
         }

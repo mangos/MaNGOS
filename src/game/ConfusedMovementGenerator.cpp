@@ -31,7 +31,7 @@ void ConfusedMovementGenerator<T>::Initialize(T& unit)
     unit.GetPosition(i_x, i_y, i_z);
 
     unit.StopMoving();
-    unit.addUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.addUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_CONFUSED_MOVE);
 }
 
 template<class T>
@@ -46,7 +46,7 @@ void ConfusedMovementGenerator<T>::Reset(T& unit)
 {
     i_nextMoveTime.Reset(0);
     unit.StopMoving();
-    unit.addUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.addUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_CONFUSED_MOVE);
 }
 
 template<class T>
@@ -73,8 +73,8 @@ bool ConfusedMovementGenerator<T>::Update(T& unit, const uint32& diff)
             // start moving
             unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
 
-            float x = i_x + 10.0f*(rand_norm_f() - 0.5f);
-            float y = i_y + 10.0f*(rand_norm_f() - 0.5f);
+            float x = i_x + 10.0f * (rand_norm_f() - 0.5f);
+            float y = i_y + 10.0f * (rand_norm_f() - 0.5f);
             float z = i_z;
 
             unit.UpdateAllowedPositionZ(x, y, z);
@@ -101,14 +101,14 @@ bool ConfusedMovementGenerator<T>::Update(T& unit, const uint32& diff)
 template<>
 void ConfusedMovementGenerator<Player>::Finalize(Player& unit)
 {
-    unit.clearUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.clearUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_CONFUSED_MOVE);
     unit.StopMoving();
 }
 
 template<>
 void ConfusedMovementGenerator<Creature>::Finalize(Creature& unit)
 {
-    unit.clearUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
+    unit.clearUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_CONFUSED_MOVE);
 }
 
 template void ConfusedMovementGenerator<Player>::Initialize(Player& player);

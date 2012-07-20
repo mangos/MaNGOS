@@ -221,7 +221,7 @@ void BattleGroundAV::UpdateScore(BattleGroundTeamIndex teamIdx, int32 points)
         {
             m_TeamScores[teamIdx] = 0;
             // other team will win:
-            EndBattleGround((teamIdx == BG_TEAM_ALLIANCE)? HORDE : ALLIANCE);
+            EndBattleGround((teamIdx == BG_TEAM_ALLIANCE) ? HORDE : ALLIANCE);
         }
         else if (!m_IsInformedNearLose[teamIdx] && m_TeamScores[teamIdx] < BG_AV_SCORE_NEAR_LOSE)
         {
@@ -246,7 +246,7 @@ void BattleGroundAV::Update(uint32 diff)
     {
         if (m_Mine_Owner[mine] != BG_AV_TEAM_NEUTRAL)
         {
-            m_Mine_Timer[mine] -=diff;
+            m_Mine_Timer[mine] -= diff;
             if (m_Mine_Timer[mine] <= 0)
             {
                 UpdateScore(BattleGroundTeamIndex(m_Mine_Owner[mine]), 1);
@@ -568,7 +568,7 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
     {
         SendYell2ToAll(LANG_BG_AV_TOWER_DEFENDED, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
                        GetNodeName(node),
-                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY:LANG_BG_HORDE);
+                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
         UpdatePlayerScore(player, SCORE_TOWERS_DEFENDED, 1);
         PlaySoundToAll(BG_AV_SOUND_BOTH_TOWER_DEFEND);
     }
@@ -576,10 +576,10 @@ void BattleGroundAV::EventPlayerDefendsPoint(Player* player, BG_AV_Nodes node)
     {
         SendYell2ToAll(LANG_BG_AV_GRAVE_DEFENDED, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
                        GetNodeName(node),
-                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY:LANG_BG_HORDE);
+                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
         UpdatePlayerScore(player, SCORE_GRAVEYARDS_DEFENDED, 1);
         // update the statistic for the defending player
-        PlaySoundToAll((teamIdx == BG_TEAM_ALLIANCE)?BG_AV_SOUND_ALLIANCE_GOOD:BG_AV_SOUND_HORDE_GOOD);
+        PlaySoundToAll((teamIdx == BG_TEAM_ALLIANCE) ? BG_AV_SOUND_ALLIANCE_GOOD : BG_AV_SOUND_HORDE_GOOD);
     }
 }
 
@@ -599,14 +599,14 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
     {
         SendYell2ToAll(LANG_BG_AV_TOWER_ASSAULTED, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
                        GetNodeName(node),
-                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY:LANG_BG_HORDE);
+                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
         UpdatePlayerScore(player, SCORE_TOWERS_ASSAULTED, 1);
     }
     else
     {
         SendYell2ToAll(LANG_BG_AV_GRAVE_ASSAULTED, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0),
                        GetNodeName(node),
-                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY:LANG_BG_HORDE);
+                       (teamIdx == BG_TEAM_ALLIANCE) ? LANG_BG_ALLY : LANG_BG_HORDE);
         // update the statistic for the assaulting player
         UpdatePlayerScore(player, SCORE_GRAVEYARDS_ASSAULTED, 1);
     }
@@ -656,11 +656,11 @@ void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
 
 void BattleGroundAV::UpdateNodeWorldState(BG_AV_Nodes node)
 {
-    UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].State,m_Nodes[node].Owner)], 1);
+    UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].State, m_Nodes[node].Owner)], 1);
     if (m_Nodes[node].PrevOwner == BG_AV_TEAM_NEUTRAL)      // currently only snowfall is supported as neutral node
         UpdateWorldState(AV_SNOWFALL_N, 0);
     else
-        UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].PrevState,m_Nodes[node].PrevOwner)], 0);
+        UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].PrevState, m_Nodes[node].PrevOwner)], 0);
 }
 
 void BattleGroundAV::SendMineWorldStates(uint32 mine)
@@ -807,7 +807,7 @@ void BattleGroundAV::Reset()
     {
         m_Mine_Owner[i] = BG_AV_TEAM_NEUTRAL;
         m_Mine_PrevOwner[i] = m_Mine_Owner[i];
-        m_ActiveEvents[BG_AV_MINE_BOSSES+ i] = BG_AV_TEAM_NEUTRAL;
+        m_ActiveEvents[BG_AV_MINE_BOSSES + i] = BG_AV_TEAM_NEUTRAL;
         m_ActiveEvents[BG_AV_MINE_EVENT + i] = BG_AV_TEAM_NEUTRAL;
         m_Mine_Timer[i] = BG_AV_MINE_TICK_TIMER;
     }

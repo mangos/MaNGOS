@@ -142,7 +142,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recv_data)
 
     player->SetArenaTeamIdInvited(arenateam->GetId());
 
-    WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8+10));
+    WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8 + 10));
     data << GetPlayer()->GetName();
     data << arenateam->GetName();
     player->GetSession()->SendPacket(&data);
@@ -176,7 +176,7 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recv_data*/)
     if (!at->AddMember(_player->GetObjectGuid()))
     {
         // arena team not found
-        SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S,"","",ERR_ARENA_TEAM_INTERNAL);
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_INTERNAL);
         return;
     }
 
@@ -329,7 +329,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendArenaTeamCommandResult(uint32 team_action, const std::string& team, const std::string& player, uint32 error_id)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4+team.length()+1+player.length()+1+4);
+    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4 + team.length() + 1 + player.length() + 1 + 4);
     data << uint32(team_action);
     data << team;
     data << player;
@@ -339,7 +339,7 @@ void WorldSession::SendArenaTeamCommandResult(uint32 team_action, const std::str
 
 void WorldSession::SendNotInArenaTeamPacket(uint8 type)
 {
-    WorldPacket data(SMSG_ARENA_ERROR, 4+1);                // 886 - You are not in a %uv%u arena team
+    WorldPacket data(SMSG_ARENA_ERROR, 4 + 1);              // 886 - You are not in a %uv%u arena team
     uint32 unk = 0;
     data << uint32(unk);                                    // unk(0)
     if (!unk)

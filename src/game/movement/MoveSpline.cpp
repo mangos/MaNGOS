@@ -32,7 +32,7 @@ namespace Movement
         MANGOS_ASSERT(Initialized());
 
         float u = 1.f;
-        int32 seg_time = spline.length(point_Idx,point_Idx+1);
+        int32 seg_time = spline.length(point_Idx, point_Idx + 1);
         if (seg_time > 0)
             u = (time_passed - spline.length(point_Idx)) / (float)seg_time;
         Location c;
@@ -51,15 +51,15 @@ namespace Movement
             if (splineflags.final_angle)
                 c.orientation = facing.angle;
             else if (splineflags.final_point)
-                c.orientation = atan2(facing.f.y-c.y, facing.f.x-c.x);
+                c.orientation = atan2(facing.f.y - c.y, facing.f.x - c.x);
             //nothing to do for MoveSplineFlag::Final_Target flag
         }
         else
         {
-            if (!splineflags.hasFlag(MoveSplineFlag::OrientationFixed|MoveSplineFlag::Falling))
+            if (!splineflags.hasFlag(MoveSplineFlag::OrientationFixed | MoveSplineFlag::Falling))
             {
                 Vector3 hermite;
-                spline.evaluate_derivative(point_Idx,u,hermite);
+                spline.evaluate_derivative(point_Idx, u, hermite);
                 c.orientation = atan2(hermite.y, hermite.x);
             }
 
@@ -103,7 +103,7 @@ namespace Movement
         float start_elevation;
         inline int32 operator()(Spline<int32>& s, int32 i)
         {
-            return Movement::computeFallTime(start_elevation - s.getPoint(i+1).z,false) * 1000.f;
+            return Movement::computeFallTime(start_elevation - s.getPoint(i + 1).z, false) * 1000.f;
         }
     };
 
@@ -114,7 +114,7 @@ namespace Movement
 
     struct CommonInitializer
     {
-        CommonInitializer(float _velocity) : velocityInv(1000.f/_velocity), time(minimal_duration) {}
+        CommonInitializer(float _velocity) : velocityInv(1000.f / _velocity), time(minimal_duration) {}
         float velocityInv;
         int32 time;
         inline int32 operator()(Spline<int32>& s, int32 i)
@@ -126,7 +126,7 @@ namespace Movement
 
     void MoveSpline::init_spline(const MoveSplineInitArgs& args)
     {
-        const SplineBase::EvaluationMode modes[2] = {SplineBase::ModeLinear,SplineBase::ModeCatmullrom};
+        const SplineBase::EvaluationMode modes[2] = {SplineBase::ModeLinear, SplineBase::ModeCatmullrom};
         if (args.flags.cyclic)
         {
             uint32 cyclic_point = 0;
@@ -222,9 +222,9 @@ namespace Movement
             {
                 MAX_OFFSET = (1 << 11) / 2,
             };
-            Vector3 middle = (path.front()+path.back()) / 2;
+            Vector3 middle = (path.front() + path.back()) / 2;
             Vector3 offset;
-            for (uint32 i = 1; i < path.size()-1; ++i)
+            for (uint32 i = 1; i < path.size() - 1; ++i)
             {
                 offset = path[i] - middle;
                 if (fabs(offset.x) >= MAX_OFFSET || fabs(offset.y) >= MAX_OFFSET || fabs(offset.z) >= MAX_OFFSET)
@@ -313,7 +313,7 @@ namespace Movement
     {
         int32 point = point_Idx_offset + point_Idx - spline.first() + (int)Finalized();
         if (isCyclic())
-            point = point % (spline.last()-spline.first());
+            point = point % (spline.last() - spline.first());
         return point;
     }
 }

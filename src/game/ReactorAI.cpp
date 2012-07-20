@@ -45,7 +45,7 @@ ReactorAI::AttackStart(Unit* p)
     if (!p)
         return;
 
-    if (m_creature->Attack(p,true))
+    if (m_creature->Attack(p, true))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Tag unit GUID: %u (TypeId: %u) as a victim", p->GetGUIDLow(), p->GetTypeId());
         i_victimGuid = p->GetObjectGuid();

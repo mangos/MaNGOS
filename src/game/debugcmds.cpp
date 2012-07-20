@@ -81,7 +81,7 @@ bool ChatHandler::HandleDebugSendPoiCommand(char* args)
     if (!ExtractUInt32(&args, flags))
         return false;
 
-    DETAIL_LOG("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon,flags);
+    DETAIL_LOG("Command : POI, NPC = %u, icon = %u flags = %u", target->GetGUIDLow(), icon, flags);
     pPlayer->PlayerTalkClass->SendPointOfInterest(target->GetPositionX(), target->GetPositionY(), Poi_Icon(icon), flags, 30, "Test POI");
     return true;
 }
@@ -287,7 +287,7 @@ bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
     if (!ExtractUInt32(&args, code) || code > 255)
         return false;
 
-    WorldPacket data(SMSG_CHANNEL_NOTIFY, (1+10));
+    WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
     data << uint8(code);                                    // notify type
     data << name;                                           // channel name
     data << uint32(0);
@@ -700,11 +700,11 @@ bool ChatHandler::HandleDebugSetAuraStateCommand(char* args)
     {
         // reset all states
         for (int i = 1; i <= 32; ++i)
-            unit->ModifyAuraState(AuraState(i),false);
+            unit->ModifyAuraState(AuraState(i), false);
         return true;
     }
 
-    unit->ModifyAuraState(AuraState(abs(state)),state > 0);
+    unit->ModifyAuraState(AuraState(abs(state)), state > 0);
     return true;
 }
 
@@ -841,10 +841,10 @@ bool ChatHandler::HandleGetValueHelper(Object* target, uint32 field, char* typeS
             {
                 // starting 0 if need as required bitstring format
                 std::string res;
-                res.reserve(1+32+1);
-                res = iValue & (1 << (32-1)) ? "0" : " ";
+                res.reserve(1 + 32 + 1);
+                res = iValue & (1 << (32 - 1)) ? "0" : " ";
                 for (int i = 32; i > 0; --i)
-                    res += iValue & (1 << (i-1)) ? "1" : "0";
+                    res += iValue & (1 << (i - 1)) ? "1" : "0";
                 DEBUG_LOG(GetMangosString(LANG_GET_BITSTR), guid.GetString().c_str(), field, res.c_str());
                 PSendSysMessage(LANG_GET_BITSTR_FIELD, guid.GetString().c_str(), field, res.c_str());
                 break;
@@ -927,11 +927,11 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
         type = 1;
     else if (strncmp(typeStr, "float", strlen(typeStr)) == 0)
         type = 0;
-    else if (strncmp(typeStr, "|=", strlen("|=")+1) == 0)   // exactly copy
+    else if (strncmp(typeStr, "|=", strlen("|=") + 1) == 0) // exactly copy
         type = 2;
-    else if (strncmp(typeStr, "&=", strlen("&=")+1) == 0)   // exactly copy
+    else if (strncmp(typeStr, "&=", strlen("&=") + 1) == 0) // exactly copy
         type = 3;
-    else if (strncmp(typeStr, "&=~", strlen("&=~")+1) == 0) // exactly copy
+    else if (strncmp(typeStr, "&=~", strlen("&=~") + 1) == 0) // exactly copy
         type = 4;
     else
         return false;
@@ -1106,7 +1106,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
         return false;
 
     uint32 effidx;
-    if (!ExtractUInt32(&args, effidx) || effidx >= 64+32)
+    if (!ExtractUInt32(&args, effidx) || effidx >= 64 + 32)
         return false;
 
     uint32 spellmodop;
@@ -1135,7 +1135,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_SPELLMODS_CHANGED, GetNameLink().c_str(),
                                          opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
-    WorldPacket data(opcode, (1+1+2+2));
+    WorldPacket data(opcode, (1 + 1 + 2 + 2));
     data << uint8(effidx);
     data << uint8(spellmodop);
     data << int32(value);

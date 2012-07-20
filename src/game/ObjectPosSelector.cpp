@@ -26,7 +26,7 @@ ObjectPosSelector::ObjectPosSelector(float x, float y, float dist, float searche
     if (m_searcherSize == 0.0f)
         m_searcherSize = DEFAULT_WORLD_OBJECT_SIZE;
 
-    m_searcherHalfSize = asin(m_searcherSize/m_searcherDist);
+    m_searcherHalfSize = asin(m_searcherSize / m_searcherDist);
 
     // Really init in InitilizeAngle
     m_nextUsedAreaItr[USED_POS_PLUS]  = m_UsedAreaLists[USED_POS_PLUS].begin();

@@ -300,7 +300,7 @@ class BattleGround
         BattleGroundBracketId GetBracketId() const { return m_BracketId; }
         // the instanceId check is also used to determine a bg-template
         // that's why the m_map hack is here..
-        uint32 GetInstanceID()              { return m_Map?GetBgMap()->GetInstanceId():0; }
+        uint32 GetInstanceID()              { return m_Map ? GetBgMap()->GetInstanceId() : 0; }
         BattleGroundStatus GetStatus() const { return m_Status; }
         uint32 GetClientInstanceID() const  { return m_ClientInstanceID; }
         uint32 GetStartTime() const         { return m_StartTime; }
@@ -411,8 +411,8 @@ class BattleGround
         void CastSpellOnTeam(uint32 SpellID, Team team);
         void RewardHonorToTeam(uint32 Honor, Team team);
         void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team team);
-        void RewardMark(Player* plr,uint32 count);
-        void SendRewardMarkByMail(Player* plr,uint32 mark, uint32 count);
+        void RewardMark(Player* plr, uint32 count);
+        void SendRewardMarkByMail(Player* plr, uint32 mark, uint32 count);
         void RewardItem(Player* plr, uint32 item_id, uint32 count);
         void RewardQuestComplete(Player* plr);
         void RewardSpellCast(Player* plr, uint32 spell_id);
@@ -633,7 +633,7 @@ inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state,
 inline void FillInitialWorldState(ByteBuffer& data, uint32& count, uint32 state, bool value)
 {
     data << uint32(state);
-    data << uint32(value?1:0);
+    data << uint32(value ? 1 : 0);
     ++count;
 }
 

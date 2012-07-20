@@ -63,9 +63,9 @@ class MANGOS_DLL_DECL ObjectGridUnloader
         void MoveToRespawnN();
         void UnloadN()
         {
-            for (unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
+            for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
             {
-                for (unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
+                for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
                 {
                     GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
                     loader.Unload(i_grid(x, y), *this);
@@ -87,9 +87,9 @@ class MANGOS_DLL_DECL ObjectGridStoper
         void MoveToRespawnN();
         void StopN()
         {
-            for (unsigned int x=0; x < MAX_NUMBER_OF_CELLS; ++x)
+            for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
             {
-                for (unsigned int y=0; y < MAX_NUMBER_OF_CELLS; ++y)
+                for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
                 {
                     GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
                     loader.Stop(i_grid(x, y), *this);

@@ -54,7 +54,7 @@ namespace Movement
     {
         MoveSpline& move_spline = *unit.movespline;
 
-        Location real_position(unit.GetPositionX(),unit.GetPositionY(),unit.GetPositionZ(),unit.GetOrientation());
+        Location real_position(unit.GetPositionX(), unit.GetPositionY(), unit.GetPositionZ(), unit.GetOrientation());
         // there is a big chane that current position is unknown if current state is not finalized, need compute it
         // this also allows calculate spline position and update map position in much greater intervals
         if (!move_spline.Finalized())
@@ -76,7 +76,7 @@ namespace Movement
         else
             moveFlags &= ~MOVEFLAG_WALK_MODE;
 
-        moveFlags |= (MOVEFLAG_SPLINE_ENABLED|MOVEFLAG_FORWARD);
+        moveFlags |= (MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD);
 
         if (args.velocity == 0.f)
             args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
@@ -90,7 +90,7 @@ namespace Movement
         WorldPacket data(SMSG_MONSTER_MOVE, 64);
         data << unit.GetPackGUID();
         PacketBuilder::WriteMonsterMove(move_spline, data);
-        unit.SendMessageToSet(&data,true);
+        unit.SendMessageToSet(&data, true);
 
         return move_spline.Duration();
     }
@@ -99,7 +99,7 @@ namespace Movement
     {
         // mix existing state into new
         args.flags.walkmode = unit.m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);
-        args.flags.flying = unit.m_movementInfo.HasMovementFlag((MovementFlags)(MOVEFLAG_FLYING|MOVEFLAG_LEVITATING));
+        args.flags.flying = unit.m_movementInfo.HasMovementFlag((MovementFlags)(MOVEFLAG_FLYING | MOVEFLAG_LEVITATING));
     }
 
     void MoveSplineInit::SetFacing(const Unit* target)

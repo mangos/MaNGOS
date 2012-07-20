@@ -94,24 +94,24 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         static bool ExistMapAndVMap(uint32 mapid, float x, float y);
         static bool IsValidMAP(uint32 mapid);
 
-        static bool IsValidMapCoord(uint32 mapid, float x,float y)
+        static bool IsValidMapCoord(uint32 mapid, float x, float y)
         {
-            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x,y);
+            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x, y);
         }
 
-        static bool IsValidMapCoord(uint32 mapid, float x,float y,float z)
+        static bool IsValidMapCoord(uint32 mapid, float x, float y, float z)
         {
-            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x,y,z);
+            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x, y, z);
         }
 
-        static bool IsValidMapCoord(uint32 mapid, float x,float y,float z,float o)
+        static bool IsValidMapCoord(uint32 mapid, float x, float y, float z, float o)
         {
-            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x,y,z,o);
+            return IsValidMAP(mapid) && MaNGOS::IsValidMapCoord(x, y, z, o);
         }
 
         static bool IsValidMapCoord(WorldLocation const& loc)
         {
-            return IsValidMapCoord(loc.mapid,loc.coord_x,loc.coord_y,loc.coord_z,loc.orientation);
+            return IsValidMapCoord(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
         }
 
         // modulos a radian orientation to the range of 0..2PI
@@ -121,12 +121,12 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
             // to emulate negative numbers
             if (o < 0)
             {
-                float mod = o *-1;
-                mod = fmod(mod, 2.0f*M_PI_F);
-                mod = -mod+2.0f*M_PI_F;
+                float mod = o * -1;
+                mod = fmod(mod, 2.0f * M_PI_F);
+                mod = -mod + 2.0f * M_PI_F;
                 return mod;
             }
-            return fmod(o, 2.0f*M_PI_F);
+            return fmod(o, 2.0f * M_PI_F);
         }
 
         void RemoveAllObjectsInRemoveList();
@@ -182,8 +182,8 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 template<typename Do>
 inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Do& _do)
 {
-    MapMapType::const_iterator start = i_maps.lower_bound(MapID(mapId,0));
-    MapMapType::const_iterator end   = i_maps.lower_bound(MapID(mapId+1,0));
+    MapMapType::const_iterator start = i_maps.lower_bound(MapID(mapId, 0));
+    MapMapType::const_iterator end   = i_maps.lower_bound(MapID(mapId + 1, 0));
     for (MapMapType::const_iterator itr = start; itr != end; ++itr)
         _do(itr->second);
 }

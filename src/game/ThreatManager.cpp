@@ -276,7 +276,7 @@ bool HostileReferenceSortPredicate(const HostileReference* lhs, const HostileRef
 
 void ThreatContainer::update()
 {
-    if (iDirty && iThreatList.size() >1)
+    if (iDirty && iThreatList.size() > 1)
     {
         iThreatList.sort(HostileReferenceSortPredicate);
     }
@@ -423,7 +423,7 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
     if (!pVictim->isAlive() || !getOwner()->isAlive())
         return;
 
-    MANGOS_ASSERT(getOwner()->GetTypeId()== TYPEID_UNIT);
+    MANGOS_ASSERT(getOwner()->GetTypeId() == TYPEID_UNIT);
 
     float threat = ThreatCalcHelper::CalcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
 
@@ -556,8 +556,8 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
     switch (threatRefStatusChangeEvent->getType())
     {
         case UEV_THREAT_REF_THREAT_CHANGE:
-            if ((getCurrentVictim() == hostileReference && threatRefStatusChangeEvent->getFValue()<0.0f) ||
-                    (getCurrentVictim() != hostileReference && threatRefStatusChangeEvent->getFValue()>0.0f))
+            if ((getCurrentVictim() == hostileReference && threatRefStatusChangeEvent->getFValue() < 0.0f) ||
+                    (getCurrentVictim() != hostileReference && threatRefStatusChangeEvent->getFValue() > 0.0f))
                 setDirty(true);                             // the order in the threat list might have changed
             break;
         case UEV_THREAT_REF_ONLINE_STATUS:

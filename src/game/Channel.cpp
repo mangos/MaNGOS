@@ -435,7 +435,7 @@ void Channel::List(Player* player)
     }
     else
     {
-        WorldPacket data(SMSG_CHANNEL_LIST, 1+(GetName().size()+1)+1+4+m_players.size()*(8+1));
+        WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + m_players.size() * (8 + 1));
         data << uint8(1);                                   // channel type?
         data << GetName();                                  // channel name
         data << uint8(GetFlags());                          // channel flags?
@@ -461,7 +461,7 @@ void Channel::List(Player* player)
             }
         }
 
-        data.put<uint32>(pos,count);
+        data.put<uint32>(pos, count);
 
         SendToOne(&data, p);
     }
@@ -565,7 +565,7 @@ void Channel::Say(ObjectGuid p, const char* what, uint32 lang)
     {
         uint32 messageLength = strlen(what) + 1;
 
-        WorldPacket data(SMSG_MESSAGECHAT, 1+4+8+4+m_name.size()+1+8+4+messageLength+1);
+        WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + m_name.size() + 1 + 8 + 4 + messageLength + 1);
         data << uint8(CHAT_MSG_CHANNEL);
         data << uint32(lang);
         data << ObjectGuid(p);                              // 2.1.0
@@ -686,7 +686,7 @@ void Channel::DeVoice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
 // done
 void Channel::MakeNotifyPacket(WorldPacket* data, uint8 notify_type)
 {
-    data->Initialize(SMSG_CHANNEL_NOTIFY, 1+m_name.size()+1);
+    data->Initialize(SMSG_CHANNEL_NOTIFY, 1 + m_name.size() + 1);
     *data << uint8(notify_type);
     *data << m_name;
 }
@@ -948,9 +948,9 @@ void Channel::JoinNotify(ObjectGuid guid)
     WorldPacket data;
 
     if (IsConstant())
-        data.Initialize(SMSG_USERLIST_ADD, 8+1+1+4+GetName().size()+1);
+        data.Initialize(SMSG_USERLIST_ADD, 8 + 1 + 1 + 4 + GetName().size() + 1);
     else
-        data.Initialize(SMSG_USERLIST_UPDATE, 8+1+1+4+GetName().size()+1);
+        data.Initialize(SMSG_USERLIST_UPDATE, 8 + 1 + 1 + 4 + GetName().size() + 1);
 
     data << ObjectGuid(guid);
     data << uint8(GetPlayerFlags(guid));
@@ -962,7 +962,7 @@ void Channel::JoinNotify(ObjectGuid guid)
 
 void Channel::LeaveNotify(ObjectGuid guid)
 {
-    WorldPacket data(SMSG_USERLIST_REMOVE, 8+1+4+GetName().size()+1);
+    WorldPacket data(SMSG_USERLIST_REMOVE, 8 + 1 + 4 + GetName().size() + 1);
     data << ObjectGuid(guid);
     data << uint8(GetFlags());
     data << uint32(GetNumPlayers());

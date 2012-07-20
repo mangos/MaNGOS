@@ -85,8 +85,8 @@ struct CreatureLinkingInfo
     uint32 mapId;
     uint32 masterId;
     uint32 masterDBGuid;
-    uint16 linkingFlag:16;
-    uint16 searchRange:16;
+    uint16 linkingFlag: 16;
+    uint16 searchRange: 16;
 };
 
 /**
@@ -116,7 +116,7 @@ class CreatureLinkingMgr
         CreatureLinkingInfo const* GetLinkedTriggerInformation(Creature* pCreature);
 
     private:
-        typedef std::multimap<uint32 /*slaveEntry*/, CreatureLinkingInfo> CreatureLinkingMap;
+        typedef std::multimap < uint32 /*slaveEntry*/, CreatureLinkingInfo > CreatureLinkingMap;
         typedef std::pair<CreatureLinkingMap::const_iterator, CreatureLinkingMap::const_iterator> CreatureLinkingMapBounds;
 
         // Storage of Data: npc_entry_slave, (map, npc_entry_master, flag, master_db_guid[If Unique], search_range)
@@ -163,8 +163,8 @@ class CreatureLinkingHolder
         // Structure associated to a master (entry case)
         struct InfoAndGuids
         {
-            uint16 linkingFlag:16;
-            uint16 searchRange:16;
+            uint16 linkingFlag: 16;
+            uint16 searchRange: 16;
             GuidList linkedGuids;
         };
         // Structure associated to a master (guid case)
@@ -174,9 +174,9 @@ class CreatureLinkingHolder
             ObjectGuid linkedGuid;
         };
 
-        typedef std::multimap<uint32 /*masterEntryOrGuid*/, InfoAndGuids> HolderMap;
+        typedef std::multimap < uint32 /*masterEntryOrGuid*/, InfoAndGuids > HolderMap;
         typedef std::pair<HolderMap::iterator, HolderMap::iterator> HolderMapBounds;
-        typedef std::multimap<uint32 /*Entry*/, ObjectGuid> BossGuidMap;
+        typedef std::multimap < uint32 /*Entry*/, ObjectGuid > BossGuidMap;
         typedef std::pair<BossGuidMap::iterator, BossGuidMap::iterator> BossGuidMapBounds;
 
         // Helper function, to process a slave list

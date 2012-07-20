@@ -204,7 +204,7 @@ namespace MaNGOS
         Check& i_check;
 
         WorldObjectSearcher(WorldObject*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(GameObjectMapType& m);
         void Visit(PlayerMapType& m);
@@ -223,7 +223,7 @@ namespace MaNGOS
         Check& i_check;
 
         WorldObjectListSearcher(std::list<WorldObject*>& objects, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -245,34 +245,34 @@ namespace MaNGOS
 
         void Visit(GameObjectMapType& m)
         {
-            for (GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (GameObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
 
         void Visit(PlayerMapType& m)
         {
-            for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
         void Visit(CreatureMapType& m)
         {
-            for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
 
         void Visit(CorpseMapType& m)
         {
-            for (CorpseMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (CorpseMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
 
         void Visit(DynamicObjectMapType& m)
         {
-            for (DynamicObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (DynamicObjectMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
@@ -290,7 +290,7 @@ namespace MaNGOS
         Check& i_check;
 
         GameObjectSearcher(GameObject*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(GameObjectMapType& m);
 
@@ -339,7 +339,7 @@ namespace MaNGOS
         Check& i_check;
 
         UnitSearcher(Unit*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
@@ -356,7 +356,7 @@ namespace MaNGOS
         Check& i_check;
 
         UnitLastSearcher(Unit*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(CreatureMapType& m);
         void Visit(PlayerMapType& m);
@@ -373,7 +373,7 @@ namespace MaNGOS
         Check& i_check;
 
         UnitListSearcher(std::list<Unit*>& objects, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
@@ -391,7 +391,7 @@ namespace MaNGOS
         Check& i_check;
 
         CreatureSearcher(Creature*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(CreatureMapType& m);
 
@@ -407,7 +407,7 @@ namespace MaNGOS
         Check& i_check;
 
         CreatureLastSearcher(Creature*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(CreatureMapType& m);
 
@@ -422,7 +422,7 @@ namespace MaNGOS
         Check& i_check;
 
         CreatureListSearcher(std::list<Creature*>& objects, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(CreatureMapType& m);
 
@@ -440,7 +440,7 @@ namespace MaNGOS
 
         void Visit(CreatureMapType& m)
         {
-            for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
@@ -458,7 +458,7 @@ namespace MaNGOS
         Check& i_check;
 
         PlayerSearcher(Player*& result, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_object(result), i_check(check) {}
 
         void Visit(PlayerMapType& m);
 
@@ -473,7 +473,7 @@ namespace MaNGOS
         Check& i_check;
 
         PlayerListSearcher(std::list<Player*>& objects, Check& check)
-            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects),i_check(check) {}
+            : i_phaseMask(check.GetFocusObject().GetPhaseMask()), i_objects(objects), i_check(check) {}
 
         void Visit(PlayerMapType& m);
 
@@ -491,7 +491,7 @@ namespace MaNGOS
 
         void Visit(PlayerMapType& m)
         {
-            for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->getSource()->InSamePhase(i_phaseMask))
                     i_do(itr->getSource());
         }
@@ -511,8 +511,8 @@ namespace MaNGOS
 
         void Visit(CameraMapType& m)
         {
-            for (CameraMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->getSource()->GetBody()->InSamePhase(i_searcher) && itr->getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
+            for (CameraMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+                if (itr->getSource()->GetBody()->InSamePhase(i_searcher) && itr->getSource()->GetBody()->IsWithinDist(i_searcher, i_dist))
                     i_do(itr->getSource()->GetOwner());
         }
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -547,7 +547,7 @@ namespace MaNGOS
             {
                 if (i_fobj->isHonorOrXPTarget(u) ||
                         u->getDeathState() != CORPSE || u->IsDeadByDefault() || u->IsTaxiFlying() ||
-                        (u->GetCreatureTypeMask() & (1 << (CREATURE_TYPE_HUMANOID-1)))==0 ||
+                        (u->GetCreatureTypeMask() & (1 << (CREATURE_TYPE_HUMANOID - 1))) == 0 ||
                         (u->GetDisplayId() != u->GetNativeDisplayId()))
                     return false;
 
@@ -566,7 +566,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_fobj; }
             bool operator()(Player* u)
             {
-                if (u->getDeathState()!=CORPSE || u->IsTaxiFlying() ||
+                if (u->getDeathState() != CORPSE || u->IsTaxiFlying() ||
                         u->HasAuraType(SPELL_AURA_GHOST) || (u->GetDisplayId() != u->GetNativeDisplayId()))
                     return false;
 
@@ -574,9 +574,9 @@ namespace MaNGOS
             }
             bool operator()(Creature* u)
             {
-                if (u->getDeathState()!=CORPSE || u->IsTaxiFlying() || u->IsDeadByDefault() ||
+                if (u->getDeathState() != CORPSE || u->IsTaxiFlying() || u->IsDeadByDefault() ||
                         (u->GetDisplayId() != u->GetNativeDisplayId()) ||
-                        (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL)!=0)
+                        (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL) != 0)
                     return false;
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
@@ -603,7 +603,7 @@ namespace MaNGOS
             bool operator()(Creature* u)
             {
                 if (i_fobj->IsFriendlyTo(u) || u->isAlive() || u->IsTaxiFlying() ||
-                        (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD)==0)
+                        (u->GetCreatureTypeMask() & CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD) == 0)
                     return false;
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
@@ -631,7 +631,7 @@ namespace MaNGOS
     class GameObjectFocusCheck
     {
         public:
-            GameObjectFocusCheck(Unit const* unit,uint32 focusId) : i_unit(unit), i_focusId(focusId) {}
+            GameObjectFocusCheck(Unit const* unit, uint32 focusId) : i_unit(unit), i_focusId(focusId) {}
             WorldObject const& GetFocusObject() const { return *i_unit; }
             bool operator()(GameObject* go) const
             {
@@ -678,7 +678,7 @@ namespace MaNGOS
     class NearestGameObjectEntryInObjectRangeCheck
     {
         public:
-            NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj,uint32 entry, float range) : i_obj(obj), i_entry(entry), i_range(range) {}
+            NearestGameObjectEntryInObjectRangeCheck(WorldObject const& obj, uint32 entry, float range) : i_obj(obj), i_entry(entry), i_range(range) {}
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(GameObject* go)
             {
@@ -713,7 +713,7 @@ namespace MaNGOS
                 if (go->GetEntry() == i_entry && go->IsWithinDist3d(i_x, i_y, i_z, i_range))
                 {
                     // use found GO range as new range limit for next check
-                    i_range = go->GetDistance(i_x,i_y,i_z);
+                    i_range = go->GetDistance(i_x, i_y, i_z);
                     return true;
                 }
 
@@ -851,7 +851,7 @@ namespace MaNGOS
                 return u->isAlive()
                        && i_obj->IsWithinDistInMap(u, i_range)
                        && !i_funit->IsFriendlyTo(u)
-                       && u->isVisibleForOrDetect(i_funit,i_funit,false);
+                       && u->isVisibleForOrDetect(i_funit, i_funit, false);
             }
         private:
             WorldObject const* i_obj;
@@ -902,7 +902,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 if (u->isTargetableForAttack() && i_obj->IsWithinDistInMap(u, i_range) &&
-                        !i_funit->IsFriendlyTo(u) && u->isVisibleForOrDetect(i_funit,i_funit,false))
+                        !i_funit->IsFriendlyTo(u) && u->isVisibleForOrDetect(i_funit, i_funit, false))
                 {
                     i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                     return true;
@@ -936,7 +936,7 @@ namespace MaNGOS
                     return false;
 
                 // ignore totems as AoE targets
-                if (u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsTotem())
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                     return false;
 
                 // check visibility only for unit-like original casters
@@ -971,10 +971,10 @@ namespace MaNGOS
                 if (!u->isTargetableForAttack())
                     return false;
 
-                if (u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsTotem())
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
                     return false;
 
-                if ((i_targetForPlayer ? !i_obj->IsFriendlyTo(u) : i_obj->IsHostileTo(u))&& i_obj->IsWithinDistInMap(u, i_range))
+                if ((i_targetForPlayer ? !i_obj->IsFriendlyTo(u) : i_obj->IsHostileTo(u)) && i_obj->IsWithinDistInMap(u, i_range))
                     return true;
 
                 return false;
@@ -1016,7 +1016,7 @@ namespace MaNGOS
         public:
             explicit AnyStealthedCheck(WorldObject const* fobj) : i_fobj(fobj) {}
             WorldObject const& GetFocusObject() const { return *i_fobj; }
-            bool operator()(Unit* u) { return u->GetVisibility()==VISIBILITY_GROUP_STEALTH; }
+            bool operator()(Unit* u) { return u->GetVisibility() == VISIBILITY_GROUP_STEALTH; }
         private:
             WorldObject const* i_fobj;
     };
@@ -1065,7 +1065,7 @@ namespace MaNGOS
             {
                 if (u == i_obj)
                     return false;
-                if (!u->CanAssistTo(i_obj,i_enemy))
+                if (!u->CanAssistTo(i_obj, i_enemy))
                     return false;
 
                 if (!i_obj->IsWithinDistInMap(u, i_range))
@@ -1091,7 +1091,7 @@ namespace MaNGOS
     class NearestCreatureEntryWithLiveStateInObjectRangeCheck
     {
         public:
-            NearestCreatureEntryWithLiveStateInObjectRangeCheck(WorldObject const& obj,uint32 entry, bool onlyAlive, bool onlyDead, float range)
+            NearestCreatureEntryWithLiveStateInObjectRangeCheck(WorldObject const& obj, uint32 entry, bool onlyAlive, bool onlyDead, float range)
                 : i_obj(obj), i_entry(entry), i_onlyAlive(onlyAlive), i_onlyDead(onlyDead), i_range(range) {}
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(Creature* u)
@@ -1122,7 +1122,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *m_pObject; }
             bool operator()(Unit* pUnit)
             {
-                if (pUnit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pUnit,m_fRange,false))
+                if (pUnit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pUnit, m_fRange, false))
                     return true;
 
                 return false;

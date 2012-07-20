@@ -116,8 +116,8 @@ class AuctionBotConfig
 
         uint32      getConfig(AuctionBotConfigUInt32Values index) const { return m_configUint32Values[index]; }
         bool        getConfig(AuctionBotConfigBoolValues index) const { return m_configBoolValues[index]; }
-        void        setConfig(AuctionBotConfigBoolValues index, bool value) { m_configBoolValues[index]=value; }
-        void        setConfig(AuctionBotConfigUInt32Values index, uint32 value) { m_configUint32Values[index]=value; }
+        void        setConfig(AuctionBotConfigBoolValues index, bool value) { m_configBoolValues[index] = value; }
+        void        setConfig(AuctionBotConfigUInt32Values index, uint32 value) { m_configUint32Values[index] = value; }
 
         uint32 getConfigItemAmountRatio(AuctionHouseType houseType) const;
         bool getConfigBuyerEnabled(AuctionHouseType houseType) const;
@@ -160,8 +160,8 @@ class AuctionBotAgent
         AuctionBotAgent() {}
         virtual ~AuctionBotAgent() {}
     public:
-        virtual bool Initialize() =0;
-        virtual bool Update(AuctionHouseType houseType) =0;
+        virtual bool Initialize() = 0;
+        virtual bool Update(AuctionHouseType houseType) = 0;
 };
 
 struct AuctionHouseBotStatusInfoPerType

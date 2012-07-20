@@ -197,7 +197,7 @@ void ScriptMgr::LoadScripts(ScriptMapMapName& scripts, const char* tablename)
 
         if (tmp.data_flags)                                 // Check flags
         {
-            if (tmp.data_flags & ~(SCRIPT_FLAG_COMMAND_ADDITIONAL*2 - 1))
+            if (tmp.data_flags & ~(SCRIPT_FLAG_COMMAND_ADDITIONAL * 2 - 1))
             {
                 sLog.outErrorDb("Table `%s` has invalid data_flags %u in command %u for script id %u, skipping.", tablename, tmp.data_flags, tmp.command, tmp.id);
                 continue;
@@ -1050,7 +1050,7 @@ void ScriptAction::HandleScriptStep()
                 }
 
                 // Use one random
-                textId = m_script->textId[urand(0, i-1)];
+                textId = m_script->textId[urand(0, i - 1)];
             }
 
             switch (m_script->talk.chatType)
@@ -1277,10 +1277,10 @@ void ScriptAction::HandleScriptStep()
                 break;
             }
 
-            if (pGo->GetGoType()==GAMEOBJECT_TYPE_FISHINGNODE ||
-                    pGo->GetGoType()==GAMEOBJECT_TYPE_DOOR        ||
-                    pGo->GetGoType()==GAMEOBJECT_TYPE_BUTTON      ||
-                    pGo->GetGoType()==GAMEOBJECT_TYPE_TRAP)
+            if (pGo->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE ||
+                    pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR        ||
+                    pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON      ||
+                    pGo->GetGoType() == GAMEOBJECT_TYPE_TRAP)
             {
                 sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u can not be used with gameobject of type %u (guid: %u, buddyEntry: %u).", m_table, m_script->id, m_script->command, uint32(pGo->GetGoType()), m_script->respawnGo.goGuid, m_script->buddyEntry);
                 break;
@@ -1307,7 +1307,7 @@ void ScriptAction::HandleScriptStep()
             float z = m_script->z;
             float o = m_script->o;
 
-            Creature* pCreature = pSource->SummonCreature(m_script->summonCreature.creatureEntry, x, y, z, o, m_script->summonCreature.despawnDelay ? TEMPSUMMON_TIMED_OR_DEAD_DESPAWN : TEMPSUMMON_DEAD_DESPAWN, m_script->summonCreature.despawnDelay, (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL) ? true: false);
+            Creature* pCreature = pSource->SummonCreature(m_script->summonCreature.creatureEntry, x, y, z, o, m_script->summonCreature.despawnDelay ? TEMPSUMMON_TIMED_OR_DEAD_DESPAWN : TEMPSUMMON_DEAD_DESPAWN, m_script->summonCreature.despawnDelay, (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL) ? true : false);
             if (!pCreature)
             {
                 sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u failed for creature (entry: %u).", m_table, m_script->id, m_script->command, m_script->summonCreature.creatureEntry);
@@ -2037,7 +2037,7 @@ ScriptLoadResult ScriptMgr::LoadScriptLibrary(const char* libName)
         }
 
     // let check used mangosd revision for build library (unsafe use with different revision because changes in inline functions, define and etc)
-    char const* (MANGOS_IMPORT* pGetMangosRevStr)();
+    char const* (MANGOS_IMPORT * pGetMangosRevStr)();
 
     GET_SCRIPT_HOOK_PTR(pGetMangosRevStr,              "GetMangosRevStr");
 

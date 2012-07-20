@@ -39,7 +39,7 @@ enum LogFilters
     LOG_FILTER_TRANSPORT_MOVES    = 0x000001,               //  0 any related to transport moves
     LOG_FILTER_CREATURE_MOVES     = 0x000002,               //  1 creature move by cells
     LOG_FILTER_VISIBILITY_CHANGES = 0x000004,               //  2 update visibility for diff objects and players
-    LOG_FILTER_ACHIEVEMENT_UPDATES= 0x000008,               //  3 achievement update broadcasts
+    LOG_FILTER_ACHIEVEMENT_UPDATES = 0x000008,              //  3 achievement update broadcasts
     LOG_FILTER_WEATHER            = 0x000010,               //  4 weather changes
     LOG_FILTER_PLAYER_STATS       = 0x000020,               //  5 player save data
     LOG_FILTER_SQL_TEXT           = 0x000040,               //  6 raw SQL text send to DB engine
@@ -85,7 +85,7 @@ enum Color
     WHITE
 };
 
-const int Color_count = int(WHITE)+1;
+const int Color_count = int(WHITE) + 1;
 
 class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Thread_Mutex> >
 {
@@ -122,29 +122,29 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         void Initialize();
         void InitColors(const std::string& init_str);
 
-        void outCommand(uint32 account, const char* str, ...) ATTR_PRINTF(3,4);
+        void outCommand(uint32 account, const char* str, ...) ATTR_PRINTF(3, 4);
         void outString();                                   // any log level
         // any log level
-        void outString(const char* str, ...)      ATTR_PRINTF(2,3);
+        void outString(const char* str, ...)      ATTR_PRINTF(2, 3);
         // any log level
-        void outError(const char* err, ...)       ATTR_PRINTF(2,3);
+        void outError(const char* err, ...)       ATTR_PRINTF(2, 3);
         // log level >= 1
-        void outBasic(const char* str, ...)       ATTR_PRINTF(2,3);
+        void outBasic(const char* str, ...)       ATTR_PRINTF(2, 3);
         // log level >= 2
-        void outDetail(const char* str, ...)      ATTR_PRINTF(2,3);
+        void outDetail(const char* str, ...)      ATTR_PRINTF(2, 3);
         // log level >= 3
-        void outDebug(const char* str, ...)       ATTR_PRINTF(2,3);
+        void outDebug(const char* str, ...)       ATTR_PRINTF(2, 3);
 
         void outErrorDb();                                  // any log level
         // any log level
-        void outErrorDb(const char* str, ...)     ATTR_PRINTF(2,3);
+        void outErrorDb(const char* str, ...)     ATTR_PRINTF(2, 3);
         // any log level
-        void outChar(const char* str, ...)        ATTR_PRINTF(2,3);
+        void outChar(const char* str, ...)        ATTR_PRINTF(2, 3);
         // any log level
         void outWorldPacketDump(uint32 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming);
         // any log level
         void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name);
-        void outRALog(const char* str, ...)       ATTR_PRINTF(2,3);
+        void outRALog(const char* str, ...)       ATTR_PRINTF(2, 3);
         uint32 GetLogLevel() const { return m_logLevel; }
         void SetLogLevel(char* Level);
         void SetLogFileLevel(char* Level);
@@ -161,7 +161,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
         static void WaitBeforeContinueIfNeed();
     private:
-        FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
+        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
         FILE* raLogfile;
@@ -239,9 +239,9 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
     ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
 // primary for script library
-void MANGOS_DLL_SPEC outstring_log(const char* str, ...) ATTR_PRINTF(1,2);
-void MANGOS_DLL_SPEC detail_log(const char* str, ...) ATTR_PRINTF(1,2);
-void MANGOS_DLL_SPEC debug_log(const char* str, ...) ATTR_PRINTF(1,2);
-void MANGOS_DLL_SPEC error_log(const char* str, ...) ATTR_PRINTF(1,2);
-void MANGOS_DLL_SPEC error_db_log(const char* str, ...) ATTR_PRINTF(1,2);
+void MANGOS_DLL_SPEC outstring_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC detail_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC debug_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_db_log(const char* str, ...) ATTR_PRINTF(1, 2);
 #endif

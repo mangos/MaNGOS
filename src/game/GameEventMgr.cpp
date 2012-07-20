@@ -75,7 +75,7 @@ void GameEventMgr::StartEvent(uint16 event_id, bool overwrite /*=false*/, bool r
     {
         mGameEvent[event_id].start = time(NULL);
         if (mGameEvent[event_id].end <= mGameEvent[event_id].start)
-            mGameEvent[event_id].end = mGameEvent[event_id].start+mGameEvent[event_id].length;
+            mGameEvent[event_id].end = mGameEvent[event_id].start + mGameEvent[event_id].length;
     }
 }
 
@@ -86,7 +86,7 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
     {
         mGameEvent[event_id].start = time(NULL) - mGameEvent[event_id].length * MINUTE;
         if (mGameEvent[event_id].end <= mGameEvent[event_id].start)
-            mGameEvent[event_id].end = mGameEvent[event_id].start+mGameEvent[event_id].length;
+            mGameEvent[event_id].end = mGameEvent[event_id].start + mGameEvent[event_id].length;
     }
 }
 
@@ -106,7 +106,7 @@ void GameEventMgr::LoadFromDB()
         uint32 max_event_id = fields[0].GetUInt16();
         delete result;
 
-        mGameEvent.resize(max_event_id+1);
+        mGameEvent.resize(max_event_id + 1);
     }
 
     QueryResult* result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description FROM game_event");
@@ -176,14 +176,14 @@ void GameEventMgr::LoadFromDB()
         sLog.outString(">> Loaded %u game events", count);
     }
 
-    std::map<uint16,int16> pool2event;                      // for check unique spawn event associated with pool
-    std::map<uint32,int16> creature2event;                  // for check unique spawn event associated with creature
-    std::map<uint32,int16> go2event;                        // for check unique spawn event associated with gameobject
+    std::map<uint16, int16> pool2event;                     // for check unique spawn event associated with pool
+    std::map<uint32, int16> creature2event;                 // for check unique spawn event associated with creature
+    std::map<uint32, int16> go2event;                       // for check unique spawn event associated with gameobject
 
     // list only positive event top pools, filled at creature/gameobject loading
     mGameEventSpawnPoolIds.resize(mGameEvent.size());
 
-    mGameEventCreatureGuids.resize(mGameEvent.size()*2-1);
+    mGameEventCreatureGuids.resize(mGameEvent.size() * 2 - 1);
     //                                   1              2
     result = WorldDatabase.Query("SELECT creature.guid, game_event_creature.event "
                                  "FROM creature JOIN game_event_creature ON creature.guid = game_event_creature.guid");
@@ -262,7 +262,7 @@ void GameEventMgr::LoadFromDB()
         sLog.outString(">> Loaded %u creatures in game events", count);
     }
 
-    mGameEventGameobjectGuids.resize(mGameEvent.size()*2-1);
+    mGameEventGameobjectGuids.resize(mGameEvent.size() * 2 - 1);
     //                                   1                2
     result = WorldDatabase.Query("SELECT gameobject.guid, game_event_gameobject.event "
                                  "FROM gameobject JOIN game_event_gameobject ON gameobject.guid=game_event_gameobject.guid");
@@ -342,7 +342,7 @@ void GameEventMgr::LoadFromDB()
     }
 
     // now recheck that all eventPools linked with events after our skip pools with parents
-    for (std::map<uint16,int16>::const_iterator itr = pool2event.begin(); itr != pool2event.end();  ++itr)
+    for (std::map<uint16, int16>::const_iterator itr = pool2event.begin(); itr != pool2event.end();  ++itr)
     {
         uint16 pool_id = itr->first;
         int16 event_id = itr->second;
@@ -382,7 +382,7 @@ void GameEventMgr::LoadFromDB()
 
             if (event_id == 0)
             {
-                sLog.outErrorDb("`game_event_creature_data` game event id (%i) is reserved and can't be used." ,event_id);
+                sLog.outErrorDb("`game_event_creature_data` game event id (%i) is reserved and can't be used." , event_id);
                 continue;
             }
 
@@ -497,7 +497,7 @@ void GameEventMgr::LoadFromDB()
         sLog.outString(">> Loaded %u quest additions in game events", count);
     }
 
-    mGameEventMails.resize(mGameEvent.size()*2-1);
+    mGameEventMails.resize(mGameEvent.size() * 2 - 1);
 
     result = WorldDatabase.Query("SELECT event, raceMask, quest, mailTemplateId, senderEntry FROM game_event_mail");
 
@@ -707,7 +707,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventCreatureGuids.size());
+        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
         return;
     }
 
@@ -737,7 +737,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventGameobjectGuids.size());
+        sLog.outError("GameEventMgr::GameEventSpawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
         return;
     }
 
@@ -784,7 +784,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventCreatureGuids.size())
     {
-        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventCreatureGuids.size());
+        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventCreatureGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventCreatureGuids.size());
         return;
     }
 
@@ -814,7 +814,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
 
     if (internal_event_id < 0 || (size_t)internal_event_id >= mGameEventGameobjectGuids.size())
     {
-        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")",internal_event_id,mGameEventGameobjectGuids.size());
+        sLog.outError("GameEventMgr::GameEventUnspawn attempt access to out of range mGameEventGameobjectGuids element %i (size: " SIZEFMTD ")", internal_event_id, mGameEventGameobjectGuids.size());
         return;
     }
 

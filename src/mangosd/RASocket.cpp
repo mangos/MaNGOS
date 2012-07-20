@@ -33,12 +33,12 @@
 
 /// RASocket constructor
 RASocket::RASocket()
-    :RAHandler(),
-     pendingCommands(0, USYNC_THREAD, "pendingCommands"),
-     outActive(false),
-     inputBufferLen(0),
-     outputBufferLen(0),
-     stage(NONE)
+    : RAHandler(),
+      pendingCommands(0, USYNC_THREAD, "pendingCommands"),
+      outActive(false),
+      inputBufferLen(0),
+      outputBufferLen(0),
+      stage(NONE)
 {
     ///- Get the config parameters
     bSecure = sConfig.GetBoolDefault("RA.Secure", true);
@@ -72,7 +72,7 @@ int RASocket::open(void*)
     }
 
 
-    sLog.outRALog("Incoming connection from %s.",remote_addr.get_host_addr());
+    sLog.outRALog("Incoming connection from %s.", remote_addr.get_host_addr());
 
     ///- print Motd
     sendf(sWorld.GetMotd());
@@ -133,10 +133,10 @@ int RASocket::handle_output(ACE_HANDLE)
     ssize_t n = peer().send(outputBuffer, outputBufferLen);
 #endif // MSG_NOSIGNAL
 
-    if (n<=0)
+    if (n <= 0)
         return -1;
 
-    ACE_OS::memmove(outputBuffer, outputBuffer+n, outputBufferLen-n);
+    ACE_OS::memmove(outputBuffer, outputBuffer + n, outputBufferLen - n);
 
     outputBufferLen -= n;
 
@@ -153,7 +153,7 @@ int RASocket::handle_input(ACE_HANDLE)
         return -1;
     }
 
-    size_t readBytes = peer().recv(inputBuffer+inputBufferLen, RA_BUFF_SIZE-inputBufferLen-1);
+    size_t readBytes = peer().recv(inputBuffer + inputBufferLen, RA_BUFF_SIZE - inputBufferLen - 1);
 
     if (readBytes <= 0)
     {
@@ -162,13 +162,13 @@ int RASocket::handle_input(ACE_HANDLE)
     }
 
     ///- Discard data after line break or line feed
-    bool gotenter=false;
+    bool gotenter = false;
     for (; readBytes > 0 ; --readBytes)
     {
         char c = inputBuffer[inputBufferLen];
-        if (c=='\r'|| c=='\n')
+        if (c == '\r' || c == '\n')
         {
-            gotenter=true;
+            gotenter = true;
             break;
         }
         ++inputBufferLen;
@@ -176,14 +176,14 @@ int RASocket::handle_input(ACE_HANDLE)
 
     if (gotenter)
     {
-        inputBuffer[inputBufferLen]=0;
-        inputBufferLen=0;
+        inputBuffer[inputBufferLen] = 0;
+        inputBufferLen = 0;
         switch (stage)
         {
                 /// <ul> <li> If the input is '<username>'
             case NONE:
             {
-                std::string szLogin=inputBuffer;
+                std::string szLogin = inputBuffer;
 
                 accId = sAccountMgr.GetId(szLogin);
 
@@ -191,7 +191,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 if (!accId)
                 {
                     sendf("-No such user.\r\n");
-                    sLog.outRALog("User %s does not exist.",szLogin.c_str());
+                    sLog.outRALog("User %s does not exist.", szLogin.c_str());
                     if (bSecure)
                     {
                         handle_output();
@@ -208,7 +208,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 if (accAccessLevel < iMinLevel)
                 {
                     sendf("-Not enough privileges.\r\n");
-                    sLog.outRALog("User %s has no privilege.",szLogin.c_str());
+                    sLog.outRALog("User %s has no privilege.", szLogin.c_str());
                     if (bSecure)
                     {
                         handle_output();
@@ -223,7 +223,7 @@ int RASocket::handle_input(ACE_HANDLE)
                 if (accAccessLevel >= SEC_ADMINISTRATOR && !bStricted)
                     accAccessLevel = SEC_CONSOLE;
 
-                stage=LG;
+                stage = LG;
                 sendf(sObjectMgr.GetMangosStringForDBCLocale(LANG_RA_PASS));
                 break;
             }
@@ -235,7 +235,7 @@ int RASocket::handle_input(ACE_HANDLE)
 
                 if (sAccountMgr.CheckPassword(accId, pw))
                 {
-                    stage=OK;
+                    stage = OK;
 
                     sendf("+Logged in.\r\n");
                     sLog.outRALog("User account %u has logged in.", accId);
@@ -260,8 +260,8 @@ int RASocket::handle_input(ACE_HANDLE)
             case OK:
                 if (strlen(inputBuffer))
                 {
-                    sLog.outRALog("Got '%s' cmd.",inputBuffer);
-                    if (strncmp(inputBuffer,"quit",4)==0)
+                    sLog.outRALog("Got '%s' cmd.", inputBuffer);
+                    if (strncmp(inputBuffer, "quit", 4) == 0)
                         return -1;
                     else
                     {
@@ -306,10 +306,10 @@ int RASocket::sendf(const char* msg)
 
     int msgLen = strlen(msg);
 
-    if (msgLen+outputBufferLen > RA_BUFF_SIZE)
+    if (msgLen + outputBufferLen > RA_BUFF_SIZE)
         return -1;
 
-    ACE_OS::memcpy(outputBuffer+outputBufferLen, msg, msgLen);
+    ACE_OS::memcpy(outputBuffer + outputBufferLen, msg, msgLen);
     outputBufferLen += msgLen;
 
     if (!outActive)

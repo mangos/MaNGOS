@@ -47,10 +47,10 @@ struct FactionState
     bool needSave;
 };
 
-typedef std::map<RepListID,FactionState> FactionStateList;
-typedef std::pair<FactionStateList::const_iterator,FactionStateList::const_iterator> FactionStateListPair;
+typedef std::map<RepListID, FactionState> FactionStateList;
+typedef std::pair<FactionStateList::const_iterator, FactionStateList::const_iterator> FactionStateListPair;
 
-typedef std::map<uint32,ReputationRank> ForcedReactions;
+typedef std::map<uint32, ReputationRank> ForcedReactions;
 
 class Player;
 class QueryResult;
@@ -117,7 +117,7 @@ class ReputationMgr
         void SetAtWar(RepListID repListID, bool on);
         void SetInactive(RepListID repListID, bool on);
 
-        void ApplyForceReaction(uint32 faction_id,ReputationRank rank,bool apply);
+        void ApplyForceReaction(uint32 faction_id, ReputationRank rank, bool apply);
 
     public:                                                 // senders
         void SendInitialReputations();
@@ -138,10 +138,10 @@ class ReputationMgr
         Player* m_player;
         FactionStateList m_factions;
         ForcedReactions m_forcedReactions;
-        uint8 m_visibleFactionCount :8;
-        uint8 m_honoredFactionCount :8;
-        uint8 m_reveredFactionCount :8;
-        uint8 m_exaltedFactionCount :8;
+        uint8 m_visibleFactionCount : 8;
+        uint8 m_honoredFactionCount : 8;
+        uint8 m_reveredFactionCount : 8;
+        uint8 m_exaltedFactionCount : 8;
 };
 
 #endif

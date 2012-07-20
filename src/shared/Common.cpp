@@ -50,7 +50,7 @@ LocaleNameStr const fullLocaleNameList[] =
 LocaleConstant GetLocaleByName(const std::string& name)
 {
     for (LocaleNameStr const* itr = &fullLocaleNameList[0]; itr->name; ++itr)
-        if (name==itr->name)
+        if (name == itr->name)
             return itr->locale;
 
     return LOCALE_enUS;                                     // including enGB case

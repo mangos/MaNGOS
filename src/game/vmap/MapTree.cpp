@@ -35,7 +35,7 @@ namespace VMAP
     {
         public:
             MapRayCallback(ModelInstance* val): prims(val), hit(false) {}
-            bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit=true)
+            bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
             {
                 bool result = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
                 if (result)
@@ -121,7 +121,7 @@ namespace VMAP
     StaticMapTree::StaticMapTree(uint32 mapID, const std::string& basePath):
         iMapID(mapID), iTreeValues(0), iBasePath(basePath)
     {
-        if (iBasePath.length() > 0 && (iBasePath[iBasePath.length()-1] != '/' && iBasePath[iBasePath.length()-1] != '\\'))
+        if (iBasePath.length() > 0 && (iBasePath[iBasePath.length() - 1] != '/' && iBasePath[iBasePath.length() - 1] != '\\'))
             iBasePath.append("/");
     }
 
@@ -158,7 +158,7 @@ namespace VMAP
         if (maxDist < 1e-10f)
             return true;
         // direction with length of 1
-        G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1)/maxDist);
+        G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
         if (getIntersectionTime(ray, maxDist, true))
             return false;
 
@@ -172,7 +172,7 @@ namespace VMAP
 
     bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
     {
-        bool result=false;
+        bool result = false;
         float maxDist = (pPos2 - pPos1).magnitude();
         // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
         MANGOS_ASSERT(maxDist < std::numeric_limits<float>::max());
@@ -182,7 +182,7 @@ namespace VMAP
             pResultHitPos = pPos2;
             return false;
         }
-        Vector3 dir = (pPos2 - pPos1)/maxDist;              // direction with length of 1
+        Vector3 dir = (pPos2 - pPos1) / maxDist;            // direction with length of 1
         G3D::Ray ray(pPos1, dir);
         float dist = maxDist;
         if (getIntersectionTime(ray, dist, false))
@@ -192,7 +192,7 @@ namespace VMAP
             {
                 if ((pResultHitPos - pPos1).magnitude() > -pModifyDist)
                 {
-                    pResultHitPos = pResultHitPos + dir*pModifyDist;
+                    pResultHitPos = pResultHitPos + dir * pModifyDist;
                 }
                 else
                 {
@@ -201,7 +201,7 @@ namespace VMAP
             }
             else
             {
-                pResultHitPos = pResultHitPos + dir*pModifyDist;
+                pResultHitPos = pResultHitPos + dir * pModifyDist;
             }
             result = true;
         }
@@ -218,7 +218,7 @@ namespace VMAP
     float StaticMapTree::getHeight(const Vector3& pPos, float maxSearchDist) const
     {
         float height = G3D::inf();
-        Vector3 dir = Vector3(0,0,-1);
+        Vector3 dir = Vector3(0, 0, -1);
         G3D::Ray ray(pPos, dir);   // direction with length of 1
         float maxDist = maxSearchDist;
         if (getIntersectionTime(ray, maxDist, false))
@@ -233,7 +233,7 @@ namespace VMAP
     bool StaticMapTree::CanLoadMap(const std::string& vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
     {
         std::string basePath = vmapPath;
-        if (basePath.length() > 0 && (basePath[basePath.length()-1] != '/' && basePath[basePath.length()-1] != '\\'))
+        if (basePath.length() > 0 && (basePath[basePath.length() - 1] != '/' && basePath[basePath.length() - 1] != '\\'))
             basePath.append("/");
         std::string fullname = basePath + VMapManager2::getMapFileName(mapID);
         bool success = true;
@@ -363,7 +363,7 @@ namespace VMAP
             uint32 numSpawns;
             if (result && fread(&numSpawns, sizeof(uint32), 1, tf) != 1)
                 result = false;
-            for (uint32 i=0; i<numSpawns && result; ++i)
+            for (uint32 i = 0; i < numSpawns && result; ++i)
             {
                 // read model spawns
                 ModelSpawn spawn;
@@ -428,14 +428,14 @@ namespace VMAP
             FILE* tf = fopen(tilefile.c_str(), "rb");
             if (tf)
             {
-                bool result=true;
+                bool result = true;
                 char chunk[8];
                 if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
                     result = false;
                 uint32 numSpawns;
                 if (fread(&numSpawns, sizeof(uint32), 1, tf) != 1)
                     result = false;
-                for (uint32 i=0; i<numSpawns && result; ++i)
+                for (uint32 i = 0; i < numSpawns && result; ++i)
                 {
                     // read model spawns
                     ModelSpawn spawn;

@@ -115,7 +115,7 @@ void Corpse::SaveToDB()
         << GetPositionZ() << ", "
         << GetOrientation() << ", "
         << GetMapId() << ", "
-        << uint64(m_time) <<", "
+        << uint64(m_time) << ", "
         << uint32(GetType()) << ", "
         << int(GetInstanceId()) << ", "
         << uint16(GetPhaseMask()) << ")";           // prevent out of range error
@@ -155,7 +155,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     //QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10         11      12    13     14           15            16              17       18
     //    "time, corpse_type, instance, phaseMask, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse"
-    uint32 playerLowGuid= fields[1].GetUInt32();
+    uint32 playerLowGuid = fields[1].GetUInt32();
     float positionX     = fields[2].GetFloat();
     float positionY     = fields[3].GetFloat();
     float positionZ     = fields[4].GetFloat();
@@ -277,7 +277,7 @@ bool Corpse::IsFriendlyTo(Unit const* unit) const
 bool Corpse::IsExpired(time_t t) const
 {
     if (m_type == CORPSE_BONES)
-        return m_time < t - 60*MINUTE;
+        return m_time < t - 60 * MINUTE;
     else
-        return m_time < t - 3*DAY;
+        return m_time < t - 3 * DAY;
 }

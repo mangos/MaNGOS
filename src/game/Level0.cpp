@@ -83,7 +83,7 @@ bool ChatHandler::HandleStartCommand(char* /*args*/)
     }
 
     // cast spell Stuck
-    chr->CastSpell(chr,7355,false);
+    chr->CastSpell(chr, 7355, false);
     return true;
 }
 
@@ -97,9 +97,9 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
 
     char const* full;
     if (m_session)
-        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,"|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
+        full = _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, "|cffffffff|Hurl:" REVISION_ID "|h" REVISION_ID "|h|r");
     else
-        full = _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID);
+        full = _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID);
     SendSysMessage(full);
 
     if (sScriptMgr.IsScriptLibraryLoaded())
@@ -113,8 +113,8 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
     else
         SendSysMessage(LANG_USING_SCRIPT_LIB_NONE);
 
-    PSendSysMessage(LANG_USING_WORLD_DB,sWorld.GetDBVersion());
-    PSendSysMessage(LANG_USING_EVENT_AI,sWorld.GetCreatureEventAIVersion());
+    PSendSysMessage(LANG_USING_WORLD_DB, sWorld.GetDBVersion());
+    PSendSysMessage(LANG_USING_EVENT_AI, sWorld.GetCreatureEventAIVersion());
     PSendSysMessage(LANG_CONNECTED_USERS, activeClientsNum, maxActiveClientsNum, queuedClientsNum, maxQueuedClientsNum);
     PSendSysMessage(LANG_UPTIME, str.c_str());
 
@@ -145,7 +145,7 @@ bool ChatHandler::HandleDismountCommand(char* /*args*/)
 
 bool ChatHandler::HandleSaveCommand(char* /*args*/)
 {
-    Player* player=m_session->GetPlayer();
+    Player* player = m_session->GetPlayer();
 
     // save GM account without delay and output message (testing, etc)
     if (GetAccessLevel() > SEC_PLAYER)
@@ -157,7 +157,7 @@ bool ChatHandler::HandleSaveCommand(char* /*args*/)
 
     // save or plan save after 20 sec (logout delay) if current next save time more this value and _not_ output any messages to prevent cheat planning
     uint32 save_interval = sWorld.getConfig(CONFIG_UINT32_INTERVAL_SAVE);
-    if (save_interval==0 || (save_interval > 20*IN_MILLISECONDS && player->GetSaveTimer() <= save_interval - 20*IN_MILLISECONDS))
+    if (save_interval == 0 || (save_interval > 20 * IN_MILLISECONDS && player->GetSaveTimer() <= save_interval - 20 * IN_MILLISECONDS))
         player->SaveToDB();
 
     return true;

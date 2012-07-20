@@ -45,7 +45,7 @@ WaypointBehavior::WaypointBehavior(const WaypointBehavior& b)
     spell = b.spell;
     model1 = b.model1;
     model2 = b.model2;
-    for (int i=0; i < MAX_WAYPOINT_TEXT; ++i)
+    for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
         textid[i] = b.textid[i];
 }
 
@@ -128,7 +128,7 @@ void WaypointManager::Load()
             // the cleanup queries make sure the following is true
             MANGOS_ASSERT(point >= 1 && point <= path.size());
 
-            WaypointNode& node  = path[point-1];
+            WaypointNode& node  = path[point - 1];
 
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
@@ -181,7 +181,7 @@ void WaypointManager::Load()
 
             for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
             {
-                be.textid[i]    = fields[7+i].GetUInt32();
+                be.textid[i]    = fields[7 + i].GetUInt32();
 
                 if (be.textid[i])
                 {
@@ -202,7 +202,7 @@ void WaypointManager::Load()
             if (be.emote)
             {
                 if (!sEmotesStore.LookupEntry(be.emote))
-                    sLog.outErrorDb("Waypoint path %u (Point %u) are using emote %u, but emote does not exist.",id, point, be.emote);
+                    sLog.outErrorDb("Waypoint path %u (Point %u) are using emote %u, but emote does not exist.", id, point, be.emote);
             }
 
             // save memory by not storing empty behaviors
@@ -301,7 +301,7 @@ void WaypointManager::Load()
             // the cleanup queries make sure the following is true
             MANGOS_ASSERT(point >= 1 && point <= path.size());
 
-            WaypointNode& node  = path[point-1];
+            WaypointNode& node  = path[point - 1];
 
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
@@ -344,7 +344,7 @@ void WaypointManager::Load()
 
             for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
             {
-                be.textid[i]    = fields[7+i].GetUInt32();
+                be.textid[i]    = fields[7 + i].GetUInt32();
 
                 if (be.textid[i])
                 {
@@ -493,7 +493,7 @@ void WaypointManager::DeleteNode(uint32 id, uint32 point)
     WorldDatabase.PExecuteLog("UPDATE creature_movement SET point=point-1 WHERE id=%u AND point>%u", id, point);
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if (itr != m_pathMap.end() && point <= itr->second.size())
-        itr->second.erase(itr->second.begin() + (point-1));
+        itr->second.erase(itr->second.begin() + (point - 1));
 }
 
 void WaypointManager::DeletePath(uint32 id)
@@ -515,9 +515,9 @@ void WaypointManager::SetNodePosition(uint32 id, uint32 point, float x, float y,
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if (itr != m_pathMap.end() && point <= itr->second.size())
     {
-        itr->second[point-1].x = x;
-        itr->second[point-1].y = y;
-        itr->second[point-1].z = z;
+        itr->second[point - 1].x = x;
+        itr->second[point - 1].y = y;
+        itr->second[point - 1].z = z;
     }
 }
 
@@ -542,7 +542,7 @@ void WaypointManager::SetNodeText(uint32 id, uint32 point, const char* text_fiel
     WaypointPathMap::iterator itr = m_pathMap.find(id);
     if (itr != m_pathMap.end() && point <= itr->second.size())
     {
-        WaypointNode& node = itr->second[point-1];
+        WaypointNode& node = itr->second[point - 1];
         if (!node.behavior) node.behavior = new WaypointBehavior();
 
 //        if(field == "text1") node.behavior->text[0] = text ? text : "";
@@ -595,7 +595,7 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                     if (zeroCount)
                     {
                         // Correct textid but some zeros leading, so move it forward.
-                        be->textid[j-zeroCount] = be->textid[j];
+                        be->textid[j - zeroCount] = be->textid[j];
                         be->textid[j] = 0;
                     }
                 }
@@ -639,7 +639,7 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                     if (zeroCount)
                     {
                         // Correct textid but some zeros leading, so move it forward.
-                        be->textid[j-zeroCount] = be->textid[j];
+                        be->textid[j - zeroCount] = be->textid[j];
                         be->textid[j] = 0;
                     }
                 }

@@ -201,7 +201,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     m_lootThreshold = ItemQualities(fields[4].GetUInt16());
 
     for (int i = 0; i < TARGET_ICON_COUNT; ++i)
-        m_targetIcons[i] = ObjectGuid(fields[5+i].GetUInt64());
+        m_targetIcons[i] = ObjectGuid(fields[5 + i].GetUInt64());
 
     return true;
 }
@@ -279,7 +279,7 @@ uint32 Group::RemoveInvite(Player* player)
 
 void Group::RemoveAllInvites()
 {
-    for (InvitesList::iterator itr = m_invitees.begin(); itr!=m_invitees.end(); ++itr)
+    for (InvitesList::iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
         (*itr)->SetGroupInvite(NULL);
 
     m_invitees.clear();
@@ -317,8 +317,8 @@ bool Group::AddMember(ObjectGuid guid, const char* name)
         {
             // reset the new member's instances, unless he is currently in one of them
             // including raid/heroic instances that they are not permanently bound to!
-            player->ResetInstances(INSTANCE_RESET_GROUP_JOIN,false);
-            player->ResetInstances(INSTANCE_RESET_GROUP_JOIN,true);
+            player->ResetInstances(INSTANCE_RESET_GROUP_JOIN, false);
+            player->ResetInstances(INSTANCE_RESET_GROUP_JOIN, true);
 
             if (player->getLevel() >= LEVELREQUIREMENT_HEROIC)
             {
@@ -373,7 +373,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 method)
             }
             else
             {
-                data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+                data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
                 data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
                 data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
                 player->GetSession()->SendPacket(&data);
@@ -384,7 +384,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 method)
 
         if (leaderChanged)
         {
-            WorldPacket data(SMSG_GROUP_SET_LEADER, (m_memberSlots.front().name.size()+1));
+            WorldPacket data(SMSG_GROUP_SET_LEADER, (m_memberSlots.front().name.size() + 1));
             data << m_memberSlots.front().name;
             BroadcastPacket(&data, true);
         }
@@ -406,7 +406,7 @@ void Group::ChangeLeader(ObjectGuid guid)
 
     _setLeader(guid);
 
-    WorldPacket data(SMSG_GROUP_SET_LEADER, slot->name.size()+1);
+    WorldPacket data(SMSG_GROUP_SET_LEADER, slot->name.size() + 1);
     data << slot->name;
     BroadcastPacket(&data, true);
     SendUpdate();
@@ -456,7 +456,7 @@ void Group::Disband(bool hideDestroy)
         }
         else
         {
-            data.Initialize(SMSG_GROUP_LIST, 1+1+1+1+8+4+4+8);
+            data.Initialize(SMSG_GROUP_LIST, 1 + 1 + 1 + 1 + 8 + 4 + 4 + 8);
             data << uint8(0x10) << uint8(0) << uint8(0) << uint8(0);
             data << uint64(0) << uint32(0) << uint32(0) << uint64(0);
             player->GetSession()->SendPacket(&data);
@@ -489,7 +489,7 @@ void Group::Disband(bool hideDestroy)
 
 void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
 {
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8+4+4+4+4+4+4+1));
+    WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(mapid);                                  // 3.3.3 mapid
     data << uint32(r.itemSlot);                             // item slot in loot
@@ -513,7 +513,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
 
         // dependent from player
         RollVoteMask mask = r.GetVoteMaskFor(p);
-        data.put<uint8>(voteMaskPos,uint8(mask));
+        data.put<uint8>(voteMaskPos, uint8(mask));
 
         p->GetSession()->SendPacket(&data);
     }
@@ -521,7 +521,7 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
 
 void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll& r)
 {
-    WorldPacket data(SMSG_LOOT_ROLL, (8+4+8+4+4+4+1+1+1));
+    WorldPacket data(SMSG_LOOT_ROLL, (8 + 4 + 8 + 4 + 4 + 4 + 1 + 1 + 1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(r.itemSlot);                             // unknown, maybe amount of players, or item slot in loot
     data << targetGuid;
@@ -545,7 +545,7 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
 
 void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll& r)
 {
-    WorldPacket data(SMSG_LOOT_ROLL_WON, (8+4+4+4+4+8+1+1));
+    WorldPacket data(SMSG_LOOT_ROLL_WON, (8 + 4 + 4 + 4 + 4 + 8 + 1 + 1));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(r.itemSlot);                             // item slot in loot
     data << uint32(r.itemid);                               // the itemEntryId for the item that shall be rolled for
@@ -568,14 +568,14 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, Roll
 
 void Group::SendLootAllPassed(Roll const& r)
 {
-    WorldPacket data(SMSG_LOOT_ALL_PASSED, (8+4+4+4+4));
+    WorldPacket data(SMSG_LOOT_ALL_PASSED, (8 + 4 + 4 + 4 + 4));
     data << r.lootedTargetGUID;                             // creature guid what we're looting
     data << uint32(r.itemSlot);                             // item slot in loot
     data << uint32(r.itemid);                               // The itemEntryId for the item that shall be rolled for
     data << uint32(r.itemRandomPropId);                     // Item random property ID
     data << uint32(r.itemRandomSuffix);                     // Item random suffix ID
 
-    for (Roll::PlayerVote::const_iterator itr=r.playerVote.begin(); itr!=r.playerVote.end(); ++itr)
+    for (Roll::PlayerVote::const_iterator itr = r.playerVote.begin(); itr != r.playerVote.end(); ++itr)
     {
         Player* p = sObjectMgr.GetPlayer(itr->first);
         if (!p || !p->GetSession())
@@ -632,7 +632,7 @@ void Group::NeedBeforeGreed(WorldObject* pSource, Loot* loot)
 
 void Group::MasterLoot(WorldObject* pSource, Loot* loot)
 {
-    for (LootItemList::iterator i=loot->items.begin(); i != loot->items.end(); ++i)
+    for (LootItemList::iterator i = loot->items.begin(); i != loot->items.end(); ++i)
     {
         ItemPrototype const* item = ObjectMgr::GetItemPrototype(i->itemid);
         if (!item)
@@ -955,7 +955,7 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid)
 
     m_targetIcons[id] = targetGuid;
 
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1+8+1+8));
+    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + 8 + 1 + 8));
     data << uint8(0);                                       // set targets
     data << whoGuid;
     data << uint8(id);
@@ -975,7 +975,7 @@ static void GetDataForXPAtKill_helper(Player* player, Unit const* victim, uint32
         not_gray_member_with_max_level = player;
 }
 
-void Group::GetDataForXPAtKill(Unit const* victim, uint32& count,uint32& sum_level, Player*& member_with_max_level, Player*& not_gray_member_with_max_level, Player* additional)
+void Group::GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_level, Player*& member_with_max_level, Player*& not_gray_member_with_max_level, Player* additional)
 {
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
@@ -991,7 +991,7 @@ void Group::GetDataForXPAtKill(Unit const* victim, uint32& count,uint32& sum_lev
             continue;
 
         ++count;
-        GetDataForXPAtKill_helper(member,victim,sum_level,member_with_max_level,not_gray_member_with_max_level);
+        GetDataForXPAtKill_helper(member, victim, sum_level, member_with_max_level, not_gray_member_with_max_level);
     }
 
     if (additional)
@@ -999,7 +999,7 @@ void Group::GetDataForXPAtKill(Unit const* victim, uint32& count,uint32& sum_lev
         if (additional->IsAtGroupRewardDistance(victim))    // at req. distance
         {
             ++count;
-            GetDataForXPAtKill_helper(additional,victim,sum_level,member_with_max_level,not_gray_member_with_max_level);
+            GetDataForXPAtKill_helper(additional, victim, sum_level, member_with_max_level, not_gray_member_with_max_level);
         }
     }
 }
@@ -1009,7 +1009,7 @@ void Group::SendTargetIconList(WorldSession* session)
     if (!session)
         return;
 
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1+TARGET_ICON_COUNT*9));
+    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + TARGET_ICON_COUNT * 9));
     data << uint8(1);                                       // list targets
 
     for (int i = 0; i < TARGET_ICON_COUNT; ++i)
@@ -1032,7 +1032,7 @@ void Group::SendUpdate()
         if (!player || !player->GetSession() || player->GetGroup() != this)
             continue;
         // guess size
-        WorldPacket data(SMSG_GROUP_LIST, (1+1+1+1+8+4+GetMembersCount()*20));
+        WorldPacket data(SMSG_GROUP_LIST, (1 + 1 + 1 + 1 + 8 + 4 + GetMembersCount() * 20));
         data << uint8(m_groupType);                         // group type (flags in 3.3)
         data << uint8(citr->group);                         // groupid
         data << uint8(GetFlags(*citr));                     // group flags
@@ -1044,7 +1044,7 @@ void Group::SendUpdate()
         }
         data << GetObjectGuid();                            // group guid
         data << uint32(0);                                  // 3.3, this value increments every time SMSG_GROUP_LIST is sent
-        data << uint32(GetMembersCount()-1);
+        data << uint32(GetMembersCount() - 1);
         for (member_citerator citr2 = m_memberSlots.begin(); citr2 != m_memberSlots.end(); ++citr2)
         {
             if (citr->guid == citr2->guid)
@@ -1062,7 +1062,7 @@ void Group::SendUpdate()
         }
 
         data << m_leaderGuid;                               // leader guid
-        if (GetMembersCount()-1)
+        if (GetMembersCount() - 1)
         {
             data << uint8(m_lootMethod);                    // loot method
             data << m_looterGuid;                           // looter guid
@@ -1212,7 +1212,7 @@ bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant, uint
     {
         // insert into group table
         CharacterDatabase.PExecute("INSERT INTO group_member(groupId,memberGuid,assistant,subgroup) VALUES('%u','%u','%u','%u')",
-                                   m_Id, member.guid.GetCounter(), ((member.assistant==1)?1:0), member.group);
+                                   m_Id, member.guid.GetCounter(), ((member.assistant == 1) ? 1 : 0), member.group);
     }
 
     return true;
@@ -1373,7 +1373,7 @@ bool Group::_setAssistantFlag(ObjectGuid guid, const bool& state)
 
     slot->assistant = state;
     if (!isBGGroup())
-        CharacterDatabase.PExecute("UPDATE group_member SET assistant='%u' WHERE memberGuid='%u'", (state==true)?1:0, guid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE group_member SET assistant='%u' WHERE memberGuid='%u'", (state == true) ? 1 : 0, guid.GetCounter());
     return true;
 }
 
@@ -1780,7 +1780,7 @@ InstanceGroupBind* Group::GetBoundInstance(uint32 mapid, Player* player)
     Difficulty difficulty = player->GetDifficulty(mapEntry->IsRaid());
 
     // some instances only have one difficulty
-    MapDifficulty const* mapDiff = GetMapDifficultyData(mapid,difficulty);
+    MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
     if (!mapDiff)
         difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
@@ -1794,7 +1794,7 @@ InstanceGroupBind* Group::GetBoundInstance(uint32 mapid, Player* player)
 InstanceGroupBind* Group::GetBoundInstance(Map* aMap, Difficulty difficulty)
 {
     // some instances only have one difficulty
-    MapDifficulty const* mapDiff = GetMapDifficultyData(aMap->GetId(),difficulty);
+    MapDifficulty const* mapDiff = GetMapDifficultyData(aMap->GetId(), difficulty);
     if (!mapDiff)
         return NULL;
 
@@ -1873,7 +1873,7 @@ static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 co
 {
     // honor can be in PvP and !PvP (racial leader) cases (for alive)
     if (pGroupGuy->isAlive())
-        pGroupGuy->RewardHonor(pVictim,count);
+        pGroupGuy->RewardHonor(pVictim, count);
 
     // xp and reputation only in !PvP case
     if (!PvP)
@@ -1882,24 +1882,24 @@ static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 co
 
         // if is in dungeon then all receive full reputation at kill
         // rewarded any alive/dead/near_corpse group member
-        pGroupGuy->RewardReputation(pVictim,is_dungeon ? 1.0f : rate);
+        pGroupGuy->RewardReputation(pVictim, is_dungeon ? 1.0f : rate);
 
         // XP updated only for alive group member
         if (pGroupGuy->isAlive() && not_gray_member_with_max_level &&
                 pGroupGuy->getLevel() <= not_gray_member_with_max_level->getLevel())
         {
-            uint32 itr_xp = (member_with_max_level == not_gray_member_with_max_level) ? uint32(xp*rate) : uint32((xp*rate/2)+1);
+            uint32 itr_xp = (member_with_max_level == not_gray_member_with_max_level) ? uint32(xp * rate) : uint32((xp * rate / 2) + 1);
 
             pGroupGuy->GiveXP(itr_xp, pVictim);
             if (Pet* pet = pGroupGuy->GetPet())
-                pet->GivePetXP(itr_xp/2);
+                pet->GivePetXP(itr_xp / 2);
         }
 
         // quest objectives updated only for alive group member or dead but with not released body
-        if (pGroupGuy->isAlive()|| !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        if (pGroupGuy->isAlive() || !pGroupGuy->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         {
             // normal creature (not pet/etc) can be only in !PvP case
-            if (pVictim->GetTypeId()==TYPEID_UNIT)
+            if (pVictim->GetTypeId() == TYPEID_UNIT)
                 if (CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(pVictim->GetEntry()))
                     pGroupGuy->KilledMonster(normalInfo, pVictim->GetObjectGuid());
         }
@@ -1925,7 +1925,7 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* player_tap)
     Player* member_with_max_level = NULL;
     Player* not_gray_member_with_max_level = NULL;
 
-    GetDataForXPAtKill(pVictim,count,sum_level,member_with_max_level,not_gray_member_with_max_level,player_tap);
+    GetDataForXPAtKill(pVictim, count, sum_level, member_with_max_level, not_gray_member_with_max_level, player_tap);
 
     if (member_with_max_level)
     {
@@ -1935,7 +1935,7 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* player_tap)
         /// skip in check PvP case (for speed, not used)
         bool is_raid = PvP ? false : sMapStore.LookupEntry(pVictim->GetMapId())->IsRaid() && isRaidGroup();
         bool is_dungeon = PvP ? false : sMapStore.LookupEntry(pVictim->GetMapId())->IsDungeon();
-        float group_rate = MaNGOS::XP::xp_in_group_rate(count,is_raid);
+        float group_rate = MaNGOS::XP::xp_in_group_rate(count, is_raid);
 
         for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
         {
@@ -1944,7 +1944,7 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* player_tap)
                 continue;
 
             // will proccessed later
-            if (pGroupGuy==player_tap)
+            if (pGroupGuy == player_tap)
                 continue;
 
             if (!pGroupGuy->IsAtGroupRewardDistance(pVictim))

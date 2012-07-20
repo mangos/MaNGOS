@@ -61,7 +61,7 @@ namespace Movement
 
     using G3D::Matrix4;
     static const Matrix4 s_catmullRomCoeffs(
-        -0.5f, 1.5f,-1.5f, 0.5f,
+        -0.5f, 1.5f, -1.5f, 0.5f,
         1.f, -2.5f, 2.f, -0.5f,
         -0.5f, 0.f,  0.5f, 0.f,
         0.f,  1.f,  0.f,  0.f);
@@ -98,7 +98,7 @@ namespace Movement
 
     inline void C_Evaluate(const Vector3* vertice, float t, const Matrix4& matr, Vector3& result)
     {
-        Vector4 tvec(t*t*t, t*t, t, 1.f);
+        Vector4 tvec(t * t * t, t * t, t, 1.f);
         Vector4 weights(tvec * matr);
 
         result = vertice[0] * weights[0] + vertice[1] * weights[1]
@@ -107,7 +107,7 @@ namespace Movement
 
     inline void C_Evaluate_Derivative(const Vector3* vertice, float t, const Matrix4& matr, Vector3& result)
     {
-        Vector4 tvec(3.f*t*t, 2.f*t, 1.f, 0.f);
+        Vector4 tvec(3.f * t * t, 2.f * t, 1.f, 0.f);
         Vector4 weights(tvec * matr);
 
         result = vertice[0] * weights[0] + vertice[1] * weights[1]
@@ -117,7 +117,7 @@ namespace Movement
     void SplineBase::EvaluateLinear(index_type index, float u, Vector3& result) const
     {
         MANGOS_ASSERT(index >= index_lo && index < index_hi);
-        result = points[index] + (points[index+1] - points[index]) * u;
+        result = points[index] + (points[index + 1] - points[index]) * u;
     }
 
     void SplineBase::EvaluateCatmullRom(index_type index, float t, Vector3& result) const
@@ -136,7 +136,7 @@ namespace Movement
     void SplineBase::EvaluateDerivativeLinear(index_type index, float, Vector3& result) const
     {
         MANGOS_ASSERT(index >= index_lo && index < index_hi);
-        result = points[index+1] - points[index];
+        result = points[index + 1] - points[index];
     }
 
     void SplineBase::EvaluateDerivativeCatmullRom(index_type index, float t, Vector3& result) const
@@ -155,7 +155,7 @@ namespace Movement
     float SplineBase::SegLengthLinear(index_type index) const
     {
         MANGOS_ASSERT(index >= index_lo && index < index_hi);
-        return (points[index] - points[index+1]).length();
+        return (points[index] - points[index + 1]).length();
     }
 
     float SplineBase::SegLengthCatmullRom(index_type index) const
@@ -225,14 +225,14 @@ namespace Movement
 
         points.resize(real_size);
 
-        memcpy(&points[0],controls, sizeof(Vector3) * count);
+        memcpy(&points[0], controls, sizeof(Vector3) * count);
 
         // first and last two indexes are space for special 'virtual points'
         // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
         if (cyclic)
             points[count] = controls[cyclic_point];
         else
-            points[count] = controls[count-1];
+            points[count] = controls[count - 1];
 
         index_lo = 0;
         index_hi = cyclic ? count : (count - 1);
@@ -240,31 +240,31 @@ namespace Movement
 
     void SplineBase::InitCatmullRom(const Vector3* controls, index_type count, bool cyclic, index_type cyclic_point)
     {
-        const int real_size = count + (cyclic ? (1+2) : (1+1));
+        const int real_size = count + (cyclic ? (1 + 2) : (1 + 1));
 
         points.resize(real_size);
 
         int lo_index = 1;
         int high_index = lo_index + count - 1;
 
-        memcpy(&points[lo_index],controls, sizeof(Vector3) * count);
+        memcpy(&points[lo_index], controls, sizeof(Vector3) * count);
 
         // first and last two indexes are space for special 'virtual points'
         // these points are required for proper C_Evaluate and C_Evaluate_Derivative methtod work
         if (cyclic)
         {
             if (cyclic_point == 0)
-                points[0] = controls[count-1];
+                points[0] = controls[count - 1];
             else
                 points[0] = controls[0].lerp(controls[1], -1);
 
-            points[high_index+1] = controls[cyclic_point];
-            points[high_index+2] = controls[cyclic_point+1];
+            points[high_index + 1] = controls[cyclic_point];
+            points[high_index + 2] = controls[cyclic_point + 1];
         }
         else
         {
             points[0] = controls[0].lerp(controls[1], -1);
-            points[high_index+1] = controls[count-1];
+            points[high_index + 1] = controls[count - 1];
         }
 
         index_lo = lo_index;
@@ -277,10 +277,10 @@ namespace Movement
         index_type t = c / 3u;
 
         points.resize(c);
-        memcpy(&points[0],controls, sizeof(Vector3) * c);
+        memcpy(&points[0], controls, sizeof(Vector3) * c);
 
         index_lo = 0;
-        index_hi = t-1;
+        index_hi = t - 1;
         //mov_assert(points.size() % 3 == 0);
     }
 

@@ -72,7 +72,7 @@
 
 #define DEFAULT_GOSSIP_MESSAGE              0xffffff
 
-extern uint32 GetSkillLevel(Player* player,uint32 skill);
+extern uint32 GetSkillLevel(Player* player, uint32 skill);
 
 // Defined functions to use with player.
 

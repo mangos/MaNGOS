@@ -134,7 +134,7 @@ void Camera::UpdateVisibilityOf(WorldObject* target)
 template<class T>
 void Camera::UpdateVisibilityOf(T* target, UpdateData& data, std::set<WorldObject*>& vis)
 {
-    m_owner.template UpdateVisibilityOf<T>(m_source, target,data,vis);
+    m_owner.template UpdateVisibilityOf<T>(m_source, target, data, vis);
 }
 
 template void Camera::UpdateVisibilityOf(Player*        , UpdateData& , std::set<WorldObject*>&);

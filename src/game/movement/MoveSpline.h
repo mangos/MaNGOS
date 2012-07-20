@@ -27,7 +27,7 @@ namespace Movement
     struct Location : public Vector3
     {
         Location() : orientation(0) {}
-        Location(float x, float y, float z, float o) : Vector3(x,y,z), orientation(o) {}
+        Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
         Location(const Vector3& v) : Vector3(v), orientation(0) {}
         Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
 
@@ -76,8 +76,8 @@ namespace Movement
             void computeFallElevation(float& el) const;
 
             UpdateResult _updateState(int32& ms_time_diff);
-            int32 next_timestamp() const { return spline.length(point_Idx+1);}
-            int32 segment_time_elapsed() const { return next_timestamp()-time_passed;}
+            int32 next_timestamp() const { return spline.length(point_Idx + 1);}
+            int32 segment_time_elapsed() const { return next_timestamp() - time_passed;}
             int32 timeElapsed() const { return Duration() - time_passed;}
             int32 timePassed() const { return time_passed;}
 
@@ -116,7 +116,7 @@ namespace Movement
             bool Finalized() const { return splineflags.done; }
             bool isCyclic() const { return splineflags.cyclic;}
             const Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
-            const Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx+1) : Vector3();}
+            const Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3();}
             int32 currentPathIdx() const;
 
             int32 Duration() const { return spline.length();}

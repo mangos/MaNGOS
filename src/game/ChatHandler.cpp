@@ -529,7 +529,7 @@ namespace MaNGOS
                 char const* nam = i_target ? i_target->GetNameForLocaleIdx(loc_idx) : NULL;
                 uint32 namlen = (nam ? strlen(nam) : 0) + 1;
 
-                data.Initialize(SMSG_TEXT_EMOTE, (20+namlen));
+                data.Initialize(SMSG_TEXT_EMOTE, (20 + namlen));
                 data << ObjectGuid(i_player.GetObjectGuid());
                 data << uint32(i_text_emote);
                 data << uint32(i_emote_num);
@@ -625,14 +625,14 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendPlayerNotFoundNotice(std::string name)
 {
-    WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size()+1);
+    WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
     data << name;
     SendPacket(&data);
 }
 
 void WorldSession::SendPlayerAmbiguousNotice(std::string name)
 {
-    WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size()+1);
+    WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size() + 1);
     data << name;
     SendPacket(&data);
 }

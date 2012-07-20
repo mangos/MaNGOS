@@ -117,7 +117,7 @@ bool PostgreSQLConnection::_Query(const char* sql, PGresult** pResult, uint64* p
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s, WorldTimer::getMSTime()), sql);
     }
 
     *pRowCount = PQntuples(*pResult);
@@ -142,7 +142,7 @@ QueryResult* PostgreSQLConnection::Query(const char* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if (!_Query(sql,&result,&rowCount,&fieldCount))
+    if (!_Query(sql, &result, &rowCount, &fieldCount))
         return NULL;
 
     QueryResultPostgre* queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
@@ -160,7 +160,7 @@ QueryNamedResult* PostgreSQLConnection::QueryNamed(const char* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if (!_Query(sql,&result,&rowCount,&fieldCount))
+    if (!_Query(sql, &result, &rowCount, &fieldCount))
         return NULL;
 
     QueryFieldNames names(fieldCount);
@@ -170,7 +170,7 @@ QueryNamedResult* PostgreSQLConnection::QueryNamed(const char* sql)
     QueryResultPostgre* queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
 
     queryResult->NextRow();
-    return new QueryNamedResult(queryResult,names);
+    return new QueryNamedResult(queryResult, names);
 }
 
 bool PostgreSQLConnection::Execute(const char* sql)
@@ -189,7 +189,7 @@ bool PostgreSQLConnection::Execute(const char* sql)
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s, WorldTimer::getMSTime()), sql);
     }
 
     PQclear(res);

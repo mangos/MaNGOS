@@ -90,8 +90,8 @@ World::World()
     m_allowMovement = true;
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
-    m_gameTime=time(NULL);
-    m_startTime=m_gameTime;
+    m_gameTime = time(NULL);
+    m_startTime = m_gameTime;
     m_maxActiveSessionCount = 0;
     m_maxQueuedSessionCount = 0;
     m_NextDailyQuestReset = 0;
@@ -321,7 +321,7 @@ bool World::RemoveQueuedSession(WorldSession* sess)
 
     for (; iter != m_QueuedSessions.end(); ++iter, ++position)
     {
-        if (*iter==sess)
+        if (*iter == sess)
         {
             sess->SetInQueue(false);
             iter = m_QueuedSessions.erase(iter);
@@ -400,7 +400,7 @@ Weather* World::AddWeather(uint32 zone_id)
     if (!weatherChances)
         return NULL;
 
-    Weather* w = new Weather(zone_id,weatherChances);
+    Weather* w = new Weather(zone_id, weatherChances);
     m_weathers[w->GetZone()] = w;
     w->ReGenerate();
     w->UpdateWeather();
@@ -414,7 +414,7 @@ void World::LoadConfigSettings(bool reload)
     {
         if (!sConfig.Reload())
         {
-            sLog.outError("World settings reload fail: can't read settings from %s.",sConfig.GetFilename().c_str());
+            sLog.outError("World settings reload fail: can't read settings from %s.", sConfig.GetFilename().c_str());
             return;
         }
     }
@@ -452,7 +452,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_FLOAT_RATE_POWER_RAGE_INCOME, "Rate.Rage.Income", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_POWER_RAGE_LOSS, "Rate.Rage.Loss", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_POWER_RUNICPOWER_INCOME, "Rate.RunicPower.Income", 1.0f);
-    setConfigPos(CONFIG_FLOAT_RATE_POWER_RUNICPOWER_LOSS,"Rate.RunicPower.Loss",   1.0f);
+    setConfigPos(CONFIG_FLOAT_RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss",   1.0f);
     setConfig(CONFIG_FLOAT_RATE_POWER_FOCUS,             "Rate.Focus", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_POWER_ENERGY,            "Rate.Energy", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_SKILL_DISCOVERY,      "Rate.Skill.Discovery",      1.0f);
@@ -495,7 +495,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT, "Rate.Auction.Deposit", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_AUCTION_CUT,     "Rate.Auction.Cut", 1.0f);
     setConfig(CONFIG_UINT32_AUCTION_DEPOSIT_MIN, "Auction.Deposit.Min", SILVER);
-    setConfig(CONFIG_FLOAT_RATE_HONOR, "Rate.Honor",1.0f);
+    setConfig(CONFIG_FLOAT_RATE_HONOR, "Rate.Honor", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_MINING_AMOUNT, "Rate.Mining.Amount", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_MINING_NEXT,   "Rate.Mining.Next", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_INSTANCE_RESET_TIME, "Rate.InstanceResetTime", 1.0f);
@@ -639,7 +639,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_UPTIME_UPDATE, "UpdateUptimeInterval", 10);
     if (reload)
     {
-        m_timers[WUPDATE_UPTIME].SetInterval(getConfig(CONFIG_UINT32_UPTIME_UPDATE)*MINUTE*IN_MILLISECONDS);
+        m_timers[WUPDATE_UPTIME].SetInterval(getConfig(CONFIG_UINT32_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
         m_timers[WUPDATE_UPTIME].Reset();
     }
 
@@ -782,64 +782,64 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", true);
 
     m_relocation_ai_notify_delay = sConfig.GetIntDefault("Visibility.AIRelocationNotifyDelay", 1000u);
-    m_relocation_lower_limit_sq  = pow(sConfig.GetFloatDefault("Visibility.RelocationLowerLimit",10), 2);
+    m_relocation_lower_limit_sq  = pow(sConfig.GetFloatDefault("Visibility.RelocationLowerLimit", 10), 2);
 
     m_VisibleUnitGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Unit", 1);
     if (m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.Grey.Unit can't be greater %f",MAX_VISIBILITY_DISTANCE);
+        sLog.outError("Visibility.Distance.Grey.Unit can't be greater %f", MAX_VISIBILITY_DISTANCE);
         m_VisibleUnitGreyDistance = MAX_VISIBILITY_DISTANCE;
     }
     m_VisibleObjectGreyDistance = sConfig.GetFloatDefault("Visibility.Distance.Grey.Object", 10);
     if (m_VisibleObjectGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.Grey.Object can't be greater %f",MAX_VISIBILITY_DISTANCE);
+        sLog.outError("Visibility.Distance.Grey.Object can't be greater %f", MAX_VISIBILITY_DISTANCE);
         m_VisibleObjectGreyDistance = MAX_VISIBILITY_DISTANCE;
     }
 
     //visibility on continents
     m_MaxVisibleDistanceOnContinents      = sConfig.GetFloatDefault("Visibility.Distance.Continents",     DEFAULT_VISIBILITY_DISTANCE);
-    if (m_MaxVisibleDistanceOnContinents < 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
+    if (m_MaxVisibleDistanceOnContinents < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.outError("Visibility.Distance.Continents can't be less max aggro radius %f", 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
-        m_MaxVisibleDistanceOnContinents = 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+        sLog.outError("Visibility.Distance.Continents can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceOnContinents = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceOnContinents + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.Continents can't be greater %f",MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.outError("Visibility.Distance.Continents can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceOnContinents = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
     //visibility in instances
     m_MaxVisibleDistanceInInstances        = sConfig.GetFloatDefault("Visibility.Distance.Instances",       DEFAULT_VISIBILITY_INSTANCE);
-    if (m_MaxVisibleDistanceInInstances < 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
+    if (m_MaxVisibleDistanceInInstances < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.outError("Visibility.Distance.Instances can't be less max aggro radius %f",45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
-        m_MaxVisibleDistanceInInstances = 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+        sLog.outError("Visibility.Distance.Instances can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceInInstances = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceInInstances + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.Instances can't be greater %f",MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.outError("Visibility.Distance.Instances can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceInInstances = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
     //visibility in BG/Arenas
     m_MaxVisibleDistanceInBGArenas        = sConfig.GetFloatDefault("Visibility.Distance.BGArenas",       DEFAULT_VISIBILITY_BGARENAS);
-    if (m_MaxVisibleDistanceInBGArenas < 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
+    if (m_MaxVisibleDistanceInBGArenas < 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO))
     {
-        sLog.outError("Visibility.Distance.BGArenas can't be less max aggro radius %f",45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
-        m_MaxVisibleDistanceInBGArenas = 45*getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+        sLog.outError("Visibility.Distance.BGArenas can't be less max aggro radius %f", 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO));
+        m_MaxVisibleDistanceInBGArenas = 45 * getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     }
     else if (m_MaxVisibleDistanceInBGArenas + m_VisibleUnitGreyDistance >  MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.BGArenas can't be greater %f",MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
+        sLog.outError("Visibility.Distance.BGArenas can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance);
         m_MaxVisibleDistanceInBGArenas = MAX_VISIBILITY_DISTANCE - m_VisibleUnitGreyDistance;
     }
 
     m_MaxVisibleDistanceInFlight    = sConfig.GetFloatDefault("Visibility.Distance.InFlight",      DEFAULT_VISIBILITY_DISTANCE);
     if (m_MaxVisibleDistanceInFlight + m_VisibleObjectGreyDistance > MAX_VISIBILITY_DISTANCE)
     {
-        sLog.outError("Visibility.Distance.InFlight can't be greater %f",MAX_VISIBILITY_DISTANCE-m_VisibleObjectGreyDistance);
+        sLog.outError("Visibility.Distance.InFlight can't be greater %f", MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance);
         m_MaxVisibleDistanceInFlight = MAX_VISIBILITY_DISTANCE - m_VisibleObjectGreyDistance;
     }
 
@@ -862,7 +862,7 @@ void World::LoadConfigSettings(bool reload)
     if (dataPath.empty())
         dataPath = "./";
     // normalize dir path to path/ or path\ form
-    else if (dataPath.at(dataPath.length()-1) != '/' && dataPath.at(dataPath.length()-1) != '\\')
+    else if (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\')
         dataPath.append("/");
 
     if (reload)
@@ -889,7 +889,7 @@ void World::LoadConfigSettings(bool reload)
     VMAP::VMapFactory::preventSpellsFromBeingTestedForLoS(ignoreSpellIds.c_str());
     sLog.outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i",
                    enableLOS, enableHeight, getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) ? 1 : 0);
-    sLog.outString("WORLD: VMap data directory is: %svmaps",m_dataPath.c_str());
+    sLog.outString("WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
 
     setConfig(CONFIG_BOOL_MMAP_ENABLED, "mmap.enabled", true);
     std::string ignoreMapIds = sConfig.GetStringDefault("mmap.ignoreMapIds", "");
@@ -913,17 +913,17 @@ void World::SetInitialWorldSettings()
     LoadConfigSettings();
 
     ///- Check the existence of the map files for all races start areas.
-    if (!MapManager::ExistMapAndVMap(0,-6240.32f, 331.033f) ||
-            !MapManager::ExistMapAndVMap(0,-8949.95f,-132.493f) ||
-            !MapManager::ExistMapAndVMap(0,-8949.95f,-132.493f) ||
-            !MapManager::ExistMapAndVMap(1,-618.518f,-4251.67f) ||
+    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f) ||
+            !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f) ||
+            !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f) ||
+            !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f) ||
             !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f) ||
             !MapManager::ExistMapAndVMap(1, 10311.3f, 832.463f) ||
-            !MapManager::ExistMapAndVMap(1,-2917.58f,-257.98f) ||
+            !MapManager::ExistMapAndVMap(1, -2917.58f, -257.98f) ||
             (m_configUint32Values[CONFIG_UINT32_EXPANSION] &&
-             (!MapManager::ExistMapAndVMap(530,10349.6f,-6357.29f) || !MapManager::ExistMapAndVMap(530,-3961.64f,-13931.2f))))
+             (!MapManager::ExistMapAndVMap(530, 10349.6f, -6357.29f) || !MapManager::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
     {
-        sLog.outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map and vmap files in appropriate directories or correct the DataDir value in the mangosd.conf file.",m_dataPath.c_str(),m_dataPath.c_str());
+        sLog.outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map and vmap files in appropriate directories or correct the DataDir value in the mangosd.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }
@@ -946,7 +946,7 @@ void World::SetInitialWorldSettings()
     LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%u'", server_type, realm_zone, realmID);
 
     ///- Remove the bones (they should not exist in DB though) and old corpses after a restart
-    CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0' OR time < (UNIX_TIMESTAMP()-'%u')", 3*DAY);
+    CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0' OR time < (UNIX_TIMESTAMP()-'%u')", 3 * DAY);
 
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
@@ -1326,33 +1326,33 @@ void World::SetInitialWorldSettings()
     ///- Initialize game time and timers
     sLog.outString("DEBUG:: Initialize game time and timers");
     m_gameTime = time(NULL);
-    m_startTime=m_gameTime;
+    m_startTime = m_gameTime;
 
     tm local;
     time_t curr;
     time(&curr);
-    local=*(localtime(&curr));                              // dereference and assign
+    local = *(localtime(&curr));                            // dereference and assign
     char isoDate[128];
     sprintf(isoDate, "%04d-%02d-%02d %02d:%02d:%02d",
-            local.tm_year+1900, local.tm_mon+1, local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
+            local.tm_year + 1900, local.tm_mon + 1, local.tm_mday, local.tm_hour, local.tm_min, local.tm_sec);
 
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, startstring, uptime) VALUES('%u', " UI64FMTD ", '%s', 0)",
                            realmID, uint64(m_startTime), isoDate);
 
-    m_timers[WUPDATE_WEATHERS].SetInterval(1*IN_MILLISECONDS);
-    m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE*IN_MILLISECONDS);
-    m_timers[WUPDATE_UPTIME].SetInterval(getConfig(CONFIG_UINT32_UPTIME_UPDATE)*MINUTE*IN_MILLISECONDS);
+    m_timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
+    m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
+    m_timers[WUPDATE_UPTIME].SetInterval(getConfig(CONFIG_UINT32_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
-    m_timers[WUPDATE_CORPSES].SetInterval(20*MINUTE*IN_MILLISECONDS);
-    m_timers[WUPDATE_DELETECHARS].SetInterval(DAY*IN_MILLISECONDS); // check for chars to delete every day
+    m_timers[WUPDATE_CORPSES].SetInterval(20 * MINUTE * IN_MILLISECONDS);
+    m_timers[WUPDATE_DELETECHARS].SetInterval(DAY * IN_MILLISECONDS); // check for chars to delete every day
 
     // for AhBot
-    m_timers[WUPDATE_AHBOT].SetInterval(20*IN_MILLISECONDS); // every 20 sec
+    m_timers[WUPDATE_AHBOT].SetInterval(20 * IN_MILLISECONDS); // every 20 sec
 
     //to set mailtimer to return mails every day between 4 and 5 am
     //mailtimer is increased when updating auctions
     //one second is 1000 -(tested on win system)
-    mail_timer = uint32((((localtime(&m_gameTime)->tm_hour + 20) % 24)* HOUR * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval());
+    mail_timer = uint32((((localtime(&m_gameTime)->tm_hour + 20) % 24) * HOUR * IN_MILLISECONDS) / m_timers[WUPDATE_AUCTIONS].GetInterval());
     //1440
     mail_timer_expires = uint32((DAY * IN_MILLISECONDS) / (m_timers[WUPDATE_AUCTIONS].GetInterval()));
     DEBUG_LOG("Mail timer set to: %u, mail return is called every %u minutes", mail_timer, mail_timer_expires);
@@ -1408,7 +1408,7 @@ void World::DetectDBCLang()
 
     if (m_lang_confid != 255 && m_lang_confid >= MAX_LOCALE)
     {
-        sLog.outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)",MAX_LOCALE);
+        sLog.outError("Incorrect DBC.Locale! Must be >= 0 and < %d (set to 0)", MAX_LOCALE);
         m_lang_confid = LOCALE_enUS;
     }
 
@@ -1418,7 +1418,7 @@ void World::DetectDBCLang()
     std::string availableLocalsStr;
 
     uint32 default_locale = MAX_LOCALE;
-    for (int i = MAX_LOCALE-1; i >= 0; --i)
+    for (int i = MAX_LOCALE - 1; i >= 0; --i)
     {
         if (strlen(race->name[i]) > 0)                      // check by race names
         {
@@ -1444,7 +1444,7 @@ void World::DetectDBCLang()
 
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
-    sLog.outString("Using %s DBC Locale as default. All available DBC locales: %s",localeNames[m_defaultDbcLocale],availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
+    sLog.outString("Using %s DBC Locale as default. All available DBC locales: %s", localeNames[m_defaultDbcLocale], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
     sLog.outString();
 }
 
@@ -1454,7 +1454,7 @@ void World::Update(uint32 diff)
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
     {
-        if (m_timers[i].GetCurrent()>=0)
+        if (m_timers[i].GetCurrent() >= 0)
             m_timers[i].Update(diff);
         else
             m_timers[i].SetCurrent(0);
@@ -1606,25 +1606,25 @@ namespace MaNGOS
             explicit WorldWorldTextBuilder(int32 textId, va_list* args = NULL) : i_textId(textId), i_args(args) {}
             void operator()(WorldPacketList& data_list, int32 loc_idx)
             {
-                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
                 if (i_args)
                 {
                     // we need copy va_list before use or original va_list will corrupted
                     va_list ap;
-                    va_copy(ap,*i_args);
+                    va_copy(ap, *i_args);
 
                     char str [2048];
-                    vsnprintf(str,2048,text, ap);
+                    vsnprintf(str, 2048, text, ap);
                     va_end(ap);
 
-                    do_helper(data_list,&str[0]);
+                    do_helper(data_list, &str[0]);
                 }
                 else
-                    do_helper(data_list,(char*)text);
+                    do_helper(data_list, (char*)text);
             }
         private:
-            char* lineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = NULL; return start; }
+            char* lineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
             void do_helper(WorldPacketList& data_list, char* text)
             {
                 char* pos = text;
@@ -1741,7 +1741,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
 {
     LoginDatabase.escape_string(nameOrIP);
     LoginDatabase.escape_string(reason);
-    std::string safe_author=author;
+    std::string safe_author = author;
     LoginDatabase.escape_string(safe_author);
 
     QueryResult* resultAccounts = NULL;                     //used for kicking
@@ -1751,16 +1751,16 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
     {
         case BAN_IP:
             //No SQL injection as strings are escaped
-            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE last_ip = '%s'",nameOrIP.c_str());
-            LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+%u,'%s','%s')",nameOrIP.c_str(),duration_secs,safe_author.c_str(),reason.c_str());
+            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE last_ip = '%s'", nameOrIP.c_str());
+            LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+%u,'%s','%s')", nameOrIP.c_str(), duration_secs, safe_author.c_str(), reason.c_str());
             break;
         case BAN_ACCOUNT:
             //No SQL injection as string is escaped
-            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'",nameOrIP.c_str());
+            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", nameOrIP.c_str());
             break;
         case BAN_CHARACTER:
             //No SQL injection as string is escaped
-            resultAccounts = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'",nameOrIP.c_str());
+            resultAccounts = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", nameOrIP.c_str());
             break;
         default:
             return BAN_SYNTAX_ERROR;
@@ -1768,7 +1768,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
 
     if (!resultAccounts)
     {
-        if (mode==BAN_IP)
+        if (mode == BAN_IP)
             return BAN_SUCCESS;                             // ip correctly banned but nobody affected (yet)
         else
             return BAN_NOTFOUND;                                // Nobody to ban
@@ -1780,11 +1780,11 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
         Field* fieldsAccount = resultAccounts->Fetch();
         uint32 account = fieldsAccount->GetUInt32();
 
-        if (mode!=BAN_IP)
+        if (mode != BAN_IP)
         {
             //No SQL injection as strings are escaped
             LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+%u, '%s', '%s', '1')",
-                                   account,duration_secs,safe_author.c_str(),reason.c_str());
+                                   account, duration_secs, safe_author.c_str(), reason.c_str());
         }
 
         if (WorldSession* sess = FindSession(account))
@@ -1803,7 +1803,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
     if (mode == BAN_IP)
     {
         LoginDatabase.escape_string(nameOrIP);
-        LoginDatabase.PExecute("DELETE FROM ip_banned WHERE ip = '%s'",nameOrIP.c_str());
+        LoginDatabase.PExecute("DELETE FROM ip_banned WHERE ip = '%s'", nameOrIP.c_str());
     }
     else
     {
@@ -1817,7 +1817,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
             return false;
 
         //NO SQL injection as account is uint32
-        LoginDatabase.PExecute("UPDATE account_banned SET active = '0' WHERE id = '%u'",account);
+        LoginDatabase.PExecute("UPDATE account_banned SET active = '0' WHERE id = '%u'", account);
     }
     return true;
 }
@@ -1836,7 +1836,7 @@ void World::_UpdateGameTime()
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (m_ShutdownTimer <= elapsed)
         {
-            if (!(m_ShutdownMask & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount()==0)
+            if (!(m_ShutdownMask & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
                 m_stopEvent = true;                         // exist code already set
             else
                 m_ShutdownTimer = 1;                        // minimum timer value to wait idle state
@@ -1862,9 +1862,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
     m_ExitCode = exitcode;
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
-    if (time==0)
+    if (time == 0)
     {
-        if (!(options & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount()==0)
+        if (!(options & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
             m_stopEvent = true;                             // exist code already set
         else
             m_ShutdownTimer = 1;                            //So that the session count is re-evaluated at next world tick
@@ -1896,8 +1896,8 @@ void World::ShutdownMsg(bool show, Player* player)
 
         ServerMessageType msgid = (m_ShutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
 
-        SendServerMessage(msgid,str.c_str(),player);
-        DEBUG_LOG("Server is %s in %s",(m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutting down"),str.c_str());
+        SendServerMessage(msgid, str.c_str(), player);
+        DEBUG_LOG("Server is %s in %s", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutting down"), str.c_str());
     }
 }
 
@@ -1915,7 +1915,7 @@ void World::ShutdownCancel()
     m_ExitCode = SHUTDOWN_EXIT_CODE;                       // to default value
     SendServerMessage(msgid);
 
-    DEBUG_LOG("Server %s cancelled.",(m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
+    DEBUG_LOG("Server %s cancelled.", (m_ShutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"));
 }
 
 /// Send a server message to the user(s)
@@ -2174,8 +2174,8 @@ void World::SetPlayerLimit(int32 limit, bool needUpdate)
 
 void World::UpdateMaxSessionCounters()
 {
-    m_maxActiveSessionCount = std::max(m_maxActiveSessionCount,uint32(m_sessions.size()-m_QueuedSessions.size()));
-    m_maxQueuedSessionCount = std::max(m_maxQueuedSessionCount,uint32(m_QueuedSessions.size()));
+    m_maxActiveSessionCount = std::max(m_maxActiveSessionCount, uint32(m_sessions.size() - m_QueuedSessions.size()));
+    m_maxQueuedSessionCount = std::max(m_maxQueuedSessionCount, uint32(m_QueuedSessions.size()));
 }
 
 void World::LoadDBVersion()
@@ -2202,7 +2202,7 @@ void World::LoadDBVersion()
 
 void World::setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue)
 {
-    setConfig(index, sConfig.GetIntDefault(fieldname,defvalue));
+    setConfig(index, sConfig.GetIntDefault(fieldname, defvalue));
     if (int32(getConfig(index)) < 0)
     {
         sLog.outError("%s (%i) can't be negative. Using %u instead.", fieldname, int32(getConfig(index)), defvalue);
@@ -2212,17 +2212,17 @@ void World::setConfig(eConfigUInt32Values index, char const* fieldname, uint32 d
 
 void World::setConfig(eConfigInt32Values index, char const* fieldname, int32 defvalue)
 {
-    setConfig(index, sConfig.GetIntDefault(fieldname,defvalue));
+    setConfig(index, sConfig.GetIntDefault(fieldname, defvalue));
 }
 
 void World::setConfig(eConfigFloatValues index, char const* fieldname, float defvalue)
 {
-    setConfig(index, sConfig.GetFloatDefault(fieldname,defvalue));
+    setConfig(index, sConfig.GetFloatDefault(fieldname, defvalue));
 }
 
 void World::setConfig(eConfigBoolValues index, char const* fieldname, bool defvalue)
 {
-    setConfig(index, sConfig.GetBoolDefault(fieldname,defvalue));
+    setConfig(index, sConfig.GetBoolDefault(fieldname, defvalue));
 }
 
 void World::setConfigPos(eConfigFloatValues index, char const* fieldname, float defvalue)

@@ -106,7 +106,7 @@ Cell::Visit(const CellPair& standing_cell, TypeContainerVisitor<T, CONTAINER>& v
     {
         for (uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; y++)
         {
-            CellPair cell_pair(x,y);
+            CellPair cell_pair(x, y);
             //lets skip standing cell since we already visited it
             if (cell_pair != standing_cell)
             {
@@ -133,7 +133,7 @@ Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER>& visitor, Map& m, const Cel
     {
         for (uint32 y = begin_cell.y_coord; y <= end_cell.y_coord; ++y)
         {
-            CellPair cell_pair(x,y);
+            CellPair cell_pair(x, y);
             Cell r_zone(cell_pair);
             r_zone.data.Part.nocreate = data.Part.nocreate;
             m.Visit(r_zone, visitor);
@@ -225,7 +225,7 @@ inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, floa
     if (dont_load)
         cell.SetNoCreate();
     TypeContainerVisitor<T, WorldTypeMapContainer > gnotifier(visitor);
-    cell.Visit(p ,gnotifier, *map, x, y, radius);
+    cell.Visit(p , gnotifier, *map, x, y, radius);
 }
 
 template<class T>

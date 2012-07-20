@@ -151,7 +151,7 @@ void MapPersistentState::ClearRespawnTimes()
 void MapPersistentState::AddCreatureToGrid(uint32 guid, CreatureData const* data)
 {
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
-    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+    uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_gridObjectGuids[cell_id].creatures.insert(guid);
 }
@@ -159,7 +159,7 @@ void MapPersistentState::AddCreatureToGrid(uint32 guid, CreatureData const* data
 void MapPersistentState::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
 {
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
-    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+    uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_gridObjectGuids[cell_id].creatures.erase(guid);
 }
@@ -167,7 +167,7 @@ void MapPersistentState::RemoveCreatureFromGrid(uint32 guid, CreatureData const*
 void MapPersistentState::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
 {
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
-    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+    uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_gridObjectGuids[cell_id].gameobjects.insert(guid);
 }
@@ -175,7 +175,7 @@ void MapPersistentState::AddGameobjectToGrid(uint32 guid, GameObjectData const* 
 void MapPersistentState::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data)
 {
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
-    uint32 cell_id = (cell_pair.y_coord*TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
+    uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_gridObjectGuids[cell_id].gameobjects.erase(guid);
 }
@@ -349,7 +349,7 @@ void DungeonResetScheduler::LoadResetTimes()
     // get the current reset times for normal instances (these may need to be updated)
     // these are only kept in memory for InstanceSaves that are loaded later
     // resettime = 0 in the DB for raid/heroic instances so those are skipped
-    typedef std::pair<uint32 /*PAIR32(map,difficulty)*/, time_t> ResetTimeMapDiffType;
+    typedef std::pair < uint32 /*PAIR32(map,difficulty)*/, time_t > ResetTimeMapDiffType;
     typedef std::map<uint32, ResetTimeMapDiffType> InstResetTimeMapDiffType;
     InstResetTimeMapDiffType instResetTime;
 
@@ -372,7 +372,7 @@ void DungeonResetScheduler::LoadResetTimes()
                     continue;
                 }
 
-                instResetTime[id] = ResetTimeMapDiffType(MAKE_PAIR32(mapid,difficulty), resettime);
+                instResetTime[id] = ResetTimeMapDiffType(MAKE_PAIR32(mapid, difficulty), resettime);
             }
         }
         while (result->NextRow());
@@ -403,7 +403,7 @@ void DungeonResetScheduler::LoadResetTimes()
         // schedule the reset times
         for (InstResetTimeMapDiffType::iterator itr = instResetTime.begin(); itr != instResetTime.end(); ++itr)
             if (itr->second.second > now)
-                ScheduleReset(true, itr->second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, PAIR32_LOPART(itr->second.first),Difficulty(PAIR32_HIPART(itr->second.first)),itr->first));
+                ScheduleReset(true, itr->second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, PAIR32_LOPART(itr->second.first), Difficulty(PAIR32_HIPART(itr->second.first)), itr->first));
     }
 
     // load the global respawn times for raid/heroic instances
@@ -421,10 +421,10 @@ void DungeonResetScheduler::LoadResetTimes()
 
             MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
 
-            if (!mapEntry || !mapEntry->IsDungeon() || !GetMapDifficultyData(mapid,difficulty))
+            if (!mapEntry || !mapEntry->IsDungeon() || !GetMapDifficultyData(mapid, difficulty))
             {
                 sLog.outError("MapPersistentStateManager::LoadResetTimes: invalid mapid(%u)/difficulty(%u) pair in instance_reset!", mapid, difficulty);
-                CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u' AND difficulty = '%u'", mapid,difficulty);
+                CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u' AND difficulty = '%u'", mapid, difficulty);
                 continue;
             }
 
@@ -433,7 +433,7 @@ void DungeonResetScheduler::LoadResetTimes()
             if (oldresettime != newresettime)
                 CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty = '%u'", newresettime, mapid, difficulty);
 
-            SetResetTimeFor(mapid,difficulty,newresettime);
+            SetResetTimeFor(mapid, difficulty, newresettime);
         }
         while (result->NextRow());
         delete result;
@@ -461,7 +461,7 @@ void DungeonResetScheduler::LoadResetTimes()
             continue;
 
         uint32 period = GetMaxResetTimeFor(mapDiff);
-        time_t t = GetResetTimeFor(mapid,difficulty);
+        time_t t = GetResetTimeFor(mapid, difficulty);
         if (!t)
         {
             // initialize the reset time
@@ -478,11 +478,11 @@ void DungeonResetScheduler::LoadResetTimes()
             CharacterDatabase.DirectPExecute("UPDATE instance_reset SET resettime = '"UI64FMTD"' WHERE mapid = '%u' AND difficulty= '%u'", (uint64)t, mapid, difficulty);
         }
 
-        SetResetTimeFor(mapid,difficulty,t);
+        SetResetTimeFor(mapid, difficulty, t);
 
         // schedule the global reset/warning
         ResetEventType type = RESET_EVENT_INFORM_1;
-        for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type+1))
+        for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type + 1))
             if (t - resetEventTypeDelay[type] > now)
                 break;
 
@@ -540,19 +540,19 @@ void DungeonResetScheduler::Update()
         else
         {
             // global reset/warning for a certain map
-            time_t resetTime = GetResetTimeFor(event.mapid,event.difficulty);
+            time_t resetTime = GetResetTimeFor(event.mapid, event.difficulty);
             m_InstanceSaves._ResetOrWarnAll(event.mapid, event.difficulty, event.type != RESET_EVENT_INFORM_LAST, uint32(resetTime - now));
             if (event.type != RESET_EVENT_INFORM_LAST)
             {
                 // schedule the next warning/reset
-                event.type = ResetEventType(event.type+1);
+                event.type = ResetEventType(event.type + 1);
                 ScheduleReset(true, resetTime - resetEventTypeDelay[event.type], event);
             }
             else
             {
                 // re-schedule the next/new global reset/warning
                 // calculate the next reset time
-                MapDifficulty const* mapDiff = GetMapDifficultyData(event.mapid,event.difficulty);
+                MapDifficulty const* mapDiff = GetMapDifficultyData(event.mapid, event.difficulty);
                 MANGOS_ASSERT(mapDiff);
 
                 time_t next_reset = DungeonResetScheduler::CalculateNextResetTime(mapDiff, resetTime);
@@ -562,7 +562,7 @@ void DungeonResetScheduler::Update()
                 SetResetTimeFor(event.mapid, event.difficulty, next_reset);
 
                 ResetEventType type = RESET_EVENT_INFORM_1;
-                for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type+1))
+                for (; type < RESET_EVENT_INFORM_LAST; type = ResetEventType(type + 1))
                     if (next_reset - resetEventTypeDelay[type] > now)
                         break;
 
@@ -699,7 +699,7 @@ void MapPersistentStateManager::RemovePersistentState(uint32 mapId, uint32 insta
     }
 }
 
-void MapPersistentStateManager::_DelHelper(DatabaseType& db, const char* fields, const char* table, const char* queryTail,...)
+void MapPersistentStateManager::_DelHelper(DatabaseType& db, const char* fields, const char* table, const char* queryTail, ...)
 {
     Tokens fieldTokens = StrSplit(fields, ", ");
     MANGOS_ASSERT(fieldTokens.size() != 0);
@@ -857,7 +857,7 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficu
 
     if (!warn)
     {
-        MapDifficulty const* mapDiff = GetMapDifficultyData(mapid,difficulty);
+        MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
         if (!mapDiff || !mapDiff->resetTime)
         {
             sLog.outError("MapPersistentStateManager::ResetOrWarnAll: not valid difficulty or no reset delay for map %d", mapid);

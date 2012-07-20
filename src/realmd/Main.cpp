@@ -82,7 +82,7 @@ void usage(const char* prog)
                    "    -s run                   run as daemon\n\r"
                    "    -s stop                  stop daemon\n\r"
 #endif
-                   ,prog);
+                   , prog);
 }
 
 /// Launch the realm server
@@ -107,7 +107,7 @@ extern int main(int argc, char** argv)
                 cfg_file = cmd_opts.opt_arg();
                 break;
             case 'v':
-                printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+                printf("%s\n", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
                 return 0;
 
             case 's':
@@ -185,7 +185,7 @@ extern int main(int argc, char** argv)
 
     sLog.Initialize();
 
-    sLog.outString("%s [realm-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+    sLog.outString("%s [realm-daemon]", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
     sLog.outString("<Ctrl-C> to stop.\n");
     sLog.outString("Using configuration file %s.", cfg_file);
 
@@ -285,17 +285,17 @@ extern int main(int argc, char** argv)
             ULONG_PTR appAff;
             ULONG_PTR sysAff;
 
-            if (GetProcessAffinityMask(hProcess,&appAff,&sysAff))
+            if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
             {
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
                 if (!curAff)
                 {
-                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for realmd. Accessible processors bitmask (hex): %x", Aff, appAff);
                 }
                 else
                 {
-                    if (SetProcessAffinityMask(hProcess,curAff))
+                    if (SetProcessAffinityMask(hProcess, curAff))
                         sLog.outString("Using processors (bitmask, hex): %x", curAff);
                     else
                         sLog.outError("Can't set used processors (hex): %x", curAff);
@@ -308,7 +308,7 @@ extern int main(int argc, char** argv)
 
         if (Prio)
         {
-            if (SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
+            if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
                 sLog.outString("realmd process priority class set to HIGH");
             else
                 sLog.outError("Can't set realmd process priority class.");
@@ -396,7 +396,7 @@ bool StartDB()
         return false;
     }
 
-    if (!LoginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    if (!LoginDatabase.CheckRequiredField("realmd_db_version", REVISION_DB_REALMD))
     {
         ///- Wait for already started DB delay threads to end
         LoginDatabase.HaltDelayThread();

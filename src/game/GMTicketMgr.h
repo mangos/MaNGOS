@@ -37,7 +37,7 @@ class GMTicket
             m_guid = guid;
             m_text = text;
             m_responseText = responsetext;
-            m_lastUpdate =update;
+            m_lastUpdate = update;
         }
 
         ObjectGuid const& GetPlayerGuid() const

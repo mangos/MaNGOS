@@ -388,7 +388,7 @@ void ArenaTeam::Roster(WorldSession* session)
 
 void ArenaTeam::Query(WorldSession* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4*7+GetName().size()+1);
+    WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4 * 7 + GetName().size() + 1);
     data << uint32(GetId());                                // team id
     data << GetName();                                      // team name
     data << uint32(GetType());                              // arena team type (2=2x2, 3=3x3 or 5=5x5)
@@ -403,7 +403,7 @@ void ArenaTeam::Query(WorldSession* session)
 
 void ArenaTeam::Stats(WorldSession* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_STATS, 4*7);
+    WorldPacket data(SMSG_ARENA_TEAM_STATS, 4 * 7);
     data << uint32(GetId());                                // team id
     data << uint32(m_stats.rating);                         // rating
     data << uint32(m_stats.games_week);                     // games this week
@@ -432,7 +432,7 @@ void ArenaTeam::InspectStats(WorldSession* session, ObjectGuid guid)
     if (!member)
         return;
 
-    WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8+1+4*6);
+    WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
     data << guid;                                           // player guid
     data << uint8(GetSlot());                               // slot (0...2)
     data << uint32(GetId());                                // arena team id
@@ -503,7 +503,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, char cons
 {
     uint8 strCount = !str1 ? 0 : (!str2 ? 1 : (!str3 ? 2 : 3));
 
-    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1*strCount + (!guid ? 0 : 8));
+    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1 * strCount + (!guid ? 0 : 8));
     data << uint8(event);
     data << uint8(strCount);
 
@@ -587,7 +587,7 @@ float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
     if (sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID) >= 6)
         if (enemy_rating < 1000)
             enemy_rating = 1000;
-    return 1.0f/(1.0f+exp(log(10.0f)*(float)((float)enemy_rating - (float)own_rating)/400.0f));
+    return 1.0f / (1.0f + exp(log(10.0f) * (float)((float)enemy_rating - (float)own_rating) / 400.0f));
 }
 
 void ArenaTeam::FinishGame(int32 mod)
@@ -616,7 +616,7 @@ int32 ArenaTeam::WonAgainst(uint32 againstRating)
     float chance = GetChanceAgainst(m_stats.rating, againstRating);
     float K = (m_stats.rating < 1000) ? 48.0f : 32.0f;
     // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
-    int32 mod = (int32)floor(K* (1.0f - chance));
+    int32 mod = (int32)floor(K * (1.0f - chance));
     // modify the team stats accordingly
     FinishGame(mod);
     m_stats.wins_week += 1;
@@ -700,7 +700,7 @@ void ArenaTeam::MemberWon(Player* plr, uint32 againstRating)
             float chance = GetChanceAgainst(itr->personal_rating, againstRating);
             float K = (itr->personal_rating < 1000) ? 48.0f : 32.0f;
             // calculate the rating modification (ELO system with k=32 or k=48 if rating<1000)
-            int32 mod = (int32)floor(K* (1.0f - chance));
+            int32 mod = (int32)floor(K * (1.0f - chance));
             itr->ModifyPersonalRating(plr, mod, GetSlot());
             // update personal stats
             itr->games_week += 1;

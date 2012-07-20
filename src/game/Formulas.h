@@ -25,9 +25,9 @@ namespace MaNGOS
 {
     namespace Honor
     {
-        inline float hk_honor_at_level(uint32 level, uint32 count=1)
+        inline float hk_honor_at_level(uint32 level, uint32 count = 1)
         {
-            return (float)ceil(count*(-0.53177f + 0.59357f * exp((level +23.54042f) / 26.07859f)));
+            return (float)ceil(count * (-0.53177f + 0.59357f * exp((level + 23.54042f) / 26.07859f)));
         }
     }
     namespace XP
@@ -39,9 +39,9 @@ namespace MaNGOS
             if (pl_level <= 5)
                 return 0;
             else if (pl_level <= 39)
-                return pl_level - 5 - pl_level/10;
+                return pl_level - 5 - pl_level / 10;
             else if (pl_level <= 59)
-                return pl_level - 1 - pl_level/5;
+                return pl_level - 1 - pl_level / 5;
             else
                 return pl_level - 9;
         }
@@ -85,7 +85,7 @@ namespace MaNGOS
                 case CONTENT_61_70: nBaseExp = 235; break;
                 case CONTENT_71_80: nBaseExp = 580; break;
                 default:
-                    sLog.outError("BaseGain: Unsupported content level %u",content);
+                    sLog.outError("BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;  break;
             }
 
@@ -94,7 +94,7 @@ namespace MaNGOS
                 uint32 nLevelDiff = mob_level - pl_level;
                 if (nLevelDiff > 4)
                     nLevelDiff = 4;
-                return ((pl_level*5 + nBaseExp) * (20 + nLevelDiff)/10 + 1)/2;
+                return ((pl_level * 5 + nBaseExp) * (20 + nLevelDiff) / 10 + 1) / 2;
             }
             else
             {
@@ -102,7 +102,7 @@ namespace MaNGOS
                 if (mob_level > gray_level)
                 {
                     uint32 ZD = GetZeroDifference(pl_level);
-                    return (pl_level*5 + nBaseExp) * (ZD + mob_level - pl_level)/ZD;
+                    return (pl_level * 5 + nBaseExp) * (ZD + mob_level - pl_level) / ZD;
                 }
                 return 0;
             }
@@ -110,19 +110,19 @@ namespace MaNGOS
 
         inline uint32 Gain(Player* pl, Unit* u)
         {
-            if (u->GetTypeId()==TYPEID_UNIT && (
+            if (u->GetTypeId() == TYPEID_UNIT && (
                         ((Creature*)u)->IsTotem() || ((Creature*)u)->IsPet() ||
                         (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)))
                 return 0;
 
-            uint32 xp_gain= BaseGain(pl->getLevel(), u->getLevel(), GetContentLevelsForMapAndZone(pl->GetMapId(),pl->GetZoneId()));
+            uint32 xp_gain = BaseGain(pl->getLevel(), u->getLevel(), GetContentLevelsForMapAndZone(pl->GetMapId(), pl->GetZoneId()));
             if (xp_gain == 0)
                 return 0;
 
-            if (u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsElite())
+            if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsElite())
                 xp_gain *= 2;
 
-            return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
+            return (uint32)(xp_gain * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
         }
 
         inline float xp_in_group_rate(uint32 count, bool isRaid)

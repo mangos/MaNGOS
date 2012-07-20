@@ -110,7 +110,7 @@ class SpellCastTargets
         void read(ByteBuffer& data, Unit* caster);
         void write(ByteBuffer& data) const;
 
-        SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this,caster); }
+        SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this, caster); }
 
         SpellCastTargets& operator=(const SpellCastTargets& target)
         {
@@ -202,7 +202,7 @@ inline ByteBuffer& operator<< (ByteBuffer& buf, SpellCastTargets const& targets)
 
 inline ByteBuffer& operator>> (ByteBuffer& buf, SpellCastTargetsReader const& targets)
 {
-    targets.targets.read(buf,targets.caster);
+    targets.targets.read(buf, targets.caster);
     return buf;
 }
 
@@ -423,7 +423,7 @@ class Spell
         void SendResurrectRequest(Player* target);
         void SendPlaySpellVisual(uint32 SpellID);
 
-        void HandleEffects(Unit* pUnitTarget,Item* pItemTarget,GameObject* pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
+        void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, SpellEffectIndex i, float DamageMultiplier = 1.0);
         void HandleThreatSpells();
         //void HandleAddAura(Unit* Target);
 
@@ -580,10 +580,10 @@ class Spell
             uint64 timeDelay;
             uint32 HitInfo;
             uint32 damage;
-            SpellMissInfo missCondition:8;
-            SpellMissInfo reflectResult:8;
-            uint8  effectMask:8;
-            bool   processed:1;
+            SpellMissInfo missCondition: 8;
+            SpellMissInfo reflectResult: 8;
+            uint8  effectMask: 8;
+            bool   processed: 1;
         };
         uint8 m_needAliveTargetMask;                        // Mask req. alive targets
 
@@ -591,8 +591,8 @@ class Spell
         {
             ObjectGuid targetGUID;
             uint64 timeDelay;
-            uint8  effectMask:8;
-            bool   processed:1;
+            uint8  effectMask: 8;
+            bool   processed: 1;
         };
 
         struct ItemTargetInfo
@@ -696,7 +696,7 @@ namespace MaNGOS
             if (!i_originalCaster)
                 return;
 
-            for (PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+            for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
             {
                 Player* pPlayer = itr->getSource();
                 if (!pPlayer->isAlive() || pPlayer->IsTaxiFlying())
@@ -705,7 +705,7 @@ namespace MaNGOS
                 if (i_originalCaster->IsFriendlyTo(pPlayer))
                     continue;
 
-                if (pPlayer->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ,i_radius))
+                if (pPlayer->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ, i_radius))
                     i_data.push_back(pPlayer);
             }
         }
@@ -814,7 +814,7 @@ namespace MaNGOS
                         break;
                     case SPELL_TARGETS_AOE_DAMAGE:
                     {
-                        if (itr->getSource()->GetTypeId()==TYPEID_UNIT && ((Creature*)itr->getSource())->IsTotem())
+                        if (itr->getSource()->GetTypeId() == TYPEID_UNIT && ((Creature*)itr->getSource())->IsTotem())
                             continue;
 
                         if (i_playerControlled)
@@ -838,23 +838,23 @@ namespace MaNGOS
                 switch (i_push_type)
                 {
                     case PUSH_IN_FRONT:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_90:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/2))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 2))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_30:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/6))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 6))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_FRONT_15:
-                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F/12))
+                        if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 12))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_IN_BACK:
-                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2*M_PI_F/3))
+                        if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
                             i_data->push_back(itr->getSource());
                         break;
                     case PUSH_SELF_CENTER:

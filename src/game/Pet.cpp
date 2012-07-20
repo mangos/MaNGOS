@@ -96,13 +96,13 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         //                                        0   1      2(?)   3        4      5    6           7     8     9        10         11       12           13       14        15                 16                 17              18
         result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, curhappiness, abdata, savetime, resettalents_cost, resettalents_time, CreatedBySpell, PetType "
                                           "FROM character_pet WHERE owner = '%u' AND entry = '%u' AND (slot = '%u' OR slot > '%u') ",
-                                          ownerid, petentry,PET_SAVE_AS_CURRENT,PET_SAVE_LAST_STABLE_SLOT);
+                                          ownerid, petentry, PET_SAVE_AS_CURRENT, PET_SAVE_LAST_STABLE_SLOT);
     else
         // any current or other non-stabled pet (for hunter "call pet")
         //                                        0   1      2(?)   3        4      5    6           7     8     9        10         11       12            13      14        15                 16                 17              18
         result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, slot, name, renamed, curhealth, curmana, curhappiness, abdata, savetime, resettalents_cost, resettalents_time, CreatedBySpell, PetType "
                                           "FROM character_pet WHERE owner = '%u' AND (slot = '%u' OR slot > '%u') ",
-                                          ownerid,PET_SAVE_AS_CURRENT,PET_SAVE_LAST_STABLE_SLOT);
+                                          ownerid, PET_SAVE_AS_CURRENT, PET_SAVE_LAST_STABLE_SLOT);
 
     if (!result)
         return false;
@@ -194,7 +194,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     switch (getPetType())
     {
         case SUMMON_PET:
-            petlevel=owner->getLevel();
+            petlevel = owner->getLevel();
             break;
         case HUNTER_PET:
             SetByteFlag(UNIT_FIELD_BYTES_2, 2, fields[9].GetBool() ? UNIT_CAN_BE_ABANDONED : UNIT_CAN_BE_RENAMED | UNIT_CAN_BE_ABANDONED);
@@ -358,7 +358,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
                  pOwner->GetTemporaryUnsummonedPetNumber() != m_charmInfo->GetPetNumber())
         {
             // pet will lost anyway at restore temporary unsummoned
-            if (getPetType()==HUNTER_PET)
+            if (getPetType() == HUNTER_PET)
                 return;
 
             // for warlock case
@@ -396,7 +396,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         }
 
         // prevent existence another hunter pet in PET_SAVE_AS_CURRENT and PET_SAVE_NOT_IN_SLOT
-        if (getPetType()==HUNTER_PET && (mode==PET_SAVE_AS_CURRENT||mode > PET_SAVE_LAST_STABLE_SLOT))
+        if (getPetType() == HUNTER_PET && (mode == PET_SAVE_AS_CURRENT || mode > PET_SAVE_LAST_STABLE_SLOT))
         {
             static SqlStatementID del ;
 
@@ -480,10 +480,10 @@ void Pet::DeleteFromDB(uint32 guidlow, bool separate_transaction)
 void Pet::SetDeathState(DeathState s)                       // overwrite virtual Creature::SetDeathState and Unit::SetDeathState
 {
     Creature::SetDeathState(s);
-    if (getDeathState()==CORPSE)
+    if (getDeathState() == CORPSE)
     {
         //remove summoned pet (no corpse)
-        if (getPetType()==SUMMON_PET)
+        if (getPetType() == SUMMON_PET)
             Unsummon(PET_SAVE_NOT_IN_SLOT);
         // other will despawn at corpse desppawning (Pet::Update code)
         else
@@ -500,7 +500,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
     }
-    else if (getDeathState()==ALIVE)
+    else if (getDeathState() == ALIVE)
     {
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         CastPetAuras(true);
@@ -518,7 +518,7 @@ void Pet::Update(uint32 update_diff, uint32 diff)
         {
             if (m_corpseDecayTimer <= update_diff)
             {
-                MANGOS_ASSERT(getPetType()!=SUMMON_PET && "Must be already removed.");
+                MANGOS_ASSERT(getPetType() != SUMMON_PET && "Must be already removed.");
                 Unsummon(PET_SAVE_NOT_IN_SLOT);             //hunters' pets never get removed because of death, NEVER!
                 return;
             }
@@ -711,7 +711,7 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
         if (GetOwnerGuid() != owner->GetObjectGuid())
             return;
 
-        Player* p_owner = owner->GetTypeId()==TYPEID_PLAYER ? (Player*)owner : NULL;
+        Player* p_owner = owner->GetTypeId() == TYPEID_PLAYER ? (Player*)owner : NULL;
 
         if (p_owner)
         {
@@ -818,7 +818,7 @@ void Pet::GivePetLevel(uint32 level)
     if (!level || level == getLevel())
         return;
 
-    if (getPetType()==HUNTER_PET)
+    if (getPetType() == HUNTER_PET)
     {
         SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
         SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(level));
@@ -924,7 +924,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
-    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel*50));
+    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
     SetAttackTime(OFF_ATTACK, BASE_ATTACK_TIME);
@@ -933,7 +933,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0);
 
     CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
-    if (cFamily && cFamily->minScale > 0.0f && getPetType()==HUNTER_PET)
+    if (cFamily && cFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
         if (getLevel() >= cFamily->maxScaleLevel)
@@ -948,7 +948,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     }
     m_bonusdamage = 0;
 
-    int32 createResistance[MAX_SPELL_SCHOOL] = {0,0,0,0,0,0,0};
+    int32 createResistance[MAX_SPELL_SCHOOL] = {0, 0, 0, 0, 0, 0, 0};
 
     if (getPetType() != HUNTER_PET)
     {
@@ -1015,7 +1015,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             }
             else                                            // not exist in DB, use some default fake data
             {
-                sLog.outErrorDb("Summoned pet (Entry: %u) not have pet stats data in DB",cinfo->Entry);
+                sLog.outErrorDb("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->Entry);
 
                 // remove elite bonuses included in DB values
                 SetCreateHealth(uint32(((float(cinfo->maxhealth) / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
@@ -1072,8 +1072,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
 
-            SetCreateMana(28 + 10*petlevel);
-            SetCreateHealth(28 + 30*petlevel);
+            SetCreateMana(28 + 10 * petlevel);
+            SetCreateHealth(28 + 30 * petlevel);
 
             // FIXME: this is wrong formula, possible each guardian pet have own damage formula
             //these formula may not be correct; however, it is designed to be close to what it should be
@@ -1112,7 +1112,7 @@ bool Pet::HaveInDiet(ItemPrototype const* item) const
         return false;
 
     uint32 diet = cFamily->petFoodMask;
-    uint32 FoodMask = 1 << (item->FoodType-1);
+    uint32 FoodMask = 1 << (item->FoodType - 1);
     return diet & FoodMask;
 }
 
@@ -1137,13 +1137,13 @@ void Pet::_LoadSpellCooldowns()
     m_CreatureSpellCooldowns.clear();
     m_CreatureCategoryCooldowns.clear();
 
-    QueryResult* result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    QueryResult* result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'", m_charmInfo->GetPetNumber());
 
     if (result)
     {
         time_t curTime = time(NULL);
 
-        WorldPacket data(SMSG_SPELL_COOLDOWN, (8+1+size_t(result->GetRowCount())*8));
+        WorldPacket data(SMSG_SPELL_COOLDOWN, (8 + 1 + size_t(result->GetRowCount()) * 8));
         data << ObjectGuid(GetObjectGuid());
         data << uint8(0x0);                                 // flags (0x1, 0x2)
 
@@ -1156,7 +1156,7 @@ void Pet::_LoadSpellCooldowns()
 
             if (!sSpellStore.LookupEntry(spell_id))
             {
-                sLog.outError("Pet %u have unknown spell %u in `pet_spell_cooldown`, skipping.",m_charmInfo->GetPetNumber(),spell_id);
+                sLog.outError("Pet %u have unknown spell %u in `pet_spell_cooldown`, skipping.", m_charmInfo->GetPetNumber(), spell_id);
                 continue;
             }
 
@@ -1165,11 +1165,11 @@ void Pet::_LoadSpellCooldowns()
                 continue;
 
             data << uint32(spell_id);
-            data << uint32(uint32(db_time-curTime)*IN_MILLISECONDS);
+            data << uint32(uint32(db_time - curTime)*IN_MILLISECONDS);
 
-            _AddCreatureSpellCooldown(spell_id,db_time);
+            _AddCreatureSpellCooldown(spell_id, db_time);
 
-            DEBUG_LOG("Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time-curTime));
+            DEBUG_LOG("Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time - curTime));
         }
         while (result->NextRow());
 
@@ -1208,7 +1208,7 @@ void Pet::_SaveSpellCooldowns()
 
 void Pet::_LoadSpells()
 {
-    QueryResult* result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    QueryResult* result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'", m_charmInfo->GetPetNumber());
 
     if (result)
     {
@@ -1290,8 +1290,8 @@ void Pet::_LoadAuras(uint32 timediff)
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
-                damage[i] = fields[i+5].GetInt32();
-                periodicTime[i] = fields[i+8].GetUInt32();
+                damage[i] = fields[i + 5].GetInt32();
+                periodicTime[i] = fields[i + 8].GetUInt32();
             }
 
             int32 maxduration = fields[11].GetInt32();
@@ -1301,7 +1301,7 @@ void Pet::_LoadAuras(uint32 timediff)
             SpellEntry const* spellproto = sSpellStore.LookupEntry(spellid);
             if (!spellproto)
             {
-                sLog.outError("Unknown spell (spellid %u), ignore.",spellid);
+                sLog.outError("Unknown spell (spellid %u), ignore.", spellid);
                 continue;
             }
 
@@ -1311,10 +1311,10 @@ void Pet::_LoadAuras(uint32 timediff)
 
             if (remaintime != -1 && !IsPositiveSpell(spellproto))
             {
-                if (remaintime/IN_MILLISECONDS <= int32(timediff))
+                if (remaintime / IN_MILLISECONDS <= int32(timediff))
                     continue;
 
-                remaintime -= timediff*IN_MILLISECONDS;
+                remaintime -= timediff * IN_MILLISECONDS;
             }
 
             // prevent wrong values of remaincharges
@@ -1438,7 +1438,7 @@ void Pet::_SaveAuras()
     }
 }
 
-bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
+bool Pet::addSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
 {
     SpellEntry const* spellInfo = sSpellStore.LookupEntry(spell_id);
     if (!spellInfo)
@@ -1446,11 +1446,11 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
         // do pet spell book cleanup
         if (state == PETSPELL_UNCHANGED)                    // spell load case
         {
-            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.",spell_id);
-            CharacterDatabase.PExecute("DELETE FROM pet_spell WHERE spell = '%u'",spell_id);
+            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spell_id);
+            CharacterDatabase.PExecute("DELETE FROM pet_spell WHERE spell = '%u'", spell_id);
         }
         else
-            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request.",spell_id);
+            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request.", spell_id);
 
         return false;
     }
@@ -1500,30 +1500,30 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     {
         if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
         {
-            for (int i=0; i < MAX_TALENT_RANK; ++i)
+            for (int i = 0; i < MAX_TALENT_RANK; ++i)
             {
                 // skip learning spell and no rank spell case
                 uint32 rankSpellId = talentInfo->RankID[i];
-                if (!rankSpellId || rankSpellId==spell_id)
+                if (!rankSpellId || rankSpellId == spell_id)
                     continue;
 
                 // skip unknown ranks
                 if (!HasSpell(rankSpellId))
                     continue;
-                removeSpell(rankSpellId,false,false);
+                removeSpell(rankSpellId, false, false);
             }
         }
     }
-    else if (sSpellMgr.GetSpellRank(spell_id)!=0)
+    else if (sSpellMgr.GetSpellRank(spell_id) != 0)
     {
         for (PetSpellMap::const_iterator itr2 = m_spells.begin(); itr2 != m_spells.end(); ++itr2)
         {
             if (itr2->second.state == PETSPELL_REMOVED) continue;
 
-            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo,itr2->first))
+            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr2->first))
             {
                 // replace by new high rank
-                if (sSpellMgr.IsHighRankOfSpell(spell_id,itr2->first))
+                if (sSpellMgr.IsHighRankOfSpell(spell_id, itr2->first))
                 {
                     newspell.active = itr2->second.active;
 
@@ -1531,11 +1531,11 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
                         ToggleAutocast(itr2->first, false);
 
                     oldspell_id = itr2->first;
-                    unlearnSpell(itr2->first,false,false);
+                    unlearnSpell(itr2->first, false, false);
                     break;
                 }
                 // ignore new lesser rank
-                else if (sSpellMgr.IsHighRankOfSpell(itr2->first,spell_id))
+                else if (sSpellMgr.IsHighRankOfSpell(itr2->first, spell_id))
                     return false;
             }
         }
@@ -1554,7 +1554,7 @@ bool Pet::addSpell(uint32 spell_id,ActiveStates active /*= ACT_DECIDE*/, PetSpel
     uint32 talentCost = GetTalentSpellCost(spell_id);
     if (talentCost)
     {
-        m_usedTalentCount+=talentCost;
+        m_usedTalentCount += talentCost;
         UpdateFreeTalentPoints(false);
     }
     return true;
@@ -1592,7 +1592,7 @@ void Pet::InitLevelupSpellsForLevel()
         {
             // will called first if level down
             if (itr->first > level)
-                unlearnSpell(itr->second,true);                 // will learn prev rank if any
+                unlearnSpell(itr->second, true);                // will learn prev rank if any
             // will called if level up
             else
                 learnSpell(itr->second);                        // will unlearn prev rank if any
@@ -1612,7 +1612,7 @@ void Pet::InitLevelupSpellsForLevel()
 
             // will called first if level down
             if (spellEntry->spellLevel > level)
-                unlearnSpell(spellEntry->Id,true);
+                unlearnSpell(spellEntry->Id, true);
             // will called if level up
             else
                 learnSpell(spellEntry->Id);
@@ -1622,7 +1622,7 @@ void Pet::InitLevelupSpellsForLevel()
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if (removeSpell(spell_id,learn_prev,clear_ab))
+    if (removeSpell(spell_id, learn_prev, clear_ab))
     {
         if (!m_loading)
         {
@@ -1661,7 +1661,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     if (talentCost > 0)
     {
         if (m_usedTalentCount > talentCost)
-            m_usedTalentCount-=talentCost;
+            m_usedTalentCount -= talentCost;
         else
             m_usedTalentCount = 0;
 
@@ -1697,7 +1697,7 @@ void Pet::CleanupActionBar()
         if (UnitActionBarEntry const* ab = m_charmInfo->GetActionBarEntry(i))
             if (uint32 action = ab->GetAction())
                 if (ab->IsActionBarForSpell() && !HasSpell(action))
-                    m_charmInfo->SetActionBar(i,0,ACT_DISABLED);
+                    m_charmInfo->SetActionBar(i, 0, ACT_DISABLED);
 }
 
 void Pet::InitPetCreateSpells()
@@ -1713,12 +1713,12 @@ void Pet::InitPetCreateSpells()
 bool Pet::resetTalents(bool no_cost)
 {
     Unit* owner = GetOwner();
-    if (!owner || owner->GetTypeId()!=TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return false;
 
     // not need after this call
     if (((Player*)owner)->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
-        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS,true);
+        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
 
     CreatureInfo const* ci = GetCreatureInfo();
     if (!ci)
@@ -1766,7 +1766,7 @@ bool Pet::resetTalents(bool no_cost)
 
         for (int j = 0; j < MAX_TALENT_RANK; j++)
             if (talentInfo->RankID[j])
-                removeSpell(talentInfo->RankID[j],!IsPassiveSpell(talentInfo->RankID[j]),false);
+                removeSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
     }
 
     UpdateFreeTalentPoints(false);
@@ -1786,7 +1786,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
 {
     // not need after this call
     if (((Player*)owner)->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
-        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS,true);
+        ((Player*)owner)->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
 
     // reset for online
     if (online_pet)
@@ -1797,7 +1797,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
 
     QueryResult* resultPets = CharacterDatabase.PQuery(
                                   "SELECT id FROM character_pet WHERE owner = '%u' AND id <> '%u'",
-                                  owner->GetGUIDLow(),except_petnumber);
+                                  owner->GetGUIDLow(), except_petnumber);
 
     // no offline pets
     if (!resultPets)
@@ -1806,7 +1806,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
     QueryResult* result = CharacterDatabase.PQuery(
                               "SELECT DISTINCT pet_spell.spell FROM pet_spell, character_pet "
                               "WHERE character_pet.owner = '%u' AND character_pet.id = pet_spell.guid AND character_pet.id <> %u",
-                              owner->GetGUIDLow(),except_petnumber);
+                              owner->GetGUIDLow(), except_petnumber);
 
     if (!result)
     {
@@ -1904,20 +1904,20 @@ void Pet::InitTalentForLevel()
 
 uint32 Pet::resetTalentsCost() const
 {
-    uint32 days = uint32(sWorld.GetGameTime() - m_resetTalentsTime)/DAY;
+    uint32 days = uint32(sWorld.GetGameTime() - m_resetTalentsTime) / DAY;
 
     // The first time reset costs 10 silver; after 1 day cost is reset to 10 silver
-    if (m_resetTalentsCost < 10*SILVER || days > 0)
-        return 10*SILVER;
+    if (m_resetTalentsCost < 10 * SILVER || days > 0)
+        return 10 * SILVER;
     // then 50 silver
-    else if (m_resetTalentsCost < 50*SILVER)
-        return 50*SILVER;
+    else if (m_resetTalentsCost < 50 * SILVER)
+        return 50 * SILVER;
     // then 1 gold
-    else if (m_resetTalentsCost < 1*GOLD)
-        return 1*GOLD;
+    else if (m_resetTalentsCost < 1 * GOLD)
+        return 1 * GOLD;
     // then increasing at a rate of 1 gold; cap 10 gold
     else
-        return (m_resetTalentsCost + 1*GOLD > 10*GOLD ? 10*GOLD : m_resetTalentsCost + 1*GOLD);
+        return (m_resetTalentsCost + 1 * GOLD > 10 * GOLD ? 10 * GOLD : m_resetTalentsCost + 1 * GOLD);
 }
 
 uint8 Pet::GetMaxTalentPointsForLevel(uint32 level)
@@ -1925,7 +1925,7 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint32 level)
     uint8 points = (level >= 20) ? ((level - 16) / 4) : 0;
     // Mod points from owner SPELL_AURA_MOD_PET_TALENT_POINTS
     if (Unit* owner = GetOwner())
-        points+=owner->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
+        points += owner->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
     return points;
 }
 
@@ -2050,7 +2050,7 @@ void Pet::LearnPetPassives()
 void Pet::CastPetAuras(bool current)
 {
     Unit* owner = GetOwner();
-    if (!owner || owner->GetTypeId()!=TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     for (PetAuraSet::const_iterator itr = owner->m_petAuras.begin(); itr != owner->m_petAuras.end();)
@@ -2092,7 +2092,7 @@ void Pet::learnSpellHighRank(uint32 spellid)
     learnSpell(spellid);
 
     DoPetLearnSpell worker(*this);
-    sSpellMgr.doForHighRanks(spellid,worker);
+    sSpellMgr.doForHighRanks(spellid, worker);
 }
 
 void Pet::SynchronizeLevelWithOwner()
@@ -2127,7 +2127,7 @@ void Pet::ApplyModeFlags(PetModeFlags mode, bool apply)
         m_petModeFlags = PetModeFlags(m_petModeFlags & ~mode);
 
     Unit* owner = GetOwner();
-    if (!owner || owner->GetTypeId()!=TYPEID_PLAYER)
+    if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
 
     WorldPacket data(SMSG_PET_MODE, 12);

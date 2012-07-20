@@ -144,14 +144,14 @@ class MANGOS_DLL_SPEC Pet : public Creature
 
         PetType getPetType() const { return m_petType; }
         void setPetType(PetType type) { m_petType = type; }
-        bool isControlled() const { return getPetType()==SUMMON_PET || getPetType()==HUNTER_PET; }
+        bool isControlled() const { return getPetType() == SUMMON_PET || getPetType() == HUNTER_PET; }
         bool isTemporarySummoned() const { return m_duration > 0; }
 
         bool IsPermanentPetFor(Player* owner);              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
         bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
         bool CreateBaseAtCreature(Creature* creature);
-        bool LoadPetFromDB(Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false);
+        bool LoadPetFromDB(Player* owner, uint32 petentry = 0, uint32 petnumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
         void Unsummon(PetSaveMode mode, Unit* owner = NULL);
         static void DeleteFromDB(uint32 guidlow, bool separate_transaction = true);
@@ -211,7 +211,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
         void _LoadSpells();
         void _SaveSpells();
 
-        bool addSpell(uint32 spell_id,ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
+        bool addSpell(uint32 spell_id, ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool learnSpell(uint32 spell_id);
         void learnSpellHighRank(uint32 spellid);
         void InitLevelupSpellsForLevel();

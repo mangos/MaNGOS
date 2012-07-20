@@ -39,7 +39,7 @@ void WorldSession::SendNameQueryOpcode(Player* p)
     if (!p)
         return;
     // guess size
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+10));
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
     data << p->GetPackGUID();                               // player guid
     data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << p->GetName();                                   // played name
@@ -102,7 +102,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult* result, uint32
         pClass       = fields[4].GetUInt8();
     }
     // guess size
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8+1+1+1+1+1+1+10));
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 1 + 10));
     data << ObjectGuid(HIGHGUID_PLAYER, lowguid).WriteAsPacked();
     data << uint8(0);                                       // added in 3.1; if > 1, then end of packet
     data << name;
@@ -115,7 +115,7 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult* result, uint32
     if (sWorld.getConfig(CONFIG_BOOL_DECLINED_NAMES_USED) && fields[5].GetCppString() != "")
     {
         data << uint8(1);                                   // is declined
-        for (int i = 5; i < MAX_DECLINED_NAME_CASES+5; ++i)
+        for (int i = 5; i < MAX_DECLINED_NAME_CASES + 5; ++i)
             data << fields[i].GetCppString();
     }
     else
@@ -298,7 +298,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recv_data*/)
         }
     }
 
-    WorldPacket data(MSG_CORPSE_QUERY, 1+(6*4));
+    WorldPacket data(MSG_CORPSE_QUERY, 1 + (6 * 4));
     data << uint8(1);                                       // corpse found
     data << int32(mapid);
     data << float(x);
@@ -347,8 +347,8 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recv_data)
         std::string Text_0[MAX_GOSSIP_TEXT_OPTIONS], Text_1[MAX_GOSSIP_TEXT_OPTIONS];
         for (int i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
         {
-            Text_0[i]=pGossip->Options[i].Text_0;
-            Text_1[i]=pGossip->Options[i].Text_1;
+            Text_0[i] = pGossip->Options[i].Text_0;
+            Text_1[i] = pGossip->Options[i].Text_1;
         }
 
         int loc_idx = GetSessionDbLocaleIndex();
@@ -438,7 +438,7 @@ void WorldSession::HandleCorpseMapPositionQueryOpcode(WorldPacket& recv_data)
     uint32 unk;
     recv_data >> unk;
 
-    WorldPacket data(SMSG_CORPSE_TRANSPORT_QUERY, 4+4+4+4);
+    WorldPacket data(SMSG_CORPSE_TRANSPORT_QUERY, 4 + 4 + 4 + 4);
     data << float(0);
     data << float(0);
     data << float(0);
@@ -450,7 +450,7 @@ void WorldSession::HandleQueryQuestsCompletedOpcode(WorldPacket& /*recv_data */)
 {
     uint32 count = 0;
 
-    WorldPacket data(SMSG_ALL_QUESTS_COMPLETED, 4+4*count);
+    WorldPacket data(SMSG_ALL_QUESTS_COMPLETED, 4 + 4 * count);
     data << uint32(count);
 
     for (QuestStatusMap::const_iterator itr = _player->getQuestStatusMap().begin(); itr != _player->getQuestStatusMap().end(); ++itr)
@@ -476,7 +476,7 @@ void WorldSession::HandleQuestPOIQueryOpcode(WorldPacket& recv_data)
         return;
     }
 
-    WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4+(4+4)*count);
+    WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4 + (4 + 4)*count);
     data << uint32(count);                                  // count
 
     for (uint32 i = 0; i < count; ++i)
@@ -489,7 +489,7 @@ void WorldSession::HandleQuestPOIQueryOpcode(WorldPacket& recv_data)
         uint16 questSlot = _player->FindQuestSlot(questId);
 
         if (questSlot != MAX_QUEST_LOG_SIZE)
-            questOk =_player->GetQuestSlotQuestId(questSlot) == questId;
+            questOk = _player->GetQuestSlotQuestId(questSlot) == questId;
 
         if (questOk)
         {
@@ -536,7 +536,7 @@ void WorldSession::HandleQuestPOIQueryOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendQueryTimeResponse()
 {
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4+4);
+    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4 + 4);
     data << uint32(time(NULL));
     data << uint32(sWorld.GetNextDailyQuestsResetTime() - time(NULL));
     SendPacket(&data);

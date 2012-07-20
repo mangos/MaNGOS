@@ -44,22 +44,22 @@ namespace MaNGOS
                 : i_msgtype(msgtype), i_textId(textId), i_source(source), i_args(args) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
                 if (i_args)
                 {
                     // we need copy va_list before use or original va_list will corrupted
                     va_list ap;
-                    va_copy(ap,*i_args);
+                    va_copy(ap, *i_args);
 
                     char str [2048];
-                    vsnprintf(str,2048,text, ap);
+                    vsnprintf(str, 2048, text, ap);
                     va_end(ap);
 
-                    do_helper(data,&str[0]);
+                    do_helper(data, &str[0]);
                 }
                 else
-                    do_helper(data,text);
+                    do_helper(data, text);
             }
         private:
             void do_helper(WorldPacket& data, char const* text)
@@ -71,7 +71,7 @@ namespace MaNGOS
                 data << ObjectGuid(targetGuid);             // there 0 for BG messages
                 data << uint32(0);                          // can be chat msg group or something
                 data << ObjectGuid(targetGuid);
-                data << uint32(strlen(text)+1);
+                data << uint32(strlen(text) + 1);
                 data << text;
                 data << uint8(i_source ? i_source->GetChatTag() : CHAT_TAG_NONE);
             }
@@ -89,22 +89,22 @@ namespace MaNGOS
                 : i_language(language), i_textId(textId), i_source(source), i_args(args) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
+                char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
                 if (i_args)
                 {
                     // we need copy va_list before use or original va_list will corrupted
                     va_list ap;
-                    va_copy(ap,*i_args);
+                    va_copy(ap, *i_args);
 
                     char str [2048];
-                    vsnprintf(str,2048,text, ap);
+                    vsnprintf(str, 2048, text, ap);
                     va_end(ap);
 
-                    do_helper(data,&str[0]);
+                    do_helper(data, &str[0]);
                 }
                 else
-                    do_helper(data,text);
+                    do_helper(data, text);
             }
         private:
             void do_helper(WorldPacket& data, char const* text)
@@ -114,10 +114,10 @@ namespace MaNGOS
                 data << uint32(i_language);
                 data << ObjectGuid(i_source->GetObjectGuid());
                 data << uint32(0);                          // 2.1.0
-                data << uint32(strlen(i_source->GetName())+1);
+                data << uint32(strlen(i_source->GetName()) + 1);
                 data << i_source->GetName();
                 data << ObjectGuid();                       // Unit Target - isn't important for bgs
-                data << uint32(strlen(text)+1);
+                data << uint32(strlen(text) + 1);
                 data << text;
                 data << uint8(0);                                      // ChatTag - for bgs allways 0?
             }
@@ -136,12 +136,12 @@ namespace MaNGOS
                 : i_msgtype(msgtype), i_textId(textId), i_source(source), i_arg1(arg1), i_arg2(arg2) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
-                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1,loc_idx) : "";
-                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2,loc_idx) : "";
+                char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
+                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1, loc_idx) : "";
+                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2, loc_idx) : "";
 
                 char str [2048];
-                snprintf(str,2048,text, arg1str, arg2str);
+                snprintf(str, 2048, text, arg1str, arg2str);
 
                 ObjectGuid targetGuid = i_source  ? i_source ->GetObjectGuid() : ObjectGuid();
 
@@ -150,7 +150,7 @@ namespace MaNGOS
                 data << ObjectGuid(targetGuid);             // there 0 for BG messages
                 data << uint32(0);                          // can be chat msg group or something
                 data << ObjectGuid(targetGuid);
-                data << uint32(strlen(str)+1);
+                data << uint32(strlen(str) + 1);
                 data << str;
                 data << uint8(i_source ? i_source->GetChatTag() : CHAT_TAG_NONE);
             }
@@ -170,9 +170,9 @@ namespace MaNGOS
                 : i_language(language), i_textId(textId), i_source(source), i_arg1(arg1), i_arg2(arg2) {}
             void operator()(WorldPacket& data, int32 loc_idx)
             {
-                char const* text = sObjectMgr.GetMangosString(i_textId,loc_idx);
-                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1,loc_idx) : "";
-                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2,loc_idx) : "";
+                char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
+                char const* arg1str = i_arg1 ? sObjectMgr.GetMangosString(i_arg1, loc_idx) : "";
+                char const* arg2str = i_arg2 ? sObjectMgr.GetMangosString(i_arg2, loc_idx) : "";
 
                 char str [2048];
                 snprintf(str, 2048, text, arg1str, arg2str);
@@ -181,10 +181,10 @@ namespace MaNGOS
                 data << uint32(i_language);
                 data << ObjectGuid(i_source->GetObjectGuid());
                 data << uint32(0);                          // 2.1.0
-                data << uint32(strlen(i_source->GetName())+1);
+                data << uint32(strlen(i_source->GetName()) + 1);
                 data << i_source->GetName();
                 data << ObjectGuid();                       // Unit Target - isn't important for bgs
-                data << uint32(strlen(str)+1);
+                data << uint32(strlen(str) + 1);
                 data << str;
                 data << uint8(0);                           // ChatTag - for bgs allways 0?
             }
@@ -776,7 +776,7 @@ void BattleGround::EndBattleGround(Team winner)
                 if (member)
                     plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, member->personal_rating);
 
-                winner_arena_team->MemberWon(plr,loser_rating);
+                winner_arena_team->MemberWon(plr, loser_rating);
 
                 if (member)
                 {
@@ -786,7 +786,7 @@ void BattleGround::EndBattleGround(Team winner)
             }
             else
             {
-                loser_arena_team->MemberLost(plr,winner_rating);
+                loser_arena_team->MemberLost(plr, winner_rating);
 
                 // Arena lost => reset the win_rated_arena having the "no_loose" condition
                 plr->GetAchievementMgr().ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, ACHIEVEMENT_CRITERIA_CONDITION_NO_LOOSE);
@@ -795,12 +795,12 @@ void BattleGround::EndBattleGround(Team winner)
 
         if (team == winner)
         {
-            RewardMark(plr,ITEM_WINNER_COUNT);
+            RewardMark(plr, ITEM_WINNER_COUNT);
             RewardQuestComplete(plr);
             plr->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, 1);
         }
         else
-            RewardMark(plr,ITEM_LOSER_COUNT);
+            RewardMark(plr, ITEM_LOSER_COUNT);
 
         plr->CombatStopWithPets(true);
 
@@ -852,27 +852,27 @@ uint32 BattleGround::GetBattlemasterEntry() const
     }
 }
 
-void BattleGround::RewardMark(Player* plr,uint32 count)
+void BattleGround::RewardMark(Player* plr, uint32 count)
 {
     switch (GetTypeID())
     {
         case BATTLEGROUND_AV:
             if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr,SPELL_AV_MARK_WINNER);
+                RewardSpellCast(plr, SPELL_AV_MARK_WINNER);
             else
-                RewardSpellCast(plr,SPELL_AV_MARK_LOSER);
+                RewardSpellCast(plr, SPELL_AV_MARK_LOSER);
             break;
         case BATTLEGROUND_WS:
             if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr,SPELL_WS_MARK_WINNER);
+                RewardSpellCast(plr, SPELL_WS_MARK_WINNER);
             else
-                RewardSpellCast(plr,SPELL_WS_MARK_LOSER);
+                RewardSpellCast(plr, SPELL_WS_MARK_LOSER);
             break;
         case BATTLEGROUND_AB:
             if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr,SPELL_AB_MARK_WINNER);
+                RewardSpellCast(plr, SPELL_AB_MARK_WINNER);
             else
-                RewardSpellCast(plr,SPELL_AB_MARK_LOSER);
+                RewardSpellCast(plr, SPELL_AB_MARK_LOSER);
             break;
         case BATTLEGROUND_EY:                               // no rewards
         default:
@@ -889,7 +889,7 @@ void BattleGround::RewardSpellCast(Player* plr, uint32 spell_id)
     SpellEntry const* spellInfo = sSpellStore.LookupEntry(spell_id);
     if (!spellInfo)
     {
-        sLog.outError("Battleground reward casting spell %u not exist.",spell_id);
+        sLog.outError("Battleground reward casting spell %u not exist.", spell_id);
         return;
     }
 
@@ -908,7 +908,7 @@ void BattleGround::RewardItem(Player* plr, uint32 item_id, uint32 count)
 
     if (msg == EQUIP_ERR_ITEM_NOT_FOUND)
     {
-        sLog.outErrorDb("Battleground reward item (Entry %u) not exist in `item_template`.",item_id);
+        sLog.outErrorDb("Battleground reward item (Entry %u) not exist in `item_template`.", item_id);
         return;
     }
 
@@ -917,13 +917,13 @@ void BattleGround::RewardItem(Player* plr, uint32 item_id, uint32 count)
 
     if (count != 0 && !dest.empty())                        // can add some
         if (Item* item = plr->StoreNewItem(dest, item_id, true, 0))
-            plr->SendNewItem(item,count,true,false);
+            plr->SendNewItem(item, count, true, false);
 
     if (no_space_count > 0)
-        SendRewardMarkByMail(plr,item_id,no_space_count);
+        SendRewardMarkByMail(plr, item_id, no_space_count);
 }
 
-void BattleGround::SendRewardMarkByMail(Player* plr,uint32 mark, uint32 count)
+void BattleGround::SendRewardMarkByMail(Player* plr, uint32 mark, uint32 count)
 {
     uint32 bmEntry = GetBattlemasterEntry();
     if (!bmEntry)
@@ -933,7 +933,7 @@ void BattleGround::SendRewardMarkByMail(Player* plr,uint32 mark, uint32 count)
     if (!markProto)
         return;
 
-    if (Item* markItem = Item::CreateItem(mark,count,plr))
+    if (Item* markItem = Item::CreateItem(mark, count, plr))
     {
         // save new item before send
         markItem->SaveToDB();                               // save for prevent lost at next mail load, if send fail then item will deleted
@@ -1038,7 +1038,7 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
             if (isArena())
             {
                 plr->RemoveArenaAuras(true);                // removes debuffs / dots etc., we don't want the player to die after porting out
-                bgTypeId=BATTLEGROUND_AA;                   // set the bg type to all arenas (it will be used for queue refreshing)
+                bgTypeId = BATTLEGROUND_AA;                 // set the bg type to all arenas (it will be used for queue refreshing)
 
                 // unsummon current and summon old pet if there was one and there isn't a current pet
                 plr->RemovePet(PET_SAVE_NOT_IN_SLOT);
@@ -1050,7 +1050,7 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
                     ArenaTeam* winner_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(GetOtherTeam(team)));
                     ArenaTeam* loser_arena_team = sObjectMgr.GetArenaTeamById(GetArenaTeamIdForTeam(team));
                     if (winner_arena_team && loser_arena_team)
-                        loser_arena_team->MemberLost(plr,winner_arena_team->GetRating());
+                        loser_arena_team->MemberLost(plr, winner_arena_team->GetRating());
                 }
             }
             if (SendPacket)
@@ -1203,16 +1203,16 @@ void BattleGround::AddPlayer(Player* plr)
         if (team == ALLIANCE)                               // gold
         {
             if (plr->GetTeam() == HORDE)
-                plr->CastSpell(plr, SPELL_HORDE_GOLD_FLAG,true);
+                plr->CastSpell(plr, SPELL_HORDE_GOLD_FLAG, true);
             else
-                plr->CastSpell(plr, SPELL_ALLIANCE_GOLD_FLAG,true);
+                plr->CastSpell(plr, SPELL_ALLIANCE_GOLD_FLAG, true);
         }
         else                                                // green
         {
             if (plr->GetTeam() == HORDE)
-                plr->CastSpell(plr, SPELL_HORDE_GREEN_FLAG,true);
+                plr->CastSpell(plr, SPELL_HORDE_GREEN_FLAG, true);
             else
-                plr->CastSpell(plr, SPELL_ALLIANCE_GREEN_FLAG,true);
+                plr->CastSpell(plr, SPELL_ALLIANCE_GREEN_FLAG, true);
         }
 
         plr->DestroyConjuredItems(true);
@@ -1393,8 +1393,8 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // so we must create it specific for this instance
     GameObject* go = new GameObject;
-    if (!go->Create(GetBgMap()->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT),entry, GetBgMap(),
-                    PHASEMASK_NORMAL, x,y,z,o, QuaternionData(rotation0,rotation1,rotation2,rotation3)))
+    if (!go->Create(GetBgMap()->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), entry, GetBgMap(),
+                    PHASEMASK_NORMAL, x, y, z, o, QuaternionData(rotation0, rotation1, rotation2, rotation3)))
     {
         sLog.outErrorDb("Gameobject template %u not found in database! BattleGround not created!", entry);
         sLog.outError("Cannot create gameobject template %u! BattleGround not created!", entry);
@@ -1834,5 +1834,5 @@ bool BattleGround::IsTeamScoreInRange(Team team, uint32 minScore, uint32 maxScor
 void BattleGround::SetBracket(PvPDifficultyEntry const* bracketEntry)
 {
     m_BracketId  = bracketEntry->GetBracketId();
-    SetLevelRange(bracketEntry->minLevel,bracketEntry->maxLevel);
+    SetLevelRange(bracketEntry->minLevel, bracketEntry->maxLevel);
 }

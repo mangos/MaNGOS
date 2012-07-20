@@ -162,7 +162,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     MD5_CTX ctx;
     MD5_Init(&ctx);
 
-    const size_t check_chunk_size = 4*1024;
+    const size_t check_chunk_size = 4 * 1024;
 
     ACE_UINT8 buf[check_chunk_size];
 

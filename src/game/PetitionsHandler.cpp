@@ -271,7 +271,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 
     DEBUG_LOG("CMSG_PETITION_SHOW_SIGNATURES petition: %s", petitionguid.GetString().c_str());
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+1+signs*12));
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << ObjectGuid(petitionguid);                       // petition guid
     data << _player->GetObjectGuid();                       // owner guid
     data << uint32(petitionguid_low);                       // guild guid (in mangos always same as GUID_LOPART(petitionguid)
@@ -335,7 +335,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
         return;
     }
 
-    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4+8+name.size()+1+1+4*12+2+10));
+    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + name.size() + 1 + 1 + 4 * 12 + 2 + 10));
     data << uint32(petitionLowGuid);                        // guild/team guid (in mangos always same as GUID_LOPART(petition guid)
     data << ObjectGuid(ownerGuid);                          // charter owner guid
     data << name;                                           // name (guild/arena team)
@@ -348,8 +348,8 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
     }
     else
     {
-        data << uint32(type-1);
-        data << uint32(type-1);
+        data << uint32(type - 1);
+        data << uint32(type - 1);
         data << uint32(type);                               // bypass client - side limitation, a different value is needed here for each petition
     }
     data << uint32(0);                                      // 5
@@ -438,7 +438,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 
     DEBUG_LOG("Petition %s renamed to '%s'", petitionGuid.GetString().c_str(), newname.c_str());
 
-    WorldPacket data(MSG_PETITION_RENAME, (8+newname.size()+1));
+    WorldPacket data(MSG_PETITION_RENAME, (8 + newname.size() + 1));
     data << ObjectGuid(petitionGuid);
     data << newname;
     SendPacket(&data);
@@ -542,7 +542,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
     if (result)
     {
         delete result;
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8+8+4));
+        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
         data << ObjectGuid(petitionGuid);
         data << ObjectGuid(_player->GetObjectGuid());
         data << uint32(PETITION_SIGN_ALREADY_SIGNED);
@@ -561,7 +561,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 
     DEBUG_LOG("PETITION SIGN: %s by %s", petitionGuid.GetString().c_str(), _player->GetGuidStr().c_str());
 
-    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8+8+4));
+    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
     data << ObjectGuid(petitionGuid);
     data << ObjectGuid(_player->GetObjectGuid());
     data << uint32(PETITION_SIGN_OK);
@@ -696,7 +696,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
         signs = (uint8)result->GetRowCount();
 
     /// Send response
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8+8+4+signs+signs*12));
+    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + signs + signs * 12));
     data << ObjectGuid(petitionGuid);                       // petition guid
     data << ObjectGuid(_player->GetObjectGuid());           // owner guid
     data << uint32(petitionGuid.GetCounter());              // guild guid (in mangos always same as low part of petition guid)
@@ -932,7 +932,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     else
         count = 3;
 
-    WorldPacket data(SMSG_PETITION_SHOWLIST, 8+1+4*6);
+    WorldPacket data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
     data << ObjectGuid(guid);                               // npc guid
     data << uint8(count);                                   // count
     if (count == 1)

@@ -30,7 +30,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recv_data*/)
 
     time_t cur_time = time(NULL);
 
-    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR, 4+4*0+4+4*0+4+4);
+    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR, 4 + 4 * 0 + 4 + 4 * 0 + 4 + 4);
 
     // TODO: calendar invite event output
     data << (uint32) 0;                                     // invite node count
@@ -59,7 +59,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recv_data*/)
             }
         }
     }
-    data.put<uint32>(p_counter,counter);
+    data.put<uint32>(p_counter, counter);
 
     data << (uint32) 1135753200;                            // base date (28.12.2005 12:00)
     data << (uint32) 0;                                     // raid reset count

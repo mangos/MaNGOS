@@ -69,7 +69,7 @@ class FreezeDetectorRunnable : public ACE_Based::Runnable
         {
             if (!_delaytime)
                 return;
-            sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
+            sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...", _delaytime / 1000);
             m_loops = 0;
             w_loops = 0;
             m_lastchange = 0;
@@ -253,20 +253,20 @@ int Master::Run()
             ULONG_PTR appAff;
             ULONG_PTR sysAff;
 
-            if (GetProcessAffinityMask(hProcess,&appAff,&sysAff))
+            if (GetProcessAffinityMask(hProcess, &appAff, &sysAff))
             {
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
                 if (!curAff)
                 {
-                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x",Aff,appAff);
+                    sLog.outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for mangosd. Accessible processors bitmask (hex): %x", Aff, appAff);
                 }
                 else
                 {
-                    if (SetProcessAffinityMask(hProcess,curAff))
+                    if (SetProcessAffinityMask(hProcess, curAff))
                         sLog.outString("Using processors (bitmask, hex): %x", curAff);
                     else
-                        sLog.outError("Can't set used processors (hex): %x",curAff);
+                        sLog.outError("Can't set used processors (hex): %x", curAff);
                 }
             }
             sLog.outString();
@@ -277,7 +277,7 @@ int Master::Run()
 //        if(Prio && (m_ServiceStatus == -1)/* need set to default process priority class in service mode*/)
         if (Prio)
         {
-            if (SetPriorityClass(hProcess,HIGH_PRIORITY_CLASS))
+            if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
                 sLog.outString("mangosd process priority class set to HIGH");
             else
                 sLog.outError("Can't set mangosd process priority class.");
@@ -302,7 +302,7 @@ int Master::Run()
     if (uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* fdr = new FreezeDetectorRunnable();
-        fdr->SetDelayTime(freeze_delay*1000);
+        fdr->SetDelayTime(freeze_delay * 1000);
         freeze_thread = new ACE_Based::Thread(fdr);
         freeze_thread->setPriority(ACE_Based::Highest);
     }
@@ -436,11 +436,11 @@ bool Master::_StartDB()
     ///- Initialise the world database
     if (!WorldDatabase.Initialize(dbstring.c_str(), nConnections))
     {
-        sLog.outError("Cannot connect to world database %s",dbstring.c_str());
+        sLog.outError("Cannot connect to world database %s", dbstring.c_str());
         return false;
     }
 
-    if (!WorldDatabase.CheckRequiredField("db_version",REVISION_DB_MANGOS))
+    if (!WorldDatabase.CheckRequiredField("db_version", REVISION_DB_MANGOS))
     {
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
@@ -462,14 +462,14 @@ bool Master::_StartDB()
     ///- Initialise the Character database
     if (!CharacterDatabase.Initialize(dbstring.c_str(), nConnections))
     {
-        sLog.outError("Cannot connect to Character database %s",dbstring.c_str());
+        sLog.outError("Cannot connect to Character database %s", dbstring.c_str());
 
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
         return false;
     }
 
-    if (!CharacterDatabase.CheckRequiredField("character_db_version",REVISION_DB_CHARACTERS))
+    if (!CharacterDatabase.CheckRequiredField("character_db_version", REVISION_DB_CHARACTERS))
     {
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
@@ -494,7 +494,7 @@ bool Master::_StartDB()
     sLog.outString("Login Database total connections: %i", nConnections + 1);
     if (!LoginDatabase.Initialize(dbstring.c_str(), nConnections))
     {
-        sLog.outError("Cannot connect to login database %s",dbstring.c_str());
+        sLog.outError("Cannot connect to login database %s", dbstring.c_str());
 
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();
@@ -502,7 +502,7 @@ bool Master::_StartDB()
         return false;
     }
 
-    if (!LoginDatabase.CheckRequiredField("realmd_db_version",REVISION_DB_REALMD))
+    if (!LoginDatabase.CheckRequiredField("realmd_db_version", REVISION_DB_REALMD))
     {
         ///- Wait for already started DB delay threads to end
         WorldDatabase.HaltDelayThread();

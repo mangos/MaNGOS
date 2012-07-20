@@ -76,5 +76,5 @@ void BattleGroundSA::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
     if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
-    BattleGround::UpdatePlayerScore(Source,type,value);
+    BattleGround::UpdatePlayerScore(Source, type, value);
 }

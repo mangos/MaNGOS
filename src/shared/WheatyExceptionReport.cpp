@@ -317,10 +317,10 @@ void WheatyExceptionReport::PrintSystemInfo()
     _tprintf(_T("//=====================================================\r\n"));
     if (_GetProcessorName(sString, countof(sString)))
         _tprintf(_T("*** Hardware ***\r\nProcessor: %s\r\nNumber Of Processors: %d\r\nPhysical Memory: %d KB (Available: %d KB)\r\nCommit Charge Limit: %d KB\r\n"),
-                 sString, SystemInfo.dwNumberOfProcessors, MemoryStatus.dwTotalPhys/0x400, MemoryStatus.dwAvailPhys/0x400, MemoryStatus.dwTotalPageFile/0x400);
+                 sString, SystemInfo.dwNumberOfProcessors, MemoryStatus.dwTotalPhys / 0x400, MemoryStatus.dwAvailPhys / 0x400, MemoryStatus.dwTotalPageFile / 0x400);
     else
         _tprintf(_T("*** Hardware ***\r\nProcessor: <unknown>\r\nNumber Of Processors: %d\r\nPhysical Memory: %d KB (Available: %d KB)\r\nCommit Charge Limit: %d KB\r\n"),
-                 SystemInfo.dwNumberOfProcessors, MemoryStatus.dwTotalPhys/0x400, MemoryStatus.dwAvailPhys/0x400, MemoryStatus.dwTotalPageFile/0x400);
+                 SystemInfo.dwNumberOfProcessors, MemoryStatus.dwTotalPhys / 0x400, MemoryStatus.dwAvailPhys / 0x400, MemoryStatus.dwTotalPageFile / 0x400);
 
     if (_GetWindowsVersion(sString, countof(sString)))
         _tprintf(_T("\r\n*** Operation System ***\r\n%s\r\n"), sString);
@@ -362,7 +362,7 @@ void WheatyExceptionReport::printTracesForAllThreads()
         {
             CONTEXT context;
             context.ContextFlags = 0xffffffff;
-            HANDLE threadHandle = OpenThread(THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION,false, te32.th32ThreadID);
+            HANDLE threadHandle = OpenThread(THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, false, te32.th32ThreadID);
             if (threadHandle && GetThreadContext(threadHandle, &context))
             {
                 WriteStackDetails(&context, false, threadHandle);
@@ -425,7 +425,7 @@ void WheatyExceptionReport::GenerateExceptionReport(
     _tprintf(_T("\r\nRegisters:\r\n"));
 
     _tprintf(_T("EAX:%08X\r\nEBX:%08X\r\nECX:%08X\r\nEDX:%08X\r\nESI:%08X\r\nEDI:%08X\r\n")
-             ,pCtx->Eax, pCtx->Ebx, pCtx->Ecx, pCtx->Edx,
+             , pCtx->Eax, pCtx->Ebx, pCtx->Ecx, pCtx->Edx,
              pCtx->Esi, pCtx->Edi);
 
     _tprintf(_T("CS:EIP:%04X:%08X\r\n"), pCtx->SegCs, pCtx->Eip);
@@ -440,8 +440,8 @@ void WheatyExceptionReport::GenerateExceptionReport(
     _tprintf(_T("\r\nRegisters:\r\n"));
     _tprintf(_T("RAX:%016I64X\r\nRBX:%016I64X\r\nRCX:%016I64X\r\nRDX:%016I64X\r\nRSI:%016I64X\r\nRDI:%016I64X\r\n")
              _T("R8: %016I64X\r\nR9: %016I64X\r\nR10:%016I64X\r\nR11:%016I64X\r\nR12:%016I64X\r\nR13:%016I64X\r\nR14:%016I64X\r\nR15:%016I64X\r\n")
-             ,pCtx->Rax, pCtx->Rbx, pCtx->Rcx, pCtx->Rdx,
-             pCtx->Rsi, pCtx->Rdi ,pCtx->R9,pCtx->R10,pCtx->R11,pCtx->R12,pCtx->R13,pCtx->R14,pCtx->R15);
+             , pCtx->Rax, pCtx->Rbx, pCtx->Rcx, pCtx->Rdx,
+             pCtx->Rsi, pCtx->Rdi , pCtx->R9, pCtx->R10, pCtx->R11, pCtx->R12, pCtx->R13, pCtx->R14, pCtx->R15);
     _tprintf(_T("CS:RIP:%04X:%016I64X\r\n"), pCtx->SegCs, pCtx->Rip);
     _tprintf(_T("SS:RSP:%04X:%016X  RBP:%08X\r\n"),
              pCtx->SegSs, pCtx->Rsp, pCtx->Rbp);
@@ -577,7 +577,7 @@ BOOL WheatyExceptionReport::GetLogicalAddress(
             // Yes, address is in the section.  Calculate section and offset,
             // and store in the "section" & "offset" params, which were
             // passed by reference.
-            section = i+1;
+            section = i + 1;
             offset = rva - sectionStart;
             return TRUE;
         }
@@ -696,7 +696,7 @@ void WheatyExceptionReport::WriteStackDetails(
         if (SymGetLineFromAddr64(m_hProcess, sf.AddrPC.Offset,
                                  &dwLineDisplacement, &lineInfo))
         {
-            _tprintf(_T("  %s line %u"),lineInfo.FileName,lineInfo.LineNumber);
+            _tprintf(_T("  %s line %u"), lineInfo.FileName, lineInfo.LineNumber);
         }
 
         _tprintf(_T("\r\n"));
@@ -793,7 +793,7 @@ bool WheatyExceptionReport::FormatSymbolValue(
     // Determine if the variable is a user defined type (UDT).  IF so, bHandled
     // will return true.
     bool bHandled;
-    pszCurrBuffer = DumpTypeIndex(pszCurrBuffer,pSym->ModBase, pSym->TypeIndex,
+    pszCurrBuffer = DumpTypeIndex(pszCurrBuffer, pSym->ModBase, pSym->TypeIndex,
                                   0, pVariable, bHandled, pSym->Name);
 
     if (!bHandled)
@@ -858,7 +858,7 @@ char* WheatyExceptionReport::DumpTypeIndex(
     } children;
 
     children.Count = dwChildrenCount;
-    children.Start= 0;
+    children.Start = 0;
 
     // Get the array of TypeIds, one for each child type
     if (!SymGetTypeInfo(m_hProcess, modBase, dwTypeIndex, TI_FINDCHILDREN,
@@ -874,7 +874,7 @@ char* WheatyExceptionReport::DumpTypeIndex(
     for (unsigned i = 0; i < dwChildrenCount; i++)
     {
         // Add appropriate indentation level (since this routine is recursive)
-        for (unsigned j = 0; j <= nestingLevel+1; j++)
+        for (unsigned j = 0; j <= nestingLevel + 1; j++)
             pszCurrBuffer += sprintf(pszCurrBuffer, "\t");
 
         // Recurse for each of the child types
@@ -883,7 +883,7 @@ char* WheatyExceptionReport::DumpTypeIndex(
         pszCurrBuffer += sprintf(pszCurrBuffer, rgBaseType[basicType]);
 
         pszCurrBuffer = DumpTypeIndex(pszCurrBuffer, modBase,
-                                      children.ChildId[i], nestingLevel+1,
+                                      children.ChildId[i], nestingLevel + 1,
                                       offset, bHandled2, ""/*Name */);
 
         // If the child wasn't a UDT, format it appropriately
@@ -902,7 +902,7 @@ char* WheatyExceptionReport::DumpTypeIndex(
 
             // Get the size of the child member
             ULONG64 length;
-            SymGetTypeInfo(m_hProcess, modBase, typeId, TI_GET_LENGTH,&length);
+            SymGetTypeInfo(m_hProcess, modBase, typeId, TI_GET_LENGTH, &length);
 
             // Calculate the address of the member
             DWORD_PTR dwFinalOffset = offset + dwMemberOffset;
@@ -939,7 +939,7 @@ char* WheatyExceptionReport::FormatOutputValue(char* pszCurrBuffer,
     {
         if (basicType == btFloat)
         {
-            pszCurrBuffer += sprintf(pszCurrBuffer," = %f", *(PFLOAT)pAddress);
+            pszCurrBuffer += sprintf(pszCurrBuffer, " = %f", *(PFLOAT)pAddress);
         }
         else if (basicType == btChar)
         {
@@ -953,7 +953,7 @@ char* WheatyExceptionReport::FormatOutputValue(char* pszCurrBuffer,
                                          *(PDWORD)pAddress);
         }
         else
-            pszCurrBuffer += sprintf(pszCurrBuffer," = %X", *(PDWORD)pAddress);
+            pszCurrBuffer += sprintf(pszCurrBuffer, " = %X", *(PDWORD)pAddress);
     }
     else if (length == 8)
     {
@@ -983,7 +983,7 @@ WheatyExceptionReport::GetBasicType(DWORD typeIndex, DWORD64 modBase)
     // Get the real "TypeId" of the child.  We need this for the
     // SymGetTypeInfo( TI_GET_TYPEID ) call below.
     DWORD typeId;
-    if (SymGetTypeInfo(m_hProcess,modBase, typeIndex, TI_GET_TYPEID, &typeId))
+    if (SymGetTypeInfo(m_hProcess, modBase, typeIndex, TI_GET_TYPEID, &typeId))
     {
         if (SymGetTypeInfo(m_hProcess, modBase, typeId, TI_GET_BASETYPE,
                            &basicType))

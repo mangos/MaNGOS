@@ -212,7 +212,7 @@ class BattleGroundAB : public BattleGround
 
         /* Creature spawning/despawning */
         // TODO: working, scripted peons spawning
-        void _NodeOccupied(uint8 node,Team team);
+        void _NodeOccupied(uint8 node, Team team);
 
         int32 _GetNodeNameId(uint8 node);
 

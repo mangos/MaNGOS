@@ -50,7 +50,7 @@ static inline uint32 floatToRawIntBits(float f)
         uint32 ival;
         float fval;
     } temp;
-    temp.fval=f;
+    temp.fval = f;
     return temp.ival;
 }
 
@@ -61,7 +61,7 @@ static inline float intBitsToFloat(uint32 i)
         uint32 ival;
         float fval;
     } temp;
-    temp.ival=i;
+    temp.ival = i;
     return temp.fval;
 }
 
@@ -82,7 +82,7 @@ class BIH
     public:
         BIH() {};
         template< class T, class BoundsFunc >
-        void build(const std::vector<T>& primitives, BoundsFunc& getBounds, uint32 leafSize = 3, bool printStats=false)
+        void build(const std::vector<T>& primitives, BoundsFunc& getBounds, uint32 leafSize = 3, bool printStats = false)
         {
             if (primitives.size() == 0)
                 return;
@@ -92,7 +92,7 @@ class BIH
             dat.indices = new uint32[dat.numPrims];
             dat.primBound = new AABox[dat.numPrims];
             getBounds(primitives[0], bounds);
-            for (uint32 i=0; i<dat.numPrims; ++i)
+            for (uint32 i = 0; i < dat.numPrims; ++i)
             {
                 dat.indices[i] = i;
                 AABox tb;
@@ -106,7 +106,7 @@ class BIH
                 stats.printStats();
 
             objects.resize(dat.numPrims);
-            for (uint32 i=0; i<dat.numPrims; ++i)
+            for (uint32 i = 0; i < dat.numPrims; ++i)
                 objects[i] = dat.indices[i];
             //nObjects = dat.numPrims;
             tree = tempTree;
@@ -116,14 +116,14 @@ class BIH
         uint32 primCount() { return objects.size(); }
 
         template<typename RayCallback>
-        void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirst=false) const
+        void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirst = false) const
         {
             float intervalMin = -1.f;
             float intervalMax = -1.f;
             Vector3 org = r.origin();
             Vector3 dir = r.direction();
             Vector3 invDir;
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 invDir[i] = 1.f / dir[i];
                 if (G3D::fuzzyNe(dir[i], 0.0f))
@@ -154,7 +154,7 @@ class BIH
             uint32 offsetBack3[3];
             // compute custom offsets from direction sign bit
 
-            for (int i=0; i<3; ++i)
+            for (int i = 0; i < 3; ++i)
             {
                 offsetFront[i] = floatToRawIntBits(dir[i]) >> 31;
                 offsetBack[i] = offsetFront[i] ^ 1;
@@ -229,7 +229,7 @@ class BIH
                     }
                     else
                     {
-                        if (axis>2)
+                        if (axis > 2)
                             return; // should not happen
                         float tf = (intBitsToFloat(tree[node + offsetFront[axis]]) - org[axis]) * invDir[axis];
                         float tb = (intBitsToFloat(tree[node + offsetBack[axis]]) - org[axis]) * invDir[axis];
@@ -321,7 +321,7 @@ class BIH
                     }
                     else // BVH2 node (empty space cut off left and right)
                     {
-                        if (axis>2)
+                        if (axis > 2)
                             return; // should not happen
                         float tl = intBitsToFloat(tree[node + 1]);
                         float tr = intBitsToFloat(tree[node + 2]);
@@ -383,7 +383,7 @@ class BIH
                     maxObjects(0xFFFFFFFF), sumDepth(0), minDepth(0x0FFFFFFF),
                     maxDepth(0xFFFFFFFF), numBVH2(0)
                 {
-                    for (int i=0; i<6; ++i) numLeavesN[i] = 0;
+                    for (int i = 0; i < 6; ++i) numLeavesN[i] = 0;
                 }
 
                 void updateInner() { numNodes++; }

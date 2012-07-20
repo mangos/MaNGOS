@@ -48,13 +48,13 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
         return;
     }
 
-    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(),unit->GetPositionY(),unit->GetPositionZ(),unit->GetMapId(),GetPlayer()->GetTeam());
+    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
 
     // not found nearest
     if (curloc == 0)
         return;
 
-    DEBUG_LOG("WORLD: current location %u ",curloc);
+    DEBUG_LOG("WORLD: current location %u ", curloc);
 
     WorldPacket data(SMSG_TAXINODE_STATUS, 9);
     data << ObjectGuid(guid);
@@ -94,18 +94,18 @@ void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recv_data)
 void WorldSession::SendTaxiMenu(Creature* unit)
 {
     // find current node
-    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(),unit->GetPositionY(),unit->GetPositionZ(),unit->GetMapId(),GetPlayer()->GetTeam());
+    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
 
     if (curloc == 0)
         return;
 
-    DEBUG_LOG("WORLD: CMSG_TAXINODE_STATUS_QUERY %u ",curloc);
+    DEBUG_LOG("WORLD: CMSG_TAXINODE_STATUS_QUERY %u ", curloc);
 
-    WorldPacket data(SMSG_SHOWTAXINODES, (4+8+4+8*4));
+    WorldPacket data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
     data << uint32(1);
     data << unit->GetObjectGuid();
     data << uint32(curloc);
-    GetPlayer()->m_taxi.AppendTaximaskTo(data,GetPlayer()->isTaxiCheater());
+    GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->isTaxiCheater());
     SendPacket(&data);
 
     DEBUG_LOG("WORLD: Sent SMSG_SHOWTAXINODES");
@@ -117,19 +117,19 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    while (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()==FLIGHT_MOTION_TYPE)
+    while (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         GetPlayer()->GetMotionMaster()->MovementExpired(false);
 
     if (mountDisplayId)
         GetPlayer()->Mount(mountDisplayId);
 
-    GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path,pathNode);
+    GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
 {
     // find current node
-    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(),unit->GetPositionY(),unit->GetPositionZ(),unit->GetMapId(),GetPlayer()->GetTeam());
+    uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
 
     if (curloc == 0)
         return true;                                        // `true` send to avoid WorldSession::SendTaxiMenu call with one more curlock seartch with same false result.
@@ -177,7 +177,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recv_data)
     if (nodes.empty())
         return;
 
-    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXIEXPRESS from %d to %d" ,nodes.front(),nodes.back());
+    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXIEXPRESS from %d to %d" , nodes.front(), nodes.back());
 
     GetPlayer()->ActivateTaxiPathTo(nodes, npc);
 }
@@ -207,7 +207,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
     // far teleport case
     if (curDestNode && curDestNode->map_id != GetPlayer()->GetMapId())
     {
-        if (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType()==FLIGHT_MOTION_TYPE)
+        if (GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         {
             // short preparations to continue flight
             FlightPathMovementGenerator* flight = (FlightPathMovementGenerator*)(GetPlayer()->GetMotionMaster()->top());
@@ -218,7 +218,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
             TaxiPathNodeEntry const& node = flight->GetPath()[flight->GetCurrentNode()];
             flight->SkipCurrentNode();
 
-            GetPlayer()->TeleportTo(curDestNode->map_id,node.x,node.y,node.z,GetPlayer()->GetOrientation());
+            GetPlayer()->TeleportTo(curDestNode->map_id, node.x, node.y, node.z, GetPlayer()->GetOrientation());
         }
         return;
     }
@@ -264,7 +264,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recv_data)
     nodes.resize(2);
 
     recv_data >> guid >> nodes[0] >> nodes[1];
-    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXI from %d to %d" ,nodes[0],nodes[1]);
+    DEBUG_LOG("WORLD: Received CMSG_ACTIVATETAXI from %d to %d" , nodes[0], nodes[1]);
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!npc)
     {

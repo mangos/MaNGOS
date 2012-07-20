@@ -35,7 +35,7 @@ Weather::Weather(uint32 zone, WeatherZoneChances const* weatherChances) : m_zone
     m_type = WEATHER_TYPE_FINE;
     m_grade = 0;
 
-    DETAIL_FILTER_LOG(LOG_FILTER_WEATHER, "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (m_timer.GetInterval() / (MINUTE*IN_MILLISECONDS)));
+    DETAIL_FILTER_LOG(LOG_FILTER_WEATHER, "WORLD: Starting weather system for zone %u (change every %u minutes).", m_zone, (m_timer.GetInterval() / (MINUTE * IN_MILLISECONDS)));
 }
 
 /// Launch a weather update
@@ -86,7 +86,7 @@ bool Weather::ReGenerate()
     // season source http://aa.usno.navy.mil/data/docs/EarthSeasons.html
     time_t gtime = sWorld.GetGameTime();
     struct tm* ltime = localtime(&gtime);
-    uint32 season = ((ltime->tm_yday - 78 + 365)/91)%4;
+    uint32 season = ((ltime->tm_yday - 78 + 365) / 91) % 4;
 
     static char const* seasonName[WEATHER_SEASONS] = { "spring", "summer", "fall", "winter" };
 
@@ -127,7 +127,7 @@ bool Weather::ReGenerate()
             if (m_grade > 0.6666667f)
             {
                 // Severe change, but how severe?
-                uint32 rnd = urand(0,99);
+                uint32 rnd = urand(0, 99);
                 if (rnd < 50)
                 {
                     m_grade -= 0.6666667f;
@@ -141,8 +141,8 @@ bool Weather::ReGenerate()
 
     // At this point, only weather that isn't doing anything remains but that have weather data
     uint32 chance1 =          m_weatherChances->data[season].rainChance;
-    uint32 chance2 = chance1+ m_weatherChances->data[season].snowChance;
-    uint32 chance3 = chance2+ m_weatherChances->data[season].stormChance;
+    uint32 chance2 = chance1 + m_weatherChances->data[season].snowChance;
+    uint32 chance3 = chance2 + m_weatherChances->data[season].stormChance;
 
     uint32 rnd = urand(0, 99);
     if (rnd <= chance1)
@@ -184,7 +184,7 @@ bool Weather::ReGenerate()
 
 void Weather::SendWeatherUpdateToPlayer(Player* player)
 {
-    WorldPacket data(SMSG_WEATHER, (4+4+1));
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
 
     data << uint32(GetWeatherState()) << (float)m_grade << uint8(0);
     player->GetSession()->SendPacket(&data);
@@ -192,7 +192,7 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
 
 void Weather::SendFineWeatherUpdateToPlayer(Player* player)
 {
-    WorldPacket data(SMSG_WEATHER, (4+4+1));
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
 
     data << (uint32)WEATHER_STATE_FINE << (float)0.0f << uint8(0);
     player->GetSession()->SendPacket(&data);
@@ -213,7 +213,7 @@ bool Weather::UpdateWeather()
 
     WeatherState state = GetWeatherState();
 
-    WorldPacket data(SMSG_WEATHER, (4+4+1));
+    WorldPacket data(SMSG_WEATHER, (4 + 4 + 1));
     data << uint32(state) << (float)m_grade << uint8(0);
     player->SendMessageToSet(&data, true);
 
@@ -279,29 +279,29 @@ void Weather::SetWeather(WeatherType type, float grade)
 /// Get the sound number associated with the current weather
 WeatherState Weather::GetWeatherState() const
 {
-    if (m_grade<0.27f)
+    if (m_grade < 0.27f)
         return WEATHER_STATE_FINE;
 
     switch (m_type)
     {
         case WEATHER_TYPE_RAIN:
-            if (m_grade<0.40f)
+            if (m_grade < 0.40f)
                 return WEATHER_STATE_LIGHT_RAIN;
-            else if (m_grade<0.70f)
+            else if (m_grade < 0.70f)
                 return WEATHER_STATE_MEDIUM_RAIN;
             else
                 return WEATHER_STATE_HEAVY_RAIN;
         case WEATHER_TYPE_SNOW:
-            if (m_grade<0.40f)
+            if (m_grade < 0.40f)
                 return WEATHER_STATE_LIGHT_SNOW;
-            else if (m_grade<0.70f)
+            else if (m_grade < 0.70f)
                 return WEATHER_STATE_MEDIUM_SNOW;
             else
                 return WEATHER_STATE_HEAVY_SNOW;
         case WEATHER_TYPE_STORM:
-            if (m_grade<0.40f)
+            if (m_grade < 0.40f)
                 return WEATHER_STATE_LIGHT_SANDSTORM;
-            else if (m_grade<0.70f)
+            else if (m_grade < 0.70f)
                 return WEATHER_STATE_MEDIUM_SANDSTORM;
             else
                 return WEATHER_STATE_HEAVY_SANDSTORM;

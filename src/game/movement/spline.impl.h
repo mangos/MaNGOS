@@ -55,7 +55,7 @@ namespace Movement
 
         index_type i = index_lo;
         index_type N = index_hi;
-        while (i+1 < N && lengths[i+1] < length_)
+        while (i + 1 < N && lengths[i + 1] < length_)
             ++i;
 
         return i;
@@ -67,7 +67,7 @@ namespace Movement
         length_type length_ = t * length();
         index = computeIndexInBounds(length_);
         MANGOS_ASSERT(index < index_hi);
-        u = (length_ - length(index)) / (float)length(index, index+1);
+        u = (length_ - length(index)) / (float)length(index, index + 1);
     }
 
     template<typename length_type> SplineBase::index_type Spline<length_type>::computeIndexInBounds(float t) const
@@ -80,7 +80,7 @@ namespace Movement
     {
         index_type i = index_lo;
         length_type length = 0;
-        lengths.resize(index_hi+1);
+        lengths.resize(index_hi + 1);
         while (i < index_hi)
         {
             length += SegLength(i);

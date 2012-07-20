@@ -41,10 +41,10 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() const { return POINT_MOTION_TYPE; }
 
-        bool GetDestination(float& x, float& y, float& z) const { x=i_x; y=i_y; z=i_z; return true; }
+        bool GetDestination(float& x, float& y, float& z) const { x = i_x; y = i_y; z = i_z; return true; }
     private:
         uint32 id;
-        float i_x,i_y,i_z;
+        float i_x, i_y, i_z;
         bool m_generatePath;
 };
 

@@ -155,7 +155,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         void ResetGridExpiry(NGridType& grid, float factor = 1) const
         {
-            grid.ResetTimeTracker((time_t)((float)i_gridExpiry*factor));
+            grid.ResetTimeTracker((time_t)((float)i_gridExpiry * factor));
         }
 
         time_t GetGridExpiry(void) const { return i_gridExpiry; }
@@ -207,7 +207,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         bool HavePlayers() const { return !m_mapRefManager.isEmpty(); }
         uint32 GetPlayersCountExceptGMs() const;
-        bool ActiveObjectsNearGrid(uint32 x,uint32 y) const;
+        bool ActiveObjectsNearGrid(uint32 x, uint32 y) const;
 
         void SendToPlayers(WorldPacket const* data) const;
 
@@ -296,8 +296,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
             return i_grids[x][y];
         }
 
-        bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x,y)->isGridObjectDataLoaded(); }
-        void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x,y)->setGridObjectDataLoaded(pLoaded); }
+        bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
+        void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
 
         void setNGrid(NGridType* grid, uint32 x, uint32 y);
         void ScriptsProcess();
@@ -432,7 +432,7 @@ Map::Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER>& visitor)
     const uint32 cell_x = cell.CellX();
     const uint32 cell_y = cell.CellY();
 
-    if (!cell.NoCreate() || loaded(GridPair(x,y)))
+    if (!cell.NoCreate() || loaded(GridPair(x, y)))
     {
         EnsureGridLoaded(cell);
         getNGrid(x, y)->Visit(cell_x, cell_y, visitor);

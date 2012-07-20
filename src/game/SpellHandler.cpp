@@ -113,7 +113,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
             pUser->InArena())
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
-        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH,pItem,NULL);
+        pUser->SendEquipError(EQUIP_ERR_NOT_DURING_ARENA_MATCH, pItem, NULL);
         return;
     }
 
@@ -126,7 +126,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 if (IsNonCombatSpell(spellInfo))
                 {
                     recvPacket.rpos(recvPacket.wpos());     // prevent spam at not read packet tail
-                    pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT,pItem,NULL);
+                    pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, NULL);
                     return;
                 }
             }
@@ -136,7 +136,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         if (pItem->IsPotion() && pUser->GetLastPotionId())
         {
             recvPacket.rpos(recvPacket.wpos());             // prevent spam at not read packet tail
-            pUser->SendEquipError(EQUIP_ERR_OBJECT_IS_BUSY,pItem,NULL);
+            pUser->SendEquipError(EQUIP_ERR_OBJECT_IS_BUSY, pItem, NULL);
             return;
         }
     }
@@ -168,10 +168,10 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
             // for implicit area/coord target spells
             if (IsPointEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) ||
                     IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])))
-                Spell::SendCastResult(_player,spellInfo,cast_count,SPELL_FAILED_NO_VALID_TARGETS);
+                Spell::SendCastResult(_player, spellInfo, cast_count, SPELL_FAILED_NO_VALID_TARGETS);
             // for explicit target spells
             else
-                Spell::SendCastResult(_player,spellInfo,cast_count,SPELL_FAILED_BAD_TARGETS);
+                Spell::SendCastResult(_player, spellInfo, cast_count, SPELL_FAILED_BAD_TARGETS);
         }
         return;
     }
@@ -180,7 +180,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     if (!sScriptMgr.OnItemUse(pUser, pItem, targets))
     {
         // no script or script not process request by self
-        pUser->CastItemUseSpell(pItem,targets,cast_count,glyphIndex);
+        pUser->CastItemUseSpell(pItem, targets, cast_count, glyphIndex);
     }
 }
 
@@ -192,13 +192,13 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = %i",(uint32)recvPacket.size());
+    DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = %i", (uint32)recvPacket.size());
 
     uint8 bagIndex, slot;
 
     recvPacket >> bagIndex >> slot;
 
-    DETAIL_LOG("bagIndex: %u, slot: %u",bagIndex,slot);
+    DETAIL_LOG("bagIndex: %u, slot: %u", bagIndex, slot);
 
     Player* pUser = _player;
 
@@ -269,7 +269,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         stmt.PExecute(pItem->GetGUIDLow());
     }
     else
-        pUser->SendLoot(pItem->GetObjectGuid(),LOOT_CORPSE);
+        pUser->SendLoot(pItem->GetObjectGuid(), LOOT_CORPSE);
 }
 
 void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
@@ -327,7 +327,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     if (!go)
         return;
 
-    if (!go->IsWithinDistInMap(_player,INTERACTION_DISTANCE))
+    if (!go->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
         return;
 
     _player->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, go->GetEntry());
@@ -343,7 +343,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->GetMover();
-    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
         return;
@@ -361,7 +361,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (mover->GetTypeId()==TYPEID_PLAYER)
+    if (mover->GetTypeId() == TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
         if (!((Player*)mover)->HasActiveSpell(spellId) || IsPassiveSpell(spellInfo))
@@ -429,15 +429,15 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->GetMover();
-    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
         return;
 
     //FIXME: hack, ignore unexpected client cancel Deadly Throw cast
-    if (spellId==26679)
+    if (spellId == 26679)
         return;
 
     if (mover->IsNonMeleeSpellCasted(false))
-        mover->InterruptNonMeleeSpells(false,spellId);
+        mover->InterruptNonMeleeSpells(false, spellId);
 }
 
 void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
@@ -484,7 +484,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (IsChanneledSpell(spellInfo))
     {
         if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            if (curSpell->m_spellInfo->Id==spellId)
+            if (curSpell->m_spellInfo->Id == spellId)
                 _player->InterruptSpell(CURRENT_CHANNELED_SPELL);
         return;
     }
@@ -561,7 +561,7 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recv_data)
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->GetMover();
-    if (mover != _player && mover->GetTypeId()==TYPEID_PLAYER)
+    if (mover != _player && mover->GetTypeId() == TYPEID_PLAYER)
         return;
 
     mover->InterruptSpell(CURRENT_CHANNELED_SPELL);

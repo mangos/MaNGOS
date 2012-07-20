@@ -99,7 +99,7 @@ void BarGoLink::step()
 #endif
         for (i = 0; i < n; i++) printf(full);
         for (; i < indic_len; i++) printf(empty);
-        float percent = (((float)n/(float)indic_len)*100);
+        float percent = (((float)n / (float)indic_len) * 100);
 #ifdef _WIN32
         printf("\x3D %i%%  \r\x3D", (int)percent);
 #else

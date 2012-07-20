@@ -38,12 +38,12 @@ void utf8print(void* arg, const char* str)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     wchar_t wtemp_buf[6000];
-    size_t wtemp_len = 6000-1;
-    if (!Utf8toWStr(str,strlen(str),wtemp_buf,wtemp_len))
+    size_t wtemp_len = 6000 - 1;
+    if (!Utf8toWStr(str, strlen(str), wtemp_buf, wtemp_len))
         return;
 
     char temp_buf[6000];
-    CharToOemBuffW(&wtemp_buf[0],&temp_buf[0],wtemp_len+1);
+    CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_len + 1);
     printf("%s", temp_buf);
 #else
     printf("%s", str);
@@ -78,18 +78,18 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
     switch (result)
     {
         case AOR_OK:
-            PSendSysMessage(LANG_ACCOUNT_DELETED,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_DELETED, account_name.c_str());
             break;
         case AOR_NAME_NOT_EXIST:
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, account_name.c_str());
             SetSentErrorMessage(true);
             return false;
         case AOR_DB_INTERNAL_ERROR:
-            PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, account_name.c_str());
             SetSentErrorMessage(true);
             return false;
         default:
-            PSendSysMessage(LANG_ACCOUNT_NOT_DELETED,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_DELETED, account_name.c_str());
             SetSentErrorMessage(true);
             return false;
     }
@@ -430,7 +430,7 @@ bool ChatHandler::HandleCharacterEraseCommand(char* args)
         account_id = sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
 
     std::string account_name;
-    sAccountMgr.GetName(account_id,account_name);
+    sAccountMgr.GetName(account_id, account_name);
 
     Player::DeleteFromDB(target_guid, account_id, true, true);
     PSendSysMessage(LANG_CHARACTER_DELETED, target_name.c_str(), target_guid.GetCounter(), account_name.c_str(), account_id);
@@ -464,7 +464,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
     //                                                 0   1         2        3        4
     QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE active_realm_id = %u", realmID);
 
-    return ShowAccountListHelper(result,&limit);
+    return ShowAccountListHelper(result, &limit);
 }
 
 /// Create an account
@@ -484,7 +484,7 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
     switch (result)
     {
         case AOR_OK:
-            PSendSysMessage(LANG_ACCOUNT_CREATED,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_CREATED, account_name.c_str());
             break;
         case AOR_NAME_TOO_LONG:
             SendSysMessage(LANG_ACCOUNT_TOO_LONG);
@@ -495,11 +495,11 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         case AOR_DB_INTERNAL_ERROR:
-            PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_CREATED_SQL_ERROR, account_name.c_str());
             SetSentErrorMessage(true);
             return false;
         default:
-            PSendSysMessage(LANG_ACCOUNT_NOT_CREATED,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_CREATED, account_name.c_str());
             SetSentErrorMessage(true);
             return false;
     }
@@ -515,7 +515,7 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
         SendSysMessage(LANG_LOG_FILTERS_STATE_HEADER);
         for (int i = 0; i < LOG_FILTER_COUNT; ++i)
             if (*logFilterData[i].name)
-                PSendSysMessage("  %-20s = %s",logFilterData[i].name, GetOnOffStr(sLog.HasLogFilter(1 << i)));
+                PSendSysMessage("  %-20s = %s", logFilterData[i].name, GetOnOffStr(sLog.HasLogFilter(1 << i)));
         return true;
     }
 
@@ -543,10 +543,10 @@ bool ChatHandler::HandleServerLogFilterCommand(char* args)
         if (!*logFilterData[i].name)
             continue;
 
-        if (!strncmp(filtername,logFilterData[i].name,strlen(filtername)))
+        if (!strncmp(filtername, logFilterData[i].name, strlen(filtername)))
         {
-            sLog.SetLogFilter(LogFilters(1 << i),value);
-            PSendSysMessage("  %-20s = %s",logFilterData[i].name, GetOnOffStr(value));
+            sLog.SetLogFilter(LogFilters(1 << i), value);
+            PSendSysMessage("  %-20s = %s", logFilterData[i].name, GetOnOffStr(value));
             return true;
         }
     }
@@ -579,7 +579,7 @@ int kb_hit_return()
     tv.tv_usec = 0;
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds);
-    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv);
     return FD_ISSET(STDIN_FILENO, &fds);
 }
 #endif
@@ -613,13 +613,13 @@ void CliRunnable::run()
         if (World::IsStopped())
             break;
 #endif
-        char* command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
+        char* command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
         if (command_str != NULL)
         {
-            for (int x=0; command_str[x]; x++)
-                if (command_str[x]=='\r'||command_str[x]=='\n')
+            for (int x = 0; command_str[x]; x++)
+                if (command_str[x] == '\r' || command_str[x] == '\n')
                 {
-                    command_str[x]=0;
+                    command_str[x] = 0;
                     break;
                 }
 
@@ -631,7 +631,7 @@ void CliRunnable::run()
             }
 
             std::string command;
-            if (!consoleToUtf8(command_str,command))        // convert from console encoding to utf8
+            if (!consoleToUtf8(command_str, command))       // convert from console encoding to utf8
             {
                 printf("mangos>");
                 continue;

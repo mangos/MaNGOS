@@ -49,7 +49,7 @@ class DynamicObject : public WorldObject
         ObjectGuid const& GetCasterGuid() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
         Unit* GetCaster() const;
         float GetRadius() const { return m_radius; }
-        DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
+        DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES, 0); }
         bool IsAffecting(Unit* unit) const { return m_affected.find(unit->GetObjectGuid()) != m_affected.end(); }
         void AddAffected(Unit* unit) { m_affected.insert(unit->GetObjectGuid()); }
         void RemoveAffected(Unit* unit) { m_affected.erase(unit->GetObjectGuid()); }

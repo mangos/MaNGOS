@@ -41,12 +41,12 @@ RandomMovementGenerator<Creature>::RandomMovementGenerator(const Creature& creat
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature& creature)
 {
-    const float angle = rand_norm_f() * (M_PI_F*2.0f);
+    const float angle = rand_norm_f() * (M_PI_F * 2.0f);
     const float range = rand_norm_f() * i_radius;
 
     float destX = i_x + range * cos(angle);
     float destY = i_y + range * sin(angle);
-    float destZ = i_z + frand(-1,1) * i_verticalZ;
+    float destZ = i_z + frand(-1, 1) * i_verticalZ;
     creature.UpdateAllowedPositionZ(destX, destY, destZ);
 
     creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
@@ -68,7 +68,7 @@ void RandomMovementGenerator<Creature>::Initialize(Creature& creature)
     if (!creature.isAlive())
         return;
 
-    creature.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     _setRandomLocation(creature);
 }
 
@@ -81,14 +81,14 @@ void RandomMovementGenerator<Creature>::Reset(Creature& creature)
 template<>
 void RandomMovementGenerator<Creature>::Interrupt(Creature& creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 
 template<>
 void RandomMovementGenerator<Creature>::Finalize(Creature& creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 

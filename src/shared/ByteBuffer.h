@@ -76,10 +76,10 @@ class ByteBuffer
             _rpos = _wpos = 0;
         }
 
-        template <typename T> void put(size_t pos,T value)
+        template <typename T> void put(size_t pos, T value)
         {
             EndianConvert(value);
-            put(pos,(uint8*)&value,sizeof(value));
+            put(pos, (uint8*)&value, sizeof(value));
         }
 
         ByteBuffer& operator<<(uint8 value)
@@ -384,7 +384,7 @@ class ByteBuffer
 
         void appendPackGUID(uint64 guid)
         {
-            uint8 packGUID[8+1];
+            uint8 packGUID[8 + 1];
             packGUID[0] = 0;
             size_t size = 1;
             for (uint8 i = 0; guid != 0; ++i)

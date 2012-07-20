@@ -74,7 +74,7 @@ void usage(const char* prog)
                    "    -s run                   run as daemon\n\r"
                    "    -s stop                  stop daemon\n\r"
 #endif
-                   ,prog);
+                   , prog);
 }
 
 /// Launch the mangos server
@@ -104,7 +104,7 @@ extern int main(int argc, char** argv)
                 cfg_file = cmd_opts.opt_arg();
                 break;
             case 'v':
-                printf("%s\n", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+                printf("%s\n", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
                 return 0;
             case 's':
             {
@@ -179,7 +179,7 @@ extern int main(int argc, char** argv)
     }
 #endif
 
-    sLog.outString("%s [world-daemon]", _FULLVERSION(REVISION_DATE,REVISION_TIME,REVISION_NR,REVISION_ID));
+    sLog.outString("%s [world-daemon]", _FULLVERSION(REVISION_DATE, REVISION_TIME, REVISION_NR, REVISION_ID));
     sLog.outString("<Ctrl-C> to stop.");
     sLog.outString("\n\n"
                    "MM   MM         MM   MM  MMMMM   MMMM   MMMMM\n"

@@ -92,7 +92,7 @@ inline void MaNGOS::CreatureRelocationNotifier::Visit(PlayerMapType& m)
     if (!i_creature.isAlive())
         return;
 
-    for (PlayerMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* player = iter->getSource();
         if (player->isAlive() && !player->IsTaxiFlying())
@@ -130,7 +130,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         return;
 
     // Evade target
-    if (target->GetTypeId()==TYPEID_UNIT && ((Creature*)target)->IsInEvadeMode())
+    if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsInEvadeMode())
         return;
 
     //Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
@@ -171,7 +171,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
             holder->AddAura(Aur, eff_index);
             target->AddAuraToModList(Aur);
             holder->SetInUse(true);
-            Aur->ApplyModifier(true,true);
+            Aur->ApplyModifier(true, true);
             holder->SetInUse(false);
         }
         else if (holder->GetAuraDuration() >= 0 && uint32(holder->GetAuraDuration()) < i_dynobject.GetDuration())
@@ -194,7 +194,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 template<>
 inline void MaNGOS::DynamicObjectUpdater::Visit(CreatureMapType&  m)
 {
-    for (CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
+    for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
         VisitHelper(itr->getSource());
 }
 
@@ -561,14 +561,14 @@ template<class Builder>
 void MaNGOS::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
     int32 loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
-    uint32 cache_idx = loc_idx+1;
+    uint32 cache_idx = loc_idx + 1;
     WorldPacket* data;
 
     // create if not cached yet
-    if (i_data_cache.size() < cache_idx+1 || !i_data_cache[cache_idx])
+    if (i_data_cache.size() < cache_idx + 1 || !i_data_cache[cache_idx])
     {
-        if (i_data_cache.size() < cache_idx+1)
-            i_data_cache.resize(cache_idx+1);
+        if (i_data_cache.size() < cache_idx + 1)
+            i_data_cache.resize(cache_idx + 1);
 
         data = new WorldPacket(SMSG_MESSAGECHAT, 200);
 
@@ -586,14 +586,14 @@ template<class Builder>
 void MaNGOS::LocalizedPacketListDo<Builder>::operator()(Player* p)
 {
     int32 loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
-    uint32 cache_idx = loc_idx+1;
+    uint32 cache_idx = loc_idx + 1;
     WorldPacketList* data_list;
 
     // create if not cached yet
-    if (i_data_cache.size() < cache_idx+1 || i_data_cache[cache_idx].empty())
+    if (i_data_cache.size() < cache_idx + 1 || i_data_cache[cache_idx].empty())
     {
-        if (i_data_cache.size() < cache_idx+1)
-            i_data_cache.resize(cache_idx+1);
+        if (i_data_cache.size() < cache_idx + 1)
+            i_data_cache.resize(cache_idx + 1);
 
         data_list = &i_data_cache[cache_idx];
 

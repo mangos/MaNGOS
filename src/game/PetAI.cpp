@@ -73,7 +73,7 @@ void PetAI::AttackStart(Unit* u)
     if (!u || (m_creature->IsPet() && ((Pet*)m_creature)->getPetType() == MINI_PET))
         return;
 
-    if (m_creature->Attack(u,true))
+    if (m_creature->Attack(u, true))
     {
         // TMGs call CreatureRelocation which via MoveInLineOfSight can call this function
         // thus with the following clear the original TMG gets invalidated and crash, doh
@@ -110,7 +110,7 @@ void PetAI::_stopAttack()
 
     if (owner && m_creature->GetCharmInfo() && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
     {
-        m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+        m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     }
     else
     {
@@ -182,7 +182,7 @@ void PetAI::UpdateAI(const uint32 diff)
         {
             if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW))
             {
-                m_creature->GetMotionMaster()->MoveFollow(owner,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE);
+                m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
         }
     }
@@ -302,8 +302,8 @@ void PetAI::UpdateAI(const uint32 diff)
 
 bool PetAI::_isVisible(Unit* u) const
 {
-    return m_creature->IsWithinDist(u,sWorld.getConfig(CONFIG_FLOAT_SIGHT_GUARDER))
-           && u->isVisibleForOrDetect(m_creature,m_creature,true);
+    return m_creature->IsWithinDist(u, sWorld.getConfig(CONFIG_FLOAT_SIGHT_GUARDER))
+           && u->isVisibleForOrDetect(m_creature, m_creature, true);
 }
 
 void PetAI::UpdateAllies()
@@ -311,7 +311,7 @@ void PetAI::UpdateAllies()
     Unit* owner = m_creature->GetCharmerOrOwner();
     Group* pGroup = NULL;
 
-    m_updateAlliesTimer = 10*IN_MILLISECONDS;                //update friendly targets every 10 seconds, lesser checks increase performance
+    m_updateAlliesTimer = 10 * IN_MILLISECONDS;              //update friendly targets every 10 seconds, lesser checks increase performance
 
     if (!owner)
         return;

@@ -82,7 +82,7 @@ void MapManager::LoadTransports()
         if (!t->GenerateWaypoints(goinfo->moTransport.taxiPathId, mapsUsed))
             // skip transports with empty waypoints list
         {
-            sLog.outErrorDb("Transport (path id %u) path size = 0. Transport ignored, check DBC files or transport GO data0 field.",goinfo->moTransport.taxiPathId);
+            sLog.outErrorDb("Transport (path id %u) path size = 0. Transport ignored, check DBC files or transport GO data0 field.", goinfo->moTransport.taxiPathId);
             delete t;
             continue;
         }
@@ -134,7 +134,7 @@ void MapManager::LoadTransports()
             uint32 guid  = fields[0].GetUInt32();
             uint32 entry = fields[1].GetUInt32();
             std::string name = fields[2].GetCppString();
-            sLog.outErrorDb("Transport %u '%s' have record (GUID: %u) in `gameobject`. Transports DON'T must have any records in `gameobject` or its behavior will be unpredictable/bugged.",entry,name.c_str(),guid);
+            sLog.outErrorDb("Transport %u '%s' have record (GUID: %u) in `gameobject`. Transports DON'T must have any records in `gameobject` or its behavior will be unpredictable/bugged.", entry, name.c_str(), guid);
         }
         while (result->NextRow());
 
@@ -149,13 +149,13 @@ Transport::Transport() : GameObject()
 
 bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, float ang, uint8 animprogress, uint16 dynamicHighValue)
 {
-    Relocate(x,y,z,ang);
+    Relocate(x, y, z, ang);
     // instance id and phaseMask isn't set to values different from std.
 
     if (!IsPositionValid())
     {
         sLog.outError("Transport (GUID: %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-                      guidlow,x,y);
+                      guidlow, x, y);
         return false;
     }
 
@@ -165,7 +165,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
 
     if (!goinfo)
     {
-        sLog.outErrorDb("Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f",guidlow, mapid, x, y, z, ang);
+        sLog.outErrorDb("Transport not created: entry in `gameobject_template` not found, guidlow: %u map: %u  (X: %f Y: %f Z: %f) ang: %f", guidlow, mapid, x, y, z, ang);
         return false;
     }
 
@@ -225,7 +225,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids)
         if (mapChange == 0)
         {
             TaxiPathNodeEntry const& node_i = path[i];
-            if (node_i.mapid == path[i+1].mapid)
+            if (node_i.mapid == path[i + 1].mapid)
             {
                 keyFrame k(node_i);
                 keyFrames.push_back(k);
@@ -255,7 +255,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids)
     // find the rest of the distances between key points
     for (size_t i = 1; i < keyFrames.size(); ++i)
     {
-        if ((keyFrames[i].node->actionFlag == 1) || (keyFrames[i].node->mapid != keyFrames[i-1].node->mapid))
+        if ((keyFrames[i].node->actionFlag == 1) || (keyFrames[i].node->mapid != keyFrames[i - 1].node->mapid))
         {
             keyFrames[i].distFromPrev = 0;
         }
@@ -288,7 +288,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids)
 
     for (int i = int(keyFrames.size()) - 1; i >= 0; i--)
     {
-        int j = (i + (firstStop+1)) % keyFrames.size();
+        int j = (i + (firstStop + 1)) % keyFrames.size();
         tmpDist += keyFrames[(j + 1) % keyFrames.size()].distFromPrev;
         keyFrames[j].distUntilStop = tmpDist;
         if (keyFrames[j].node->actionFlag == 2)
@@ -506,11 +506,11 @@ void Transport::Update(uint32 update_diff, uint32 /*p_time*/)
     while (((m_timer - m_curr->first) % m_pathTime) > ((m_next->first - m_curr->first) % m_pathTime))
     {
 
-        DoEventIfAny(*m_curr,true);
+        DoEventIfAny(*m_curr, true);
 
         MoveToNextWayPoint();
 
-        DoEventIfAny(*m_curr,false);
+        DoEventIfAny(*m_curr, false);
 
         // first check help in case client-server transport coordinates de-synchronization
         if (m_curr->second.mapid != GetMapId() || m_curr->second.teleport)
@@ -546,7 +546,7 @@ void Transport::UpdateForMap(Map const* targetMap)
     if (pl.isEmpty())
         return;
 
-    if (GetMapId()==targetMap->GetId())
+    if (GetMapId() == targetMap->GetId())
     {
         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
         {

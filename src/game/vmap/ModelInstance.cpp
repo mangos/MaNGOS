@@ -28,8 +28,8 @@ namespace VMAP
 {
     ModelInstance::ModelInstance(const ModelSpawn& spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
     {
-        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi()*iRot.y/180.f, G3D::pi()*iRot.x/180.f, G3D::pi()*iRot.z/180.f).inverse();
-        iInvScale = 1.f/iScale;
+        iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
+        iInvScale = 1.f / iScale;
     }
 
     bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit) const
@@ -152,7 +152,7 @@ namespace VMAP
 
     bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     {
-        uint32 check=0, nameLen;
+        uint32 check = 0, nameLen;
         check += fread(&spawn.flags, sizeof(uint32), 1, rf);
         // EoF?
         if (!check)
@@ -181,7 +181,7 @@ namespace VMAP
             return false;
         }
         char nameBuff[500];
-        if (nameLen>500) // file names should never be that long, must be file error
+        if (nameLen > 500) // file names should never be that long, must be file error
         {
             ERROR_LOG("Error reading ModelSpawn, file name too long!");
             return false;
@@ -198,7 +198,7 @@ namespace VMAP
 
     bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     {
-        uint32 check=0;
+        uint32 check = 0;
         check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);
         check += fwrite(&spawn.adtId, sizeof(uint16), 1, wf);
         check += fwrite(&spawn.ID, sizeof(uint32), 1, wf);

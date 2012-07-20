@@ -104,10 +104,10 @@ bool Database::Initialize(const char* infoString, int nConns /*= 1*/)
     // Enable logging of SQL commands (usually only GM commands)
     // (See method: PExecuteLog)
     m_logSQL = sConfig.GetBoolDefault("LogSQL", false);
-    m_logsDir = sConfig.GetStringDefault("LogsDir","");
+    m_logsDir = sConfig.GetStringDefault("LogsDir", "");
     if (!m_logsDir.empty())
     {
-        if ((m_logsDir.at(m_logsDir.length()-1)!='/') && (m_logsDir.at(m_logsDir.length()-1)!='\\'))
+        if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
             m_logsDir.append("/");
     }
 
@@ -215,9 +215,9 @@ void Database::escape_string(std::string& str)
     if (str.empty())
         return;
 
-    char* buf = new char[str.size()*2+1];
+    char* buf = new char[str.size() * 2 + 1];
     //we don't care what connection to use - escape string will be the same
-    m_pQueryConnections[0]->escape_string(buf,str.c_str(),str.size());
+    m_pQueryConnections[0]->escape_string(buf, str.c_str(), str.size());
     str = buf;
     delete[] buf;
 }
@@ -250,7 +250,7 @@ void Database::Ping()
     }
 }
 
-bool Database::PExecuteLog(const char* format,...)
+bool Database::PExecuteLog(const char* format, ...)
 {
     if (!format)
         return false;
@@ -261,9 +261,9 @@ bool Database::PExecuteLog(const char* format,...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res==-1)
+    if (res == -1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
         return false;
     }
 
@@ -272,12 +272,12 @@ bool Database::PExecuteLog(const char* format,...)
         time_t curr;
         tm local;
         time(&curr);                                        // get current time_t value
-        local=*(localtime(&curr));                          // dereference and assign
+        local = *(localtime(&curr));                        // dereference and assign
         char fName[128];
-        sprintf(fName, "%04d-%02d-%02d_logSQL.sql", local.tm_year+1900, local.tm_mon+1, local.tm_mday);
+        sprintf(fName, "%04d-%02d-%02d_logSQL.sql", local.tm_year + 1900, local.tm_mon + 1, local.tm_mday);
 
         FILE* log_file;
-        std::string logsDir_fname = m_logsDir+fName;
+        std::string logsDir_fname = m_logsDir + fName;
         log_file = fopen(logsDir_fname.c_str(), "a");
         if (log_file)
         {
@@ -287,14 +287,14 @@ bool Database::PExecuteLog(const char* format,...)
         else
         {
             // The file could not be opened
-            sLog.outError("SQL-Logging is disabled - Log file for the SQL commands could not be openend: %s",fName);
+            sLog.outError("SQL-Logging is disabled - Log file for the SQL commands could not be openend: %s", fName);
         }
     }
 
     return Execute(szQuery);
 }
 
-QueryResult* Database::PQuery(const char* format,...)
+QueryResult* Database::PQuery(const char* format, ...)
 {
     if (!format) return NULL;
 
@@ -304,16 +304,16 @@ QueryResult* Database::PQuery(const char* format,...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res==-1)
+    if (res == -1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
         return NULL;
     }
 
     return Query(szQuery);
 }
 
-QueryNamedResult* Database::PQueryNamed(const char* format,...)
+QueryNamedResult* Database::PQueryNamed(const char* format, ...)
 {
     if (!format) return NULL;
 
@@ -323,9 +323,9 @@ QueryNamedResult* Database::PQueryNamed(const char* format,...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res==-1)
+    if (res == -1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
         return NULL;
     }
 
@@ -356,7 +356,7 @@ bool Database::Execute(const char* sql)
     return true;
 }
 
-bool Database::PExecute(const char* format,...)
+bool Database::PExecute(const char* format, ...)
 {
     if (!format)
         return false;
@@ -367,16 +367,16 @@ bool Database::PExecute(const char* format,...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res==-1)
+    if (res == -1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
         return false;
     }
 
     return Execute(szQuery);
 }
 
-bool Database::DirectPExecute(const char* format,...)
+bool Database::DirectPExecute(const char* format, ...)
 {
     if (!format)
         return false;
@@ -387,9 +387,9 @@ bool Database::DirectPExecute(const char* format,...)
     int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
-    if (res==-1)
+    if (res == -1)
     {
-        sLog.outError("SQL Query truncated (and not execute) for format: %s",format);
+        sLog.outError("SQL Query truncated (and not execute) for format: %s", format);
         return false;
     }
 
@@ -459,7 +459,7 @@ bool Database::RollbackTransaction()
 bool Database::CheckRequiredField(char const* table_name, char const* required_name)
 {
     // check required field
-    QueryResult* result = PQuery("SELECT %s FROM %s LIMIT 1",required_name,table_name);
+    QueryResult* result = PQuery("SELECT %s FROM %s LIMIT 1", required_name, table_name);
     if (result)
     {
         delete result;
@@ -479,16 +479,16 @@ bool Database::CheckRequiredField(char const* table_name, char const* required_n
     else
         db_name = "UNKNOWN";
 
-    char const* req_sql_update_name = required_name+strlen("required_");
+    char const* req_sql_update_name = required_name + strlen("required_");
 
-    QueryNamedResult* result2 = PQueryNamed("SELECT * FROM %s LIMIT 1",table_name);
+    QueryNamedResult* result2 = PQueryNamed("SELECT * FROM %s LIMIT 1", table_name);
     if (result2)
     {
         QueryFieldNames const& namesMap = result2->GetFieldNames();
         std::string reqName;
         for (QueryFieldNames::const_iterator itr = namesMap.begin(); itr != namesMap.end(); ++itr)
         {
-            if (itr->substr(0,9)=="required_")
+            if (itr->substr(0, 9) == "required_")
             {
                 reqName = *itr;
                 break;
@@ -497,15 +497,15 @@ bool Database::CheckRequiredField(char const* table_name, char const* required_n
 
         delete result2;
 
-        std::string cur_sql_update_name = reqName.substr(strlen("required_"),reqName.npos);
+        std::string cur_sql_update_name = reqName.substr(strlen("required_"), reqName.npos);
 
         if (!reqName.empty())
         {
-            sLog.outErrorDb("The table `%s` in your [%s] database indicates that this database is out of date!",table_name,db_name);
+            sLog.outErrorDb("The table `%s` in your [%s] database indicates that this database is out of date!", table_name, db_name);
             sLog.outErrorDb();
-            sLog.outErrorDb("  [A] You have: --> `%s.sql`",cur_sql_update_name.c_str());
+            sLog.outErrorDb("  [A] You have: --> `%s.sql`", cur_sql_update_name.c_str());
             sLog.outErrorDb();
-            sLog.outErrorDb("  [B] You need: --> `%s.sql`",req_sql_update_name);
+            sLog.outErrorDb("  [B] You need: --> `%s.sql`", req_sql_update_name);
             sLog.outErrorDb();
             sLog.outErrorDb("You must apply all updates after [A] to [B] to use mangos with this database.");
             sLog.outErrorDb("These updates are included in the sql/updates folder.");
@@ -513,32 +513,32 @@ bool Database::CheckRequiredField(char const* table_name, char const* required_n
         }
         else
         {
-            sLog.outErrorDb("The table `%s` in your [%s] database is missing its version info.",table_name,db_name);
+            sLog.outErrorDb("The table `%s` in your [%s] database is missing its version info.", table_name, db_name);
             sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.");
             sLog.outErrorDb();
             sLog.outErrorDb("This revision of MaNGOS requires a database updated to:");
-            sLog.outErrorDb("`%s.sql`",req_sql_update_name);
+            sLog.outErrorDb("`%s.sql`", req_sql_update_name);
             sLog.outErrorDb();
 
             if (!strcmp(db_name, "WORLD"))
                 sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
             else
-                sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.",db_name);
+                sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.", db_name);
         }
     }
     else
     {
-        sLog.outErrorDb("The table `%s` in your [%s] database is missing or corrupt.",table_name,db_name);
+        sLog.outErrorDb("The table `%s` in your [%s] database is missing or corrupt.", table_name, db_name);
         sLog.outErrorDb("MaNGOS cannot find the version info needed to check that the db is up to date.");
         sLog.outErrorDb();
         sLog.outErrorDb("This revision of mangos requires a database updated to:");
-        sLog.outErrorDb("`%s.sql`",req_sql_update_name);
+        sLog.outErrorDb("`%s.sql`", req_sql_update_name);
         sLog.outErrorDb();
 
         if (!strcmp(db_name, "WORLD"))
             sLog.outErrorDb("Post this error to your database provider forum or find a solution there.");
         else
-            sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.",db_name);
+            sLog.outErrorDb("Reinstall your [%s] database with the included sql file in the sql folder.", db_name);
     }
 
     return false;

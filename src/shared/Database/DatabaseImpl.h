@@ -107,7 +107,7 @@ Database::AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamT
 
 template<class Class>
 bool
-Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), const char* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, szQuery);
@@ -115,7 +115,7 @@ Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), const 
 
 template<class Class, typename ParamType1>
 bool
-Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, szQuery);
@@ -123,7 +123,7 @@ Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamTy
 
 template<class Class, typename ParamType1, typename ParamType2>
 bool
-Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, param2, szQuery);
@@ -131,7 +131,7 @@ Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamTy
 
 template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
 bool
-Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, param2, param3, szQuery);
@@ -141,7 +141,7 @@ Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamTy
 
 template<typename ParamType1>
 bool
-Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format,...)
+Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(method, param1, szQuery);
@@ -149,7 +149,7 @@ Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param
 
 template<typename ParamType1, typename ParamType2>
 bool
-Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format,...)
+Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(method, param1, param2, szQuery);
@@ -157,7 +157,7 @@ Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), Para
 
 template<typename ParamType1, typename ParamType2, typename ParamType3>
 bool
-Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format,...)
+Database::AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char* format, ...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(method, param1, param2, param3, szQuery);

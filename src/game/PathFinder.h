@@ -64,7 +64,7 @@ class PathFinder
 
         // option setters - use optional
         void setUseStrightPath(bool useStraightPath) { m_useStraightPath = useStraightPath; };
-        void setPathLengthLimit(float distance) { m_pointPathLimit = std::min<uint32>(uint32(distance/SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); };
+        void setPathLengthLimit(float distance) { m_pointPathLimit = std::min<uint32>(uint32(distance / SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); };
 
         // result getters
         Vector3 getStartPosition()      const { return m_startPosition; }

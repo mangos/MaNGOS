@@ -32,7 +32,7 @@ namespace ByteConverter
     inline void convert(char* val)
     {
         std::swap(*val, *(val + T - 1));
-        convert<T - 2>(val + 1);
+        convert < T - 2 > (val + 1);
     }
 
     template<> inline void convert<0>(char*) {}

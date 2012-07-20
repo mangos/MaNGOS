@@ -77,10 +77,10 @@ struct LootStoreItem
     uint32  itemid;                                         // id of the item
     float   chance;                                         // always positive, chance to drop for both quest and non-quest items, chance to be used for refs
     int32   mincountOrRef;                                  // mincount for drop items (positive) or minus referenced TemplateleId (negative)
-    uint8   group       :7;
-    bool    needs_quest :1;                                 // quest drop (negative ChanceOrQuestChance in DB)
-    uint8   maxcount    :8;                                 // max drop count for the item (mincountOrRef positive) or Ref multiplicator (mincountOrRef negative)
-    uint16  conditionId :16;                                // additional loot condition Id
+    uint8   group       : 7;
+    bool    needs_quest : 1;                                // quest drop (negative ChanceOrQuestChance in DB)
+    uint8   maxcount    : 8;                                // max drop count for the item (mincountOrRef positive) or Ref multiplicator (mincountOrRef negative)
+    uint16  conditionId : 16;                               // additional loot condition Id
 
     // Constructor, converting ChanceOrQuestChance -> (chance, needs_quest)
     // displayid is filled in IsValid() which must be called after
@@ -99,7 +99,7 @@ struct LootItem
     uint32  itemid;
     uint32  randomSuffix;
     int32   randomPropertyId;
-    uint16  conditionId       :16;                          // allow compiler pack structure
+    uint16  conditionId       : 16;                         // allow compiler pack structure
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -159,7 +159,7 @@ class LootStore
 
         bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
         bool HaveQuestLootFor(uint32 loot_id) const;
-        bool HaveQuestLootForPlayer(uint32 loot_id,Player* player) const;
+        bool HaveQuestLootForPlayer(uint32 loot_id, Player* player) const;
 
         LootTemplate const* GetLootFor(uint32 loot_id) const;
 
@@ -318,7 +318,7 @@ struct LootView
     Loot& loot;
     Player* viewer;
     PermissionTypes permission;
-    LootView(Loot& _loot, Player* _viewer,PermissionTypes _permission = ALL_PERMISSION)
+    LootView(Loot& _loot, Player* _viewer, PermissionTypes _permission = ALL_PERMISSION)
         : loot(_loot), viewer(_viewer), permission(_permission) {}
 };
 

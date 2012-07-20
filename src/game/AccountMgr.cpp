@@ -63,7 +63,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
     delete result;
 
     // existing characters list
-    result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE account='%u'",accid);
+    result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE account='%u'", accid);
     if (result)
     {
         do
@@ -82,7 +82,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
     }
 
     // table realm specific but common for all characters of account for realm
-    CharacterDatabase.PExecute("DELETE FROM character_tutorial WHERE account = '%u'",accid);
+    CharacterDatabase.PExecute("DELETE FROM character_tutorial WHERE account = '%u'", accid);
 
     LoginDatabase.BeginTransaction();
 
@@ -190,7 +190,7 @@ uint32 AccountMgr::GetCharactersCount(uint32 acc_id)
     QueryResult* result = CharacterDatabase.PQuery("SELECT COUNT(guid) FROM characters WHERE account = '%u'", acc_id);
     if (result)
     {
-        Field* fields=result->Fetch();
+        Field* fields = result->Fetch();
         uint32 charcount = fields[0].GetUInt32();
         delete result;
         return charcount;
@@ -219,15 +219,15 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd)
 
 bool AccountMgr::normalizeString(std::string& utf8str)
 {
-    wchar_t wstr_buf[MAX_ACCOUNT_STR+1];
+    wchar_t wstr_buf[MAX_ACCOUNT_STR + 1];
 
     size_t wstr_len = MAX_ACCOUNT_STR;
-    if (!Utf8toWStr(utf8str,wstr_buf,wstr_len))
+    if (!Utf8toWStr(utf8str, wstr_buf, wstr_len))
         return false;
 
-    std::transform(&wstr_buf[0], wstr_buf+wstr_len, &wstr_buf[0], wcharToUpperOnlyLatin);
+    std::transform(&wstr_buf[0], wstr_buf + wstr_len, &wstr_buf[0], wcharToUpperOnlyLatin);
 
-    return WStrToUtf8(wstr_buf,wstr_len,utf8str);
+    return WStrToUtf8(wstr_buf, wstr_len, utf8str);
 }
 
 std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& password)

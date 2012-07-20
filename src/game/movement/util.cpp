@@ -30,7 +30,7 @@ namespace Movement
 
     const float terminal_length = float(terminalVelocity* terminalVelocity) / (2.f* gravity);
     const float terminal_savefall_length = (terminalSavefallVelocity* terminalSavefallVelocity) / (2.f* gravity);
-    const float terminalFallTime = float(terminalVelocity/gravity); // the time that needed to reach terminalVelocity
+    const float terminalFallTime = float(terminalVelocity / gravity); // the time that needed to reach terminalVelocity
 
     float computeFallTime(float path_length, bool isSafeFall)
     {
@@ -41,16 +41,16 @@ namespace Movement
         if (isSafeFall)
         {
             if (path_length >= terminal_savefall_length)
-                time = (path_length - terminal_savefall_length)/terminalSavefallVelocity + terminalSavefallVelocity/gravity;
+                time = (path_length - terminal_savefall_length) / terminalSavefallVelocity + terminalSavefallVelocity / gravity;
             else
-                time = sqrtf(2.f * path_length/gravity);
+                time = sqrtf(2.f * path_length / gravity);
         }
         else
         {
             if (path_length >= terminal_length)
-                time = (path_length - terminal_length)/terminalVelocity + terminalFallTime;
+                time = (path_length - terminal_length) / terminalVelocity + terminalFallTime;
             else
-                time = sqrtf(2.f * path_length/gravity);
+                time = sqrtf(2.f * path_length / gravity);
         }
 
         return time;
@@ -73,8 +73,8 @@ namespace Movement
 
         if (t_passed > terminal_time)
         {
-            result = terminalVelocity*(t_passed - terminal_time) +
-                     start_velocity*terminal_time + gravity*terminal_time*terminal_time*0.5f;
+            result = terminalVelocity * (t_passed - terminal_time) +
+                     start_velocity * terminal_time + gravity * terminal_time * terminal_time * 0.5f;
         }
         else
             result = t_passed * (start_velocity + t_passed * gravity * 0.5f);
@@ -100,7 +100,7 @@ namespace Movement
 
 #define STR(x) #x
 
-    const char* g_MovementFlag_names[]=
+    const char* g_MovementFlag_names[] =
     {
         STR(Forward),            // 0x00000001,
         STR(Backward),           // 0x00000002,
@@ -153,7 +153,7 @@ namespace Movement
         STR(Unk10),
     };
 
-    const char* g_SplineFlag_names[32]=
+    const char* g_SplineFlag_names[32] =
     {
         STR(AnimBit1),     // 0x00000001,
         STR(AnimBit2),     // 0x00000002,
@@ -190,7 +190,7 @@ namespace Movement
     };
 
     template<class Flags, int N>
-    void print_flags(Flags t, const char* (&names)[N], std::string& str)
+    void print_flags(Flags t, const char * (&names)[N], std::string& str)
     {
         for (int i = 0; i < N; ++i)
         {
@@ -202,7 +202,7 @@ namespace Movement
     std::string MoveSplineFlag::ToString() const
     {
         std::string str;
-        print_flags(raw(),g_SplineFlag_names,str);
+        print_flags(raw(), g_SplineFlag_names, str);
         return str;
     }
 }

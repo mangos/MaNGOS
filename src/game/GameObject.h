@@ -425,7 +425,7 @@ struct GameObjectInfo
             case GAMEOBJECT_TYPE_AREADAMAGE: return areadamage.lockId;
             case GAMEOBJECT_TYPE_CAMERA:     return camera.lockId;
             case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.lockId;
-            case GAMEOBJECT_TYPE_FISHINGHOLE:return fishinghole.lockId;
+            case GAMEOBJECT_TYPE_FISHINGHOLE: return fishinghole.lockId;
             case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.lockId;
             default: return 0;
         }
@@ -556,7 +556,7 @@ struct QuaternionData
     QuaternionData() : x(0.f), y(0.f), z(0.f), w(0.f) {}
     QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) {}
 
-    bool isUnit() const { return fabs(x*x + y*y + z*z + w*w - 1.f) < 1e-5;}
+    bool isUnit() const { return fabs(x * x + y * y + z * z + w * w - 1.f) < 1e-5;}
 };
 
 // from `gameobject`

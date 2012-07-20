@@ -33,7 +33,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     if (!set)
     {
-        sLog.outErrorDb("Item set %u for item (id %u) not found, mods not applied.", setid,proto->ItemId);
+        sLog.outErrorDb("Item set %u for item (id %u) not found, mods not applied.", setid, proto->ItemId);
         return;
     }
 
@@ -63,7 +63,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 break;
 
         if (x < player->ItemSetEff.size())
-            player->ItemSetEff[x]=eff;
+            player->ItemSetEff[x] = eff;
         else
             player->ItemSetEff.push_back(eff);
     }
@@ -94,7 +94,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 SpellEntry const* spellInfo = sSpellStore.LookupEntry(set->spells[x]);
                 if (!spellInfo)
                 {
-                    sLog.outError("WORLD: unknown spell id %u in items set %u effects", set->spells[x],setid);
+                    sLog.outError("WORLD: unknown spell id %u in items set %u effects", set->spells[x], setid);
                     break;
                 }
 
@@ -115,7 +115,7 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
 
     if (!set)
     {
-        sLog.outErrorDb("Item set #%u for item #%u not found, mods not removed.", setid,proto->ItemId);
+        sLog.outErrorDb("Item set #%u for item #%u not found, mods not removed.", setid, proto->ItemId);
         return;
     }
 
@@ -265,7 +265,7 @@ bool Item::Create(uint32 guidlow, uint32 itemid, Player const* owner)
     SetUInt32Value(ITEM_FIELD_DURABILITY, itemProto->MaxDurability);
 
     for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-        SetSpellCharges(i,itemProto->Spells[i].SpellCharges);
+        SetSpellCharges(i, itemProto->Spells[i].SpellCharges);
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
 
@@ -444,7 +444,7 @@ bool Item::LoadFromDB(uint32 guidLow, Field* fields, ObjectGuid ownerGuid)
         return false;
 
     // update max durability (and durability) if need
-    if (proto->MaxDurability!= GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
+    if (proto->MaxDurability != GetUInt32Value(ITEM_FIELD_MAXDURABILITY))
     {
         SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
         if (GetUInt32Value(ITEM_FIELD_DURABILITY) > proto->MaxDurability)
@@ -633,7 +633,7 @@ uint32 Item::GetSpell()
                 case ITEM_SUBCLASS_WEAPON_DAGGER:  return 1180;
                 case ITEM_SUBCLASS_WEAPON_THROWN:  return 2567;
                 case ITEM_SUBCLASS_WEAPON_SPEAR:   return 3386;
-                case ITEM_SUBCLASS_WEAPON_CROSSBOW:return 5011;
+                case ITEM_SUBCLASS_WEAPON_CROSSBOW: return 5011;
                 case ITEM_SUBCLASS_WEAPON_WAND:    return 5009;
                 default: return 0;
             }
@@ -702,7 +702,7 @@ void Item::SetItemRandomProperties(int32 randomPropId)
         {
             if (GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID) != int32(item_rand->ID))
             {
-                SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID,item_rand->ID);
+                SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, item_rand->ID);
                 SetState(ITEM_CHANGED);
             }
             for (uint32 i = PROP_ENCHANTMENT_SLOT_2; i < PROP_ENCHANTMENT_SLOT_2 + 3; ++i)
@@ -733,7 +733,7 @@ bool Item::UpdateItemSuffixFactor()
     uint32 suffixFactor = GenerateEnchSuffixFactor(GetEntry());
     if (GetItemSuffixFactor() == suffixFactor)
         return false;
-    SetUInt32Value(ITEM_FIELD_PROPERTY_SEED,suffixFactor);
+    SetUInt32Value(ITEM_FIELD_PROPERTY_SEED, suffixFactor);
     return true;
 }
 
@@ -792,7 +792,7 @@ void Item::AddToUpdateQueueOf(Player* player)
         return;
 
     player->m_itemUpdateQueue.push_back(this);
-    uQueuePos = player->m_itemUpdateQueue.size() -1;
+    uQueuePos = player->m_itemUpdateQueue.size() - 1;
 }
 
 void Item::RemoveFromUpdateQueueOf(Player* player)
@@ -980,7 +980,7 @@ bool Item::GemsFitSockets() const
     bool fits = true;
     for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
     {
-        uint8 SocketColor = GetProto()->Socket[enchant_slot-SOCK_ENCHANTMENT_SLOT].Color;
+        uint8 SocketColor = GetProto()->Socket[enchant_slot - SOCK_ENCHANTMENT_SLOT].Color;
 
         uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot));
         if (!enchant_id)

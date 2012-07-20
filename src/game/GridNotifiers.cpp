@@ -31,7 +31,7 @@ using namespace MaNGOS;
 
 void VisibleChangesNotifier::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         iter->getSource()->UpdateVisibilityOf(&i_object);
     }
@@ -44,7 +44,7 @@ void VisibleNotifier::Notify()
     // but exist one case when this possible and object not out of range: transports
     if (Transport* transport = player.GetTransport())
     {
-        for (Transport::PlayerSet::const_iterator itr = transport->GetPassengers().begin(); itr!=transport->GetPassengers().end(); ++itr)
+        for (Transport::PlayerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
         {
             if (i_clientGUIDs.find((*itr)->GetObjectGuid()) != i_clientGUIDs.end())
             {
@@ -58,7 +58,7 @@ void VisibleNotifier::Notify()
 
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
-    for (GuidSet::iterator itr = i_clientGUIDs.begin(); itr!=i_clientGUIDs.end(); ++itr)
+    for (GuidSet::iterator itr = i_clientGUIDs.begin(); itr != i_clientGUIDs.end(); ++itr)
     {
         player.m_clientGUIDs.erase(*itr);
 
@@ -141,13 +141,13 @@ void ObjectMessageDeliverer::Visit(CameraMapType& m)
 
 void MessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* owner = iter->getSource()->GetOwner();
 
         if ((i_toSelf || owner != &i_player) &&
                 (!i_ownTeamOnly || owner->GetTeam() == i_player.GetTeam()) &&
-                (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_player,i_dist)))
+                (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_player, i_dist)))
         {
             if (!i_player.InSamePhase(iter->getSource()->GetBody()))
                 continue;
@@ -160,9 +160,9 @@ void MessageDistDeliverer::Visit(CameraMapType& m)
 
 void ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter=m.begin(); iter != m.end(); ++iter)
+    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        if (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_object,i_dist))
+        if (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_object, i_dist))
         {
             if (!i_object.InSamePhase(iter->getSource()->GetBody()))
                 continue;
@@ -186,7 +186,7 @@ void ObjectUpdater::Visit(GridRefManager<T>& m)
 bool CannibalizeObjectCheck::operator()(Corpse* u)
 {
     // ignore bones
-    if (u->GetType()==CORPSE_BONES)
+    if (u->GetType() == CORPSE_BONES)
         return false;
 
     Player* owner = ObjectAccessor::FindPlayer(u->GetOwnerGuid());

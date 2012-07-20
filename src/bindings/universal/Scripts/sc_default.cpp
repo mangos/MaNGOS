@@ -98,7 +98,7 @@ void AddSC_default()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name="default";
+    newscript->Name = "default";
     newscript->pGossipHello          = &GossipHello_default;
     newscript->pQuestAccept          = &QuestAccept_default;
     newscript->pGossipSelect         = &GossipSelect_default;

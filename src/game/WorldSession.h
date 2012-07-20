@@ -241,14 +241,14 @@ class MANGOS_DLL_SPEC WorldSession
         void SendAddonsInfo();
 
         void SendPacket(WorldPacket const* packet);
-        void SendNotification(const char* format,...) ATTR_PRINTF(2,3);
-        void SendNotification(int32 string_id,...);
+        void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
+        void SendNotification(int32 string_id, ...);
         void SendPetNameInvalid(uint32 error, const std::string& name, DeclinedName* declinedName);
         void SendLfgSearchResults(LfgType type, uint32 entry);
         void SendLfgJoinResult(LfgJoinResult result);
         void SendLfgUpdate(bool isGroup, LfgUpdateType updateType, uint32 id);
         void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
-        void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
+        void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
         void SendSetPhaseShift(uint32 phaseShift);
         void SendQueryTimeResponse();
         void SendRedirectClient(std::string& ip, uint16 port);

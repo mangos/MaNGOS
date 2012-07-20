@@ -86,7 +86,7 @@ class MANGOS_DLL_SPEC ChatHandler
             FillMessageData(data, m_session, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, ObjectGuid(), message);
         }
 
-        static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = NULL; return start; }
+        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
 
         // function with different implementation for chat/console
         virtual const char* GetMangosString(int32 entry) const;
@@ -95,7 +95,7 @@ class MANGOS_DLL_SPEC ChatHandler
         virtual void SendSysMessage(const char* str);
 
         void SendSysMessage(int32     entry);
-        void PSendSysMessage(const char* format, ...) ATTR_PRINTF(2,3);
+        void PSendSysMessage(const char* format, ...) ATTR_PRINTF(2, 3);
         void PSendSysMessage(int32     entry, ...);
 
         bool ParseCommands(const char* text);
@@ -617,7 +617,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool  ExtractInt32(char** args, int32& val);
         bool  ExtractOptInt32(char** args, int32& val, int32 defVal);
         bool  ExtractUInt32Base(char** args, uint32& val, uint32 base);
-        bool  ExtractUInt32(char** args, uint32& val) { return ExtractUInt32Base(args,val, 10); }
+        bool  ExtractUInt32(char** args, uint32& val) { return ExtractUInt32Base(args, val, 10); }
         bool  ExtractOptUInt32(char** args, uint32& val, uint32 defVal);
         bool  ExtractFloat(char** args, float& val);
         bool  ExtractOptFloat(char** args, float& val, float defVal);
@@ -646,10 +646,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool ExtractPlayerTarget(char** args, Player** player, ObjectGuid* player_guid = NULL, std::string* player_name = NULL);
         // select by arg (name/link) or in-game selection online/offline player
 
-        std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
+        std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:" + name + "|h[" + name + "]|h|r" : name; }
         std::string GetNameLink(Player* chr) const;
 
-        GameObject* GetGameObjectWithGuid(uint32 lowguid,uint32 entry);
+        GameObject* GetGameObjectWithGuid(uint32 lowguid, uint32 entry);
 
         // Utility methods for commands
         bool ShowAccountListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
@@ -670,7 +670,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
         bool HandleUnBanHelper(BanMode mode, char* args);
         void HandleCharacterLevel(Player* player, ObjectGuid player_guid, uint32 oldlevel, uint32 newlevel);
-        void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
+        void HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = NULL, float const* ortPtr = NULL);
         bool HandleGetValueHelper(Object* target, uint32 field, char* typeStr);
         bool HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr);

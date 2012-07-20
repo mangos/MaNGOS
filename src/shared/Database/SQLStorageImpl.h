@@ -84,35 +84,35 @@ void SQLStorageLoaderBase<T>::storeValue(V value, SQLStorage& store, char* p, ui
     {
         case FT_LOGIC:
             subclass->convert(x, value, *((bool*)(&p[offset])));
-            offset+=sizeof(bool);
+            offset += sizeof(bool);
             break;
         case FT_BYTE:
             subclass->convert(x, value, *((char*)(&p[offset])));
-            offset+=sizeof(char);
+            offset += sizeof(char);
             break;
         case FT_INT:
             subclass->convert(x, value, *((uint32*)(&p[offset])));
-            offset+=sizeof(uint32);
+            offset += sizeof(uint32);
             break;
         case FT_FLOAT:
             subclass->convert(x, value, *((float*)(&p[offset])));
-            offset+=sizeof(float);
+            offset += sizeof(float);
             break;
         case FT_STRING:
             subclass->convert_to_str(x, value, *((char**)(&p[offset])));
-            offset+=sizeof(char*);
+            offset += sizeof(char*);
             break;
         case FT_NA:
             subclass->default_fill(x, value, *((int32*)(&p[offset])));
-            offset+=sizeof(uint32);
+            offset += sizeof(uint32);
             break;
         case FT_NA_BYTE:
             subclass->default_fill(x, value, *((char*)(&p[offset])));
-            offset+=sizeof(char);
+            offset += sizeof(char);
             break;
         case FT_NA_FLOAT:
             subclass->default_fill(x, value, *((float*)(&p[offset])));
-            offset+=sizeof(float);
+            offset += sizeof(float);
             break;
         case FT_IND:
         case FT_SORT:
@@ -132,7 +132,7 @@ void SQLStorageLoaderBase<T>::storeValue(char const* value, SQLStorage& store, c
     {
         case FT_LOGIC:
             subclass->convert_from_str(x, value, *((bool*)(&p[offset])));
-            offset+=sizeof(bool);
+            offset += sizeof(bool);
             break;
         case FT_BYTE:
             subclass->convert_from_str(x, value, *((char*)(&p[offset])));
@@ -177,7 +177,7 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage& store, bool error_at_empty /*= tr
         exit(1);                                            // Stop server at loading non exited table or not accessable table
     }
 
-    maxi = (*result)[0].GetUInt32()+1;
+    maxi = (*result)[0].GetUInt32() + 1;
     delete result;
 
     result = WorldDatabase.PQuery("SELECT COUNT(*) FROM %s", store.table);
@@ -249,9 +249,9 @@ void SQLStorageLoaderBase<T>::Load(SQLStorage& store, bool error_at_empty /*= tr
     }
 
     char** newIndex = new char*[maxi];
-    memset(newIndex, 0, maxi*sizeof(char*));
+    memset(newIndex, 0, maxi * sizeof(char*));
 
-    char* _data= new char[store.RecordCount * recordsize];
+    char* _data = new char[store.RecordCount * recordsize];
     uint32 count = 0;
     BarGoLink bar(store.RecordCount);
     do

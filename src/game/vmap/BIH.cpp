@@ -251,7 +251,7 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
 bool BIH::writeToFile(FILE* wf) const
 {
     uint32 treeSize = tree.size();
-    uint32 check=0, count=0;
+    uint32 check = 0, count = 0;
     check += fwrite(&bounds.low(), sizeof(float), 3, wf);
     check += fwrite(&bounds.high(), sizeof(float), 3, wf);
     check += fwrite(&treeSize, sizeof(uint32), 1, wf);
@@ -266,7 +266,7 @@ bool BIH::readFromFile(FILE* rf)
 {
     uint32 treeSize;
     Vector3 lo, hi;
-    uint32 check=0, count=0;
+    uint32 check = 0, count = 0;
     check += fread(&lo, sizeof(float), 3, rf);
     check += fread(&hi, sizeof(float), 3, rf);
     bounds = AABox(lo, hi);

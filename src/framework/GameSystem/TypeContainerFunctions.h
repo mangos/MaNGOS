@@ -54,7 +54,7 @@ namespace MaNGOS
     template<class SPECIFIC_TYPE, class T>
     size_t Count(const ContainerMapList<TypeList<SPECIFIC_TYPE, T> >& elements, SPECIFIC_TYPE* fake)
     {
-        return Count(elements._elements,fake);
+        return Count(elements._elements, fake);
     }
 
     template<class SPECIFIC_TYPE, class H, class T>
@@ -89,7 +89,7 @@ namespace MaNGOS
     template<class SPECIFIC_TYPE, class H, class T>
     SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T> >& elements, SPECIFIC_TYPE* obj)
     {
-        SPECIFIC_TYPE* t= Insert(elements._elements, obj);
+        SPECIFIC_TYPE* t = Insert(elements._elements, obj);
         return (t != NULL ? t : Insert(elements._TailElements, obj));
     }
 

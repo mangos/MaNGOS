@@ -124,7 +124,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
             uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid);
 
-            sLog.outCommand(bidder_accId,"GM %s (Account: %u) won item in auction (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
                             bidder_name.c_str(), bidder_accId, auction->itemTemplate, auction->itemCount, auction->bid, owner_name.c_str(), owner_accid);
         }
     }
@@ -292,7 +292,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
         if (!proto)
         {
-            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid,item_template);
+            sLog.outError("AuctionHouseMgr::LoadAuctionItems: Unknown item (GUID: %u id: #%u) in auction, skipped.", item_guid, item_template);
             continue;
         }
 
@@ -327,7 +327,7 @@ void AuctionHouseMgr::LoadAuctions()
     }
 
     Field* fields = result->Fetch();
-    uint32 AuctionCount=fields[0].GetUInt32();
+    uint32 AuctionCount = fields[0].GetUInt32();
     delete result;
 
     if (!AuctionCount)
@@ -433,7 +433,7 @@ void AuctionHouseMgr::LoadAuctions()
 
             // Attempt send item back to owner
             std::ostringstream msgAuctionCanceledOwner;
-            msgAuctionCanceledOwner << auction->itemTemplate << ":"<< auction->itemRandomPropertyId << ":" << AUCTION_CANCELED << ":" << auction->Id << ":" << auction->itemCount;
+            msgAuctionCanceledOwner << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_CANCELED << ":" << auction->Id << ":" << auction->itemCount;
 
             if (auction->itemGuidLow)
             {
@@ -949,7 +949,7 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(startbid);                               // Auction->startbid (not sure if useful)
     data << uint32(bid ? GetAuctionOutBid() : 0);           // minimal outbid
     data << uint32(buyout);                                 // auction->buyout
-    data << uint32((expireTime-time(NULL))*IN_MILLISECONDS);// time left
+    data << uint32((expireTime - time(NULL))*IN_MILLISECONDS); // time left
     data << ObjectGuid(HIGHGUID_PLAYER, bidder);            // auction->bidder current
     data << uint32(bid);                                    // current bid
     return true;

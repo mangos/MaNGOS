@@ -41,7 +41,7 @@ HostileRefManager::~HostileRefManager()
 void HostileRefManager::threatAssist(Unit* pVictim, float pThreat, SpellEntry const* pThreatSpell, bool pSingleTarget)
 {
     uint32 size = pSingleTarget ? 1 : getSize();            // if pSingleTarget do not devide threat
-    float threat = pThreat/size;
+    float threat = pThreat / size;
     HostileReference* ref = getFirst();
     while (ref)
     {
@@ -149,7 +149,7 @@ void HostileRefManager::deleteReference(Unit* pCreature)
 //=================================================
 // set state for one reference, defined by Unit
 
-void HostileRefManager::setOnlineOfflineState(Unit* pCreature,bool pIsOnline)
+void HostileRefManager::setOnlineOfflineState(Unit* pCreature, bool pIsOnline)
 {
     HostileReference* ref = getFirst();
     while (ref)

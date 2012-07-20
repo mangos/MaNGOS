@@ -73,36 +73,36 @@ bool FleeingMovementGenerator<T>::_getPoint(T& owner, float& x, float& y, float&
         if (dist_from_caster > 0.2f)
             angle_to_caster = fright->GetAngle(&owner);
         else
-            angle_to_caster = frand(0, 2*M_PI_F);
+            angle_to_caster = frand(0, 2 * M_PI_F);
     }
     else
     {
         dist_from_caster = 0.0f;
-        angle_to_caster = frand(0, 2*M_PI_F);
+        angle_to_caster = frand(0, 2 * M_PI_F);
     }
 
     float dist, angle;
     if (dist_from_caster < MIN_QUIET_DISTANCE)
     {
-        dist = frand(0.4f, 1.3f)*(MIN_QUIET_DISTANCE - dist_from_caster);
-        angle = angle_to_caster + frand(-M_PI_F/8, M_PI_F/8);
+        dist = frand(0.4f, 1.3f) * (MIN_QUIET_DISTANCE - dist_from_caster);
+        angle = angle_to_caster + frand(-M_PI_F / 8, M_PI_F / 8);
     }
     else if (dist_from_caster > MAX_QUIET_DISTANCE)
     {
-        dist = frand(0.4f, 1.0f)*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
-        angle = -angle_to_caster + frand(-M_PI_F/4, M_PI_F/4);
+        dist = frand(0.4f, 1.0f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
+        angle = -angle_to_caster + frand(-M_PI_F / 4, M_PI_F / 4);
     }
     else    // we are inside quiet range
     {
-        dist = frand(0.6f, 1.2f)*(MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
-        angle = frand(0, 2*M_PI_F);
+        dist = frand(0.6f, 1.2f) * (MAX_QUIET_DISTANCE - MIN_QUIET_DISTANCE);
+        angle = frand(0, 2 * M_PI_F);
     }
 
     float curr_x, curr_y, curr_z;
     owner.GetPosition(curr_x, curr_y, curr_z);
 
-    x = curr_x + dist*cos(angle);
-    y = curr_y + dist*sin(angle);
+    x = curr_x + dist * cos(angle);
+    y = curr_y + dist * sin(angle);
     z = curr_z;
 
     owner.UpdateAllowedPositionZ(x, y, z);
@@ -113,7 +113,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T& owner, float& x, float& y, float&
 template<class T>
 void FleeingMovementGenerator<T>::Initialize(T& owner)
 {
-    owner.addUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
+    owner.addUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
     owner.StopMoving();
 
     if (owner.GetTypeId() == TYPEID_UNIT)
@@ -125,14 +125,14 @@ void FleeingMovementGenerator<T>::Initialize(T& owner)
 template<>
 void FleeingMovementGenerator<Player>::Finalize(Player& owner)
 {
-    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
+    owner.clearUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
     owner.StopMoving();
 }
 
 template<>
 void FleeingMovementGenerator<Creature>::Finalize(Creature& owner)
 {
-    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
+    owner.clearUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
 }
 
 template<class T>
@@ -183,7 +183,7 @@ template bool FleeingMovementGenerator<Creature>::Update(Creature&, const uint32
 
 void TimedFleeingMovementGenerator::Finalize(Unit& owner)
 {
-    owner.clearUnitState(UNIT_STAT_FLEEING|UNIT_STAT_FLEEING_MOVE);
+    owner.clearUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
     if (Unit* victim = owner.getVictim())
     {
         if (owner.isAlive())

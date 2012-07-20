@@ -34,9 +34,9 @@ struct AchievementCriteriaEntry;
 typedef std::list<AchievementCriteriaEntry const*> AchievementCriteriaEntryList;
 typedef std::list<AchievementEntry const*>         AchievementEntryList;
 
-typedef std::map<uint32,AchievementCriteriaEntryList> AchievementCriteriaListByAchievement;
-typedef std::map<uint32,AchievementEntryList>         AchievementListByReferencedId;
-typedef std::map<uint32,time_t>                       AchievementCriteriaFailTimeMap;
+typedef std::map<uint32, AchievementCriteriaEntryList> AchievementCriteriaListByAchievement;
+typedef std::map<uint32, AchievementEntryList>         AchievementListByReferencedId;
+typedef std::map<uint32, time_t>                       AchievementCriteriaFailTimeMap;
 
 struct CriteriaProgress
 {
@@ -52,7 +52,7 @@ enum AchievementCriteriaRequirementType
     ACHIEVEMENT_CRITERIA_REQUIRE_NONE                = 0,   // 0              0
     ACHIEVEMENT_CRITERIA_REQUIRE_T_CREATURE          = 1,   // creature_id    0
     ACHIEVEMENT_CRITERIA_REQUIRE_T_PLAYER_CLASS_RACE = 2,   // class_id       race_id
-    ACHIEVEMENT_CRITERIA_REQUIRE_T_PLAYER_LESS_HEALTH= 3,   // health_percent 0
+    ACHIEVEMENT_CRITERIA_REQUIRE_T_PLAYER_LESS_HEALTH = 3,  // health_percent 0
     ACHIEVEMENT_CRITERIA_REQUIRE_T_PLAYER_DEAD       = 4,   // own_team       0             not corpse (not released body), own_team==false if enemy team expected
     ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA              = 5,   // spell_id       effect_idx
     ACHIEVEMENT_CRITERIA_REQUIRE_S_AREA              = 6,   // area id        0
@@ -216,7 +216,7 @@ struct AchievementCriteriaRequirementSet
         Storage storage;
 };
 
-typedef std::map<uint32,AchievementCriteriaRequirementSet> AchievementCriteriaRequirementMap;
+typedef std::map<uint32, AchievementCriteriaRequirementSet> AchievementCriteriaRequirementMap;
 
 struct AchievementReward
 {
@@ -264,10 +264,10 @@ class AchievementMgr
         static void DeleteFromDB(ObjectGuid guid);
         void LoadFromDB(QueryResult* achievementResult, QueryResult* criteriaResult);
         void SaveToDB();
-        void ResetAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0);
+        void ResetAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1 = 0, uint32 miscvalue2 = 0);
         void StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime = 0);
         void DoFailedTimedAchievementCriterias();
-        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit* unit=NULL, uint32 time=0);
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1 = 0, uint32 miscvalue2 = 0, Unit* unit = NULL, uint32 time = 0);
         void CheckAllAchievementCriteria();
         void SendAllAchievementData();
         void SendRespondInspectAchievements(Player* player);

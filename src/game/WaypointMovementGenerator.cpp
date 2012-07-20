@@ -82,24 +82,24 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature& creature)
 void WaypointMovementGenerator<Creature>::Initialize(Creature& creature)
 {
     LoadPath(creature);
-    creature.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
 }
 
 void WaypointMovementGenerator<Creature>::Finalize(Creature& creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 
 void WaypointMovementGenerator<Creature>::Interrupt(Creature& creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(false);
 }
 
 void WaypointMovementGenerator<Creature>::Reset(Creature& creature)
 {
-    creature.addUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING_MOVE);
+    creature.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     StartMoveNow(creature);
 }
 
@@ -173,7 +173,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature& creature)
     }
 
     if (m_isArrivalDone)
-        i_currentNode = (i_currentNode+1) % i_path->size();
+        i_currentNode = (i_currentNode + 1) % i_path->size();
 
     m_isArrivalDone = false;
 
@@ -269,7 +269,7 @@ void FlightPathMovementGenerator::Finalize(Player& player)
     player.clearUnitState(UNIT_STAT_TAXI_FLIGHT);
 
     player.Unmount();
-    player.RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    player.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
     if (player.m_taxi.empty())
     {
@@ -295,13 +295,13 @@ void FlightPathMovementGenerator::Reset(Player& player)
 {
     player.getHostileRefManager().setOnlineOfflineState(false);
     player.addUnitState(UNIT_STAT_TAXI_FLIGHT);
-    player.SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    player.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 
     Movement::MoveSplineInit init(player);
     uint32 end = GetPathAtMapEnd();
     for (uint32 i = GetCurrentNode(); i != end; ++i)
     {
-        G3D::Vector3 vertice((*i_path)[i].x,(*i_path)[i].y,(*i_path)[i].z);
+        G3D::Vector3 vertice((*i_path)[i].x, (*i_path)[i].y, (*i_path)[i].z);
         init.Path().push_back(vertice);
     }
     init.SetFirstPointId(GetCurrentNode());
@@ -318,7 +318,7 @@ bool FlightPathMovementGenerator::Update(Player& player, const uint32& diff)
         bool departureEvent = true;
         do
         {
-            DoEventIfAny(player,(*i_path)[i_currentNode],departureEvent);
+            DoEventIfAny(player, (*i_path)[i_currentNode], departureEvent);
             if (pointId == i_currentNode)
                 break;
             i_currentNode += (uint32)departureEvent;
@@ -327,7 +327,7 @@ bool FlightPathMovementGenerator::Update(Player& player, const uint32& diff)
         while (true);
     }
 
-    return i_currentNode < (i_path->size()-1);
+    return i_currentNode < (i_path->size() - 1);
 }
 
 void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()

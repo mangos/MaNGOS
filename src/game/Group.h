@@ -200,7 +200,7 @@ class MANGOS_DLL_SPEC Group
         typedef std::list<MemberSlot> MemberSlotList;
         typedef MemberSlotList::const_iterator member_citerator;
 
-        typedef UNORDERED_MAP< uint32 /*mapId*/, InstanceGroupBind> BoundInstancesMap;
+        typedef UNORDERED_MAP < uint32 /*mapId*/, InstanceGroupBind > BoundInstancesMap;
     protected:
         typedef MemberSlotList::iterator member_witerator;
         typedef std::set<Player*> InvitesList;
@@ -225,7 +225,7 @@ class MANGOS_DLL_SPEC Group
         void   SetLooterGuid(ObjectGuid guid) { m_looterGuid = guid; }
         void   UpdateLooterGuid(WorldObject* pSource, bool ifneed = false);
         void   SetLootThreshold(ItemQualities threshold) { m_lootThreshold = threshold; }
-        void   Disband(bool hideDestroy=false);
+        void   Disband(bool hideDestroy = false);
 
         // properties accessories
         uint32 GetId() const { return m_Id; }
@@ -254,7 +254,7 @@ class MANGOS_DLL_SPEC Group
         bool IsAssistant(ObjectGuid guid) const
         {
             member_citerator mslot = _getMemberCSlot(guid);
-            if (mslot==m_memberSlots.end())
+            if (mslot == m_memberSlots.end())
                 return false;
 
             return mslot->assistant;
@@ -272,7 +272,7 @@ class MANGOS_DLL_SPEC Group
         MemberSlotList const& GetMemberSlots() const { return m_memberSlots; }
         GroupReference* GetFirstMember() { return m_memberMgr.getFirst(); }
         uint32 GetMembersCount() const { return m_memberSlots.size(); }
-        void GetDataForXPAtKill(Unit const* victim, uint32& count,uint32& sum_level, Player*& member_with_max_level, Player*& not_gray_member_with_max_level, Player* additional = NULL);
+        void GetDataForXPAtKill(Unit const* victim, uint32& count, uint32& sum_level, Player*& member_with_max_level, Player*& not_gray_member_with_max_level, Player* additional = NULL);
         uint8 GetMemberGroup(ObjectGuid guid) const
         {
             member_citerator mslot = _getMemberCSlot(guid);
@@ -333,7 +333,7 @@ class MANGOS_DLL_SPEC Group
         void SendUpdate();
         void UpdatePlayerOutOfRange(Player* pPlayer);
         // ignore: GUID of player that will be ignored
-        void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group=-1, ObjectGuid ignore = ObjectGuid());
+        void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid());
         void BroadcastReadyCheck(WorldPacket* packet);
         void OfflineReadyCheck();
 
@@ -366,7 +366,7 @@ class MANGOS_DLL_SPEC Group
         BoundInstancesMap& GetBoundInstances(Difficulty difficulty) { return m_boundInstances[difficulty]; }
 
     protected:
-        bool _addMember(ObjectGuid guid, const char* name, bool isAssistant=false);
+        bool _addMember(ObjectGuid guid, const char* name, bool isAssistant = false);
         bool _addMember(ObjectGuid guid, const char* name, bool isAssistant, uint8 group);
         bool _removeMember(ObjectGuid guid);                // returns true if leader has changed
         void _setLeader(ObjectGuid guid);

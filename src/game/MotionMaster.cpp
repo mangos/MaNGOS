@@ -46,7 +46,7 @@ void MotionMaster::Initialize()
         m_owner->StopMoving();
 
     // clear ALL movement generators (including default)
-    Clear(false,true);
+    Clear(false, true);
 
     // set new default movement generator
     if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->hasUnitState(UNIT_STAT_CONTROLLED))
@@ -259,7 +259,7 @@ void MotionMaster::MoveTargetedHome()
         if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
-            Mutate(new FollowMovementGenerator<Creature>(*target,PET_FOLLOW_DIST,PET_FOLLOW_ANGLE));
+            Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
         }
         else
         {
@@ -289,9 +289,9 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s chase to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
-        Mutate(new ChaseMovementGenerator<Player>(*target,dist,angle));
+        Mutate(new ChaseMovementGenerator<Player>(*target, dist, angle));
     else
-        Mutate(new ChaseMovementGenerator<Creature>(*target,dist,angle));
+        Mutate(new ChaseMovementGenerator<Creature>(*target, dist, angle));
 }
 
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle)
@@ -308,9 +308,9 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle)
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
-        Mutate(new FollowMovementGenerator<Player>(*target,dist,angle));
+        Mutate(new FollowMovementGenerator<Player>(*target, dist, angle));
     else
-        Mutate(new FollowMovementGenerator<Creature>(*target,dist,angle));
+        Mutate(new FollowMovementGenerator<Creature>(*target, dist, angle));
 }
 
 void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generatePath)
@@ -318,9 +318,9 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s targeted point (Id: %u X: %f Y: %f Z: %f)", m_owner->GetGuidStr().c_str(), id, x, y, z);
 
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
-        Mutate(new PointMovementGenerator<Player>(id,x,y,z,generatePath));
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, generatePath));
     else
-        Mutate(new PointMovementGenerator<Creature>(id,x,y,z,generatePath));
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, generatePath));
 }
 
 void MotionMaster::MoveSeekAssistance(float x, float y, float z)
@@ -333,7 +333,7 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s seek assistance (X: %f Y: %f Z: %f)",
                          m_owner->GetGuidStr().c_str(), x, y, z);
-        Mutate(new AssistanceMovementGenerator(x,y,z));
+        Mutate(new AssistanceMovementGenerator(x, y, z));
     }
 }
 
@@ -397,7 +397,7 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
         if (path < sTaxiPathNodesByPath.size())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s taxi to (Path %u node %u)", m_owner->GetGuidStr().c_str(), path, pathnode);
-            FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(sTaxiPathNodesByPath[path],pathnode);
+            FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(sTaxiPathNodesByPath[path], pathnode);
             Mutate(mgen);
         }
         else
@@ -482,8 +482,8 @@ void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
 void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id)
 {
     Movement::MoveSplineInit init(*m_owner);
-    init.MoveTo(x,y,z);
-    init.SetParabolic(max_height,0);
+    init.MoveTo(x, y, z);
+    init.SetParabolic(max_height, 0);
     init.SetVelocity(horizontalSpeed);
     init.Launch();
     Mutate(new EffectMovementGenerator(id));
@@ -505,7 +505,7 @@ void MotionMaster::MoveFall()
         return;
 
     Movement::MoveSplineInit init(*m_owner);
-    init.MoveTo(m_owner->GetPositionX(),m_owner->GetPositionY(),tz);
+    init.MoveTo(m_owner->GetPositionX(), m_owner->GetPositionY(), tz);
     init.SetFall();
     init.Launch();
     Mutate(new EffectMovementGenerator(0));

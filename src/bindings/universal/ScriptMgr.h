@@ -96,7 +96,7 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
     // Is unit visible for MoveInLineOfSight
     bool IsVisible(Unit* who) const
     {
-        return !who->HasStealthAura() && m_creature->IsWithinDist(who,VISIBLE_RANGE);
+        return !who->HasStealthAura() && m_creature->IsWithinDist(who, VISIBLE_RANGE);
     }
 
     // Called at World update tick
@@ -113,12 +113,12 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
     // Cast spell
     void DoCast(Unit* victim, uint32 spelId)
     {
-        m_creature->CastSpell(victim,spelId,true);
+        m_creature->CastSpell(victim, spelId, true);
     }
 
-    void DoCastSpell(Unit* who,SpellEntry* spellInfo)
+    void DoCastSpell(Unit* who, SpellEntry* spellInfo)
     {
-        m_creature->CastSpell(who,spellInfo,true);
+        m_creature->CastSpell(who, spellInfo, true);
     }
 
     void DoSay(int32 text_id, uint32 language)

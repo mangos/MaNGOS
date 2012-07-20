@@ -52,8 +52,8 @@ struct MANGOS_DLL_DECL Cell
 
         void Compute(uint32& x, uint32& y) const
         {
-            x = data.Part.grid_x*MAX_NUMBER_OF_CELLS + data.Part.cell_x;
-            y = data.Part.grid_y*MAX_NUMBER_OF_CELLS + data.Part.cell_y;
+            x = data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x;
+            y = data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y;
         }
 
         bool DiffCell(const Cell& cell) const
@@ -75,13 +75,13 @@ struct MANGOS_DLL_DECL Cell
         bool NoCreate() const { return data.Part.nocreate; }
         void SetNoCreate() { data.Part.nocreate = 1; }
 
-        GridPair gridPair() const { return GridPair(GridX(),GridY()); }
+        GridPair gridPair() const { return GridPair(GridX(), GridY()); }
 
         CellPair cellPair() const
         {
             return CellPair(
-                       data.Part.grid_x*MAX_NUMBER_OF_CELLS+data.Part.cell_x,
-                       data.Part.grid_y*MAX_NUMBER_OF_CELLS+data.Part.cell_y);
+                       data.Part.grid_x * MAX_NUMBER_OF_CELLS + data.Part.cell_x,
+                       data.Part.grid_y * MAX_NUMBER_OF_CELLS + data.Part.cell_y);
         }
 
         Cell& operator=(const Cell& cell)

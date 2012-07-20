@@ -58,7 +58,7 @@ bool WinServiceInstall()
     }
 
     char path[_MAX_PATH + 10];
-    if (!GetModuleFileName(0, path, sizeof(path)/sizeof(path[0])))
+    if (!GetModuleFileName(0, path, sizeof(path) / sizeof(path[0])))
     {
         CloseServiceHandle(serviceControlManager);
         sLog.outError("SERVICE: Can't get service binary filename.");
@@ -121,7 +121,7 @@ bool WinServiceInstall()
     ZeroMemory(&sfa, sizeof(SERVICE_FAILURE_ACTIONS));
     sfa.lpsaActions = _action;
     sfa.cActions = 1;
-    sfa.dwResetPeriod =INFINITE;
+    sfa.dwResetPeriod = INFINITE;
     ChangeService_Config2(
         service,                                // handle to service
         SERVICE_CONFIG_FAILURE_ACTIONS,         // information level
@@ -221,7 +221,7 @@ void WINAPI ServiceMain(DWORD argc, char* argv[])
         char path[_MAX_PATH + 1];
         unsigned int i, last_slash = 0;
 
-        GetModuleFileName(0, path, sizeof(path)/sizeof(path[0]));
+        GetModuleFileName(0, path, sizeof(path) / sizeof(path[0]));
 
         for (i = 0; i < std::strlen(path); i++)
         {

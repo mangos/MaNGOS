@@ -110,7 +110,7 @@ void PlayerSocial::SetFriendNote(ObjectGuid friend_guid, std::string note)
     if (itr == m_playerSocialMap.end())                     // not exist
         return;
 
-    utf8truncate(note,48);                                  // DB and client size limitation
+    utf8truncate(note, 48);                                 // DB and client size limitation
 
     std::string safe_note = note;
     CharacterDatabase.escape_string(safe_note);
@@ -126,7 +126,7 @@ void PlayerSocial::SendSocialList()
 
     uint32 size = m_playerSocialMap.size();
 
-    WorldPacket data(SMSG_CONTACT_LIST, (4+4+size*25));     // just can guess size
+    WorldPacket data(SMSG_CONTACT_LIST, (4 + 4 + size * 25)); // just can guess size
     data << uint32(7);                                      // unk flag (0x1, 0x2, 0x4), 0x7 if it include ignore list
     data << uint32(size);                                   // friends count
 
@@ -309,7 +309,7 @@ PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
     std::string note = "";
 
     // used to speed up check below. Using GetNumberOfSocialsWithFlag will cause unneeded iteration
-    uint32 friendCounter=0, ignoreCounter=0;
+    uint32 friendCounter = 0, ignoreCounter = 0;
 
     do
     {

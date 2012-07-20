@@ -37,7 +37,7 @@ inline float SignOf(UsedAreaSide side)
 
 struct ObjectPosSelector
 {
-    typedef std::multimap<float,float> UsedAreaList;        // angle pos -> angle offset
+    typedef std::multimap<float, float> UsedAreaList;       // angle pos -> angle offset
     typedef UsedAreaList::value_type UsedArea;
 
     ObjectPosSelector(float x, float y, float dist, float searcher_size);

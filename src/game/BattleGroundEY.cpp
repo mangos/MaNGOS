@@ -163,7 +163,7 @@ void BattleGroundEY::CheckSomeoneJoinedPoint()
 void BattleGroundEY::CheckSomeoneLeftPoint()
 {
     //reset current point counts
-    for (uint8 i = 0; i < 2*BG_EY_NODES_MAX; ++i)
+    for (uint8 i = 0; i < 2 * BG_EY_NODES_MAX; ++i)
         m_CurrentPointPlayersCount[i] = 0;
     for (uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
@@ -576,9 +576,9 @@ void BattleGroundEY::EventTeamLostPoint(Player* Source, uint32 Point)
     //buff isn't despawned
 
     if (team == ALLIANCE)
-        SendMessageToAll(LoosingPointTypes[Point].MessageIdAlliance,CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
+        SendMessageToAll(LoosingPointTypes[Point].MessageIdAlliance, CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
     else
-        SendMessageToAll(LoosingPointTypes[Point].MessageIdHorde,CHAT_MSG_BG_SYSTEM_HORDE, Source);
+        SendMessageToAll(LoosingPointTypes[Point].MessageIdHorde, CHAT_MSG_BG_SYSTEM_HORDE, Source);
 
     UpdatePointsIcons(team, Point);
     UpdatePointsCount(team);
@@ -600,9 +600,9 @@ void BattleGroundEY::EventTeamCapturedPoint(Player* Source, uint32 Point)
     m_PointState[Point] = EY_POINT_UNDER_CONTROL;
 
     if (team == ALLIANCE)
-        SendMessageToAll(CapturingPointTypes[Point].MessageIdAlliance,CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
+        SendMessageToAll(CapturingPointTypes[Point].MessageIdAlliance, CHAT_MSG_BG_SYSTEM_ALLIANCE, Source);
     else
-        SendMessageToAll(CapturingPointTypes[Point].MessageIdHorde,CHAT_MSG_BG_SYSTEM_HORDE, Source);
+        SendMessageToAll(CapturingPointTypes[Point].MessageIdHorde, CHAT_MSG_BG_SYSTEM_HORDE, Source);
 
     UpdatePointsIcons(team, Point);
     UpdatePointsCount(team);
@@ -729,19 +729,19 @@ WorldSafeLocsEntry const* BattleGroundEY::GetClosestGraveYard(Player* player)
     float plr_z = player->GetPositionZ();
 
 
-    distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
+    distance = (entry->x - plr_x) * (entry->x - plr_x) + (entry->y - plr_y) * (entry->y - plr_y) + (entry->z - plr_z) * (entry->z - plr_z);
     nearestDistance = distance;
 
     for (uint8 i = 0; i < BG_EY_NODES_MAX; ++i)
     {
-        if (m_PointOwnedByTeam[i]==player->GetTeam() && m_PointState[i]==EY_POINT_UNDER_CONTROL)
+        if (m_PointOwnedByTeam[i] == player->GetTeam() && m_PointState[i] == EY_POINT_UNDER_CONTROL)
         {
             entry = sWorldSafeLocsStore.LookupEntry(CapturingPointTypes[i].GraveYardId);
             if (!entry)
-                sLog.outError("BattleGroundEY: Not found graveyard: %u",CapturingPointTypes[i].GraveYardId);
+                sLog.outError("BattleGroundEY: Not found graveyard: %u", CapturingPointTypes[i].GraveYardId);
             else
             {
-                distance = (entry->x - plr_x)*(entry->x - plr_x) + (entry->y - plr_y)*(entry->y - plr_y) + (entry->z - plr_z)*(entry->z - plr_z);
+                distance = (entry->x - plr_x) * (entry->x - plr_x) + (entry->y - plr_y) * (entry->y - plr_y) + (entry->z - plr_z) * (entry->z - plr_z);
                 if (distance < nearestDistance)
                 {
                     nearestDistance = distance;

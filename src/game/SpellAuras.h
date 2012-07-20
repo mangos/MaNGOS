@@ -176,15 +176,15 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         int32 m_duration;                                   // Current time
         int32 m_timeCla;                                    // Timer for power per sec calculation
 
-        AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
-        DiminishingGroup m_AuraDRGroup:8;                   // Diminishing
+        AuraRemoveMode m_removeMode: 8;                     // Store info for know remove aura reason
+        DiminishingGroup m_AuraDRGroup: 8;                  // Diminishing
 
-        bool m_permanent:1;
-        bool m_isPassive:1;
-        bool m_isDeathPersist:1;
-        bool m_isRemovedOnShapeLost:1;
-        bool m_isSingleTarget:1;                            // true if it's a single target spell and registered at caster - can change at spell steal for example
-        bool m_deleted:1;
+        bool m_permanent: 1;
+        bool m_isPassive: 1;
+        bool m_isDeathPersist: 1;
+        bool m_isRemovedOnShapeLost: 1;
+        bool m_isSingleTarget: 1;                           // true if it's a single target spell and registered at caster - can change at spell steal for example
+        bool m_deleted: 1;
 
         uint32 m_in_use;                                    // > 0 while in SpellAuraHolder::ApplyModifiers call/SpellAuraHolder::Update/etc
 };
@@ -475,14 +475,14 @@ class MANGOS_DLL_SPEC Aura
         int32 m_periodicTimer;                              // Timer for periodic auras
         uint32 m_periodicTick;                              // Tick count pass (including current if use in tick code) from aura apply, used for some tick count dependent aura effects
 
-        AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
+        AuraRemoveMode m_removeMode: 8;                     // Store info for know remove aura reason
 
-        SpellEffectIndex m_effIndex :8;                     // Aura effect index in spell
+        SpellEffectIndex m_effIndex : 8;                    // Aura effect index in spell
 
-        bool m_positive:1;
-        bool m_isPeriodic:1;
-        bool m_isAreaAura:1;
-        bool m_isPersistent:1;
+        bool m_positive: 1;
+        bool m_isPeriodic: 1;
+        bool m_isAreaAura: 1;
+        bool m_isPersistent: 1;
 
         uint32 m_in_use;                                    // > 0 while in Aura::ApplyModifier call/Aura::Update/etc
 

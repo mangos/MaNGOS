@@ -92,7 +92,7 @@ ChatCommand* ChatHandler::getCommandTable()
     static ChatCommand achievementCriteriaCommandTable[] =
     {
         { "add",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaAddCommand,   "", NULL },
-        { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaRemoveCommand,"", NULL },
+        { "remove",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAchievementCriteriaRemoveCommand, "", NULL },
         { NULL,             0,                  true,  NULL,                                                "", NULL }
     };
 
@@ -111,9 +111,9 @@ ChatCommand* ChatHandler::getCommandTable()
         { "white",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_WHITE>, "", NULL },
         { "green",          SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_GREEN>, "", NULL },
         { "blue",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_BLUE>,  "", NULL },
-        { "purple",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_PURPLE>,"", NULL },
-        { "orange",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_ORANGE>,"", NULL },
-        { "yellow",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_YELLOW>,"", NULL },
+        { "purple",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_PURPLE>, "", NULL },
+        { "orange",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_ORANGE>, "", NULL },
+        { "yellow",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountQualityCommand<AUCTION_QUALITY_YELLOW>, "", NULL },
         { "",               SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleAHBotItemsAmountCommand,      "", NULL },
         { NULL,             0,                  true,  NULL,                                             "", NULL }
     };
@@ -190,15 +190,15 @@ ChatCommand* ChatHandler::getCommandTable()
     static ChatCommand characterDeletedCommandTable[] =
     {
         { "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeletedDeleteCommand, "", NULL },
-        { "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedListCommand,"", NULL },
-        { "restore",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedRestoreCommand,"", NULL },
+        { "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedListCommand, "", NULL },
+        { "restore",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedRestoreCommand, "", NULL },
         { "old",            SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeletedOldCommand, "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
     static ChatCommand characterCommandTable[] =
     {
-        { "achievements",   SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterAchievementsCommand,"",NULL },
+        { "achievements",   SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterAchievementsCommand, "", NULL },
         { "customize",      SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterCustomizeCommand,  "", NULL },
         { "deleted",        SEC_GAMEMASTER,     true,  NULL,                                           "", characterDeletedCommandTable},
         { "erase",          SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterEraseCommand,      "", NULL },
@@ -340,7 +340,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "all_default",    SEC_MODERATOR,      false, &ChatHandler::HandleLearnAllDefaultCommand,     "", NULL },
         { "all_lang",       SEC_MODERATOR,      false, &ChatHandler::HandleLearnAllLangCommand,        "", NULL },
         { "all_myclass",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleLearnAllMyClassCommand,     "", NULL },
-        { "all_mypettalents",SEC_ADMINISTRATOR, false, &ChatHandler::HandleLearnAllMyPetTalentsCommand,"", NULL },
+        { "all_mypettalents", SEC_ADMINISTRATOR, false, &ChatHandler::HandleLearnAllMyPetTalentsCommand, "", NULL },
         { "all_myspells",   SEC_ADMINISTRATOR,  false, &ChatHandler::HandleLearnAllMySpellsCommand,    "", NULL },
         { "all_mytalents",  SEC_ADMINISTRATOR,  false, &ChatHandler::HandleLearnAllMyTalentsCommand,   "", NULL },
         { "all_recipes",    SEC_GAMEMASTER,     false, &ChatHandler::HandleLearnAllRecipesCommand,     "", NULL },
@@ -500,7 +500,7 @@ ChatCommand* ChatHandler::getCommandTable()
     static ChatCommand reloadCommandTable[] =
     {
         { "all",            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllCommand,           "", NULL },
-        { "all_achievement",SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllAchievementCommand,"", NULL },
+        { "all_achievement", SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllAchievementCommand, "", NULL },
         { "all_area",       SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllAreaCommand,       "", NULL },
         { "all_eventai",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllEventAICommand,    "", NULL },
         { "all_gossips",    SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadAllGossipsCommand,    "", NULL },
@@ -514,9 +514,9 @@ ChatCommand* ChatHandler::getCommandTable()
 
         { "config",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleReloadConfigCommand,        "", NULL },
 
-        { "achievement_criteria_requirement",SEC_ADMINISTRATOR,true,&ChatHandler::HandleReloadAchievementCriteriaRequirementCommand,"",NULL },
+        { "achievement_criteria_requirement", SEC_ADMINISTRATOR, true, &ChatHandler::HandleReloadAchievementCriteriaRequirementCommand, "", NULL },
         { "achievement_reward",          SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAchievementRewardCommand,       "", NULL },
-        { "areatrigger_involvedrelation",SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestAreaTriggersCommand,       "", NULL },
+        { "areatrigger_involvedrelation", SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestAreaTriggersCommand,       "", NULL },
         { "areatrigger_tavern",          SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAreaTriggerTavernCommand,       "", NULL },
         { "areatrigger_teleport",        SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAreaTriggerTeleportCommand,     "", NULL },
         { "command",                     SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCommandCommand,                 "", NULL },
@@ -525,7 +525,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "creature_ai_summons",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadEventAISummonsCommand,          "", NULL },
         { "creature_ai_texts",           SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadEventAITextsCommand,            "", NULL },
         { "creature_battleground",       SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadBattleEventCommand,             "", NULL },
-        { "creature_involvedrelation",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCreatureQuestInvRelationsCommand,"",NULL },
+        { "creature_involvedrelation",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCreatureQuestInvRelationsCommand, "", NULL },
         { "creature_loot_template",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesCreatureCommand,   "", NULL },
         { "creature_questrelation",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadCreatureQuestRelationsCommand,  "", NULL },
         { "db_script_string",            SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadDbScriptStringCommand,          "", NULL },
@@ -546,7 +546,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "item_enchantment_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadItemEnchantementsCommand,       "", NULL },
         { "item_loot_template",          SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesItemCommand,       "", NULL },
         { "item_required_target",        SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadItemRequiredTragetCommand,      "", NULL },
-        { "locales_achievement_reward",  SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesAchievementRewardCommand,"", NULL },
+        { "locales_achievement_reward",  SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesAchievementRewardCommand, "", NULL },
         { "locales_creature",            SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesCreatureCommand,         "", NULL },
         { "locales_gameobject",          SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesGameobjectCommand,       "", NULL },
         { "locales_gossip_menu_option",  SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLocalesGossipMenuOptionCommand, "", NULL },
@@ -565,9 +565,9 @@ ChatCommand* ChatHandler::getCommandTable()
         { "npc_trainer",                 SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadNpcTrainerCommand,              "", NULL },
         { "npc_vendor",                  SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadNpcVendorCommand,               "", NULL },
         { "page_text",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadPageTextsCommand,               "", NULL },
-        { "pickpocketing_loot_template", SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesPickpocketingCommand,"",NULL},
+        { "pickpocketing_loot_template", SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesPickpocketingCommand, "", NULL},
         { "points_of_interest",          SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadPointsOfInterestCommand,        "", NULL },
-        { "prospecting_loot_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesProspectingCommand,"", NULL },
+        { "prospecting_loot_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesProspectingCommand, "", NULL },
         { "quest_end_scripts",           SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestEndScriptsCommand,         "", NULL },
         { "quest_poi",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestPOICommand,                "", NULL },
         { "quest_start_scripts",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestStartScriptsCommand,       "", NULL },
@@ -575,7 +575,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "reference_loot_template",     SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesReferenceCommand,  "", NULL },
         { "reserved_name",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", NULL },
         { "reputation_reward_rate",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReputationRewardRateCommand,    "", NULL },
-        { "reputation_spillover_template",SEC_ADMINISTRATOR, true, &ChatHandler::HandleReloadReputationSpilloverTemplateCommand,"", NULL },
+        { "reputation_spillover_template", SEC_ADMINISTRATOR, true, &ChatHandler::HandleReloadReputationSpilloverTemplateCommand, "", NULL },
         { "skill_discovery_template",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillDiscoveryTemplateCommand,  "", NULL },
         { "skill_extra_item_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillExtraItemTemplateCommand,  "", NULL },
         { "skill_fishing_base_level",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillFishingBaseLevelCommand,   "", NULL },
@@ -631,28 +631,28 @@ ChatCommand* ChatHandler::getCommandTable()
 
     static ChatCommand serverIdleRestartCommandTable[] =
     {
-        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand,"", NULL },
+        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand, "", NULL },
         { ""   ,            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerIdleRestartCommand,   "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
     static ChatCommand serverIdleShutdownCommandTable[] =
     {
-        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand,"", NULL },
+        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand, "", NULL },
         { ""   ,            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerIdleShutDownCommand,  "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
     static ChatCommand serverRestartCommandTable[] =
     {
-        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand,"", NULL },
+        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand, "", NULL },
         { ""   ,            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerRestartCommand,       "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
 
     static ChatCommand serverShutdownCommandTable[] =
     {
-        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand,"", NULL },
+        { "cancel",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCancelCommand, "", NULL },
         { ""   ,            SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerShutDownCommand,      "", NULL },
         { NULL,             0,                  false, NULL,                                           "", NULL }
     };
@@ -818,7 +818,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "cometome",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleComeToMeCommand,            "", NULL },
         { "damage",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDamageCommand,              "", NULL },
         { "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", NULL },
-        { "flusharenapoints",SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,    "", NULL },
+        { "flusharenapoints", SEC_ADMINISTRATOR, false, &ChatHandler::HandleFlushArenaPointsCommand,    "", NULL },
         { "repairitems",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleRepairitemsCommand,         "", NULL },
         { "stable",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleStableCommand,              "", NULL },
         { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", NULL },
@@ -909,7 +909,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
         return true;
     }
 
-    return HasLowerSecurityAccount(target_session,target_account,strong);
+    return HasLowerSecurityAccount(target_session, target_account, strong);
 }
 
 bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_account, bool strong)
@@ -1033,7 +1033,7 @@ void ChatHandler::CheckIntegrity(ChatCommand* table, ChatCommand* parentCommand)
             sLog.outError("Subcommand '%s' of command '%s' have less access level (%u) that parent (%u)",
                           command->Name, parentCommand->Name, command->SecurityLevel, parentCommand->SecurityLevel);
 
-        if (!parentCommand && strlen(command->Name)==0)
+        if (!parentCommand && strlen(command->Name) == 0)
             sLog.outError("Subcommand '' at top level");
 
         if (command->ChildCommands)
@@ -1048,7 +1048,7 @@ void ChatHandler::CheckIntegrity(ChatCommand* table, ChatCommand* parentCommand)
                                   command->Name);
             }
 
-            if (parentCommand && strlen(command->Name)==0)
+            if (parentCommand && strlen(command->Name) == 0)
                 sLog.outError("Subcommand '' of command '%s' have subcommands", parentCommand->Name);
 
             CheckIntegrity(command->ChildCommands, command);
@@ -1129,7 +1129,7 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
         if (exactlyName)
         {
             size_t len = strlen(table[i].Name);
-            if (strncmp(table[i].Name, cmd.c_str(), len+1) != 0)
+            if (strncmp(table[i].Name, cmd.c_str(), len + 1) != 0)
                 continue;
         }
         else
@@ -1153,7 +1153,7 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
                         *parentCommand = parentSubcommand ? parentSubcommand : &table[i];
 
                     // Name == "" is special case: restore original command text for next level "" (where parentSubcommand==NULL)
-                    if (strlen(command->Name)==0 && !parentSubcommand)
+                    if (strlen(command->Name) == 0 && !parentSubcommand)
                         text = oldchildtext;
 
                     return CHAT_COMMAND_OK;
@@ -1247,7 +1247,7 @@ void ChatHandler::ExecuteCommand(const char* text)
                 else
                     SendSysMessage(LANG_CMD_SYNTAX);
 
-                if (ChatCommand* showCommand = (strlen(command->Name)==0 && parentCommand ? parentCommand : command))
+                if (ChatCommand* showCommand = (strlen(command->Name) == 0 && parentCommand ? parentCommand : command))
                     if (ChatCommand* childs = showCommand->ChildCommands)
                         ShowHelpForSubCommands(childs, showCommand->Name);
 
@@ -1258,7 +1258,7 @@ void ChatHandler::ExecuteCommand(const char* text)
         case CHAT_COMMAND_UNKNOWN_SUBCOMMAND:
         {
             SendSysMessage(LANG_NO_SUBCMD);
-            ShowHelpForCommand(command->ChildCommands,text);
+            ShowHelpForCommand(command->ChildCommands, text);
             SetSentErrorMessage(true);
             break;
         }
@@ -1298,7 +1298,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand* commandTable, const char
         {
             if (command->SecurityLevel != security)
                 DETAIL_LOG("Table `command` overwrite for command '%s' default security (%u) by %u",
-                           fullcommand.c_str(),command->SecurityLevel,security);
+                           fullcommand.c_str(), command->SecurityLevel, security);
 
             command->SecurityLevel = security;
             command->Help          = help;
@@ -1489,7 +1489,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
             {
                 if (commandChar == *validSequenceIterator)
                 {
-                    if (validSequenceIterator == validSequence+4)
+                    if (validSequenceIterator == validSequence + 4)
                         validSequenceIterator = validSequence;
                     else
                         ++validSequenceIterator;
@@ -1508,7 +1508,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
     ItemPrototype const* linkedItem = NULL;
     Quest const* linkedQuest = NULL;
-    SpellEntry const* linkedSpell= NULL;
+    SpellEntry const* linkedSpell = NULL;
     AchievementEntry const* linkedAchievement = NULL;
     ItemRandomPropertiesEntry const* itemProperty = NULL;
     ItemRandomSuffixEntry const* itemSuffix = NULL;
@@ -1551,7 +1551,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
         {
             if (commandChar == *validSequenceIterator)
             {
-                if (validSequenceIterator == validSequence+4)
+                if (validSequenceIterator == validSequence + 4)
                     validSequenceIterator = validSequence;
                 else
                     ++validSequenceIterator;
@@ -1574,7 +1574,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
             case 'c':
                 color = 0;
                 // validate color, expect 8 hex chars
-                for (int i=0; i<8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     char c;
                     reader >> c;
@@ -1586,14 +1586,14 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
                     color <<= 4;
                     // check for hex char
-                    if (c >= '0' && c <='9')
+                    if (c >= '0' && c <= '9')
                     {
-                        color |= c-'0';
+                        color |= c - '0';
                         continue;
                     }
-                    if (c >= 'a' && c <='f')
+                    if (c >= 'a' && c <= 'f')
                     {
-                        color |= 10+c-'a';
+                        color |= 10 + c - 'a';
                         continue;
                     }
                     DEBUG_LOG("ChatHandler::isValidChatMessage got non hex char '%c' while reading color", c);
@@ -1635,16 +1635,16 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     int32 propertyId = 0;
                     bool negativeNumber = false;
                     char c;
-                    for (uint8 i=0; i < randomPropertyPosition; ++i)
+                    for (uint8 i = 0; i < randomPropertyPosition; ++i)
                     {
                         propertyId = 0;
                         negativeNumber = false;
                         while ((c = reader.get()) != ':')
                         {
-                            if (c >='0' && c<='9')
+                            if (c >= '0' && c <= '9')
                             {
-                                propertyId*=10;
-                                propertyId += c-'0';
+                                propertyId *= 10;
+                                propertyId += c - '0';
                             }
                             else if (c == '-')
                                 negativeNumber = true;
@@ -1669,7 +1669,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
 
                     // ignore other integers
-                    while ((c >= '0' && c <= '9') || c== ':')
+                    while ((c >= '0' && c <= '9') || c == ':')
                     {
                         reader.ignore(1);
                         c = reader.peek();
@@ -1678,14 +1678,14 @@ bool ChatHandler::isValidChatMessage(const char* message)
                 else if (strcmp(buffer, "quest") == 0)
                 {
                     // no color check for questlinks, each client will adapt it anyway
-                    uint32 questid= 0;
+                    uint32 questid = 0;
                     // read questid
                     char c = reader.peek();
-                    while (c >='0' && c<='9')
+                    while (c >= '0' && c <= '9')
                     {
                         reader.ignore(1);
                         questid *= 10;
-                        questid += c-'0';
+                        questid += c - '0';
                         c = reader.peek();
                     }
 
@@ -1697,7 +1697,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         return false;
                     }
 
-                    if (c !=':')
+                    if (c != ':')
                     {
                         DEBUG_LOG("ChatHandler::isValidChatMessage Invalid quest link structure");
                         return false;
@@ -1707,11 +1707,11 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     c = reader.peek();
                     // level
                     uint32 questlevel = 0;
-                    while (c >='0' && c<='9')
+                    while (c >= '0' && c <= '9')
                     {
                         reader.ignore(1);
                         questlevel *= 10;
-                        questlevel += c-'0';
+                        questlevel += c - '0';
                         c = reader.peek();
                     }
 
@@ -1721,7 +1721,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         return false;
                     }
 
-                    if (c !='|')
+                    if (c != '|')
                     {
                         DEBUG_LOG("ChatHandler::isValidChatMessage Invalid quest link structure");
                         return false;
@@ -1743,7 +1743,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
                     char c = reader.peek();
                     // base64 encoded stuff
-                    while (c !='|' && c!='\0')
+                    while (c != '|' && c != '\0')
                     {
                         reader.ignore(1);
                         c = reader.peek();
@@ -1770,7 +1770,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
                     char c = reader.peek();
                     // skillpoints? whatever, drop it
-                    while (c !='|' && c!='\0')
+                    while (c != '|' && c != '\0')
                     {
                         reader.ignore(1);
                         c = reader.peek();
@@ -1784,11 +1784,11 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     uint32 spellid = 0;
                     // read spell entry
                     char c = reader.peek();
-                    while (c >='0' && c<='9')
+                    while (c >= '0' && c <= '9')
                     {
                         reader.ignore(1);
                         spellid *= 10;
-                        spellid += c-'0';
+                        spellid += c - '0';
                         c = reader.peek();
                     }
                     linkedSpell = sSpellStore.LookupEntry(spellid);
@@ -1803,11 +1803,11 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     uint32 spellid = 0;
                     // read spell entry
                     char c = reader.peek();
-                    while (c >='0' && c<='9')
+                    while (c >= '0' && c <= '9')
                     {
                         reader.ignore(1);
                         spellid *= 10;
-                        spellid += c-'0';
+                        spellid += c - '0';
                         c = reader.peek();
                     }
                     linkedSpell = sSpellStore.LookupEntry(spellid);
@@ -1831,7 +1831,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
                     char c = reader.peek();
                     // skip progress
-                    while (c !='|' && c != '\0')
+                    while (c != '|' && c != '\0')
                     {
                         reader.ignore(1);
                         c = reader.peek();
@@ -1849,10 +1849,10 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
                     uint32 glyphId = 0;
                     char c = reader.peek();
-                    while (c>='0' && c <='9')
+                    while (c >= '0' && c <= '9')
                     {
                         glyphId *= 10;
-                        glyphId += c-'0';
+                        glyphId += c - '0';
                         reader.ignore(1);
                         c = reader.peek();
                     }
@@ -1911,20 +1911,20 @@ bool ChatHandler::isValidChatMessage(const char* message)
                                 return false;
                             }
 
-                            for (uint8 i=0; i < MAX_LOCALE; ++i)
+                            for (uint8 i = 0; i < MAX_LOCALE; ++i)
                             {
                                 uint32 skillLineNameLength = strlen(skillLine->name[i]);
                                 if (skillLineNameLength > 0 && strncmp(skillLine->name[i], buffer, skillLineNameLength) == 0)
                                 {
                                     // found the prefix, remove it to perform spellname validation below
                                     // -2 = strlen(": ")
-                                    uint32 spellNameLength = strlen(buffer)-skillLineNameLength-2;
-                                    memmove(buffer, buffer+skillLineNameLength+2, spellNameLength+1);
+                                    uint32 spellNameLength = strlen(buffer) - skillLineNameLength - 2;
+                                    memmove(buffer, buffer + skillLineNameLength + 2, spellNameLength + 1);
                                 }
                             }
                         }
                         bool foundName = false;
-                        for (uint8 i=0; i<MAX_LOCALE; ++i)
+                        for (uint8 i = 0; i < MAX_LOCALE; ++i)
                         {
                             if (*linkedSpell->SpellName[i] && strcmp(linkedSpell->SpellName[i], buffer) == 0)
                             {
@@ -1948,7 +1948,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                             }
 
                             bool foundName = false;
-                            for (uint8 i=0; i < ql->Title.size(); ++i)
+                            for (uint8 i = 0; i < ql->Title.size(); ++i)
                             {
                                 if (ql->Title[i] == buffer)
                                 {
@@ -1965,7 +1965,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
                     else if (linkedItem)
                     {
-                        char* const* suffix = itemSuffix?itemSuffix->nameSuffix:(itemProperty?itemProperty->nameSuffix:NULL);
+                        char* const* suffix = itemSuffix ? itemSuffix->nameSuffix : (itemProperty ? itemProperty->nameSuffix : NULL);
 
                         std::string expectedName = std::string(linkedItem->Name1);
                         if (suffix)
@@ -1979,7 +1979,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                             ItemLocale const* il = sObjectMgr.GetItemLocale(linkedItem->ItemId);
 
                             bool foundName = false;
-                            for (uint8 i=LOCALE_koKR; i<MAX_LOCALE; ++i)
+                            for (uint8 i = LOCALE_koKR; i < MAX_LOCALE; ++i)
                             {
                                 int8 dbIndex = sObjectMgr.GetIndexForLocale(LocaleConstant(i));
                                 if (dbIndex == -1 || il == NULL || (size_t)dbIndex >= il->Name.size())
@@ -2008,7 +2008,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     else if (linkedAchievement)
                     {
                         bool foundName = false;
-                        for (uint8 i=0; i<MAX_LOCALE; ++i)
+                        for (uint8 i = 0; i < MAX_LOCALE; ++i)
                         {
                             if (*linkedAchievement->name[i] && strcmp(linkedAchievement->name[i], buffer) == 0)
                             {
@@ -2420,7 +2420,7 @@ char* ChatHandler::ExtractQuotedArg(char** args, bool asis /*= false*/)
     if (guard == '[')
         guard = ']';
 
-    char* tail = (*args)+1;                                 // start scan after first quote symbol
+    char* tail = (*args) + 1;                               // start scan after first quote symbol
     char* head = asis ? *args : tail;                       // start arg
 
     while (*tail && *tail != guard)
@@ -2442,7 +2442,7 @@ char* ChatHandler::ExtractQuotedArg(char** args, bool asis /*= false*/)
         *tail = '\0';
     }
 
-    *args = tail+1;
+    *args = tail + 1;
 
     SkipWhiteSpaces(args);
 
@@ -2525,7 +2525,7 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
 
     // |color|Hlinktype:key:data...|h[name]|h|r
 
-    char* tail = (*args)+1;                                 // skip |
+    char* tail = (*args) + 1;                               // skip |
 
     if (*tail != 'H')                                       // skip color part, some links can not have color part
     {
@@ -2595,8 +2595,8 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
 
     // |h[name]|h|r or :something...|h[name]|h|r
 
-    char* somethingStart = tail+1;
-    char* somethingEnd   = tail+1;                          // will updated later if need
+    char* somethingStart = tail + 1;
+    char* somethingEnd   = tail + 1;                        // will updated later if need
 
     if (*tail == ':' && somethingPair)                      // optional data extraction
     {
@@ -2618,7 +2618,7 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
 
     // |h[name]|h|r or :something2...|h[name]|h|r
 
-    while (*tail && (*tail != '|' || *(tail+1) != 'h'))     // skip ... part if exist
+    while (*tail && (*tail != '|' || *(tail + 1) != 'h'))   // skip ... part if exist
         ++tail;
 
     if (!*tail)
@@ -2632,19 +2632,19 @@ char* ChatHandler::ExtractLinkArg(char** args, char const* const* linkTypes /*= 
     if (!*tail || *tail != '[')
         return NULL;
 
-    while (*tail && (*tail != ']' || *(tail+1) != '|'))     // skip name part
+    while (*tail && (*tail != ']' || *(tail + 1) != '|'))   // skip name part
         ++tail;
 
     tail += 2;                                              // skip ]|
 
     // h|r
-    if (!*tail || *tail != 'h'  || *(tail+1) != '|')
+    if (!*tail || *tail != 'h'  || *(tail + 1) != '|')
         return NULL;
 
     tail += 2;                                              // skip h|
 
     // r
-    if (!*tail || *tail != 'r' || (*(tail+1) && !isWhiteSpace(*(tail+1))))
+    if (!*tail || *tail != 'r' || (*(tail + 1) && !isWhiteSpace(*(tail + 1))))
         return NULL;
 
     ++tail;                                                 // skip r
@@ -2814,7 +2814,7 @@ bool ChatHandler::ExtractUint32KeyFromLink(char** text, char const* linkType, ui
     return ExtractUInt32(&arg, value);
 }
 
-GameObject* ChatHandler::GetGameObjectWithGuid(uint32 lowguid,uint32 entry)
+GameObject* ChatHandler::GetGameObjectWithGuid(uint32 lowguid, uint32 entry)
 {
     if (!m_session)
         return NULL;
@@ -2826,7 +2826,7 @@ GameObject* ChatHandler::GetGameObjectWithGuid(uint32 lowguid,uint32 entry)
 
 enum SpellLinkType
 {
-    SPELL_LINK_RAW     =-1,                                 // non-link case
+    SPELL_LINK_RAW     = -1,                                // non-link case
     SPELL_LINK_SPELL   = 0,
     SPELL_LINK_TALENT  = 1,
     SPELL_LINK_ENCHANT = 2,
@@ -2903,7 +2903,7 @@ uint32 ChatHandler::ExtractSpellIdFromLink(char** text)
 GameTele const* ChatHandler::ExtractGameTeleFromLink(char** text)
 {
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    char* cId = ExtractKeyFromLink(text,"Htele");
+    char* cId = ExtractKeyFromLink(text, "Htele");
     if (!cId)
         return NULL;
 
@@ -2917,7 +2917,7 @@ GameTele const* ChatHandler::ExtractGameTeleFromLink(char** text)
 
 enum GuidLinkType
 {
-    GUID_LINK_RAW        =-1,                               // non-link case
+    GUID_LINK_RAW        = -1,                              // non-link case
     GUID_LINK_PLAYER     = 0,
     GUID_LINK_CREATURE   = 1,
     GUID_LINK_GAMEOBJECT = 2,
@@ -2986,7 +2986,7 @@ ObjectGuid ChatHandler::ExtractGuidFromLink(char** text)
 
 enum LocationLinkType
 {
-    LOCATION_LINK_RAW               =-1,                    // non-link case
+    LOCATION_LINK_RAW               = -1,                   // non-link case
     LOCATION_LINK_PLAYER            = 0,
     LOCATION_LINK_TELE              = 1,
     LOCATION_LINK_TAXINODE          = 2,
@@ -2995,7 +2995,7 @@ enum LocationLinkType
     LOCATION_LINK_CREATURE_ENTRY    = 5,
     LOCATION_LINK_GAMEOBJECT_ENTRY  = 6,
     LOCATION_LINK_AREATRIGGER       = 7,
-    LOCATION_LINK_AREATRIGGER_TARGET= 8,
+    LOCATION_LINK_AREATRIGGER_TARGET = 8,
 };
 
 static char const* const locationKeys[] =
@@ -3253,7 +3253,7 @@ std::string ChatHandler::ExtractPlayerNameFromLink(char** text)
  *
  * @return           true if extraction successful
  */
-bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, ObjectGuid* player_guid /*= NULL*/,std::string* player_name /*= NULL*/)
+bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, ObjectGuid* player_guid /*= NULL*/, std::string* player_name /*= NULL*/)
 {
     if (*args &&** args)
     {
@@ -3340,7 +3340,7 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
     {
         if (!sAccountMgr.GetName(account_id, account_name))
         {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_str);
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, account_str);
             SetSentErrorMessage(true);
             return 0;
         }
@@ -3350,7 +3350,7 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
         account_name = account_str;
         if (!AccountMgr::normalizeString(account_name))
         {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, account_name.c_str());
             SetSentErrorMessage(true);
             return 0;
         }
@@ -3358,7 +3358,7 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
         account_id = sAccountMgr.GetId(account_name);
         if (!account_id)
         {
-            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST,account_name.c_str());
+            PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, account_name.c_str());
             SetSentErrorMessage(true);
             return 0;
         }
@@ -3382,16 +3382,16 @@ struct RaceMaskName
 static RaceMaskName const raceMaskNames[] =
 {
     // races
-    { "human", (1<<(RACE_HUMAN-1))   },
-    { "orc", (1<<(RACE_ORC-1))     },
-    { "dwarf", (1<<(RACE_DWARF-1))   },
-    { "nightelf", (1<<(RACE_NIGHTELF-1))},
-    { "undead", (1<<(RACE_UNDEAD-1))  },
-    { "tauren", (1<<(RACE_TAUREN-1))  },
-    { "gnome", (1<<(RACE_GNOME-1))   },
-    { "troll", (1<<(RACE_TROLL-1))   },
-    { "bloodelf", (1<<(RACE_BLOODELF-1))},
-    { "draenei", (1<<(RACE_DRAENEI-1)) },
+    { "human", (1 << (RACE_HUMAN - 1))   },
+    { "orc", (1 << (RACE_ORC - 1))     },
+    { "dwarf", (1 << (RACE_DWARF - 1))   },
+    { "nightelf", (1 << (RACE_NIGHTELF - 1))},
+    { "undead", (1 << (RACE_UNDEAD - 1))  },
+    { "tauren", (1 << (RACE_TAUREN - 1))  },
+    { "gnome", (1 << (RACE_GNOME - 1))   },
+    { "troll", (1 << (RACE_TROLL - 1))   },
+    { "bloodelf", (1 << (RACE_BLOODELF - 1))},
+    { "draenei", (1 << (RACE_DRAENEI - 1)) },
 
     // masks
     { "alliance", RACEMASK_ALLIANCE },
@@ -3578,13 +3578,13 @@ void ChatHandler::LogCommand(char const* fullcmd)
     {
         Player* p = m_session->GetPlayer();
         ObjectGuid sel_guid = p->GetSelectionGuid();
-        sLog.outCommand(GetAccountId(),"Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+        sLog.outCommand(GetAccountId(), "Command: %s [Player: %s (Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
                         fullcmd, p->GetName(), GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
                         sel_guid.GetString().c_str());
     }
     else                                        // 0 account -> console
     {
-        sLog.outCommand(GetAccountId(),"Command: %s [Account: %u from %s]",
+        sLog.outCommand(GetAccountId(), "Command: %s [Account: %u from %s]",
                         fullcmd, GetAccountId(), GetAccountId() ? "RA-connection" : "Console");
     }
 }

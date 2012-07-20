@@ -72,7 +72,7 @@ BattleGroundQueue::~BattleGroundQueue()
     {
         for (uint32 j = 0; j < BG_QUEUE_GROUP_TYPES_COUNT; ++j)
         {
-            for (GroupsQueueType::iterator itr = m_QueuedGroups[i][j].begin(); itr!= m_QueuedGroups[i][j].end(); ++itr)
+            for (GroupsQueueType::iterator itr = m_QueuedGroups[i][j].begin(); itr != m_QueuedGroups[i][j].end(); ++itr)
                 delete(*itr);
             m_QueuedGroups[i][j].clear();
         }
@@ -232,7 +232,7 @@ GroupQueueInfo* BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGr
                         qHorde += (*itr)->Players.size();
 
                 // Show queue status to player only (when joining queue)
-                if (sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN)==1)
+                if (sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN) == 1)
                 {
                     ChatHandler(leader).PSendSysMessage(LANG_BG_QUEUE_ANNOUNCE_SELF, bgName, q_min_level, q_max_level,
                                                         qAlliance, (MinPlayers > qAlliance) ? MinPlayers - qAlliance : (uint32)0, qHorde, (MinPlayers > qHorde) ? MinPlayers - qHorde : (uint32)0);
@@ -805,7 +805,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
         return;
     }
 
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketById(bg_template->GetMapId(),bracket_id);
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketById(bg_template->GetMapId(), bracket_id);
     if (!bracketEntry)
     {
         sLog.outError("Battleground: Update: bg bracket entry not found for map %u bracket id %u", bg_template->GetMapId(), bracket_id);
@@ -1098,7 +1098,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         BattleGroundQueue& bgQueue = sBattleGroundMgr.m_BattleGroundQueues[m_BgQueueTypeId];
         if (bgQueue.IsPlayerInvited(m_PlayerGuid, m_BgInstanceGUID, m_RemoveTime))
         {
-            DEBUG_LOG("Battleground: removing player %u from bg queue for instance %u because of not pressing enter battle in time.",plr->GetGUIDLow(),m_BgInstanceGUID);
+            DEBUG_LOG("Battleground: removing player %u from bg queue for instance %u because of not pressing enter battle in time.", plr->GetGUIDLow(), m_BgInstanceGUID);
 
             plr->RemoveBattleGroundQueueId(m_BgQueueTypeId);
             bgQueue.RemovePlayer(m_PlayerGuid, true);
@@ -1130,7 +1130,7 @@ BattleGroundMgr::BattleGroundMgr() : m_AutoDistributionTimeChecker(0), m_ArenaTe
     for (uint32 i = BATTLEGROUND_TYPE_NONE; i < MAX_BATTLEGROUND_TYPE_ID; i++)
         m_BattleGrounds[i].clear();
     m_NextRatingDiscardUpdate = sWorld.getConfig(CONFIG_UINT32_ARENA_RATING_DISCARD_TIMER);
-    m_Testing=false;
+    m_Testing = false;
 }
 
 BattleGroundMgr::~BattleGroundMgr()
@@ -1221,13 +1221,13 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
 
     if (StatusID == 0 || !bg)
     {
-        data->Initialize(SMSG_BATTLEFIELD_STATUS, 4+8);
+        data->Initialize(SMSG_BATTLEFIELD_STATUS, 4 + 8);
         *data << uint32(QueueSlot);                         // queue id (0...1)
         *data << uint64(0);
         return;
     }
 
-    data->Initialize(SMSG_BATTLEFIELD_STATUS, (4+8+1+1+4+1+4+4+4));
+    data->Initialize(SMSG_BATTLEFIELD_STATUS, (4 + 8 + 1 + 1 + 4 + 1 + 4 + 4 + 4));
     *data << uint32(QueueSlot);                             // queue id (0...1) - player can be in 2 queues in time
     // uint64 in client
     *data << uint64(uint64(arenatype) | (uint64(0x0D) << 8) | (uint64(bg->GetTypeID()) << 16) | (uint64(0x1F90) << 48));
@@ -1266,7 +1266,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg)
 {
     uint8 type = (bg->isArena() ? 1 : 0);
     // last check on 3.0.3
-    data->Initialize(MSG_PVP_LOG_DATA, (1+1+4+40*bg->GetPlayerScoresSize()));
+    data->Initialize(MSG_PVP_LOG_DATA, (1 + 1 + 4 + 40 * bg->GetPlayerScoresSize()));
     *data << uint8(type);                                   // type (battleground=0/arena=1)
 
     if (type)                                               // arena
@@ -1382,7 +1382,7 @@ void BattleGroundMgr::BuildGroupJoinedBattlegroundPacket(WorldPacket* data, Grou
 
 void BattleGroundMgr::BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value)
 {
-    data->Initialize(SMSG_UPDATE_WORLD_STATE, 4+4);
+    data->Initialize(SMSG_UPDATE_WORLD_STATE, 4 + 4);
     *data << uint32(field);
     *data << uint32(value);
 }
@@ -1486,7 +1486,7 @@ BattleGround* BattleGroundMgr::CreateNewBattleGround(BattleGroundTypeId bgTypeId
     if (bg_template->isArena())
     {
         BattleGroundTypeId arenas[] = { BATTLEGROUND_NA, BATTLEGROUND_BE, BATTLEGROUND_RL/*, BATTLEGROUND_DS, BATTLEGROUND_RV*/ };
-        bgTypeId = arenas[urand(0, countof(arenas)-1)];
+        bgTypeId = arenas[urand(0, countof(arenas) - 1)];
         bg_template = GetBattleGroundTemplate(bgTypeId);
         if (!bg_template)
         {
@@ -1830,7 +1830,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
         if (BattleGround* bgTemplate = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId))
         {
             // expected bracket entry
-            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgTemplate->GetMapId(),plr->getLevel()))
+            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgTemplate->GetMapId(), plr->getLevel()))
             {
                 BattleGroundBracketId bracketId = bracketEntry->GetBracketId();
                 ClientBattleGroundIdSet const& ids = m_ClientBattleGroundIds[bgTypeId][bracketId];
@@ -1853,7 +1853,7 @@ void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGr
         uint32 mapid = bg->GetMapId();
         float x, y, z, O;
         Team team = pl->GetBGTeam();
-        if (team==0)
+        if (team == 0)
             team = pl->GetTeam();
         bg->GetTeamStartLoc(team, x, y, z, O);
 
@@ -1862,7 +1862,7 @@ void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGr
     }
     else
     {
-        sLog.outError("player %u trying to port to nonexistent bg instance %u",pl->GetGUIDLow(), instanceId);
+        sLog.outError("player %u trying to port to nonexistent bg instance %u", pl->GetGUIDLow(), instanceId);
     }
 }
 

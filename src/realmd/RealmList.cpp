@@ -43,8 +43,8 @@ static RealmBuildInfo ExpectedRealmdClientBuilds[] =
     {11159, 3, 3, 0, 'a'},
     {10505, 3, 2, 2, 'a'},
     {8606,  2, 4, 3, ' '},
-    {6005,  1,12, 2, ' '},
-    {5875,  1,12, 1, ' '},
+    {6005,  1, 12, 2, ' '},
+    {5875,  1, 12, 1, ' '},
     {0,     0, 0, 0, ' '}                                   // terminator
 };
 
@@ -155,14 +155,14 @@ void RealmList::UpdateRealms(bool init)
 
             uint8 realmflags = fields[5].GetUInt8();
 
-            if (realmflags & ~(REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD))
+            if (realmflags & ~(REALM_FLAG_OFFLINE | REALM_FLAG_NEW_PLAYERS | REALM_FLAG_RECOMMENDED | REALM_FLAG_SPECIFYBUILD))
             {
                 sLog.outError("Realm allowed have only OFFLINE Mask 0x2), or NEWPLAYERS (mask 0x20), or RECOMMENDED (mask 0x40), or SPECIFICBUILD (mask 0x04) flags in DB");
-                realmflags &= (REALM_FLAG_OFFLINE|REALM_FLAG_NEW_PLAYERS|REALM_FLAG_RECOMMENDED|REALM_FLAG_SPECIFYBUILD);
+                realmflags &= (REALM_FLAG_OFFLINE | REALM_FLAG_NEW_PLAYERS | REALM_FLAG_RECOMMENDED | REALM_FLAG_SPECIFYBUILD);
             }
 
             UpdateRealm(
-                fields[0].GetUInt32(), fields[1].GetCppString(),fields[2].GetCppString(),fields[3].GetUInt32(),
+                fields[0].GetUInt32(), fields[1].GetCppString(), fields[2].GetCppString(), fields[3].GetUInt32(),
                 fields[4].GetUInt8(), RealmFlags(realmflags), fields[6].GetUInt8(),
                 (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR),
                 fields[8].GetFloat(), fields[9].GetCppString());

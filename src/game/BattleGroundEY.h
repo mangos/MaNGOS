@@ -319,7 +319,7 @@ class BattleGroundEY : public BattleGround
         uint8 m_PointState[BG_EY_NODES_MAX];
         int32 m_PointBarStatus[BG_EY_NODES_MAX];
         GuidVector m_PlayersNearPoint[BG_EY_NODES_MAX_WITH_SPEIAL];
-        uint8 m_CurrentPointPlayersCount[2*BG_EY_NODES_MAX];
+        uint8 m_CurrentPointPlayersCount[2 * BG_EY_NODES_MAX];
 
         int32 m_PointAddingTimer;
         uint32 m_HonorTics;

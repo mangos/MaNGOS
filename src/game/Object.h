@@ -187,7 +187,7 @@ class MANGOS_DLL_SPEC Object
         const uint64& GetUInt64Value(uint16 index) const
         {
             MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , false));
-            return *((uint64*)&(m_uint32Values[ index ]));
+            return *((uint64*) & (m_uint32Values[ index ]));
         }
 
         const float& GetFloatValue(uint16 index) const
@@ -200,14 +200,14 @@ class MANGOS_DLL_SPEC Object
         {
             MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             MANGOS_ASSERT(offset < 4);
-            return *(((uint8*)&m_uint32Values[ index ])+offset);
+            return *(((uint8*)&m_uint32Values[ index ]) + offset);
         }
 
         uint16 GetUInt16Value(uint16 index, uint8 offset) const
         {
             MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             MANGOS_ASSERT(offset < 2);
-            return *(((uint16*)&m_uint32Values[ index ])+offset);
+            return *(((uint16*)&m_uint32Values[ index ]) + offset);
         }
 
         ObjectGuid const& GetGuidValue(uint16 index) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
@@ -218,7 +218,7 @@ class MANGOS_DLL_SPEC Object
         void SetFloatValue(uint16 index,       float   value);
         void SetByteValue(uint16 index, uint8 offset, uint8 value);
         void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
-        void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index,offset,(uint16)value); }
+        void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index, offset, (uint16)value); }
         void SetGuidValue(uint16 index, ObjectGuid const& value) { SetUInt64Value(index, value.GetRawValue()); }
         void SetStatFloatValue(uint16 index, float value);
         void SetStatInt32Value(uint16 index, int32 value);
@@ -232,7 +232,7 @@ class MANGOS_DLL_SPEC Object
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
             val = val != -100.0f ? val : -99.9f ;
-            SetFloatValue(index, GetFloatValue(index) * (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val)));
+            SetFloatValue(index, GetFloatValue(index) * (apply ? (100.0f + val) / 100.0f : 100.0f / (100.0f + val)));
         }
 
         void SetFlag(uint16 index, uint32 newFlag);
@@ -315,14 +315,14 @@ class MANGOS_DLL_SPEC Object
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval | newFlag;
-            SetUInt64Value(index,newval);
+            SetUInt64Value(index, newval);
         }
 
         void RemoveFlag64(uint16 index, uint64 oldFlag)
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval & ~oldFlag;
-            SetUInt64Value(index,newval);
+            SetUInt64Value(index, newval);
         }
 
         void ToggleFlag64(uint16 index, uint64 flag)
@@ -488,7 +488,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         InstanceData* GetInstanceData() const;
 
         const char* GetName() const { return m_name.c_str(); }
-        void SetName(const std::string& newname) { m_name=newname; }
+        void SetName(const std::string& newname) { m_name = newname; }
 
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
 
@@ -508,12 +508,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // use only if you will sure about placing both object at same map
         bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
-            return obj && _IsWithinDist(obj,dist2compare,is3D);
+            return obj && _IsWithinDist(obj, dist2compare, is3D);
         }
 
         bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
-            return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D);
+            return obj && IsInMap(obj) && _IsWithinDist(obj, dist2compare, is3D);
         }
         bool IsWithinLOS(float x, float y, float z) const;
         bool IsWithinLOSInMap(const WorldObject* obj) const;
@@ -525,9 +525,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetAngle(const WorldObject* obj) const;
         float GetAngle(const float x, const float y) const;
         bool HasInArc(const float arcangle, const WorldObject* obj) const;
-        bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInFrontInMap(WorldObject const* target, float distance, float arc = M_PI) const;
         bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
-        bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
+        bool isInFront(WorldObject const* target, float distance, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
@@ -553,8 +553,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SendObjectDeSpawnAnim(ObjectGuid guid);
         void SendGameObjectCustomAnim(ObjectGuid guid, uint32 animId = 0);
 
-        virtual bool IsHostileTo(Unit const* unit) const =0;
-        virtual bool IsFriendlyTo(Unit const* unit) const =0;
+        virtual bool IsHostileTo(Unit const* unit) const = 0;
+        virtual bool IsFriendlyTo(Unit const* unit) const = 0;
         bool IsControlledByPlayer() const;
 
         virtual void SaveRespawnTime() {}
@@ -564,7 +564,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual void UpdateVisibilityAndView();             // update visibility for object and object for all around
 
         // main visibility check function in normal case (ignore grey zone distance check)
-        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
+        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u, viewPoint, false); }
 
         // low level function for visibility change code, must be define in all main world object subclasses
         virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
@@ -581,7 +581,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void RemoveFromClientUpdateList();
         void BuildUpdateData(UpdateDataMapType&);
 
-        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype,uint32 despwtime, bool asActiveObject = false);
+        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject = false);
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
         void SetActiveObjectState(bool active);

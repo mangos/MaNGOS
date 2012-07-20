@@ -113,7 +113,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
         std::string temp;
         recv_data >> temp;                                  // user entered string, it used as universal search pattern(guild+player name)?
 
-        if (!Utf8toWStr(temp,str[i]))
+        if (!Utf8toWStr(temp, str[i]))
             continue;
 
         wstrToLower(str[i]);
@@ -201,7 +201,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
 
         std::string pname = pl->GetName();
         std::wstring wpname;
-        if (!Utf8toWStr(pname,wpname))
+        if (!Utf8toWStr(pname, wpname))
             continue;
         wstrToLower(wpname);
 
@@ -210,7 +210,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
 
         std::string gname = sGuildMgr.GetGuildNameById(pl->GetGuildId());
         std::wstring wgname;
-        if (!Utf8toWStr(gname,wgname))
+        if (!Utf8toWStr(gname, wgname))
             continue;
         wstrToLower(wgname);
 
@@ -296,7 +296,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
         if ((GetPlayer()->GetPositionZ() < height + 0.1f) && !(GetPlayer()->IsInWater()))
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, (8+4));      // guess size
+        WorldPacket data(SMSG_FORCE_MOVE_ROOT, (8 + 4));    // guess size
         data << GetPlayer()->GetPackGUID();
         data << (uint32)2;
         SendPacket(&data);
@@ -644,7 +644,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
         return;
 
     // prevent resurrect before 30-sec delay after body release not finished
-    if (corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType()==CORPSE_RESURRECTABLE_PVP) > time(NULL))
+    if (corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(NULL))
         return;
 
     if (!corpse->IsWithinDistInMap(GetPlayer(), CORPSE_RECLAIM_RADIUS, true))
@@ -767,7 +767,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             do
             {
                 // most often fast case
-                if (instance_map==targetMapEntry->MapID)
+                if (instance_map == targetMapEntry->MapID)
                     break;
 
                 InstanceTemplate const* instance = ObjectMgr::GetInstanceTemplate(instance_map);
@@ -876,7 +876,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
     {
         SetAccountData(AccountDataType(type), 0, "");
 
-        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
+        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
         data << uint32(type);
         data << uint32(0);
         SendPacket(&data);
@@ -909,7 +909,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 
     SetAccountData(AccountDataType(type), timestamp, adata);
 
-    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4+4);
+    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
     data << uint32(type);
     data << uint32(0);
     SendPacket(&data);
@@ -944,7 +944,7 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
     dest.resize(destSize);
 
-    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8+4+4+4+destSize);
+    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8 + 4 + 4 + 4 + destSize);
     data << (_player ? _player->GetObjectGuid() : ObjectGuid());// player guid
     data << uint32(type);                                   // type (0-7)
     data << uint32(adata->Time);                            // unix time
@@ -967,7 +967,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     if (!packetData)
     {
         DETAIL_LOG("MISC: Remove action from button %u", button);
-        GetPlayer()->removeActionButton(GetPlayer()->GetActiveSpec(),button);
+        GetPlayer()->removeActionButton(GetPlayer()->GetActiveSpec(), button);
     }
     else
     {
@@ -1165,7 +1165,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
         return;
     }
 
-    WorldPacket data(MSG_INSPECT_HONOR_STATS, 8+1+4*4);
+    WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
     data << player->GetObjectGuid();
     data << uint8(player->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY));
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_KILLS));
@@ -1199,11 +1199,11 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 
     if (GetPlayer()->IsTaxiFlying())
     {
-        DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore worldport command.",GetPlayer()->GetName(),GetPlayer()->GetGUIDLow());
+        DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore worldport command.", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow());
         return;
     }
 
-    DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time/1000, mapid, PositionX, PositionY, PositionZ, Orientation);
+    DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time / 1000, mapid, PositionX, PositionY, PositionZ, Orientation);
 
     if (GetSecurity() >= SEC_ADMINISTRATOR)
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
@@ -1260,7 +1260,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     std::string msg = charname + "'s " + "account is " + acc + ", e-mail: " + email + ", last ip: " + lastip;
 
-    WorldPacket data(SMSG_WHOIS, msg.size()+1);
+    WorldPacket data(SMSG_WHOIS, msg.size() + 1);
     data << msg;
     _player->GetSession()->SendPacket(&data);
 
@@ -1318,7 +1318,7 @@ void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
     std::string split_date = "01/01/01";
     recv_data >> unk;
 
-    WorldPacket data(SMSG_REALM_SPLIT, 4+4+split_date.size()+1);
+    WorldPacket data(SMSG_REALM_SPLIT, 4 + 4 + split_date.size() + 1);
     data << unk;
     data << uint32(0x00000000);                             // realm split state
     // split states:

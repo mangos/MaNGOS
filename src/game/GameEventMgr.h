@@ -32,7 +32,7 @@ class MapPersistentState;
 
 struct GameEventData
 {
-    GameEventData() : start(1),end(0),occurence(0),length(0), holiday_id(HOLIDAY_NONE) {}
+    GameEventData() : start(1), end(0), occurence(0), length(0), holiday_id(HOLIDAY_NONE) {}
     time_t start;
     time_t end;
     uint32 occurence;                                       // Delay in minutes between occurences of the event
@@ -81,7 +81,7 @@ class GameEventMgr
         void Initialize(MapPersistentState* state);         // called at new MapPersistentState object create
         uint32 Update(ActiveEvents const* activeAtShutdown = NULL);
         bool IsValidEvent(uint16 event_id) const { return event_id < mGameEvent.size() && mGameEvent[event_id].isValid(); }
-        bool IsActiveEvent(uint16 event_id) const { return (m_ActiveEvents.find(event_id)!=m_ActiveEvents.end()); }
+        bool IsActiveEvent(uint16 event_id) const { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
         bool IsActiveHoliday(HolidayIds id);
         uint32 Initialize();
         void StartEvent(uint16 event_id, bool overwrite = false, bool resume = false);
@@ -107,7 +107,7 @@ class GameEventMgr
         typedef std::list<GameEventCreatureDataPair> GameEventCreatureDataList;
         typedef std::vector<GameEventCreatureDataList> GameEventCreatureDataMap;
         typedef std::multimap<uint32, uint32> GameEventCreatureDataPerGuidMap;
-        typedef std::pair<GameEventCreatureDataPerGuidMap::const_iterator,GameEventCreatureDataPerGuidMap::const_iterator> GameEventCreatureDataPerGuidBounds;
+        typedef std::pair<GameEventCreatureDataPerGuidMap::const_iterator, GameEventCreatureDataPerGuidMap::const_iterator> GameEventCreatureDataPerGuidBounds;
 
         typedef std::list<uint32> QuestList;
         typedef std::vector<QuestList> GameEventQuestMap;

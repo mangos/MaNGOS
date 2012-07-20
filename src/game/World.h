@@ -423,7 +423,7 @@ struct CliCommandHolder
     CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, const char* command, Print* zprint, CommandFinished* commandFinished)
         : m_cliAccountId(accountId), m_cliAccessLevel(cliAccessLevel), m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
-        size_t len = strlen(command)+1;
+        size_t len = strlen(command) + 1;
         m_command = new char[len];
         memcpy(m_command, command, len);
     }
@@ -500,7 +500,7 @@ class World
         uint16 GetConfigMaxSkillValue() const
         {
             uint32 lvl = getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
-            return lvl > 60 ? 300 + ((lvl - 60) * 75) / 10 : lvl*5;
+            return lvl > 60 ? 300 + ((lvl - 60) * 75) / 10 : lvl * 5;
         }
 
         void SetInitialWorldSettings();
@@ -527,22 +527,22 @@ class World
         void UpdateSessions(uint32 diff);
 
         /// Get a server configuration element (see #eConfigFloatValues)
-        void setConfig(eConfigFloatValues index,float value) { m_configFloatValues[index]=value; }
+        void setConfig(eConfigFloatValues index, float value) { m_configFloatValues[index] = value; }
         /// Get a server configuration element (see #eConfigFloatValues)
         float getConfig(eConfigFloatValues rate) const { return m_configFloatValues[rate]; }
 
         /// Set a server configuration element (see #eConfigUInt32Values)
-        void setConfig(eConfigUInt32Values index, uint32 value) { m_configUint32Values[index]=value; }
+        void setConfig(eConfigUInt32Values index, uint32 value) { m_configUint32Values[index] = value; }
         /// Get a server configuration element (see #eConfigUInt32Values)
         uint32 getConfig(eConfigUInt32Values index) const { return m_configUint32Values[index]; }
 
         /// Set a server configuration element (see #eConfigInt32Values)
-        void setConfig(eConfigInt32Values index, int32 value) { m_configInt32Values[index]=value; }
+        void setConfig(eConfigInt32Values index, int32 value) { m_configInt32Values[index] = value; }
         /// Get a server configuration element (see #eConfigInt32Values)
         int32 getConfig(eConfigInt32Values index) const { return m_configInt32Values[index]; }
 
         /// Set a server configuration element (see #eConfigBoolValues)
-        void setConfig(eConfigBoolValues index, bool value) { m_configBoolValues[index]=value; }
+        void setConfig(eConfigBoolValues index, bool value) { m_configBoolValues[index] = value; }
         /// Get a server configuration element (see #eConfigBoolValues)
         bool getConfig(eConfigBoolValues index) const { return m_configBoolValues[index]; }
 
@@ -655,7 +655,7 @@ class World
         static uint32 m_relocation_ai_notify_delay;
 
         // CLI command holder to be thread safe
-        ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;
+        ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
 
         // next daily quests reset time
         time_t m_NextDailyQuestReset;

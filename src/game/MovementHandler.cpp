@@ -172,11 +172,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (mInstance)
     {
         Difficulty diff = GetPlayer()->GetDifficulty(mEntry->IsRaid());
-        if (MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID,diff))
+        if (MapDifficulty const* mapDiff = GetMapDifficultyData(mEntry->MapID, diff))
         {
             if (mapDiff->resetTime)
             {
-                if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->MapID,diff))
+                if (time_t timeReset = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(mEntry->MapID, diff))
                 {
                     uint32 timeleft = uint32(timeReset - time(NULL));
                     GetPlayer()->SendInstanceResetWarning(mEntry->MapID, diff, timeleft);
@@ -211,7 +211,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
     uint32 counter, time;
     recv_data >> counter >> time;
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
-    DEBUG_LOG("Counter %u, time %u", counter, time/IN_MILLISECONDS);
+    DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
     Unit* mover = _player->GetMover();
     Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
@@ -353,12 +353,12 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recv_data)
         {
             sLog.outError("%sSpeedChange player %s is NOT correct (must be %f instead %f), force set to correct value",
                           move_type_name[move_type], _player->GetName(), _player->GetSpeed(move_type), newspeed);
-            _player->SetSpeedRate(move_type,_player->GetSpeedRate(move_type),true);
+            _player->SetSpeedRate(move_type, _player->GetSpeedRate(move_type), true);
         }
         else                                                // must be lesser - cheating
         {
             BASIC_LOG("Player %s from account id %u kicked for incorrect speed (must be %f instead %f)",
-                      _player->GetName(),_player->GetSession()->GetAccountId(),_player->GetSpeed(move_type), newspeed);
+                      _player->GetName(), _player->GetSession()->GetAccountId(), _player->GetSpeed(move_type), newspeed);
             _player->GetSession()->KickPlayer();
         }
     }

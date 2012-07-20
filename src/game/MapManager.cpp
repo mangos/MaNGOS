@@ -40,7 +40,7 @@ MapManager::MapManager()
 
 MapManager::~MapManager()
 {
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         delete iter->second;
 
     for (TransportSet::iterator i = m_Transports.begin(); i != m_Transports.end(); ++i)
@@ -82,7 +82,7 @@ void MapManager::UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid,
 
 void MapManager::InitializeVisibilityDistanceInfo()
 {
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         (*iter).second->InitVisibilityDistance();
 }
 
@@ -182,7 +182,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         }
 
         //The player has a heroic mode and tries to enter into instance which has no a heroic mode
-        MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID,player->GetDifficulty(entry->map_type == MAP_RAID));
+        MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID, player->GetDifficulty(entry->map_type == MAP_RAID));
         if (!mapDiff)
         {
             bool isRegularTargetMap = player->GetDifficulty(entry->IsRaid()) == REGULAR_DIFFICULTY;
@@ -230,7 +230,7 @@ MapManager::Update(uint32 diff)
     if (!i_timer.Passed())
         return;
 
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         iter->second->Update((uint32)i_timer.GetCurrent());
 
     for (TransportSet::iterator iter = m_Transports.begin(); iter != m_Transports.end(); ++iter)
@@ -261,18 +261,18 @@ MapManager::Update(uint32 diff)
 
 void MapManager::RemoveAllObjectsInRemoveList()
 {
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         iter->second->RemoveAllObjectsInRemoveList();
 }
 
-bool MapManager::ExistMapAndVMap(uint32 mapid, float x,float y)
+bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
-    GridPair p = MaNGOS::ComputeGridPair(x,y);
+    GridPair p = MaNGOS::ComputeGridPair(x, y);
 
-    int gx=63-p.x_coord;
-    int gy=63-p.y_coord;
+    int gx = 63 - p.x_coord;
+    int gy = 63 - p.y_coord;
 
-    return GridMap::ExistMap(mapid,gx,gy) && GridMap::ExistVMap(mapid,gx,gy);
+    return GridMap::ExistMap(mapid, gx, gy) && GridMap::ExistVMap(mapid, gx, gy);
 }
 
 bool MapManager::IsValidMAP(uint32 mapid)
@@ -284,7 +284,7 @@ bool MapManager::IsValidMAP(uint32 mapid)
 
 void MapManager::UnloadAll()
 {
-    for (MapMapType::iterator iter=i_maps.begin(); iter != i_maps.end(); ++iter)
+    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         iter->second->UnloadAll(true);
 
     while (!i_maps.empty())
@@ -384,7 +384,7 @@ DungeonMap* MapManager::CreateDungeonMap(uint32 id, uint32 InstanceId, Difficult
     if (!GetMapDifficultyData(id, difficulty))
         difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
-    DEBUG_LOG("MapInstanced::CreateDungeonMap: %s map instance %d for %d created with difficulty %d", save?"":"new ", InstanceId, id, difficulty);
+    DEBUG_LOG("MapInstanced::CreateDungeonMap: %s map instance %d for %d created with difficulty %d", save ? "" : "new ", InstanceId, id, difficulty);
 
     DungeonMap* map = new DungeonMap(id, i_gridCleanUpDelay, InstanceId, difficulty);
 
@@ -399,7 +399,7 @@ BattleGroundMap* MapManager::CreateBattleGroundMap(uint32 id, uint32 InstanceId,
 {
     DEBUG_LOG("MapInstanced::CreateBattleGroundMap: instance:%d for map:%d and bgType:%d created.", InstanceId, id, bg->GetTypeID());
 
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(),bg->GetMinLevel());
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), bg->GetMinLevel());
 
     uint8 spawnMode = bracketEntry ? bracketEntry->difficulty : REGULAR_DIFFICULTY;
 

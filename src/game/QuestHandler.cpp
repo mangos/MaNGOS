@@ -138,7 +138,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
     if (qInfo)
     {
         // prevent cheating
-        if (!GetPlayer()->CanTakeQuest(qInfo,true))
+        if (!GetPlayer()->CanTakeQuest(qInfo, true))
         {
             _player->PlayerTalkClass->CloseGossip();
             _player->ClearDividerGuid();
@@ -221,7 +221,7 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recv_data)
 {
     uint32 quest;
     recv_data >> quest;
-    DEBUG_LOG("WORLD: Received CMSG_QUEST_QUERY quest = %u",quest);
+    DEBUG_LOG("WORLD: Received CMSG_QUEST_QUERY quest = %u", quest);
 
     Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
     if (pQuest)
@@ -282,7 +282,7 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_REQUEST_REWARD - for %s to %s, quest = %u", _player->GetGuidStr().c_str(), guid.GetString().c_str(), quest);
 
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-    if (!pObject||!pObject->HasInvolvedQuest(quest))
+    if (!pObject || !pObject->HasInvolvedQuest(quest))
         return;
 
     if (_player->CanCompleteQuest(quest))
@@ -312,7 +312,7 @@ void WorldSession::HandleQuestLogSwapQuest(WorldPacket& recv_data)
 
     DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_SWAP_QUEST slot 1 = %u, slot 2 = %u", slot1, slot2);
 
-    GetPlayer()->SwapQuestSlot(slot1,slot2);
+    GetPlayer()->SwapQuestSlot(slot1, slot2);
 }
 
 void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
@@ -413,7 +413,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
         else
         {
             if (pQuest->GetReqItemsCount())                 // some items required
-                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest,false), false);
+                _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest, false), false);
             else                                            // no items required
                 _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
         }
@@ -492,7 +492,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 
     if (Player* pPlayer = ObjectAccessor::FindPlayer(_player->GetDividerGuid()))
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8+1));
+        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << ObjectGuid(guid);
         data << uint8(msg);                             // valid values: 0-8
         pPlayer->GetSession()->SendPacket(&data);

@@ -42,7 +42,7 @@ void InstanceData::SaveToDB()
 bool InstanceData::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= NULL*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
     sLog.outError("Achievement system call InstanceData::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
-                  instance->GetId(),criteria_id);
+                  instance->GetId(), criteria_id);
     return false;
 }
 

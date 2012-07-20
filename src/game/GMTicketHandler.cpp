@@ -28,7 +28,7 @@
 void WorldSession::SendGMTicketGetTicket(uint32 status, GMTicket* ticket /*= NULL*/)
 {
     int len = ticket ? strlen(ticket->GetText()) : 0;
-    WorldPacket data(SMSG_GMTICKET_GETTICKET, (4+len+1+4+2+4+4));
+    WorldPacket data(SMSG_GMTICKET_GETTICKET, (4 + len + 1 + 4 + 2 + 4 + 4));
     data << uint32(status);                                 // standard 0x0A, 0x06 if text present
     if (status == 6)
     {
@@ -46,8 +46,8 @@ void WorldSession::SendGMTicketGetTicket(uint32 status, GMTicket* ticket /*= NUL
 
 void WorldSession::SendGMResponse(GMTicket* ticket)
 {
-    int len = strlen(ticket->GetText())+1+strlen(ticket->GetResponse())+1;
-    WorldPacket data(SMSG_GMTICKET_GET_RESPONSE, 4+4+len+1+1+1);
+    int len = strlen(ticket->GetText()) + 1 + strlen(ticket->GetResponse()) + 1;
+    WorldPacket data(SMSG_GMTICKET_GET_RESPONSE, 4 + 4 + len + 1 + 1 + 1);
     data << uint32(123);
     data << uint32(456);
     data << ticket->GetText();                              // issue text
@@ -137,7 +137,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recv_data)
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (itr->second->GetSession()->GetSecurity() >= SEC_GAMEMASTER && itr->second->isAcceptTickets())
-            ChatHandler(itr->second).PSendSysMessage(LANG_COMMAND_TICKETNEW,GetPlayer()->GetName());
+            ChatHandler(itr->second).PSendSysMessage(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName());
     }
 }
 

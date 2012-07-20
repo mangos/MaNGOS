@@ -181,7 +181,7 @@ enum ActionButtonIndex
 
 #define  MAX_ACTION_BUTTONS 144                             //checked in 3.2.0
 
-typedef std::map<uint8,ActionButton> ActionButtonList;
+typedef std::map<uint8, ActionButton> ActionButtonList;
 
 enum GlyphUpdateState
 {
@@ -251,7 +251,7 @@ struct PlayerClassInfo
 
 struct PlayerLevelInfo
 {
-    PlayerLevelInfo() { for (int i=0; i < MAX_STATS; ++i) stats[i] = 0; }
+    PlayerLevelInfo() { for (int i = 0; i < MAX_STATS; ++i) stats[i] = 0; }
 
     uint8 stats[MAX_STATS];
 };
@@ -273,7 +273,7 @@ typedef std::list<PlayerCreateInfoAction> PlayerCreateInfoActions;
 struct PlayerInfo
 {
     // existence checked by displayId != 0             // existence checked by displayId != 0
-    PlayerInfo() : displayId_m(0),displayId_f(0),levelInfo(NULL)
+    PlayerInfo() : displayId_m(0), displayId_f(0), levelInfo(NULL)
     {
     }
 
@@ -898,13 +898,13 @@ class MANGOS_DLL_SPEC PlayerTaxi
         bool IsTaximaskNodeKnown(uint32 nodeidx) const
         {
             uint8  field   = uint8((nodeidx - 1) / 32);
-            uint32 submask = 1<<((nodeidx-1)%32);
+            uint32 submask = 1 << ((nodeidx - 1) % 32);
             return (m_taximask[field] & submask) == submask;
         }
         bool SetTaximaskNode(uint32 nodeidx)
         {
             uint8  field   = uint8((nodeidx - 1) / 32);
-            uint32 submask = 1<<((nodeidx-1)%32);
+            uint32 submask = 1 << ((nodeidx - 1) % 32);
             if ((m_taximask[field] & submask) != submask)
             {
                 m_taximask[field] |= submask;
@@ -1111,7 +1111,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         int GetAuctionAccessMode() const { return m_ExtraFlags & PLAYER_EXTRA_AUCTION_ENEMY ? -1 : (m_ExtraFlags & PLAYER_EXTRA_AUCTION_NEUTRAL ? 1 : 0); }
         void SetAuctionAccessMode(int state)
         {
-            m_ExtraFlags &= ~(PLAYER_EXTRA_AUCTION_ENEMY|PLAYER_EXTRA_AUCTION_NEUTRAL);
+            m_ExtraFlags &= ~(PLAYER_EXTRA_AUCTION_ENEMY | PLAYER_EXTRA_AUCTION_NEUTRAL);
 
             if (state < 0)
                 m_ExtraFlags |= PLAYER_EXTRA_AUCTION_ENEMY;
@@ -1172,7 +1172,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         uint32 GetItemDisplayIdInSlot(uint8 bag, uint8 slot) const;
-        Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
+        Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType, false, false); }
         Item* GetWeaponForAttack(WeaponAttackType attackType, bool nonbroken, bool useable) const;
         Item* GetShield(bool useable = false) const;
         static uint32 GetAttackBySlot(uint8 slot);          // MAX_ATTACK if not weapon slot
@@ -1207,7 +1207,7 @@ class MANGOS_DLL_SPEC Player : public Unit
             return _CanStoreItem(bag, slot, dest, pItem->GetEntry(), count, pItem, swap, NULL);
 
         }
-        InventoryResult CanStoreItems(Item** pItem,int count) const;
+        InventoryResult CanStoreItems(Item** pItem, int count) const;
         InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
         InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool direct_action = true) const;
 
@@ -1220,7 +1220,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasItemTotemCategory(uint32 TotemCategory) const;
         InventoryResult CanUseItem(ItemPrototype const* pItem) const;
         InventoryResult CanUseAmmo(uint32 item) const;
-        Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update,int32 randomPropertyId = 0);
+        Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
         Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
         Item* EquipNewItem(uint16 pos, uint32 item, bool update);
         Item* EquipItem(uint16 pos, Item* pItem, bool update);
@@ -1268,7 +1268,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void TakeExtendedCost(uint32 extendedCostId, uint32 count);
 
-        uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
+        uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
         void SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2 = NULL, uint32 itemid = 0) const;
         void SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 param);
         void SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 param);
@@ -1297,13 +1297,13 @@ class MANGOS_DLL_SPEC Player : public Unit
         void TradeCancel(bool sendback);
 
         void UpdateEnchantTime(uint32 time);
-        void UpdateItemDuration(uint32 time, bool realtimeonly=false);
+        void UpdateItemDuration(uint32 time, bool realtimeonly = false);
         void AddEnchantmentDurations(Item* item);
         void RemoveEnchantmentDurations(Item* item);
         void RemoveAllEnchantments(EnchantmentSlot slot);
-        void AddEnchantmentDuration(Item* item,EnchantmentSlot slot,uint32 duration);
-        void ApplyEnchantment(Item* item,EnchantmentSlot slot,bool apply, bool apply_dur = true, bool ignore_condition = false);
-        void ApplyEnchantment(Item* item,bool apply);
+        void AddEnchantmentDuration(Item* item, EnchantmentSlot slot, uint32 duration);
+        void ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool apply_dur = true, bool ignore_condition = false);
+        void ApplyEnchantment(Item* item, bool apply);
         void SendEnchantmentDurations();
         void BuildEnchantmentsInfoData(WorldPacket* data);
         void AddItemDurations(Item* item);
@@ -1316,7 +1316,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 GetEquipGearScore(bool withBags = true, bool withBank = false);
         void ResetCachedGearScore() { m_cachedGS = 0; }
-        typedef std::vector<uint32/*item level*/> GearScoreVec;
+        typedef std::vector < uint32/*item level*/ > GearScoreVec;
 
         /*********************************************************/
         /***                    GOSSIP SYSTEM                  ***/
@@ -1465,7 +1465,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         static uint32 GetZoneIdFromDB(ObjectGuid guid);
         static uint32 GetLevelFromDB(ObjectGuid guid);
-        static bool   LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x,float& y,float& z,float& o, bool& in_flight);
+        static bool   LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
@@ -1474,10 +1474,10 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SaveToDB();
         void SaveInventoryAndGoldToDB();                    // fast save function for item/money cheating preventing
         void SaveGoldToDB();
-        static void SetUInt32ValueInArray(Tokens& data,uint16 index, uint32 value);
-        static void SetFloatValueInArray(Tokens& data,uint16 index, float value);
+        static void SetUInt32ValueInArray(Tokens& data, uint16 index, uint32 value);
+        static void SetFloatValueInArray(Tokens& data, uint16 index, float value);
         static void Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
-        static void SavePositionInDB(ObjectGuid guid, uint32 mapid, float x,float y,float z,float o,uint32 zone);
+        static void SavePositionInDB(ObjectGuid guid, uint32 mapid, float x, float y, float z, float o, uint32 zone);
 
         static void DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRealmChars = true, bool deleteFinally = false);
         static void DeleteOldCharacters();
@@ -1491,7 +1491,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SendTalentWipeConfirm(ObjectGuid guid);
         void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
         void SendPetSkillWipeConfirm();
-        void CalcRage(uint32 damage,bool attacker);
+        void CalcRage(uint32 damage, bool attacker);
         void RegenerateAll(uint32 diff = REGEN_TIME_FULL);
         void Regenerate(Powers power, uint32 diff);
         void RegenerateHealth(uint32 diff);
@@ -1508,7 +1508,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
             // "At Gold Limit"
             if (GetMoney() >= MAX_MONEY_AMOUNT)
-                SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD,NULL,NULL);
+                SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
         }
         void SetMoney(uint32 value)
         {
@@ -1597,7 +1597,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void learnSpellHighRank(uint32 spellid);
 
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
-        void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1,points); }
+        void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1, points); }
         void UpdateFreeTalentPoints(bool resetIfNeed = true);
         bool resetTalents(bool no_cost = false, bool all_specs = false);
         uint32 resetTalentsCost() const;
@@ -1642,7 +1642,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell const* spell = NULL);
 
         static uint32 const infinityCooldownDelay = MONTH;  // used for set "infinity cooldowns" for spells and check
-        static uint32 const infinityCooldownDelayCheck = MONTH/2;
+        static uint32 const infinityCooldownDelayCheck = MONTH / 2;
         bool HasSpellCooldown(uint32 spell_id) const
         {
             SpellCooldowns::const_iterator itr = m_spellCooldowns.find(spell_id);
@@ -1698,8 +1698,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         ActionButton const* GetActionButton(uint8 button);
 
         PvPInfo pvpInfo;
-        void UpdatePvP(bool state, bool ovrride=false);
-        void UpdateZone(uint32 newZone,uint32 newArea);
+        void UpdatePvP(bool state, bool ovrride = false);
+        void UpdateZone(uint32 newZone, uint32 newArea);
         void UpdateArea(uint32 newArea);
         uint32 GetCachedZoneId() const { return m_zoneUpdateId; }
 
@@ -1728,7 +1728,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool IsGroupVisibleFor(Player* p) const;
         bool IsInSameGroupWith(Player const* p) const;
-        bool IsInSameRaidWith(Player const* p) const { return p==this || (GetGroup() != NULL && GetGroup() == p->GetGroup()); }
+        bool IsInSameRaidWith(Player const* p) const { return p == this || (GetGroup() != NULL && GetGroup() == p->GetGroup()); }
         void UninviteFromGroup();
         static void RemoveFromGroup(Group* group, ObjectGuid guid);
         void RemoveFromGroup() { RemoveFromGroup(GetGroup(), GetObjectGuid()); }
@@ -1839,7 +1839,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void DestroyForPlayer(Player* target, bool anim = false) const;
-        void SendLogXPGain(uint32 GivenXP,Unit* victim,uint32 RestXP);
+        void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP);
 
         uint8 LastSwingErrorMsg() const { return m_swingErrorMsg; }
         void SwingErrorMsg(uint8 val) { m_swingErrorMsg = val; }
@@ -1935,7 +1935,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool IsAtGroupRewardDistance(WorldObject const* pRewardSource) const;
         void RewardSinglePlayerAtKill(Unit* pVictim);
-        void RewardPlayerAndGroupAtEvent(uint32 creature_id,WorldObject* pRewardSource);
+        void RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewardSource);
         void RewardPlayerAndGroupAtCast(WorldObject* pRewardSource, uint32 spellid = 0);
         bool isHonorOrXPTarget(Unit* pVictim) const;
 
@@ -1948,7 +1948,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
-        void ModifySkillBonus(uint32 skillid,int32 val, bool talent);
+        void ModifySkillBonus(uint32 skillid, int32 val, bool talent);
 
         /*********************************************************/
         /***                  PVP SYSTEM                       ***/
@@ -1967,7 +1967,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         //End of PvP System
 
-        void SetDrunkValue(uint16 newDrunkValue, uint32 itemid=0);
+        void SetDrunkValue(uint16 newDrunkValue, uint32 itemid = 0);
         uint16 GetDrunkValue() const { return m_drunk; }
         static DrunkenState GetDrunkenstateByValue(uint16 value);
 
@@ -2002,11 +2002,11 @@ class MANGOS_DLL_SPEC Player : public Unit
         void _ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply);
         void _ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, Aura* aura, bool apply);
 
-        void _ApplyItemMods(Item* item,uint8 slot,bool apply);
+        void _ApplyItemMods(Item* item, uint8 slot, bool apply);
         void _RemoveAllItemMods();
         void _ApplyAllItemMods();
         void _ApplyAllLevelScaleItemMods(bool apply);
-        void _ApplyItemBonuses(ItemPrototype const* proto,uint8 slot,bool apply, bool only_level_scale = false);
+        void _ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool apply, bool only_level_scale = false);
         void _ApplyAmmoBonuses();
         bool EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot);
         void ToggleMetaGemsActive(uint8 exceptslot, bool apply);
@@ -2017,7 +2017,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply, bool form_change = false);
         void UpdateEquipSpellsAtFormChange();
         void CastItemCombatSpell(Unit* Target, WeaponAttackType attType);
-        void CastItemUseSpell(Item* item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
+        void CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
 
         void ApplyItemOnStoreSpell(Item* item, bool apply);
         void DestroyItemWithOnStoreSpell(Item* item, uint32 spellId);
@@ -2053,7 +2053,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         bool InBattleGroundQueue() const
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId != BATTLEGROUND_QUEUE_NONE)
                     return true;
             return false;
@@ -2062,14 +2062,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         BattleGroundQueueTypeId GetBattleGroundQueueTypeId(uint32 index) const { return m_bgBattleGroundQueueID[index].bgQueueTypeId; }
         uint32 GetBattleGroundQueueIndex(BattleGroundQueueTypeId bgQueueTypeId) const
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
                     return i;
             return PLAYER_MAX_BATTLEGROUND_QUEUES;
         }
         bool IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId bgQueueTypeId) const
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
                     return m_bgBattleGroundQueueID[i].invitedToInstance != 0;
             return false;
@@ -2087,7 +2087,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         uint32 AddBattleGroundQueueId(BattleGroundQueueTypeId val)
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             {
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == BATTLEGROUND_QUEUE_NONE || m_bgBattleGroundQueueID[i].bgQueueTypeId == val)
                 {
@@ -2100,14 +2100,14 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         bool HasFreeBattleGroundQueueId()
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == BATTLEGROUND_QUEUE_NONE)
                     return true;
             return false;
         }
         void RemoveBattleGroundQueueId(BattleGroundQueueTypeId val)
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
             {
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == val)
                 {
@@ -2119,13 +2119,13 @@ class MANGOS_DLL_SPEC Player : public Unit
         }
         void SetInviteForBattleGroundQueueType(BattleGroundQueueTypeId bgQueueTypeId, uint32 instanceId)
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].bgQueueTypeId == bgQueueTypeId)
                     m_bgBattleGroundQueueID[i].invitedToInstance = instanceId;
         }
         bool IsInvitedForBattleGroundInstance(uint32 instanceId) const
         {
-            for (int i=0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
                 if (m_bgBattleGroundQueueID[i].invitedToInstance == instanceId)
                     return true;
             return false;
@@ -2158,7 +2158,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                    REST SYSTEM                    ***/
         /*********************************************************/
 
-        bool isRested() const { return GetRestTime() >= 10*IN_MILLISECONDS; }
+        bool isRested() const { return GetRestTime() >= 10 * IN_MILLISECONDS; }
         uint32 GetXPRestBonus(uint32 xp);
         uint32 GetRestTime() const { return m_restTime; }
         void SetRestTime(uint32 v) { m_restTime = v; }
@@ -2181,7 +2181,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 VARIOUS SYSTEMS                   ***/
         /*********************************************************/
         bool HasMovementFlag(MovementFlags f) const;        // for script access to m_movementInfo.HasMovementFlag
-        void UpdateFallInformationIfNeed(MovementInfo const& minfo,uint16 opcode);
+        void UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode);
         void SetFallInformation(uint32 time, float z)
         {
             m_lastFallTime = time;
@@ -2237,7 +2237,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         // currently visible objects at player client
         GuidSet m_clientGUIDs;
 
-        bool HaveAtClient(WorldObject const* u) { return u==this || m_clientGUIDs.find(u->GetObjectGuid())!=m_clientGUIDs.end(); }
+        bool HaveAtClient(WorldObject const* u) { return u == this || m_clientGUIDs.find(u->GetObjectGuid()) != m_clientGUIDs.end(); }
 
         bool IsVisibleInGridForPlayer(Player* pl) const;
         bool IsVisibleGloballyFor(Player* pl) const;
@@ -2245,7 +2245,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject* target);
 
         template<class T>
-        void UpdateVisibilityOf(WorldObject const* viewPoint,T* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+        void UpdateVisibilityOf(WorldObject const* viewPoint, T* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
         // Stealth detection system
         void HandleStealthedUnitsDetection();
@@ -2274,7 +2274,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                 INSTANCE SYSTEM                   ***/
         /*********************************************************/
 
-        typedef UNORDERED_MAP< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
+        typedef UNORDERED_MAP < uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
 
         void UpdateHomebindTime(uint32 time);
 
@@ -2341,7 +2341,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         AchievementMgr const& GetAchievementMgr() const { return m_achievementMgr; }
         AchievementMgr& GetAchievementMgr() { return m_achievementMgr; }
-        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1=0, uint32 miscvalue2=0, Unit* unit=NULL, uint32 time=0);
+        void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscvalue1 = 0, uint32 miscvalue2 = 0, Unit* unit = NULL, uint32 time = 0);
         void StartTimedAchievementCriteria(AchievementCriteriaTypes type, uint32 timedRequirementId, time_t startTime = 0);
 
 
@@ -2667,7 +2667,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_cachedGS;
 };
 
-void AddItemsSetItem(Player* player,Item* item);
-void RemoveItemsSetItem(Player* player,ItemPrototype const* proto);
+void AddItemsSetItem(Player* player, Item* item);
+void RemoveItemsSetItem(Player* player, ItemPrototype const* proto);
 
 #endif

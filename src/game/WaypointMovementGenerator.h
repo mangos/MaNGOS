@@ -113,7 +113,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
  */
 class MANGOS_DLL_SPEC FlightPathMovementGenerator
     : public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
-  public PathMovementBase<Player,TaxiPathNodeList const*>
+  public PathMovementBase<Player, TaxiPathNodeList const*>
 {
     public:
         explicit FlightPathMovementGenerator(TaxiPathNodeList const& pathnodes, uint32 startNode = 0)

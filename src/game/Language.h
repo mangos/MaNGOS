@@ -711,8 +711,8 @@ enum MangosStrings
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
 //                                      = 716, not used
     LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN= 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT= 719,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."

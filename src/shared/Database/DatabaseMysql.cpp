@@ -104,12 +104,12 @@ bool MySQLConnection::Initialize(const char* infoString)
     if (iter != tokens.end())
         database = *iter++;
 
-    mysql_options(mysqlInit,MYSQL_SET_CHARSET_NAME,"utf8");
+    mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
 #ifdef WIN32
-    if (host==".")                                          // named pipe use option (Windows)
+    if (host == ".")                                        // named pipe use option (Windows)
     {
         unsigned int opt = MYSQL_PROTOCOL_PIPE;
-        mysql_options(mysqlInit,MYSQL_OPT_PROTOCOL,(char const*)&opt);
+        mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
         port = 0;
         unix_socket = 0;
     }
@@ -119,10 +119,10 @@ bool MySQLConnection::Initialize(const char* infoString)
         unix_socket = 0;
     }
 #else
-    if (host==".")                                          // socket use option (Unix/Linux)
+    if (host == ".")                                        // socket use option (Unix/Linux)
     {
         unsigned int opt = MYSQL_PROTOCOL_SOCKET;
-        mysql_options(mysqlInit,MYSQL_OPT_PROTOCOL,(char const*)&opt);
+        mysql_options(mysqlInit, MYSQL_OPT_PROTOCOL, (char const*)&opt);
         host = "localhost";
         port = 0;
         unix_socket = port_or_socket.c_str();
@@ -140,7 +140,7 @@ bool MySQLConnection::Initialize(const char* infoString)
     if (!mMysql)
     {
         sLog.outError("Could not connect to MySQL database at %s: %s\n",
-                      host.c_str(),mysql_error(mysqlInit));
+                      host.c_str(), mysql_error(mysqlInit));
         mysql_close(mysqlInit);
         return false;
     }
@@ -189,7 +189,7 @@ bool MySQLConnection::_Query(const char* sql, MYSQL_RES** pResult, MYSQL_FIELD**
     }
     else
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+        DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s, WorldTimer::getMSTime()), sql);
     }
 
     *pResult = mysql_store_result(mMysql);
@@ -216,7 +216,7 @@ QueryResult* MySQLConnection::Query(const char* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if (!_Query(sql,&result,&fields,&rowCount,&fieldCount))
+    if (!_Query(sql, &result, &fields, &rowCount, &fieldCount))
         return NULL;
 
     QueryResultMysql* queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
@@ -232,7 +232,7 @@ QueryNamedResult* MySQLConnection::QueryNamed(const char* sql)
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
-    if (!_Query(sql,&result,&fields,&rowCount,&fieldCount))
+    if (!_Query(sql, &result, &fields, &rowCount, &fieldCount))
         return NULL;
 
     QueryFieldNames names(fieldCount);
@@ -242,7 +242,7 @@ QueryNamedResult* MySQLConnection::QueryNamed(const char* sql)
     QueryResultMysql* queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
 
     queryResult->NextRow();
-    return new QueryNamedResult(queryResult,names);
+    return new QueryNamedResult(queryResult, names);
 }
 
 bool MySQLConnection::Execute(const char* sql)
@@ -261,7 +261,7 @@ bool MySQLConnection::Execute(const char* sql)
         }
         else
         {
-            DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s,WorldTimer::getMSTime()), sql);
+            DEBUG_FILTER_LOG(LOG_FILTER_SQL_TEXT, "[%u ms] SQL: %s", WorldTimer::getMSTimeDiff(_s, WorldTimer::getMSTime()), sql);
         }
         // end guarded block
     }

@@ -153,7 +153,7 @@ enum EventFlags
     EFLAG_RESERVED_6            = 0x40,
     EFLAG_DEBUG_ONLY            = 0x80,                     //Event only occurs in debug build
     // no free bits, uint8 field
-    EFLAG_DIFFICULTY_ALL        = (EFLAG_DIFFICULTY_0|EFLAG_DIFFICULTY_1|EFLAG_DIFFICULTY_2|EFLAG_DIFFICULTY_3)
+    EFLAG_DIFFICULTY_ALL        = (EFLAG_DIFFICULTY_0 | EFLAG_DIFFICULTY_1 | EFLAG_DIFFICULTY_2 | EFLAG_DIFFICULTY_3)
 };
 
 enum SpawnedEventMode

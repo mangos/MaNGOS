@@ -71,7 +71,7 @@ class SQLStorage
         void init(const char* _entry_field, const char* sqlname)
         {
             entry_field = _entry_field;
-            table=sqlname;
+            table = sqlname;
             data = NULL;
             pIndex = NULL;
             iNumFields = strlen(src_format);

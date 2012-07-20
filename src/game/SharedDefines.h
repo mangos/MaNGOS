@@ -126,8 +126,8 @@ enum ReputationRank
 enum MoneyConstants
 {
     COPPER = 1,
-    SILVER = COPPER*100,
-    GOLD   = SILVER*100
+    SILVER = COPPER * 100,
+    GOLD   = SILVER * 100
 };
 
 enum Stats
@@ -640,7 +640,7 @@ enum SpellEffects
     SPELL_EFFECT_DUAL_WIELD                = 40,
     SPELL_EFFECT_JUMP                      = 41,
     SPELL_EFFECT_JUMP2                     = 42,
-    SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER= 43,
+    SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER = 43,
     SPELL_EFFECT_SKILL_STEP                = 44,
     SPELL_EFFECT_ADD_HONOR                 = 45,
     SPELL_EFFECT_SPAWN                     = 46,
@@ -1242,7 +1242,7 @@ enum Targets
     TARGET_AREAEFFECT_PARTY            = 37,
     TARGET_SCRIPT                      = 38,
     TARGET_SELF_FISHING                = 39,
-    TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT= 40,
+    TARGET_FOCUS_OR_SCRIPTED_GAMEOBJECT = 40,
     TARGET_TOTEM_EARTH                 = 41,
     TARGET_TOTEM_WATER                 = 42,
     TARGET_TOTEM_AIR                   = 43,
@@ -1905,7 +1905,7 @@ enum Anim
     ANIM_FLY                       = 0x87,
     ANIM_EMOTE_WORK_NO_SHEATHE     = 0x88,
     ANIM_EMOTE_STUN_NO_SHEATHE     = 0x89,
-    ANIM_EMOTE_USE_STANDING_NO_SHEATHE= 0x8A,
+    ANIM_EMOTE_USE_STANDING_NO_SHEATHE = 0x8A,
     ANIM_SPELL_SLEEP_DOWN          = 0x8B,
     ANIM_SPELL_KNEEL_START         = 0x8C,
     ANIM_SPELL_KNEEL_LOOP          = 0x8D,
@@ -2054,9 +2054,9 @@ enum CreatureType
     CREATURE_TYPE_GAS_CLOUD        = 13
 };
 
-uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
-uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
-uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL-1)) | (1 << (CREATURE_TYPE_ELEMENTAL-1));
+uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
+uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
+uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL - 1)) | (1 << (CREATURE_TYPE_ELEMENTAL - 1));
 
 // CreatureFamily.dbc
 enum CreatureFamily

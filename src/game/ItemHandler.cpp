@@ -662,7 +662,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recv_data)
     {
         for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            if (Bag* pBag = (Bag*)_player->GetItemByPos(INVENTORY_SLOT_BAG_0,i))
+            if (Bag* pBag = (Bag*)_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
                 if (bagGuid == pBag->GetObjectGuid())
                 {
@@ -738,7 +738,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
 
     if (!vItems && !tItems)
     {
-        WorldPacket data(SMSG_LIST_INVENTORY, (8+1+1));
+        WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + 1));
         data << ObjectGuid(vendorguid);
         data << uint8(0);                                   // count==0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
@@ -751,7 +751,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
 
     uint8 count = 0;
 
-    WorldPacket data(SMSG_LIST_INVENTORY, (8+1+numitems*8*4));
+    WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + numitems * 8 * 4));
     data << ObjectGuid(vendorguid);
 
     size_t count_pos = data.wpos();
@@ -803,7 +803,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
                 // reputation discount
                 uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? uint32(floor(pProto->BuyPrice * discountMod)) : 0;
 
-                data << uint32(vendorslot +1);              // client size expected counting from 1
+                data << uint32(vendorslot + 1);             // client size expected counting from 1
                 data << uint32(pProto->ItemId);
                 data << uint32(pProto->DisplayInfoID);
                 data << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
@@ -1042,7 +1042,7 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
 
 void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId)
 {
-    WorldPacket data(SMSG_ENCHANTMENTLOG, (8+8+4+4+1));     // last check 2.0.10
+    WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1)); // last check 2.0.10
     data << ObjectGuid(targetGuid);
     data << ObjectGuid(casterGuid);
     data << uint32(itemId);
@@ -1054,7 +1054,7 @@ void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGu
 void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration)
 {
     // last check 2.0.10
-    WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8+4+4+8));
+    WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
     data << ObjectGuid(itemGuid);
     data << uint32(slot);
     data << uint32(duration);
@@ -1076,7 +1076,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
         std::string name = pProto->Name1;
         sObjectMgr.GetItemLocaleStrings(pProto->ItemId, loc_idx, &name);
         // guess size
-        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+10));
+        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + 10));
         data << uint32(pProto->ItemId);
         data << name;
         data << uint32(pProto->InventoryType);
@@ -1223,7 +1223,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
         if (!gemGuid.IsItem())
             return;
 
-        for (int j = i+1; j < MAX_GEM_SOCKETS; ++j)
+        for (int j = i + 1; j < MAX_GEM_SOCKETS; ++j)
             if (gemGuids[j] == gemGuid)
                 return;
     }
@@ -1402,7 +1402,7 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recv_data)
     bool SocketBonusToBeActivated = itemTarget->GemsFitSockets();// current socketbonus state
     if (SocketBonusActivated != SocketBonusToBeActivated)   // if there was a change...
     {
-        _player->ApplyEnchantment(itemTarget,BONUS_ENCHANTMENT_SLOT, false);
+        _player->ApplyEnchantment(itemTarget, BONUS_ENCHANTMENT_SLOT, false);
         itemTarget->SetEnchantment(BONUS_ENCHANTMENT_SLOT, (SocketBonusToBeActivated ? itemTarget->GetProto()->socketBonus : 0), 0, 0);
         _player->ApplyEnchantment(itemTarget, BONUS_ENCHANTMENT_SLOT, true);
         //it is not displayed, client has an inbuilt system to determine if the bonus is activated
@@ -1471,7 +1471,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recv_data)
 
     DEBUG_LOG("CMSG_ITEM_TEXT_QUERY item guid: %u", itemGuid.GetCounter());
 
-    WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4+10));// guess size
+    WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, (4 + 10)); // guess size
 
     if (Item* item = _player->GetItemByGuid(itemGuid))
     {

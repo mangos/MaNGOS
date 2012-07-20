@@ -913,7 +913,7 @@ struct FactionTemplateEntry
         }
         return (hostileMask & entry.ourMask) != 0;
     }
-    bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) !=0; }
+    bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
     bool IsNeutralToAll() const
     {
         for (int i = 0; i < 4; ++i)
@@ -921,7 +921,7 @@ struct FactionTemplateEntry
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD)!=0; }
+    bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1259,10 +1259,10 @@ struct MapEntry
     bool IsMountAllowed() const
     {
         return !IsDungeon() ||
-               MapID==209 || MapID==269 || MapID==309 ||       // TanarisInstance, CavernsOfTime, Zul'gurub
-               MapID==509 || MapID==534 || MapID==560 ||       // AhnQiraj, HyjalPast, HillsbradPast
-               MapID==568 || MapID==580 || MapID==595 ||       // ZulAman, Sunwell Plateau, Culling of Stratholme
-               MapID==603 || MapID==615 || MapID==616;         // Ulduar, The Obsidian Sanctum, The Eye Of Eternity
+               MapID == 209 || MapID == 269 || MapID == 309 || // TanarisInstance, CavernsOfTime, Zul'gurub
+               MapID == 509 || MapID == 534 || MapID == 560 || // AhnQiraj, HyjalPast, HillsbradPast
+               MapID == 568 || MapID == 580 || MapID == 595 || // ZulAman, Sunwell Plateau, Culling of Stratholme
+               MapID == 603 || MapID == 615 || MapID == 616;   // Ulduar, The Obsidian Sanctum, The Eye Of Eternity
     }
 
     bool IsContinent() const
@@ -2100,9 +2100,9 @@ struct WorldSafeLocsEntry
 #endif
 
 typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32,SpellCategorySet > SpellCategoryStore;
+typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
-typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
+typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
 
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
@@ -2123,18 +2123,18 @@ struct TalentSpellPos
     uint8  rank;
 };
 
-typedef std::map<uint32,TalentSpellPos> TalentSpellPosMap;
+typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
 struct TaxiPathBySourceAndDestination
 {
-    TaxiPathBySourceAndDestination() : ID(0),price(0) {}
-    TaxiPathBySourceAndDestination(uint32 _id,uint32 _price) : ID(_id),price(_price) {}
+    TaxiPathBySourceAndDestination() : ID(0), price(0) {}
+    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
 
     uint32    ID;
     uint32    price;
 };
-typedef std::map<uint32,TaxiPathBySourceAndDestination> TaxiPathSetForSource;
-typedef std::map<uint32,TaxiPathSetForSource> TaxiPathSetBySource;
+typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 
 struct TaxiPathNodePtr
 {
@@ -2146,7 +2146,7 @@ struct TaxiPathNodePtr
     operator TaxiPathNodeEntry const& () const { return *i_ptr; }
 };
 
-typedef Path<TaxiPathNodePtr,TaxiPathNodeEntry const> TaxiPathNodeList;
+typedef Path<TaxiPathNodePtr, TaxiPathNodeEntry const> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
 #define TaxiMaskSize 14

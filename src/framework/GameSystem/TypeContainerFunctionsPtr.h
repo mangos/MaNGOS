@@ -77,8 +77,8 @@ namespace MaNGOS
 
     template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(ContainerMapList<TypeList<H, T> >& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
     {
-        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl,fake);
-        return (!t ? Find(elements._TailElements, hdl,fake) : t);
+        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl, fake);
+        return (!t ? Find(elements._TailElements, hdl, fake) : t);
     }
 
     // const find functions
@@ -100,9 +100,9 @@ namespace MaNGOS
 
     template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Find(const ContainerMapList<TypeList<H, T> >& elements, OBJECT_HANDLE hdl, CountedPtr<SPECIFIC_TYPE>* fake)
     {
-        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl,fake);
+        CountedPtr<SPECIFIC_TYPE>& t = Find(elements._elements, hdl, fake);
         if (!t)
-            t = Find(elements._TailElement, hdl,fake);
+            t = Find(elements._TailElement, hdl, fake);
 
         return t;
     }
@@ -128,7 +128,7 @@ namespace MaNGOS
     // Recursion
     template<class SPECIFIC_TYPE, class H, class T> CountedPtr<SPECIFIC_TYPE>& Insert(ContainerMapList<TypeList<H, T> >& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
-        CountedPtr<SPECIFIC_TYPE>& t= Insert(elements._elements, obj, hdl);
+        CountedPtr<SPECIFIC_TYPE>& t = Insert(elements._elements, obj, hdl);
         return (!t ? Insert(elements._TailElements, obj, hdl) : t);
     }
 
