@@ -595,13 +595,6 @@ enum LootState
     GO_JUST_DEACTIVATED
 };
 
-// TODO: Move this somewhere else
-enum WorldStateType
-{
-    WORLD_STATE_REMOVE              = 0,
-    WORLD_STATE_ADD                 = 1
-};
-
 enum CapturePointState
 {
     CAPTURE_STATE_NEUTRAL = 0,

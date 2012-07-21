@@ -71,7 +71,7 @@ void BattleGroundDS::HandleKillPlayer(Player* player, Player* killer)
     BattleGround::HandleKillPlayer(player, killer);
 }
 
-void BattleGroundDS::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
+void BattleGroundDS::HandleAreaTrigger(Player* /*source*/, uint32 /*trigger*/)
 {
 }
 

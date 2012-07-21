@@ -46,11 +46,11 @@ class BattleGroundSA : public BattleGround
         virtual void StartingEventOpenDoors();
 
         void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleAreaTrigger(Player* source, uint32 trigger);
         //bool SetupBattleGround();
 
         /* Scorekeeping */
-        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
 
     private:
 };

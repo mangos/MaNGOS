@@ -108,15 +108,15 @@ bool BattleGroundBE::HandlePlayerUnderMap(Player* player)
     return true;
 }
 
-void BattleGroundBE::HandleAreaTrigger(Player* Source, uint32 Trigger)
+void BattleGroundBE::HandleAreaTrigger(Player* source, uint32 trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 SpellId = 0;
+    //uint32 spellId = 0;
     //uint64 buff_guid = 0;
-    switch (Trigger)
+    switch (trigger)
     {
         case 4538:                                          // buff trigger?
             //buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_1];
@@ -125,13 +125,13 @@ void BattleGroundBE::HandleAreaTrigger(Player* Source, uint32 Trigger)
             //buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_2];
             break;
         default:
-            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
 
     //if (buff_guid)
-    //    HandleTriggerBuff(buff_guid,Source);
+    //    HandleTriggerBuff(buff_guid, source);
 }
 
 void BattleGroundBE::FillInitialWorldStates(WorldPacket& data, uint32& count)
@@ -152,15 +152,15 @@ bool BattleGroundBE::SetupBattleGround()
     return true;
 }
 
-void BattleGroundBE::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
+void BattleGroundBE::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
 {
 
-    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(source->GetObjectGuid());
     if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
     //there is nothing special in this score
-    BattleGround::UpdatePlayerScore(Source, type, value);
+    BattleGround::UpdatePlayerScore(source, type, value);
 
 }
 

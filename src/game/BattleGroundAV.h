@@ -332,12 +332,12 @@ class BattleGroundAV : public BattleGround
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
         void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleAreaTrigger(Player* source, uint32 trigger);
         virtual void Reset();
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
 
         /*handle stuff*/ // these are functions which get called from extern scripts
         virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);

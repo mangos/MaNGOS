@@ -249,7 +249,7 @@ void BattleGroundAV::Update(uint32 diff)
             m_Mine_Timer[mine] -= diff;
             if (m_Mine_Timer[mine] <= 0)
             {
-                UpdateScore(BattleGroundTeamIndex(m_Mine_Owner[mine]), 1);
+                UpdateScore(BattleGroundTeamIndex(m_Mine_Owner[mine]), WORLD_STATE_ADD);
                 m_Mine_Timer[mine] = BG_AV_MINE_TICK_TIMER;
             }
 
@@ -280,8 +280,8 @@ void BattleGroundAV::StartingEventCloseDoors()
 
 void BattleGroundAV::StartingEventOpenDoors()
 {
-    UpdateWorldState(BG_AV_SHOW_H_SCORE, 1);
-    UpdateWorldState(BG_AV_SHOW_A_SCORE, 1);
+    UpdateWorldState(BG_AV_SHOW_H_SCORE, WORLD_STATE_ADD);
+    UpdateWorldState(BG_AV_SHOW_A_SCORE, WORLD_STATE_ADD);
 
     OpenDoorEvent(BG_EVENT_DOOR);
 
@@ -318,14 +318,14 @@ void BattleGroundAV::EndBattleGround(Team winner)
         if (m_Nodes[i].State == POINT_CONTROLLED && m_Nodes[i].Owner != BG_AV_TEAM_NEUTRAL)
             ++graves_owned[m_Nodes[i].Owner];
 
-    for (uint32 i = 0; i < BG_AV_MAX_MINES; ++i)
+    for (uint8 i = 0; i < BG_AV_MAX_MINES; ++i)
         if (m_Mine_Owner[i] != BG_AV_TEAM_NEUTRAL)
             ++mines_owned[m_Mine_Owner[i]];
 
     // now we have the values give the honor/reputation to the teams:
     Team team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
     uint32 faction[BG_TEAMS_COUNT]   = { BG_AV_FACTION_A, BG_AV_FACTION_H };
-    for (uint32 i = 0; i < BG_TEAMS_COUNT; ++i)
+    for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
         if (tower_survived[i])
         {
@@ -358,23 +358,23 @@ void BattleGroundAV::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
-void BattleGroundAV::HandleAreaTrigger(Player* Source, uint32 Trigger)
+void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
-    switch (Trigger)
+    switch (trigger)
     {
         case 95:
         case 2608:
-            if (Source->GetTeam() != ALLIANCE)
-                Source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
+            if (source->GetTeam() != ALLIANCE)
+                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_ALLIANCE_USE);
             else
-                Source->LeaveBattleground();
+                source->LeaveBattleground();
             break;
         case 2606:
-            if (Source->GetTeam() != HORDE)
-                Source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
+            if (source->GetTeam() != HORDE)
+                source->GetSession()->SendNotification(LANG_BATTLEGROUND_ONLY_HORDE_USE);
             else
-                Source->LeaveBattleground();
+                source->LeaveBattleground();
             break;
         case 3326:
         case 3327:
@@ -382,19 +382,19 @@ void BattleGroundAV::HandleAreaTrigger(Player* Source, uint32 Trigger)
         case 3329:
         case 3330:
         case 3331:
-            //Source->Unmount();
+            //source->Unmount();
             break;
         default:
-            DEBUG_LOG("BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-//            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            DEBUG_LOG("BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+//            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
 }
 
-void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
+void BattleGroundAV::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
 {
 
-    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
+    BattleGroundScoreMap::iterator itr = m_PlayerScores.find(source->GetObjectGuid());
     if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
@@ -416,7 +416,7 @@ void BattleGroundAV::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
             ((BattleGroundAVScore*)itr->second)->SecondaryObjectives += value;
             break;
         default:
-            BattleGround::UpdatePlayerScore(Source, type, value);
+            BattleGround::UpdatePlayerScore(source, type, value);
             break;
     }
 }
@@ -617,7 +617,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
 void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
 {
     bool stateok;
-    for (uint32 i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
+    for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
     {
         for (uint8 j = 0; j < BG_AV_MAX_STATES; ++j)
         {
@@ -630,46 +630,46 @@ void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
     }
 
     if (m_Nodes[BG_AV_NODES_SNOWFALL_GRAVE].Owner == BG_AV_TEAM_NEUTRAL)    // cause neutral teams aren't handled generic
-        FillInitialWorldState(data, count, AV_SNOWFALL_N, 1);
+        FillInitialWorldState(data, count, AV_SNOWFALL_N, WORLD_STATE_ADD);
 
     FillInitialWorldState(data, count, BG_AV_Alliance_Score, m_TeamScores[BG_TEAM_ALLIANCE]);
     FillInitialWorldState(data, count, BG_AV_Horde_Score,    m_TeamScores[BG_TEAM_HORDE]);
     if (GetStatus() == STATUS_IN_PROGRESS)                  // only if game is running the teamscores are displayed
     {
-        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, 1);
-        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, 1);
+        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, WORLD_STATE_ADD);
+        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, WORLD_STATE_ADD);
     }
     else
     {
-        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, 0);
-        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, 0);
+        FillInitialWorldState(data, count, BG_AV_SHOW_A_SCORE, WORLD_STATE_REMOVE);
+        FillInitialWorldState(data, count, BG_AV_SHOW_H_SCORE, WORLD_STATE_REMOVE);
     }
 
-    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_Owner[BG_AV_NORTH_MINE]], 1);
+    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_Owner[BG_AV_NORTH_MINE]], WORLD_STATE_ADD);
     if (m_Mine_Owner[BG_AV_NORTH_MINE] != m_Mine_PrevOwner[BG_AV_NORTH_MINE])
-        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_PrevOwner[BG_AV_NORTH_MINE]], 0);
+        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_NORTH_MINE][m_Mine_PrevOwner[BG_AV_NORTH_MINE]], WORLD_STATE_REMOVE);
 
-    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_Owner[BG_AV_SOUTH_MINE]], 1);
+    FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_Owner[BG_AV_SOUTH_MINE]], WORLD_STATE_ADD);
     if (m_Mine_Owner[BG_AV_SOUTH_MINE] != m_Mine_PrevOwner[BG_AV_SOUTH_MINE])
-        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_PrevOwner[BG_AV_SOUTH_MINE]], 0);
+        FillInitialWorldState(data, count, BG_AV_MineWorldStates[BG_AV_SOUTH_MINE][m_Mine_PrevOwner[BG_AV_SOUTH_MINE]], WORLD_STATE_REMOVE);
 }
 
 void BattleGroundAV::UpdateNodeWorldState(BG_AV_Nodes node)
 {
-    UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].State, m_Nodes[node].Owner)], 1);
+    UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].State, m_Nodes[node].Owner)], WORLD_STATE_ADD);
     if (m_Nodes[node].PrevOwner == BG_AV_TEAM_NEUTRAL)      // currently only snowfall is supported as neutral node
-        UpdateWorldState(AV_SNOWFALL_N, 0);
+        UpdateWorldState(AV_SNOWFALL_N, WORLD_STATE_REMOVE);
     else
-        UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].PrevState, m_Nodes[node].PrevOwner)], 0);
+        UpdateWorldState(BG_AV_NodeWorldStates[node][GetWorldStateType(m_Nodes[node].PrevState, m_Nodes[node].PrevOwner)], WORLD_STATE_REMOVE);
 }
 
 void BattleGroundAV::SendMineWorldStates(uint32 mine)
 {
     MANGOS_ASSERT(mine == BG_AV_NORTH_MINE || mine == BG_AV_SOUTH_MINE);
 
-    UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_Owner[mine]], 1);
+    UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_Owner[mine]], WORLD_STATE_ADD);
     if (m_Mine_Owner[mine] != m_Mine_PrevOwner[mine])
-        UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_PrevOwner[mine]], 0);
+        UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_PrevOwner[mine]], WORLD_STATE_REMOVE);
 }
 
 WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player* plr)

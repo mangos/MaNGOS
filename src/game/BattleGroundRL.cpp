@@ -108,27 +108,27 @@ bool BattleGroundRL::HandlePlayerUnderMap(Player* player)
     return true;
 }
 
-void BattleGroundRL::HandleAreaTrigger(Player* Source, uint32 Trigger)
+void BattleGroundRL::HandleAreaTrigger(Player* source, uint32 trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 SpellId = 0;
+    //uint32 spellId = 0;
     //uint64 buff_guid = 0;
-    switch (Trigger)
+    switch (trigger)
     {
         case 4696:                                          // buff trigger?
         case 4697:                                          // buff trigger?
             break;
         default:
-            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", Trigger);
-            Source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", Trigger);
+            sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
 
     //if (buff_guid)
-    //    HandleTriggerBuff(buff_guid,Source);
+    //    HandleTriggerBuff(buff_guid, source);
 }
 
 void BattleGroundRL::FillInitialWorldStates(WorldPacket& data, uint32& count)

@@ -71,7 +71,7 @@ void BattleGroundRV::HandleKillPlayer(Player* player, Player* killer)
     BattleGround::HandleKillPlayer(player, killer);
 }
 
-void BattleGroundRV::HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/)
+void BattleGroundRV::HandleAreaTrigger(Player* /*source*/, uint32 /*trigger*/)
 {
 }
 

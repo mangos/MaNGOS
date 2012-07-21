@@ -187,14 +187,14 @@ class BattleGroundAB : public BattleGround
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
         void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleAreaTrigger(Player* source, uint32 trigger);
         virtual bool SetupBattleGround();
         virtual void Reset();
         void EndBattleGround(Team winner);
         virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
 
         /* Scorekeeping */
-        virtual void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
+        virtual void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
 
         virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
 
@@ -202,7 +202,7 @@ class BattleGroundAB : public BattleGround
         virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
 
         /* achievement req. */
-        bool IsAllNodesConrolledByTeam(Team team) const;    // overwrited
+        bool IsAllNodesControlledByTeam(Team team) const;   // overwrited
         bool IsTeamScores500Disadvantage(Team team) const { return m_TeamScores500Disadvantage[GetTeamIndexByTeamId(team)]; }
     private:
         /* Gameobject spawning/despawning */
