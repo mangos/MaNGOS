@@ -1019,7 +1019,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 uint32 counter = 0;
                 for (QuestStatusMap::const_iterator itr = GetPlayer()->getQuestStatusMap().begin(); itr != GetPlayer()->getQuestStatusMap().end(); ++itr)
                     if (itr->second.m_rewarded)
-                        counter++;
+                        ++counter;
                 change = counter;
                 progressType = PROGRESS_HIGHEST;
                 break;
@@ -1035,7 +1035,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     Quest const* quest = sObjectMgr.GetQuestTemplate(itr->first);
                     if (itr->second.m_rewarded && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
-                        counter++;
+                        ++counter;
                 }
                 change = counter;
                 progressType = PROGRESS_HIGHEST;
@@ -1548,7 +1548,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                     {
                         if (skillIter->second->skillId == achievementCriteria->learn_skillline_spell.skillLine)
-                            spellCount++;
+                            ++spellCount;
                     }
                 }
                 change = spellCount;
@@ -1612,7 +1612,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellIter->first);
                     for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                         if (skillIter->second->skillId == achievementCriteria->learn_skill_line.skillLine)
-                            spellCount++;
+                            ++spellCount;
                 }
                 change = spellCount;
                 progressType = PROGRESS_HIGHEST;

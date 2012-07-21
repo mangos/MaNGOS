@@ -1327,7 +1327,7 @@ bool ChatHandler::HandleLookupAchievementCommand(char* args)
         {
             CompletedAchievementData const* completed = target ? target->GetAchievementMgr().GetCompleteData(id) : NULL;
             ShowAchievementListHelper(achEntry, LocaleConstant(loc), completed ? &completed->date : NULL, target);
-            counter++;
+            ++counter;
         }
     }
 
@@ -1441,7 +1441,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
             {
                 FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
                 ShowFactionListHelper(factionEntry, LocaleConstant(loc), repState, target);
-                counter++;
+                ++counter;
             }
         }
     }
@@ -2367,7 +2367,7 @@ bool ChatHandler::HandleNpcSubNameCommand(char* /*args*/)
         return true;
     }
 
-    for (uint8 i = 0; i < strlen(args); i++)
+    for (uint8 i = 0; i < strlen(args); ++i)
     {
         if (!isalpha(args[i]) && args[i]!=' ')
         {
@@ -5031,7 +5031,7 @@ bool ChatHandler::HandleLookupTitleCommand(char* args)
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
     // Search in CharTitles.dbc
-    for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
+    for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); ++id)
     {
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
         if (titleInfo)
@@ -5236,7 +5236,7 @@ bool ChatHandler::HandleCharacterTitlesCommand(char* args)
     char const* knownStr = GetMangosString(LANG_KNOWN);
 
     // Search in CharTitles.dbc
-    for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
+    for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); ++id)
     {
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
         if (titleInfo && target->HasTitle(titleInfo))

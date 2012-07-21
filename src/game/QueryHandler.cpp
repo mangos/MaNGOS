@@ -458,7 +458,7 @@ void WorldSession::HandleQueryQuestsCompletedOpcode(WorldPacket& /*recv_data */)
         if (itr->second.m_rewarded)
         {
             data << uint32(itr->first);
-            count++;
+            ++count;
         }
     }
     data.put<uint32>(0, count);

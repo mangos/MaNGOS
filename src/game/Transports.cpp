@@ -286,7 +286,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids)
         keyFrames[j].distSinceStop = tmpDist;
     }
 
-    for (int i = int(keyFrames.size()) - 1; i >= 0; i--)
+    for (int i = int(keyFrames.size()) - 1; i >= 0; --i)
     {
         int j = (i + (firstStop + 1)) % keyFrames.size();
         tmpDist += keyFrames[(j + 1) % keyFrames.size()].distFromPrev;

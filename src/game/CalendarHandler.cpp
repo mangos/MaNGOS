@@ -73,13 +73,13 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recv_data*/)
             data << uint32(0);                                  // Holidays.dbc priority
             data << uint32(0);                                  // Holidays.dbc calendarFilterType
 
-            for(uint32 j = 0; j < 26; j++)
+            for(uint32 j = 0; j < 26; ++j)
                 data << uint32(0);                              // Holidays.dbc date
 
-            for(uint32 j = 0; j < 10; j++)
+            for(uint32 j = 0; j < 10; ++j)
                 data << uint32(0);                              // Holidays.dbc duration
 
-            for(uint32 j = 0; j < 10; j++)
+            for(uint32 j = 0; j < 10; ++j)
                 data << uint32(0);                              // Holidays.dbc calendarFlags
 
             data << "";                                         // Holidays.dbc textureFilename
@@ -139,7 +139,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recv_data)
     //    {
     //        uint8 unk12,unk13;
     //        ObjectGuid guid;
-    //        for (int i=0;i<count;i++)
+    //        for (int i = 0; i < count; ++i)
     //        {
     //            recv_data >> guid.ReadAsPacked();
     //            recv_data >> (uint8)unk12;

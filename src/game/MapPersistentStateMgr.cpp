@@ -717,7 +717,7 @@ void MapPersistentStateManager::_DelHelper(DatabaseType& db, const char* fields,
         {
             Field* fields = result->Fetch();
             std::ostringstream ss;
-            for (size_t i = 0; i < fieldTokens.size(); i++)
+            for (size_t i = 0; i < fieldTokens.size(); ++i)
             {
                 std::string fieldValue = fields[i].GetCppString();
                 db.escape_string(fieldValue);

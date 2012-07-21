@@ -616,7 +616,7 @@ void CliRunnable::run()
         char* command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
         if (command_str != NULL)
         {
-            for (int x = 0; command_str[x]; x++)
+            for (int x = 0; command_str[x]; ++x)
                 if (command_str[x] == '\r' || command_str[x] == '\n')
                 {
                     command_str[x] = 0;

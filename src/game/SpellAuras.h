@@ -136,7 +136,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
             if (m_procCharges == 0)
                 return false;
 
-            m_procCharges--;
+            --m_procCharges;
             SendAuraUpdate(false);
             return m_procCharges == 0;
         }

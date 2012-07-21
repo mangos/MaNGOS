@@ -28,7 +28,7 @@ QueryResultMysql::QueryResultMysql(MYSQL_RES* result, MYSQL_FIELD* fields, uint6
     mCurrentRow = new Field[mFieldCount];
     MANGOS_ASSERT(mCurrentRow);
 
-    for (uint32 i = 0; i < mFieldCount; i++)
+    for (uint32 i = 0; i < mFieldCount; ++i)
         mCurrentRow[i].SetType(ConvertNativeType(fields[i].type));
 }
 
@@ -51,7 +51,7 @@ bool QueryResultMysql::NextRow()
         return false;
     }
 
-    for (uint32 i = 0; i < mFieldCount; i++)
+    for (uint32 i = 0; i < mFieldCount; ++i)
         mCurrentRow[i].SetValue(row[i]);
 
     return true;

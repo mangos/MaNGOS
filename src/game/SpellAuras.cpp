@@ -4811,7 +4811,7 @@ void Aura::HandleModThreat(bool apply, bool Real)
         m_modifier.m_amount += multiplier * level_diff;
 
     if (target->GetTypeId() == TYPEID_PLAYER)
-        for (int8 x = 0; x < MAX_SPELL_SCHOOL; x++)
+        for (int8 x = 0; x < MAX_SPELL_SCHOOL; ++x)
             if (m_modifier.m_miscvalue & int32(1 << x))
                 ApplyPercentModFloatVar(target->m_threatModifier[x], float(m_modifier.m_amount), apply);
 }
@@ -5631,7 +5631,7 @@ void Aura::HandlePeriodicHealthFunnel(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModResistanceExclusive(bool apply, bool /*Real*/)
 {
-    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; ++x)
     {
         if (m_modifier.m_miscvalue & int32(1 << x))
         {
@@ -5644,7 +5644,7 @@ void Aura::HandleAuraModResistanceExclusive(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModResistance(bool apply, bool /*Real*/)
 {
-    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+    for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; ++x)
     {
         if (m_modifier.m_miscvalue & int32(1 << x))
         {
@@ -5666,7 +5666,7 @@ void Aura::HandleAuraModBaseResistancePCT(bool apply, bool /*Real*/)
     }
     else
     {
-        for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; x++)
+        for (int8 x = SPELL_SCHOOL_NORMAL; x < MAX_SPELL_SCHOOL; ++x)
         {
             if (m_modifier.m_miscvalue & int32(1 << x))
                 GetTarget()->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + x), BASE_PCT, float(m_modifier.m_amount), apply);
@@ -5678,7 +5678,7 @@ void Aura::HandleModResistancePercent(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
 
-    for (int8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+    for (int8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
     {
         if (m_modifier.m_miscvalue & int32(1 << i))
         {
@@ -5703,7 +5703,7 @@ void Aura::HandleModBaseResistance(bool apply, bool /*Real*/)
     }
     else
     {
-        for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; i++)
+        for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
             if (m_modifier.m_miscvalue & (1 << i))
                 GetTarget()->HandleStatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), TOTAL_VALUE, float(m_modifier.m_amount), apply);
     }
@@ -5721,7 +5721,7 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
         return;
     }
 
-    for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
+    for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
     {
         // -1 or -2 is all stats ( misc < -2 checked in function beginning )
         if (m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue == i)
@@ -5825,7 +5825,7 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
     uint32 curHPValue = target->GetHealth();
     uint32 maxHPValue = target->GetMaxHealth();
 
-    for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
+    for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
     {
         if (m_modifier.m_miscvalue == i || m_modifier.m_miscvalue == -1)
         {
@@ -8405,7 +8405,7 @@ void Aura::HandleAuraAddMechanicAbilities(bool apply, bool Real)
 
         // spell give the player a new castbar with some spells.. this is a clientside process..
         // serverside just needs to register the new spells so that player isn't kicked as cheater
-        for (int i = 0; i < MAX_OVERRIDE_SPELLS; i++)
+        for (int i = 0; i < MAX_OVERRIDE_SPELLS; ++i)
             if (uint32 spellId = spellSet->Spells[i])
                 static_cast<Player*>(target)->addSpell(spellId, true, false, false, false);
 
@@ -8414,7 +8414,7 @@ void Aura::HandleAuraAddMechanicAbilities(bool apply, bool Real)
     else
     {
         target->SetUInt16Value(PLAYER_FIELD_BYTES2, 0, 0);
-        for (int i = 0; i < MAX_OVERRIDE_SPELLS; i++)
+        for (int i = 0; i < MAX_OVERRIDE_SPELLS; ++i)
             if (uint32 spellId = spellSet->Spells[i])
                 static_cast<Player*>(target)->removeSpell(spellId, false , false, false);
     }

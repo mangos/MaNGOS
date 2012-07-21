@@ -163,7 +163,7 @@ void ReputationMgr::SendInitialReputations()
     for (FactionStateList::iterator itr = m_factions.begin(); itr != m_factions.end(); ++itr)
     {
         // fill in absent fields
-        for (; a != itr->first; a++)
+        for (; a != itr->first; ++a)
         {
             data << uint8(0x00);
             data << uint32(0x00000000);
@@ -179,7 +179,7 @@ void ReputationMgr::SendInitialReputations()
     }
 
     // fill in absent fields
-    for (; a != 128; a++)
+    for (; a != 128; ++a)
     {
         data << uint8(0x00);
         data << uint32(0x00000000);
@@ -207,7 +207,7 @@ void ReputationMgr::Initialize()
     m_reveredFactionCount = 0;
     m_exaltedFactionCount = 0;
 
-    for (unsigned int i = 1; i < sFactionStore.GetNumRows(); i++)
+    for (unsigned int i = 1; i < sFactionStore.GetNumRows(); ++i)
     {
         FactionEntry const* factionEntry = sFactionStore.LookupEntry(i);
 

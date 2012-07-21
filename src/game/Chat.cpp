@@ -1574,7 +1574,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
             case 'c':
                 color = 0;
                 // validate color, expect 8 hex chars
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < 8; ++i)
                 {
                     char c;
                     reader >> c;

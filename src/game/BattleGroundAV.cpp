@@ -242,7 +242,7 @@ void BattleGroundAV::Update(uint32 diff)
         return;
 
     // add points from mine owning, and look if the neutral team can reclaim the mine
-    for (uint8 mine = 0; mine < BG_AV_MAX_MINES; mine++)
+    for (uint8 mine = 0; mine < BG_AV_MAX_MINES; ++mine)
     {
         if (m_Mine_Owner[mine] != BG_AV_TEAM_NEUTRAL)
         {
@@ -325,7 +325,7 @@ void BattleGroundAV::EndBattleGround(Team winner)
     // now we have the values give the honor/reputation to the teams:
     Team team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
     uint32 faction[BG_TEAMS_COUNT]   = { BG_AV_FACTION_A, BG_AV_FACTION_H };
-    for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
+    for (uint32 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
         if (tower_survived[i])
         {
@@ -619,7 +619,7 @@ void BattleGroundAV::FillInitialWorldStates(WorldPacket& data, uint32& count)
     bool stateok;
     for (uint32 i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
     {
-        for (uint8 j = 0; j < BG_AV_MAX_STATES; j++)
+        for (uint8 j = 0; j < BG_AV_MAX_STATES; ++j)
         {
             stateok = (m_Nodes[i].State == j);
             FillInitialWorldState(data, count, BG_AV_NodeWorldStates[i][GetWorldStateType(j, BG_AV_TEAM_ALLIANCE)],
@@ -794,16 +794,16 @@ void BattleGroundAV::Reset()
     m_RepSurviveTower     = (isBGWeekend) ? BG_AV_REP_SURVIVING_TOWER_HOLIDAY : BG_AV_REP_SURVIVING_TOWER;
     m_RepOwnedMine        = (isBGWeekend) ? BG_AV_REP_OWNED_MINE_HOLIDAY    : BG_AV_REP_OWNED_MINE;
 
-    for (uint8 i = 0; i < BG_TEAMS_COUNT; i++)
+    for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
     {
-        for (uint8 j = 0; j < 9; j++)                       // 9 quests getting tracked
+        for (uint8 j = 0; j < 9; ++j)                       // 9 quests getting tracked
             m_Team_QuestStatus[i][j] = 0;
         m_TeamScores[i]         = BG_AV_SCORE_INITIAL_POINTS;
         m_IsInformedNearLose[i] = false;
         m_ActiveEvents[BG_AV_NodeEventCaptainDead_A + i] = BG_EVENT_NONE;
     }
 
-    for (uint8 i = 0; i < BG_AV_MAX_MINES; i++)
+    for (uint8 i = 0; i < BG_AV_MAX_MINES; ++i)
     {
         m_Mine_Owner[i] = BG_AV_TEAM_NEUTRAL;
         m_Mine_PrevOwner[i] = m_Mine_Owner[i];

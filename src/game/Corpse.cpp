@@ -202,7 +202,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 
     // Load equipment
     Tokens data = StrSplit(fields[16].GetCppString(), " ");
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; slot++)
+    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         uint32 visualbase = slot * 2;
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);

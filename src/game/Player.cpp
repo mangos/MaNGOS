@@ -589,7 +589,7 @@ Player::~Player()
         m_transport->RemovePassenger(this);
     }
 
-    for (size_t x = 0; x < ItemSetEff.size(); x++)
+    for (size_t x = 0; x < ItemSetEff.size(); ++x)
         if (ItemSetEff[x])
             delete ItemSetEff[x];
 
@@ -1539,7 +1539,7 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
 
 
     Tokens data = StrSplit(fields[19].GetCppString(), " ");
-    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; slot++)
+    for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         uint32 visualbase = slot * 2;
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
@@ -3809,7 +3809,7 @@ void Player::_SetCreateBits(UpdateMask* updateMask, Player* target) const
     }
     else
     {
-        for (uint16 index = 0; index < m_valuesCount; index++)
+        for (uint16 index = 0; index < m_valuesCount; ++index)
         {
             if (GetUInt32Value(index) != 0 && updateVisualBits.GetBit(index))
                 updateMask->SetBit(index);
@@ -19753,7 +19753,7 @@ bool Player::EnchantmentFitsRequirements(uint32 enchantmentcondition, int8 slot)
 
                 uint8 GemColor = gemProperty->color;
 
-                for (uint8 b = 0, tmpcolormask = 1; b < 4; b++, tmpcolormask <<= 1)
+                for (uint8 b = 0, tmpcolormask = 1; b < 4; ++b, tmpcolormask <<= 1)
                 {
                     if (tmpcolormask & GemColor)
                         ++curcount[b];

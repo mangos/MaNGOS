@@ -392,7 +392,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     {
         // amount of real actions
         uint32 count = 0;
-        for (uint32 j = 0; j < MAX_ACTIONS; j++)
+        for (uint32 j = 0; j < MAX_ACTIONS; ++j)
             if (pHolder.Event.action[j].type != ACTION_T_NONE)
                 ++count;
 

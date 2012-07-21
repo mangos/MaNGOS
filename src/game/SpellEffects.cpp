@@ -4153,7 +4153,7 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
             {
                 if (targetAura->GetSpellProto()->EffectApplyAuraName[idx] == SPELL_AURA_PERIODIC_HEAL)
                     break;
-                idx++;
+                ++idx;
             }
 
             int32 tickheal = targetAura->GetModifier()->m_amount;

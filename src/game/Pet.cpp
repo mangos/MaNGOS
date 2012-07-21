@@ -682,7 +682,7 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 
         uint8 x;
 
-        for (x = 0; x < activecount; x++)
+        for (x = 0; x < activecount; ++x)
         {
             if (chainstart == chainstartstore[x])
                 break;
@@ -1764,7 +1764,7 @@ bool Pet::resetTalents(bool no_cost)
         if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
             continue;
 
-        for (int j = 0; j < MAX_TALENT_RANK; j++)
+        for (int j = 0; j < MAX_TALENT_RANK; ++j)
             if (talentInfo->RankID[j])
                 removeSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
     }
@@ -1958,7 +1958,7 @@ void Pet::ToggleAutocast(uint32 spellid, bool apply)
     else
     {
         AutoSpellList::iterator itr2 = m_autospells.begin();
-        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i, itr2++)
+        for (i = 0; i < m_autospells.size() && m_autospells[i] != spellid; ++i, ++itr2)
             ;                                               // just search
 
         if (i < m_autospells.size())

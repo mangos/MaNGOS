@@ -133,7 +133,7 @@ int PatchHandler::svc(void)
 
 PatchCache::~PatchCache()
 {
-    for (Patches::iterator i = patches_.begin(); i != patches_.end(); i++)
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); ++i)
         delete i->second;
 }
 
@@ -181,7 +181,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
 
 bool PatchCache::GetHash(const char* pat, ACE_UINT8 mymd5[MD5_DIGEST_LENGTH])
 {
-    for (Patches::iterator i = patches_.begin(); i != patches_.end(); i++)
+    for (Patches::iterator i = patches_.begin(); i != patches_.end(); ++i)
         if (!stricmp(pat, i->first.c_str()))
         {
             memcpy(mymd5, i->second->md5, MD5_DIGEST_LENGTH);

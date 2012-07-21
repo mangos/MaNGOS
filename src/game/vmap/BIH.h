@@ -208,7 +208,7 @@ class BIH
                             stack[stackPos].node = back;
                             stack[stackPos].tnear = (tb >= intervalMin) ? tb : intervalMin;
                             stack[stackPos].tfar = intervalMax;
-                            stackPos++;
+                            ++stackPos;
                             // update ray interval for front node
                             intervalMax = (tf <= intervalMax) ? tf : intervalMax;
                             continue;
@@ -247,7 +247,7 @@ class BIH
                     if (stackPos == 0)
                         return;
                     // move back up the stack
-                    stackPos--;
+                    --stackPos;
                     intervalMin = stack[stackPos].tnear;
                     if (maxDist < intervalMin)
                         continue;
@@ -303,7 +303,7 @@ class BIH
                             // point is in both nodes
                             // push back right node
                             stack[stackPos].node = right;
-                            stackPos++;
+                            ++stackPos;
                             continue;
                         }
                         else
@@ -336,7 +336,7 @@ class BIH
                 if (stackPos == 0)
                     return;
                 // move back up the stack
-                stackPos--;
+                --stackPos;
                 node = stack[stackPos].node;
             }
         }
@@ -386,8 +386,8 @@ class BIH
                     for (int i = 0; i < 6; ++i) numLeavesN[i] = 0;
                 }
 
-                void updateInner() { numNodes++; }
-                void updateBVH2() { numBVH2++; }
+                void updateInner() { ++numNodes; }
+                void updateBVH2() { ++numBVH2; }
                 void updateLeaf(int depth, int n);
                 void printStats();
         };

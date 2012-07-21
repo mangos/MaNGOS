@@ -27,7 +27,7 @@ QueryResultPostgre::QueryResultPostgre(PGresult* result, uint64 rowCount, uint32
     mCurrentRow = new Field[mFieldCount];
     MANGOS_ASSERT(mCurrentRow);
 
-    for (uint32 i = 0; i < mFieldCount; i++)
+    for (uint32 i = 0; i < mFieldCount; ++i)
         mCurrentRow[i].SetType(ConvertNativeType(PQftype(result, i)));
 }
 
@@ -48,7 +48,7 @@ bool QueryResultPostgre::NextRow()
     }
 
     char* pPQgetvalue;
-    for (int j = 0; j < mFieldCount; j++)
+    for (int j = 0; j < mFieldCount; ++j)
     {
         pPQgetvalue = PQgetvalue(mResult, mTableIndex, j);
         if (pPQgetvalue && !(*pPQgetvalue))

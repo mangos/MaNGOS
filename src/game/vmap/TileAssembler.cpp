@@ -263,7 +263,7 @@ namespace VMAP
 
         // temporary use defines to simplify read/check code (close file and return at fail)
 #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
-                                        fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); } ++readOperation;
 #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
@@ -317,7 +317,7 @@ namespace VMAP
                 return false;
             }
 
-            for (uint32 i = 0, indexNo = 0; indexNo < nvectors; indexNo++, i += 3)
+            for (uint32 i = 0, indexNo = 0; indexNo < nvectors; ++indexNo, i += 3)
             {
                 Vector3 v = Vector3(vectorarray[i + 0], vectorarray[i + 1], vectorarray[i + 2]);
                 v = modelPosition.transform(v);
@@ -369,7 +369,7 @@ namespace VMAP
 
         // temporary use defines to simplify read/check code (close file and return at fail)
 #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
-                                        fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); } ++readOperation;
 #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 

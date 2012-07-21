@@ -1691,7 +1691,7 @@ void BattleGround::HandleTriggerBuff(ObjectGuid go_guid)
     // TODO this can be done when poolsystem works for instances
     int32 index = m_BgObjects.size() - 1;
     while (index >= 0 && m_BgObjects[index] != go_guid)
-        index--;
+        --index;
     if (index < 0)
     {
         sLog.outError("BattleGround (Type: %u) has buff trigger %s GOType: %u but it hasn't that object in its internal data",
