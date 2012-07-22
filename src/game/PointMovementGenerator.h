@@ -39,7 +39,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 
         void MovementInform(T&);
 
-        MovementGeneratorType GetMovementGeneratorType() const { return POINT_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return POINT_MOTION_TYPE; }
 
         bool GetDestination(float& x, float& y, float& z) const { x = i_x; y = i_y; z = i_z; return true; }
     private:
@@ -55,8 +55,8 @@ class MANGOS_DLL_SPEC AssistanceMovementGenerator
         AssistanceMovementGenerator(float _x, float _y, float _z) :
             PointMovementGenerator<Creature>(0, _x, _y, _z, true) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return ASSISTANCE_MOTION_TYPE; }
-        void Finalize(Unit&);
+        MovementGeneratorType GetMovementGeneratorType() const override { return ASSISTANCE_MOTION_TYPE; }
+        void Finalize(Unit&) override;
 };
 
 // Does almost nothing - just doesn't allows previous movegen interrupt current effect. Can be reused for charge effect
@@ -64,12 +64,12 @@ class EffectMovementGenerator : public MovementGenerator
 {
     public:
         explicit EffectMovementGenerator(uint32 Id) : m_Id(Id) {}
-        void Initialize(Unit&) {}
-        void Finalize(Unit& unit);
-        void Interrupt(Unit&) {}
-        void Reset(Unit&) {}
-        bool Update(Unit& u, const uint32&);
-        MovementGeneratorType GetMovementGeneratorType() const { return EFFECT_MOTION_TYPE; }
+        void Initialize(Unit&) override {}
+        void Finalize(Unit& unit) override;
+        void Interrupt(Unit&) override {}
+        void Reset(Unit&) override {}
+        bool Update(Unit& u, const uint32&) override;
+        MovementGeneratorType GetMovementGeneratorType() const override { return EFFECT_MOTION_TYPE; }
     private:
         uint32 m_Id;
 };

@@ -39,8 +39,8 @@ class AuthSocket: public BufferedSocket
         AuthSocket();
         ~AuthSocket();
 
-        void OnAccept();
-        void OnRead();
+        void OnAccept() override;
+        void OnRead() override;
         void SendProof(Sha1Hash sha);
         void LoadRealmlist(ByteBuffer& pkt, uint32 acctid);
 

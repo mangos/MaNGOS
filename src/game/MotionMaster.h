@@ -55,7 +55,7 @@ enum MMCleanFlag
 {
     MMCF_NONE   = 0,
     MMCF_UPDATE = 1,                                        // Clear or Expire called from update
-    MMCF_RESET  = 2                                         // Flag if need top()->Reset()
+    MMCF_RESET  = 2                                         // Flag if need top()->Reset() override
 };
 
 class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator*>

@@ -42,13 +42,13 @@ class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
         ~MySqlPreparedStatement();
 
         // prepare statement
-        virtual bool prepare();
+        virtual bool prepare() override;
 
         // bind input parameters
-        virtual void bind(const SqlStmtParameters& holder);
+        virtual void bind(const SqlStmtParameters& holder) override;
 
         // execute DML statement
-        virtual bool execute();
+        virtual bool execute() override;
 
     protected:
         // bind parameters
@@ -74,20 +74,20 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
 
         //! Initializes Mysql and connects to a server.
         /*! infoString should be formated like hostname;username;password;database. */
-        bool Initialize(const char* infoString);
+        bool Initialize(const char* infoString) override;
 
-        QueryResult* Query(const char* sql);
-        QueryNamedResult* QueryNamed(const char* sql);
-        bool Execute(const char* sql);
+        QueryResult* Query(const char* sql) override;
+        QueryNamedResult* QueryNamed(const char* sql) override;
+        bool Execute(const char* sql) override;
 
         unsigned long escape_string(char* to, const char* from, unsigned long length);
 
-        bool BeginTransaction();
-        bool CommitTransaction();
-        bool RollbackTransaction();
+        bool BeginTransaction() override;
+        bool CommitTransaction() override;
+        bool RollbackTransaction() override;
 
     protected:
-        SqlPreparedStatement* CreateStatement(const std::string& fmt);
+        SqlPreparedStatement* CreateStatement(const std::string& fmt) override;
 
     private:
         bool _TransactionCmd(const char* sql);
@@ -105,12 +105,12 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
         ~DatabaseMysql();
 
         // must be call before first query in thread
-        void ThreadStart();
+        void ThreadStart() override;
         // must be call before finish thread run
-        void ThreadEnd();
+        void ThreadEnd() override;
 
     protected:
-        virtual SqlConnection* CreateConnection();
+        virtual SqlConnection* CreateConnection() override;
 
     private:
         static size_t db_count;

@@ -35,7 +35,7 @@ class MANGOS_DLL_SPEC FleeingMovementGenerator
         void Reset(T&);
         bool Update(T&, const uint32&);
 
-        MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
 
     private:
         void _setTargetLocation(T& owner);
@@ -53,9 +53,9 @@ class MANGOS_DLL_SPEC TimedFleeingMovementGenerator
             FleeingMovementGenerator<Creature>(fright),
             i_totalFleeTime(time) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return TIMED_FLEEING_MOTION_TYPE; }
-        bool Update(Unit&, const uint32&);
-        void Finalize(Unit&);
+        MovementGeneratorType GetMovementGeneratorType() const override { return TIMED_FLEEING_MOTION_TYPE; }
+        bool Update(Unit&, const uint32&) override;
+        void Finalize(Unit&) override;
 
     private:
         TimeTracker i_totalFleeTime;

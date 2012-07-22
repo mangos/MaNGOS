@@ -50,7 +50,7 @@ class SqlPlainRequest : public SqlOperation
     public:
         SqlPlainRequest(const char* sql) : m_sql(mangos_strdup(sql)) {}
         ~SqlPlainRequest() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        bool Execute(SqlConnection* conn);
+        bool Execute(SqlConnection* conn) override;
 };
 
 class SqlTransaction : public SqlOperation
@@ -62,9 +62,9 @@ class SqlTransaction : public SqlOperation
         SqlTransaction() {}
         ~SqlTransaction();
 
-        void DelayExecute(SqlOperation* sql)   {   m_queue.push_back(sql); }
+        void DelayExecute(SqlOperation* sql) { m_queue.push_back(sql); }
 
-        bool Execute(SqlConnection* conn);
+        bool Execute(SqlConnection* conn) override;
 };
 
 class SqlPreparedRequest : public SqlOperation
@@ -73,7 +73,7 @@ class SqlPreparedRequest : public SqlOperation
         SqlPreparedRequest(int nIndex, SqlStmtParameters* arg);
         ~SqlPreparedRequest();
 
-        bool Execute(SqlConnection* conn);
+        bool Execute(SqlConnection* conn) override;
 
     private:
         const int m_nIndex;
@@ -105,7 +105,7 @@ class SqlQuery : public SqlOperation
         SqlQuery(const char* sql, MaNGOS::IQueryCallback* callback, SqlResultQueue* queue)
             : m_sql(mangos_strdup(sql)), m_callback(callback), m_queue(queue) {}
         ~SqlQuery() { char* tofree = const_cast<char*>(m_sql); delete [] tofree; }
-        bool Execute(SqlConnection* conn);
+        bool Execute(SqlConnection* conn) override;
 };
 
 class SqlQueryHolder
@@ -134,6 +134,6 @@ class SqlQueryHolderEx : public SqlOperation
     public:
         SqlQueryHolderEx(SqlQueryHolder* holder, MaNGOS::IQueryCallback* callback, SqlResultQueue* queue)
             : m_holder(holder), m_callback(callback), m_queue(queue) {}
-        bool Execute(SqlConnection* conn);
+        bool Execute(SqlConnection* conn) override;
 };
 #endif                                                      //__SQLOPERATIONS_H

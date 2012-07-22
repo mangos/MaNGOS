@@ -321,34 +321,34 @@ class BattleGroundAV : public BattleGround
     public:
         BattleGroundAV();
         ~BattleGroundAV();
-        void Update(uint32 diff);
+        void Update(uint32 diff) override;
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* plr);
+        virtual void AddPlayer(Player* plr) override;
 
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
+        virtual void StartingEventCloseDoors() override;
+        virtual void StartingEventOpenDoors() override;
         // world states
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
-        void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
-        virtual void Reset();
+        void RemovePlayer(Player* plr, ObjectGuid guid) override;
+        void HandleAreaTrigger(Player* source, uint32 trigger) override;
+        virtual void Reset() override;
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value) override;
 
         /*handle stuff*/ // these are functions which get called from extern scripts
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
-        void HandleKillPlayer(Player* player, Player* killer);
-        void HandleKillUnit(Creature* creature, Player* killer);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
+        void HandleKillPlayer(Player* player, Player* killer) override;
+        void HandleKillUnit(Creature* creature, Player* killer) override;
         void HandleQuestComplete(uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
-        void EndBattleGround(Team winner);
+        void EndBattleGround(Team winner) override;
 
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* plr);
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* plr) override;
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
     private:

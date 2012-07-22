@@ -334,12 +334,12 @@ class MANGOS_DLL_SPEC SqlPlainPreparedStatement : public SqlPreparedStatement
         ~SqlPlainPreparedStatement() {}
 
         // this statement is always prepared
-        virtual bool prepare() { return true; }
+        virtual bool prepare() override { return true; }
 
         // we should replace all '?' symbols with substrings with proper format
-        virtual void bind(const SqlStmtParameters& holder);
+        virtual void bind(const SqlStmtParameters& holder) override;
 
-        virtual bool execute();
+        virtual bool execute() override;
 
     protected:
         void DataToString(const SqlStmtFieldData& data, std::ostringstream& fmt);

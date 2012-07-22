@@ -1093,12 +1093,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         virtual ~Unit();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
-        void CleanupsBeforeDelete();                        // used in ~Creature/~Player (or before mass creature delete to remove cross-references to already deleted units)
+        void CleanupsBeforeDelete() override;               // used in ~Creature/~Player (or before mass creature delete to remove cross-references to already deleted units)
 
-        float GetObjectBoundingRadius() const               // overwrite WorldObject version
+        float GetObjectBoundingRadius() const override      // overwrite WorldObject version
         {
             return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS];
         }
@@ -1142,7 +1142,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             if (itr == m_attackers.end())
                 m_attackers.insert(pAttacker);
         }
-        void _removeAttacker(Unit* pAttacker)               // must be called only from Unit::AttackStop()
+        void _removeAttacker(Unit* pAttacker)               // must be called only from Unit::AttackStop() override
         {
             m_attackers.erase(pAttacker);
         }
@@ -1228,9 +1228,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void setFaction(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
         FactionTemplateEntry const* getFactionTemplateEntry() const;
-        bool IsHostileTo(Unit const* unit) const;
+        bool IsHostileTo(Unit const* unit) const override;
         bool IsHostileToPlayers() const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        bool IsFriendlyTo(Unit const* unit) const override;
         bool IsNeutralToAll() const;
         bool IsContestedGuard() const
         {
@@ -1653,15 +1653,15 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Visibility system
         UnitVisibility GetVisibility() const { return m_Visibility; }
         void SetVisibility(UnitVisibility x);
-        void UpdateVisibilityAndView();                     // overwrite WorldObject::UpdateVisibilityAndView()
+        void UpdateVisibilityAndView() override;            // overwrite WorldObject::UpdateVisibilityAndView()
 
         // common function for visibility checks for player/creatures with detection code
         bool isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool is3dDistance = true) const;
         bool canDetectInvisibilityOf(Unit const* u) const;
-        void SetPhaseMask(uint32 newPhaseMask, bool update);// overwrite WorldObject::SetPhaseMask
+        void SetPhaseMask(uint32 newPhaseMask, bool update) override;// overwrite WorldObject::SetPhaseMask
 
         // virtual functions for all world objects types
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const override;
         // function for low level grid visibility checks in player/creature cases
         virtual bool IsVisibleInGridForPlayer(Player* pl) const = 0;
         bool isInvisibleForAlive() const;

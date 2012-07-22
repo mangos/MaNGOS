@@ -91,16 +91,16 @@ struct MANGOS_DLL_DECL ScriptedAI : public CreatureAI
     ~ScriptedAI() {}
 
     // Called at stopping attack by any attacker
-    void EnterEvadeMode();
+    void EnterEvadeMode() override;
 
     // Is unit visible for MoveInLineOfSight
-    bool IsVisible(Unit* who) const
+    bool IsVisible(Unit* who) const override
     {
         return !who->HasStealthAura() && m_creature->IsWithinDist(who, VISIBLE_RANGE);
     }
 
     // Called at World update tick
-    void UpdateAI(const uint32);
+    void UpdateAI(const uint32) override;
 
     //= Some useful helpers =========================
 

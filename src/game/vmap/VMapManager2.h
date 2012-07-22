@@ -69,7 +69,7 @@ namespace VMAP
             InstanceTreeMap iInstanceMapTrees;
 
             bool _loadMap(uint32 pMapId, const std::string& basePath, uint32 tileX, uint32 tileY);
-            /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
+            /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y) override override; */
 
         public:
             // public for debug
@@ -80,32 +80,32 @@ namespace VMAP
             VMapManager2();
             ~VMapManager2(void);
 
-            VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y);
+            VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
 
-            void unloadMap(unsigned int pMapId, int x, int y);
-            void unloadMap(unsigned int pMapId);
+            void unloadMap(unsigned int pMapId, int x, int y) override;
+            void unloadMap(unsigned int pMapId) override;
 
-            bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2) ;
+            bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2) override ;
             /**
             fill the hit pos and return true, if an object was hit
             */
-            bool getObjectHitPos(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float pModifyDist);
-            float getHeight(unsigned int pMapId, float x, float y, float z, float maxSearchDist);
+            bool getObjectHitPos(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float pModifyDist) override;
+            float getHeight(unsigned int pMapId, float x, float y, float z, float maxSearchDist) override;
 
-            bool processCommand(char* pCommand) { return false; }      // for debug and extensions
+            bool processCommand(char* pCommand) override { return false; }      // for debug and extensions
 
-            bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
-            bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const;
+            bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
+            bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const override;
 
             WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
             void releaseModelInstance(const std::string& filename);
 
             // what's the use of this? o.O
-            virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const
+            virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const override
             {
                 return getMapFileName(pMapId);
             }
-            virtual bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y);
+            virtual bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
 
 #ifdef MMAP_GENERATOR
         public:

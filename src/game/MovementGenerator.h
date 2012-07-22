@@ -66,38 +66,38 @@ template<class T, class D>
 class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
 {
     public:
-        void Initialize(Unit& u)
+        void Initialize(Unit& u) override
         {
             // u->AssertIsType<T>();
             (static_cast<D*>(this))->Initialize(*((T*)&u));
         }
-        void Finalize(Unit& u)
+        void Finalize(Unit& u) override
         {
             // u->AssertIsType<T>();
             (static_cast<D*>(this))->Finalize(*((T*)&u));
         }
-        void Interrupt(Unit& u)
+        void Interrupt(Unit& u) override
         {
             // u->AssertIsType<T>();
             (static_cast<D*>(this))->Interrupt(*((T*)&u));
         }
-        void Reset(Unit& u)
+        void Reset(Unit& u) override
         {
             // u->AssertIsType<T>();
             (static_cast<D*>(this))->Reset(*((T*)&u));
         }
-        bool Update(Unit& u, const uint32& time_diff)
+        bool Update(Unit& u, const uint32& time_diff) override
         {
             // u->AssertIsType<T>();
             return (static_cast<D*>(this))->Update(*((T*)&u), time_diff);
         }
-        bool GetResetPosition(Unit& u, float& x, float& y, float& z)
+        bool GetResetPosition(Unit& u, float& x, float& y, float& z) override
         {
             // u->AssertIsType<T>();
             return (static_cast<D*>(this))->GetResetPosition(*((T*)&u), x, y, z);
         }
     public:
-        // will not link if not overridden in the generators
+        // Will not link if not overridden in the generators
         void Initialize(T& u);
         void Finalize(T& u);
         void Interrupt(T& u);
@@ -118,7 +118,7 @@ struct MovementGeneratorFactory : public SelectableMovement
 {
     MovementGeneratorFactory(MovementGeneratorType mgt) : SelectableMovement(mgt) {}
 
-    MovementGenerator* Create(void*) const;
+    MovementGenerator* Create(void*) const override;
 };
 
 typedef FactoryHolder<MovementGenerator, MovementGeneratorType> MovementGeneratorCreator;

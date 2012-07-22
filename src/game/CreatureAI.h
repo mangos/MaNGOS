@@ -78,7 +78,7 @@ class MANGOS_DLL_SPEC CreatureAI
         ///== Reactions At =================================
 
         /**
-         * Called if IsVisible(Unit* pWho) is true at each (relative) pWho move, reaction at visibility zone enter
+         * Called if IsVisible(Unit* pWho) is true at each (relative) override pWho move, reaction at visibility zone enter
          * Note: The Unit* pWho can be out of Line of Sight, usually this is only visibiliy (by state) and range dependendend
          * Note: This function is not called for creatures who are in evade mode
          * @param pWho Unit* who moved in the visibility range and is visisble
@@ -280,7 +280,7 @@ struct CreatureAIFactory : public SelectableAI
 {
     CreatureAIFactory(const char* name) : SelectableAI(name) {}
 
-    CreatureAI* Create(void*) const;
+    CreatureAI* Create(void*) const override;
 
     int Permit(const Creature* c) const { return REAL_AI::Permissible(c); }
 };

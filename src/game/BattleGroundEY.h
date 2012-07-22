@@ -248,12 +248,12 @@ class BattleGroundEY : public BattleGround
     public:
         BattleGroundEY();
         ~BattleGroundEY();
-        void Update(uint32 diff);
+        void Update(uint32 diff) override;
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player* plr);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
+        virtual void AddPlayer(Player* plr) override;
+        virtual void StartingEventCloseDoors() override;
+        virtual void StartingEventOpenDoors() override;
 
         /* BG Flags */
         ObjectGuid const& GetFlagPickerGuid() const { return m_FlagKeeper; }
@@ -264,29 +264,29 @@ class BattleGroundEY : public BattleGround
         void RespawnFlag(bool send_message);
         void RespawnFlagAfterDrop();
 
-        void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
-        void HandleKillPlayer(Player* player, Player* killer);
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
-        virtual bool SetupBattleGround();
-        virtual void Reset();
+        void RemovePlayer(Player* plr, ObjectGuid guid) override;
+        void HandleAreaTrigger(Player* source, uint32 trigger) override;
+        void HandleKillPlayer(Player* player, Player* killer) override;
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
+        virtual bool SetupBattleGround() override;
+        virtual void Reset() override;
         void UpdateTeamScore(Team team);
-        void EndBattleGround(Team winner);
-        void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        void EndBattleGround(Team winner) override;
+        void UpdatePlayerScore(Player* source, uint32 type, uint32 value) override;
+        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
         void SetDroppedFlagGuid(ObjectGuid guid)     { m_DroppedFlagGuid = guid;}
         void ClearDroppedFlagGuid()                  { m_DroppedFlagGuid.Clear();}
         ObjectGuid const& GetDroppedFlagGuid() const { return m_DroppedFlagGuid;}
 
         /* Battleground Events */
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
-        virtual void EventPlayerDroppedFlag(Player* source);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
+        virtual void EventPlayerDroppedFlag(Player* source) override;
 
         /* achievement req. */
         bool IsAllNodesControlledByTeam(Team team) const;
 
     private:
-        void EventPlayerCapturedFlag(Player* source, BG_EY_Nodes node);
+        void EventPlayerCapturedFlag(Player* source, BG_EY_Nodes node);     // NOTE: virtual BattleGround::EventPlayerCapturedFlag has different parameters list
         void EventTeamCapturedPoint(Player* source, uint32 point);
         void EventTeamLostPoint(Player* source, uint32 point);
         void UpdatePointsCount(Team team);

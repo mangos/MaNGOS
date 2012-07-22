@@ -152,7 +152,7 @@ class Roll : public LootValidatorRef
         ~Roll() { }
         void setLoot(Loot* pLoot) { link(pLoot, this); }
         Loot* getLoot() { return getTarget(); }
-        void targetObjectBuildLink();
+        void targetObjectBuildLink() override;
 
         void CalculateCommonVoteMask(uint32 max_enchanting_skill);
         RollVoteMask GetVoteMaskFor(Player* player) const;

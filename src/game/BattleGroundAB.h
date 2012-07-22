@@ -182,24 +182,24 @@ class BattleGroundAB : public BattleGround
         BattleGroundAB();
         ~BattleGroundAB();
 
-        void Update(uint32 diff);
-        void AddPlayer(Player* plr);
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
-        void RemovePlayer(Player* plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player* source, uint32 trigger);
-        virtual bool SetupBattleGround();
-        virtual void Reset();
-        void EndBattleGround(Team winner);
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player);
+        void Update(uint32 diff) override;
+        void AddPlayer(Player* plr) override;
+        virtual void StartingEventCloseDoors() override;
+        virtual void StartingEventOpenDoors() override;
+        void RemovePlayer(Player* plr, ObjectGuid guid) override;
+        void HandleAreaTrigger(Player* source, uint32 trigger) override;
+        virtual bool SetupBattleGround() override;
+        virtual void Reset() override;
+        void EndBattleGround(Team winner) override;
+        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player* player) override;
 
         /* Scorekeeping */
-        virtual void UpdatePlayerScore(Player* source, uint32 type, uint32 value);
+        virtual void UpdatePlayerScore(Player* source, uint32 type, uint32 value) override;
 
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
         /* Nodes occupying */
-        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj);
+        virtual void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
 
         /* achievement req. */
         bool IsAllNodesControlledByTeam(Team team) const;   // overwrited

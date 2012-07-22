@@ -133,7 +133,7 @@ namespace MaNGOS
     }
 
     // non-const remove method
-    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<SPECIFIC_TYPE>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<SPECIFIC_TYPE>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl) override
     {
         typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE> >::iterator iter = elements._element.find(hdl);
         if (iter != elements._element.end())
@@ -145,22 +145,22 @@ namespace MaNGOS
         return false;                                       // found... terminate the search
     }
 
-    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<TypeNull>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<TypeNull>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl) override
     {
         return false;
     }
 
     // this is a missed
-    template<class SPECIFIC_TYPE, class T> bool Remove(ContainerMapList<T>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class T> bool Remove(ContainerMapList<T>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl) override
     {
         return false;
     }
 
-    template<class SPECIFIC_TYPE, class T, class H> bool Remove(ContainerMapList<TypeList<H, T> >& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
+    template<class SPECIFIC_TYPE, class T, class H> bool Remove(ContainerMapList<TypeList<H, T> >& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl) override
     {
         // The head element is bad
-        bool t = Remove(elements._elements, obj, hdl);
-        return (!t ? Remove(elements._TailElements, obj, hdl) : t);
+        bool t = Remove(elements._elements, obj, hdl) override;
+        return (!t ? Remove(elements._TailElements, obj, hdl) : t) override;
     }
 
 }

@@ -32,12 +32,12 @@ class MANGOS_DLL_DECL TotemAI : public CreatureAI
 
         explicit TotemAI(Creature* c);
 
-        void MoveInLineOfSight(Unit*);
-        void AttackStart(Unit*);
-        void EnterEvadeMode();
-        bool IsVisible(Unit*) const;
+        void MoveInLineOfSight(Unit*) override;
+        void AttackStart(Unit*) override;
+        void EnterEvadeMode() override;
+        bool IsVisible(Unit*) const override;
 
-        void UpdateAI(const uint32);
+        void UpdateAI(const uint32) override;
         static int Permissible(const Creature*);
     protected:
         Totem& getTotem();

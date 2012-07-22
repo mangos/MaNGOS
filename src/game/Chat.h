@@ -720,15 +720,15 @@ class CliHandler : public ChatHandler
             : m_accountId(accountId), m_loginAccessLevel(accessLevel), m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        const char* GetMangosString(int32 entry) const;
-        uint32 GetAccountId() const;
-        AccountTypes GetAccessLevel() const;
-        bool isAvailable(ChatCommand const& cmd) const;
-        void SendSysMessage(const char* str);
-        std::string GetNameLink() const;
-        bool needReportToTarget(Player* chr) const;
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        const char* GetMangosString(int32 entry) const override;
+        uint32 GetAccountId() const override;
+        AccountTypes GetAccessLevel() const override;
+        bool isAvailable(ChatCommand const& cmd) const override;
+        void SendSysMessage(const char* str) override;
+        std::string GetNameLink() const override;
+        bool needReportToTarget(Player* chr) const override;
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 
     private:
         uint32 m_accountId;
