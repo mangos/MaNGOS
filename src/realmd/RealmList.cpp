@@ -169,7 +169,7 @@ void RealmList::UpdateRealms(bool init)
                 fields[8].GetFloat(), fields[9].GetCppString());
 
             if (init)
-                sLog.outString("Added realm \"%s\"", fields[1].GetString());
+                sLog.outString("Added realm id %u, name '%s'",  Id, name.c_str());
         }
         while (result->NextRow());
         delete result;

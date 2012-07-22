@@ -1142,7 +1142,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             if (itr == m_attackers.end())
                 m_attackers.insert(pAttacker);
         }
-        void _removeAttacker(Unit* pAttacker)               // must be called only from Unit::AttackStop() override
+        void _removeAttacker(Unit* pAttacker)               // must be called only from Unit::AttackStop()
         {
             m_attackers.erase(pAttacker);
         }

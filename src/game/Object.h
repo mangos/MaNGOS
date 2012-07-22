@@ -413,7 +413,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
     public:
 
         // class is used to manipulate with WorldUpdateCounter
-        // it is needed in order to get time diff between two object's Update() override calls
+        // it is needed in order to get time diff between two object's Update() calls
         class MANGOS_DLL_SPEC UpdateHelper
         {
             public:
@@ -597,7 +597,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         explicit WorldObject();
 
         // these functions are used mostly for Relocate() and Corpse/Player specific stuff...
-        // use them ONLY in LoadFromDB()/Create() override override funcs and nowhere else!
+        // use them ONLY in LoadFromDB()/Create()  funcs and nowhere else!
         // mapId/instanceId should be set in SetMap() function!
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
