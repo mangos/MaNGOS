@@ -153,7 +153,7 @@ void CreatureEventAIMgr::CheckUnusedAITexts()
 void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
 {
 
-    //Drop Existing EventSummon Map
+    // Drop Existing EventSummon Map
     m_CreatureEventAI_Summon_Map.clear();
 
     // Gather additional data for EventAI
@@ -183,7 +183,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Summons(bool check_entry_use)
                 continue;
             }
 
-            //Add to map
+            // Add to map
             m_CreatureEventAI_Summon_Map[temp.id] = temp;
             ++Count;
         }
@@ -244,7 +244,7 @@ void CreatureEventAIMgr::CheckUnusedAISummons()
 // -------------------
 void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
 {
-    //Drop Existing EventAI List
+    // Drop Existing EventAI List
     m_CreatureEventAI_Event_Map.clear();
 
     // Gather event data
@@ -272,7 +272,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
             uint32 creature_id = temp.creature_id;
 
             uint32 e_type = fields[2].GetUInt32();
-            //Report any errors in event
+            // Report any errors in event
             if (e_type >= EVENT_T_END)
             {
                 sLog.outErrorDb("CreatureEventAI:  Event %u have wrong type (%u), skipping.", i, e_type);
@@ -288,24 +288,24 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
             temp.raw.param3 = fields[8].GetUInt32();
             temp.raw.param4 = fields[9].GetUInt32();
 
-            //Creature does not exist in database
+            // Creature does not exist in database
             if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.creature_id))
             {
                 sLog.outErrorDb("CreatureEventAI:  Event %u has script for non-existing creature entry (%u), skipping.", i, temp.creature_id);
                 continue;
             }
 
-            //No chance of this event occuring
+            // No chance of this event occuring
             if (temp.event_chance == 0)
                 sLog.outErrorDb("CreatureEventAI:  Event %u has 0 percent chance. Event will never trigger!", i);
-            //Chance above 100, force it to be 100
+            // Chance above 100, force it to be 100
             else if (temp.event_chance > 100)
             {
                 sLog.outErrorDb("CreatureEventAI:  Creature %u are using event %u with more than 100 percent chance. Adjusting to 100 percent.", temp.creature_id, i);
                 temp.event_chance = 100;
             }
 
-            //Individual event checks
+            // Individual event checks
             switch (temp.event_type)
             {
                 case EVENT_T_TIMER:
@@ -506,7 +506,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                 action.raw.param2 = fields[12 + (j * 4)].GetUInt32();
                 action.raw.param3 = fields[13 + (j * 4)].GetUInt32();
 
-                //Report any errors in actions
+                // Report any errors in actions
                 switch (action.type)
                 {
                     case ACTION_T_NONE:
@@ -603,14 +603,14 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         {
                             if (spell->RecoveryTime > 0 && temp.event_flags & EFLAG_REPEATABLE)
                             {
-                                //output as debug for now, also because there's no general rule all spells have RecoveryTime
+                                // output as debug for now, also because there's no general rule all spells have RecoveryTime
                                 if (temp.event_param3 < spell->RecoveryTime)
                                     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI:  Event %u Action %u uses SpellID %u but cooldown is longer(%u) than minumum defined in event param3(%u).", i, j+1,action.cast.spellId, spell->RecoveryTime, temp.event_param3);
                             }
                         }
                         */
 
-                        //Cast is always triggered if target is forced to cast on self
+                        // Cast is always triggered if target is forced to cast on self
                         if (action.cast.castFlags & CAST_FORCE_TARGET_SELF)
                             action.cast.castFlags |= CAST_TRIGGERED;
 
@@ -698,7 +698,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         if (action.remove_aura.target >= TARGET_T_END)
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u uses incorrect Target type", i, j + 1);
                         break;
-                    case ACTION_T_RANDOM_PHASE:             //PhaseId1, PhaseId2, PhaseId3
+                    case ACTION_T_RANDOM_PHASE:             // PhaseId1, PhaseId2, PhaseId3
                         if (action.random_phase.phase1 >= MAX_PHASE)
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u attempts to set phase1 >= %u. Phase mask cannot be used past phase %u.", i, j + 1, MAX_PHASE, MAX_PHASE - 1);
                         if (action.random_phase.phase2 >= MAX_PHASE)
@@ -706,7 +706,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         if (action.random_phase.phase3 >= MAX_PHASE)
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u attempts to set phase3 >= %u. Phase mask cannot be used past phase %u.", i, j + 1, MAX_PHASE, MAX_PHASE - 1);
                         break;
-                    case ACTION_T_RANDOM_PHASE_RANGE:       //PhaseMin, PhaseMax
+                    case ACTION_T_RANDOM_PHASE_RANGE:       // PhaseMin, PhaseMax
                         if (action.random_phase_range.phaseMin >= MAX_PHASE)
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u attempts to set phaseMin >= %u. Phase mask cannot be used past phase %u.", i, j + 1, MAX_PHASE, MAX_PHASE - 1);
                         if (action.random_phase_range.phaseMin >= MAX_PHASE)
@@ -789,15 +789,15 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             }
                         }
                         break;
-                    case ACTION_T_EVADE:                    //No Params
-                    case ACTION_T_FLEE_FOR_ASSIST:          //No Params
-                    case ACTION_T_DIE:                      //No Params
-                    case ACTION_T_ZONE_COMBAT_PULSE:        //No Params
-                    case ACTION_T_FORCE_DESPAWN:            //Delay
-                    case ACTION_T_AUTO_ATTACK:              //AllowAttackState (0 = stop attack, anything else means continue attacking)
-                    case ACTION_T_COMBAT_MOVEMENT:          //AllowCombatMovement (0 = stop combat based movement, anything else continue attacking)
-                    case ACTION_T_RANGED_MOVEMENT:          //Distance, Angle
-                    case ACTION_T_CALL_FOR_HELP:            //Distance
+                    case ACTION_T_EVADE:                    // No Params
+                    case ACTION_T_FLEE_FOR_ASSIST:          // No Params
+                    case ACTION_T_DIE:                      // No Params
+                    case ACTION_T_ZONE_COMBAT_PULSE:        // No Params
+                    case ACTION_T_FORCE_DESPAWN:            // Delay
+                    case ACTION_T_AUTO_ATTACK:              // AllowAttackState (0 = stop attack, anything else means continue attacking)
+                    case ACTION_T_COMBAT_MOVEMENT:          // AllowCombatMovement (0 = stop combat based movement, anything else continue attacking)
+                    case ACTION_T_RANGED_MOVEMENT:          // Distance, Angle
+                    case ACTION_T_CALL_FOR_HELP:            // Distance
                         break;
 
                     case ACTION_T_RANDOM_SAY:
@@ -811,7 +811,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                 }
             }
 
-            //Add to list
+            // Add to list
             m_CreatureEventAI_Event_Map[creature_id].push_back(temp);
             ++Count;
         }

@@ -209,7 +209,7 @@ class MANGOS_DLL_SPEC Aura
         friend Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32* currentBasePoints, SpellAuraHolder* holder, Unit* target, Unit* caster, Item* castItem);
 
     public:
-        //aura handlers
+        // aura handlers
         void HandleNULL(bool, bool)
         {
             // NOT IMPLEMENTED

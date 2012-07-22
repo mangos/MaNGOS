@@ -88,7 +88,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
             i_timer.Reset();
         }
 
-        //void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
+        // void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
         void UnloadAll();
 
         static bool ExistMapAndVMap(uint32 mapid, float x, float y);
@@ -147,7 +147,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         uint32 GetNumPlayersInInstances();
 
 
-        //get list of all maps
+        // get list of all maps
         const MapMapType& Maps() const { return i_maps; }
 
         template<typename Do>

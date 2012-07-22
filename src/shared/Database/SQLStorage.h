@@ -86,7 +86,7 @@ class SQLStorage
         const char* dst_format;
         const char* table;
         const char* entry_field;
-        //bool HasString;
+        // bool HasString;
 };
 
 template <class T>

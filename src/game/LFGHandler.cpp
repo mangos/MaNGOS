@@ -49,15 +49,15 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recv_data)
 
     recv_data >> comment;                                   // lfg comment
 
-    //SendLfgJoinResult(ERR_LFG_OK);
-    //SendLfgUpdate(false, LFG_UPDATE_JOIN, dungeons[0]);
+    // SendLfgJoinResult(ERR_LFG_OK);
+    // SendLfgUpdate(false, LFG_UPDATE_JOIN, dungeons[0]);
 }
 
 void WorldSession::HandleLfgLeaveOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("CMSG_LFG_LEAVE");
 
-    //SendLfgUpdate(false, LFG_UPDATE_LEAVE, 0);
+    // SendLfgUpdate(false, LFG_UPDATE_LEAVE, 0);
 }
 
 void WorldSession::HandleSearchLfgJoinOpcode(WorldPacket& recv_data)
@@ -70,7 +70,7 @@ void WorldSession::HandleSearchLfgJoinOpcode(WorldPacket& recv_data)
     entry = (temp & 0x00FFFFFF);
     // LfgType type = LfgType((temp >> 24) & 0x000000FF);
 
-    //SendLfgSearchResults(type, entry);
+    // SendLfgSearchResults(type, entry);
 }
 
 void WorldSession::HandleSearchLfgLeaveOpcode(WorldPacket& recv_data)
@@ -136,7 +136,7 @@ void WorldSession::SendLfgSearchResults(LfgType type, uint32 entry)
         }
     }
 
-    //TODO: Guard Player map
+    // TODO: Guard Player map
     HashMapHolder<Player>::MapType const& players = sObjectAccessor.GetPlayers();
     uint32 playersSize = players.size();
     data << uint32(playersSize);                            // players count

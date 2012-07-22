@@ -47,7 +47,7 @@ void GuardAI::MoveInLineOfSight(Unit* u)
         float attackRadius = m_creature->GetAttackDistance(u);
         if (m_creature->IsWithinDistInMap(u, attackRadius))
         {
-            //Need add code to let guard support player
+            // Need add code to let guard support player
             AttackStart(u);
             u->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         }

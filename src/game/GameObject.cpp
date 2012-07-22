@@ -161,9 +161,9 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     if (goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT && goinfo->capturePoint.radius)
         SetCapturePointSlider(CAPTURE_SLIDER_NEUTRAL);
 
-    //Notify the map's instance data.
-    //Only works if you create the object in it, not if it is moves to that map.
-    //Normally non-players do not teleport to other maps.
+    // Notify the map's instance data.
+    // Only works if you create the object in it, not if it is moves to that map.
+    // Normally non-players do not teleport to other maps.
     if (InstanceData* iData = map->GetInstanceData())
         iData->OnObjectCreate(this);
 
@@ -247,10 +247,10 @@ void GameObject::Update(uint32 update_diff, uint32 p_time)
                         }
                         case GAMEOBJECT_TYPE_DOOR:
                         case GAMEOBJECT_TYPE_BUTTON:
-                            //we need to open doors if they are closed (add there another condition if this code breaks some usage, but it need to be here for battlegrounds)
+                            // we need to open doors if they are closed (add there another condition if this code breaks some usage, but it need to be here for battlegrounds)
                             if (GetGoState() != GO_STATE_READY)
                                 ResetDoorOrButton();
-                            //flags in AB are type_button and we need to add them here so no break!
+                            // flags in AB are type_button and we need to add them here so no break!
                         default:
                             if (!m_spawnedByDefault)        // despawn timer
                             {
@@ -280,8 +280,8 @@ void GameObject::Update(uint32 update_diff, uint32 p_time)
                     Unit* ok = NULL;                        // pointer to appropriate target if found any
 
                     bool IsBattleGroundTrap = false;
-                    //FIXME: this is activation radius (in different casting radius that must be selected from spell data)
-                    //TODO: move activated state code (cast itself) to GO_ACTIVATED, in this place only check activating and set state
+                    // FIXME: this is activation radius (in different casting radius that must be selected from spell data)
+                    // TODO: move activated state code (cast itself) to GO_ACTIVATED, in this place only check activating and set state
                     float radius = float(goInfo->trap.radius);
                     if (!radius)
                     {
@@ -334,7 +334,7 @@ void GameObject::Update(uint32 update_diff, uint32 p_time)
 
                         if (IsBattleGroundTrap && ok->GetTypeId() == TYPEID_PLAYER)
                         {
-                            //BattleGround gameobjects case
+                            // BattleGround gameobjects case
                             if (((Player*)ok)->InBattleGround())
                                 if (BattleGround* bg = ((Player*)ok)->GetBattleGround())
                                     bg->HandleTriggerBuff(GetObjectGuid());
@@ -412,7 +412,7 @@ void GameObject::Update(uint32 update_diff, uint32 p_time)
 
                     SetGoState(GO_STATE_READY);
 
-                    //any return here in case battleground traps
+                    // any return here in case battleground traps
                     break;
                 case GAMEOBJECT_TYPE_CAPTURE_POINT:
                     // remove capturing players because slider wont be displayed if capture point is being locked
@@ -605,7 +605,7 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map)
     }
 
     uint32 entry = data->id;
-    //uint32 map_id = data->mapid;                          // already used before call
+    // uint32 map_id = data->mapid;                         // already used before call
     uint32 phaseMask = data->phaseMask;
     float x = data->posX;
     float y = data->posY;
@@ -822,7 +822,7 @@ bool GameObject::ActivateToQuest(Player* pTarget) const
 
             if (LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), pTarget))
             {
-                //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
+                // look for battlegroundAV for some objects which are only activated after mine gots captured by own team
                 if (GetEntry() == BG_AV_OBJECTID_MINE_N || GetEntry() == BG_AV_OBJECTID_MINE_S)
                     if (BattleGround* bg = pTarget->GetBattleGround())
                         if (bg->GetTypeID() == BATTLEGROUND_AV && !(((BattleGroundAV*)bg)->PlayerCanDoMineQuest(GetEntry(), pTarget->GetTeam())))
@@ -961,9 +961,9 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
     else
         RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
 
-    if (GetGoState() == GO_STATE_READY)                     //if closed -> open
+    if (GetGoState() == GO_STATE_READY)                     // if closed -> open
         SetGoState(alternative ? GO_STATE_ACTIVE_ALTERNATIVE : GO_STATE_ACTIVE);
-    else                                                    //if open -> close
+    else                                                    // if open -> close
         SetGoState(GO_STATE_READY);
 }
 
@@ -994,7 +994,7 @@ void GameObject::Use(Unit* user)
     {
         case GAMEOBJECT_TYPE_DOOR:                          // 0
         {
-            //doors never really despawn, only reset to default state/flags
+            // doors never really despawn, only reset to default state/flags
             UseDoorOrButton();
 
             // activate script
@@ -1004,7 +1004,7 @@ void GameObject::Use(Unit* user)
         }
         case GAMEOBJECT_TYPE_BUTTON:                        // 1
         {
-            //buttons never really despawn, only reset to default state/flags
+            // buttons never really despawn, only reset to default state/flags
             UseDoorOrButton();
 
             TriggerLinkedGameObject(user);
@@ -1192,7 +1192,7 @@ void GameObject::Use(Unit* user)
                 // possible quest objective for active quests
                 if (info->goober.questId && sObjectMgr.GetQuestTemplate(info->goober.questId))
                 {
-                    //Quest require to be active for GO using
+                    // Quest require to be active for GO using
                     if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
                         break;
                 }
@@ -1265,7 +1265,7 @@ void GameObject::Use(Unit* user)
                     if (!zone_skill)
                         zone_skill = sObjectMgr.GetFishingBaseSkillLevel(zone);
 
-                    //provide error, no fishable zone or area should be 0
+                    // provide error, no fishable zone or area should be 0
                     if (!zone_skill)
                         sLog.outErrorDb("Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
 
@@ -1284,7 +1284,7 @@ void GameObject::Use(Unit* user)
                     {
                         if (!sWorld.getConfig(CONFIG_BOOL_SKILL_FAIL_POSSIBLE_FISHINGPOOL))
                         {
-                            //TODO: find reasonable value for fishing hole search
+                            // TODO: find reasonable value for fishing hole search
                             fishingHole = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
                             if (fishingHole)
                                 success = true;
@@ -1292,7 +1292,7 @@ void GameObject::Use(Unit* user)
                     }
                     // just search fishhole for success case
                     else
-                        //TODO: find reasonable value for fishing hole search
+                        // TODO: find reasonable value for fishing hole search
                         fishingHole = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
 
                     if (success || sWorld.getConfig(CONFIG_BOOL_SKILL_FAIL_GAIN_FISHING))
@@ -1461,7 +1461,7 @@ void GameObject::Use(Unit* user)
             if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameGroupWith(player))
                 return;
 
-            //required lvl checks!
+            // required lvl checks!
             uint8 level = player->getLevel();
             if (level < info->meetingstone.minLevel || level > info->meetingstone.maxLevel)
                 return;
@@ -1498,7 +1498,7 @@ void GameObject::Use(Unit* user)
                 // 15004
                 // 15005
                 bg->EventPlayerClickedOnFlag(player, this);
-                return;                                     //we don't need to delete flag ... it is despawned!
+                return;                                     // we don't need to delete flag ... it is despawned!
             }
             break;
         }
@@ -1549,7 +1549,7 @@ void GameObject::Use(Unit* user)
                             break;
                     }
                 }
-                //this cause to call return, all flags must be deleted here!!
+                // this cause to call return, all flags must be deleted here!!
                 spellId = 0;
                 Delete();
             }
@@ -1855,7 +1855,7 @@ void GameObject::SetLootRecipient(Unit* pUnit)
 
 float GameObject::GetObjectBoundingRadius() const
 {
-    //FIXME:
+    // FIXME:
     // 1. This is clearly hack way because GameObjectDisplayInfoEntry have 6 floats related to GO sizes, but better that use DEFAULT_WORLD_OBJECT_SIZE
     // 2. In some cases this must be only interactive size, not GO size, current way can affect creature target point auto-selection in strange ways for big underground/virtual GOs
     if (m_displayInfo)
@@ -1904,7 +1904,7 @@ struct SpawnGameObjectInMapsWorker
         if (map->IsLoaded(i_data->posX, i_data->posY))
         {
             GameObject* pGameobject = new GameObject;
-            //DEBUG_LOG("Spawning gameobject %u", *itr);
+            // DEBUG_LOG("Spawning gameobject %u", *itr);
             if (!pGameobject->LoadFromDB(i_guid, map))
             {
                 delete pGameobject;

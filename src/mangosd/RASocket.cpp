@@ -230,7 +230,7 @@ int RASocket::handle_input(ACE_HANDLE)
             ///<li> If the input is '<password>' (and the user already gave his username)
             case LG:
             {
-                //login+pass ok
+                // login+pass ok
                 std::string pw = inputBuffer;
 
                 if (sAccountMgr.CheckPassword(accId, pw))

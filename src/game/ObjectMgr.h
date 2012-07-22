@@ -623,7 +623,7 @@ class ObjectMgr
 
         // Static wrappers for various accessors
         static GameObjectInfo const* GetGameObjectInfo(uint32 id);                  ///< Wrapper for sGOStorage.LookupEntry
-        static Player* GetPlayer(const char* name);                                 ///< Wrapper for ObjectAccessor::FindPlayerByName
+        static Player* GetPlayer(const char* name);         ///< Wrapper for ObjectAccessor::FindPlayerByName
         static Player* GetPlayer(ObjectGuid guid, bool inWorld = true);             ///< Wrapper for ObjectAccessor::FindPlayer
         static CreatureInfo const* GetCreatureTemplate(uint32 id);                  ///< Wrapper for sCreatureStorage.LookupEntry
         static CreatureModelInfo const* GetCreatureModelInfo(uint32 modelid);       ///< Wrapper for sCreatureModelStorage.LookupEntry
@@ -750,7 +750,7 @@ class ObjectMgr
         uint32 GenerateAuctionID() { return m_AuctionIds.Generate(); }
         uint64 GenerateEquipmentSetGuid() { return m_EquipmentSetIds.Generate(); }
         uint32 GenerateGuildId() { return m_GuildIds.Generate(); }
-        //uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
+        // uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
         uint32 GenerateMailID() { return m_MailIds.Generate(); }
         uint32 GeneratePetNumber() { return m_PetNumbers.Generate(); }
 
@@ -1132,7 +1132,7 @@ class ObjectMgr
 
         WeatherZoneMap      mWeatherZoneMap;
 
-        //character reserved names
+        // character reserved names
         typedef std::set<std::wstring> ReservedNamesMap;
         ReservedNamesMap    m_ReservedNames;
 
@@ -1185,7 +1185,7 @@ class ObjectMgr
         typedef std::map<uint32, uint32> BaseXPMap;         // [area level][base xp]
         BaseXPMap mBaseXPTable;
 
-        typedef std::map<uint32, int32> FishingBaseSkillMap; // [areaId][base skill level]
+        typedef std::map<uint32, int32> FishingBaseSkillMap;// [areaId][base skill level]
         FishingBaseSkillMap mFishingBaseForArea;
 
         typedef std::map<uint32, std::vector<std::string> > HalfNameMap;

@@ -76,7 +76,7 @@ class HashMapHolder
 
     private:
 
-        //Non instanceable only static
+        // Non instanceable only static
         HashMapHolder() {}
 
         static LockType i_lock;

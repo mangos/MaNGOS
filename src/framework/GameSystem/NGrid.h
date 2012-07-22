@@ -60,8 +60,8 @@ class GridInfo
     private:
 
         TimeTracker i_timer;
-        uint16 i_unloadActiveLockCount : 16;                    // lock from active object spawn points (prevent clone loading)
-        bool i_unloadExplicitLock      : 1;                     // explicit manual lock or config setting
+        uint16 i_unloadActiveLockCount : 16;                // lock from active object spawn points (prevent clone loading)
+        bool i_unloadExplicitLock      : 1;                 // explicit manual lock or config setting
 };
 
 typedef enum

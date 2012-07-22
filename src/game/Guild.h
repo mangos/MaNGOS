@@ -34,14 +34,14 @@ class Item;
 
 enum GuildDefaultRanks
 {
-    //these ranks can be modified, but they cannot be deleted
+    // these ranks can be modified, but they cannot be deleted
     GR_GUILDMASTER  = 0,
     GR_OFFICER      = 1,
     GR_VETERAN      = 2,
     GR_MEMBER       = 3,
     GR_INITIATE     = 4,
-    //When promoting member server does: rank--;!
-    //When demoting member server does: rank++;!
+    // When promoting member server does: rank--;!
+    // When demoting member server does: rank++;!
 };
 
 enum GuildRankRights
@@ -324,7 +324,7 @@ class Guild
         void SetLeader(ObjectGuid guid);
         bool AddMember(ObjectGuid plGuid, uint32 plRank);
         bool DelMember(ObjectGuid guid, bool isDisbanding = false);
-        //lowest rank is the count of ranks - 1 (the highest rank_id in table)
+        // lowest rank is the count of ranks - 1 (the highest rank_id in table)
         uint32 GetLowestRank() const { return m_Ranks.size() - 1; }
 
         void SetMOTD(std::string motd);

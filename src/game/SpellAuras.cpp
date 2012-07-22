@@ -1821,10 +1821,10 @@ void Aura::TriggerSpell()
 //            {
 //                switch(auraId)
 //                {
-//                    //Frost Trap Aura
+//                    // Frost Trap Aura
 //                    case 13810:
 //                        return;
-//                    //Rizzle's Frost Trap
+//                    // Rizzle's Frost Trap
 //                    case 39900:
 //                        return;
 //                    // Tame spells
@@ -2859,7 +2859,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
-                case 40133:                                 //Summon Fire Elemental
+                case 40133:                                 // Summon Fire Elemental
                 {
                     Unit* caster = GetCaster();
                     if (!caster)
@@ -2875,7 +2875,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
-                case 40132:                                 //Summon Earth Elemental
+                case 40132:                                 // Summon Earth Elemental
                 {
                     Unit* caster = GetCaster();
                     if (!caster)
@@ -2891,7 +2891,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     }
                     return;
                 }
-                case 40214:                                 //Dragonmaw Illusion
+                case 40214:                                 // Dragonmaw Illusion
                 {
                     if (apply)
                     {
@@ -3063,9 +3063,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 uint32 spell_id;
                 switch (GetId())
                 {
-                    case 48384: spell_id = 50170; break;    //Rank 1
-                    case 48395: spell_id = 50171; break;    //Rank 2
-                    case 48396: spell_id = 50172; break;    //Rank 3
+                    case 48384: spell_id = 50170; break;    // Rank 1
+                    case 48395: spell_id = 50171; break;    // Rank 2
+                    case 48396: spell_id = 50172; break;    // Rank 3
                     default:
                         sLog.outError("HandleAuraDummy: Not handled rank of IMF (Spell: %u)", GetId());
                         return;
@@ -3586,10 +3586,10 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 case 42365:                                 // Murloc costume
                     target->SetDisplayId(21723);
                     break;
-                    //case 44186:                               // Gossip NPC Appearance - All, Brewfest
-                    //break;
-                    //case 48305:                               // Gossip NPC Appearance - All, Spirit of Competition
-                    //break;
+                    // case 44186:                          // Gossip NPC Appearance - All, Brewfest
+                    // break;
+                    // case 48305:                          // Gossip NPC Appearance - All, Spirit of Competition
+                    // break;
                 case 50517:                                 // Dread Corsair
                 case 51926:                                 // Corsair Costume
                 {
@@ -3635,20 +3635,20 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
                     break;
                 }
-                //case 50531:                               // Gossip NPC Appearance - All, Pirate Day
-                //break;
-                //case 51010:                               // Dire Brew
-                //break;
-                //case 53806:                               // Pygmy Oil
-                //break;
-                //case 62847:                               // NPC Appearance - Valiant 02
-                //break;
-                //case 62852:                               // NPC Appearance - Champion 01
-                //break;
-                //case 63965:                               // NPC Appearance - Champion 02
-                //break;
-                //case 63966:                               // NPC Appearance - Valiant 03
-                //break;
+                // case 50531:                              // Gossip NPC Appearance - All, Pirate Day
+                // break;
+                // case 51010:                              // Dire Brew
+                // break;
+                // case 53806:                              // Pygmy Oil
+                // break;
+                // case 62847:                              // NPC Appearance - Valiant 02
+                // break;
+                // case 62852:                              // NPC Appearance - Champion 01
+                // break;
+                // case 63965:                              // NPC Appearance - Champion 02
+                // break;
+                // case 63966:                              // NPC Appearance - Valiant 03
+                // break;
                 case 65386:                                 // Honor the Dead
                 case 65495:
                 {
@@ -3664,20 +3664,20 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     }
                     break;
                 }
-                //case 65511:                               // Gossip NPC Appearance - Brewfest
-                //break;
-                //case 65522:                               // Gossip NPC Appearance - Winter Veil
-                //break;
-                //case 65523:                               // Gossip NPC Appearance - Default
-                //break;
-                //case 65524:                               // Gossip NPC Appearance - Lunar Festival
-                //break;
-                //case 65525:                               // Gossip NPC Appearance - Hallow's End
-                //break;
-                //case 65526:                               // Gossip NPC Appearance - Midsummer
-                //break;
-                //case 65527:                               // Gossip NPC Appearance - Spirit of Competition
-                //break;
+                // case 65511:                              // Gossip NPC Appearance - Brewfest
+                // break;
+                // case 65522:                              // Gossip NPC Appearance - Winter Veil
+                // break;
+                // case 65523:                              // Gossip NPC Appearance - Default
+                // break;
+                // case 65524:                              // Gossip NPC Appearance - Lunar Festival
+                // break;
+                // case 65525:                              // Gossip NPC Appearance - Hallow's End
+                // break;
+                // case 65526:                              // Gossip NPC Appearance - Midsummer
+                // break;
+                // case 65527:                              // Gossip NPC Appearance - Spirit of Competition
+                // break;
                 case 65528:                                 // Gossip NPC Appearance - Pirates' Day
                 {
                     // expecting npc's using this spell to have models with race info.
@@ -3725,21 +3725,21 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     // random, regardless of current gender
                     target->SetDisplayId(roll_chance_i(50) ? 29203 : 29204);
                     break;
-                    //case 66236:                               // Incinerate Flesh
-                    //break;
-                    //case 69999:                               // [DND] Swap IDs
-                    //break;
-                    //case 70764:                               // Citizen Costume (note: many spells w/same name)
-                    //break;
-                    //case 71309:                               // [DND] Spawn Portal
-                    //break;
+                    // case 66236:                          // Incinerate Flesh
+                    // break;
+                    // case 69999:                          // [DND] Swap IDs
+                    // break;
+                    // case 70764:                          // Citizen Costume (note: many spells w/same name)
+                    // break;
+                    // case 71309:                          // [DND] Spawn Portal
+                    // break;
                 case 71450:                                 // Crown Parcel Service Uniform
                     target->SetDisplayId(target->getGender() == GENDER_MALE ? 31002 : 31003);
                     break;
-                    //case 75531:                               // Gnomeregan Pride
-                    //break;
-                    //case 75532:                               // Darkspear Pride
-                    //break;
+                    // case 75531:                          // Gnomeregan Pride
+                    // break;
+                    // case 75532:                          // Darkspear Pride
+                    // break;
                 default:
                     sLog.outError("Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined model.", GetId());
                     break;
@@ -3787,7 +3787,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             if (GetCasterGuid().IsPlayer())
                 ((Player*)target)->setRegenTimer(1 * IN_MILLISECONDS);
 
-            //dismount polymorphed target (after patch 2.4.2)
+            // dismount polymorphed target (after patch 2.4.2)
             if (target->IsMounted())
                 target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED, GetHolder());
         }
@@ -3902,7 +3902,7 @@ void Aura::HandleChannelDeathItem(bool apply, bool Real)
                 return;
         }
 
-        //Adding items
+        // Adding items
         uint32 noSpaceForCount = 0;
         uint32 count = m_modifier.m_amount;
 
@@ -4234,9 +4234,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
                         target->SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_MAGE);
                     }
 
-                    //just to enable stat window
+                    // just to enable stat window
                     charmInfo->SetPetNumber(sObjectMgr.GeneratePetNumber(), true);
-                    //if charmed two demons the same session, the 2nd gets the 1st one's name
+                    // if charmed two demons the same session, the 2nd gets the 1st one's name
                     target->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL)));
                 }
             }
@@ -4688,7 +4688,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
         target->addUnitState(UNIT_STAT_ROOT);
         target->SetTargetGuid(ObjectGuid());
 
-        //Save last orientation
+        // Save last orientation
         if (target->getVictim())
             target->SetOrientation(target->GetAngle(target->getVictim()));
 
@@ -4699,7 +4699,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
             data << (uint32)2;
             target->SendMessageToSet(&data, true);
 
-            //Clear unit movement flags
+            // Clear unit movement flags
             ((Player*)target)->m_movementInfo.SetMovementFlags(MOVEFLAG_NONE);
         }
         else
@@ -4926,10 +4926,10 @@ void Aura::HandleAuraModIncreaseFlightSpeed(bool apply, bool Real)
         else
             data.Initialize(SMSG_MOVE_UNSET_CAN_FLY, 12);
         data << target->GetPackGUID();
-        data << uint32(0);                                      // unknown
+        data << uint32(0);                                  // unknown
         target->SendMessageToSet(&data, true);
 
-        //Players on flying mounts must be immune to polymorph
+        // Players on flying mounts must be immune to polymorph
         if (target->GetTypeId() == TYPEID_PLAYER)
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, apply);
 
@@ -5082,7 +5082,7 @@ void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)
     // check implemented in Unit::IsImmuneToSpell and Unit::IsImmuneToSpellEffect
 }
 
-//this method is called whenever we add / remove aura which gives m_target some imunity to some spell effect
+// this method is called whenever we add / remove aura which gives m_target some imunity to some spell effect
 void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
 {
     Unit* target = GetTarget();
@@ -5130,7 +5130,7 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
     // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
     if (Real && apply
             && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
-            && IsPositiveSpell(GetId()))                        // Only positive immunity removes auras
+            && IsPositiveSpell(GetId()))                    // Only positive immunity removes auras
     {
         uint32 school_mask = m_modifier.m_miscvalue;
         Unit::SpellAuraHolderMap& Auras = target->GetSpellAuraHolderMap();
@@ -5140,9 +5140,9 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
             ++next;
             SpellEntry const* spell = iter->second->GetSpellProto();
             if ((GetSpellSchoolMask(spell) & school_mask)   // Check for school mask
-                    && !spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)   //Spells unaffected by invulnerability
-                    && !iter->second->IsPositive()              // Don't remove positive spells
-                    && spell->Id != GetId())                    // Don't remove self
+                    && !spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)   // Spells unaffected by invulnerability
+                    && !iter->second->IsPositive()          // Don't remove positive spells
+                    && spell->Id != GetId())                // Don't remove self
             {
                 target->RemoveAurasDueToSpell(spell->Id);
                 if (Auras.empty())
@@ -5660,7 +5660,7 @@ void Aura::HandleAuraModBaseResistancePCT(bool apply, bool /*Real*/)
     // only players have base stats
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
     {
-        //pets only have base armor
+        // pets only have base armor
         if (((Creature*)GetTarget())->IsPet() && (m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL))
             GetTarget()->HandleStatModifier(UNIT_MOD_ARMOR, BASE_PCT, float(m_modifier.m_amount), apply);
     }
@@ -5697,7 +5697,7 @@ void Aura::HandleModBaseResistance(bool apply, bool /*Real*/)
     // only players have base stats
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
     {
-        //only pets have base stats
+        // only pets have base stats
         if (((Creature*)GetTarget())->IsPet() && (m_modifier.m_miscvalue & SPELL_SCHOOL_MASK_NORMAL))
             GetTarget()->HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(m_modifier.m_amount), apply);
     }
@@ -5726,7 +5726,7 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
         // -1 or -2 is all stats ( misc < -2 checked in function beginning )
         if (m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue == i)
         {
-            //m_target->ApplyStatMod(Stats(i), m_modifier.m_amount,apply);
+            // m_target->ApplyStatMod(Stats(i), m_modifier.m_amount,apply);
             GetTarget()->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(m_modifier.m_amount), apply);
             if (GetTarget()->GetTypeId() == TYPEID_PLAYER || ((Creature*)GetTarget())->IsPet())
                 GetTarget()->ApplyStatBuffMod(Stats(i), float(m_modifier.m_amount), apply);
@@ -5821,7 +5821,7 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
 
     Unit* target = GetTarget();
 
-    //save current and max HP before applying aura
+    // save current and max HP before applying aura
     uint32 curHPValue = target->GetHealth();
     uint32 maxHPValue = target->GetMaxHealth();
 
@@ -5835,7 +5835,7 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
         }
     }
 
-    //recalculate current HP/MP after applying aura modifications (only for spells with 0x10 flag)
+    // recalculate current HP/MP after applying aura modifications (only for spells with 0x10 flag)
     if (m_modifier.m_miscvalue == STAT_STAMINA && maxHPValue > 0 && GetSpellProto()->HasAttribute(SPELL_ATTR_UNK4))
     {
         // newHP = (curHP / maxHP) * newMaxHP = (newMaxHP * curHP) / maxHP -> which is better because no int -> double -> int conversion is needed
@@ -5933,7 +5933,7 @@ void Aura::HandleModManaRegen(bool /*apply*/, bool Real)
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    //Note: an increase in regen does NOT cause threat.
+    // Note: an increase in regen does NOT cause threat.
     ((Player*)GetTarget())->UpdateManaRegen();
 }
 
@@ -6089,7 +6089,7 @@ void Aura::HandleAuraModDodgePercent(bool /*apply*/, bool /*Real*/)
         return;
 
     ((Player*)GetTarget())->UpdateDodgePercentage();
-    //sLog.outError("BONUS DODGE CHANCE: + %f", float(m_modifier.m_amount));
+    // sLog.outError("BONUS DODGE CHANCE: + %f", float(m_modifier.m_amount));
 }
 
 void Aura::HandleAuraModBlockPercent(bool /*apply*/, bool /*Real*/)
@@ -6098,7 +6098,7 @@ void Aura::HandleAuraModBlockPercent(bool /*apply*/, bool /*Real*/)
         return;
 
     ((Player*)GetTarget())->UpdateBlockPercentage();
-    //sLog.outError("BONUS BLOCK CHANCE: + %f", float(m_modifier.m_amount));
+    // sLog.outError("BONUS BLOCK CHANCE: + %f", float(m_modifier.m_amount));
 }
 
 void Aura::HandleAuraModRegenInterrupt(bool /*apply*/, bool Real)
@@ -6271,7 +6271,7 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
 {
-    //UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
+    // UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
     GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(m_modifier.m_amount), apply);
 }
 
@@ -6280,7 +6280,7 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
     if ((GetTarget()->getClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
-    //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
+    // UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
     GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, float(m_modifier.m_amount), apply);
 }
 
@@ -6701,9 +6701,9 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                         uint32 spell_id = 0;
                         switch ((*i)->GetId())
                         {
-                            case 48384: spell_id = 50170; break; //Rank 1
-                            case 48395: spell_id = 50171; break; //Rank 2
-                            case 48396: spell_id = 50172; break; //Rank 3
+                            case 48384: spell_id = 50170; break; // Rank 1
+                            case 48395: spell_id = 50171; break; // Rank 2
+                            case 48396: spell_id = 50172; break; // Rank 3
                             default:
                                 sLog.outError("Aura::HandleShapeshiftBoosts: Not handled rank of IMF (Spell: %u)", (*i)->GetId());
                                 break;
@@ -6998,7 +6998,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                     {
                         //+80.68% from +spell bonus
                         DoneActualBenefit = caster->SpellBaseHealingBonusDone(GetSpellSchoolMask(spellProto)) * 0.8068f;
-                        //Borrowed Time
+                        // Borrowed Time
                         Unit::AuraList const& borrowedTime = caster->GetAurasByType(SPELL_AURA_DUMMY);
                         for (Unit::AuraList::const_iterator itr = borrowedTime.begin(); itr != borrowedTime.end(); ++itr)
                         {
@@ -7100,7 +7100,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
                                     break;
                             }
 
-                            //cooldown aura
+                            // cooldown aura
                             caster->CastSpell(caster, 63853, true);
                             break;
                         }
@@ -7303,7 +7303,7 @@ void Aura::PeriodicTick()
 
             uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
 
-            //Calculate armor mitigation if it is a physical spell
+            // Calculate armor mitigation if it is a physical spell
             if (GetSpellSchoolMask(spellProto) & SPELL_SCHOOL_MASK_NORMAL)
             {
                 uint32 pdamageReductedArmor = pCaster->CalcArmorReducedDamage(target, pdamage);
@@ -7465,7 +7465,7 @@ void Aura::PeriodicTick()
             }
 
 //            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;//   | PROC_FLAG_SUCCESSFUL_HEAL;
-//            uint32 procVictim   = 0;//ROC_FLAG_ON_TAKE_PERIODIC | PROC_FLAG_TAKEN_HEAL;
+//            uint32 procVictim   = 0;// ROC_FLAG_ON_TAKE_PERIODIC | PROC_FLAG_TAKEN_HEAL;
             // ignore item heals
 //            if(procSpell && !haveCastItem)
 //                pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, PROC_EX_NORMAL_HIT, pdamage, BASE_ATTACK, spellProto);
@@ -8370,14 +8370,14 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
         if (caster->GetTypeId() == TYPEID_PLAYER)
             ((Player*)caster)->RemovePet(PET_SAVE_AS_CURRENT);
 
-        //caster->EnterVehicle(target);
+        // caster->EnterVehicle(target);
     }
     else
     {
         // some SPELL_AURA_CONTROL_VEHICLE auras have a dummy effect on the player - remove them
         caster->RemoveAurasDueToSpell(GetId());
 
-        //caster->ExitVehicle();
+        // caster->ExitVehicle();
 
         if (caster->GetTypeId() == TYPEID_PLAYER)
             ((Player*)caster)->ResummonPetTemporaryUnSummonedIfAny();
@@ -8836,9 +8836,9 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             if (Item* castItem = ((Player*)m_target)->GetItemByGuid(castItemGuid))
                 ((Player*)m_target)->DestroyItemWithOnStoreSpell(castItem, GetId());
 
-    //passive auras do not get put in slots - said who? ;)
+    // passive auras do not get put in slots - said who? ;)
     // Note: but totem can be not accessible for aura target in time remove (to far for find in grid)
-    //if(m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem()))
+    // if(m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem()))
     //    return;
 
     uint8 slot = GetAuraSlot();
@@ -9198,7 +9198,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                         return;
                     break;
                 }
-                case 58914:                                     // Kill Command, pet aura
+                case 58914:                                 // Kill Command, pet aura
                 {
                     // Removal is needed here because the dummy aura handler is applied / removed at stacks change
                     if (!apply)
@@ -9593,7 +9593,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     // apply in special way
                     if (percent)
                     {
-                        spellId1 = 57318;                    // Sanctified Wrath (triggered)
+                        spellId1 = 57318;                   // Sanctified Wrath (triggered)
                         // prevent aura deletion, specially in multi-boost case
                         SetInUse(true);
                         m_target->CastCustomSpell(m_target, spellId1, &percent, &percent, NULL, true, NULL);
@@ -9679,10 +9679,10 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                             }
                         }
                         if (power_pct || !apply)
-                            spellId2 = 49772;                   // Unholy Presence, speed part, spell1 used for Improvement presence fit to own presence
+                            spellId2 = 49772;               // Unholy Presence, speed part, spell1 used for Improvement presence fit to own presence
                     }
                     else
-                        spellId1 = 49772;                       // Unholy Presence move speed
+                        spellId1 = 49772;                   // Unholy Presence move speed
 
                     if (GetId() == 48265 || GetId() == 48266)   // Unholy Presence or Blood Presence
                     {

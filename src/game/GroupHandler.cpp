@@ -164,7 +164,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
     data << GetPlayer()->GetName();                         // max len 48
     data << uint32(0);                                      // unk
     data << uint8(0);                                       // count
-    //for(int i = 0; i < count; ++i)
+    // for(int i = 0; i < count; ++i)
     //    data << uint32(0);
     data << uint32(0);                                      // unk
     player->GetSession()->SendPacket(&data);
@@ -388,11 +388,11 @@ void WorldSession::HandleLootRoll(WorldPacket& recv_data)
     ObjectGuid lootedTarget;
     uint32 itemSlot;
     uint8  rollType;
-    recv_data >> lootedTarget;                              //guid of the item rolled
+    recv_data >> lootedTarget;                              // guid of the item rolled
     recv_data >> itemSlot;
     recv_data >> rollType;
 
-    //DEBUG_LOG("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
+    // DEBUG_LOG("WORLD RECIEVE CMSG_LOOT_ROLL, From:%u, Numberofplayers:%u, rollType:%u", (uint32)Guid, NumberOfPlayers, rollType);
 
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -426,7 +426,7 @@ void WorldSession::HandleMinimapPingOpcode(WorldPacket& recv_data)
     if (!GetPlayer()->GetGroup())
         return;
 
-    //DEBUG_LOG("Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
+    // DEBUG_LOG("Received opcode MSG_MINIMAP_PING X: %f, Y: %f", x, y);
 
     /** error handling **/
     /********************/
@@ -453,7 +453,7 @@ void WorldSession::HandleRandomRollOpcode(WorldPacket& recv_data)
     // everything is fine, do it
     roll = urand(minimum, maximum);
 
-    //DEBUG_LOG("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
+    // DEBUG_LOG("ROLL: MIN: %u, MAX: %u, ROLL: %u", minimum, maximum, roll);
 
     WorldPacket data(MSG_RANDOM_ROLL, 4 + 4 + 4 + 8);
     data << uint32(minimum);
@@ -648,11 +648,11 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleRaidReadyCheckFinishedOpcode(WorldPacket& /*recv_data*/)
 {
-    //Group* group = GetPlayer()->GetGroup();
-    //if(!group)
+    // Group* group = GetPlayer()->GetGroup();
+    // if(!group)
     //    return;
 
-    //if(!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+    // if(!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
     //    return;
 
     // Is any reaction need?
@@ -843,7 +843,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     data << uint16(player->GetMaxPower(powerType));         // GROUP_UPDATE_FLAG_MAX_POWER
     data << uint16(player->getLevel());                     // GROUP_UPDATE_FLAG_LEVEL
 
-    //verify player coordinates and zoneid to send to teammates
+    // verify player coordinates and zoneid to send to teammates
     uint16 iZoneId = 0;
     uint16 iCoordX = 0;
     uint16 iCoordY = 0;
@@ -863,7 +863,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     }
     else
     {
-        //unknown player status.
+        // unknown player status.
     }
 
     data << uint16(iZoneId);                              // GROUP_UPDATE_FLAG_ZONE

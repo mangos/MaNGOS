@@ -281,7 +281,7 @@ namespace Movement
 
         index_lo = 0;
         index_hi = t - 1;
-        //mov_assert(points.size() % 3 == 0);
+        // mov_assert(points.size() % 3 == 0);
     }
 
     void SplineBase::clear()

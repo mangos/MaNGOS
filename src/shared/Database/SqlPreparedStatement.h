@@ -60,8 +60,8 @@ enum SqlStmtFieldType
     FIELD_NONE
 };
 
-//templates might be the best choice here
-//but I didn't have time to play with them
+// templates might be the best choice here
+// but I didn't have time to play with them
 class MANGOS_DLL_SPEC SqlStmtFieldData
 {
     public:
@@ -74,7 +74,7 @@ class MANGOS_DLL_SPEC SqlStmtFieldData
         template<typename T1>
         void set(T1 param1);
 
-        //getters
+        // getters
         bool toBool() const { MANGOS_ASSERT(m_type == FIELD_BOOL); return static_cast<bool>(m_binaryData.ui8); }
         uint8 toUint8() const { MANGOS_ASSERT(m_type == FIELD_UI8); return m_binaryData.ui8; }
         int8 toInt8() const { MANGOS_ASSERT(m_type == FIELD_I8); return m_binaryData.i8; }
@@ -88,18 +88,18 @@ class MANGOS_DLL_SPEC SqlStmtFieldData
         double toDouble() const { MANGOS_ASSERT(m_type == FIELD_DOUBLE); return m_binaryData.d; }
         const char* toStr() const { MANGOS_ASSERT(m_type == FIELD_STRING); return m_szStringData.c_str(); }
 
-        //get type of data
+        // get type of data
         SqlStmtFieldType type() const { return m_type; }
-        //get underlying buffer type
+        // get underlying buffer type
         void* buff() const { return m_type == FIELD_STRING ? (void*)m_szStringData.c_str() : (void*)&m_binaryData; }
 
-        //get size of data
+        // get size of data
         size_t size() const
         {
             switch (m_type)
             {
                 case FIELD_NONE:    return 0;
-                case FIELD_BOOL:    //return sizeof(bool);
+                case FIELD_BOOL:    // return sizeof(bool);
                 case FIELD_UI8:     return sizeof(uint8);
                 case FIELD_UI16:    return sizeof(uint16);
                 case FIELD_UI32:    return sizeof(uint32);
@@ -123,7 +123,7 @@ class MANGOS_DLL_SPEC SqlStmtFieldData
         std::string m_szStringData;
 };
 
-//template specialization
+// template specialization
 template<> inline void SqlStmtFieldData::set(bool val) { m_type = FIELD_BOOL; m_binaryData.ui8 = val; }
 template<> inline void SqlStmtFieldData::set(uint8 val) { m_type = FIELD_UI8; m_binaryData.ui8 = val; }
 template<> inline void SqlStmtFieldData::set(int8 val) { m_type = FIELD_I8; m_binaryData.i8 = val; }
@@ -138,37 +138,37 @@ template<> inline void SqlStmtFieldData::set(double val) { m_type = FIELD_DOUBLE
 template<> inline void SqlStmtFieldData::set(const char* val) { m_type = FIELD_STRING; m_szStringData = val; }
 
 class SqlStatement;
-//prepared statement executor
+// prepared statement executor
 class MANGOS_DLL_SPEC SqlStmtParameters
 {
     public:
         typedef std::vector<SqlStmtFieldData> ParameterContainer;
 
-        //reserve memory to contain all input parameters of stmt
+        // reserve memory to contain all input parameters of stmt
         explicit SqlStmtParameters(int nParams);
 
         ~SqlStmtParameters() {}
 
-        //get amount of bound parameters
+        // get amount of bound parameters
         int boundParams() const { return int(m_params.size()); }
-        //add parameter
+        // add parameter
         void addParam(const SqlStmtFieldData& data) { m_params.push_back(data); }
-        //empty SQL statement parameters. In case nParams > 1 - reserve memory for parameters
-        //should help to reuse the same object with batched SQL requests
+        // empty SQL statement parameters. In case nParams > 1 - reserve memory for parameters
+        // should help to reuse the same object with batched SQL requests
         void reset(const SqlStatement& stmt);
-        //swaps contents of intenral param container
+        // swaps contents of intenral param container
         void swap(SqlStmtParameters& obj);
-        //get bound parameters
+        // get bound parameters
         const ParameterContainer& params() const { return m_params; }
 
     private:
         SqlStmtParameters& operator=(const SqlStmtParameters& obj);
 
-        //statement parameter holder
+        // statement parameter holder
         ParameterContainer m_params;
 };
 
-//statement ID encapsulation logic
+// statement ID encapsulation logic
 class SqlStatementID
 {
     public:
@@ -187,7 +187,7 @@ class SqlStatementID
         bool m_bInitialized;
 };
 
-//statement index
+// statement index
 class MANGOS_DLL_SPEC SqlStatement
 {
     public:
@@ -207,7 +207,7 @@ class MANGOS_DLL_SPEC SqlStatement
         bool Execute();
         bool DirectExecute();
 
-        //templates to simplify 1-4 parameter bindings
+        // templates to simplify 1-4 parameter bindings
         template<typename ParamType1>
         bool PExecute(ParamType1 param1)
         {
@@ -242,7 +242,7 @@ class MANGOS_DLL_SPEC SqlStatement
             return Execute();
         }
 
-        //bind parameters with specified type
+        // bind parameters with specified type
         void addBool(bool var) { arg(var); }
         void addUInt8(uint8 var) { arg(var); }
         void addInt8(int8 var) { arg(var); }
@@ -259,7 +259,7 @@ class MANGOS_DLL_SPEC SqlStatement
         void addString(std::ostringstream& ss) { arg(ss.str().c_str()); ss.str(std::string()); }
 
     protected:
-        //don't allow anyone except Database class to create static SqlStatement objects
+        // don't allow anyone except Database class to create static SqlStatement objects
         friend class Database;
         SqlStatement(const SqlStatementID& index, Database& db) : m_index(index), m_pDB(&db), m_pParams(NULL) {}
 
@@ -280,8 +280,8 @@ class MANGOS_DLL_SPEC SqlStatement
             return p;
         }
 
-        //helper function
-        //use appropriate add* functions to bind specific data type
+        // helper function
+        // use appropriate add* functions to bind specific data type
         template<typename ParamType>
         void arg(ParamType val)
         {
@@ -294,7 +294,7 @@ class MANGOS_DLL_SPEC SqlStatement
         SqlStmtParameters* m_pParams;
 };
 
-//base prepared statement class
+// base prepared statement class
 class MANGOS_DLL_SPEC SqlPreparedStatement
 {
     public:
@@ -306,13 +306,13 @@ class MANGOS_DLL_SPEC SqlPreparedStatement
         uint32 params() const { return m_nParams; }
         uint32 columns() const { return isQuery() ? m_nColumns : 0; }
 
-        //initialize internal structures of prepared statement
-        //upon success m_bPrepared should be true
+        // initialize internal structures of prepared statement
+        // upon success m_bPrepared should be true
         virtual bool prepare() = 0;
-        //bind parameters for prepared statement from parameter placeholder
+        // bind parameters for prepared statement from parameter placeholder
         virtual void bind(const SqlStmtParameters& holder) = 0;
 
-        //execute statement w/o result set
+        // execute statement w/o result set
         virtual bool execute() = 0;
 
     protected:
@@ -326,17 +326,17 @@ class MANGOS_DLL_SPEC SqlPreparedStatement
         SqlConnection& m_pConn;
 };
 
-//prepared statements via plain SQL string requests
+// prepared statements via plain SQL string requests
 class MANGOS_DLL_SPEC SqlPlainPreparedStatement : public SqlPreparedStatement
 {
     public:
         SqlPlainPreparedStatement(const std::string& fmt, SqlConnection& conn);
         ~SqlPlainPreparedStatement() {}
 
-        //this statement is always prepared
+        // this statement is always prepared
         virtual bool prepare() { return true; }
 
-        //we should replace all '?' symbols with substrings with proper format
+        // we should replace all '?' symbols with substrings with proper format
         virtual void bind(const SqlStmtParameters& holder);
 
         virtual bool execute();

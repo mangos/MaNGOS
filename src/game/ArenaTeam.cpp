@@ -209,7 +209,7 @@ bool ArenaTeam::LoadArenaTeamFromDB(QueryResult* arenaTeamDataResult)
     m_EmblemColor        = fields[6].GetUInt32();
     m_BorderStyle        = fields[7].GetUInt32();
     m_BorderColor        = fields[8].GetUInt32();
-    //load team stats
+    // load team stats
     m_stats.rating       = fields[9].GetUInt32();
     m_stats.games_week   = fields[10].GetUInt32();
     m_stats.wins_week    = fields[11].GetUInt32();
@@ -230,20 +230,20 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult* arenaTeamMembersResult)
     do
     {
         Field* fields = arenaTeamMembersResult->Fetch();
-        //prevent crash if db records are broken, when all members in result are already processed and current team hasn't got any members
+        // prevent crash if db records are broken, when all members in result are already processed and current team hasn't got any members
         if (!fields)
             break;
         uint32 arenaTeamId        = fields[0].GetUInt32();
         if (arenaTeamId < m_TeamId)
         {
-            //there is in table arena_team_member record which doesn't have arenateamid in arena_team table, report error
+            // there is in table arena_team_member record which doesn't have arenateamid in arena_team table, report error
             sLog.outErrorDb("ArenaTeam %u does not exist but it has record in arena_team_member table, deleting it!", arenaTeamId);
             CharacterDatabase.PExecute("DELETE FROM arena_team_member WHERE arenateamid = '%u'", arenaTeamId);
             continue;
         }
 
         if (arenaTeamId > m_TeamId)
-            //we loaded all members for this arena_team already, break cycle
+            // we loaded all members for this arena_team already, break cycle
             break;
 
         ArenaTeamMember newmember;
@@ -256,7 +256,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult* arenaTeamMembersResult)
         newmember.name            = fields[7].GetCppString();
         newmember.Class           = fields[8].GetUInt8();
 
-        //check if member exists in characters table
+        // check if member exists in characters table
         if (newmember.name.empty())
         {
             sLog.outErrorDb("ArenaTeam %u has member with empty name - probably player %s doesn't exist, deleting him from memberlist!", arenaTeamId, newmember.guid.GetString().c_str());
@@ -735,7 +735,7 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& PlayerPoints)
         std::map<uint32, uint32>::iterator plr_itr = PlayerPoints.find(itr->guid.GetCounter());
         if (plr_itr != PlayerPoints.end())
         {
-            //check if there is already more points
+            // check if there is already more points
             if (plr_itr->second < points_to_add)
                 PlayerPoints[itr->guid.GetCounter()] = points_to_add;
         }
@@ -759,8 +759,8 @@ void ArenaTeam::SaveToDB()
 
 void ArenaTeam::FinishWeek()
 {
-    m_stats.games_week = 0;                                   // played this week
-    m_stats.wins_week = 0;                                    // wins this week
+    m_stats.games_week = 0;                                 // played this week
+    m_stats.wins_week = 0;                                  // wins this week
     for (MemberList::iterator itr = m_members.begin(); itr !=  m_members.end(); ++itr)
     {
         itr->games_week = 0;

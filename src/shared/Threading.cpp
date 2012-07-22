@@ -59,10 +59,10 @@ ThreadPriority::ThreadPriority()
             }
         }
 
-        //since we have only 7(seven) values in enum Priority
-        //and 3 we know already (Idle, Normal, Realtime) so
-        //we need to split each list [Idle...Normal] and [Normal...Realtime]
-        //into ¹ piesces
+        // since we have only 7(seven) values in enum Priority
+        // and 3 we know already (Idle, Normal, Realtime) so
+        // we need to split each list [Idle...Normal] and [Normal...Realtime]
+        // into ¹ piesces
         const size_t _divider = 4;
         size_t _div = (norm_pos - min_pos) / _divider;
         if (_div == 0)
@@ -118,14 +118,14 @@ Thread::Thread(Runnable* instance) : m_iThreadId(0), m_hThreadHandle(0), m_task(
 
 Thread::~Thread()
 {
-    //Wait();
+    // Wait();
 
     // deleted runnable object (if no other references)
     if (m_task)
         m_task->decReference();
 }
 
-//initialize Thread's class static member
+// initialize Thread's class static member
 Thread::ThreadStorage Thread::m_ThreadStorage;
 ThreadPriority Thread::m_TpEnum;
 
@@ -227,7 +227,7 @@ void Thread::setPriority(Priority type)
 #ifndef __sun__
     int _priority = m_TpEnum.getPriority(type);
     int _ok = ACE_Thread::setprio(m_hThreadHandle, _priority);
-    //remove this ASSERT in case you don't want to know is thread priority change was successful or not
+    // remove this ASSERT in case you don't want to know is thread priority change was successful or not
     MANGOS_ASSERT(_ok == 0);
 #endif
 }

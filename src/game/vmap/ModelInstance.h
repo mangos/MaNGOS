@@ -42,7 +42,7 @@ namespace VMAP
     class ModelSpawn
     {
         public:
-            //mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
+            // mapID, tileX, tileY, Flags, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
             uint32 flags;
             uint16 adtId;
             uint32 ID;
@@ -52,7 +52,7 @@ namespace VMAP
             G3D::AABox iBound;
             std::string name;
             bool operator==(const ModelSpawn& other) const { return ID == other.ID; }
-            //uint32 hashCode() const { return ID; }
+            // uint32 hashCode() const { return ID; }
             // temp?
             const G3D::AABox& getBounds() const { return iBound; }
 

@@ -294,10 +294,10 @@ void AuctionBotConfig::setConfig(AuctionBotConfigBoolValues index, char const* f
     setConfig(index, m_AhBotCfg.GetBoolDefault(fieldname, defvalue));
 }
 
-//Get AuctionHousebot configuration file
+// Get AuctionHousebot configuration file
 void AuctionBotConfig::GetConfigFromFile()
 {
-    //Check config file version
+    // Check config file version
     if (m_AhBotCfg.GetIntDefault("ConfVersion", 0) != AUCTIONHOUSEBOT_CONF_VERSION)
         sLog.outError("AHBot: Configuration file version doesn't match expected version. Some config variables may be wrong or missing.");
 
@@ -476,7 +476,7 @@ bool AuctionBotBuyer::Initialize()
     if (!active_house)
         return false;
 
-    //load Check interval
+    // load Check interval
     m_CheckInterval = sAuctionBotConfig.getConfig(CONFIG_UINT32_AHBOT_BUYER_RECHECK_INTERVAL) * MINUTE;
     DETAIL_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot buyer interval between 2 check = %u", m_CheckInterval);
     sLog.SetLogFilter(LOG_FILTER_AHBOT_BUYER, !sAuctionBotConfig.getConfig(CONFIG_BOOL_AHBOT_DEBUG_BUYER));
@@ -1387,7 +1387,7 @@ void AuctionBotSeller::LoadSellerValues(AHB_Seller_Config& config)
     config.SetPriceRatioPerQuality(AUCTION_QUALITY_ORANGE, PriceRatio);
     config.SetPriceRatioPerQuality(AUCTION_QUALITY_YELLOW, PriceRatio);
 
-    //load min and max auction times
+    // load min and max auction times
     config.SetMinTime(sAuctionBotConfig.getConfig(CONFIG_UINT32_AHBOT_MINTIME));
     config.SetMaxTime(sAuctionBotConfig.getConfig(CONFIG_UINT32_AHBOT_MAXTIME));
 

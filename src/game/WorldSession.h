@@ -185,8 +185,8 @@ enum TutorialDataState
     TUTORIALDATA_NEW       = 2
 };
 
-//class to deal with packet processing
-//allows to determine if next packet is safe to be processed
+// class to deal with packet processing
+// allows to determine if next packet is safe to be processed
 class PacketFilter
 {
     public:
@@ -200,7 +200,7 @@ class PacketFilter
         WorldSession* const m_pSession;
 };
 
-//process only thread-safe packets in Map::Update()
+// process only thread-safe packets in Map::Update()
 class MapSessionFilter : public PacketFilter
 {
     public:
@@ -208,12 +208,12 @@ class MapSessionFilter : public PacketFilter
         ~MapSessionFilter() {}
 
         virtual bool Process(WorldPacket* packet);
-        //in Map::Update() we do not process player logout!
+        // in Map::Update() we do not process player logout!
         virtual bool ProcessLogout() const { return false; }
 };
 
-//class used to filer only thread-unsafe packets from queue
-//in order to update only be used in World::UpdateSessions()
+// class used to filer only thread-unsafe packets from queue
+// in order to update only be used in World::UpdateSessions()
 class WorldSessionFilter : public PacketFilter
 {
     public:
@@ -318,7 +318,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SendPetitionQueryOpcode(ObjectGuid petitionguid);
 
-        //pet
+        // pet
         void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
         void SendStablePet(ObjectGuid guid);
         void SendStableResult(uint8 res);
@@ -347,10 +347,10 @@ class MANGOS_DLL_SPEC WorldSession
                     m_tutorialState = TUTORIALDATA_CHANGED;
             }
         }
-        //used with item_page table
+        // used with item_page table
         bool SendItemInfo(uint32 itemid, WorldPacket data);
 
-        //auction
+        // auction
         void SendAuctionHello(Unit* unit);
         void SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Action, AuctionError ErrorCode, InventoryResult invError = EQUIP_ERR_OK);
         void SendAuctionBidderNotification(AuctionEntry* auction);
@@ -363,11 +363,11 @@ class MANGOS_DLL_SPEC WorldSession
 
         AuctionHouseEntry const* GetCheckedAuctionHouseForAuctioneer(ObjectGuid guid);
 
-        //Item Enchantment
+        // Item Enchantment
         void SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId);
         void SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid itemGuid, uint32 slot, uint32 duration);
 
-        //Taxi
+        // Taxi
         void SendTaxiStatus(ObjectGuid guid);
         void SendTaxiMenu(Creature* unit);
         void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
@@ -730,7 +730,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleTutorialClearOpcode(WorldPacket& recv_data);
         void HandleTutorialResetOpcode(WorldPacket& recv_data);
 
-        //Pet
+        // Pet
         void HandlePetAction(WorldPacket& recv_data);
         void HandlePetStopAttack(WorldPacket& recv_data);
         void HandlePetNameQueryOpcode(WorldPacket& recv_data);
@@ -752,7 +752,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void HandleTotemDestroyed(WorldPacket& recv_data);
 
-        //BattleGround
+        // BattleGround
         void HandleBattlemasterHelloOpcode(WorldPacket& recv_data);
         void HandleBattlemasterJoinOpcode(WorldPacket& recv_data);
         void HandleBattleGroundPlayerPositionsOpcode(WorldPacket& recv_data);

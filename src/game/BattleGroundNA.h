@@ -25,7 +25,7 @@ class BattleGroundNAScore : public BattleGroundScore
     public:
         BattleGroundNAScore() {};
         virtual ~BattleGroundNAScore() {};
-        //TODO fix me
+        // TODO fix me
 };
 
 class BattleGroundNA : public BattleGround

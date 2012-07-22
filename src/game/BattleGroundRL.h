@@ -25,7 +25,7 @@ class BattleGroundRLScore : public BattleGroundScore
     public:
         BattleGroundRLScore() {};
         virtual ~BattleGroundRLScore() {};
-        //TODO fix me
+        // TODO fix me
 };
 
 class BattleGroundRL : public BattleGround

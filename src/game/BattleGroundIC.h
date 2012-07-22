@@ -44,7 +44,7 @@ class BattleGroundIC : public BattleGround
 
         void RemovePlayer(Player* plr, ObjectGuid guid);
         void HandleAreaTrigger(Player* source, uint32 trigger);
-        //bool SetupBattleGround();
+        // bool SetupBattleGround();
 
         /* Scorekeeping */
         void UpdatePlayerScore(Player* source, uint32 type, uint32 value);

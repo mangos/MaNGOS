@@ -23,7 +23,7 @@
 
 BattleGroundIC::BattleGroundIC()
 {
-    //TODO FIX ME!
+    // TODO FIX ME!
     m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = 0;
     m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_BG_WS_START_ONE_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
@@ -51,7 +51,7 @@ void BattleGroundIC::StartingEventOpenDoors()
 void BattleGroundIC::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
-    //create score and add it to map, default values are set in constructor
+    // create score and add it to map, default values are set in constructor
     BattleGroundICScore* sc = new BattleGroundICScore;
 
     m_PlayerScores[plr->GetObjectGuid()] = sc;

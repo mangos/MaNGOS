@@ -29,7 +29,7 @@
 
 typedef std::map<uint32, BattleGround*> BattleGroundSet;
 
-//this container can't be deque, because deque doesn't like removing the last element - if you remove it, it invalidates next iterator and crash appears
+// this container can't be deque, because deque doesn't like removing the last element - if you remove it, it invalidates next iterator and crash appears
 typedef std::list<BattleGround*> BGFreeSlotQueueType;
 
 typedef UNORDERED_MAP<uint32, BattleGroundTypeId> BattleMastersMap;
@@ -93,14 +93,14 @@ class BattleGroundQueue
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
 
     private:
-        //mutex that should not allow changing private data, nor allowing to update Queue during private data change.
+        // mutex that should not allow changing private data, nor allowing to update Queue during private data change.
         ACE_Recursive_Thread_Mutex  m_Lock;
 
 
         typedef std::map<ObjectGuid, PlayerQueueInfo> QueuedPlayersMap;
         QueuedPlayersMap m_QueuedPlayers;
 
-        //we need constant add to begin and constant remove / add from the end, therefore deque suits our problem well
+        // we need constant add to begin and constant remove / add from the end, therefore deque suits our problem well
         typedef std::list<GroupQueueInfo*> GroupsQueueType;
 
         /*
@@ -128,7 +128,7 @@ class BattleGroundQueue
                 uint32 PlayerCount;
         };
 
-        //one selection pool for horde, other one for alliance
+        // one selection pool for horde, other one for alliance
         SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
 
         bool InviteGroupToBG(GroupQueueInfo* ginfo, BattleGround* bg, Team side);
@@ -204,7 +204,7 @@ class BattleGroundMgr
 
         /* Battlegrounds */
         BattleGround* GetBattleGroundThroughClientInstance(uint32 instanceId, BattleGroundTypeId bgTypeId);
-        BattleGround* GetBattleGround(uint32 InstanceID, BattleGroundTypeId bgTypeId); //there must be uint32 because MAX_BATTLEGROUND_TYPE_ID means unknown
+        BattleGround* GetBattleGround(uint32 InstanceID, BattleGroundTypeId bgTypeId); // there must be uint32 because MAX_BATTLEGROUND_TYPE_ID means unknown
 
         BattleGround* GetBattleGroundTemplate(BattleGroundTypeId bgTypeId);
         BattleGround* CreateNewBattleGround(BattleGroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, ArenaType arenaType, bool isRated);
@@ -225,7 +225,7 @@ class BattleGroundMgr
         void SendToBattleGround(Player* pl, uint32 InstanceID, BattleGroundTypeId bgTypeId);
 
         /* Battleground queues */
-        //these queues are instantiated when creating BattlegroundMrg
+        // these queues are instantiated when creating BattlegroundMrg
         BattleGroundQueue m_BattleGroundQueues[MAX_BATTLEGROUND_QUEUE_TYPES]; // public, because we need to access them in BG handler code
 
         BGFreeSlotQueueType BGFreeSlotQueue[MAX_BATTLEGROUND_TYPE_ID];
@@ -287,7 +287,7 @@ class BattleGroundMgr
         BattleGroundSet m_BattleGrounds[MAX_BATTLEGROUND_TYPE_ID];
         std::vector<uint64> m_QueueUpdateScheduler;
         typedef std::set<uint32> ClientBattleGroundIdSet;
-        ClientBattleGroundIdSet m_ClientBattleGroundIds[MAX_BATTLEGROUND_TYPE_ID][MAX_BATTLEGROUND_BRACKETS]; //the instanceids just visible for the client
+        ClientBattleGroundIdSet m_ClientBattleGroundIds[MAX_BATTLEGROUND_TYPE_ID][MAX_BATTLEGROUND_BRACKETS]; // the instanceids just visible for the client
         uint32 m_NextRatingDiscardUpdate;
         time_t m_NextAutoDistributionTime;
         uint32 m_AutoDistributionTimeChecker;

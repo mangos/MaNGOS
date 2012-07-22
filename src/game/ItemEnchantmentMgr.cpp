@@ -109,7 +109,7 @@ uint32 GetItemEnchantMod(uint32 entry)
         if (fCount > dRoll) return ench_iter->ench;
     }
 
-    //we could get here only if sum of all enchantment chances is lower than 100%
+    // we could get here only if sum of all enchantment chances is lower than 100%
     dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100;
     fCount = 0;
 

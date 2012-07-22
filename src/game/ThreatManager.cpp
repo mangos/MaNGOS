@@ -406,10 +406,10 @@ void ThreatManager::clearReferences()
 
 void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
 {
-    //function deals with adding threat and adding players and pets into ThreatList
-    //mobs, NPCs, guards have ThreatList and HateOfflineList
-    //players and pets have only InHateListOf
-    //HateOfflineList is used co contain unattackable victims (in-flight, in-water, GM etc.)
+    // function deals with adding threat and adding players and pets into ThreatList
+    // mobs, NPCs, guards have ThreatList and HateOfflineList
+    // players and pets have only InHateListOf
+    // HateOfflineList is used co contain unattackable victims (in-flight, in-water, GM etc.)
 
     // not to self
     if (pVictim == getOwner())

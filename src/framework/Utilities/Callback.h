@@ -19,7 +19,7 @@
 #ifndef MANGOS_CALLBACK_H
 #define MANGOS_CALLBACK_H
 
-//defines to simplify multi param templates code and readablity
+// defines to simplify multi param templates code and readablity
 #define TYPENAMES_1 typename T1
 #define TYPENAMES_2 TYPENAMES_1, typename T2
 #define TYPENAMES_3 TYPENAMES_2, typename T3
@@ -42,7 +42,7 @@
 #define PARAMS_9 PARAMS_8, T9 param9
 #define PARAMS_10 PARAMS_9, T10 param10
 
-//empty struct to use in templates instead of void type
+// empty struct to use in templates instead of void type
 struct null { null() {} };
 /// ------------ BASE CLASSES ------------
 

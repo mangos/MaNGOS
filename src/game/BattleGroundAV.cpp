@@ -147,7 +147,7 @@ void BattleGroundAV::HandleQuestComplete(uint32 questid, Player* player)
             break;
         case BG_AV_QUEST_A_BOSS1:
         case BG_AV_QUEST_H_BOSS1:
-            m_Team_QuestStatus[teamIdx][4] += 4;               // there are 2 quests where you can turn in 5 or 1 item.. ( + 4 cause +1 will be done some lines below)
+            m_Team_QuestStatus[teamIdx][4] += 4;            // there are 2 quests where you can turn in 5 or 1 item.. ( + 4 cause +1 will be done some lines below)
             reputation = 4;
         case BG_AV_QUEST_A_BOSS2:
         case BG_AV_QUEST_H_BOSS2:
@@ -382,7 +382,7 @@ void BattleGroundAV::HandleAreaTrigger(Player* source, uint32 trigger)
         case 3329:
         case 3330:
         case 3331:
-            //source->Unmount();
+            // source->Unmount();
             break;
         default:
             DEBUG_LOG("BattleGroundAV: WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
@@ -591,7 +591,7 @@ void BattleGroundAV::EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node)
     if (m_Nodes[node].Owner == BattleGroundAVTeamIndex(teamIdx) || BattleGroundAVTeamIndex(teamIdx) == m_Nodes[node].TotalOwner)
         return;
 
-    AssaultNode(node, teamIdx);                                // update nodeinfo variables
+    AssaultNode(node, teamIdx);                             // update nodeinfo variables
     UpdateNodeWorldState(node);                             // send mapicon
     PopulateNode(node);
 

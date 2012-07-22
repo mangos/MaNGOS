@@ -97,9 +97,9 @@ namespace ACE_Based
             Runnable* m_task;
 
             typedef ACE_TSS<Thread> ThreadStorage;
-            //global object - container for Thread class representation of every thread
+            // global object - container for Thread class representation of every thread
             static ThreadStorage m_ThreadStorage;
-            //use this object to determine current OS thread priority values mapped to enum Priority{}
+            // use this object to determine current OS thread priority values mapped to enum Priority{}
             static ThreadPriority m_TpEnum;
     };
 }

@@ -179,7 +179,7 @@ enum ActionButtonIndex
     ACTION_BUTTON_SHAMAN_TOTEMS_BAR = 132,
 };
 
-#define  MAX_ACTION_BUTTONS 144                             //checked in 3.2.0
+#define  MAX_ACTION_BUTTONS 144                             // checked in 3.2.0
 
 typedef std::map<uint8, ActionButton> ActionButtonList;
 
@@ -322,7 +322,7 @@ struct Areas
 };
 
 #define MAX_RUNES       6
-#define RUNE_COOLDOWN   (2*5*IN_MILLISECONDS)                // msec
+#define RUNE_COOLDOWN   (2*5*IN_MILLISECONDS)               // msec
 
 enum RuneType
 {
@@ -1563,7 +1563,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddMItem(Item* it)
         {
             MANGOS_ASSERT(it);
-            //ASSERT deleted, because items can be added before loading
+            // ASSERT deleted, because items can be added before loading
             mMitems[it->GetGUIDLow()] = it;
         }
 
@@ -1965,7 +1965,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot);
 
-        //End of PvP System
+        // End of PvP System
 
         void SetDrunkValue(uint16 newDrunkValue, uint32 itemid = 0);
         uint16 GetDrunkValue() const { return m_drunk; }
@@ -2374,7 +2374,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
 
-        //We allow only one timed quest active at the same time. Below can then be simple value instead of set.
+        // We allow only one timed quest active at the same time. Below can then be simple value instead of set.
         typedef std::set<uint32> QuestSet;
         QuestSet m_timedquests;
         QuestSet m_weeklyquests;
@@ -2546,12 +2546,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint8 m_swingErrorMsg;
         float m_ammoDPS;
 
-        ////////////////////Rest System/////////////////////
+        //////////////////// Rest System/////////////////////
         time_t time_inn_enter;
         uint32 inn_trigger_id;
         float m_rest_bonus;
         RestType rest_type;
-        ////////////////////Rest System/////////////////////
+        //////////////////// Rest System/////////////////////
 
         // Transports
         Transport* m_transport;

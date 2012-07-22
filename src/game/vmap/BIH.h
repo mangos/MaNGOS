@@ -108,7 +108,7 @@ class BIH
             objects.resize(dat.numPrims);
             for (uint32 i = 0; i < dat.numPrims; ++i)
                 objects[i] = dat.indices[i];
-            //nObjects = dat.numPrims;
+            // nObjects = dat.numPrims;
             tree = tempTree;
             delete[] dat.primBound;
             delete[] dat.indices;

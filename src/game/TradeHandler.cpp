@@ -218,7 +218,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item** m
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
             DEBUG_LOG("player trade %s bag: %u slot: %u", item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
-            //Can return NULL
+            // Can return NULL
             myItems[i] = item;
             myItems[i]->SetInTrade();
         }

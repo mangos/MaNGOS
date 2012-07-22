@@ -64,8 +64,8 @@ class Field
         }
 
         void SetType(enum DataTypes type) { mType = type; }
-        //no need for memory allocations to store resultset field strings
-        //all we need is to cache pointers returned by different DBMS APIs
+        // no need for memory allocations to store resultset field strings
+        // all we need is to cache pointers returned by different DBMS APIs
         void SetValue(const char* value) { mValue = value; };
 
     private:

@@ -91,7 +91,7 @@ int PatchHandler::open(void*)
     {
         return -1;
     }
-#endif //TCP_CORK
+#endif // TCP_CORK
 
     (void) peer().disable(ACE_NONBLOCK);
 

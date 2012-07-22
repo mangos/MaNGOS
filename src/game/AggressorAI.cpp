@@ -100,8 +100,8 @@ void AggressorAI::EnterEvadeMode()
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, victim out run him [guid=%u]", m_creature->GetGUIDLow());
-        //i_state = STATE_LOOK_AT_VICTIM;
-        //i_tracker.Reset(TIME_INTERVAL_LOOK);
+        // i_state = STATE_LOOK_AT_VICTIM;
+        // i_tracker.Reset(TIME_INTERVAL_LOOK);
     }
 
     if (!m_creature->isCharmed())

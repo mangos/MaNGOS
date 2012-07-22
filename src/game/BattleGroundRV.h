@@ -25,7 +25,7 @@ class BattleGroundRVScore : public BattleGroundScore
     public:
         BattleGroundRVScore() {};
         virtual ~BattleGroundRVScore() {};
-        //TODO fix me
+        // TODO fix me
 };
 
 class BattleGroundRV : public BattleGround

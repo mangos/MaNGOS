@@ -386,7 +386,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 return;
 
             WorldPacket data;
-            //in battleground, raid warning is sent only to players in battleground - code is ok
+            // in battleground, raid warning is sent only to players in battleground - code is ok
             ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_WARNING, lang, msg.c_str());
             group->BroadcastPacket(&data, false);
         } break;
@@ -600,7 +600,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
 
     GetPlayer()->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
 
-    //Send scripted event call
+    // Send scripted event call
     if (unit && unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->AI())
         ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
 }
@@ -609,7 +609,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
 {
     ObjectGuid iguid;
     uint8 unk;
-    //DEBUG_LOG("WORLD: Received CMSG_CHAT_IGNORED");
+    // DEBUG_LOG("WORLD: Received CMSG_CHAT_IGNORED");
 
     recv_data >> iguid;
     recv_data >> unk;                                       // probably related to spam reporting

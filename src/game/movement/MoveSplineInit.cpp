@@ -41,7 +41,7 @@ namespace Movement
         }
         else if (moveFlags & MOVEFLAG_WALK_MODE)
         {
-            //if ( speed_obj.run > speed_obj.walk )
+            // if ( speed_obj.run > speed_obj.walk )
             return MOVE_WALK;
         }
         else if (moveFlags & MOVEFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)

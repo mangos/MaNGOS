@@ -190,7 +190,7 @@ void PlayerMenu::SendGossipMenu(uint32 TitleTextId, ObjectGuid objectGuid)
     }
 
     GetMenuSession()->SendPacket(&data);
-    //DEBUG_LOG( "WORLD: Sent SMSG_GOSSIP_MESSAGE NPCGuid=%u",GUID_LOPART(npcGUID) );
+    // DEBUG_LOG( "WORLD: Sent SMSG_GOSSIP_MESSAGE NPCGuid=%u",GUID_LOPART(npcGUID) );
 }
 
 void PlayerMenu::CloseGossip()
@@ -198,7 +198,7 @@ void PlayerMenu::CloseGossip()
     WorldPacket data(SMSG_GOSSIP_COMPLETE, 0);
     GetMenuSession()->SendPacket(&data);
 
-    //DEBUG_LOG( "WORLD: Sent SMSG_GOSSIP_COMPLETE" );
+    // DEBUG_LOG( "WORLD: Sent SMSG_GOSSIP_COMPLETE" );
 }
 
 // Outdated
@@ -213,7 +213,7 @@ void PlayerMenu::SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags
     data << locName;
 
     GetMenuSession()->SendPacket(&data);
-    //DEBUG_LOG("WORLD: Sent SMSG_GOSSIP_POI");
+    // DEBUG_LOG("WORLD: Sent SMSG_GOSSIP_POI");
 }
 
 void PlayerMenu::SendPointOfInterest(uint32 poi_id)
@@ -242,7 +242,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poi_id)
     data << icon_name;
 
     GetMenuSession()->SendPacket(&data);
-    //DEBUG_LOG("WORLD: Sent SMSG_GOSSIP_POI");
+    // DEBUG_LOG("WORLD: Sent SMSG_GOSSIP_POI");
 }
 
 void PlayerMenu::SendTalking(uint32 textID)
@@ -528,7 +528,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid guid
 
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)       // reward reputation override. No bonus is expected given
         data << int32(0);
-    //data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
+    // data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
 
     data << uint32(QUEST_EMOTE_COUNT);
 
@@ -651,7 +651,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* pQuest)
 
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)       // reward reputation override. No bonus is expected given
         data << int32(0);
-    //data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
+    // data << int32(pQuest->RewRepValue[i]);            // current field for store of rep value, can be reused to implement "override value"
 
     data << pQuest->GetPointMapId();
     data << pQuest->GetPointX();
@@ -795,7 +795,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
 
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)       // reward reputation override. No diplomacy bonus is expected given, reward also does not display in chat window
         data << int32(0);
-    //data << int32(pQuest->RewRepValue[i]);
+    // data << int32(pQuest->RewRepValue[i]);
 
     GetMenuSession()->SendPacket(&data);
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD NPCGuid = %s, questid = %u", npcGUID.GetString().c_str(), pQuest->GetQuestId());

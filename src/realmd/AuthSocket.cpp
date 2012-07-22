@@ -77,7 +77,7 @@ typedef struct AUTH_LOGON_CHALLENGE_C
     uint8   I[1];
 } sAuthLogonChallenge_C;
 
-//typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
+// typedef sAuthLogonChallenge_C sAuthReconnectChallenge_C;
 /*
 typedef struct
 {
@@ -127,9 +127,9 @@ typedef struct AUTH_LOGON_PROOF_S_BUILD_6005
     uint8   cmd;
     uint8   error;
     uint8   M2[20];
-    //uint32  unk1;
+    // uint32  unk1;
     uint32  unk2;
-    //uint16  unk3;
+    // uint16  unk3;
 } sAuthLogonProof_S_BUILD_6005;
 
 typedef struct AUTH_RECONNECT_PROOF_C
@@ -335,7 +335,7 @@ bool AuthSocket::_HandleLogonChallenge()
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
 
-    //No big fear of memory outage (size is int16, i.e. < 65536)
+    // No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
     sAuthLogonChallenge_C* ch = (sAuthLogonChallenge_C*)&buf[0];
@@ -361,10 +361,10 @@ bool AuthSocket::_HandleLogonChallenge()
     _build = ch->build;
 
     ///- Normalize account name
-    //utf8ToUpperOnlyLatin(_login); -- client already send account in expected form
+    // utf8ToUpperOnlyLatin(_login); -- client already send account in expected form
 
-    //Escape the user login to avoid further SQL injection
-    //Memory will be freed on AuthSocket object destruction
+    // Escape the user login to avoid further SQL injection
+    // Memory will be freed on AuthSocket object destruction
     _safelogin = _login;
     LoginDatabase.escape_string(_safelogin);
 
@@ -703,7 +703,7 @@ bool AuthSocket::_HandleLogonProof()
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if (MaxWrongPassCount > 0)
         {
-            //Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
+            // Increment number of failed logins by one and if it reaches the limit temporarily ban that account or IP
             LoginDatabase.PExecute("UPDATE account SET failed_logins = failed_logins + 1 WHERE username = '%s'", _safelogin.c_str());
 
             if (QueryResult* loginfail = LoginDatabase.PQuery("SELECT id, failed_logins FROM account WHERE username = '%s'", _safelogin.c_str()))
@@ -761,7 +761,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     if ((remaining < sizeof(sAuthLogonChallenge_C) - buf.size()) || (recv_len() < remaining))
         return false;
 
-    //No big fear of memory outage (size is int16, i.e. < 65536)
+    // No big fear of memory outage (size is int16, i.e. < 65536)
     buf.resize(remaining + buf.size() + 1);
     buf[buf.size() - 1] = 0;
     sAuthLogonChallenge_C* ch = (sAuthLogonChallenge_C*)&buf[0];

@@ -87,7 +87,7 @@ struct AuctionEntry
     bool UpdateBid(uint32 newbid, Player* newbidder = NULL);// true if normal bid, false if buyout, bidder==NULL for generated bid
 };
 
-//this class is used as auctionhouse instance
+// this class is used as auctionhouse instance
 class AuctionHouseObject
 {
     public:
@@ -176,7 +176,7 @@ class AuctionHouseMgr
             return NULL;
         }
 
-        //auction messages
+        // auction messages
         void SendAuctionWonMail(AuctionEntry* auction);
         void SendAuctionSuccessfulMail(AuctionEntry* auction);
         void SendAuctionExpiredMail(AuctionEntry* auction);
@@ -186,7 +186,7 @@ class AuctionHouseMgr
         static AuctionHouseEntry const* GetAuctionHouseEntry(Unit* unit);
 
     public:
-        //load first auction items, because of check if item exists, when loading
+        // load first auction items, because of check if item exists, when loading
         void LoadAuctionItems();
         void LoadAuctions();
 

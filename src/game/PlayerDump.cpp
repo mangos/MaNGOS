@@ -506,7 +506,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
-        DumpTableType type = DTT_CHARACTER;                 //Fixed: Using uninitialized memory 'type'
+        DumpTableType type = DTT_CHARACTER;                 // Fixed: Using uninitialized memory 'type'
         DumpTable* dTable = &dumpTables[0];
         for (; dTable->isValid(); ++dTable)
         {
@@ -625,7 +625,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
             }
             case DTT_PET:
             {
-                //store a map of old pet id to new inserted pet id for use by type 5 tables
+                // store a map of old pet id to new inserted pet id for use by type 5 tables
                 snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
                 if (strlen(lastpetid) == 0)
                     snprintf(lastpetid, 20, "%s", currpetid);
@@ -725,7 +725,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     CharacterDatabase.CommitTransaction();
 
-    //FIXME: current code with post-updating guids not safe for future per-map threads
+    // FIXME: current code with post-updating guids not safe for future per-map threads
     sObjectMgr.m_ItemGuids.Set(sObjectMgr.m_ItemGuids.GetNextAfterMaxUsed() + items.size());
     sObjectMgr.m_MailIds.Set(sObjectMgr.m_MailIds.GetNextAfterMaxUsed() +  mails.size());
     sObjectMgr.m_EquipmentSetIds.Set(sObjectMgr.m_EquipmentSetIds.GetNextAfterMaxUsed() + eqsets.size());

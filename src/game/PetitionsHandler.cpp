@@ -181,7 +181,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
 
     if (_player->GetMoney() < cost)
     {
-        //player hasn't got enough money
+        // player hasn't got enough money
         _player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, pCreature, charterid, 0);
         return;
     }
@@ -240,7 +240,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 {
     // ok
     DEBUG_LOG("Received opcode CMSG_PETITION_SHOW_SIGNATURES");
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     uint8 signs = 0;
     ObjectGuid petitionguid;
@@ -294,7 +294,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recv_data)
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_PETITION_QUERY");
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     uint32 guildguid;
     ObjectGuid petitionguid;
@@ -377,7 +377,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode MSG_PETITION_RENAME");   // ok
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     ObjectGuid petitionGuid;
     uint32 type;
@@ -447,7 +447,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recv_data)
 void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_PETITION_SIGN");    // ok
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     Field* fields;
     ObjectGuid petitionGuid;
@@ -532,11 +532,11 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
         }
     }
 
-    if (++signs > type)                                       // client signs maximum
+    if (++signs > type)                                     // client signs maximum
         return;
 
-    //client doesn't allow to sign petition two times by one character, but not check sign by another character from same account
-    //not allow sign another player from already sign player account
+    // client doesn't allow to sign petition two times by one character, but not check sign by another character from same account
+    // not allow sign another player from already sign player account
     result = CharacterDatabase.PQuery("SELECT playerguid FROM petition_sign WHERE player_account = '%u' AND petitionguid = '%u'", GetAccountId(), petitionLowGuid);
 
     if (result)
@@ -570,8 +570,8 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 
     // update signs count on charter, required testing...
-    //Item *item = _player->GetItemByGuid(petitionguid));
-    //if(item)
+    // Item *item = _player->GetItemByGuid(petitionguid));
+    // if(item)
     //    item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1+1, signs);
 
     // update for owner if online
@@ -582,7 +582,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recv_data)
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode MSG_PETITION_DECLINE");  // ok
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     ObjectGuid petitionGuid;
     recv_data >> petitionGuid;                              // petition guid
@@ -611,7 +611,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recv_data)
 void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_OFFER_PETITION");   // ok
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     ObjectGuid petitionGuid;
     ObjectGuid playerGuid;
@@ -720,7 +720,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recv_data)
 void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received opcode CMSG_TURN_IN_PETITION"); // ok
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     ObjectGuid petitionGuid;
 
@@ -770,8 +770,8 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 
         if (_player->GetArenaTeamId(slot))
         {
-            //data.Initialize(SMSG_TURN_IN_PETITION_RESULTS, 4);
-            //data << (uint32)PETITION_TURN_ALREADY_IN_GUILD;   // already in guild
+            // data.Initialize(SMSG_TURN_IN_PETITION_RESULTS, 4);
+            // data << (uint32)PETITION_TURN_ALREADY_IN_GUILD;   // already in guild
             //_player->GetSession()->SendPacket(&data);
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, name, "", ERR_ALREADY_IN_ARENA_TEAM);
             return;
@@ -905,7 +905,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recv_data)
 void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("Received CMSG_PETITION_SHOWLIST");
-    //recv_data.hexlike();
+    // recv_data.hexlike();
 
     ObjectGuid guid;
     recv_data >> guid;
@@ -968,7 +968,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
         data << uint32(5);                                  // unknown
         data << uint32(5);                                  // required signs?
     }
-    //for(uint8 i = 0; i < count; ++i)
+    // for(uint8 i = 0; i < count; ++i)
     //{
     //    data << uint32(i);                        // index
     //    data << uint32(GUILD_CHARTER);            // charter entry

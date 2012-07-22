@@ -366,7 +366,7 @@ uint32 Group::RemoveMember(ObjectGuid guid, uint8 method)
                 player->GetSession()->SendPacket(&data);
             }
 
-            //we already removed player from group and in player->GetGroup() is his original group!
+            // we already removed player from group and in player->GetGroup() is his original group!
             if (Group* group = player->GetGroup())
             {
                 group->SendUpdate();
@@ -422,13 +422,13 @@ void Group::Disband(bool hideDestroy)
         if (!player)
             continue;
 
-        //we cannot call _removeMember because it would invalidate member iterator
-        //if we are removing player from battleground raid
+        // we cannot call _removeMember because it would invalidate member iterator
+        // if we are removing player from battleground raid
         if (isBGGroup())
             player->RemoveFromBattleGroundRaid();
         else
         {
-            //we can remove player who is in battleground from his original group
+            // we can remove player who is in battleground from his original group
             if (player->GetOriginalGroup() == this)
                 player->SetOriginalGroup(NULL);
             else
@@ -449,7 +449,7 @@ void Group::Disband(bool hideDestroy)
             player->GetSession()->SendPacket(&data);
         }
 
-        //we already removed player from group and in player->GetGroup() is his original group, send update
+        // we already removed player from group and in player->GetGroup() is his original group, send update
         if (Group* group = player->GetGroup())
         {
             group->SendUpdate();
@@ -600,7 +600,7 @@ void Group::GroupLoot(WorldObject* pSource, Loot* loot)
             continue;
         }
 
-        //roll for over-threshold item if it's one-player loot
+        // roll for over-threshold item if it's one-player loot
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
             StartLootRoll(pSource, GROUP_LOOT, loot, itemSlot, maxEnchantingSkill);
         else
@@ -622,7 +622,7 @@ void Group::NeedBeforeGreed(WorldObject* pSource, Loot* loot)
             continue;
         }
 
-        //only roll for one-player items, not for ones everyone can get
+        // only roll for one-player items, not for ones everyone can get
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
             StartLootRoll(pSource, NEED_BEFORE_GREED, loot, itemSlot, maxEnchantingSkill);
         else
@@ -753,7 +753,7 @@ void Group::StartLootRoll(WorldObject* lootTarget, LootMethod method, Loot* loot
 
     Roll* r = new Roll(lootTarget->GetObjectGuid(), method, lootItem);
 
-    //a vector is filled with only near party members
+    // a vector is filled with only near party members
     for (GroupReference* itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         Player* playerToRoll = itr->getSource();
@@ -801,9 +801,9 @@ void Group::EndRoll()
 {
     while (!RollId.empty())
     {
-        //need more testing here, if rolls disappear
+        // need more testing here, if rolls disappear
         Rolls::iterator itr = RollId.begin();
-        CountTheRoll(itr);                                  //i don't have to edit player votes, who didn't vote ... he will pass
+        CountTheRoll(itr);                                  // i don't have to edit player votes, who didn't vote ... he will pass
     }
 }
 
@@ -817,7 +817,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
         return;
     }
 
-    //end of the roll
+    // end of the roll
     if (roll->totalNeed > 0)
     {
         if (!roll->playerVote.empty())
@@ -874,7 +874,7 @@ void Group::CountTheRoll(Rolls::iterator& rollI)
             uint8 maxresul = 0;
             ObjectGuid maxguid = (*roll->playerVote.begin()).first;
             Player* player;
-            RollVote rollvote = ROLL_PASS;                  //Fixed: Using uninitialized memory 'rollvote'
+            RollVote rollvote = ROLL_PASS;                  // Fixed: Using uninitialized memory 'rollvote'
 
             Roll::PlayerVote::iterator itr;
             for (itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
@@ -1183,13 +1183,13 @@ bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant, uint
     if (player)
     {
         player->SetGroupInvite(NULL);
-        //if player is in group and he is being added to BG raid group, then call SetBattleGroundRaid()
+        // if player is in group and he is being added to BG raid group, then call SetBattleGroundRaid()
         if (player->GetGroup() && isBGGroup())
             player->SetBattleGroundRaid(this, group);
-        //if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
+        // if player is in bg raid and we are adding him to normal group, then call SetOriginalGroup()
         else if (player->GetGroup())
             player->SetOriginalGroup(this, group);
-        //if player is not in group, then call set group
+        // if player is not in group, then call set group
         else
             player->SetGroup(this, group);
 
@@ -1223,12 +1223,12 @@ bool Group::_removeMember(ObjectGuid guid)
     Player* player = sObjectMgr.GetPlayer(guid);
     if (player)
     {
-        //if we are removing player from battleground raid
+        // if we are removing player from battleground raid
         if (isBGGroup())
             player->RemoveFromBattleGroundRaid();
         else
         {
-            //we can remove player who is in battleground from his original group
+            // we can remove player who is in battleground from his original group
             if (player->GetOriginalGroup() == this)
                 player->SetOriginalGroup(NULL);
             else
@@ -1473,7 +1473,7 @@ void Group::ChangeMembersGroup(Player* player, uint8 group)
     {
         if (player->GetGroup() == this)
             player->GetGroupRef().setSubGroup(group);
-        //if player is in BG raid, it is possible that he is also in normal raid - and that normal raid is stored in m_originalGroup reference
+        // if player is in BG raid, it is possible that he is also in normal raid - and that normal raid is stored in m_originalGroup reference
         else
         {
             prevSubGroup = player->GetOriginalSubGroup();
@@ -1540,7 +1540,7 @@ void Group::UpdateLooterGuid(WorldObject* pSource, bool ifneed)
                 {
                     bool refresh = pl->GetLootGuid() == pSource->GetObjectGuid();
 
-                    //if(refresh)                           // update loot for new looter
+                    // if(refresh)                          // update loot for new looter
                     //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                     SetLooterGuid(pl->GetObjectGuid());
                     SendUpdate();
@@ -1561,7 +1561,7 @@ void Group::UpdateLooterGuid(WorldObject* pSource, bool ifneed)
             {
                 bool refresh = pl->GetLootGuid() == pSource->GetObjectGuid();
 
-                //if(refresh)                               // update loot for new looter
+                // if(refresh)                              // update loot for new looter
                 //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                 SetLooterGuid(pl->GetObjectGuid());
                 SendUpdate();
@@ -1848,7 +1848,7 @@ void Group::UnbindInstance(uint32 mapid, uint8 difficulty, bool unload)
         if (!unload)
             CharacterDatabase.PExecute("DELETE FROM group_instance WHERE leaderGuid = '%u' AND instance = '%u'",
                                        GetLeaderGuid().GetCounter(), itr->second.state->GetInstanceId());
-        itr->second.state->RemoveGroup(this);                // state can become invalid
+        itr->second.state->RemoveGroup(this);               // state can become invalid
         m_boundInstances[difficulty].erase(itr);
     }
 }

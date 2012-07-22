@@ -101,7 +101,7 @@ DBCStorage <GtChanceToSpellCritBaseEntry> sGtChanceToSpellCritBaseStore(GtChance
 DBCStorage <GtChanceToSpellCritEntry>     sGtChanceToSpellCritStore(GtChanceToSpellCritfmt);
 DBCStorage <GtOCTClassCombatRatingScalarEntry> sGtOCTClassCombatRatingScalarStore(GtOCTClassCombatRatingScalarfmt);
 DBCStorage <GtOCTRegenHPEntry>            sGtOCTRegenHPStore(GtOCTRegenHPfmt);
-//DBCStorage <GtOCTRegenMPEntry>            sGtOCTRegenMPStore(GtOCTRegenMPfmt);  -- not used currently
+// DBCStorage <GtOCTRegenMPEntry>            sGtOCTRegenMPStore(GtOCTRegenMPfmt);  -- not used currently
 DBCStorage <GtRegenHPPerSptEntry>         sGtRegenHPPerSptStore(GtRegenHPPerSptfmt);
 DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore(GtRegenMPPerSptfmt);
 
@@ -110,8 +110,8 @@ DBCStorage <HolidaysEntry>                sHolidaysStore(Holidaysfmt);
 DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 DBCStorage <ItemClassEntry>               sItemClassStore(ItemClassfmt);
-//DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
-//DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
+// DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
+// DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
 DBCStorage <ItemExtendedCostEntry> sItemExtendedCostStore(ItemExtendedCostEntryfmt);
 DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
@@ -328,7 +328,7 @@ inline void LoadDBC(LocalData& localeData, BarGoLink& bar, StoreProblemList& err
 
             std::string dbc_filename_loc = dbc_path + localStr->name + "/" + filename;
             if (!storage.LoadStringsFrom(dbc_filename_loc.c_str()))
-                localeData.availableDbcLocales &= ~(1 << i); // mark as not available for speedup next checks
+                localeData.availableDbcLocales &= ~(1 << i);// mark as not available for speedup next checks
         }
     }
     else
@@ -441,15 +441,15 @@ void LoadDBCStores(const std::string& dataPath)
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sGtOCTClassCombatRatingScalarStore, dbcPath, "gtOCTClassCombatRatingScalar.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sGtOCTRegenHPStore,        dbcPath, "gtOCTRegenHP.dbc");
-    //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtOCTRegenMPStore,        dbcPath,"gtOCTRegenMP.dbc");       -- not used currently
+    // LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtOCTRegenMPStore,        dbcPath,"gtOCTRegenMP.dbc");       -- not used currently
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sGtRegenHPPerSptStore,     dbcPath, "gtRegenHPPerSpt.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sGtRegenMPPerSptStore,     dbcPath, "gtRegenMPPerSpt.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sHolidaysStore,            dbcPath, "Holidays.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemStore,                dbcPath, "Item.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemBagFamilyStore,       dbcPath, "ItemBagFamily.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemClassStore,           dbcPath, "ItemClass.dbc");
-    //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDisplayInfoStore,     dbcPath,"ItemDisplayInfo.dbc");     -- not used currently
-    //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemCondExtCostsStore,    dbcPath,"ItemCondExtCosts.dbc");
+    // LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDisplayInfoStore,     dbcPath,"ItemDisplayInfo.dbc");     -- not used currently
+    // LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemCondExtCostsStore,    dbcPath,"ItemCondExtCosts.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemExtendedCostStore,    dbcPath, "ItemExtendedCost.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemLimitCategoryStore,   dbcPath, "ItemLimitCategory.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemRandomPropertiesStore, dbcPath, "ItemRandomProperties.dbc");
@@ -680,12 +680,12 @@ void LoadDBCStores(const std::string& dataPath)
 
     // Check loaded DBC files proper version
     if (!sAreaStore.LookupEntry(3617)              ||       // last area (areaflag) added in 3.3.5a
-            !sCharTitlesStore.LookupEntry(177)         ||       // last char title added in 3.3.5a
-            !sGemPropertiesStore.LookupEntry(1629)     ||       // last gem property added in 3.3.5a
-            !sItemStore.LookupEntry(56806)             ||       // last client known item added in 3.3.5a
-            !sItemExtendedCostStore.LookupEntry(2997)  ||       // last item extended cost added in 3.3.5a
-            !sMapStore.LookupEntry(724)                ||       // last map added in 3.3.5a
-            !sSpellStore.LookupEntry(80864))                    // last added spell in 3.3.5a
+            !sCharTitlesStore.LookupEntry(177)         ||   // last char title added in 3.3.5a
+            !sGemPropertiesStore.LookupEntry(1629)     ||   // last gem property added in 3.3.5a
+            !sItemStore.LookupEntry(56806)             ||   // last client known item added in 3.3.5a
+            !sItemExtendedCostStore.LookupEntry(2997)  ||   // last item extended cost added in 3.3.5a
+            !sMapStore.LookupEntry(724)                ||   // last map added in 3.3.5a
+            !sSpellStore.LookupEntry(80864))                // last added spell in 3.3.5a
     {
         sLog.outError("\nYou have mixed version DBC files. Please re-extract DBC files for one from client build: %s", AcceptableClientBuildsListStr().c_str());
         Log::WaitBeforeContinueIfNeed();

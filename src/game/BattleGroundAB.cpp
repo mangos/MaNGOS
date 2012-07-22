@@ -170,7 +170,7 @@ void BattleGroundAB::StartingEventOpenDoors()
 {
     for (uint8 i = 0; i < BG_AB_NODES_MAX; ++i)
     {
-        //randomly select buff to spawn
+        // randomly select buff to spawn
         uint8 buff = urand(0, 2);
         SpawnBGObject(m_BgObjects[BG_AB_OBJECT_SPEEDBUFF_STABLES + buff + i * 3], RESPAWN_IMMEDIATELY);
     }
@@ -183,7 +183,7 @@ void BattleGroundAB::StartingEventOpenDoors()
 void BattleGroundAB::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
-    //create score and add it to map, default values are set in the constructor
+    // create score and add it to map, default values are set in the constructor
     BattleGroundABScore* sc = new BattleGroundABScore;
 
     m_PlayerScores[plr->GetObjectGuid()] = sc;
@@ -217,10 +217,10 @@ void BattleGroundAB::HandleAreaTrigger(Player* source, uint32 trigger)
         case 3870:                                          // Black Smith
         case 4020:                                          // Unk1
         case 4021:                                          // Unk2
-            //break;
+            // break;
         default:
-            //sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
-            //source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
+            // sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
+            // source->GetSession()->SendAreaTriggerMessage("Warning: Unhandled AreaTrigger in Battleground: %u", trigger);
             break;
     }
 }
@@ -443,7 +443,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player* source, GameObject* target
 
 bool BattleGroundAB::SetupBattleGround()
 {
-    //buffs
+    // buffs
     for (uint8 i = 0; i < BG_AB_NODES_MAX; ++i)
     {
         if (!AddObject(BG_AB_OBJECT_SPEEDBUFF_STABLES + 3 * i, Buff_Entries[0], BG_AB_BuffPositions[i][0], BG_AB_BuffPositions[i][1], BG_AB_BuffPositions[i][2], BG_AB_BuffPositions[i][3], 0, 0, sin(BG_AB_BuffPositions[i][3] / 2), cos(BG_AB_BuffPositions[i][3] / 2), RESPAWN_ONE_DAY)
@@ -458,7 +458,7 @@ bool BattleGroundAB::SetupBattleGround()
 
 void BattleGroundAB::Reset()
 {
-    //call parent's class reset
+    // call parent's class reset
     BattleGround::Reset();
 
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
@@ -490,12 +490,12 @@ void BattleGroundAB::Reset()
 
 void BattleGroundAB::EndBattleGround(Team winner)
 {
-    //win reward
+    // win reward
     if (winner == ALLIANCE)
         RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
     if (winner == HORDE)
         RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
-    //complete map_end rewards (even if no team wins)
+    // complete map_end rewards (even if no team wins)
     RewardHonorToTeam(GetBonusHonorFromKill(1), HORDE);
     RewardHonorToTeam(GetBonusHonorFromKill(1), ALLIANCE);
 
@@ -544,7 +544,7 @@ WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
 void BattleGroundAB::UpdatePlayerScore(Player* source, uint32 type, uint32 value)
 {
     BattleGroundScoreMap::iterator itr = m_PlayerScores.find(source->GetObjectGuid());
-    if (itr == m_PlayerScores.end())                          // player not found...
+    if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
     switch (type)

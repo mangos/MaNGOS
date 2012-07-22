@@ -336,20 +336,20 @@ bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
     do
     {
         fields = guildRanksResult->Fetch();
-        //condition that would be true when all ranks in QueryResult will be processed and guild without ranks is being processed
+        // condition that would be true when all ranks in QueryResult will be processed and guild without ranks is being processed
         if (!fields)
             break;
 
         uint32 guildId       = fields[0].GetUInt32();
         if (guildId < m_Id)
         {
-            //there is in table guild_rank record which doesn't have guildid in guild table, report error
+            // there is in table guild_rank record which doesn't have guildid in guild table, report error
             sLog.outErrorDb("Guild %u does not exist but it has a record in guild_rank table, deleting it!", guildId);
             CharacterDatabase.PExecute("DELETE FROM guild_rank WHERE guildid = '%u'", guildId);
             continue;
         }
 
-        if (guildId > m_Id)                                 //we loaded all ranks for this guild already, break cycle
+        if (guildId > m_Id)                                 // we loaded all ranks for this guild already, break cycle
             break;
 
         uint32 rankID        = fields[1].GetUInt32();
@@ -714,7 +714,7 @@ void Guild::Disband()
     CharacterDatabase.PExecute("DELETE FROM guild_rank WHERE guildid = '%u'", m_Id);
     CharacterDatabase.PExecute("DELETE FROM guild_bank_tab WHERE guildid = '%u'", m_Id);
 
-    //Free bank tab used memory and delete items stored in them
+    // Free bank tab used memory and delete items stored in them
     DeleteGuildBankItems(true);
 
     CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE guildid = '%u'", m_Id);
@@ -828,7 +828,7 @@ uint32 Guild::GetAccountsNumber()
     if (m_accountsNumber)
         return m_accountsNumber;
 
-    //We use a set to be sure each element will be unique
+    // We use a set to be sure each element will be unique
     std::set<uint32> accountsIdSet;
     for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
         accountsIdSet.insert(itr->second.accountId);
@@ -875,7 +875,7 @@ void Guild::LoadGuildEventLogFromDB()
     if (!result)
         return;
     bool isNextLogGuidSet = false;
-    //uint32 configCount = sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT);
+    // uint32 configCount = sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT);
     // First event in list will be the oldest and the latest event is last event in list
     do
     {

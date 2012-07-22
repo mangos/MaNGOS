@@ -58,7 +58,7 @@ DatabaseMysql::~DatabaseMysql()
 {
     StopServer();
 
-    //Free Mysql library pointers for last ~DB
+    // Free Mysql library pointers for last ~DB
     if (--db_count == 0)
         mysql_library_end();
 }
@@ -330,10 +330,10 @@ bool MySqlPreparedStatement::prepare()
     if (isPrepared())
         return true;
 
-    //remove old binds
+    // remove old binds
     RemoveBinds();
 
-    //create statement object
+    // create statement object
     m_stmt = mysql_stmt_init(m_pMySQLConn);
     if (!m_stmt)
     {
@@ -341,7 +341,7 @@ bool MySqlPreparedStatement::prepare()
         return false;
     }
 
-    //prepare statement
+    // prepare statement
     if (mysql_stmt_prepare(m_stmt, m_szFmt.c_str(), m_szFmt.length()))
     {
         sLog.outError("SQL: mysql_stmt_prepare() failed for '%s'", m_szFmt.c_str());
@@ -354,7 +354,7 @@ bool MySqlPreparedStatement::prepare()
 
     /* Fetch result set meta information */
     m_pResultMetadata = mysql_stmt_result_metadata(m_stmt);
-    //if we do not have result metadata
+    // if we do not have result metadata
     if (!m_pResultMetadata && strnicmp(m_szFmt.c_str(), "select", 6) == 0)
     {
         sLog.outError("SQL: no meta information for '%s'", m_szFmt.c_str());
@@ -362,22 +362,22 @@ bool MySqlPreparedStatement::prepare()
         return false;
     }
 
-    //bind input buffers
+    // bind input buffers
     if (m_nParams)
     {
         m_pInputArgs = new MYSQL_BIND[m_nParams];
         memset(m_pInputArgs, 0, sizeof(MYSQL_BIND) * m_nParams);
     }
 
-    //check if we have a statement which returns result sets
+    // check if we have a statement which returns result sets
     if (m_pResultMetadata)
     {
-        //our statement is query
+        // our statement is query
         m_bIsQuery = true;
         /* Get total columns in the query */
         m_nColumns = mysql_num_fields(m_pResultMetadata);
 
-        //bind output buffers
+        // bind output buffers
     }
 
     m_bPrepared = true;
@@ -392,11 +392,11 @@ void MySqlPreparedStatement::bind(const SqlStmtParameters& holder)
         return;
     }
 
-    //finalize adding params
+    // finalize adding params
     if (!m_pInputArgs)
         return;
 
-    //verify if we bound all needed input parameters
+    // verify if we bound all needed input parameters
     if (m_nParams != holder.boundParams())
     {
         MANGOS_ASSERT(false);
@@ -409,11 +409,11 @@ void MySqlPreparedStatement::bind(const SqlStmtParameters& holder)
     SqlStmtParameters::ParameterContainer::const_iterator iter_last = _args.end();
     for (SqlStmtParameters::ParameterContainer::const_iterator iter = _args.begin(); iter != iter_last; ++iter)
     {
-        //bind parameter
+        // bind parameter
         addParam(nIndex++, (*iter));
     }
 
-    //bind input arguments
+    // bind input arguments
     if (mysql_stmt_bind_param(m_stmt, m_pInputArgs))
     {
         sLog.outError("SQL ERROR: mysql_stmt_bind_param() failed\n");
@@ -431,7 +431,7 @@ void MySqlPreparedStatement::addParam(int nIndex, const SqlStmtFieldData& data)
     my_bool bUnsigned = 0;
     enum_field_types dataType = ToMySQLType(data, bUnsigned);
 
-    //setup MYSQL_BIND structure
+    // setup MYSQL_BIND structure
     pData.buffer_type = dataType;
     pData.is_unsigned = bUnsigned;
     pData.buffer = data.buff();
@@ -482,7 +482,7 @@ enum_field_types MySqlPreparedStatement::ToMySQLType(const SqlStmtFieldData& dat
     {
         case FIELD_NONE:    dataType = MYSQL_TYPE_NULL;                     break;
             // MySQL does not support MYSQL_TYPE_BIT as input type
-        case FIELD_BOOL:    //dataType = MYSQL_TYPE_BIT;      bUnsigned = 1;  break;
+        case FIELD_BOOL:    // dataType = MYSQL_TYPE_BIT;      bUnsigned = 1;  break;
         case FIELD_UI8:     dataType = MYSQL_TYPE_TINY;     bUnsigned = 1;  break;
         case FIELD_I8:      dataType = MYSQL_TYPE_TINY;                     break;
         case FIELD_I16:     dataType = MYSQL_TYPE_SHORT;                    break;

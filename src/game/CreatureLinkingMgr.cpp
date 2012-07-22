@@ -334,7 +334,7 @@ void CreatureLinkingHolder::AddSlaveToHolder(Creature* pCreature)
             if (itr->second.linkingFlag == pInfo->linkingFlag)
             {
                 itr->second.linkedGuids.push_back(pCreature->GetObjectGuid());
-                pCreature = NULL;                               // Store that is was handled
+                pCreature = NULL;                           // Store that is was handled
                 break;
             }
         }

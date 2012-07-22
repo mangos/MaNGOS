@@ -91,7 +91,7 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
         i_victimGuid = victim->GetObjectGuid();
 
         // attack
-        m_creature->SetInFront(victim);                      // client change orientation by self
+        m_creature->SetInFront(victim);                     // client change orientation by self
         m_creature->CastSpell(victim, getTotem().GetSpell(), false);
     }
     else

@@ -91,7 +91,7 @@ void MapManager::LoadTransports()
         uint32 mapid;
         x = t->m_WayPoints[0].x; y = t->m_WayPoints[0].y; z = t->m_WayPoints[0].z; mapid = t->m_WayPoints[0].mapid; o = 1;
 
-        //current code does not support transports in dungeon!
+        // current code does not support transports in dungeon!
         const MapEntry* pMapInfo = sMapStore.LookupEntry(mapid);
         if (!pMapInfo || pMapInfo->Instanceable())
         {
@@ -111,10 +111,10 @@ void MapManager::LoadTransports()
         for (std::set<uint32>::const_iterator i = mapsUsed.begin(); i != mapsUsed.end(); ++i)
             m_TransportsByMap[*i].insert(t);
 
-        //If we someday decide to use the grid to track transports, here:
+        // If we someday decide to use the grid to track transports, here:
         t->SetMap(sMapMgr.CreateMap(mapid, t));
 
-        //t->GetMap()->Add<GameObject>((GameObject *)t);
+        // t->GetMap()->Add<GameObject>((GameObject *)t);
         ++count;
     }
     while (result->NextRow());
@@ -174,7 +174,7 @@ bool Transport::Create(uint32 guidlow, uint32 mapid, float x, float y, float z, 
     SetObjectScale(goinfo->size);
 
     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
-    //SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
+    // SetUInt32Value(GAMEOBJECT_FLAGS, goinfo->flags);
     SetUInt32Value(GAMEOBJECT_FLAGS, (GO_FLAG_TRANSPORT | GO_FLAG_NODESPAWN));
     SetUInt32Value(GAMEOBJECT_LEVEL, m_period);
     SetEntry(goinfo->id);
@@ -408,7 +408,7 @@ bool Transport::GenerateWaypoints(uint32 pathid, std::set<uint32>& mapids)
 
         //        sLog.outString("T: %d, x: %f, y: %f, z: %f, t:%d", t, pos.x, pos.y, pos.z, teleport);
 
-        //if (teleport)
+        // if (teleport)
         m_WayPoints[t] = pos;
 
         t += keyFrames[i + 1].node->delay * 1000;
@@ -462,14 +462,14 @@ void Transport::TeleportTransport(uint32 newMapid, float x, float y, float z)
         }
         plr->TeleportTo(newMapid, x, y, z, GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT);
 
-        //WorldPacket data(SMSG_811, 4);
-        //data << uint32(0);
-        //plr->GetSession()->SendPacket(&data);
+        // WorldPacket data(SMSG_811, 4);
+        // data << uint32(0);
+        // plr->GetSession()->SendPacket(&data);
     }
 
-    //we need to create and save new Map object with 'newMapid' because if not done -> lead to invalid Map object reference...
-    //player far teleport would try to create same instance, but we need it NOW for transport...
-    //correct me if I'm wrong O.o
+    // we need to create and save new Map object with 'newMapid' because if not done -> lead to invalid Map object reference...
+    // player far teleport would try to create same instance, but we need it NOW for transport...
+    // correct me if I'm wrong O.o
     Map* newMap = sMapMgr.CreateMap(newMapid, this);
     SetMap(newMap);
 

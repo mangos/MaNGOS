@@ -317,7 +317,7 @@ extern int main(int argc, char** argv)
     }
 #endif
 
-    //server has started up successfully => enable async DB requests
+    // server has started up successfully => enable async DB requests
     LoginDatabase.AllowAsyncTransactions();
 
     // maximum counter for next ping

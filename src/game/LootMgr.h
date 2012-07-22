@@ -178,7 +178,7 @@ class LootStore
 
 class LootTemplate
 {
-        class  LootGroup;                                       // A set of loot definitions for items (refs are not allowed inside)
+        class  LootGroup;                                   // A set of loot definitions for items (refs are not allowed inside)
         typedef std::vector<LootGroup> LootGroups;
 
     public:
@@ -243,7 +243,7 @@ struct Loot
         LootItemList items;
         uint32 gold;
         uint8 unlootedCount;
-        LootType loot_type;                                     // required for achievement system
+        LootType loot_type;                                 // required for achievement system
 
         Loot(uint32 _gold = 0) : gold(_gold), unlootedCount(0), loot_type(LOOT_CORPSE) {}
         ~Loot() { clear(); }

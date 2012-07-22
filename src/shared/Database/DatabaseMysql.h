@@ -34,24 +34,24 @@
 #include <mysql.h>
 #endif
 
-//MySQL prepared statement class
+// MySQL prepared statement class
 class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
 {
     public:
         MySqlPreparedStatement(const std::string& fmt, SqlConnection& conn, MYSQL* mysql);
         ~MySqlPreparedStatement();
 
-        //prepare statement
+        // prepare statement
         virtual bool prepare();
 
-        //bind input parameters
+        // bind input parameters
         virtual void bind(const SqlStmtParameters& holder);
 
-        //execute DML statement
+        // execute DML statement
         virtual bool execute();
 
     protected:
-        //bind parameters
+        // bind parameters
         void addParam(int nIndex, const SqlStmtFieldData& data);
 
         static enum_field_types ToMySQLType(const SqlStmtFieldData& data, my_bool& bUnsigned);

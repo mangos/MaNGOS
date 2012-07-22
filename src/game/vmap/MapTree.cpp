@@ -90,7 +90,7 @@ namespace VMAP
         std::stringstream tilefilename;
         tilefilename.fill('0');
         tilefilename << std::setw(3) << mapID << "_";
-        //tilefilename << std::setw(2) << tileX << "_" << std::setw(2) << tileY << ".vmtile";
+        // tilefilename << std::setw(2) << tileX << "_" << std::setw(2) << tileY << ".vmtile";
         tilefilename << std::setw(2) << tileY << "_" << std::setw(2) << tileX << ".vmtile";
         return tilefilename.str();
     }
@@ -278,7 +278,7 @@ namespace VMAP
         else
         {
             char chunk[8];
-            //general info
+            // general info
             if (!readChunk(rf, chunk, VMAP_MAGIC, 8)) success = false;
             char tiled;
             if (success && fread(&tiled, sizeof(char), 1, rf) != 1) success = false;

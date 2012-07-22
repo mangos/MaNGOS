@@ -423,8 +423,8 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
         return;
     }
 
-    //we can return mail now
-    //so firstly delete the old one
+    // we can return mail now
+    // so firstly delete the old one
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", mailId);
     // needed?

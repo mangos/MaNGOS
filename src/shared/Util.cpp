@@ -37,13 +37,13 @@ uint32 WorldTimer::tickPrevTime() { return m_iPrevTime; }
 
 uint32 WorldTimer::tick()
 {
-    //save previous world tick time
+    // save previous world tick time
     m_iPrevTime = m_iTime;
 
-    //get the new one and don't forget to persist current system time in m_SystemTickTime
+    // get the new one and don't forget to persist current system time in m_SystemTickTime
     m_iTime = WorldTimer::getMSTime_internal(true);
 
-    //return tick diff
+    // return tick diff
     return getMSTimeDiff(m_iPrevTime, m_iTime);
 }
 
@@ -54,15 +54,15 @@ uint32 WorldTimer::getMSTime()
 
 uint32 WorldTimer::getMSTime_internal(bool savetime /*= false*/)
 {
-    //get current time
+    // get current time
     const ACE_Time_Value currTime = ACE_OS::gettimeofday();
-    //calculate time diff between two world ticks
-    //special case: curr_time < old_time - we suppose that our time has not ticked at all
-    //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
+    // calculate time diff between two world ticks
+    // special case: curr_time < old_time - we suppose that our time has not ticked at all
+    // this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
     uint64 diff = 0;
     (currTime - g_SystemTickTime).msec(diff);
 
-    //lets calculate current world time
+    // lets calculate current world time
     uint32 iRes = uint32(diff % UI64LIT(0x00000000FFFFFFFF));
     return iRes;
 }
@@ -220,7 +220,7 @@ uint32 TimeStringToSecs(const std::string& timestring)
                 case 'h': multiplier = HOUR;    break;
                 case 'm': multiplier = MINUTE;  break;
                 case 's': multiplier = 1;       break;
-                default : return 0;                         //bad format
+                default : return 0;                         // bad format
             }
             buffer *= multiplier;
             secs += buffer;
@@ -384,7 +384,7 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str)
         utf8str2.resize(wstr.size() * 4);                   // allocate for most long case
 
         char* oend = utf8::utf16to8(wstr.c_str(), wstr.c_str() + wstr.size(), &utf8str2[0]);
-        utf8str2.resize(oend - (&utf8str2[0]));              // remove unused tail
+        utf8str2.resize(oend - (&utf8str2[0]));             // remove unused tail
         utf8str = utf8str2;
     }
     catch (std::exception)

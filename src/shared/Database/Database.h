@@ -43,16 +43,16 @@ class MANGOS_DLL_SPEC SqlConnection
     public:
         virtual ~SqlConnection() {}
 
-        //method for initializing DB connection
+        // method for initializing DB connection
         virtual bool Initialize(const char* infoString) = 0;
-        //public methods for making queries
+        // public methods for making queries
         virtual QueryResult* Query(const char* sql) = 0;
         virtual QueryNamedResult* QueryNamed(const char* sql) = 0;
 
-        //public methods for making requests
+        // public methods for making requests
         virtual bool Execute(const char* sql) = 0;
 
-        //escape string generation
+        // escape string generation
         virtual unsigned long escape_string(char* to, const char* from, unsigned long length) { strncpy(to, from, length); return length; }
 
         // nothing do if DB not support transactions
@@ -61,10 +61,10 @@ class MANGOS_DLL_SPEC SqlConnection
         // can't rollback without transaction support
         virtual bool RollbackTransaction() { return true; }
 
-        //methods to work with prepared statements
+        // methods to work with prepared statements
         bool ExecuteStmt(int nIndex, const SqlStmtParameters& id);
 
-        //SqlConnection object lock
+        // SqlConnection object lock
         class Lock
         {
             public:
@@ -77,19 +77,19 @@ class MANGOS_DLL_SPEC SqlConnection
                 SqlConnection* const m_pConn;
         };
 
-        //get DB object
+        // get DB object
         Database& DB() { return m_db; }
 
     protected:
         SqlConnection(Database& db) : m_db(db) {}
 
         virtual SqlPreparedStatement* CreateStatement(const std::string& fmt);
-        //allocate prepared statement and return statement ID
+        // allocate prepared statement and return statement ID
         SqlPreparedStatement* GetStmt(int nIndex);
 
         Database& m_db;
 
-        //free prepared statements objects
+        // free prepared statements objects
         void FreePreparedStatements();
 
     private:
@@ -106,9 +106,9 @@ class MANGOS_DLL_SPEC Database
         virtual ~Database();
 
         virtual bool Initialize(const char* infoString, int nConns = 1);
-        //start worker thread for async DB request execution
+        // start worker thread for async DB request execution
         virtual void InitDelayThread();
-        //stop worker thread
+        // stop worker thread
         virtual void HaltDelayThread();
 
         /// Synchronous DB queries
@@ -187,19 +187,19 @@ class MANGOS_DLL_SPEC Database
         bool BeginTransaction();
         bool CommitTransaction();
         bool RollbackTransaction();
-        //for sync transaction execution
+        // for sync transaction execution
         bool CommitTransactionDirect();
 
-        //PREPARED STATEMENT API
+        // PREPARED STATEMENT API
 
-        //allocate index for prepared statement with SQL request 'fmt'
+        // allocate index for prepared statement with SQL request 'fmt'
         SqlStatement CreateStatement(SqlStatementID& index, const char* fmt);
-        //get prepared statement format string
+        // get prepared statement format string
         std::string GetStmtString(const int stmtId) const;
 
         operator bool () const { return m_pQueryConnections.size() && m_pAsyncConn != 0; }
 
-        //escape string generation
+        // escape string generation
         void escape_string(std::string& str);
 
         // must be called before first query in thread (one time for thread using one from existing Database objects)
@@ -213,12 +213,12 @@ class MANGOS_DLL_SPEC Database
         bool CheckRequiredField(char const* table_name, char const* required_name);
         uint32 GetPingIntervall() { return m_pingIntervallms; }
 
-        //function to ping database connections
+        // function to ping database connections
         void Ping();
 
-        //set this to allow async transactions
-        //you should call it explicitly after your server successfully started up
-        //NO ASYNC TRANSACTIONS DURING SERVER STARTUP - ONLY DURING RUNTIME!!!
+        // set this to allow async transactions
+        // you should call it explicitly after your server successfully started up
+        // NO ASYNC TRANSACTIONS DURING SERVER STARTUP - ONLY DURING RUNTIME!!!
         void AllowAsyncTransactions() { m_bAllowAsyncTransactions = true; }
 
     protected:
@@ -230,9 +230,9 @@ class MANGOS_DLL_SPEC Database
 
         void StopServer();
 
-        //factory method to create SqlConnection objects
+        // factory method to create SqlConnection objects
         virtual SqlConnection* CreateConnection() = 0;
-        //factory method to create SqlDelayThread objects
+        // factory method to create SqlDelayThread objects
         virtual SqlDelayThread* CreateDelayThread();
 
         class MANGOS_DLL_SPEC TransHelper
@@ -241,63 +241,63 @@ class MANGOS_DLL_SPEC Database
                 TransHelper() : m_pTrans(NULL) {}
                 ~TransHelper();
 
-                //initializes new SqlTransaction object
+                // initializes new SqlTransaction object
                 SqlTransaction* init();
-                //gets pointer on current transaction object. Returns NULL if transaction was not initiated
+                // gets pointer on current transaction object. Returns NULL if transaction was not initiated
                 SqlTransaction* get() const { return m_pTrans; }
-                //detaches SqlTransaction object allocated by init() function
-                //next call to get() function will return NULL!
-                //do not forget to destroy obtained SqlTransaction object!
+                // detaches SqlTransaction object allocated by init() function
+                // next call to get() function will return NULL!
+                // do not forget to destroy obtained SqlTransaction object!
                 SqlTransaction* detach();
-                //destroyes SqlTransaction allocated by init() function
+                // destroyes SqlTransaction allocated by init() function
                 void reset();
 
             private:
                 SqlTransaction* m_pTrans;
         };
 
-        //per-thread based storage for SqlTransaction object initialization - no locking is required
+        // per-thread based storage for SqlTransaction object initialization - no locking is required
         typedef ACE_TSS<Database::TransHelper> DBTransHelperTSS;
         Database::DBTransHelperTSS m_TransStorage;
 
         ///< DB connections
 
-        //round-robin connection selection
+        // round-robin connection selection
         SqlConnection* getQueryConnection();
-        //for now return one single connection for async requests
+        // for now return one single connection for async requests
         SqlConnection* getAsyncConnection() const { return m_pAsyncConn; }
 
         friend class SqlStatement;
-        //PREPARED STATEMENT API
-        //query function for prepared statements
+        // PREPARED STATEMENT API
+        // query function for prepared statements
         bool ExecuteStmt(const SqlStatementID& id, SqlStmtParameters* params);
         bool DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters* params);
 
-        //connection helper counters
-        int m_nQueryConnPoolSize;                               //current size of query connection pool
-        ACE_Atomic_Op<ACE_Thread_Mutex, long> m_nQueryCounter;  //counter for connection selection
+        // connection helper counters
+        int m_nQueryConnPoolSize;                           // current size of query connection pool
+        ACE_Atomic_Op<ACE_Thread_Mutex, long> m_nQueryCounter;  // counter for connection selection
 
-        //lets use pool of connections for sync queries
+        // lets use pool of connections for sync queries
         typedef std::vector< SqlConnection* > SqlConnectionContainer;
         SqlConnectionContainer m_pQueryConnections;
 
-        //only one single DB connection for transactions
+        // only one single DB connection for transactions
         SqlConnection* m_pAsyncConn;
 
-        SqlResultQueue*     m_pResultQueue;                  ///< Transaction queues from diff. threads
-        SqlDelayThread*     m_threadBody;                    ///< Pointer to delay sql executer (owned by m_delayThread)
-        ACE_Based::Thread* m_delayThread;                    ///< Pointer to executer thread
+        SqlResultQueue*     m_pResultQueue;                 ///< Transaction queues from diff. threads
+        SqlDelayThread*     m_threadBody;                   ///< Pointer to delay sql executer (owned by m_delayThread)
+        ACE_Based::Thread* m_delayThread;                   ///< Pointer to executer thread
 
-        bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
+        bool m_bAllowAsyncTransactions;                     ///< flag which specifies if async transactions are enabled
 
-        //PREPARED STATEMENT REGISTRY
+        // PREPARED STATEMENT REGISTRY
         typedef ACE_Thread_Mutex LOCK_TYPE;
         typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
 
         mutable LOCK_TYPE m_stmtGuard;
 
         typedef UNORDERED_MAP<std::string, int> PreparedStmtRegistry;
-        PreparedStmtRegistry m_stmtRegistry;                 ///<
+        PreparedStmtRegistry m_stmtRegistry;                ///<
 
         int m_iStmtIndex;
 

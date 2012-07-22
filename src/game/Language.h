@@ -42,8 +42,8 @@ enum MangosStrings
     LANG_GMS_ON_SRV                     = 16,
     LANG_GMS_NOT_LOGGED                 = 17,
     LANG_YOU_IN_FLIGHT                  = 18,
-    //LANG_YOU_IN_BATTLEGROUND            = 19, not used
-    //LANG_TARGET_IN_FLIGHT               = 20, not used
+    // LANG_YOU_IN_BATTLEGROUND            = 19, not used
+    // LANG_TARGET_IN_FLIGHT               = 20, not used
     LANG_CHAR_IN_FLIGHT                 = 21,
     LANG_CHAR_NON_MOUNTED               = 22,
     LANG_YOU_IN_COMBAT                  = 23,
@@ -83,7 +83,7 @@ enum MangosStrings
     LANG_USING_WORLD_DB                 = 57,
     LANG_USING_SCRIPT_LIB               = 58,
     LANG_USING_EVENT_AI                 = 59,
-    //LANG_RA_BUSY                      = 60, not used
+    // LANG_RA_BUSY                      = 60, not used
     LANG_RA_USER                        = 61,
     LANG_RA_PASS                        = 62,
     LANG_GM_ACCEPTS_WHISPER             = 63,
@@ -119,7 +119,7 @@ enum MangosStrings
     LANG_YOU_CHANGE_ENERGY              = 122,
     LANG_YOURS_ENERGY_CHANGED           = 123,
 
-    LANG_CURRENT_ENERGY                 = 124,              //log
+    LANG_CURRENT_ENERGY                 = 124,              // log
     LANG_YOU_CHANGE_RAGE                = 125,
     LANG_YOURS_RAGE_CHANGED             = 126,
     LANG_YOU_CHANGE_LVL                 = 127,
@@ -501,8 +501,8 @@ enum MangosStrings
     LANG_REMOVEALL_COOLDOWN             = 492,
     LANG_REMOVE_COOLDOWN                = 493,
 
-    LANG_ADDITEM                        = 494,              //log
-    LANG_ADDITEMSET                     = 495,              //log
+    LANG_ADDITEM                        = 494,              // log
+    LANG_ADDITEMSET                     = 495,              // log
     LANG_REMOVEITEM                     = 496,
     LANG_ITEM_CANNOT_CREATE             = 497,
     LANG_INSERT_GUILD_NAME              = 498,
@@ -535,7 +535,7 @@ enum MangosStrings
 
     LANG_GAMEOBJECT_NOT_EXIST           = 522,
 
-    LANG_GAMEOBJECT_CURRENT             = 523,              //log
+    LANG_GAMEOBJECT_CURRENT             = 523,              // log
     LANG_GAMEOBJECT_DETAIL              = 524,
     LANG_GAMEOBJECT_ADD                 = 525,
 
@@ -583,17 +583,17 @@ enum MangosStrings
     //                                    562,              // not used
     //                                    563,              // not used
     LANG_TOO_BIG_INDEX                  = 564,
-    LANG_SET_UINT                       = 565,              //log
+    LANG_SET_UINT                       = 565,              // log
     LANG_SET_UINT_FIELD                 = 566,
-    LANG_SET_FLOAT                      = 567,              //log
+    LANG_SET_FLOAT                      = 567,              // log
     LANG_SET_FLOAT_FIELD                = 568,
-    LANG_GET_UINT                       = 569,              //log
+    LANG_GET_UINT                       = 569,              // log
     LANG_GET_UINT_FIELD                 = 570,
-    LANG_GET_FLOAT                      = 571,              //log
+    LANG_GET_FLOAT                      = 571,              // log
     LANG_GET_FLOAT_FIELD                = 572,
-    //                                    573,              //not used
-    //                                    574,              //not used
-    LANG_CHANGE_INT32                   = 575,              //log
+    //                                    573,              // not used
+    //                                    574,              // not used
+    LANG_CHANGE_INT32                   = 575,              // log
     LANG_CHANGE_INT32_FIELD             = 576,
 
     LANG_INVISIBLE_INVISIBLE            = 577,
@@ -898,13 +898,13 @@ enum MangosStrings
     LANG_NPC_GO_INFO_EVENT_STRING       = 1150,
     LANG_NPC_GO_INFO_POOL_EVENT_STRING  = 1151,
     LANG_COMMAND_ITEM_USABLE            = 1152,
-    LANG_GET_BITSTR                     = 1153,             //log
+    LANG_GET_BITSTR                     = 1153,             // log
     LANG_GET_BITSTR_FIELD               = 1154,
-    LANG_GET_HEX                        = 1155,             //log
+    LANG_GET_HEX                        = 1155,             // log
     LANG_GET_HEX_FIELD                  = 1156,
-    LANG_CHANGE_HEX                     = 1157,             //log
+    LANG_CHANGE_HEX                     = 1157,             // log
     LANG_CHANGE_HEX_FIELD               = 1158,
-    LANG_CHANGE_FLOAT                   = 1159,             //log
+    LANG_CHANGE_FLOAT                   = 1159,             // log
     LANG_CHANGE_FLOAT_FIELD             = 1160,
     LANG_COMMAND_ACHIEVEMENT_CRITERIA   = 1161,
     LANG_COUNTER                        = 1162,

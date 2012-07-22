@@ -1286,10 +1286,10 @@ void ScriptAction::HandleScriptStep()
             }
 
             if (pGo->isSpawned())
-                break;                                      //gameobject already spawned
+                break;                                      // gameobject already spawned
 
             pGo->SetLootState(GO_READY);
-            pGo->SetRespawnTime(time_to_despawn);           //despawn object in ? seconds
+            pGo->SetRespawnTime(time_to_despawn);           // despawn object in ? seconds
             pGo->Refresh();
             break;
         }
@@ -1386,7 +1386,7 @@ void ScriptAction::HandleScriptStep()
             if (LogIfNotUnit(pTarget))
                 break;
 
-            //TODO: when GO cast implemented, code below must be updated accordingly to also allow GO spell cast
+            // TODO: when GO cast implemented, code below must be updated accordingly to also allow GO spell cast
             ((Unit*)pSource)->CastSpell(((Unit*)pTarget), m_script->castSpell.spellId, (m_script->data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL) != 0);
 
             break;

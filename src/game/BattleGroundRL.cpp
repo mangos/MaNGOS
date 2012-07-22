@@ -30,7 +30,7 @@ BattleGroundRL::BattleGroundRL()
     m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
     m_StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
     m_StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
+    // we must set messageIds
     m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
     m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
@@ -63,7 +63,7 @@ void BattleGroundRL::StartingEventOpenDoors()
 void BattleGroundRL::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
-    //create score and add it to map, default values are set in constructor
+    // create score and add it to map, default values are set in constructor
     BattleGroundRLScore* sc = new BattleGroundRLScore;
 
     m_PlayerScores[plr->GetObjectGuid()] = sc;
@@ -114,8 +114,8 @@ void BattleGroundRL::HandleAreaTrigger(Player* source, uint32 trigger)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 spellId = 0;
-    //uint64 buff_guid = 0;
+    // uint32 spellId = 0;
+    // uint64 buff_guid = 0;
     switch (trigger)
     {
         case 4696:                                          // buff trigger?
@@ -127,7 +127,7 @@ void BattleGroundRL::HandleAreaTrigger(Player* source, uint32 trigger)
             break;
     }
 
-    //if (buff_guid)
+    // if (buff_guid)
     //    HandleTriggerBuff(buff_guid, source);
 }
 
@@ -140,7 +140,7 @@ void BattleGroundRL::FillInitialWorldStates(WorldPacket& data, uint32& count)
 
 void BattleGroundRL::Reset()
 {
-    //call parent's reset
+    // call parent's reset
     BattleGround::Reset();
 }
 

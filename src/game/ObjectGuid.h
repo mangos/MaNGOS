@@ -149,7 +149,7 @@ class MANGOS_DLL_SPEC ObjectGuid
             switch (high)
             {
                 case HIGHGUID_ITEM:         return TYPEID_ITEM;
-                    //case HIGHGUID_CONTAINER:    return TYPEID_CONTAINER; HIGHGUID_CONTAINER==HIGHGUID_ITEM currently
+                    // case HIGHGUID_CONTAINER:    return TYPEID_CONTAINER; HIGHGUID_CONTAINER==HIGHGUID_ITEM currently
                 case HIGHGUID_UNIT:         return TYPEID_UNIT;
                 case HIGHGUID_PET:          return TYPEID_UNIT;
                 case HIGHGUID_PLAYER:       return TYPEID_PLAYER;
@@ -211,7 +211,7 @@ typedef std::set<ObjectGuid> GuidSet;
 typedef std::list<ObjectGuid> GuidList;
 typedef std::vector<ObjectGuid> GuidVector;
 
-//minimum buffer size for packed guid is 9 bytes
+// minimum buffer size for packed guid is 9 bytes
 #define PACKED_GUID_MIN_BUFFER_SIZE 9
 
 class PackedGuid

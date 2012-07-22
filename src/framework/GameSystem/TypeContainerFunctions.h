@@ -67,7 +67,7 @@ namespace MaNGOS
     template<class SPECIFIC_TYPE>
     SPECIFIC_TYPE* Insert(ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* obj)
     {
-        //elements._element[hdl] = obj;
+        // elements._element[hdl] = obj;
         obj->GetGridRef().link(&elements._element, obj);
         return obj;
     }

@@ -299,7 +299,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recv_data)
     recv_data >> name;
 
     ArenaTeam* at = sObjectMgr.GetArenaTeamById(ArenaTeamId);
-    if (!at)                                                 // arena team not found
+    if (!at)                                                // arena team not found
         return;
 
     if (at->GetCaptainGuid() != _player->GetObjectGuid())

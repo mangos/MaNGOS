@@ -114,4 +114,4 @@ class WheatyExceptionReport
 };
 
 extern WheatyExceptionReport g_WheatyExceptionReport;       //  global instance of class
-#endif                                                      //WheatyExceptionReport
+#endif                                                      // WheatyExceptionReport

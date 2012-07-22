@@ -207,7 +207,7 @@ typedef ACE_Atomic_Op<ACE_Thread_Mutex, long> AtomicLong;
 #define DEFAULT_HEIGHT_SEARCH     10.0f                     // default search distance to find height at nearby locations
 #define DEFAULT_WATER_SEARCH      50.0f                     // default search distance to case detection water level
 
-//class for sharing and managin GridMap objects
+// class for sharing and managin GridMap objects
 class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 {
     public:
@@ -216,8 +216,8 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 
         uint32 GetMapId() const { return m_mapId; }
 
-        //TODO: move all terrain/vmaps data info query functions
-        //from 'Map' class into this class
+        // TODO: move all terrain/vmaps data info query functions
+        // from 'Map' class into this class
         float GetHeight(float x, float y, float z, bool pCheckVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
         float GetWaterLevel(float x, float y, float z, float* pGround = NULL) const;
         float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = NULL, bool swim = false) const;
@@ -237,15 +237,15 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         bool IsOutdoors(float x, float y, float z) const;
 
 
-        //this method should be used only by TerrainManager
-        //to cleanup unreferenced GridMap objects - they are too heavy
-        //to destroy them dynamically, especially on highly populated servers
-        //THIS METHOD IS NOT THREAD-SAFE!!!! AND IT SHOULDN'T BE THREAD-SAFE!!!!
+        // this method should be used only by TerrainManager
+        // to cleanup unreferenced GridMap objects - they are too heavy
+        // to destroy them dynamically, especially on highly populated servers
+        // THIS METHOD IS NOT THREAD-SAFE!!!! AND IT SHOULDN'T BE THREAD-SAFE!!!!
         void CleanUpGrids(const uint32 diff);
 
     protected:
         friend class Map;
-        //load/unload terrain data
+        // load/unload terrain data
         GridMap* Load(const uint32 x, const uint32 y);
         void Unload(const uint32 x, const uint32 y);
 
@@ -264,7 +264,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         GridMap* m_GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         int16 m_GridRef[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
 
-        //global garbage collection timer
+        // global garbage collection timer
         ShortIntervalTimer i_timer;
 
         typedef ACE_Thread_Mutex LOCK_TYPE;
@@ -273,7 +273,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         LOCK_TYPE m_refMutex;
 };
 
-//class for managing TerrainData object and all sort of geometry querying operations
+// class for managing TerrainData object and all sort of geometry querying operations
 class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
 {
         typedef UNORDERED_MAP<uint32,  TerrainInfo*> TerrainDataMap;

@@ -23,7 +23,7 @@ void BIH::buildHierarchy(std::vector<uint32>& tempTree, buildData& dat, BuildSta
     // create space for the first node
     tempTree.push_back(3 << 30); // dummy leaf
     tempTree.insert(tempTree.end(), 2, 0);
-    //tempTree.add(0);
+    // tempTree.add(0);
 
     // seed bbox
     AABound gridBox = { bounds.low(), bounds.high() };
@@ -58,7 +58,7 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
         {
             if (nodeBox.hi[i] < gridBox.lo[i] || nodeBox.lo[i] > gridBox.hi[i])
             {
-                //UI.printError(Module.ACCEL, "Reached tree area in error - discarding node with: %d objects", right - left + 1);
+                // UI.printError(Module.ACCEL, "Reached tree area in error - discarding node with: %d objects", right - left + 1);
                 throw std::logic_error("invalid node overlap");
             }
         }

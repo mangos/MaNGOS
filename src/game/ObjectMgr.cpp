@@ -224,7 +224,7 @@ ArenaTeam* ObjectMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
 
 void ObjectMgr::LoadCreatureLocales()
 {
-    mCreatureLocaleMap.clear();                              // need for reload case
+    mCreatureLocaleMap.clear();                             // need for reload case
 
     QueryResult* result = WorldDatabase.Query("SELECT entry,name_loc1,subname_loc1,name_loc2,subname_loc2,name_loc3,subname_loc3,name_loc4,subname_loc4,name_loc5,subname_loc5,name_loc6,subname_loc6,name_loc7,subname_loc7,name_loc8,subname_loc8 FROM locales_creature");
 
@@ -385,7 +385,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
 void ObjectMgr::LoadPointOfInterestLocales()
 {
-    mPointOfInterestLocaleMap.clear();                              // need for reload case
+    mPointOfInterestLocaleMap.clear();                      // need for reload case
 
     QueryResult* result = WorldDatabase.Query("SELECT entry,icon_name_loc1,icon_name_loc2,icon_name_loc3,icon_name_loc4,icon_name_loc5,icon_name_loc6,icon_name_loc7,icon_name_loc8 FROM locales_points_of_interest");
 
@@ -3256,7 +3256,7 @@ void ObjectMgr::LoadPlayerInfo()
                 }
                 continue;
             }
-            //PlayerXPperLevel
+            // PlayerXPperLevel
             mPlayerXPperLevel[current_level] = current_xp;
             bar.step();
             ++count;
@@ -4624,7 +4624,7 @@ void ObjectMgr::LoadInstanceEncounters()
                 if (!sSpellStore.LookupEntry(creditEntry))
                 {
                     // skip spells that aren't in dbc for now
-                    //sLog.outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
+                    // sLog.outErrorDb("Table `instance_encounters` has an invalid spell (entry %u) linked to the encounter %u (%s), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
                     continue;
                 }
                 break;
@@ -4919,12 +4919,12 @@ void ObjectMgr::LoadGossipTextLocales()
     sLog.outString(">> Loaded %lu NpcText locale strings", (unsigned long)mNpcTextLocaleMap.size());
 }
 
-//not very fast function but it is called only once a day, or on starting-up
+// not very fast function but it is called only once a day, or on starting-up
 void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 {
     time_t basetime = time(NULL);
     DEBUG_LOG("Returning mails current time: hour: %d, minute: %d, second: %d ", localtime(&basetime)->tm_hour, localtime(&basetime)->tm_min, localtime(&basetime)->tm_sec);
-    //delete all old mails without item and without body immediately, if starting server
+    // delete all old mails without item and without body immediately, if starting server
     if (!serverUp)
         CharacterDatabase.PExecute("DELETE FROM mail WHERE expire_time < '" UI64FMTD "' AND has_items = '0' AND body = ''", (uint64)basetime);
     //                                                     0  1           2      3        4         5           6   7       8
@@ -4938,10 +4938,10 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         return;                                             // any mails need to be returned or deleted
     }
 
-    //std::ostringstream delitems, delmails; //will be here for optimization
-    //bool deletemail = false, deleteitem = false;
-    //delitems << "DELETE FROM item_instance WHERE guid IN ( ";
-    //delmails << "DELETE FROM mail WHERE id IN ( "
+    // std::ostringstream delitems, delmails; // will be here for optimization
+    // bool deletemail = false, deleteitem = false;
+    // delitems << "DELETE FROM item_instance WHERE guid IN ( ";
+    // delmails << "DELETE FROM mail WHERE id IN ( "
 
     BarGoLink bar(result->GetRowCount());
     uint32 count = 0;
@@ -4969,12 +4969,12 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             pl = GetPlayer(m->receiverGuid);
         if (pl)
         {
-            //this code will run very improbably (the time is between 4 and 5 am, in game is online a player, who has old mail
-            //his in mailbox and he has already listed his mails )
+            // this code will run very improbably (the time is between 4 and 5 am, in game is online a player, who has old mail
+            // his in mailbox and he has already listed his mails )
             delete m;
             continue;
         }
-        //delete or return mail:
+        // delete or return mail:
         if (has_items)
         {
             QueryResult* resultItems = CharacterDatabase.PQuery("SELECT item_guid,item_template FROM mail_items WHERE mail_id='%u'", m->messageID);
@@ -6010,7 +6010,7 @@ void ObjectMgr::LoadGameobjectInfo()
             {
                 if (goInfo->button.lockId)
                     CheckGOLockId(goInfo, goInfo->button.lockId, 1);
-                if (goInfo->button.linkedTrapId)              // linked trap
+                if (goInfo->button.linkedTrapId)            // linked trap
                     CheckGOLinkedTrapId(goInfo, goInfo->button.linkedTrapId, 3);
                 CheckGONoDamageImmuneId(goInfo, goInfo->button.noDamageImmune, 4);
                 break;
@@ -6029,7 +6029,7 @@ void ObjectMgr::LoadGameobjectInfo()
 
                 CheckGOConsumable(goInfo, goInfo->chest.consumable, 3);
 
-                if (goInfo->chest.linkedTrapId)              // linked trap
+                if (goInfo->chest.linkedTrapId)             // linked trap
                     CheckGOLinkedTrapId(goInfo, goInfo->chest.linkedTrapId, 7);
                 break;
             }
@@ -7365,7 +7365,7 @@ void ObjectMgr::LoadGameObjectForQuests()
             }
             case GAMEOBJECT_TYPE_GOOBER:
             {
-                if (goInfo->goober.questId)                 //quests objects
+                if (goInfo->goober.questId)                 // quests objects
                 {
                     mGameObjectForQuestSet.insert(go_entry);
                     ++count;
@@ -8179,8 +8179,8 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial)
             else
                 return SKILL_RANGE_MONO;
         default:
-        case SKILL_CATEGORY_ATTRIBUTES:                     //not found in dbc
-        case SKILL_CATEGORY_GENERIC:                        //only GENERIC(DND)
+        case SKILL_CATEGORY_ATTRIBUTES:                     // not found in dbc
+        case SKILL_CATEGORY_GENERIC:                        // only GENERIC(DND)
             return SKILL_RANGE_NONE;
     }
 }

@@ -84,13 +84,13 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
         case ACT_COMMAND:                                   // 0x07
             switch (spellid)
             {
-                case COMMAND_STAY:                          // flat=1792  //STAY
+                case COMMAND_STAY:                          // flat=1792  // STAY
                     pet->StopMoving();
                     pet->GetMotionMaster()->Clear(false);
                     pet->GetMotionMaster()->MoveIdle();
                     charmInfo->SetCommandState(COMMAND_STAY);
                     break;
-                case COMMAND_FOLLOW:                        // spellid=1792  //FOLLOW
+                case COMMAND_FOLLOW:                        // spellid=1792  // FOLLOW
                     pet->AttackStop();
                     pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                     charmInfo->SetCommandState(COMMAND_FOLLOW);

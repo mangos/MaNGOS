@@ -125,7 +125,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!i_dynobject.IsWithinDistInMap(target, i_dynobject.GetRadius()))
         return;
 
-    //Check targets for not_selectable unit flag and remove
+    // Check targets for not_selectable unit flag and remove
     if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_OOC_NOT_ATTACKABLE))
         return;
 
@@ -133,7 +133,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsInEvadeMode())
         return;
 
-    //Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
+    // Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
     if (target->GetTypeId() == TYPEID_PLAYER && target != i_check && (((Player*)target)->isGameMaster() || ((Player*)target)->GetVisibility() == VISIBILITY_OFF))
         return;
 

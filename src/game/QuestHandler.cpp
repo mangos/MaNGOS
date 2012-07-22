@@ -76,7 +76,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recv_data)
             break;
     }
 
-    //inform client about status of quest
+    // inform client about status of quest
     _player->PlayerTalkClass->SendQuestGiverStatus(dialogStatus, guid);
 }
 
@@ -163,14 +163,14 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)
                     {
                         Player* pPlayer = itr->getSource();
 
-                        if (!pPlayer || pPlayer == _player)     // not self
+                        if (!pPlayer || pPlayer == _player) // not self
                             continue;
 
                         if (pPlayer->CanTakeQuest(qInfo, true))
                         {
                             pPlayer->SetDividerGuid(_player->GetObjectGuid());
 
-                            //need confirmation that any gossip window will close
+                            // need confirmation that any gossip window will close
                             pPlayer->PlayerTalkClass->CloseGossip();
 
                             _player->SendQuestConfirmAccept(qInfo, pPlayer);
@@ -522,7 +522,7 @@ uint32 WorldSession::getDialogStatus(Player* pPlayer, Object* questgiver, uint32
             break;
         }
         default:
-            //it's impossible, but check ^)
+            // it's impossible, but check ^)
             sLog.outError("Warning: GetDialogStatus called for unexpected type %u", questgiver->GetTypeId());
             return DIALOG_STATUS_NONE;
     }

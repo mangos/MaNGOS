@@ -306,8 +306,8 @@ bool WorldSession::Update(PacketFilter& updater)
         m_Socket = NULL;
     }
 
-    //check if we are safe to proceed with logout
-    //logout procedure should happen only in World::UpdateSessions() method!!!
+    // check if we are safe to proceed with logout
+    // logout procedure should happen only in World::UpdateSessions() method!!!
     if (updater.ProcessLogout())
     {
         ///- If necessary, log the player out
@@ -316,7 +316,7 @@ bool WorldSession::Update(PacketFilter& updater)
             LogoutPlayer(true);
 
         if (!m_Socket)
-            return false;                                       //Will remove this session from the world session map
+            return false;                                   // Will remove this session from the world session map
     }
 
     return true;
@@ -340,7 +340,7 @@ void WorldSession::LogoutPlayer(bool Save)
             DoLootRelease(lootGuid);
 
         ///- If the player just died before logging out, make him appear as a ghost
-        //FIXME: logout must be delayed in case lost connection with client in time of combat
+        // FIXME: logout must be delayed in case lost connection with client in time of combat
         if (_player->GetDeathTimer())
         {
             _player->getHostileRefManager().deleteReferences();
@@ -391,7 +391,7 @@ void WorldSession::LogoutPlayer(bool Save)
             _player->BuildPlayerRepop();
             _player->RepopAtGraveyard();
         }
-        //drop a flag if player is carrying it
+        // drop a flag if player is carrying it
         if (BattleGround* bg = _player->GetBattleGround())
             bg->EventPlayerLoggedOut(_player);
 
@@ -399,8 +399,8 @@ void WorldSession::LogoutPlayer(bool Save)
         if (!_player->m_InstanceValid && !_player->isGameMaster())
         {
             _player->TeleportToHomebind();
-            //this is a bad place to call for far teleport because we need player to be in world for successful logout
-            //maybe we should implement delayed far teleport logout?
+            // this is a bad place to call for far teleport because we need player to be in world for successful logout
+            // maybe we should implement delayed far teleport logout?
         }
 
         // FG: finish pending transfers after starting the logout
@@ -486,7 +486,7 @@ void WorldSession::LogoutPlayer(bool Save)
         SendPacket(&data);
 
         ///- Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        //No SQL injection as AccountId is uint32
+        // No SQL injection as AccountId is uint32
 
         static SqlStatementID updChars;
 
@@ -958,8 +958,8 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         // can be not set in fact for login opcode, but this not create porblems.
         _player->SetCanDelayTeleport(false);
 
-        //we should execute delayed teleports only for alive(!) players
-        //because we don't want player's ghost teleported from graveyard
+        // we should execute delayed teleports only for alive(!) players
+        // because we don't want player's ghost teleported from graveyard
         if (_player->IsHasDelayedTeleport())
             _player->TeleportTo(_player->m_teleport_dest, _player->m_teleport_options);
     }

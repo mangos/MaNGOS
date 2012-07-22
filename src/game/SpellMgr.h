@@ -184,7 +184,7 @@ bool IsNoStackAuraDueToAura(uint32 spellId_1, uint32 spellId_2);
 
 inline bool IsSealSpell(SpellEntry const* spellInfo)
 {
-    //Collection of all the seal family flags. No other paladin spell has any of those.
+    // Collection of all the seal family flags. No other paladin spell has any of those.
     return spellInfo->IsFitToFamily(SPELLFAMILY_PALADIN, UI64LIT(0x26000C000A000000)) &&
            // avoid counting target triggered effect as seal for avoid remove it or seal by it.
            spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0] == TARGET_SELF;
@@ -201,7 +201,7 @@ inline bool IsExplicitDiscoverySpell(SpellEntry const* spellInfo)
     return (((spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_RANDOM_ITEM
               || spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_CREATE_ITEM_2)
              && spellInfo->Effect[EFFECT_INDEX_1] == SPELL_EFFECT_SCRIPT_EFFECT)
-            || spellInfo->Id == 64323);                         // Book of Glyph Mastery (Effect0==SPELL_EFFECT_SCRIPT_EFFECT without any other data)
+            || spellInfo->Id == 64323);                     // Book of Glyph Mastery (Effect0==SPELL_EFFECT_SCRIPT_EFFECT without any other data)
 }
 
 inline bool IsLootCraftingSpell(SpellEntry const* spellInfo)

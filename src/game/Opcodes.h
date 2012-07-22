@@ -1341,10 +1341,10 @@ enum Opcodes
     MSG_MOVE_SET_COLLISION_HGT                      = 0x518,
     CMSG_CLEAR_RANDOM_BG_WIN_TIME                   = 0x519,
     CMSG_CLEAR_HOLIDAY_BG_WIN_TIME                  = 0x51A,
-    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B, // lua: CommentatorSetSkirmishMatchmakingMode/CommentatorRequestSkirmishQueueData/CommentatorRequestSkirmishMode/CommentatorStartSkirmishMatch
-    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1         = 0x51C, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST, CGCommentator::QueueNode
-    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2         = 0x51D, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
-    SMSG_COMPRESSED_UNKNOWN_1310                    = 0x51E, // some compressed packet
+    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B,// lua: CommentatorSetSkirmishMatchmakingMode/CommentatorRequestSkirmishQueueData/CommentatorRequestSkirmishMode/CommentatorStartSkirmishMatch
+    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1         = 0x51C,// event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST, CGCommentator::QueueNode
+    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2         = 0x51D,// event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
+    SMSG_COMPRESSED_UNKNOWN_1310                    = 0x51E,// some compressed packet
     NUM_MSG_TYPES                                   = 0x51F
 };
 
@@ -1361,9 +1361,9 @@ enum SessionStatus
 
 enum PacketProcessing
 {
-    PROCESS_INPLACE = 0,                                    //process packet whenever we receive it - mostly for non-handled or non-implemented packets
-    PROCESS_THREADUNSAFE,                                   //packet is not thread-safe - process it in World::UpdateSessions()
-    PROCESS_THREADSAFE                                      //packet is thread-safe - process it in Map::Update()
+    PROCESS_INPLACE = 0,                                    // process packet whenever we receive it - mostly for non-handled or non-implemented packets
+    PROCESS_THREADUNSAFE,                                   // packet is not thread-safe - process it in World::UpdateSessions()
+    PROCESS_THREADSAFE                                      // packet is thread-safe - process it in Map::Update()
 };
 
 class WorldPacket;

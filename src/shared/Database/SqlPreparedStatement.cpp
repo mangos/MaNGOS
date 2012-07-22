@@ -20,7 +20,7 @@
 
 SqlStmtParameters::SqlStmtParameters(int nParams)
 {
-    //reserve memory if needed
+    // reserve memory if needed
     if (nParams > 0)
         m_params.reserve(nParams);
 }
@@ -28,7 +28,7 @@ SqlStmtParameters::SqlStmtParameters(int nParams)
 void SqlStmtParameters::reset(const SqlStatement& stmt)
 {
     m_params.clear();
-    //reserve memory if needed
+    // reserve memory if needed
     if (stmt.arguments() > 0)
         m_params.reserve(stmt.arguments());
 }
@@ -57,7 +57,7 @@ SqlStatement& SqlStatement::operator=(const SqlStatement& index)
 bool SqlStatement::Execute()
 {
     SqlStmtParameters* args = detach();
-    //verify amount of bound parameters
+    // verify amount of bound parameters
     if (args->boundParams() != arguments())
     {
         sLog.outError("SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
@@ -72,7 +72,7 @@ bool SqlStatement::Execute()
 bool SqlStatement::DirectExecute()
 {
     SqlStmtParameters* args = detach();
-    //verify amount of bound parameters
+    // verify amount of bound parameters
     if (args->boundParams() != arguments())
     {
         sLog.outError("SQL ERROR: wrong amount of parameters (%i instead of %i)", args->boundParams(), arguments());
@@ -94,14 +94,14 @@ SqlPlainPreparedStatement::SqlPlainPreparedStatement(const std::string& fmt, Sql
 
 void SqlPlainPreparedStatement::bind(const SqlStmtParameters& holder)
 {
-    //verify if we bound all needed input parameters
+    // verify if we bound all needed input parameters
     if (m_nParams != holder.boundParams())
     {
         MANGOS_ASSERT(false);
         return;
     }
 
-    //reset resulting plain SQL request
+    // reset resulting plain SQL request
     m_szPlainRequest = m_szFmt;
     size_t nLastPos = 0;
 
@@ -110,7 +110,7 @@ void SqlPlainPreparedStatement::bind(const SqlStmtParameters& holder)
     SqlStmtParameters::ParameterContainer::const_iterator iter_last = _args.end();
     for (SqlStmtParameters::ParameterContainer::const_iterator iter = _args.begin(); iter != iter_last; ++iter)
     {
-        //bind parameter
+        // bind parameter
         const SqlStmtFieldData& data = (*iter);
 
         std::ostringstream fmt;

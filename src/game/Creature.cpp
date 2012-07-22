@@ -503,7 +503,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 else
                     SetDeathState(JUST_ALIVED);
 
-                //Call AI respawn virtual function
+                // Call AI respawn virtual function
                 if (AI())
                     AI()->JustRespawned();
 
@@ -750,9 +750,9 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     if (!cPos.Relocate(this))
         return false;
 
-    //Notify the map's instance data.
-    //Only works if you create the object in it, not if it is moves to that map.
-    //Normally non-players do not teleport to other maps.
+    // Notify the map's instance data.
+    // Only works if you create the object in it, not if it is moves to that map.
+    // Normally non-players do not teleport to other maps.
     if (InstanceData* iData = GetMap()->GetInstanceData())
         iData->OnCreatureCreate(this);
 
@@ -1129,13 +1129,13 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
        << data.posY << ","
        << data.posZ << ","
        << data.orientation << ","
-       << data.spawntimesecs << ","                        //respawn time
-       << (float) data.spawndist << ","                    //spawn distance (float)
-       << data.currentwaypoint << ","                      //currentwaypoint
-       << data.curhealth << ","                            //curhealth
-       << data.curmana << ","                              //curmana
-       << (data.is_dead  ? 1 : 0) << ","                   //is_dead
-       << uint32(data.movementType) << ")";                //default movement generator type, cast to prevent save as symbol
+       << data.spawntimesecs << ","                        // respawn time
+       << (float) data.spawndist << ","                    // spawn distance (float)
+       << data.currentwaypoint << ","                      // currentwaypoint
+       << data.curhealth << ","                            // curhealth
+       << data.curmana << ","                              // curmana
+       << (data.is_dead  ? 1 : 0) << ","                   // is_dead
+       << uint32(data.movementType) << ")";                // default movement generator type, cast to prevent save as symbol
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
@@ -1175,7 +1175,7 @@ void Creature::SelectLevel(const CreatureInfo* cinfo, float percentHealth, float
     uint32 mana = minmana + uint32(rellevel * (maxmana - minmana));
 
     SetCreateMana(mana);
-    SetMaxPower(POWER_MANA, mana);                          //MAX Mana
+    SetMaxPower(POWER_MANA, mana);                          // MAX Mana
     SetPower(POWER_MANA, mana);
 
     // TODO: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
@@ -1655,7 +1655,7 @@ SpellEntry const* Creature::ReachWithSpellAttack(Unit* pVictim)
 
         float dist = GetCombatDistance(pVictim);
 
-        //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
+        // if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if (dist > range || dist < minrange)
             continue;
@@ -1704,7 +1704,7 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
 
         float dist = GetCombatDistance(pVictim);
 
-        //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
+        // if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
         //    continue;
         if (dist > range || dist < minrange)
             continue;
@@ -1889,7 +1889,7 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
     float AttackDist = GetAttackDistance(pVictim);
     float ThreatRadius = sWorld.getConfig(CONFIG_FLOAT_THREAT_RADIUS);
 
-    //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
+    // Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
     return !pVictim->IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ,
                                     ThreatRadius > AttackDist ? ThreatRadius : AttackDist);
 }
@@ -1911,7 +1911,7 @@ CreatureDataAddon const* Creature::GetCreatureAddon() const
     return ObjectMgr::GetCreatureTemplateAddon(GetEntry());
 }
 
-//creature_addon table
+// creature_addon table
 bool Creature::LoadCreatureAddon(bool reload)
 {
     CreatureDataAddon const* cainfo = GetCreatureAddon();
@@ -1929,7 +1929,7 @@ bool Creature::LoadCreatureAddon(bool reload)
         // 3 StandMiscFlags
 
         SetByteValue(UNIT_FIELD_BYTES_1, 0, uint8(cainfo->bytes1 & 0xFF));
-        //SetByteValue(UNIT_FIELD_BYTES_1, 1, uint8((cainfo->bytes1 >> 8) & 0xFF));
+        // SetByteValue(UNIT_FIELD_BYTES_1, 1, uint8((cainfo->bytes1 >> 8) & 0xFF));
         SetByteValue(UNIT_FIELD_BYTES_1, 1, 0);
         SetByteValue(UNIT_FIELD_BYTES_1, 2, uint8((cainfo->bytes1 >> 16) & 0xFF));
         SetByteValue(UNIT_FIELD_BYTES_1, 3, uint8((cainfo->bytes1 >> 24) & 0xFF));
@@ -1945,8 +1945,8 @@ bool Creature::LoadCreatureAddon(bool reload)
     if (cainfo->pvp_state != 0)
         SetByteValue(UNIT_FIELD_BYTES_2, 1, cainfo->pvp_state);
 
-    //SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
-    //SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
+    // SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
+    // SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
 
     if (cainfo->emote != 0)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, cainfo->emote);
@@ -2223,7 +2223,7 @@ void Creature::GetRespawnCoord(float& x, float& y, float& z, float* ori, float* 
             *dist = GetRespawnRadius();
     }
 
-    //lets check if our creatures have valid spawn coordinates
+    // lets check if our creatures have valid spawn coordinates
     MANGOS_ASSERT(MaNGOS::IsValidMapCoord(x, y, z) || PrintCoordinatesError(x, y, z, "respawn"));
 }
 
@@ -2494,7 +2494,7 @@ struct SpawnCreatureInMapsWorker
         if (map->IsLoaded(i_data->posX, i_data->posY))
         {
             Creature* pCreature = new Creature;
-            //DEBUG_LOG("Spawning creature %u",*itr);
+            // DEBUG_LOG("Spawning creature %u",*itr);
             if (!pCreature->LoadFromDB(i_guid, map))
             {
                 delete pCreature;

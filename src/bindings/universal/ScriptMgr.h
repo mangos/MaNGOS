@@ -19,7 +19,7 @@
 #ifndef SCRIPTMGR_H
 #define SCRIPTMGR_H
 
-//Only required includes
+// Only required includes
 #include "../../game/CreatureAI.h"
 #include "../../game/Creature.h"
 #include "../../game/InstanceData.h"

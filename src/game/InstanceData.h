@@ -37,57 +37,57 @@ class MANGOS_DLL_SPEC InstanceData
 
         Map* instance;
 
-        //On creation, NOT load.
+        // On creation, NOT load.
         virtual void Initialize() {}
 
-        //On load
+        // On load
         virtual void Load(const char* /*data*/) {}
 
-        //When save is needed, this function generates the data
+        // When save is needed, this function generates the data
         virtual const char* Save() { return ""; }
 
         void SaveToDB();
 
-        //Called every map update
+        // Called every map update
         virtual void Update(uint32 /*diff*/) {}
 
-        //Used by the map's CanEnter function.
-        //This is to prevent players from entering during boss encounters.
+        // Used by the map's CanEnter function.
+        // This is to prevent players from entering during boss encounters.
         virtual bool IsEncounterInProgress() const { return false; };
 
-        //Called when a player successfully enters the instance (after really added to map)
+        // Called when a player successfully enters the instance (after really added to map)
         virtual void OnPlayerEnter(Player*) {}
 
-        //Called when a player dies inside instance
+        // Called when a player dies inside instance
         virtual void OnPlayerDeath(Player*) {}
 
-        //Called when a player leaves the instance (before really removed from map (or possibly world))
+        // Called when a player leaves the instance (before really removed from map (or possibly world))
         virtual void OnPlayerLeave(Player*) {}
 
-        //Called when a gameobject is created
+        // Called when a gameobject is created
         virtual void OnObjectCreate(GameObject*) {}
 
-        //called on creature creation
+        // called on creature creation
         virtual void OnCreatureCreate(Creature* /*creature*/) {}
 
-        //called on creature enter combat
+        // called on creature enter combat
         virtual void OnCreatureEnterCombat(Creature* /*creature*/) {}
 
-        //called on creature evade
+        // called on creature evade
         virtual void OnCreatureEvade(Creature* /*creature*/) {}
 
-        //called on creature death
+        // called on creature death
         virtual void OnCreatureDeath(Creature* /*creature*/) {}
 
-        //All-purpose data storage 64 bit
+        // All-purpose data storage 64 bit
         virtual uint64 GetData64(uint32 /*Data*/) { return 0; }
         virtual void SetData64(uint32 /*Data*/, uint64 /*Value*/) { }
 
-        //Guid data storage (wrapper for set/get from uint64 storage
+        // Guid data storage (wrapper for set/get from uint64 storage
         ObjectGuid GetGuid(uint32 dataIdx) { return ObjectGuid(GetData64(dataIdx)); }
         void SetGuid(uint32 dataIdx, ObjectGuid value) { SetData64(dataIdx, value.GetRawValue()); }
 
-        //All-purpose data storage 32 bit
+        // All-purpose data storage 32 bit
         virtual uint32 GetData(uint32 /*Type*/) { return 0; }
         virtual void SetData(uint32 /*Type*/, uint32 /*Data*/) {}
 

@@ -50,28 +50,28 @@ SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
     if (nIndex < 0)
         return NULL;
 
-    //resize stmt container
+    // resize stmt container
     if (m_holder.size() <= nIndex)
         m_holder.resize(nIndex + 1, NULL);
 
     SqlPreparedStatement* pStmt = NULL;
 
-    //create stmt if needed
+    // create stmt if needed
     if (m_holder[nIndex] == NULL)
     {
-        //obtain SQL request string
+        // obtain SQL request string
         std::string fmt = m_db.GetStmtString(nIndex);
         MANGOS_ASSERT(fmt.length());
-        //allocate SQlPreparedStatement object
+        // allocate SQlPreparedStatement object
         pStmt = CreateStatement(fmt);
-        //prepare statement
+        // prepare statement
         if (!pStmt->prepare())
         {
             MANGOS_ASSERT(false && "Unable to prepare SQL statement");
             return NULL;
         }
 
-        //save statement in internal registry
+        // save statement in internal registry
         m_holder[nIndex] = pStmt;
     }
     else
@@ -85,11 +85,11 @@ bool SqlConnection::ExecuteStmt(int nIndex, const SqlStmtParameters& id)
     if (nIndex == -1)
         return false;
 
-    //get prepared statement object
+    // get prepared statement object
     SqlPreparedStatement* pStmt = GetStmt(nIndex);
-    //bind parameters
+    // bind parameters
     pStmt->bind(id);
-    //execute statement
+    // execute statement
     return pStmt->execute();
 }
 
@@ -113,9 +113,9 @@ bool Database::Initialize(const char* infoString, int nConns /*= 1*/)
 
     m_pingIntervallms = sConfig.GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000);
 
-    //create DB connections
+    // create DB connections
 
-    //setup connection pool size
+    // setup connection pool size
     if (nConns < MIN_CONNECTION_POOL_SIZE)
         m_nQueryConnPoolSize = MIN_CONNECTION_POOL_SIZE;
     else if (nConns > MAX_CONNECTION_POOL_SIZE)
@@ -123,7 +123,7 @@ bool Database::Initialize(const char* infoString, int nConns /*= 1*/)
     else
         m_nQueryConnPoolSize = nConns;
 
-    //create connection pool for sync requests
+    // create connection pool for sync requests
     for (int i = 0; i < m_nQueryConnPoolSize; ++i)
     {
         SqlConnection* pConn = CreateConnection();
@@ -136,7 +136,7 @@ bool Database::Initialize(const char* infoString, int nConns /*= 1*/)
         m_pQueryConnections.push_back(pConn);
     }
 
-    //create and initialize connection for async requests
+    // create and initialize connection for async requests
     m_pAsyncConn = CreateConnection();
     if (!m_pAsyncConn->Initialize(infoString))
         return false;
@@ -180,7 +180,7 @@ void Database::InitDelayThread()
 {
     assert(!m_delayThread);
 
-    //New delay thread for delay execute
+    // New delay thread for delay execute
     m_threadBody = CreateDelayThread();              // will deleted at m_delayThread delete
     m_delayThread = new ACE_Based::Thread(m_threadBody);
 }
@@ -189,9 +189,9 @@ void Database::HaltDelayThread()
 {
     if (!m_threadBody || !m_delayThread) return;
 
-    m_threadBody->Stop();                                   //Stop event
-    m_delayThread->wait();                                  //Wait for flush to DB
-    delete m_delayThread;                                   //This also deletes m_threadBody
+    m_threadBody->Stop();                                   // Stop event
+    m_delayThread->wait();                                  // Wait for flush to DB
+    delete m_delayThread;                                   // This also deletes m_threadBody
     m_delayThread = NULL;
     m_threadBody = NULL;
 }
@@ -216,7 +216,7 @@ void Database::escape_string(std::string& str)
         return;
 
     char* buf = new char[str.size() * 2 + 1];
-    //we don't care what connection to use - escape string will be the same
+    // we don't care what connection to use - escape string will be the same
     m_pQueryConnections[0]->escape_string(buf, str.c_str(), str.size());
     str = buf;
     delete[] buf;
@@ -340,12 +340,12 @@ bool Database::Execute(const char* sql)
     SqlTransaction* pTrans = m_TransStorage->get();
     if (pTrans)
     {
-        //add SQL request to trans queue
+        // add SQL request to trans queue
         pTrans->DelayExecute(new SqlPlainRequest(sql));
     }
     else
     {
-        //if async execution is not available
+        // if async execution is not available
         if (!m_bAllowAsyncTransactions)
             return DirectExecute(sql);
 
@@ -401,8 +401,8 @@ bool Database::BeginTransaction()
     if (!m_pAsyncConn)
         return false;
 
-    //initiate transaction on current thread
-    //currently we do not support queued transactions
+    // initiate transaction on current thread
+    // currently we do not support queued transactions
     m_TransStorage->init();
     return true;
 }
@@ -412,15 +412,15 @@ bool Database::CommitTransaction()
     if (!m_pAsyncConn)
         return false;
 
-    //check if we have pending transaction
+    // check if we have pending transaction
     if (!m_TransStorage->get())
         return false;
 
-    //if async execution is not available
+    // if async execution is not available
     if (!m_bAllowAsyncTransactions)
         return CommitTransactionDirect();
 
-    //add SqlTransaction to the async queue
+    // add SqlTransaction to the async queue
     m_threadBody->Delay(m_TransStorage->detach());
     return true;
 }
@@ -430,11 +430,11 @@ bool Database::CommitTransactionDirect()
     if (!m_pAsyncConn)
         return false;
 
-    //check if we have pending transaction
+    // check if we have pending transaction
     if (!m_TransStorage->get())
         return false;
 
-    //directly execute SqlTransaction
+    // directly execute SqlTransaction
     SqlTransaction* pTrans = m_TransStorage->detach();
     pTrans->Execute(m_pAsyncConn);
     delete pTrans;
@@ -450,7 +450,7 @@ bool Database::RollbackTransaction()
     if (!m_TransStorage->get())
         return false;
 
-    //remove scheduled transaction
+    // remove scheduled transaction
     m_TransStorage->reset();
 
     return true;
@@ -552,12 +552,12 @@ bool Database::ExecuteStmt(const SqlStatementID& id, SqlStmtParameters* params)
     SqlTransaction* pTrans = m_TransStorage->get();
     if (pTrans)
     {
-        //add SQL request to trans queue
+        // add SQL request to trans queue
         pTrans->DelayExecute(new SqlPreparedRequest(id.ID(), params));
     }
     else
     {
-        //if async execution is not available
+        // if async execution is not available
         if (!m_bAllowAsyncTransactions)
             return DirectExecuteStmt(id, params);
 
@@ -572,7 +572,7 @@ bool Database::DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters* pa
 {
     MANGOS_ASSERT(params);
     std::auto_ptr<SqlStmtParameters> p(params);
-    //execute statement
+    // execute statement
     SqlConnection::Lock _guard(getAsyncConnection());
     return _guard->ExecuteStmt(id.ID(), *params);
 }
@@ -580,14 +580,14 @@ bool Database::DirectExecuteStmt(const SqlStatementID& id, SqlStmtParameters* pa
 SqlStatement Database::CreateStatement(SqlStatementID& index, const char* fmt)
 {
     int nId = -1;
-    //check if statement ID is initialized
+    // check if statement ID is initialized
     if (!index.initialized())
     {
-        //convert to lower register
+        // convert to lower register
         std::string szFmt(fmt);
-        //count input parameters
+        // count input parameters
         int nParams = std::count(szFmt.begin(), szFmt.end(), '?');
-        //find existing or add a new record in registry
+        // find existing or add a new record in registry
         LOCK_GUARD _guard(m_stmtGuard);
         PreparedStmtRegistry::const_iterator iter = m_stmtRegistry.find(szFmt);
         if (iter == m_stmtRegistry.end())
@@ -598,7 +598,7 @@ SqlStatement Database::CreateStatement(SqlStatementID& index, const char* fmt)
         else
             nId = iter->second;
 
-        //save initialized statement index info
+        // save initialized statement index info
         index.init(nId, nParams);
     }
 
@@ -622,7 +622,7 @@ std::string Database::GetStmtString(const int stmtId) const
     return std::string();
 }
 
-//HELPER CLASSES AND FUNCTIONS
+// HELPER CLASSES AND FUNCTIONS
 Database::TransHelper::~TransHelper()
 {
     reset();
@@ -630,7 +630,7 @@ Database::TransHelper::~TransHelper()
 
 SqlTransaction* Database::TransHelper::init()
 {
-    MANGOS_ASSERT(!m_pTrans);   //if we will get a nested transaction request - we MUST fix code!!!
+    MANGOS_ASSERT(!m_pTrans);   // if we will get a nested transaction request - we MUST fix code!!!
     m_pTrans = new SqlTransaction;
     return m_pTrans;
 }

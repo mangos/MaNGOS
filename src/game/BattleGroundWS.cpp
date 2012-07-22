@@ -135,7 +135,7 @@ void BattleGroundWS::StartingEventOpenDoors()
 void BattleGroundWS::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
-    //create score and add it to map, default values are set in constructor
+    // create score and add it to map, default values are set in constructor
     BattleGroundWGScore* sc = new BattleGroundWGScore;
 
     m_PlayerScores[plr->GetObjectGuid()] = sc;
@@ -158,7 +158,7 @@ void BattleGroundWS::RespawnFlag(Team team, bool captured)
 
     if (captured)
     {
-        //when map_update will be allowed for battlegrounds this code will be useless
+        // when map_update will be allowed for battlegrounds this code will be useless
         SpawnEvent(WS_EVENT_FLAG_A, 0, true);
         SpawnEvent(WS_EVENT_FLAG_H, 0, true);
         SendMessageToAll(LANG_BG_WS_F_PLACED, CHAT_MSG_BG_SYSTEM_NEUTRAL);
@@ -226,7 +226,7 @@ void BattleGroundWS::EventPlayerCapturedFlag(Player* source)
         PlaySoundToAll(BG_WS_SOUND_FLAG_CAPTURED_HORDE);
         RewardReputationToTeam(889, m_ReputationCapture, HORDE);
     }
-    //for flag capture is reward 2 honorable kills
+    // for flag capture is reward 2 honorable kills
     RewardHonorToTeam(GetBonusHonorFromKill(2), source->GetTeam());
 
     // despawn flags
@@ -352,7 +352,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
 
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event1;
 
-    //alliance flag picked up from base
+    // alliance flag picked up from base
     if (source->GetTeam() == HORDE && GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE
             && event == WS_EVENT_FLAG_A)
     {
@@ -362,13 +362,13 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
         SpawnEvent(WS_EVENT_FLAG_A, 0, false);
         SetAllianceFlagPicker(source->GetObjectGuid());
         m_FlagState[BG_TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_PLAYER;
-        //update world state to show correct flag carrier
+        // update world state to show correct flag carrier
         UpdateFlagState(HORDE, BG_WS_FLAG_STATE_ON_PLAYER);
         UpdateWorldState(BG_WS_FLAG_UNK_ALLIANCE, 1);
         source->CastSpell(source, BG_WS_SPELL_SILVERWING_FLAG, true);
     }
 
-    //horde flag picked up from base
+    // horde flag picked up from base
     if (source->GetTeam() == ALLIANCE && GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_BASE
             && event == WS_EVENT_FLAG_H)
     {
@@ -378,13 +378,13 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
         SpawnEvent(WS_EVENT_FLAG_H, 0, false);
         SetHordeFlagPicker(source->GetObjectGuid());
         m_FlagState[BG_TEAM_HORDE] = BG_WS_FLAG_STATE_ON_PLAYER;
-        //update world state to show correct flag carrier
+        // update world state to show correct flag carrier
         UpdateFlagState(ALLIANCE, BG_WS_FLAG_STATE_ON_PLAYER);
         UpdateWorldState(BG_WS_FLAG_UNK_HORDE, 1);
         source->CastSpell(source, BG_WS_SPELL_WARSONG_FLAG, true);
     }
 
-    //Alliance flag on ground(not in base) (returned or picked up again from ground!)
+    // Alliance flag on ground(not in base) (returned or picked up again from ground!)
     if (GetFlagState(ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && source->IsWithinDistInMap(target_obj, 10))
     {
         if (source->GetTeam() == ALLIANCE)
@@ -408,11 +408,11 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
             UpdateFlagState(HORDE, BG_WS_FLAG_STATE_ON_PLAYER);
             UpdateWorldState(BG_WS_FLAG_UNK_ALLIANCE, 1);
         }
-        //called in HandleGameObjectUseOpcode:
-        //target_obj->Delete();
+        // called in HandleGameObjectUseOpcode:
+        // target_obj->Delete();
     }
 
-    //Horde flag on ground(not in base) (returned or picked up again)
+    // Horde flag on ground(not in base) (returned or picked up again)
     if (GetFlagState(HORDE) == BG_WS_FLAG_STATE_ON_GROUND && source->IsWithinDistInMap(target_obj, 10))
     {
         if (source->GetTeam() == HORDE)
@@ -436,8 +436,8 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player* source, GameObject* target
             UpdateFlagState(ALLIANCE, BG_WS_FLAG_STATE_ON_PLAYER);
             UpdateWorldState(BG_WS_FLAG_UNK_HORDE, 1);
         }
-        //called in HandleGameObjectUseOpcode:
-        //target_obj->Delete();
+        // called in HandleGameObjectUseOpcode:
+        // target_obj->Delete();
     }
 
     if (!message_id)
@@ -496,8 +496,8 @@ void BattleGroundWS::HandleAreaTrigger(Player* source, uint32 trigger)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 SpellId = 0;
-    //uint64 buff_guid = 0;
+    // uint32 SpellId = 0;
+    // uint64 buff_guid = 0;
     switch (trigger)
     {
         case 3686:                                          // Alliance elixir of speed spawn. Trigger not working, because located inside other areatrigger, can be replaced by IsWithinDist(object, dist) in BattleGround::Update().
@@ -536,7 +536,7 @@ bool BattleGroundWS::SetupBattleGround()
 
 void BattleGroundWS::Reset()
 {
-    //call parent's class reset
+    // call parent's class reset
     BattleGround::Reset();
 
     // spiritguides and flags not spawned at beginning
@@ -562,12 +562,12 @@ void BattleGroundWS::Reset()
 
 void BattleGroundWS::EndBattleGround(Team winner)
 {
-    //win reward
+    // win reward
     if (winner == ALLIANCE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), ALLIANCE);
     if (winner == HORDE)
         RewardHonorToTeam(GetBonusHonorFromKill(m_HonorWinKills), HORDE);
-    //complete map_end rewards (even if no team wins)
+    // complete map_end rewards (even if no team wins)
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), ALLIANCE);
     RewardHonorToTeam(GetBonusHonorFromKill(m_HonorEndKills), HORDE);
 
@@ -607,11 +607,11 @@ void BattleGroundWS::UpdatePlayerScore(Player* source, uint32 type, uint32 value
 
 WorldSafeLocsEntry const* BattleGroundWS::GetClosestGraveYard(Player* player)
 {
-    //if status in progress, it returns main graveyards with spiritguides
-    //else it will return the graveyard in the flagroom - this is especially good
-    //if a player dies in preparation phase - then the player can't cheat
-    //and teleport to the graveyard outside the flagroom
-    //and start running around, while the doors are still closed
+    // if status in progress, it returns main graveyards with spiritguides
+    // else it will return the graveyard in the flagroom - this is especially good
+    // if a player dies in preparation phase - then the player can't cheat
+    // and teleport to the graveyard outside the flagroom
+    // and start running around, while the doors are still closed
     if (player->GetTeam() == ALLIANCE)
     {
         if (GetStatus() == STATUS_IN_PROGRESS)

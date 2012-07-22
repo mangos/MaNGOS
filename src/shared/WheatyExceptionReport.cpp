@@ -249,7 +249,7 @@ BOOL WheatyExceptionReport::_GetWindowsVersion(TCHAR* szVersion, DWORD cntMax)
                         else
                             _tcsncat(szVersion, _T("Server "), cntMax);
                     }
-                    else                                        // Windows NT 4.0
+                    else                                    // Windows NT 4.0
                     {
 #if WINVER < 0x0500
                         if (osvi.wReserved[0] & VER_SUITE_ENTERPRISE)
@@ -276,7 +276,7 @@ BOOL WheatyExceptionReport::_GetWindowsVersion(TCHAR* szVersion, DWORD cntMax)
                               osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
                     _tcsncat(szVersion, wszTmp, cntMax);
                 }
-                else                                            // Windows NT 4.0 prior to SP6a
+                else                                        // Windows NT 4.0 prior to SP6a
                 {
                     _stprintf(wszTmp, _T("%s (Version %d.%d, Build %d)"),
                               osvi.szCSDVersion, osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
@@ -284,7 +284,7 @@ BOOL WheatyExceptionReport::_GetWindowsVersion(TCHAR* szVersion, DWORD cntMax)
                 }
                 ::RegCloseKey(hKey);
             }
-            else                                                // Windows NT 3.51 and earlier or Windows 2000 and later
+            else                                            // Windows NT 3.51 and earlier or Windows 2000 and later
             {
                 if (!_tcslen(osvi.szCSDVersion))
                     _stprintf(wszTmp, _T("(Version %d.%d, Build %d)"),
@@ -464,7 +464,7 @@ void WheatyExceptionReport::GenerateExceptionReport(
     WriteStackDetails(&trashableContext, false, NULL);
     printTracesForAllThreads();
 
-//    #ifdef _M_IX86                                          // X86 Only!
+//    #ifdef _M_IX86                                        // X86 Only!
 
     _tprintf(_T("========================\r\n"));
     _tprintf(_T("Local Variables And Parameters\r\n"));
@@ -478,7 +478,7 @@ void WheatyExceptionReport::GenerateExceptionReport(
     SymEnumSymbols(GetCurrentProcess(),
                    (DWORD64)GetModuleHandle(szFaultingModule),
                    0, EnumerateSymbolsCallback, 0);
-    //  #endif                                                  // X86 Only!
+    //  #endif                                              // X86 Only!
 
     SymCleanup(GetCurrentProcess());
 
@@ -559,7 +559,7 @@ BOOL WheatyExceptionReport::GetLogicalAddress(
 
     PIMAGE_SECTION_HEADER pSection = IMAGE_FIRST_SECTION(pNtHdr);
 
-    DWORD_PTR rva = (DWORD_PTR)addr - hMod;                         // RVA is offset from module load address
+    DWORD_PTR rva = (DWORD_PTR)addr - hMod;                 // RVA is offset from module load address
 
     // Iterate through the section table, looking for the one that encompasses
     // the linear address.
@@ -602,7 +602,7 @@ struct CSymbolInfoPackage : public SYMBOL_INFO_PACKAGE
 //============================================================
 void WheatyExceptionReport::WriteStackDetails(
     PCONTEXT pContext,
-    bool bWriteVariables, HANDLE pThreadHandle)                 // true if local/params should be output
+    bool bWriteVariables, HANDLE pThreadHandle)             // true if local/params should be output
 {
     _tprintf(_T("\r\nCall stack:\r\n"));
 
@@ -665,10 +665,10 @@ void WheatyExceptionReport::WriteStackDetails(
         // Get the name of the function for this stack frame entry
         CSymbolInfoPackage sip;
         if (SymFromAddr(
-                    m_hProcess,                                     // Process handle of the current process
-                    sf.AddrPC.Offset,                               // Symbol address
-                    &symDisplacement,                               // Address of the variable that will receive the displacement
-                    &sip.si                                         // Address of the SYMBOL_INFO structure (inside "sip" object)
+                    m_hProcess,                             // Process handle of the current process
+                    sf.AddrPC.Offset,                       // Symbol address
+                    &symDisplacement,                       // Address of the variable that will receive the displacement
+                    &sip.si                                 // Address of the SYMBOL_INFO structure (inside "sip" object)
                 ))
         {
             _tprintf(_T("%hs+%I64X"), sip.si.Name, symDisplacement);

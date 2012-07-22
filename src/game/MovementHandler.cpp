@@ -196,7 +196,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
 
-    //lets process all delayed operations on successful teleport
+    // lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 }
 
@@ -245,7 +245,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
 
-    //lets process all delayed operations on successful teleport
+    // lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
 }
 
@@ -424,7 +424,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recv_data)
 
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 {
-    //DEBUG_LOG("WORLD: Recvd CMSG_MOUNTSPECIAL_ANIM");
+    // DEBUG_LOG("WORLD: Recvd CMSG_MOUNTSPECIAL_ANIM");
 
     WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
     data << GetPlayer()->GetObjectGuid();

@@ -23,8 +23,8 @@
 
 class BattleGround;
 
-#define BG_EY_FLAG_RESPAWN_TIME         (10*IN_MILLISECONDS) //10 seconds
-#define BG_EY_FPOINTS_TICK_TIME         (2*IN_MILLISECONDS)  //2 seconds
+#define BG_EY_FLAG_RESPAWN_TIME         (10*IN_MILLISECONDS)//10 seconds
+#define BG_EY_FPOINTS_TICK_TIME         (2*IN_MILLISECONDS) //2 seconds
 
 enum BG_EY_WorldStates
 {
@@ -48,7 +48,7 @@ enum BG_EY_WorldStates
     PROGRESS_BAR_STATUS             = 2719,                 //50 init!, 48 ... hordak bere .. 33 .. 0 = full 100% hordacky , 100 = full alliance
     PROGRESS_BAR_SHOW               = 2718,                 //1 init, 0 druhy send - bez messagu, 1 = controlled alliance
     NETHERSTORM_FLAG                = 2757,
-    //set to 2 when flag is picked up, and to 1 if it is dropped
+    // set to 2 when flag is picked up, and to 1 if it is dropped
     NETHERSTORM_FLAG_STATE_ALLIANCE = 2769,
     NETHERSTORM_FLAG_STATE_HORDE    = 2770
 };
@@ -69,7 +69,7 @@ enum BG_EY_ProgressBarConsts
 
 enum BG_EY_Sounds
 {
-    //strange ids, but sure about them
+    // strange ids, but sure about them
     BG_EY_SOUND_FLAG_PICKED_UP_ALLIANCE = 8212,
     BG_EY_SOUND_FLAG_CAPTURED_HORDE     = 8213,
     BG_EY_SOUND_FLAG_PICKED_UP_HORDE    = 8174,
@@ -137,7 +137,7 @@ const float BG_EY_NodePositions[BG_EY_NODES_MAX][3] =
 
 enum EYBattleGroundObjectTypes
 {
-    //buffs
+    // buffs
     BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER           = 1,
     BG_EY_OBJECT_REGENBUFF_FEL_REAVER           = 2,
     BG_EY_OBJECT_BERSERKBUFF_FEL_REAVER         = 3,
@@ -210,7 +210,7 @@ struct BattleGroundEYCapturingPointStruct
 const uint8  BG_EY_TickPoints[BG_EY_NODES_MAX] = {1, 2, 5, 10};
 const uint32 BG_EY_FlagPoints[BG_EY_NODES_MAX] = {75, 85, 100, 500};
 
-//constant arrays:
+// constant arrays:
 const BattleGroundEYPointIconsStruct PointsIconStruct[BG_EY_NODES_MAX] =
 {
     BattleGroundEYPointIconsStruct(FEL_REAVER_UNCONTROL, FEL_REAVER_ALLIANCE_CONTROL, FEL_REAVER_HORDE_CONTROL),

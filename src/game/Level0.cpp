@@ -123,7 +123,7 @@ bool ChatHandler::HandleServerInfoCommand(char* /*args*/)
 
 bool ChatHandler::HandleDismountCommand(char* /*args*/)
 {
-    //If player is not mounted, so go out :)
+    // If player is not mounted, so go out :)
     if (!m_session->GetPlayer()->IsMounted())
     {
         SendSysMessage(LANG_CHAR_NON_MOUNTED);

@@ -26,7 +26,7 @@ SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn) : m_dbEngine(d
 
 SqlDelayThread::~SqlDelayThread()
 {
-    //process all requests which might have been queued while thread was stopping
+    // process all requests which might have been queued while thread was stopping
     ProcessRequests();
 }
 

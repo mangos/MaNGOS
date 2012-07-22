@@ -389,7 +389,7 @@ void PoolGroup<Creature>::Spawn1Object(MapPersistentState& mapState, PoolObject*
             if (dataMap && dataMap->IsLoaded(data->posX, data->posY))
             {
                 Creature* pCreature = new Creature;
-                //DEBUG_LOG("Spawning creature %u",obj->guid);
+                // DEBUG_LOG("Spawning creature %u",obj->guid);
                 if (!pCreature->LoadFromDB(obj->guid, dataMap))
                 {
                     delete pCreature;
@@ -433,7 +433,7 @@ void PoolGroup<GameObject>::Spawn1Object(MapPersistentState& mapState, PoolObjec
             if (dataMap && dataMap->IsLoaded(data->posX, data->posY))
             {
                 GameObject* pGameobject = new GameObject;
-                //DEBUG_LOG("Spawning gameobject %u", obj->guid);
+                // DEBUG_LOG("Spawning gameobject %u", obj->guid);
                 if (!pGameobject->LoadFromDB(obj->guid, dataMap))
                 {
                     delete pGameobject;

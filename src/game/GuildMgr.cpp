@@ -127,7 +127,7 @@ void GuildMgr::LoadGuilds()
 
     do
     {
-        //Field *fields = result->Fetch();
+        // Field *fields = result->Fetch();
 
         bar.step();
         ++count;
@@ -157,8 +157,8 @@ void GuildMgr::LoadGuilds()
     delete guildMembersResult;
     delete guildBankTabRightsResult;
 
-    //delete unused LogGuid records in guild_eventlog and guild_bank_eventlog table
-    //you can comment these lines if you don't plan to change CONFIG_UINT32_GUILD_EVENT_LOG_COUNT and CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT
+    // delete unused LogGuid records in guild_eventlog and guild_bank_eventlog table
+    // you can comment these lines if you don't plan to change CONFIG_UINT32_GUILD_EVENT_LOG_COUNT and CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT
     CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE LogGuid > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT));
     CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE LogGuid > '%u'", sWorld.getConfig(CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT));
 

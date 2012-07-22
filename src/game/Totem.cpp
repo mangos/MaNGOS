@@ -58,9 +58,9 @@ bool Totem::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* 
     if (!cPos.Relocate(this))
         return false;
 
-    //Notify the map's instance data.
-    //Only works if you create the object in it, not if it is moves to that map.
-    //Normally non-players do not teleport to other maps.
+    // Notify the map's instance data.
+    // Only works if you create the object in it, not if it is moves to that map.
+    // Normally non-players do not teleport to other maps.
     if (InstanceData* iData = GetMap()->GetInstanceData())
         iData->OnCreatureCreate(this);
 
@@ -123,7 +123,7 @@ void Totem::UnSummon()
         owner->_RemoveTotem(this);
         owner->RemoveAurasDueToSpell(GetSpell());
 
-        //remove aura all party members too
+        // remove aura all party members too
         if (owner->GetTypeId() == TYPEID_PLAYER)
         {
             ((Player*)owner)->SendAutoRepeatCancel(this);
@@ -178,7 +178,7 @@ void Totem::SetTypeBySummonSpell(SpellEntry const* spellProto)
             m_type = TOTEM_ACTIVE;
     }
     if (spellProto->SpellIconID == 2056)
-        m_type = TOTEM_STATUE;                              //Jewelery statue
+        m_type = TOTEM_STATUE;                              // Jewelery statue
 }
 
 bool Totem::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const

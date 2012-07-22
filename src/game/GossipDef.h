@@ -55,19 +55,19 @@ enum Gossip_Option
 
 enum GossipOptionIcon
 {
-    GOSSIP_ICON_CHAT                = 0,                    //white chat bubble
-    GOSSIP_ICON_VENDOR              = 1,                    //brown bag
-    GOSSIP_ICON_TAXI                = 2,                    //flight
-    GOSSIP_ICON_TRAINER             = 3,                    //book
-    GOSSIP_ICON_INTERACT_1          = 4,                    //interaction wheel
-    GOSSIP_ICON_INTERACT_2          = 5,                    //interaction wheel
-    GOSSIP_ICON_MONEY_BAG           = 6,                    //brown bag with yellow dot
-    GOSSIP_ICON_TALK                = 7,                    //white chat bubble with black dots
-    GOSSIP_ICON_TABARD              = 8,                    //tabard
-    GOSSIP_ICON_BATTLE              = 9,                    //two swords
-    GOSSIP_ICON_DOT                 = 10,                   //yellow dot
-    GOSSIP_ICON_CHAT_11             = 11,                   //This and below are most the same visual as GOSSIP_ICON_CHAT
-    GOSSIP_ICON_CHAT_12             = 12,                   //but are still used for unknown reasons.
+    GOSSIP_ICON_CHAT                = 0,                    // white chat bubble
+    GOSSIP_ICON_VENDOR              = 1,                    // brown bag
+    GOSSIP_ICON_TAXI                = 2,                    // flight
+    GOSSIP_ICON_TRAINER             = 3,                    // book
+    GOSSIP_ICON_INTERACT_1          = 4,                    // interaction wheel
+    GOSSIP_ICON_INTERACT_2          = 5,                    // interaction wheel
+    GOSSIP_ICON_MONEY_BAG           = 6,                    // brown bag with yellow dot
+    GOSSIP_ICON_TALK                = 7,                    // white chat bubble with black dots
+    GOSSIP_ICON_TABARD              = 8,                    // tabard
+    GOSSIP_ICON_BATTLE              = 9,                    // two swords
+    GOSSIP_ICON_DOT                 = 10,                   // yellow dot
+    GOSSIP_ICON_CHAT_11             = 11,                   // This and below are most the same visual as GOSSIP_ICON_CHAT
+    GOSSIP_ICON_CHAT_12             = 12,                   // but are still used for unknown reasons.
     GOSSIP_ICON_CHAT_13             = 13,
     GOSSIP_ICON_CHAT_14             = 14,                   // probably invalid
     GOSSIP_ICON_CHAT_15             = 15,                   // probably invalid
@@ -79,7 +79,7 @@ enum GossipOptionIcon
     GOSSIP_ICON_MAX
 };
 
-//POI icons. Many more exist, list not complete.
+// POI icons. Many more exist, list not complete.
 enum Poi_Icon
 {
     ICON_POI_BLANK              =   0,                      // Blank (not visible), in 2.4.3 have value 15 with 1..15 values in 0..14 range

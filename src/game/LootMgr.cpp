@@ -29,13 +29,13 @@
 
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {
-    CONFIG_FLOAT_RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR
-    CONFIG_FLOAT_RATE_DROP_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
-    CONFIG_FLOAT_RATE_DROP_ITEM_UNCOMMON,                                // ITEM_QUALITY_UNCOMMON
-    CONFIG_FLOAT_RATE_DROP_ITEM_RARE,                                    // ITEM_QUALITY_RARE
-    CONFIG_FLOAT_RATE_DROP_ITEM_EPIC,                                    // ITEM_QUALITY_EPIC
-    CONFIG_FLOAT_RATE_DROP_ITEM_LEGENDARY,                               // ITEM_QUALITY_LEGENDARY
-    CONFIG_FLOAT_RATE_DROP_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
+    CONFIG_FLOAT_RATE_DROP_ITEM_POOR,                       // ITEM_QUALITY_POOR
+    CONFIG_FLOAT_RATE_DROP_ITEM_NORMAL,                     // ITEM_QUALITY_NORMAL
+    CONFIG_FLOAT_RATE_DROP_ITEM_UNCOMMON,                   // ITEM_QUALITY_UNCOMMON
+    CONFIG_FLOAT_RATE_DROP_ITEM_RARE,                       // ITEM_QUALITY_RARE
+    CONFIG_FLOAT_RATE_DROP_ITEM_EPIC,                       // ITEM_QUALITY_EPIC
+    CONFIG_FLOAT_RATE_DROP_ITEM_LEGENDARY,                  // ITEM_QUALITY_LEGENDARY
+    CONFIG_FLOAT_RATE_DROP_ITEM_ARTIFACT,                   // ITEM_QUALITY_ARTIFACT
 };
 
 LootStore LootTemplates_Creature("creature_loot_template",     "creature entry",                 true);
@@ -72,7 +72,7 @@ class LootTemplate::LootGroup                               // A set of loot def
         LootStoreItem const* Roll() const;                  // Rolls an item from the group, returns NULL if all miss their chances
 };
 
-//Remove all data and free all memory
+// Remove all data and free all memory
 void LootStore::Clear()
 {
     for (LootTemplateMap::const_iterator itr = m_LootTemplates.begin(); itr != m_LootTemplates.end(); ++itr)
@@ -739,7 +739,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
     b << uint32(ObjectMgr::GetItemPrototype(li.itemid)->DisplayInfoID);
     b << uint32(li.randomSuffix);
     b << uint32(li.randomPropertyId);
-    //b << uint8(0);                                        // slot type - will send after this function call
+    // b << uint8(0);                                       // slot type - will send after this function call
     return b;
 }
 
@@ -747,7 +747,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 {
     if (lv.permission == NONE_PERMISSION)
     {
-        b << uint32(0);                                     //gold
+        b << uint32(0);                                     // gold
         b << uint8(0);                                      // item count
         return b;                                           // nothing output more
     }
@@ -756,7 +756,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 
     uint8 itemsShown = 0;
 
-    //gold
+    // gold
     b << uint32(l.gold);
 
     size_t count_pos = b.wpos();                            // pos of item count byte
@@ -834,7 +834,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         }
     }
 
-    //update number of items shown
+    // update number of items shown
     b.put<uint8>(count_pos, itemsShown);
 
     return b;
@@ -860,7 +860,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll() const
     {
         float Roll = rand_chance_f();
 
-        for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i) //check each explicitly chanced entry in the template and modify its chance based on quality.
+        for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i) // check each explicitly chanced entry in the template and modify its chance based on quality.
         {
             if (ExplicitlyChanced[i].chance >= 100.0f)
                 return &ExplicitlyChanced[i];
@@ -1310,7 +1310,7 @@ void LoadLootTemplates_Prospecting()
 
         if (ids_set.find(proto->ItemId) != ids_set.end())
             ids_set.erase(proto->ItemId);
-        //else -- exist some cases that possible can be prospected but not expected have any result loot
+        // else -- exist some cases that possible can be prospected but not expected have any result loot
         //    LootTemplates_Prospecting.ReportNotExistedId(proto->ItemId);
     }
 

@@ -418,7 +418,7 @@ void AuctionHouseMgr::LoadAuctions()
                 auction->itemCount    = pItem->GetCount();
                 auction->itemRandomPropertyId = pItem->GetItemRandomPropertyId();
 
-                //No SQL injection (no strings)
+                // No SQL injection (no strings)
                 CharacterDatabase.PExecute("UPDATE auction SET item_template = %u, item_count = %u, item_randompropertyid = %i WHERE itemguid = %u",
                                            auction->itemTemplate, auction->itemCount, auction->itemRandomPropertyId, auction->itemGuidLow);
             }
@@ -443,7 +443,7 @@ void AuctionHouseMgr::LoadAuctions()
                 auction->itemGuidLow = 0;
 
                 // item will deleted or added to received mail list
-                MailDraft(msgAuctionCanceledOwner.str(), "")    // TODO: fix body
+                MailDraft(msgAuctionCanceledOwner.str(), "")// TODO: fix body
                 .AddItem(pItem)
                 .SendMailTo(MailReceiver(ObjectGuid(HIGHGUID_PLAYER, auction->owner)), auction, MAIL_CHECK_MASK_COPIED);
             }
@@ -971,13 +971,13 @@ uint32 AuctionEntry::GetAuctionOutBid() const
 
 void AuctionEntry::DeleteFromDB() const
 {
-    //No SQL injection (Id is integer)
+    // No SQL injection (Id is integer)
     CharacterDatabase.PExecute("DELETE FROM auction WHERE id = '%u'", Id);
 }
 
 void AuctionEntry::SaveToDB() const
 {
-    //No SQL injection (no strings)
+    // No SQL injection (no strings)
     CharacterDatabase.PExecute("INSERT INTO auction (id,houseid,itemguid,item_template,item_count,item_randompropertyid,itemowner,buyoutprice,time,moneyTime,buyguid,lastbid,startbid,deposit) "
                                "VALUES ('%u', '%u', '%u', '%u', '%u', '%i', '%u', '%u', '" UI64FMTD "', '" UI64FMTD "', '%u', '%u', '%u', '%u')",
                                Id, auctionHouseEntry->houseId, itemGuidLow, itemTemplate, itemCount, itemRandomPropertyId, owner, buyout, (uint64)expireTime, (uint64)moneyDeliveryTime, bidder, bid, startbid, deposit);

@@ -70,7 +70,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
         uint32 events_count = 0;
         for (CreatureEventAI_Event_Vec::const_iterator i = (*creatureEventsItr).second.begin(); i != (*creatureEventsItr).second.end(); ++i)
         {
-            //Debug check
+            // Debug check
 #ifndef MANGOS_DEBUG
             if ((*i).event_flags & EFLAG_DEBUG_ONLY)
                 continue;
@@ -85,7 +85,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
             else
                 ++events_count;
         }
-        //EventMap had events but they were not added because they must be for instance
+        // EventMap had events but they were not added because they must be for instance
         if (events_count == 0)
             sLog.outError("CreatureEventAI: Creature %u has events but no events added to list because of instance flags.", m_creature->GetEntry());
         else
@@ -94,7 +94,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
             for (CreatureEventAI_Event_Vec::const_iterator i = (*creatureEventsItr).second.begin(); i != (*creatureEventsItr).second.end(); ++i)
             {
 
-                //Debug check
+                // Debug check
 #ifndef MANGOS_DEBUG
                 if ((*i).event_flags & EFLAG_DEBUG_ONLY)
                     continue;
@@ -103,7 +103,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
                 {
                     if ((1 << (m_creature->GetMap()->GetSpawnMode() + 1)) & (*i).event_flags)
                     {
-                        //event flagged for instance mode
+                        // event flagged for instance mode
                         m_CreatureEventAIList.push_back(CreatureEventAIHolder(*i));
                     }
                 }
@@ -124,7 +124,7 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
 
     m_InvinceabilityHpLevel = 0;
 
-    //Handle Spawned Events
+    // Handle Spawned Events
     if (!m_bEmptyList)
     {
         for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
@@ -139,27 +139,27 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     if (!pHolder.Enabled || pHolder.Time)
         return false;
 
-    //Check the inverse phase mask (event doesn't trigger if current phase bit is set in mask)
+    // Check the inverse phase mask (event doesn't trigger if current phase bit is set in mask)
     if (pHolder.Event.event_inverse_phase_mask & (1 << m_Phase))
         return false;
 
     CreatureEventAI_Event const& event = pHolder.Event;
 
-    //Check event conditions based on the event type, also reset events
+    // Check event conditions based on the event type, also reset events
     switch (event.event_type)
     {
         case EVENT_T_TIMER:
             if (!m_creature->isInCombat())
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.timer.repeatMin, event.timer.repeatMax);
             break;
         case EVENT_T_TIMER_OOC:
             if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.timer.repeatMin, event.timer.repeatMax);
             break;
         case EVENT_T_HP:
@@ -172,7 +172,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.percent_range.repeatMin, event.percent_range.repeatMax);
             break;
         }
@@ -186,31 +186,31 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.percent_range.repeatMin, event.percent_range.repeatMax);
             break;
         }
         case EVENT_T_AGGRO:
             break;
         case EVENT_T_KILL:
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.kill.repeatMin, event.kill.repeatMax);
             break;
         case EVENT_T_DEATH:
         case EVENT_T_EVADE:
             break;
         case EVENT_T_SPELLHIT:
-            //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
+            // Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.spell_hit.repeatMin, event.spell_hit.repeatMax);
             break;
         case EVENT_T_RANGE:
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.range.repeatMin, event.range.repeatMax);
             break;
         case EVENT_T_OOC_LOS:
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.ooc_los.repeatMin, event.ooc_los.repeatMax);
             break;
         case EVENT_T_SPAWNED:
@@ -225,7 +225,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.percent_range.repeatMin, event.percent_range.repeatMax);
             break;
         }
@@ -233,7 +233,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat() || !m_creature->getVictim() || !m_creature->getVictim()->IsNonMeleeSpellCasted(false, false, true))
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.target_casting.repeatMin, event.target_casting.repeatMax);
             break;
         case EVENT_T_FRIENDLY_HP:
@@ -247,7 +247,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
 
             pActionInvoker = pUnit;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.friendly_hp.repeatMin, event.friendly_hp.repeatMax);
             break;
         }
@@ -259,14 +259,14 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             std::list<Creature*> pList;
             DoFindFriendlyCC(pList, (float)event.friendly_is_cc.radius);
 
-            //List is empty
+            // List is empty
             if (pList.empty())
                 return false;
 
-            //We don't really care about the whole list, just return first available
+            // We don't really care about the whole list, just return first available
             pActionInvoker = *(pList.begin());
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.friendly_is_cc.repeatMin, event.friendly_is_cc.repeatMax);
             break;
         }
@@ -275,14 +275,14 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             std::list<Creature*> pList;
             DoFindFriendlyMissingBuff(pList, (float)event.friendly_buff.radius, event.friendly_buff.spellId);
 
-            //List is empty
+            // List is empty
             if (pList.empty())
                 return false;
 
-            //We don't really care about the whole list, just return first available
+            // We don't really care about the whole list, just return first available
             pActionInvoker = *(pList.begin());
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.friendly_buff.repeatMin, event.friendly_buff.repeatMax);
             break;
         }
@@ -290,15 +290,15 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_SUMMONED_JUST_DIED:
         case EVENT_T_SUMMONED_JUST_DESPAWN:
         {
-            //Prevent event from occuring on no unit or non creatures
+            // Prevent event from occuring on no unit or non creatures
             if (!pActionInvoker || pActionInvoker->GetTypeId() != TYPEID_UNIT)
                 return false;
 
-            //Creature id doesn't match up
+            // Creature id doesn't match up
             if (((Creature*)pActionInvoker)->GetEntry() != event.summoned.creatureId)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.summoned.repeatMin, event.summoned.repeatMax);
             break;
         }
@@ -312,7 +312,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.percent_range.repeatMin, event.percent_range.repeatMax);
             break;
         }
@@ -325,7 +325,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!holder || holder->GetStackAmount() < event.buffed.amount)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.buffed.repeatMin, event.buffed.repeatMax);
             break;
         }
@@ -338,7 +338,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!holder || holder->GetStackAmount() < event.buffed.amount)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.buffed.repeatMin, event.buffed.repeatMax);
             break;
         }
@@ -348,7 +348,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (holder && holder->GetStackAmount() >= event.buffed.amount)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.buffed.repeatMin, event.buffed.repeatMax);
             break;
         }
@@ -361,7 +361,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (holder && holder->GetStackAmount() >= event.buffed.amount)
                 return false;
 
-            //Repeat Timers
+            // Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.buffed.repeatMin, event.buffed.repeatMax);
             break;
         }
@@ -370,24 +370,24 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
     }
 
-    //Disable non-repeatable events
+    // Disable non-repeatable events
     if (!(pHolder.Event.event_flags & EFLAG_REPEATABLE))
         pHolder.Enabled = false;
 
-    //Store random here so that all random actions match up
+    // Store random here so that all random actions match up
     uint32 rnd = rand();
 
-    //Return if chance for event is not met
+    // Return if chance for event is not met
     if (pHolder.Event.event_chance <= rnd % 100)
         return false;
 
-    //Process actions, normal case
+    // Process actions, normal case
     if (!(pHolder.Event.event_flags & EFLAG_RANDOM_ACTION))
     {
         for (uint32 j = 0; j < MAX_ACTIONS; ++j)
             ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
     }
-    //Process actions, random case
+    // Process actions, random case
     else
     {
         // amount of real actions
@@ -476,7 +476,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         {
             if (action.morph.creatureId || action.morph.modelId)
             {
-                //set model based on entry from creature_template
+                // set model based on entry from creature_template
                 if (action.morph.creatureId)
                 {
                     if (CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(action.morph.creatureId))
@@ -485,7 +485,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                         m_creature->SetDisplayId(display_id);
                     }
                 }
-                //if no param1, then use value from param2 (modelId)
+                // if no param1, then use value from param2 (modelId)
                 else
                     m_creature->SetDisplayId(action.morph.modelId);
             }
@@ -625,7 +625,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
 
             m_CombatMovementEnabled = action.combat_movement.state != 0;
 
-            //Allow movement (create new targeted movement gen only if idle)
+            // Allow movement (create new targeted movement gen only if idle)
             if (m_CombatMovementEnabled)
             {
                 if (action.combat_movement.melee && m_creature->isInCombat())
@@ -703,7 +703,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             {
                 if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
                 {
-                    //Drop current movement gen
+                    // Drop current movement gen
                     m_creature->GetMotionMaster()->Clear(false);
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
                 }
@@ -743,12 +743,12 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             break;
         }
         case ACTION_T_KILLED_MONSTER:
-            //first attempt player/group who tapped creature
+            // first attempt player/group who tapped creature
             if (Player* pPlayer = m_creature->GetLootRecipient())
                 pPlayer->RewardPlayerAndGroupAtEvent(action.killed_monster.creatureId, m_creature);
             else
             {
-                //if not available, use pActionInvoker
+                // if not available, use pActionInvoker
                 if (Unit* pTarget = GetTargetByType(action.killed_monster.target, pActionInvoker))
                     if (Player* pPlayer2 = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
                         pPlayer2->RewardPlayerAndGroupAtEvent(action.killed_monster.creatureId, m_creature);
@@ -845,7 +845,7 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
                         m_creature->Mount(display_id);
                     }
                 }
-                //if no param1, then use value from param2 (modelId)
+                // if no param1, then use value from param2 (modelId)
                 else
                     m_creature->Mount(action.mount.modelId);
             }
@@ -864,7 +864,7 @@ void CreatureEventAI::JustRespawned()
     if (m_bEmptyList)
         return;
 
-    //Handle Spawned Events
+    // Handle Spawned Events
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
         if (SpawnedEventConditionsCheck((*i).Event))
             ProcessEvent(*i);
@@ -878,24 +878,24 @@ void CreatureEventAI::Reset()
     if (m_bEmptyList)
         return;
 
-    //Reset all events to enabled
+    // Reset all events to enabled
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
     {
         CreatureEventAI_Event const& event = (*i).Event;
         switch (event.event_type)
         {
-                //Reset all out of combat timers
+                // Reset all out of combat timers
             case EVENT_T_TIMER_OOC:
             {
                 if ((*i).UpdateRepeatTimer(m_creature, event.timer.initialMin, event.timer.initialMax))
                     (*i).Enabled = true;
                 break;
             }
-            //default:
-            //TODO: enable below code line / verify this is correct to enable events previously disabled (ex. aggro yell), instead of enable this in void Aggro()
+            // default:
+            // TODO: enable below code line / verify this is correct to enable events previously disabled (ex. aggro yell), instead of enable this in void Aggro()
             //(*i).Enabled = true;
             //(*i).Time = 0;
-            //break;
+            // break;
         }
     }
 }
@@ -928,7 +928,7 @@ void CreatureEventAI::EnterEvadeMode()
     if (m_bEmptyList)
         return;
 
-    //Handle Evade events
+    // Handle Evade events
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_EVADE)
@@ -942,7 +942,7 @@ void CreatureEventAI::JustDied(Unit* killer)
 
     if (m_creature->IsGuard())
     {
-        //Send Zone Under Attack message to the LocalDefense and WorldDefense Channels
+        // Send Zone Under Attack message to the LocalDefense and WorldDefense Channels
         if (Player* pKiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
             m_creature->SendZoneUnderAttackMessage(pKiller);
     }
@@ -950,7 +950,7 @@ void CreatureEventAI::JustDied(Unit* killer)
     if (m_bEmptyList)
         return;
 
-    //Handle Evade events
+    // Handle Evade events
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
     {
         if ((*i).Event.event_type == EVENT_T_DEATH)
@@ -1011,7 +1011,7 @@ void CreatureEventAI::SummonedCreatureDespawn(Creature* pUnit)
 
 void CreatureEventAI::EnterCombat(Unit* enemy)
 {
-    //Check for on combat start events
+    // Check for on combat start events
     if (!m_bEmptyList)
     {
         for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
@@ -1023,12 +1023,12 @@ void CreatureEventAI::EnterCombat(Unit* enemy)
                     (*i).Enabled = true;
                     ProcessEvent(*i, enemy);
                     break;
-                    //Reset all in combat timers
+                    // Reset all in combat timers
                 case EVENT_T_TIMER:
                     if ((*i).UpdateRepeatTimer(m_creature, event.timer.initialMin, event.timer.initialMax))
                         (*i).Enabled = true;
                     break;
-                    //All normal events need to be re-enabled and their time set to 0
+                    // All normal events need to be re-enabled and their time set to 0
                 default:
                     (*i).Enabled = true;
                     (*i).Time = 0;
@@ -1069,20 +1069,20 @@ void CreatureEventAI::MoveInLineOfSight(Unit* who)
     if (!who)
         return;
 
-    //Check for OOC LOS Event
+    // Check for OOC LOS Event
     if (!m_bEmptyList && !m_creature->getVictim())
     {
         for (CreatureEventAIList::iterator itr = m_CreatureEventAIList.begin(); itr != m_CreatureEventAIList.end(); ++itr)
         {
             if ((*itr).Event.event_type == EVENT_T_OOC_LOS)
             {
-                //can trigger if closer than fMaxAllowedRange
+                // can trigger if closer than fMaxAllowedRange
                 float fMaxAllowedRange = (float)(*itr).Event.ooc_los.maxRange;
 
-                //if range is ok and we are actually in LOS
+                // if range is ok and we are actually in LOS
                 if (m_creature->IsWithinDistInMap(who, fMaxAllowedRange) && m_creature->IsWithinLOSInMap(who))
                 {
-                    //if friendly event&&who is not hostile OR hostile event&&who is hostile
+                    // if friendly event&&who is not hostile OR hostile event&&who is hostile
                     if (((*itr).Event.ooc_los.noHostile && !m_creature->IsHostileTo(who)) ||
                             ((!(*itr).Event.ooc_los.noHostile) && m_creature->IsHostileTo(who)))
                         ProcessEvent(*itr, who);
@@ -1125,7 +1125,7 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
 
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
         if ((*i).Event.event_type == EVENT_T_SPELLHIT)
-            //If spell id matches (or no spell id) & if spell school matches (or no spell school)
+            // If spell id matches (or no spell id) & if spell school matches (or no spell school)
             if (!(*i).Event.spell_hit.spellId || pSpell->Id == (*i).Event.spell_hit.spellId)
                 if (pSpell->SchoolMask & (*i).Event.spell_hit.schoolMask)
                     ProcessEvent(*i, pUnit);
@@ -1133,35 +1133,35 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
 
 void CreatureEventAI::UpdateAI(const uint32 diff)
 {
-    //Check if we are in combat (also updates calls threat update code)
+    // Check if we are in combat (also updates calls threat update code)
     bool Combat = m_creature->SelectHostileTarget() && m_creature->getVictim();
 
     if (!m_bEmptyList)
     {
-        //Events are only updated once every EVENT_UPDATE_TIME ms to prevent lag with large amount of events
+        // Events are only updated once every EVENT_UPDATE_TIME ms to prevent lag with large amount of events
         if (m_EventUpdateTime < diff)
         {
             m_EventDiff += diff;
 
-            //Check for time based events
+            // Check for time based events
             for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
             {
-                //Decrement Timers
+                // Decrement Timers
                 if ((*i).Time)
                 {
                     if ((*i).Time > m_EventDiff)
                     {
-                        //Do not decrement timers if event cannot trigger in this phase
+                        // Do not decrement timers if event cannot trigger in this phase
                         if (!((*i).Event.event_inverse_phase_mask & (1 << m_Phase)))
                             (*i).Time -= m_EventDiff;
 
-                        //Skip processing of events that have time remaining
+                        // Skip processing of events that have time remaining
                         continue;
                     }
                     else (*i).Time = 0;
                 }
 
-                //Events that are updated every EVENT_UPDATE_TIME
+                // Events that are updated every EVENT_UPDATE_TIME
                 switch ((*i).Event.event_type)
                 {
                     case EVENT_T_TIMER_OOC:
@@ -1201,7 +1201,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
         }
     }
 
-    //Melee Auto-Attack
+    // Melee Auto-Attack
     if (Combat && m_MeleeEnabled)
         DoMeleeAttackIfReady();
 }
@@ -1365,16 +1365,16 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
 
 bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const* Spell, bool Triggered)
 {
-    //No target so we can't cast
+    // No target so we can't cast
     if (!Target || !Spell)
         return false;
 
-    //Silenced so we can't cast
+    // Silenced so we can't cast
     if (!Triggered && (m_creature->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) ||
                        m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)))
         return false;
 
-    //Check for power
+    // Check for power
     if (!Triggered && m_creature->GetPower((Powers)Spell->powerType) < Spell::CalculatePowerCost(Spell, m_creature))
         return false;
 
@@ -1382,11 +1382,11 @@ bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const* Spell, bool Trigge
 
     TempRange = GetSpellRangeStore()->LookupEntry(Spell->rangeIndex);
 
-    //Spell has invalid range store so we can't use it
+    // Spell has invalid range store so we can't use it
     if (!TempRange)
         return false;
 
-    //Unit is out of range of this spell
+    // Unit is out of range of this spell
     if (!m_creature->IsInRange(Target, TempRange->minRange, TempRange->maxRange))
         return false;
 

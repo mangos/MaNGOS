@@ -20,7 +20,7 @@
 
 char const* localeNames[MAX_LOCALE] =
 {
-    "enUS",                                                   // also enGB
+    "enUS",                                                 // also enGB
     "koKR",
     "frFR",
     "deDE",

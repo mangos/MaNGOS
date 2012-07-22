@@ -25,7 +25,7 @@ class BattleGroundAAScore : public BattleGroundScore
     public:
         BattleGroundAAScore() {};
         virtual ~BattleGroundAAScore() {};
-        //TODO fix me
+        // TODO fix me
 };
 
 class BattleGroundAA : public BattleGround

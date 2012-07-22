@@ -188,7 +188,7 @@ class ByteBuffer
             return *this;
         }
 
-        //signed as in 2e complement
+        // signed as in 2e complement
         ByteBuffer& operator>>(int8& value)
         {
             value = read<int8>();

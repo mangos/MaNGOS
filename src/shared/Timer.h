@@ -26,10 +26,10 @@ class WorldTimer
 {
     public:
 
-        //get current server time
+        // get current server time
         static uint32 getMSTime();
 
-        //get time difference between two timestamps
+        // get time difference between two timestamps
         static inline uint32 getMSTimeDiff(const uint32& oldMSTime, const uint32& newMSTime)
         {
             if (oldMSTime > newMSTime)
@@ -43,18 +43,18 @@ class WorldTimer
             return newMSTime - oldMSTime;
         }
 
-        //get last world tick time
+        // get last world tick time
         static MANGOS_DLL_SPEC uint32 tickTime();
-        //get previous world tick time
+        // get previous world tick time
         static MANGOS_DLL_SPEC uint32 tickPrevTime();
-        //tick world timer
+        // tick world timer
         static MANGOS_DLL_SPEC uint32 tick();
 
     private:
         WorldTimer();
         WorldTimer(const WorldTimer&);
 
-        //analogue to getMSTime() but it persists m_SystemTickTime
+        // analogue to getMSTime() but it persists m_SystemTickTime
         static uint32 getMSTime_internal(bool savetime = false);
 
         static MANGOS_DLL_SPEC uint32 m_iTime;

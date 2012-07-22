@@ -57,7 +57,7 @@ Map::~Map()
     // unload instance specific navigation data
     MMAP::MMapFactory::createOrGetMMapManager()->unloadMapInstance(m_TerrainData->GetMapId(), GetInstanceId());
 
-    //release reference count
+    // release reference count
     if (m_TerrainData->Release())
         sTerrainMgr.UnloadTerrain(m_TerrainData->GetMapId());
 }
@@ -87,16 +87,16 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
     {
         for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
         {
-            //z code
+            // z code
             m_bLoadedGrids[idx][j] = false;
             setNGrid(NULL, idx, j);
         }
     }
 
-    //lets initialize visibility distance for map
+    // lets initialize visibility distance for map
     Map::InitVisibilityDistance();
 
-    //add reference for TerrainData object
+    // add reference for TerrainData object
     m_TerrainData->AddRef();
 
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), GetDifficulty(), 0, IsDungeon());
@@ -105,7 +105,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnMode)
 
 void Map::InitVisibilityDistance()
 {
-    //init visibility for continents
+    // init visibility for continents
     m_VisibleDistance = World::GetMaxVisibleDistanceOnContinents();
 }
 
@@ -215,7 +215,7 @@ Map::EnsureGridCreated(const GridPair& p)
 
         getNGrid(p.x_coord, p.y_coord)->SetGridState(GRID_STATE_IDLE);
 
-        //z coord
+        // z coord
         int gx = (MAX_NUMBER_OF_GRIDS - 1) - p.x_coord;
         int gy = (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord;
 
@@ -260,11 +260,11 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     MANGOS_ASSERT(grid != NULL);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
-        //it's important to set it loaded before loading!
-        //otherwise there is a possibility of infinity chain (grid loading will be called many times for the same grid)
-        //possible scenario:
-        //active object A(loaded with loader.LoadN call and added to the  map)
-        //summons some active object B, while B added to map grid loading called again and so on..
+        // it's important to set it loaded before loading!
+        // otherwise there is a possibility of infinity chain (grid loading will be called many times for the same grid)
+        // possible scenario:
+        // active object A(loaded with loader.LoadN call and added to the  map)
+        // summons some active object B, while B added to map grid loading called again and so on..
         setGridObjectDataLoaded(true, cell.GridX(), cell.GridY());
         ObjectGridLoader loader(*grid, this, cell);
         loader.LoadN();
@@ -382,8 +382,8 @@ void Map::MessageBroadcast(WorldObject* obj, WorldPacket* msg)
     if (!loaded(GridPair(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    //TODO: currently on continents when Visibility.Distance.InFlight > Visibility.Distance.Continents
-    //we have alot of blinking mobs because monster move packet send is broken...
+    // TODO: currently on continents when Visibility.Distance.InFlight > Visibility.Distance.Continents
+    // we have alot of blinking mobs because monster move packet send is broken...
     MaNGOS::ObjectMessageDeliverer post_man(*obj, msg);
     TypeContainerVisitor<MaNGOS::ObjectMessageDeliverer, WorldTypeMapContainer > message(post_man);
     cell.Visit(p, message, *this, *obj, GetVisibilityDistance());
@@ -480,7 +480,7 @@ void Map::Update(const uint32& t_diff)
         if (!plr->IsInWorld() || !plr->IsPositionValid())
             continue;
 
-        //lets update mobs/objects in ALL visible cells around player!
+        // lets update mobs/objects in ALL visible cells around player!
         CellArea area = Cell::CalculateCellArea(plr->GetPositionX(), plr->GetPositionY(), GetVisibilityDistance());
 
         for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
@@ -518,7 +518,7 @@ void Map::Update(const uint32& t_diff)
             if (!obj->IsInWorld() || !obj->IsPositionValid())
                 continue;
 
-            //lets update mobs/objects in ALL visible cells around player!
+            // lets update mobs/objects in ALL visible cells around player!
             CellArea area = Cell::CalculateCellArea(obj->GetPositionX(), obj->GetPositionY(), GetVisibilityDistance());
 
             for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
@@ -553,7 +553,7 @@ void Map::Update(const uint32& t_diff)
         {
             NGridType* grid = i->getSource();
             GridInfo* info = i->getSource()->getGridInfoRef();
-            ++i;                                                // The update might delete the map and we need the next map before the iterator gets invalid
+            ++i;                                            // The update might delete the map and we need the next map before the iterator gets invalid
             MANGOS_ASSERT(grid->GetGridState() >= 0 && grid->GetGridState() < MAX_GRID_STATE);
             sMapMgr.UpdateGridState(grid->GetGridState(), *this, *grid, *info, grid->getX(), grid->getY(), t_diff);
         }
@@ -985,7 +985,7 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
-    //DEBUG_LOG("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
+    // DEBUG_LOG("Object (GUID: %u TypeId: %u ) added to removing list.",obj->GetGUIDLow(),obj->GetTypeId());
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -993,7 +993,7 @@ void Map::RemoveAllObjectsInRemoveList()
     if (i_objectsToRemove.empty())
         return;
 
-    //DEBUG_LOG("Object remover 1 check.");
+    // DEBUG_LOG("Object remover 1 check.");
     while (!i_objectsToRemove.empty())
     {
         WorldObject* obj = *i_objectsToRemove.begin();
@@ -1025,7 +1025,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
-    //DEBUG_LOG("Object remover 2 check.");
+    // DEBUG_LOG("Object remover 2 check.");
 }
 
 uint32 Map::GetPlayersCountExceptGMs() const
@@ -1051,7 +1051,7 @@ bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
     CellPair cell_min(x * MAX_NUMBER_OF_CELLS, y * MAX_NUMBER_OF_CELLS);
     CellPair cell_max(cell_min.x_coord + MAX_NUMBER_OF_CELLS, cell_min.y_coord + MAX_NUMBER_OF_CELLS);
 
-    //we must find visible range in cells so we unload only non-visible cells...
+    // we must find visible range in cells so we unload only non-visible cells...
     float viewDist = GetVisibilityDistance();
     int cell_range = (int)ceilf(viewDist / SIZE_OF_GRID_CELL) + 1;
 
@@ -1229,7 +1229,7 @@ DungeonMap::DungeonMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 SpawnM
 {
     MANGOS_ASSERT(i_mapEntry->IsDungeon());
 
-    //lets initialize visibility distance for dungeons
+    // lets initialize visibility distance for dungeons
     DungeonMap::InitVisibilityDistance();
 
     // the timer is started by default, and stopped when the first player joins
@@ -1243,7 +1243,7 @@ DungeonMap::~DungeonMap()
 
 void DungeonMap::InitVisibilityDistance()
 {
-    //init visibility distance for instances
+    // init visibility distance for instances
     m_VisibleDistance = World::GetMaxVisibleDistanceInInstances();
 }
 
@@ -1404,7 +1404,7 @@ void DungeonMap::Remove(Player* player, bool remove)
 {
     DETAIL_LOG("MAP: Removing player '%s' from instance '%u' of map '%s' before relocating to other map", player->GetName(), GetInstanceId(), GetMapName());
 
-    //if last player set unload timer
+    // if last player set unload timer
     if (!m_unloadTimer && m_mapRefManager.getSize() == 1)
         m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld.getConfig(CONFIG_UINT32_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
 
@@ -1523,7 +1523,7 @@ DungeonPersistentState* DungeonMap::GetPersistanceState() const
 BattleGroundMap::BattleGroundMap(uint32 id, time_t expiry, uint32 InstanceId, uint8 spawnMode)
     : Map(id, expiry, InstanceId, spawnMode)
 {
-    //lets initialize visibility distance for BG/Arenas
+    // lets initialize visibility distance for BG/Arenas
     BattleGroundMap::InitVisibilityDistance();
 }
 
@@ -1546,7 +1546,7 @@ BattleGroundPersistentState* BattleGroundMap::GetPersistanceState() const
 
 void BattleGroundMap::InitVisibilityDistance()
 {
-    //init visibility distance for BG/Arenas
+    // init visibility distance for BG/Arenas
     m_VisibleDistance = World::GetMaxVisibleDistanceInBGArenas();
 }
 

@@ -116,7 +116,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair& cell, GridRefManager<T>& 
         uint32 guid = *i_guid;
 
         T* obj = new T;
-        //sLog.outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading",table,guid);
+        // sLog.outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading",table,guid);
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;

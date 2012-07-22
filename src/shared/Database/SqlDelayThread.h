@@ -38,7 +38,7 @@ class SqlDelayThread : public ACE_Based::Runnable
         SqlConnection* m_dbConnection;                      ///< Pointer to DB connection
         volatile bool m_running;
 
-        //process all enqueued requests
+        // process all enqueued requests
         void ProcessRequests();
 
     public:

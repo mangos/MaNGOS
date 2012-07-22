@@ -293,7 +293,7 @@ void WorldSession::HandleGuildPromoteOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    uint32 newRankId = slot->RankId - 1;                    //when promoting player, rank is decreased
+    uint32 newRankId = slot->RankId - 1;                    // when promoting player, rank is decreased
 
     slot->ChangeRank(newRankId);
     // Put record into guild log
@@ -354,7 +354,7 @@ void WorldSession::HandleGuildDemoteOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    uint32 newRankId = slot->RankId + 1;                    //when demoting player, rank is increased
+    uint32 newRankId = slot->RankId + 1;                    // when demoting player, rank is increased
 
     slot->ChangeRank(newRankId);
     // Put record into guild log
@@ -798,11 +798,11 @@ void WorldSession::HandleGuildPermissions(WorldPacket& /* recv_data */)
             uint32 rankId = GetPlayer()->GetRank();
 
             WorldPacket data(MSG_GUILD_PERMISSIONS, 4 * 15 + 1);
-            data << uint32(rankId);                                 // guild rank id
-            data << uint32(pGuild->GetRankRights(rankId));          // rank rights
+            data << uint32(rankId);                         // guild rank id
+            data << uint32(pGuild->GetRankRights(rankId));  // rank rights
             // money per day left
             data << uint32(pGuild->GetMemberMoneyWithdrawRem(GetPlayer()->GetGUIDLow()));
-            data << uint8(pGuild->GetPurchasedTabs());              // tabs count
+            data << uint8(pGuild->GetPurchasedTabs());      // tabs count
             // why sending all info when not all tabs are purchased???
             for (int i = 0; i < GUILD_BANK_MAX_TABS; ++i)
             {

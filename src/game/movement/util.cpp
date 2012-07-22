@@ -88,7 +88,7 @@ namespace Movement
 
         if (t_passed > terminalFallTime)
         {
-            //result = terminalVelocity * (t_passed - terminal_time) + gravity*terminal_time*terminal_time*0.5f;
+            // result = terminalVelocity * (t_passed - terminal_time) + gravity*terminal_time*terminal_time*0.5f;
             // simplified view:
             result = terminalVelocity * (t_passed - terminalFallTime) + terminal_length;
         }
@@ -111,7 +111,7 @@ namespace Movement
         STR(Pitch_Up),           // 0x00000040,
         STR(Pitch_Down),         // 0x00000080,
 
-        STR(Walk),               // 0x00000100,               // Walking
+        STR(Walk),               // 0x00000100,             // Walking
         STR(Ontransport),        // 0x00000200,
         STR(Levitation),         // 0x00000400,
         STR(Root),               // 0x00000800,
@@ -124,15 +124,15 @@ namespace Movement
         STR(PendingSTRafeleft),  // 0x00040000,
         STR(PendingSTRaferight), // 0x00080000,
         STR(Pendingroot),        // 0x00100000,
-        STR(Swimming),           // 0x00200000,               // Appears With Fly Flag Also
-        STR(Ascending),          // 0x00400000,               // Swim Up Also
-        STR(Descending),         // 0x00800000,               // Swim Down Also
-        STR(Can_Fly),            // 0x01000000,               // Can Fly In 3.3?
-        STR(Flying),             // 0x02000000,               // Actual Flying Mode
-        STR(Spline_Elevation),   // 0x04000000,               // Used For Flight Paths
-        STR(Spline_Enabled),     // 0x08000000,               // Used For Flight Paths
-        STR(Waterwalking),       // 0x10000000,               // Prevent Unit From Falling Through Water
-        STR(Safe_Fall),          // 0x20000000,               // Active Rogue Safe Fall Spell (Passive)
+        STR(Swimming),           // 0x00200000,             // Appears With Fly Flag Also
+        STR(Ascending),          // 0x00400000,             // Swim Up Also
+        STR(Descending),         // 0x00800000,             // Swim Down Also
+        STR(Can_Fly),            // 0x01000000,             // Can Fly In 3.3?
+        STR(Flying),             // 0x02000000,             // Actual Flying Mode
+        STR(Spline_Elevation),   // 0x04000000,             // Used For Flight Paths
+        STR(Spline_Enabled),     // 0x08000000,             // Used For Flight Paths
+        STR(Waterwalking),       // 0x10000000,             // Prevent Unit From Falling Through Water
+        STR(Safe_Fall),          // 0x20000000,             // Active Rogue Safe Fall Spell (Passive)
         STR(Hover),              // 0x40000000
         STR(Unknown13),          // 0x80000000
         STR(Unk1),

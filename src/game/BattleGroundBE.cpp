@@ -30,7 +30,7 @@ BattleGroundBE::BattleGroundBE()
     m_StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_30S;
     m_StartDelayTimes[BG_STARTING_EVENT_THIRD]  = BG_START_DELAY_15S;
     m_StartDelayTimes[BG_STARTING_EVENT_FOURTH] = BG_START_DELAY_NONE;
-    //we must set messageIds
+    // we must set messageIds
     m_StartMessageIds[BG_STARTING_EVENT_FIRST]  = LANG_ARENA_ONE_MINUTE;
     m_StartMessageIds[BG_STARTING_EVENT_SECOND] = LANG_ARENA_THIRTY_SECONDS;
     m_StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_ARENA_FIFTEEN_SECONDS;
@@ -63,7 +63,7 @@ void BattleGroundBE::StartingEventOpenDoors()
 void BattleGroundBE::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
-    //create score and add it to map, default values are set in constructor
+    // create score and add it to map, default values are set in constructor
     BattleGroundBEScore* sc = new BattleGroundBEScore;
 
     m_PlayerScores[plr->GetObjectGuid()] = sc;
@@ -114,15 +114,15 @@ void BattleGroundBE::HandleAreaTrigger(Player* source, uint32 trigger)
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    //uint32 spellId = 0;
-    //uint64 buff_guid = 0;
+    // uint32 spellId = 0;
+    // uint64 buff_guid = 0;
     switch (trigger)
     {
         case 4538:                                          // buff trigger?
-            //buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_1];
+            // buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_1];
             break;
         case 4539:                                          // buff trigger?
-            //buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_2];
+            // buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_2];
             break;
         default:
             sLog.outError("WARNING: Unhandled AreaTrigger in Battleground: %u", trigger);
@@ -130,7 +130,7 @@ void BattleGroundBE::HandleAreaTrigger(Player* source, uint32 trigger)
             break;
     }
 
-    //if (buff_guid)
+    // if (buff_guid)
     //    HandleTriggerBuff(buff_guid, source);
 }
 
@@ -143,7 +143,7 @@ void BattleGroundBE::FillInitialWorldStates(WorldPacket& data, uint32& count)
 
 void BattleGroundBE::Reset()
 {
-    //call parent's class reset
+    // call parent's class reset
     BattleGround::Reset();
 }
 
@@ -159,7 +159,7 @@ void BattleGroundBE::UpdatePlayerScore(Player* source, uint32 type, uint32 value
     if (itr == m_PlayerScores.end())                        // player not found...
         return;
 
-    //there is nothing special in this score
+    // there is nothing special in this score
     BattleGround::UpdatePlayerScore(source, type, value);
 
 }

@@ -257,10 +257,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     delete result;
 
-    //load spells/cooldowns/auras
+    // load spells/cooldowns/auras
     _LoadAuras(timediff);
 
-    //init AB
+    // init AB
     if (is_temporary_summoned)
     {
         // Temporary summoned pets always have initial spell list at load
@@ -272,7 +272,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         CastPetAuras(current);
     }
 
-    if (getPetType() == SUMMON_PET && !current)             //all (?) summon pets come with full health when called, but not when they are current
+    if (getPetType() == SUMMON_PET && !current)             // all (?) summon pets come with full health when called, but not when they are current
     {
         SetHealth(GetMaxHealth());
         SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
@@ -372,7 +372,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         if (mode != PET_SAVE_AS_CURRENT)
             RemoveAllAuras();
 
-        //save pet's data as one single transaction
+        // save pet's data as one single transaction
         CharacterDatabase.BeginTransaction();
         _SaveSpells();
         _SaveSpellCooldowns();
@@ -482,7 +482,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
     Creature::SetDeathState(s);
     if (getDeathState() == CORPSE)
     {
-        //remove summoned pet (no corpse)
+        // remove summoned pet (no corpse)
         if (getPetType() == SUMMON_PET)
             Unsummon(PET_SAVE_NOT_IN_SLOT);
         // other will despawn at corpse desppawning (Pet::Update code)
@@ -492,7 +492,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
             SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
-            //lose happiness when died and not in BG/Arena
+            // lose happiness when died and not in BG/Arena
             MapEntry const* mapEntry = sMapStore.LookupEntry(GetMapId());
             if (!mapEntry || (mapEntry->map_type != MAP_ARENA && mapEntry->map_type != MAP_BATTLEGROUND))
                 ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
@@ -519,7 +519,7 @@ void Pet::Update(uint32 update_diff, uint32 diff)
             if (m_corpseDecayTimer <= update_diff)
             {
                 MANGOS_ASSERT(getPetType() != SUMMON_PET && "Must be already removed.");
-                Unsummon(PET_SAVE_NOT_IN_SLOT);             //hunters' pets never get removed because of death, NEVER!
+                Unsummon(PET_SAVE_NOT_IN_SLOT);             // hunters' pets never get removed because of death, NEVER!
                 return;
             }
             break;
@@ -566,7 +566,7 @@ void Pet::Update(uint32 update_diff, uint32 diff)
 
 void Pet::RegenerateAll(uint32 update_diff)
 {
-    //regenerate focus for hunter pets or energy for deathknight's ghoul
+    // regenerate focus for hunter pets or energy for deathknight's ghoul
     if (m_regenTimer <= update_diff)
     {
         switch (getPowerType())
@@ -644,8 +644,8 @@ void Pet::LooseHappiness()
     uint32 curValue = GetPower(POWER_HAPPINESS);
     if (curValue <= 0)
         return;
-    int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
-    if (isInCombat())                                       //we know in combat happiness fades faster, multiplier guess
+    int32 addvalue = 670;                                   // value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
+    if (isInCombat())                                       // we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5);
     ModifyPower(POWER_HAPPINESS, -addvalue);
 }
@@ -688,7 +688,7 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
                 break;
         }
 
-        if (x == activecount)                               //spellchain not yet saved -> add active count
+        if (x == activecount)                               // spellchain not yet saved -> add active count
         {
             ++activecount;
             if (activecount > ACTIVE_SPELLS_MAX)
@@ -723,7 +723,7 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
 
             if (mode == PET_SAVE_REAGENTS)
             {
-                //returning of reagents only for players, so best done here
+                // returning of reagents only for players, so best done here
                 uint32 spellId = GetUInt32Value(UNIT_CREATED_BY_SPELL);
                 SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellId);
 
@@ -733,7 +733,7 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
                     {
                         if (spellInfo->Reagent[i] > 0)
                         {
-                            ItemPosCountVec dest;           //for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
+                            ItemPosCountVec dest;           // for succubus, voidwalker, felhunter and felguard credit soulshard when despawn reason other than death (out of range, logout)
                             uint8 msg = p_owner->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, spellInfo->Reagent[i], spellInfo->ReagentCount[i]);
                             if (msg == EQUIP_ERR_OK)
                             {
@@ -971,13 +971,13 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                     case CLASS_WARLOCK:
                     {
 
-                        //the damage bonus used for pets is either fire or shadow damage, whatever is higher
+                        // the damage bonus used for pets is either fire or shadow damage, whatever is higher
                         uint32 fire  = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FIRE);
                         uint32 shadow = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW);
                         uint32 val  = (fire > shadow) ? fire : shadow;
 
                         SetBonusDamage(int32(val * 0.15f));
-                        //bonusAP += val * 0.57;
+                        // bonusAP += val * 0.57;
                         break;
                     }
                     case CLASS_MAGE:
@@ -997,7 +997,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
 
-            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+            // SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
 
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
@@ -1032,20 +1032,20 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         case HUNTER_PET:
         {
             SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(petlevel));
-            //these formula may not be correct; however, it is designed to be close to what it should be
-            //this makes dps 0.5 of pets level
+            // these formula may not be correct; however, it is designed to be close to what it should be
+            // this makes dps 0.5 of pets level
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-            //damage range is then petlevel / 2
+            // damage range is then petlevel / 2
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
-            //damage is increased afterwards as strength and pet scaling modify attack power
+            // damage is increased afterwards as strength and pet scaling modify attack power
 
-            //stored standard pet stats are entry 1 in pet_levelinfo
+            // stored standard pet stats are entry 1 in pet_levelinfo
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
             {
                 SetCreateHealth(pInfo->health);
                 SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
-                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+                // SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
 
                 for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
                 {
@@ -1076,10 +1076,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetCreateHealth(28 + 30 * petlevel);
 
             // FIXME: this is wrong formula, possible each guardian pet have own damage formula
-            //these formula may not be correct; however, it is designed to be close to what it should be
-            //this makes dps 0.5 of pets level
+            // these formula may not be correct; however, it is designed to be close to what it should be
+            // this makes dps 0.5 of pets level
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
-            //damage range is then petlevel / 2
+            // damage range is then petlevel / 2
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
             break;
         default:
@@ -1119,17 +1119,17 @@ bool Pet::HaveInDiet(ItemPrototype const* item) const
 uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel)
 {
     // -5 or greater food level
-    if (getLevel() <= itemlevel + 5)                        //possible to feed level 60 pet with level 55 level food for full effect
+    if (getLevel() <= itemlevel + 5)                        // possible to feed level 60 pet with level 55 level food for full effect
         return 35000;
     // -10..-6
-    else if (getLevel() <= itemlevel + 10)                  //pure guess, but sounds good
+    else if (getLevel() <= itemlevel + 10)                  // pure guess, but sounds good
         return 17000;
     // -14..-11
-    else if (getLevel() <= itemlevel + 14)                  //level 55 food gets green on 70, makes sense to me
+    else if (getLevel() <= itemlevel + 14)                  // level 55 food gets green on 70, makes sense to me
         return 8000;
     // -15 or less
     else
-        return 0;                                           //food too low level
+        return 0;                                           // food too low level
 }
 
 void Pet::_LoadSpellCooldowns()
@@ -1389,8 +1389,8 @@ void Pet::_SaveAuras()
             }
         }
 
-        //skip all holders from spells that are passive or channeled
-        //do not save single target holders (unless they were cast by the player)
+        // skip all holders from spells that are passive or channeled
+        // do not save single target holders (unless they were cast by the player)
         if (save && !holder->IsPassive() && !IsChanneledSpell(holder->GetSpellProto()) && (holder->GetCasterGuid() == GetObjectGuid() || !holder->IsSingleTarget()))
         {
             int32  damage[MAX_EFFECT_INDEX];
@@ -1485,7 +1485,7 @@ bool Pet::addSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
     newspell.state = state;
     newspell.type = type;
 
-    if (active == ACT_DECIDE)                               //active was not used before, so we save it's autocast/passive state here
+    if (active == ACT_DECIDE)                               // active was not used before, so we save it's autocast/passive state here
     {
         if (IsPassiveSpell(spellInfo))
             newspell.active = ACT_PASSIVE;
@@ -1592,10 +1592,10 @@ void Pet::InitLevelupSpellsForLevel()
         {
             // will called first if level down
             if (itr->first > level)
-                unlearnSpell(itr->second, true);                // will learn prev rank if any
+                unlearnSpell(itr->second, true);            // will learn prev rank if any
             // will called if level up
             else
-                learnSpell(itr->second);                        // will unlearn prev rank if any
+                learnSpell(itr->second);                    // will unlearn prev rank if any
         }
     }
 
@@ -2071,7 +2071,7 @@ void Pet::CastPetAura(PetAura const* aura)
     if (!auraId)
         return;
 
-    if (auraId == 35696)                                      // Demonic Knowledge
+    if (auraId == 35696)                                    // Demonic Knowledge
     {
         int32 basePoints = int32(aura->GetDamage() * (GetStat(STAT_STAMINA) + GetStat(STAT_INTELLECT)) / 100);
         CastCustomSpell(this, auraId, &basePoints, NULL, NULL, true);

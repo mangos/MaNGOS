@@ -446,7 +446,7 @@ void ReputationMgr::LoadFromDB(QueryResult* result)
     // Set initial reputations (so everything is nifty before DB data load)
     Initialize();
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT faction,standing,flags FROM character_reputation WHERE guid = '%u'",GetGUIDLow());
+    // QueryResult *result = CharacterDatabase.PQuery("SELECT faction,standing,flags FROM character_reputation WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
     {

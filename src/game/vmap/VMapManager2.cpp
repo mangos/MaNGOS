@@ -205,7 +205,7 @@ namespace VMAP
 
     float VMapManager2::getHeight(unsigned int pMapId, float x, float y, float z, float maxSearchDist)
     {
-        float height = VMAP_INVALID_HEIGHT_VALUE;           //no height
+        float height = VMAP_INVALID_HEIGHT_VALUE;           // no height
         if (isHeightCalcEnabled())
         {
             InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(pMapId);
@@ -215,7 +215,7 @@ namespace VMAP
                 height = instanceTree->second->getHeight(pos, maxSearchDist);
                 if (!(height < G3D::inf()))
                 {
-                    height = VMAP_INVALID_HEIGHT_VALUE;         //no height
+                    height = VMAP_INVALID_HEIGHT_VALUE;     // no height
                 }
             }
         }
