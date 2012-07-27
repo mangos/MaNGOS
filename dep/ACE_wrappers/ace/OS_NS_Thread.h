@@ -38,7 +38,6 @@
 # include "ace/ACE_export.h"
 # include "ace/Object_Manager_Base.h"
 
-# include <sys/param.h>
 #if (defined(__FreeBSD__) && ((__FreeBSD_version >= 700110 && __FreeBSD_version < 800000) || __FreeBSD_version >= 800024))
 # include <sys/cpuset.h>
 # define cpu_set_t cpuset_t
