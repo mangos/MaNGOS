@@ -20,10 +20,10 @@
   \ingroup realmd
   */
 
+#include "Common.h"
 #include "PatchHandler.h"
 #include "AuthCodes.h"
 #include "Log.h"
-#include "Common.h"
 
 #include <ace/OS_NS_sys_socket.h>
 #include <ace/OS_NS_dirent.h>
