@@ -2345,7 +2345,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
             continue;
 
         // skip server-side/triggered spells
-        if (spellInfo->spellLevel == 0)
+        if(spellInfo->GetSpellLevel()==0)
             continue;
 
         // skip wrong class/race skills
@@ -2353,7 +2353,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
             continue;
 
         // skip other spell families
-        if (spellInfo->SpellFamilyName != family)
+        if( spellInfo->GetSpellFamilyName() != family)
             continue;
 
         // skip spells with first rank learned as talent (and all talents then also)
@@ -3293,7 +3293,8 @@ void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInf
     uint32 id = spellInfo->Id;
 
     bool known = target && target->HasSpell(id);
-    bool learn = (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL);
+    SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(EFFECT_INDEX_0);
+    bool learn = (spellEffect && spellEffect->Effect == SPELL_EFFECT_LEARN_SPELL);
 
     uint32 talentCost = GetTalentSpellCost(id);
 
@@ -3303,7 +3304,7 @@ void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInf
 
     // unit32 used to prevent interpreting uint8 as char at output
     // find rank of learned spell for learning spell, or talent rank
-    uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[EFFECT_INDEX_0] : id);
+    uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? (spellEffect ? spellEffect->EffectTriggerSpell : 0) : id);
 
     // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
     std::ostringstream ss;
@@ -4001,9 +4002,14 @@ bool ChatHandler::HandleAuraCommand(char* args)
 
     for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        uint8 eff = spellInfo->Effect[i];
-        if (eff >= TOTAL_SPELL_EFFECTS)
+        SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
             continue;
+
+        uint8 eff = spellEffect->Effect;
+        if (eff>=TOTAL_SPELL_EFFECTS)
+            continue;
+
         if (IsAreaAuraEffect(eff)           ||
                 eff == SPELL_EFFECT_APPLY_AURA  ||
                 eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
@@ -4949,8 +4955,8 @@ bool ChatHandler::HandleResetHonorCommand(char* args)
     target->SetHonorPoints(0);
     target->SetUInt32Value(PLAYER_FIELD_KILLS, 0);
     target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0);
-    target->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
-    target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
+    //target->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
+    //target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
 
     return true;

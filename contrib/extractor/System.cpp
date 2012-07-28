@@ -74,8 +74,7 @@ float CONF_flat_liquid_delta_limit = 0.001f; // If max - min less this value - l
 
 static char* const langs[] = {"enGB", "enUS", "deDE", "esES", "frFR", "koKR", "zhCN", "zhTW", "enCN", "enTW", "esMX", "ruRU" };
 #define LANG_COUNT 12
-
-#define MIN_SUPPORTED_BUILD 15050                           // code expect mpq files and mpq content files structure for this build or later
+#define MIN_SUPPORTED_BUILD 12911                           // code expect mpq files and mpq content files structure for this build or later
 
 void CreateDir( const std::string& Path )
 {

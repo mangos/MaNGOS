@@ -20,6 +20,7 @@
 #define DBC_FILE_LOADER_H
 #include "Platform/Define.h"
 #include "Utilities/ByteConverter.h"
+#include "Common.h"
 #include <cassert>
 
 enum
@@ -94,10 +95,12 @@ class DBCFileLoader
         uint32 GetOffset(size_t id) const { return (fieldsOffset != NULL && id < fieldCount) ? fieldsOffset[id] : 0; }
         bool IsLoaded() {return (data != NULL);}
         char* AutoProduceData(const char* fmt, uint32& count, char**& indexTable);
-        char* AutoProduceStrings(const char* fmt, char* dataTable);
-        static uint32 GetFormatRecordSize(const char* format, int32* index_pos = NULL);
-    private:
+        char* AutoProduceStringsArrayHolders(const char* fmt, char* dataTable);
+        char* AutoProduceStrings(const char* fmt, char* dataTable, LocaleConstant loc);
+        static uint32 GetFormatRecordSize(const char * format, int32 * index_pos = NULL);
+        static uint32 GetFormatStringsFields(const char * format);
 
+    private:
         uint32 recordSize;
         uint32 recordCount;
         uint32 fieldCount;

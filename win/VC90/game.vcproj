@@ -1519,6 +1519,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\DBCStructure.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\DBCStructure.h"
 				>
 			</File>
