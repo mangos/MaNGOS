@@ -75,7 +75,7 @@ float CONF_flat_liquid_delta_limit = 0.001f; // If max - min less this value - l
 static char* const langs[] = {"enGB", "enUS", "deDE", "esES", "frFR", "koKR", "zhCN", "zhTW", "enCN", "enTW", "esMX", "ruRU" };
 #define LANG_COUNT 12
 
-#define MIN_SUPPORTED_BUILD 12911                           // code expect mpq files and mpq content files structure for this build or later
+#define MIN_SUPPORTED_BUILD 15050                           // code expect mpq files and mpq content files structure for this build or later
 
 void CreateDir( const std::string& Path )
 {
@@ -315,7 +315,7 @@ void ReadLiquidTypeTableDBC()
 
 // Map file format data
 static char const* MAP_MAGIC         = "MAPS";
-static char const* MAP_VERSION_MAGIC = "v1.1";
+static char const* MAP_VERSION_MAGIC = "v1.2";
 static char const* MAP_AREA_MAGIC    = "AREA";
 static char const* MAP_HEIGHT_MAGIC  = "MHGT";
 static char const* MAP_LIQUID_MAGIC  = "MLIQ";
