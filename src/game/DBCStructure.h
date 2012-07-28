@@ -1311,7 +1311,7 @@ struct MapEntry
     float   ghost_entrance_x;                               // 12       m_corpseX entrance x coordinate in ghost mode  (in most cases = normal entrance)
     float   ghost_entrance_y;                               // 13       m_corpseY entrance y coordinate in ghost mode  (in most cases = normal entrance)
     //uint32  timeOfDayOverride;                            // 14       m_timeOfDayOverride
-    uint32  addon;                                          // 15      m_expansionID
+    uint32  addon;                                          // 15       m_expansionID
     //uint32 unkTime;                                       // 16       m_raidOffset
     //uint32 maxPlayers;                                    // 17       m_maxPlayers
     uint32  BaseMap;                                        // 18       m_baseMap
@@ -1664,13 +1664,13 @@ struct SpellAuraRestrictionsEntry
 // SpellCastingRequirements.dbc
 struct SpellCastingRequirementsEntry
 {
-    //uint32    Id;                                           // 0        m_ID
-    uint32    FacingCasterFlags;                            // 20       m_facingCasterFlags
-    //uint32    MinFactionId;                               // 159      m_minFactionID not used
-    //uint32    MinReputation;                              // 160      m_minReputation not used
-    int32     AreaGroupId;                                  // 164      m_requiredAreaGroupId
-    //uint32    RequiredAuraVision;                         // 161      m_requiredAuraVision not used
-    uint32    RequiresSpellFocus;                           // 19       m_requiresSpellFocus
+    uint32    Id;                                           // 0       m_ID
+    uint32    FacingCasterFlags;                            // 1       m_facingCasterFlags
+    //uint32    MinFactionId;                               // 2       m_minFactionID not used
+    //uint32    MinReputation;                              // 3       m_minReputation not used
+    int32     AreaGroupId;                                  // 4       m_requiredAreaGroupId
+    //uint32    RequiredAuraVision;                         // 5       m_requiredAuraVision not used
+    uint32    RequiresSpellFocus;                           // 6       m_requiresSpellFocus
 };
 
 // SpellCategories.dbc
@@ -1691,10 +1691,10 @@ struct SpellCategoriesEntry
 // SpellClassOptions.dbc
 struct SpellClassOptionsEntry
 {
-    //uint32    Id;                                         // 0        m_ID
-    //uint32    modalNextSpell;                             // 50       m_modalNextSpell not used
-    ClassFamilyMask SpellFamilyFlags;                       // 149-151  m_spellClassMask NOTE: size is 12 bytes!!!
-    uint32    SpellFamilyName;                              // 148      m_spellClassSet
+    uint32    Id;                                           // 0        m_ID
+    //uint32    modalNextSpell;                             // 1        m_modalNextSpell not used
+    ClassFamilyMask SpellFamilyFlags;                       // 2-4      m_spellClassMask NOTE: size is 12 bytes!!!
+    uint32    SpellFamilyName;                              // 5        m_spellClassSet
     //char*   Description;                                  // 6 4.0.0
 
     bool IsFitToFamilyMask(uint64 familyFlags, uint32 familyFlags2 = 0) const
