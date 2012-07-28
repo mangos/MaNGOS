@@ -78,7 +78,6 @@ static char* const langs[] = {"enGB", "enUS", "deDE", "esES", "frFR", "koKR", "z
 
 #define MIN_SUPPORTED_BUILD 15827                           // code expect mpq files and mpq content files structure for this build or later
 #define EXPANSION_COUNT 4
-#define WORLD_COUNT 1
 
 void CreateDir( const std::string& Path )
 {
