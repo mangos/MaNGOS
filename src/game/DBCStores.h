@@ -202,6 +202,7 @@ extern DBCStorage <SpellEffectEntry>             sSpellEffectStore;
 extern DBCStorage <SpellEquippedItemsEntry>      sSpellEquippedItemsStore;
 extern DBCStorage <SpellInterruptsEntry>         sSpellInterruptsStore;
 extern DBCStorage <SpellLevelsEntry>             sSpellLevelsStore;
+extern DBCStorage <SpellMiscEntry>               sSpellMiscStore;
 extern DBCStorage <SpellPowerEntry>              sSpellPowerStore;
 extern DBCStorage <SpellReagentsEntry>           sSpellReagentsStore;
 extern DBCStorage <SpellScalingEntry>            sSpellScalingStore;
