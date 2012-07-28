@@ -93,8 +93,7 @@ public:
     uint32 sizeMCSH;
     uint32 areaid;
     uint32 nMapObjRefs;
-    uint16 holes;           // locations where models pierce the heightmap
-    uint16 pad;
+    uint32 holes;
     uint16 s[2];
     uint32 data1;
     uint32 data2;
@@ -286,7 +285,5 @@ public:
 
     adt_MHDR *a_grid;
 };
-
-bool isHole(int holes, int i, int j);
 
 #endif
