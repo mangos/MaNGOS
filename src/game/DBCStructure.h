@@ -1354,7 +1354,7 @@ struct MapDifficultyEntry
 
 struct MovieEntry
 {
-    uint32      IdScalingStatValuesEntry                                         // 0        m_ID
+    uint32      Id;                                         // 0        m_ID
     //char*       filename;                                 // 1        m_filename
     //uint32      unk1;                                     // 2        m_volume
     //uint32      unk2;                                     // 3        4.0.0
@@ -1904,11 +1904,6 @@ struct SpellTotemsEntry
     //uint32    Id;                                           // 0        m_ID
     uint32    TotemCategory[MAX_SPELL_TOTEM_CATEGORIES];    // 162-163  m_requiredTotemCategoryID
     uint32    Totem[MAX_SPELL_TOTEMS];                      // 52-53    m_totem
-};
-
-struct SpellMiscEntry
-{
-
 };
 
 // Spell.dbc
