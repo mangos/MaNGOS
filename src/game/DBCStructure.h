@@ -56,6 +56,7 @@ struct AchievementEntry
     //char *titleReward;                                    // 11       m_reward_lang
     uint32 count;                                           // 12       m_minimum_criteria - need this count of completed criterias (own or referenced achievement criterias)
     uint32 refAchievement;                                  // 13       m_shares_criteria - referenced achievement (counting of all completed criterias)
+    //uint32 Unk;                                           // 14       504
 };
 
 struct AchievementCategoryEntry
@@ -522,22 +523,24 @@ struct AreaTableEntry
     uint32  exploreFlag;                                    // 3        m_AreaBit
     uint32  flags;                                          // 4        m_flags
     // 5        m_SoundProviderPref
-    // 6        m_SoundProviderPrefUnderwater
-    // 7        m_AmbienceID
-    // 8        m_ZoneMusic
-    // 9        m_IntroSound
-    int32   area_level;                                     // 10       m_ExplorationLevel
-    DBCString area_name;                                    // 11       m_AreaName_lang
-    uint32  team;                                           // 12       m_factionGroupMask
-                                                            // 13-16    m_liquidTypeID[4]
-                                                            // 17       m_minElevation
-                                                            // 18       m_ambient_multiplier
-                                                            // 19       m_lightid
-    //uint32 unk20;                                         // 20 4.0.0
-    //uint32 unk21;                                         // 21 4.0.0
-    //uint32 unk22;                                         // 22 4.0.0
-    //uint32 unk23;                                         // 23 4.0.0
-    //uint32 unk24;                                         // 24 4.0.1, may be worldStateId
+    // 6
+    // 7        m_SoundProviderPrefUnderwater
+    // 8        m_AmbienceID
+    // 9        m_ZoneMusic
+    // 10        m_IntroSound
+    int32   area_level;                                     // 11       m_ExplorationLevel
+    //uint32 unk504;                                        // 12
+    DBCString area_name;                                    // 13       m_AreaName_lang
+    uint32  team;                                           // 14       m_factionGroupMask
+                                                            // 15-18    m_liquidTypeID[4]
+                                                            // 19       m_minElevation
+                                                            // 20       m_ambient_multiplier
+                                                            // 21       m_lightid
+    //uint32 unk20;                                         // 22 4.0.0
+    //uint32 unk21;                                         // 23 4.0.0
+    //uint32 unk22;                                         // 24 4.0.0
+    //uint32 unk23;                                         // 25 4.0.0
+    //uint32 unk24;                                         // 26 4.0.1, may be worldStateId
 };
 
 struct AreaGroupEntry
@@ -562,6 +565,9 @@ struct AreaTriggerEntry
     float   box_y;                                          // 10       m_box_width
     float   box_z;                                          // 11       m_box_heigh
     float   box_orientation;                                // 12       m_box_yaw
+    //uint32 unk;                                           // 13       504
+    //uint32 unk;                                           // 14       504
+    uint32 AreaId;                                          // 15       m_areaId???
 };
 
 struct ArmorLocationEntry
@@ -600,17 +606,18 @@ struct BarberShopStyleEntry
 struct BattlemasterListEntry
 {
     uint32  id;                                             // 0        m_ID
-    int32   mapid[8];                                       // 1-8      m_mapID[8]
-    uint32  type;                                           // 9        m_instanceType
-    //uint32 canJoinAsGroup;                                // 10       m_groupsAllowed
-    DBCString name;                                         // 11       m_name_lang
-    uint32 maxGroupSize;                                    // 12       m_maxGroupSize
-    uint32 HolidayWorldStateId;                             // 13       m_holidayWorldState
-    uint32 minLevel;                                        // 14,      m_minlevel (sync with PvPDifficulty.dbc content)
-    uint32 maxLevel;                                        // 15,      m_maxlevel (sync with PvPDifficulty.dbc content)
-    //uint32 maxGroupSizeRated;                             // 16 4.0.1
-    //uint32 maxPlayers;                                    // 17 4.0.1
-    //uint32 unk1;                                          // 18 4.0.3, value 2 for Rated Battlegrounds
+    int32   mapid[10];                                      // 1-10     m_mapID[10]
+    uint32  type;                                           // 11        m_instanceType
+    //uint32 canJoinAsGroup;                                // 12       m_groupsAllowed
+    DBCString name;                                         // 13       m_name_lang
+    uint32 maxGroupSize;                                    // 14       m_maxGroupSize
+    uint32 HolidayWorldStateId;                             // 15       m_holidayWorldState
+    uint32 minLevel;                                        // 16,      m_minlevel (sync with PvPDifficulty.dbc content)
+    uint32 maxLevel;                                        // 17,      m_maxlevel (sync with PvPDifficulty.dbc content)
+    //uint32 maxGroupSizeRated;                             // 18 4.0.1
+    //uint32 minPlayers;                                    // 19 4.0.6
+    //uint32 maxPlayers;                                    // 20 4.0.1
+    //uint32 rated;                                         // 21 4.0.3, value 2 for Rated Battlegrounds
 };
 
 /*struct Cfg_CategoriesEntry
@@ -681,6 +688,10 @@ struct ChrClassesEntry
     //uint32                                                // 11
     //uint32                                                // 12
     //uint32                                                // 13
+    //uint32                                                // 14
+    //uint32                                                // 15
+    //uint32                                                // 16
+    //uint32                                                // 17      Some Flags?
 };
 
 struct ChrRacesEntry
@@ -708,6 +719,7 @@ struct ChrRacesEntry
     //uint32                                                // 21 (23 for worgens)
     //uint32                                                // 22 4.0.0
     //uint32                                                // 23 4.0.0
+    //uint32                                                // 24-35    504, Unk
 };
 
 /*struct CinematicCameraEntry
@@ -745,6 +757,8 @@ struct CreatureDisplayInfoEntry
                                                             // 14       m_creatureGeosetData
                                                             // 15       m_objectEffectPackageID
                                                             // 16       all 0
+                                                            // 17       504, Unk
+                                                            // 18       504, Something with gender? (2-both, 1-female, 0- male)
 };
 
 struct CreatureDisplayInfoExtraEntry
@@ -848,6 +862,7 @@ struct EmotesEntry
     uint32  EmoteType;                                      // 4        m_EmoteSpecProc (determine how emote are shown)
     uint32  UnitStandState;                                 // 5        m_EmoteSpecProcParam
     // uint32  SoundId;                                     // 6        m_EventSoundID
+    // uint32 unk;                                          // 7        4.2.0
 };
 
 struct EmotesTextEntry
@@ -952,6 +967,8 @@ struct GameObjectDisplayInfoEntry
     // 16       m_geoBoxMaxY
     // 17       m_geoBoxMaxZ
     // 18       m_objectEffectPackageID
+    //uint32 unk;                                           // 19
+    //uint32 unk1;                                          // 20
 };
 
 struct GemPropertiesEntry
@@ -1272,6 +1289,7 @@ struct LockEntry
 
 struct MailTemplateEntry
 {
+    uint32      Id; 
     //char*       subject;                                  // 1        m_subject_lang
     DBCString content;                                      // 2        m_body_lang
 };
@@ -1282,22 +1300,21 @@ struct MapEntry
     // char*       internalname;                            // 1        m_Directory
     uint32  map_type;                                       // 2        m_InstanceType
     //uint32 mapFlags;                                      // 3        m_Flags (0x100 - CAN_CHANGE_PLAYER_DIFFICULTY)
-    //uint32 unk4;                                          // 4 4.0.1
-    //uint32 isPvP;                                         // 5        m_PVP 0 or 1 for battlegrounds (not arenas)
-    DBCString name;                                         // 6        m_MapName_lang
-    uint32  linked_zone;                                    // 7        m_areaTableID
-    //char*     hordeIntro;                                 // 8        m_MapDescription0_lang
-    //char*     allianceIntro;                              // 9        m_MapDescription1_lang
-    uint32  multimap_id;                                    // 10       m_LoadingScreenID (LoadingScreens.dbc)
-    //float   BattlefieldMapIconScale;                      // 11       m_minimapIconScale
-    int32   ghost_entrance_map;                             // 12       m_corpseMapID map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
-    float   ghost_entrance_x;                               // 13       m_corpseX entrance x coordinate in ghost mode  (in most cases = normal entrance)
-    float   ghost_entrance_y;                               // 14       m_corpseY entrance y coordinate in ghost mode  (in most cases = normal entrance)
-    //uint32  timeOfDayOverride;                            // 15       m_timeOfDayOverride
-    uint32  addon;                                          // 16       m_expansionID
-    //uint32 unkTime;                                       // 17       m_raidOffset
-    //uint32 maxPlayers;                                    // 18       m_maxPlayers
-    //uint32 unk400;                                        // 19 new 4.0.0, mapid, related to phasing
+    //uint32 unk4;                                          // 4        4.0.1
+    DBCString name;                                         // 5        m_MapName_lang
+    uint32  linked_zone;                                    // 6        m_areaTableID
+    //char*     hordeIntro;                                 // 7        m_MapDescription0_lang
+    //char*     allianceIntro;                              // 8        m_MapDescription1_lang
+    uint32  multimap_id;                                    // 9        m_LoadingScreenID (LoadingScreens.dbc)
+    //float   BattlefieldMapIconScale;                      // 10       m_minimapIconScale
+    int32   ghost_entrance_map;                             // 11       m_corpseMapID map_id of entrance map in ghost mode (continent always and in most cases = normal entrance)
+    float   ghost_entrance_x;                               // 12       m_corpseX entrance x coordinate in ghost mode  (in most cases = normal entrance)
+    float   ghost_entrance_y;                               // 13       m_corpseY entrance y coordinate in ghost mode  (in most cases = normal entrance)
+    //uint32  timeOfDayOverride;                            // 14       m_timeOfDayOverride
+    uint32  addon;                                          // 15      m_expansionID
+    //uint32 unkTime;                                       // 16       m_raidOffset
+    //uint32 maxPlayers;                                    // 17       m_maxPlayers
+    uint32  BaseMap;                                        // 18       m_baseMap
 
     // Helpers
     uint32 Expansion() const { return addon; }
@@ -1333,15 +1350,15 @@ struct MapDifficultyEntry
     //char*       areaTriggerText;                          // 3        m_message_lang (text showed when transfer to map failed)
     uint32      resetTime;                                  // 4,       m_raidDuration in secs, 0 if no fixed reset time
     uint32      maxPlayers;                                 // 5,       m_maxPlayers some heroic versions have 0 when expected same amount as in normal version
-    //char*       difficultyString;                         // 6        m_difficultystring
 };
 
 struct MovieEntry
 {
-    uint32      Id;                                         // 0        m_ID
+    uint32      IdScalingStatValuesEntry                                         // 0        m_ID
     //char*       filename;                                 // 1        m_filename
     //uint32      unk1;                                     // 2        m_volume
-    //uint32      unk2;                                     // 3 4.0.0
+    //uint32      unk2;                                     // 3        4.0.0
+    //uint32      unk3;                                     // 4        504
 };
 
 #define MAX_OVERRIDE_SPELLS     10
@@ -1409,11 +1426,11 @@ struct ScalingStatValuesEntry
     uint32  Level;                                          // 1        m_charlevel
     uint32  dpsMod[6];                                      // 2-7 DPS mod for level
     uint32  spellBonus;                                     // 8 spell power for level
-    uint32  ssdMultiplier[5];                               // 9-13 Multiplier for ScalingStatDistribution
-    uint32  armorMod[4];                                    // 14-17 Armor for level
-    uint32  armorMod2[4];                                   // 18-21 Armor for level
-    //uint32 trash[24];                                     // 22-45
-    //uint32 unk2;                                          // 46 unk, probably also Armor for level (flag 0x80000?)
+    uint32  ssdMultiplier[6];                               // 9-14 Multiplier for ScalingStatDistribution
+    uint32  armorMod[4];                                    // 15-18 Armor for level
+    uint32  armorMod2[4];                                   // 19-22 Armor for level
+    //uint32 trash[24];                                     // 23-46
+    //uint32 unk2;                                          // 47 unk, probably also Armor for level (flag 0x80000?)
 
     /*struct ScalingStatValuesEntry
     {
@@ -1553,7 +1570,6 @@ struct SkillLineAbilityEntry
     uint32    max_value;                                    // 10       m_trivialSkillLineRankHigh
     uint32    min_value;                                    // 11       m_trivialSkillLineRankLow
     //uint32                                                // 12
-    //uint32                                                // 13       4.0.0
 };
 
 struct SoundEntriesEntry
@@ -1574,6 +1590,8 @@ struct SoundEntriesEntry
     //unk                                                   // 31       4.0.0
     //unk                                                   // 32       4.0.0
     //unk                                                   // 33       4.0.0
+    //unk                                                   // 34       4.3.0
+    //unk                                                   // 35       504
 };
 
 struct ClassFamilyMask
@@ -1831,6 +1849,11 @@ struct SpellTotemsEntry
     //uint32    Id;                                           // 0        m_ID
     uint32    TotemCategory[MAX_SPELL_TOTEM_CATEGORIES];    // 162-163  m_requiredTotemCategoryID
     uint32    Totem[MAX_SPELL_TOTEMS];                      // 52-53    m_totem
+};
+
+struct SpellMiscEntry
+{
+
 };
 
 // Spell.dbc
