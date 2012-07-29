@@ -251,7 +251,7 @@ World::AddSession_(WorldSession* s)
     packet << uint32(0);                                    // BillingTimeRemaining
     packet << uint8(0);                                     // BillingPlanFlags
     packet << uint32(0);                                    // BillingTimeRested
-    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK. Must be set in database manually for each account.
+    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - Cataclysm, 4 - MoP. Must be set in database manually for each account.
     s->SendPacket(&packet);
 
     s->SendAddonsInfo();
