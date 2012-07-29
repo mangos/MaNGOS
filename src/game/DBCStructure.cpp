@@ -118,6 +118,11 @@ SpellTotemsEntry const* SpellEntry::GetSpellTotems() const
     return SpellTotemsId ? sSpellTotemsStore.LookupEntry(SpellTotemsId) : NULL;
 }
 
+SpellMiscEntry const* SpellEntry::GetSpellMiscs() const
+{
+    return SpellMiscId ? sSpellMiscStore.LookupEntry(SpellMiscId) : NULL;
+}
+
 uint32 SpellEntry::GetManaCost() const
 {
     SpellPowerEntry const* power = GetSpellPower();
@@ -350,4 +355,28 @@ uint32 SpellEntry::GetEffectApplyAuraNameByIndex(SpellEffectIndex index) const
 {
     SpellEffectEntry const* effect = GetSpellEffect(index);
     return effect ? effect->EffectApplyAuraName : 0;
+}
+
+uint32 SpellEntry::GetSpellIconId() const
+{
+    SpellMiscEntry const* misc = GetSpellMiscs();
+    return misc ? misc->SpellIconID: 0;
+}
+
+uint32 SpellEntry::GetSpellVisual(uint32 index) const
+{
+    SpellMiscEntry const* misc = GetSpellMiscs();
+    return misc ? misc->SpellVisual[index] : 0;
+}
+
+uint32 SpellEntry::GetSpellSchoolMask() const
+{
+    SpellMiscEntry const* misc = GetSpellMiscs();
+    return misc ? misc->SchoolMask : 0;
+}
+
+uint32 SpellEntry::GetRangeIndex() const
+{
+    SpellMiscEntry const* misc = GetSpellMiscs();
+    return misc ? misc->RangeIndex : 0;
 }

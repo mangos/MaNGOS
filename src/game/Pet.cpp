@@ -1767,15 +1767,6 @@ bool Pet::resetTalents(bool no_cost)
 
         if (!talentInfo) continue;
 
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-
-        if (!talentTabInfo)
-            continue;
-
-        // unlearn only talents for pets family talent type
-        if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
-            continue;
-
         for (int j = 0; j < MAX_TALENT_RANK; ++j)
             if (talentInfo->RankID[j])
                 removeSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);

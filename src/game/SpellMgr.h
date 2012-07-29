@@ -267,12 +267,13 @@ inline bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
 inline bool IsSpellRemoveAllMovementAndControlLossEffects(SpellEntry const* spellProto)
 {
     SpellEffectEntry const* spellEffect0 = spellProto->GetSpellEffect(EFFECT_INDEX_0);
+    SpellMiscEntry const* spellMisc = spellProto->GetSpellMiscs();
 
     return spellEffect0 && spellEffect0->EffectApplyAuraName == SPELL_AURA_MECHANIC_IMMUNITY &&
         spellEffect0->EffectMiscValue == 1 &&
         spellEffect0->EffectApplyAuraName == 0 &&
         spellEffect0->EffectApplyAuraName == 0 &&
-        (spellProto->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)/* && -- all above selected spells have SPELL_ATTR_EX5_* mask
+        (spellMisc && spellMisc->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)/* && -- all above selected spells have SPELL_ATTR_EX5_* mask
         ((spellProto->AttributesEx5 &
             (SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED|SPELL_ATTR_EX5_USABLE_WHILE_FEARED|SPELL_ATTR_EX5_USABLE_WHILE_STUNNED)) ==
             (SPELL_ATTR_EX5_USABLE_WHILE_CONFUSED|SPELL_ATTR_EX5_USABLE_WHILE_FEARED|SPELL_ATTR_EX5_USABLE_WHILE_STUNNED))*/;
@@ -521,11 +522,12 @@ inline bool IsNeedCastSpellAtFormApply(SpellEntry const* spellInfo, ShapeshiftFo
         return false;
 
     SpellShapeshiftEntry const* shapeShift = spellInfo->GetSpellShapeshift();
-    if (shapeShift)
+    SpellMiscEntry const* spellMisc = spellInfo->GetSpellMiscs();
+    if (!shapeShift || !spellMisc)
         return false;
 
     // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
-    return (shapeShift->Stances & (1<<(form-1)) && !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+    return (shapeShift->Stances & (1<<(form-1)) && !(spellMisc->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
 }
 
 
@@ -536,7 +538,8 @@ inline bool NeedsComboPoints(SpellEntry const* spellInfo)
 
 inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
 {
-    return SpellSchoolMask(spellInfo->SchoolMask);
+    SpellMiscEntry const* spellMisc = spellInfo->GetSpellMiscs();
+    return SpellSchoolMask(spellMisc && spellMisc->SchoolMask);
 }
 
 inline uint32 GetSpellMechanicMask(SpellEntry const* spellInfo, uint32 effectMask)

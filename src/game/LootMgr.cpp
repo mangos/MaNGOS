@@ -1177,12 +1177,13 @@ void LoadLootTemplates_Fishing()
     LootTemplates_Fishing.LoadAndCollectLootIds(ids_set);
 
     // remove real entries and check existence loot
-    for (uint32 i = 1; i < sAreaStore.GetNumRows(); ++i)
+    // FIX IT!!!
+    /*for (uint32 i = 1; i < sAreaStore.GetNumRows(); ++i)
     {
         if (AreaTableEntry const* areaEntry = sAreaStore.LookupEntry(i))
             if (ids_set.find(areaEntry->ID) != ids_set.end())
                 ids_set.erase(areaEntry->ID);
-    }
+    }*/
 
     // by default (look config options) fishing at fail provide junk loot, entry 0 use for store this loot
     ids_set.erase(0);

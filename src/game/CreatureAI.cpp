@@ -33,6 +33,8 @@ void CreatureAI::AttackedBy(Unit* attacker)
 
 CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry* pSpell, bool isTriggered)
 {
+    SpellMiscEntry const* spellMisc = pSpell->GetSpellMiscs();
+
     // If not triggered, we check
     if (!isTriggered)
     {
@@ -45,13 +47,9 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry* pSpell, 
 
         if (pSpell->GetPreventionType() == SPELL_PREVENTION_TYPE_PACIFY && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
             return CAST_FAIL_STATE;
-
-        // Check for power (also done by Spell::CheckCast())
-        if (m_creature->GetPower((Powers)pSpell->powerType) < Spell::CalculatePowerCost(pSpell, m_creature))
-            return CAST_FAIL_POWER;
     }
 
-    if (const SpellRangeEntry* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
+    if (const SpellRangeEntry* pSpellRange = sSpellRangeStore.LookupEntry(spellMisc && spellMisc->RangeIndex))
     {
         if (pTarget != m_creature)
         {

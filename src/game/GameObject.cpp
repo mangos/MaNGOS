@@ -901,7 +901,8 @@ void GameObject::TriggerLinkedGameObject(Unit* target)
     float range = 0.5f;
 
     if (trapSpell)                                          // checked at load already
-        range = GetSpellMaxRange(sSpellRangeStore.LookupEntry(trapSpell->rangeIndex));
+        if (SpellMiscEntry const* spellMisc = trapSpell->GetSpellMiscs())
+            range = GetSpellMaxRange(sSpellRangeStore.LookupEntry(spellMisc->RangeIndex));
 
     // search nearest linked GO
     GameObject* trapGO = NULL;

@@ -1119,7 +1119,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit* who)
 
 void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
 {
-
+    SpellMiscEntry const* spellMisc = pSpell->GetSpellMiscs();
     if (m_bEmptyList)
         return;
 
@@ -1127,7 +1127,7 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
         if ((*i).Event.event_type == EVENT_T_SPELLHIT)
             // If spell id matches (or no spell id) & if spell school matches (or no spell school)
             if (!(*i).Event.spell_hit.spellId || pSpell->Id == (*i).Event.spell_hit.spellId)
-                if (pSpell->SchoolMask & (*i).Event.spell_hit.schoolMask)
+                if (spellMisc && spellMisc->SchoolMask & (*i).Event.spell_hit.schoolMask)
                     ProcessEvent(*i, pUnit);
 }
 
@@ -1365,8 +1365,9 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
 
 bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const* Spell, bool Triggered)
 {
+    SpellMiscEntry const* spellMisc = Spell->GetSpellMiscs();
     // No target so we can't cast
-    if (!Target || !Spell)
+    if (!Target || !Spell || !spellMisc)
         return false;
 
     // Silenced so we can't cast
@@ -1374,13 +1375,9 @@ bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const* Spell, bool Trigge
                        m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)))
         return false;
 
-    // Check for power
-    if (!Triggered && m_creature->GetPower((Powers)Spell->powerType) < Spell::CalculatePowerCost(Spell, m_creature))
-        return false;
-
     SpellRangeEntry const* TempRange = NULL;
 
-    TempRange = GetSpellRangeStore()->LookupEntry(Spell->rangeIndex);
+    TempRange = GetSpellRangeStore()->LookupEntry(spellMisc->RangeIndex);
 
     // Spell has invalid range store so we can't use it
     if (!TempRange)

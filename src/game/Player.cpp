@@ -3744,23 +3744,6 @@ bool Player::resetTalents(bool no_cost, bool all_specs)
             continue;
         }
 
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-
-        if (!talentTabInfo)
-        {
-            m_talents[m_activeSpec].erase(iter++);
-            continue;
-        }
-
-        // unlearn only talents for character class
-        // some spell learned by one class as normal spells or know at creation but another class learn it as talent,
-        // to prevent unexpected lost normal learned spell skip another class talents
-        if ((getClassMask() & talentTabInfo->ClassMask) == 0)
-        {
-            ++iter;
-            continue;
-        }
-
         for (int j = 0; j < MAX_TALENT_RANK; ++j)
             if (talentInfo->RankID[j])
                 removeSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
@@ -16929,23 +16912,6 @@ void Player::_LoadTalents(QueryResult* result)
                 continue;
             }
 
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-
-            if (!talentTabInfo)
-            {
-                sLog.outError("Player::_LoadTalents:Player (GUID: %u) has invalid talentTabInfo: %u for talentID: %u , this talent will be deleted from character_talent", GetGUIDLow(), talentInfo->TalentTab, talentInfo->TalentID);
-                CharacterDatabase.PExecute("DELETE FROM character_talent WHERE talent_id = '%u'", talent_id);
-                continue;
-            }
-
-            // prevent load talent for different class (cheating)
-            if ((getClassMask() & talentTabInfo->ClassMask) == 0)
-            {
-                sLog.outError("Player::_LoadTalents:Player (GUID: %u) has talent with ClassMask: %u , but Player's ClassMask is: %u , talentID: %u , this talent will be deleted from character_talent", GetGUIDLow(), talentTabInfo->ClassMask, getClassMask() , talentInfo->TalentID);
-                CharacterDatabase.PExecute("DELETE FROM character_talent WHERE guid = '%u' AND talent_id = '%u'", GetGUIDLow(), talent_id);
-                continue;
-            }
-
             uint32 currentRank = fields[1].GetUInt32();
 
             if (currentRank > MAX_TALENT_RANK || talentInfo->RankID[currentRank] == 0)
@@ -19315,7 +19281,7 @@ void Player::InitDisplayIds()
 
 void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
 {
-    ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
+    /*ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
 
     if (extendedCost->reqhonorpoints)
         ModifyHonorPoints(-int32(extendedCost->reqhonorpoints * count));
@@ -19326,7 +19292,7 @@ void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
     {
         if (extendedCost->reqitem[i])
             DestroyItemCount(extendedCost->reqitem[i], extendedCost->reqitemcount[i] * count, true);
-    }
+    }*/
 }
 
 // Return true is the bought item has a max count to force refresh of window by caller
@@ -19414,7 +19380,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
     if (uint32 extendedCostId = crItem->ExtendedCost)
     {
-        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
+        /*ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
         {
             sLog.outError("Item %u have wrong ExtendedCost field value %u", pProto->ItemId, extendedCostId);
@@ -19451,7 +19417,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
             // probably not the proper equip err
             SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, NULL, NULL);
             return false;
-        }
+        }*/
     }
 
     uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
@@ -21068,7 +21034,7 @@ uint32 Player::GetResurrectionSpellId()
     for (AuraList::const_iterator itr = dummyAuras.begin(); itr != dummyAuras.end(); ++itr)
     {
         // Soulstone Resurrection                           // prio: 3 (max, non death persistent)
-        if (prio < 2 && (*itr)->GetSpellProto()->SpellVisual[0] == 99 && (*itr)->GetSpellProto()->SpellIconID == 92)
+        if (prio < 2 && (*itr)->GetSpellProto()->GetSpellVisual(0) == 99 && (*itr)->GetSpellProto()->GetSpellIconId() == 92)
         {
             switch ((*itr)->GetId())
             {
@@ -22202,15 +22168,6 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (!talentInfo)
         return;
 
-    TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-
-    if (!talentTabInfo)
-        return;
-
-    // prevent learn talent for different class (cheating)
-    if ((getClassMask() & talentTabInfo->ClassMask) == 0)
-        return;
-
     // find current max talent rank
     uint32 curtalent_maxrank = 0;
     if (PlayerTalent const* talent = GetKnownTalentById(talentId))
@@ -22297,11 +22254,6 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
     if (!talentInfo)
         return;
 
-    TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-
-    if (!talentTabInfo)
-        return;
-
     CreatureInfo const* ci = pet->GetCreatureInfo();
 
     if (!ci)
@@ -22313,10 +22265,6 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
         return;
 
     if (pet_family->petTalentType < 0)                      // not hunter pet
-        return;
-
-    // prevent learn talent for different family (cheating)
-    if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
         return;
 
     // find current max talent rank
@@ -22543,50 +22491,6 @@ void Player::BuildPetTalentsInfoData(WorldPacket* data)
     if (!pet_family || pet_family->petTalentType < 0)
         return;
 
-    for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
-    {
-        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
-        if (!talentTabInfo)
-            continue;
-
-        if (!((1 << pet_family->petTalentType) & talentTabInfo->petTalentMask))
-            continue;
-
-        for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
-        {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-            if (!talentInfo)
-                continue;
-
-            // skip another tab talents
-            if (talentInfo->TalentTab != talentTabId)
-                continue;
-
-            // find max talent rank
-            int32 curtalent_maxrank = -1;
-            for (int32 k = 4; k > -1; --k)
-            {
-                if (talentInfo->RankID[k] && pet->HasSpell(talentInfo->RankID[k]))
-                {
-                    curtalent_maxrank = k;
-                    break;
-                }
-            }
-
-            // not learned talent
-            if (curtalent_maxrank < 0)
-                continue;
-
-            *data << uint32(talentInfo->TalentID);          // Talent.dbc
-            *data << uint8(curtalent_maxrank);              // talentMaxRank (0-4)
-
-            ++talentIdCount;
-        }
-
-        data->put<uint8>(countPos, talentIdCount);          // put real count
-
-        break;
-    }
 }
 
 void Player::SendTalentsInfoData(bool pet)
