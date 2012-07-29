@@ -81,10 +81,10 @@ static int CheckIfAllFilesKnown(TMPQArchive * ha, const char * szListFile, LPDWO
 }
 
 static int CopyNonMpqData(
-    TFileStream * pSrcStream,
-    TFileStream * pTrgStream,
-    ULONGLONG & ByteOffset,
-    ULONGLONG & ByteCount)
+        TFileStream * pSrcStream,
+        TFileStream * pTrgStream,
+        ULONGLONG & ByteOffset,
+        ULONGLONG & ByteCount)
 {
     ULONGLONG DataSize = ByteCount;
     DWORD dwToRead;
@@ -130,9 +130,9 @@ static int CopyNonMpqData(
 
 // Copies all file sectors into another archive.
 static int CopyMpqFileSectors(
-    TMPQArchive * ha,
-    TMPQFile * hf,
-    TFileStream * pNewStream)
+        TMPQArchive * ha,
+        TMPQFile * hf,
+        TFileStream * pNewStream)
 {
     TFileEntry * pFileEntry = hf->pFileEntry;
     ULONGLONG RawFilePos;               // Used for calculating sector offset in the old MPQ archive
@@ -148,7 +148,7 @@ static int CopyMpqFileSectors(
     FileStream_GetPos(pNewStream, &MpqFilePos);
     MpqFilePos -= ha->MpqPos;
 
-    // Resolve decryption keys. Note that the file key given 
+    // Resolve decryption keys. Note that the file key given
     // in the TMPQFile structure also includes the key adjustment
     if(nError == ERROR_SUCCESS && (pFileEntry->dwFlags & MPQ_FILE_ENCRYPTED))
     {
@@ -230,7 +230,7 @@ static int CopyMpqFileSectors(
 
             // Calculate the raw file offset of the file sector
             CalculateRawSectorOffset(RawFilePos, hf, dwRawByteOffset);
-            
+
             // Read the file sector
             if(!FileStream_Read(ha->pStream, &RawFilePos, hf->pbFileSector, dwRawDataInSector))
             {
@@ -239,7 +239,7 @@ static int CopyMpqFileSectors(
             }
 
             // If necessary, re-encrypt the sector
-            // Note: Recompression is not necessary here. Unlike encryption, 
+            // Note: Recompression is not necessary here. Unlike encryption,
             // the compression does not depend on the position of the file in MPQ.
             if((pFileEntry->dwFlags & MPQ_FILE_ENCRYPTED) && dwFileKey1 != dwFileKey2)
             {
@@ -328,7 +328,7 @@ static int CopyMpqFileSectors(
     // Write the MD5's of the raw file data, if needed
     if(nError == ERROR_SUCCESS && ha->pHeader->dwRawChunkSize != 0)
     {
-        nError = WriteMpqDataMD5(pNewStream, 
+        nError = WriteMpqDataMD5(pNewStream,
                                  ha->MpqPos + MpqFilePos,
                                  pFileEntry->dwCmpSize,
                                  ha->pHeader->dwRawChunkSize);
@@ -340,7 +340,7 @@ static int CopyMpqFileSectors(
         // At this point, number of bytes written should be exactly
         // the same like the compressed file size. If it isn't,
         // there's something wrong (an unknown archive version, MPQ protection, ...)
-        // 
+        //
         // Note: Diablo savegames have very weird layout, and the file "hero"
         // seems to have improper compressed size. Instead of real compressed size,
         // the "dwCmpSize" member of the block table entry contains
@@ -573,7 +573,7 @@ bool WINAPI SFileCompactArchive(HANDLE hMpq, const char * szListFile, bool /* bR
         //
         // Note: We don't recalculate position of the MPQ tables at this point.
         // SaveMPQTables does it automatically.
-        // 
+        //
 
         nError = SaveMPQTables(ha);
         if(nError == ERROR_SUCCESS && CompactCB != NULL)
@@ -696,7 +696,7 @@ bool WINAPI SFileSetMaxFileCount(HANDLE hMpq, DWORD dwMaxFileCount)
                 // Copy the old file entry to the new one
                 memcpy(pFileEntry, pOldFileEntry, sizeof(TFileEntry));
                 assert(pFileEntry->szFileName != NULL);
-                
+
                 // Create new entry in the hash table
                 if(ha->pHashTable != NULL)
                 {

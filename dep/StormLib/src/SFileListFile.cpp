@@ -92,7 +92,7 @@ static TListFileCache * CreateListFileCache(HANDLE hListFile, const char * szMas
     if(nError == ERROR_SUCCESS)
     {
         pCache->pBegin =
-        pCache->pPos = &pCache->Buffer[0];
+                pCache->pPos = &pCache->Buffer[0];
         pCache->pEnd = pCache->pBegin + dwBytesRead;
     }
     else
@@ -116,7 +116,7 @@ static DWORD ReloadListFileCache(TListFileCache * pCache)
     // Only do something if the cache is empty
     if(pCache->pPos >= pCache->pEnd)
     {
-//      __TryReadBlock:
+        //      __TryReadBlock:
 
         // Move the file position forward
         pCache->dwFilePos += CACHE_BUFFER_SIZE;
@@ -141,7 +141,7 @@ static DWORD ReloadListFileCache(TListFileCache * pCache)
 
         // Set the buffer pointers
         pCache->pBegin =
-        pCache->pPos = &pCache->Buffer[0];
+                pCache->pPos = &pCache->Buffer[0];
         pCache->pEnd = pCache->pBegin + dwBytesRead;
     }
 
@@ -153,7 +153,7 @@ static size_t ReadListFileLine(TListFileCache * pCache, char * szLine, int nMaxC
     char * szLineBegin = szLine;
     char * szLineEnd = szLine + nMaxChars - 1;
     char * szExtraString = NULL;
-    
+
     // Skip newlines, spaces, tabs and another non-printable stuff
     for(;;)
     {
@@ -212,7 +212,7 @@ static size_t ReadListFileLine(TListFileCache * pCache, char * szLine, int nMaxC
     return (szLine - szLineBegin);
 }
 
-static int CompareFileNodes(const void * p1, const void * p2) 
+static int CompareFileNodes(const void * p1, const void * p2)
 {
     char * szFileName1 = *(char **)p1;
     char * szFileName2 = *(char **)p2;
@@ -221,8 +221,8 @@ static int CompareFileNodes(const void * p1, const void * p2)
 }
 
 static int WriteListFileLine(
-    TMPQFile * hf,
-    const char * szLine)
+        TMPQFile * hf,
+        const char * szLine)
 {
     char szNewLine[2] = {0x0D, 0x0A};
     size_t nLength = strlen(szLine);
@@ -334,7 +334,7 @@ int SListFileSaveToMpq(TMPQArchive * ha)
         // Count the 0-th item
         dwFileSize += (DWORD)strlen(SortTable[0]) + 2;
         szPrevItem = SortTable[0];
-        
+
         // Count all next items
         for(i = 1; i < nFileNodes; i++)
         {
@@ -352,11 +352,11 @@ int SListFileSaveToMpq(TMPQArchive * ha)
 
         // Create the listfile in the MPQ
         nError = SFileAddFile_Init(ha, LISTFILE_NAME,
-                                       0,
-                                       dwFileSize,
-                                       LANG_NEUTRAL,
-                                       ha->dwFileFlags1 | MPQ_FILE_REPLACEEXISTING,
-                                      &hf);
+                                   0,
+                                   dwFileSize,
+                                   LANG_NEUTRAL,
+                                   ha->dwFileFlags1 | MPQ_FILE_REPLACEEXISTING,
+                                   &hf);
         // Add all file names
         if(nError == ERROR_SUCCESS)
         {
@@ -381,11 +381,11 @@ int SListFileSaveToMpq(TMPQArchive * ha)
         // Create the listfile in the MPQ
         dwFileSize = (DWORD)strlen(LISTFILE_NAME) + 2;
         nError = SFileAddFile_Init(ha, LISTFILE_NAME,
-                                       0,
-                                       dwFileSize,
-                                       LANG_NEUTRAL,
-                                       MPQ_FILE_ENCRYPTED | MPQ_FILE_COMPRESS | MPQ_FILE_REPLACEEXISTING,
-                                      &hf);
+                                   0,
+                                   dwFileSize,
+                                   LANG_NEUTRAL,
+                                   MPQ_FILE_ENCRYPTED | MPQ_FILE_COMPRESS | MPQ_FILE_REPLACEEXISTING,
+                                   &hf);
 
         // Just add "(listfile)" there
         if(nError == ERROR_SUCCESS)
@@ -399,7 +399,7 @@ int SListFileSaveToMpq(TMPQArchive * ha)
     {
         SFileAddFile_Finish(hf);
     }
-    
+
     // Free buffers
     if(nError == ERROR_SUCCESS)
         ha->dwFlags &= ~MPQ_FLAG_INV_LISTFILE;
@@ -480,7 +480,7 @@ static int SFileAddInternalListFile(
                 nError = SFileAddArbitraryListFile(ha, hListFile);
                 SFileCloseFile(hListFile);
             }
-            
+
             // Restore the original locale
             SFileSetLocale(lcSaveLocale);
 
@@ -584,7 +584,7 @@ HANDLE WINAPI SListFileFindFirstFile(HANDLE hMpq, const char * szListFile, const
 
             // If some mask entered, check it
             if(CheckWildCard(lpFindFileData->cFileName, pCache->szMask))
-                break;                
+                break;
         }
     }
 
@@ -593,6 +593,7 @@ HANDLE WINAPI SListFileFindFirstFile(HANDLE hMpq, const char * szListFile, const
     {
         memset(lpFindFileData, 0, sizeof(SFILE_FIND_DATA));
         FreeListFileCache(pCache);
+
         SetLastError(nError);
         pCache = NULL;
     }

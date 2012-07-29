@@ -13,6 +13,7 @@ set(SRC_FILES
            src/sparse/sparse.cpp
            src/FileStream.cpp
            src/SBaseCommon.cpp
+           src/SBaseDumpData.cpp
            src/SBaseFileTable.cpp
            src/SCompression.cpp
            src/SFileAddFile.cpp
@@ -27,7 +28,6 @@ set(SRC_FILES
            src/SFilePatchArchives.cpp
            src/SFileReadFile.cpp
            src/SFileVerify.cpp
-           src/libtomcrypt/src/pk/rsa/rsa_verify_simple.c
 )
 
 set(TOMCRYPT_FILES
@@ -91,6 +91,7 @@ set(TOMCRYPT_FILES
            src/libtomcrypt/src/pk/rsa/rsa_import.c
            src/libtomcrypt/src/pk/rsa/rsa_make_key.c
            src/libtomcrypt/src/pk/rsa/rsa_verify_hash.c
+           src/libtomcrypt/src/pk/rsa/rsa_verify_simple.c
 )
 
 set(TOMMATH_FILES
@@ -233,9 +234,9 @@ set(ZLIB_BZIP2_FILES
            src/zlib/zutil.c
 )
 
-set(TEST_SRC_FILES
-           test/Test.cpp
-)
+# set(TEST_SRC_FILES
+#            test/Test.cpp
+# )
 
 add_definitions(-D_7ZIP_ST -DBZ_STRICT_ANSI)
 
@@ -270,18 +271,18 @@ endif()
 add_library(storm SHARED ${SRC_FILES} ${SRC_ADDITIONAL_FILES})
 target_link_libraries(storm ${LINK_LIBS})
 
-option(WITH_TEST "Compile Test application" OFF)
-if(WITH_TEST)
-    add_executable(storm_test ${TEST_SRC_FILES})
-    target_link_libraries(storm_test storm)
-endif()
+# option(WITH_TEST "Compile Test application" OFF)
+# if(WITH_TEST)
+#      add_executable(storm_test ${TEST_SRC_FILES})
+#      target_link_libraries(storm_test storm)
+# endif()
 
-option(WITH_STATIC "Compile static linked library" OFF)
-if(WITH_STATIC)
-    add_library(StormLib_static STATIC ${SRC_FILES} ${SRC_ADDITIONAL_FILES})
-    target_link_libraries(StormLib_static ${LINK_LIBS})
-    set_target_properties(StormLib_static PROPERTIES OUTPUT_NAME StormLib)
-endif()
+# option(WITH_STATIC "Compile static linked library" OFF)
+# if(WITH_STATIC)
+#     add_library(StormLib_static STATIC ${SRC_FILES} ${SRC_ADDITIONAL_FILES})
+#     target_link_libraries(StormLib_static ${LINK_LIBS})
+#     set_target_properties(StormLib_static PROPERTIES OUTPUT_NAME StormLib)
+# endif()
 
 if(APPLE)
     set_target_properties(storm PROPERTIES FRAMEWORK true)
@@ -290,8 +291,8 @@ if(APPLE)
 endif()
 
 if(UNIX)
-    set_target_properties(storm PROPERTIES VERSION 8.10.0)
-    set_target_properties(storm PROPERTIES SOVERSION 8.10)
+    set_target_properties(storm PROPERTIES VERSION 8.20.0)
+    set_target_properties(storm PROPERTIES SOVERSION 8.20)
 endif()
 
 # On Win32, build StormLib.dll since we don't want to clash with Storm.dll

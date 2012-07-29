@@ -25,7 +25,7 @@ TABLE OF CONTENTS
 1. INTRODUCTION TO THE MOPAQ FORMAT
 The MoPaQ (or MPQ) format is an archive file format designed by Mike O'Brien (hence the name Mike O'brien PaCK) at Blizzard
 Entertainment. The format has been used in all Blizzard games since (and including) Diablo. It is heavily optimized to be
-a read-only game archive format, and excels at this role. 
+a read-only game archive format, and excels at this role.
 
 The Blizzard MoPaQ-reading functions are contained in the Storm module, which my be either statically or dynamically linked.
 The Blizzard MoPaQ-writing functions are contained in the MPQAPI module, which is always statically linked.

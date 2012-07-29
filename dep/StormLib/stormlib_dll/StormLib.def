@@ -21,23 +21,23 @@ EXPORTS
 
     SFileSetCompactCallback
     SFileCompactArchive
-    
+
     SFileGetMaxFileCount
-    SFileSetMaxFileCount    
-    
+    SFileSetMaxFileCount
+
     SFileGetAttributes
     SFileSetAttributes
     SFileUpdateFileAttributes
 
     SFileOpenPatchArchive
     SFileIsPatchedArchive
-    
+
     SFileOpenFileEx
     SFileGetFileSize
     SFileSetFilePointer
     SFileReadFile
     SFileCloseFile
-    
+
     SFileHasFile
     SFileGetFileName
     SFileGetFileInfo
@@ -57,7 +57,7 @@ EXPORTS
     SListFileFindClose
 
     SFileEnumLocales
-    
+
     SFileCreateFile
     SFileWriteFile
     SFileFinishFile
@@ -72,5 +72,5 @@ EXPORTS
 
     SCompImplode
     SCompExplode
-    SCompCompress   
-    SCompDecompress 
+    SCompCompress
+    SCompDecompress

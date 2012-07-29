@@ -27,8 +27,8 @@ typedef struct _BLIZZARD_BSDIFF40_FILE
 // Local functions
 
 static bool GetDefaultPatchPrefix(
-    const TCHAR * szBaseMpqName,
-    char * szBuffer)
+        const TCHAR * szBaseMpqName,
+        char * szBuffer)
 {
     const TCHAR * szExtension;
     const TCHAR * szDash;
@@ -60,7 +60,7 @@ static void Decompress_RLE(LPBYTE pbDecompressed, DWORD cbDecompressed, LPBYTE p
 {
     LPBYTE pbDecompressedEnd = pbDecompressed + cbDecompressed;
     LPBYTE pbCompressedEnd = pbCompressed + cbCompressed;
-    BYTE RepeatCount; 
+    BYTE RepeatCount;
     BYTE OneByte;
 
     // Cut the initial DWORD from the compressed chunk
@@ -74,7 +74,7 @@ static void Decompress_RLE(LPBYTE pbDecompressed, DWORD cbDecompressed, LPBYTE p
     while(pbCompressed < pbCompressedEnd && pbDecompressed < pbDecompressedEnd)
     {
         OneByte = *pbCompressed++;
-        
+
         // Is it a repetition byte ?
         if(OneByte & 0x80)
         {
@@ -179,8 +179,8 @@ static int LoadMpqPatch_BSD0(TMPQFile * hf, TPatchHeader * pPatchHeader)
 }
 
 static int ApplyMpqPatch_COPY(
-    TMPQFile * hf,
-    TPatchHeader * pPatchHeader)
+        TMPQFile * hf,
+        TPatchHeader * pPatchHeader)
 {
     LPBYTE pbNewFileData;
     DWORD cbNewFileData;
@@ -204,8 +204,8 @@ static int ApplyMpqPatch_COPY(
 }
 
 static int ApplyMpqPatch_BSD0(
-    TMPQFile * hf,
-    TPatchHeader * pPatchHeader)
+        TMPQFile * hf,
+        TPatchHeader * pPatchHeader)
 {
     PBLIZZARD_BSDIFF40_FILE pBsdiff;
     LPDWORD pCtrlBlock;
@@ -337,17 +337,17 @@ static int LoadMpqPatch(TMPQFile * hf)
     {
         switch(PatchHeader.dwPatchType)
         {
-            case 0x59504f43:    // 'COPY'
-                nError = LoadMpqPatch_COPY(hf, &PatchHeader);
-                break;
+        case 0x59504f43:    // 'COPY'
+            nError = LoadMpqPatch_COPY(hf, &PatchHeader);
+            break;
 
-            case 0x30445342:    // 'BSD0'
-                nError = LoadMpqPatch_BSD0(hf, &PatchHeader);
-                break;
+        case 0x30445342:    // 'BSD0'
+            nError = LoadMpqPatch_BSD0(hf, &PatchHeader);
+            break;
 
-            default:
-                nError = ERROR_FILE_CORRUPT;
-                break;
+        default:
+            nError = ERROR_FILE_CORRUPT;
+            break;
         }
     }
 
@@ -355,8 +355,8 @@ static int LoadMpqPatch(TMPQFile * hf)
 }
 
 static int ApplyMpqPatch(
-    TMPQFile * hf,
-    TPatchHeader * pPatchHeader)
+        TMPQFile * hf,
+        TPatchHeader * pPatchHeader)
 {
     int nError = ERROR_SUCCESS;
 
@@ -372,17 +372,17 @@ static int ApplyMpqPatch(
     {
         switch(pPatchHeader->dwPatchType)
         {
-            case 0x59504f43:    // 'COPY'
-                nError = ApplyMpqPatch_COPY(hf, pPatchHeader);
-                break;
+        case 0x59504f43:    // 'COPY'
+            nError = ApplyMpqPatch_COPY(hf, pPatchHeader);
+            break;
 
-            case 0x30445342:    // 'BSD0'
-                nError = ApplyMpqPatch_BSD0(hf, pPatchHeader);
-                break;
+        case 0x30445342:    // 'BSD0'
+            nError = ApplyMpqPatch_BSD0(hf, pPatchHeader);
+            break;
 
-            default:
-                nError = ERROR_FILE_CORRUPT;
-                break;
+        default:
+            nError = ERROR_FILE_CORRUPT;
+            break;
         }
     }
 
@@ -478,10 +478,10 @@ int PatchFileData(TMPQFile * hf)
 //
 
 bool WINAPI SFileOpenPatchArchive(
-    HANDLE hMpq,
-    const TCHAR * szPatchMpqName,
-    const char * szPatchPathPrefix,
-    DWORD dwFlags)
+        HANDLE hMpq,
+        const TCHAR * szPatchMpqName,
+        const char * szPatchPathPrefix,
+        DWORD dwFlags)
 {
     TMPQArchive * haPatch;
     TMPQArchive * ha = (TMPQArchive *)hMpq;

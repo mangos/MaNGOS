@@ -1,4 +1,4 @@
-http://dist.blizzard.com/mediakey/d3-authenticationcode-deDE.txt
+shttp://dist.blizzard.com/mediakey/d3-authenticationcode-deDE.txt
 http://dist.blizzard.com/mediakey/d3-authenticationcode-enGB.txt
 http://dist.blizzard.com/mediakey/d3-authenticationcode-enSG.txt
 http://dist.blizzard.com/mediakey/d3-authenticationcode-enUS.txt
@@ -11,4 +11,4 @@ http://dist.blizzard.com/mediakey/d3-authenticationcode-plPL.txt
 http://dist.blizzard.com/mediakey/d3-authenticationcode-ptBR.txt
 http://dist.blizzard.com/mediakey/d3-authenticationcode-ruRU.txt  <====
 http://dist.blizzard.com/mediakey/d3-authenticationcode-zhTW.txt
-http://dist.blizzard.com/mediakey/d3-authenticationcode-zhCN.txt  <==== 
+http://dist.blizzard.com/mediakey/d3-authenticationcode-zhCN.txt  <====

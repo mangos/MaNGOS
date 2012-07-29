@@ -139,16 +139,16 @@ LCID WINAPI SFileSetLocale(LCID lcNewLocale)
 //   phMpq      - Pointer to store open archive handle
 
 bool WINAPI SFileOpenArchive(
-    const TCHAR * szMpqName,
-    DWORD dwPriority,
-    DWORD dwFlags,
-    HANDLE * phMpq)
+        const TCHAR * szMpqName,
+        DWORD dwPriority,
+        DWORD dwFlags,
+        HANDLE * phMpq)
 {
     TFileStream * pStream = NULL;       // Open file stream
     TMPQArchive * ha = NULL;            // Archive handle
     TFileEntry * pFileEntry;
     ULONGLONG FileSize = 0;             // Size of the file
-    int nError = ERROR_SUCCESS;   
+    int nError = ERROR_SUCCESS;
 
     // Verify the parameters
     if(szMpqName == NULL || *szMpqName == 0 || phMpq == NULL)
@@ -166,7 +166,7 @@ bool WINAPI SFileOpenArchive(
         if(pStream == NULL)
             nError = GetLastError();
     }
-    
+
     // Allocate the MPQhandle
     if(nError == ERROR_SUCCESS)
     {
@@ -266,7 +266,7 @@ bool WINAPI SFileOpenArchive(
     if(nError == ERROR_SUCCESS)
     {
         // Dump the header
-//      DumpMpqHeader(ha->pHeader);
+        //      DumpMpqHeader(ha->pHeader);
 
         // W3x Map Protectors use the fact that War3's Storm.dll ignores the MPQ user data,
         // and probably ignores the MPQ format version as well. The trick is to
@@ -356,8 +356,8 @@ bool WINAPI SFileOpenArchive(
                 }
 
                 // Also, we remember end of the file
-//              if(RawFilePos > ArchiveSize)
-//                  ArchiveSize = RawFilePos;
+                //              if(RawFilePos > ArchiveSize)
+                //                  ArchiveSize = RawFilePos;
             }
         }
     }

@@ -34,7 +34,7 @@
 
 #ifndef PKEXPORT
 #ifdef WIN32
-#define PKEXPORT  __cdecl                   // Use for normal __cdecl calling 
+#define PKEXPORT  __cdecl                   // Use for normal __cdecl calling
 #else
 #define PKEXPORT
 #endif
@@ -47,7 +47,7 @@
 typedef struct
 {
     unsigned int   distance;                // 0000: Backward distance of the currently found repetition, decreased by 1
-    unsigned int   out_bytes;               // 0004: # bytes available in out_buff            
+    unsigned int   out_bytes;               // 0004: # bytes available in out_buff
     unsigned int   out_bits;                // 0008: # of bits available in the last out byte
     unsigned int   dsize_bits;              // 000C: Number of bits needed for dictionary size. 4 = 0x400, 5 = 0x800, 6 = 0x1000
     unsigned int   dsize_mask;              // 0010: Bit mask for dictionary. 0x0F = 0x400, 0x1F = 0x800, 0x3F = 0x1000
@@ -57,14 +57,14 @@ typedef struct
     unsigned char  dist_codes[0x40];        // 005C: Distance codes
     unsigned char  nChBits[0x306];          // 009C: Table of literal bit lengths to be put to the output stream
     unsigned short nChCodes[0x306];         // 03A2: Table of literal codes to be put to the output stream
-    unsigned short offs09AE;                // 09AE: 
+    unsigned short offs09AE;                // 09AE:
 
     void         * param;                   // 09B0: User parameter
     unsigned int (*read_buf)(char *buf, unsigned int *size, void *param);  // 9B4
     void         (*write_buf)(char *buf, unsigned int *size, void *param); // 9B8
 
     unsigned short offs09BC[0x204];         // 09BC:
-    unsigned long  offs0DC4;                // 0DC4: 
+    unsigned long  offs0DC4;                // 0DC4:
     unsigned short phash_to_index[0x900];   // 0DC8: Array of indexes (one for each PAIR_HASH) to the "pair_hash_offsets" table
     unsigned short phash_to_index_end;      // 1FC8: End marker for "phash_to_index" table
     char           out_buff[0x802];         // 1FCA: Compressed data
@@ -101,15 +101,15 @@ typedef struct
     unsigned char in_buff[0x800];           // 2234: Buffer for data to be decompressed
     unsigned char DistPosCodes[0x100];      // 2A34: Table of distance position codes
     unsigned char LengthCodes[0x100];       // 2B34: Table of length codes
-    unsigned char offs2C34[0x100];          // 2C34: Buffer for 
-    unsigned char offs2D34[0x100];          // 2D34: Buffer for 
-    unsigned char offs2E34[0x80];           // 2EB4: Buffer for 
-    unsigned char offs2EB4[0x100];          // 2EB4: Buffer for 
-    unsigned char ChBitsAsc[0x100];         // 2FB4: Buffer for 
+    unsigned char offs2C34[0x100];          // 2C34: Buffer for
+    unsigned char offs2D34[0x100];          // 2D34: Buffer for
+    unsigned char offs2E34[0x80];           // 2EB4: Buffer for
+    unsigned char offs2EB4[0x100];          // 2EB4: Buffer for
+    unsigned char ChBitsAsc[0x100];         // 2FB4: Buffer for
     unsigned char DistBits[0x40];           // 30B4: Numbers of bytes to skip copied block length
     unsigned char LenBits[0x10];            // 30F4: Numbers of bits for skip copied block length
     unsigned char ExLenBits[0x10];          // 3104: Number of valid bits for copied block
-    unsigned short LenBase[0x10];           // 3114: Buffer for 
+    unsigned short LenBase[0x10];           // 3114: Buffer for
 } TDcmpStruct;
 
 #define EXP_BUFFER_SIZE sizeof(TDcmpStruct) // Size of decompression structure

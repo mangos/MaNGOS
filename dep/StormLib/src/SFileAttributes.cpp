@@ -79,7 +79,7 @@ int SAttrLoadAttributes(TMPQArchive * ha)
                 SFileReadFile(hFile, pArrayCRC32, dwArraySize, &dwBytesRead, NULL);
                 if(dwBytesRead == dwArraySize)
                 {
-                     for(i = 0; i < dwBlockTableSize; i++)
+                    for(i = 0; i < dwBlockTableSize; i++)
                         ha->pFileTable[i].dwCrc32 = BSWAP_INT32_UNSIGNED(pArrayCRC32[i]);
                 }
                 else
@@ -177,10 +177,10 @@ int SAttrLoadAttributes(TMPQArchive * ha)
             }
         }
 
-        // 
-        // Note: Version 7.00 of StormLib saved the (attributes) incorrectly. 
+        //
+        // Note: Version 7.00 of StormLib saved the (attributes) incorrectly.
         // Sometimes, number of entries in the (attributes) was 1 item less
-        // than block table size. 
+        // than block table size.
         // If we encounter such table, we will zero all three arrays
         //
 
@@ -263,11 +263,11 @@ int SAttrFileSaveToMpq(TMPQArchive * ha)
 
     // Create the attributes file in the MPQ
     nError = SFileAddFile_Init(ha, ATTRIBUTES_NAME,
-                                   0,
-                                   dwFileSize,
-                                   LANG_NEUTRAL,
-                                   ha->dwFileFlags2 | MPQ_FILE_REPLACEEXISTING,
-                                  &hf);
+                               0,
+                               dwFileSize,
+                               LANG_NEUTRAL,
+                               ha->dwFileFlags2 | MPQ_FILE_REPLACEEXISTING,
+                               &hf);
 
     // Write all parts of the (attributes) file
     if(nError == ERROR_SUCCESS)

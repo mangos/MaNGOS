@@ -108,7 +108,7 @@ bool OpenPatchedFile(HANDLE hMpq, const char * szFileName, DWORD dwReserved, HAN
             // Remember the new version
             hfPatch = (TMPQFile *)hPatchFile;
 
-            // If we encountered a full replacement of the file, 
+            // If we encountered a full replacement of the file,
             // we have to remember the highest full file
             if((hfPatch->pFileEntry->dwFlags & MPQ_FILE_PATCH_FILE) == 0)
                 hfLast = hfPatch;
@@ -143,17 +143,17 @@ bool OpenPatchedFile(HANDLE hMpq, const char * szFileName, DWORD dwReserved, HAN
 /*****************************************************************************/
 
 //-----------------------------------------------------------------------------
-// SFileEnumLocales enums all locale versions within MPQ. 
+// SFileEnumLocales enums all locale versions within MPQ.
 // Functions fills all available language identifiers on a file into the buffer
 // pointed by plcLocales. There must be enough entries to copy the localed,
 // otherwise the function returns ERROR_INSUFFICIENT_BUFFER.
 
 int WINAPI SFileEnumLocales(
-    HANDLE hMpq,
-    const char * szFileName,
-    LCID * plcLocales,
-    LPDWORD pdwMaxLocales,
-    DWORD dwSearchScope)
+        HANDLE hMpq,
+        const char * szFileName,
+        LCID * plcLocales,
+        LPDWORD pdwMaxLocales,
+        DWORD dwSearchScope)
 {
     TMPQArchive * ha = (TMPQArchive *)hMpq;
     TFileEntry * pFileEntry;
@@ -169,7 +169,7 @@ int WINAPI SFileEnumLocales(
         return ERROR_INVALID_PARAMETER;
     if(pdwMaxLocales == NULL)
         return ERROR_INVALID_PARAMETER;
-    
+
     // Keep compiler happy
     dwSearchScope = dwSearchScope;
 
@@ -306,67 +306,67 @@ bool WINAPI SFileOpenFileEx(HANDLE hMpq, const char * szFileName, DWORD dwSearch
     {
         switch(dwSearchScope)
         {
-            case SFILE_OPEN_PATCHED_FILE:
+        case SFILE_OPEN_PATCHED_FILE:
 
-                // We want to open the updated version of the file
-                return OpenPatchedFile(hMpq, szFileName, 0, phFile);
+            // We want to open the updated version of the file
+            return OpenPatchedFile(hMpq, szFileName, 0, phFile);
 
-            case SFILE_OPEN_FROM_MPQ:
-                
-                if(!IsValidMpqHandle(ha))
-                {
-                    nError = ERROR_INVALID_HANDLE;
-                    break;
-                }
+        case SFILE_OPEN_FROM_MPQ:
 
-                if(szFileName == NULL || *szFileName == 0)
-                {
-                    nError = ERROR_INVALID_PARAMETER;
-                    break;
-                }
-
-                // First of all, check the name as-is
-                if(!IsPseudoFileName(szFileName, &dwFileIndex))
-                {
-                    pFileEntry = GetFileEntryLocale(ha, szFileName, lcFileLocale);
-                    if(pFileEntry == NULL)
-                        nError = ERROR_FILE_NOT_FOUND;
-                }
-                else
-                {
-                    bOpenByIndex = true;
-                    pFileEntry = GetFileEntryByIndex(ha, dwFileIndex);
-                    if(pFileEntry == NULL)
-                        nError = ERROR_FILE_NOT_FOUND;
-                }
+            if(!IsValidMpqHandle(ha))
+            {
+                nError = ERROR_INVALID_HANDLE;
                 break;
+            }
 
-            case SFILE_OPEN_ANY_LOCALE:
-
-                // This open option is reserved for opening MPQ internal listfile.
-                // No argument validation. Tries to open file with neutral locale first,
-                // then any other available.
-                dwSearchScope = SFILE_OPEN_FROM_MPQ;
-                pFileEntry = GetFileEntryAny(ha, szFileName);
-                if(pFileEntry == NULL)
-                    nError = ERROR_FILE_NOT_FOUND;
-                break;
-
-            case SFILE_OPEN_LOCAL_FILE:
-
-                if(szFileName == NULL || *szFileName == 0)
-                {
-                    nError = ERROR_INVALID_PARAMETER;
-                    break;
-                }
-
-                return OpenLocalFile(szFileName, phFile); 
-
-            default:
-
-                // Don't accept any other value
+            if(szFileName == NULL || *szFileName == 0)
+            {
                 nError = ERROR_INVALID_PARAMETER;
                 break;
+            }
+
+            // First of all, check the name as-is
+            if(!IsPseudoFileName(szFileName, &dwFileIndex))
+            {
+                pFileEntry = GetFileEntryLocale(ha, szFileName, lcFileLocale);
+                if(pFileEntry == NULL)
+                    nError = ERROR_FILE_NOT_FOUND;
+            }
+            else
+            {
+                bOpenByIndex = true;
+                pFileEntry = GetFileEntryByIndex(ha, dwFileIndex);
+                if(pFileEntry == NULL)
+                    nError = ERROR_FILE_NOT_FOUND;
+            }
+            break;
+
+        case SFILE_OPEN_ANY_LOCALE:
+
+            // This open option is reserved for opening MPQ internal listfile.
+            // No argument validation. Tries to open file with neutral locale first,
+            // then any other available.
+            dwSearchScope = SFILE_OPEN_FROM_MPQ;
+            pFileEntry = GetFileEntryAny(ha, szFileName);
+            if(pFileEntry == NULL)
+                nError = ERROR_FILE_NOT_FOUND;
+            break;
+
+        case SFILE_OPEN_LOCAL_FILE:
+
+            if(szFileName == NULL || *szFileName == 0)
+            {
+                nError = ERROR_INVALID_PARAMETER;
+                break;
+            }
+
+            return OpenLocalFile(szFileName, phFile);
+
+        default:
+
+            // Don't accept any other value
+            nError = ERROR_INVALID_PARAMETER;
+            break;
         }
 
         // Quick return if something failed
@@ -456,7 +456,7 @@ bool WINAPI SFileOpenFileEx(HANDLE hMpq, const char * szFileName, DWORD dwSearch
 bool WINAPI SFileCloseFile(HANDLE hFile)
 {
     TMPQFile * hf = (TMPQFile *)hFile;
-    
+
     if(!IsValidFileHandle(hf))
     {
         SetLastError(ERROR_INVALID_HANDLE);

@@ -69,10 +69,10 @@ void ConvertPartHeader(void * partHeader)
 #define DEFAULT_BLOCK_SIZE 0x4000
 
 static bool Dummy_GetBitmap(
-    TFileStream * pStream,
-    TFileBitmap * pBitmap,
-    DWORD Length,
-    LPDWORD LengthNeeded)
+        TFileStream * pStream,
+        TFileBitmap * pBitmap,
+        DWORD Length,
+        LPDWORD LengthNeeded)
 {
     ULONGLONG FileSize = 0;
     DWORD TotalLength;
@@ -127,10 +127,10 @@ static bool Dummy_GetBitmap(
 // Local functions - base file support
 
 static bool BaseFile_Read(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
-    void * pvBuffer,                        // Pointer to data to be read
-    DWORD dwBytesToRead)                    // Number of bytes to read from the file
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
+        void * pvBuffer,                        // Pointer to data to be read
+        DWORD dwBytesToRead)                    // Number of bytes to read from the file
 {
     ULONGLONG ByteOffset = (pByteOffset != NULL) ? *pByteOffset : pStream->Base.File.FilePos;
     DWORD dwBytesRead = 0;                  // Must be set by platform-specific code
@@ -156,7 +156,7 @@ static bool BaseFile_Read(
             if(!ReadFile(pStream->Base.File.hFile, pvBuffer, dwBytesToRead, &dwBytesRead, &Overlapped))
                 return false;
         }
-/*
+        /*
         // If the byte offset is different from the current file position,
         // we have to update the file position
         if(ByteOffset != pStream->Base.File.FilePos)
@@ -198,7 +198,7 @@ static bool BaseFile_Read(
                 nLastError = errno;
                 return false;
             }
-            
+
             dwBytesRead = (DWORD)(size_t)bytes_read;
         }
     }
@@ -245,7 +245,7 @@ static bool BaseFile_Write(TFileStream * pStream, ULONGLONG * pByteOffset, const
             if(!WriteFile(pStream->Base.File.hFile, pvBuffer, dwBytesToWrite, &dwBytesWritten, &Overlapped))
                 return false;
         }
-/*
+        /*
         // If the byte offset is different from the current file position,
         // we have to update the file position
         if(ByteOffset != pStream->Base.File.FilePos)
@@ -285,7 +285,7 @@ static bool BaseFile_Write(TFileStream * pStream, ULONGLONG * pByteOffset, const
             nLastError = errno;
             return false;
         }
-        
+
         dwBytesWritten = (DWORD)(size_t)bytes_written;
     }
 #endif
@@ -303,16 +303,16 @@ static bool BaseFile_Write(TFileStream * pStream, ULONGLONG * pByteOffset, const
 }
 
 static bool BaseFile_GetPos(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset)                 // Pointer to file byte offset
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset)                // Pointer to file byte offset
 {
     *pByteOffset = pStream->Base.File.FilePos;
     return true;
 }
 
 static bool BaseFile_GetSize(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pFileSize)                   // Pointer where to store file size
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pFileSize)                  // Pointer where to store file size
 {
     *pFileSize = pStream->Base.File.FileSize;
     return true;
@@ -346,7 +346,7 @@ static bool BaseFile_SetSize(TFileStream * pStream, ULONGLONG NewFileSize)
         return bResult;
     }
 #endif
-    
+
 #if defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
     {
         if(ftruncate((intptr_t)pStream->Base.File.hFile, (off_t)NewFileSize) == -1)
@@ -354,7 +354,7 @@ static bool BaseFile_SetSize(TFileStream * pStream, ULONGLONG NewFileSize)
             nLastError = errno;
             return false;
         }
-        
+
         return true;
     }
 #endif
@@ -385,7 +385,7 @@ static bool BaseFile_Switch(TFileStream * pStream, TFileStream * pNewStream)
         nLastError = errno;
         return false;
     }
-    
+
     return true;
 #endif
 }
@@ -408,9 +408,9 @@ static void BaseFile_Close(TFileStream * pStream)
 }
 
 static bool BaseFile_Create(
-    TFileStream * pStream,
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        TFileStream * pStream,
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
 #ifdef PLATFORM_WINDOWS
     {
@@ -431,14 +431,14 @@ static bool BaseFile_Create(
 #if defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
     {
         intptr_t handle;
-        
+
         handle = open(szFileName, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
         if(handle == -1)
         {
             nLastError = errno;
             return false;
         }
-        
+
         pStream->Base.File.hFile = (HANDLE)handle;
     }
 #endif
@@ -461,9 +461,9 @@ static bool BaseFile_Create(
 }
 
 static bool BaseFile_Open(
-    TFileStream * pStream,
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        TFileStream * pStream,
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
 #ifdef PLATFORM_WINDOWS
     {
@@ -540,10 +540,10 @@ static bool BaseFile_Open(
 // Local functions - base memory-mapped file support
 
 static bool BaseMap_Read(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
-    void * pvBuffer,                        // Pointer to data to be read
-    DWORD dwBytesToRead)                    // Number of bytes to read from the file
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
+        void * pvBuffer,                        // Pointer to data to be read
+        DWORD dwBytesToRead)                    // Number of bytes to read from the file
 {
     ULONGLONG ByteOffset = (pByteOffset != NULL) ? *pByteOffset : pStream->Base.Map.FilePos;
 
@@ -564,16 +564,16 @@ static bool BaseMap_Read(
 }
 
 static bool BaseMap_GetPos(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset)                // Pointer to file byte offset
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset)                // Pointer to file byte offset
 {
     *pByteOffset = pStream->Base.Map.FilePos;
     return true;
 }
 
 static bool BaseMap_GetSize(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pFileSize)                  // Pointer where to store file size
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pFileSize)                  // Pointer where to store file size
 {
     *pFileSize = pStream->Base.Map.FileSize;
     return true;
@@ -601,9 +601,9 @@ static void BaseMap_Close(TFileStream * pStream)
 }
 
 static bool BaseMap_Open(
-    TFileStream * pStream,
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        TFileStream * pStream,
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
 #ifdef PLATFORM_WINDOWS
 
@@ -725,10 +725,10 @@ static const TCHAR * BaseHttp_ExtractServerName(const TCHAR * szFileName, TCHAR 
 }
 
 static bool BaseHttp_Read(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
-    void * pvBuffer,                        // Pointer to data to be read
-    DWORD dwBytesToRead)                    // Number of bytes to read from the file
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
+        void * pvBuffer,                        // Pointer to data to be read
+        DWORD dwBytesToRead)                    // Number of bytes to read from the file
 {
 #ifdef PLATFORM_WINDOWS
     ULONGLONG ByteOffset = (pByteOffset != NULL) ? *pByteOffset : pStream->Base.Http.FilePos;
@@ -753,7 +753,7 @@ static bool BaseHttp_Read(
             // Add range request to the HTTP headers
             // http://www.clevercomponents.com/articles/article015/resuming.asp
             _stprintf(szRangeRequest, _T("Range: bytes=%d-%d"), dwStartOffset, dwEndOffset);
-            HttpAddRequestHeaders(hRequest, szRangeRequest, 0xFFFFFFFF, HTTP_ADDREQ_FLAG_ADD_IF_NEW); 
+            HttpAddRequestHeaders(hRequest, szRangeRequest, 0xFFFFFFFF, HTTP_ADDREQ_FLAG_ADD_IF_NEW);
 
             // Send the request to the server
             if(HttpSendRequest(hRequest, NULL, 0, NULL, 0))
@@ -803,16 +803,16 @@ static bool BaseHttp_Read(
 }
 
 static bool BaseHttp_GetPos(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pByteOffset)                // Pointer to file byte offset
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pByteOffset)                // Pointer to file byte offset
 {
     *pByteOffset = pStream->Base.Http.FilePos;
     return true;
 }
 
 static bool BaseHttp_GetSize(
-    TFileStream * pStream,                  // Pointer to an open stream
-    ULONGLONG * pFileSize)                  // Pointer where to store file size
+        TFileStream * pStream,                  // Pointer to an open stream
+        ULONGLONG * pFileSize)                  // Pointer where to store file size
 {
     *pFileSize = pStream->Base.Http.FileSize;
     return true;
@@ -840,9 +840,9 @@ static void BaseHttp_Close(TFileStream * pStream)
 }
 
 static bool BaseHttp_Open(
-    TFileStream * pStream,
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        TFileStream * pStream,
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
 #ifdef PLATFORM_WINDOWS
 
@@ -954,10 +954,10 @@ static bool BaseHttp_Open(
 // Local functions - linear stream support
 
 static bool LinearStream_Read(
-    TLinearStream * pStream,                // Pointer to an open stream
-    ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
-    void * pvBuffer,                        // Pointer to data to be read
-    DWORD dwBytesToRead)                    // Number of bytes to read from the file
+        TLinearStream * pStream,                // Pointer to an open stream
+        ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
+        void * pvBuffer,                        // Pointer to data to be read
+        DWORD dwBytesToRead)                    // Number of bytes to read from the file
 {
     ULONGLONG ByteOffset;
     ULONGLONG EndOffset;
@@ -1045,10 +1045,10 @@ static bool LinearStream_Switch(TLinearStream * pStream, TLinearStream * pNewStr
 }
 
 static bool LinearStream_GetBitmap(
-    TLinearStream * pStream,
-    TFileBitmap * pBitmap,
-    DWORD Length,
-    LPDWORD LengthNeeded)
+        TLinearStream * pStream,
+        TFileBitmap * pBitmap,
+        DWORD Length,
+        LPDWORD LengthNeeded)
 {
     DWORD TotalLength;
     bool bResult = false;
@@ -1086,7 +1086,7 @@ static void LinearStream_Close(TLinearStream * pStream)
     if(pStream->pBitmap != NULL)
         STORM_FREE(pStream->pBitmap);
     pStream->pBitmap = NULL;
-    
+
     // Call the base class for closing the stream
     return pStream->BaseClose(pStream);
 }
@@ -1127,10 +1127,10 @@ static bool IsPartHeader(PPART_FILE_HEADER pPartHdr)
 }
 
 static bool PartialStream_Read(
-    TPartialStream * pStream,
-    ULONGLONG * pByteOffset,
-    void * pvBuffer,
-    DWORD dwBytesToRead)
+        TPartialStream * pStream,
+        ULONGLONG * pByteOffset,
+        void * pvBuffer,
+        DWORD dwBytesToRead)
 {
     ULONGLONG RawByteOffset;
     LPBYTE pbBuffer = (LPBYTE)pvBuffer;
@@ -1228,26 +1228,26 @@ static bool PartialStream_Read(
 }
 
 static bool PartialStream_GetPos(
-    TPartialStream * pStream,
-    ULONGLONG & ByteOffset)
+        TPartialStream * pStream,
+        ULONGLONG & ByteOffset)
 {
     ByteOffset = pStream->VirtualPos;
     return true;
 }
 
 static bool PartialStream_GetSize(
-    TPartialStream * pStream,               // Pointer to an open stream
-    ULONGLONG & FileSize)                   // Pointer where to store file size
+        TPartialStream * pStream,               // Pointer to an open stream
+        ULONGLONG & FileSize)                   // Pointer where to store file size
 {
     FileSize = pStream->VirtualSize;
     return true;
 }
 
 static bool PartialStream_GetBitmap(
-    TPartialStream * pStream,
-    TFileBitmap * pBitmap,
-    DWORD Length,
-    LPDWORD LengthNeeded)
+        TPartialStream * pStream,
+        TFileBitmap * pBitmap,
+        DWORD Length,
+        LPDWORD LengthNeeded)
 {
     LPBYTE pbBitmap;
     DWORD TotalLength;
@@ -1274,7 +1274,7 @@ static bool PartialStream_GetBitmap(
         pBitmap->BitmapSize = BitmapSize;
         pBitmap->BlockSize = pStream->BlockSize;
         pBitmap->Reserved = 0;
-        
+
         // Is there at least one incomplete block?
         for(DWORD i = 0; i < pStream->BlockCount; i++)
         {
@@ -1287,7 +1287,7 @@ static bool PartialStream_GetBitmap(
 
         bResult = true;
     }
-    
+
     // Do we have enough space for supplying the bitmap?
     if(Length >= TotalLength)
     {
@@ -1395,7 +1395,7 @@ static const char * szKeyTemplate = "expand 32-byte k000000000000000000000000000
 static const char * AuthCodeArray[] =
 {
     // Diablo III: Agent.exe (1.0.0.954)
-    // Address of decryption routine: 00502b00                             
+    // Address of decryption routine: 00502b00
     // Pointer to decryptor object: ECX
     // Pointer to key: ECX+0x5C
     // Authentication code URL: http://dist.blizzard.com/mediakey/d3-authenticationcode-enGB.txt
@@ -1465,10 +1465,10 @@ static void CreateKeyFromAuthCode(
 }
 
 static void DecryptFileChunk(
-    DWORD * MpqData,
-    LPBYTE pbKey,
-    ULONGLONG ByteOffset,
-    DWORD dwLength)
+        DWORD * MpqData,
+        LPBYTE pbKey,
+        ULONGLONG ByteOffset,
+        DWORD dwLength)
 {
     ULONGLONG ChunkOffset;
     DWORD KeyShuffled[0x10];
@@ -1501,7 +1501,7 @@ static void DecryptFileChunk(
         KeyShuffled[0x04] = KeyMirror[0x0D];
         KeyShuffled[0x01] = KeyMirror[0x0E];
         KeyShuffled[0x00] = KeyMirror[0x0F];
-        
+
         // Shuffle the key - part 2
         for(DWORD i = 0; i < RoundCount; i += 2)
         {
@@ -1588,7 +1588,7 @@ static bool DetectFileKey(LPBYTE pbKeyBuffer, LPBYTE pbEncryptedHeader)
         // Prepare they decryption key from game serial number
         CreateKeyFromAuthCode(pbKeyBuffer, AuthCodeArray[i]);
 
-        // Try to decrypt with the given key 
+        // Try to decrypt with the given key
         memcpy(FileHeader, pbEncryptedHeader, MPQE_CHUNK_SIZE);
         DecryptFileChunk((LPDWORD)FileHeader, pbKeyBuffer, ByteOffset, MPQE_CHUNK_SIZE);
 
@@ -1604,10 +1604,10 @@ static bool DetectFileKey(LPBYTE pbKeyBuffer, LPBYTE pbEncryptedHeader)
 }
 
 static bool EncryptedStream_Read(
-    TEncryptedStream * pStream,             // Pointer to an open stream
-    ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
-    void * pvBuffer,                        // Pointer to data to be read
-    DWORD dwBytesToRead)                    // Number of bytes to read from the file
+        TEncryptedStream * pStream,             // Pointer to an open stream
+        ULONGLONG * pByteOffset,                // Pointer to file byte offset. If NULL, it reads from the current position
+        void * pvBuffer,                        // Pointer to data to be read
+        DWORD dwBytesToRead)                    // Number of bytes to read from the file
 {
     ULONGLONG StartOffset;                  // Offset of the first byte to be read from the file
     ULONGLONG ByteOffset;                   // Offset that the caller wants
@@ -1655,7 +1655,7 @@ static bool EncryptedStream_Read(
             assert(false);
         }
 
-        // Free decryption buffer        
+        // Free decryption buffer
         STORM_FREE(pbMpqData);
     }
 
@@ -1717,8 +1717,8 @@ static bool EncryptedStream_Open(TEncryptedStream * pStream)
  */
 
 TFileStream * FileStream_CreateFile(
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
     TFileStream * pStream;
 
@@ -1782,8 +1782,8 @@ TFileStream * FileStream_CreateFile(
  */
 
 TFileStream * FileStream_OpenFile(
-    const TCHAR * szFileName,
-    DWORD dwStreamFlags)
+        const TCHAR * szFileName,
+        DWORD dwStreamFlags)
 {
     TFileStream * pStream = NULL;
     size_t StreamSize = 0;
@@ -1793,22 +1793,22 @@ TFileStream * FileStream_OpenFile(
     // Allocate file stream for each stream provider
     switch(dwStreamFlags & STREAM_PROVIDER_MASK)
     {
-        case STREAM_PROVIDER_LINEAR:    // Allocate structure for linear stream 
-            StreamSize = sizeof(TLinearStream);
-            break;
+    case STREAM_PROVIDER_LINEAR:    // Allocate structure for linear stream
+        StreamSize = sizeof(TLinearStream);
+        break;
 
-        case STREAM_PROVIDER_PARTIAL:
-            dwStreamFlags |= STREAM_FLAG_READ_ONLY;
-            StreamSize = sizeof(TPartialStream);
-            break;
+    case STREAM_PROVIDER_PARTIAL:
+        dwStreamFlags |= STREAM_FLAG_READ_ONLY;
+        StreamSize = sizeof(TPartialStream);
+        break;
 
-        case STREAM_PROVIDER_ENCRYPTED:
-            dwStreamFlags |= STREAM_FLAG_READ_ONLY;
-            StreamSize = sizeof(TEncryptedStream);
-            break;
+    case STREAM_PROVIDER_ENCRYPTED:
+        dwStreamFlags |= STREAM_FLAG_READ_ONLY;
+        StreamSize = sizeof(TEncryptedStream);
+        break;
 
-        default:
-            return NULL;
+    default:
+        return NULL;
     }
 
     // Allocate the stream for each type
@@ -1823,19 +1823,19 @@ TFileStream * FileStream_OpenFile(
     // Now initialize the respective base provider
     switch(dwStreamFlags & BASE_PROVIDER_MASK)
     {
-        case BASE_PROVIDER_FILE:
-            bBaseResult = BaseFile_Open(pStream, szFileName, dwStreamFlags);
-            break;
+    case BASE_PROVIDER_FILE:
+        bBaseResult = BaseFile_Open(pStream, szFileName, dwStreamFlags);
+        break;
 
-        case BASE_PROVIDER_MAP:
-            dwStreamFlags |= STREAM_FLAG_READ_ONLY;
-            bBaseResult = BaseMap_Open(pStream, szFileName, dwStreamFlags);
-            break;
+    case BASE_PROVIDER_MAP:
+        dwStreamFlags |= STREAM_FLAG_READ_ONLY;
+        bBaseResult = BaseMap_Open(pStream, szFileName, dwStreamFlags);
+        break;
 
-        case BASE_PROVIDER_HTTP:
-            dwStreamFlags |= STREAM_FLAG_READ_ONLY;
-            bBaseResult = BaseHttp_Open(pStream, szFileName, dwStreamFlags);
-            break;
+    case BASE_PROVIDER_HTTP:
+        dwStreamFlags |= STREAM_FLAG_READ_ONLY;
+        bBaseResult = BaseHttp_Open(pStream, szFileName, dwStreamFlags);
+        break;
     }
 
     // If we failed to open the base storage, fail the operation
@@ -1848,17 +1848,17 @@ TFileStream * FileStream_OpenFile(
     // Now initialize the stream provider
     switch(dwStreamFlags & STREAM_PROVIDER_MASK)
     {
-        case STREAM_PROVIDER_LINEAR:
-            bStreamResult = LinearStream_Open((TLinearStream *)pStream);
-            break;
+    case STREAM_PROVIDER_LINEAR:
+        bStreamResult = LinearStream_Open((TLinearStream *)pStream);
+        break;
 
-        case STREAM_PROVIDER_PARTIAL:
-            bStreamResult = PartialStream_Open((TPartialStream *)pStream);
-            break;
+    case STREAM_PROVIDER_PARTIAL:
+        bStreamResult = PartialStream_Open((TPartialStream *)pStream);
+        break;
 
-        case STREAM_PROVIDER_ENCRYPTED:
-            bStreamResult = EncryptedStream_Open((TEncryptedStream *)pStream);
-            break;
+    case STREAM_PROVIDER_ENCRYPTED:
+        bStreamResult = EncryptedStream_Open((TEncryptedStream *)pStream);
+        break;
     }
 
     // If the operation failed, free the stream and set it to NULL
@@ -1949,7 +1949,7 @@ bool FileStream_GetSize(TFileStream * pStream, ULONGLONG * pFileSize)
  * \a NewFileSize File size to set
  */
 bool FileStream_SetSize(TFileStream * pStream, ULONGLONG NewFileSize)
-{                                 
+{
     if(pStream->dwFlags & STREAM_FLAG_READ_ONLY)
         return false;
 

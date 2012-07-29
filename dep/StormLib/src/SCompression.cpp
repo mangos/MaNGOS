@@ -2,7 +2,7 @@
 /* SCompression.cpp                       Copyright (c) Ladislav Zezula 2003 */
 /*---------------------------------------------------------------------------*/
 /* This module serves as a bridge between StormLib code and (de)compression  */
-/* functions. All (de)compression calls go (and should only go) through this */   
+/* functions. All (de)compression calls go (and should only go) through this */
 /* module. No system headers should be included in this module to prevent    */
 /* compile-time problems.                                                    */
 /*---------------------------------------------------------------------------*/
@@ -32,25 +32,25 @@ typedef struct
 // Function doesn't return an error. A success means that the size of compressed buffer
 // is lower than size of uncompressed buffer.
 typedef void (*COMPRESS)(
-    char * pbOutBuffer,                 // [out] Pointer to the buffer where the compressed data will be stored
-    int * pcbOutBuffer,                 // [in]  Pointer to length of the buffer pointed by pbOutBuffer
-                                        // [out] Contains length of the compressed data
-    char * pbInBuffer,                  // [in]  Pointer to the buffer with data to compress
-    int cbInBuffer,                     // [in]  Length of the buffer pointer by pbInBuffer
-    int * pCmpType,                     // [in]  Compression-method specific value. ADPCM Setups this for the following Huffman compression
-    int nCmpLevel);                     // [in]  Compression specific value. ADPCM uses this. Should be set to zero.
+        char * pbOutBuffer,                 // [out] Pointer to the buffer where the compressed data will be stored
+        int * pcbOutBuffer,                 // [in]  Pointer to length of the buffer pointed by pbOutBuffer
+        // [out] Contains length of the compressed data
+        char * pbInBuffer,                  // [in]  Pointer to the buffer with data to compress
+        int cbInBuffer,                     // [in]  Length of the buffer pointer by pbInBuffer
+        int * pCmpType,                     // [in]  Compression-method specific value. ADPCM Setups this for the following Huffman compression
+        int nCmpLevel);                     // [in]  Compression specific value. ADPCM uses this. Should be set to zero.
 
 // Prototype of the decompression function
 // Returns 1 if success, 0 if failure
 typedef int (*DECOMPRESS)(
-    char * pbOutBuffer,                 // [out] Pointer to the buffer where to store decompressed data
-    int * pcbOutBuffer,                 // [in]  Pointer to total size of the buffer pointed by pbOutBuffer
-                                        // [out] Contains length of the decompressed data
-    char * pbInBuffer,                  // [in]  Pointer to data to be decompressed  
-    int cbInBuffer);                    // [in]  Length of the data to be decompressed
+        char * pbOutBuffer,                 // [out] Pointer to the buffer where to store decompressed data
+        int * pcbOutBuffer,                 // [in]  Pointer to total size of the buffer pointed by pbOutBuffer
+        // [out] Contains length of the decompressed data
+        char * pbInBuffer,                  // [in]  Pointer to data to be decompressed
+        int cbInBuffer);                    // [in]  Length of the data to be decompressed
 
 // Table of compression functions
-typedef struct  
+typedef struct
 {
     unsigned long uMask;                // Compression mask
     COMPRESS Compress;                  // Compression function
@@ -72,12 +72,12 @@ typedef struct
 
 // 1500F4C0
 void Compress_huff(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * pCmpType,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * pCmpType,
+        int /* nCmpLevel */)
 {
     THuffmannTree ht;                   // Huffmann tree for compression
     TOutputStream os;                   // Output stream
@@ -97,7 +97,7 @@ void Compress_huff(
     // The following code is not necessary to run, because it has no
     // effect on the output data. It only clears the huffmann tree, but when
     // the tree is on the stack, who cares ?
-//  ht.UninitTree();
+    //  ht.UninitTree();
 }
 
 // 1500F5F0
@@ -121,7 +121,7 @@ int Decompress_huff(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBuffer, i
     // The following code is not necessary to run, because it has no
     // effect on the output data. It only clears the huffmann tree, but when
     // the tree is on the stack, who cares ?
-//  ht.UninitTree();
+    //  ht.UninitTree();
     return 1;
 }
 
@@ -132,12 +132,12 @@ int Decompress_huff(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBuffer, i
 /******************************************************************************/
 
 void Compress_ZLIB(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * /* pCmpType */,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * /* pCmpType */,
+        int /* nCmpLevel */)
 {
     z_stream z;                        // Stream information for zlib
     int windowBits;
@@ -175,16 +175,16 @@ void Compress_ZLIB(
     // Storm.dll uses zlib version 1.1.3
     // Wow.exe uses zlib version 1.2.3
     nResult = deflateInit2(&z,
-                            6,                  // Compression level used by WoW MPQs
-                            Z_DEFLATED,
-                            windowBits,
-                            8,
-                            Z_DEFAULT_STRATEGY);
+                           6,                  // Compression level used by WoW MPQs
+                           Z_DEFLATED,
+                           windowBits,
+                           8,
+                           Z_DEFAULT_STRATEGY);
     if(nResult == Z_OK)
     {
         // Call zlib to compress the data
         nResult = deflate(&z, Z_FINISH);
-        
+
         if(nResult == Z_OK || nResult == Z_STREAM_END)
             *pcbOutBuffer = z.total_out;
 
@@ -227,7 +227,7 @@ int Decompress_ZLIB(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBuffer, i
 // Function loads data from the input buffer. Used by Pklib's "implode"
 // and "explode" function as user-defined callback
 // Returns number of bytes loaded
-//    
+//
 //   char * buf          - Pointer to a buffer where to store loaded data
 //   unsigned int * size - Max. number of bytes to read
 //   void * param        - Custom pointer, parameter of implode/explode
@@ -241,7 +241,7 @@ static unsigned int ReadInputData(char * buf, unsigned int * size, void * param)
     // Check the case when not enough data available
     if(nToRead > nMaxAvail)
         nToRead = nMaxAvail;
-    
+
     // Load data and increment offsets
     memcpy(buf, pInfo->pbInBuff, nToRead);
     pInfo->pbInBuff += nToRead;
@@ -251,7 +251,7 @@ static unsigned int ReadInputData(char * buf, unsigned int * size, void * param)
 
 // Function for store output data. Used by Pklib's "implode" and "explode"
 // as user-defined callback
-//    
+//
 //   char * buf          - Pointer to data to be written
 //   unsigned int * size - Number of bytes to write
 //   void * param        - Custom pointer, parameter of implode/explode
@@ -273,12 +273,12 @@ static void WriteOutputData(char * buf, unsigned int * size, void * param)
 }
 
 static void Compress_PKLIB(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * /* pCmpType */,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * /* pCmpType */,
+        int /* nCmpLevel */)
 {
     TDataInfo Info;                                      // Data information
     char * work_buf = STORM_ALLOC(char, CMP_BUFFER_SIZE);// Pklib's work buffer
@@ -327,7 +327,7 @@ static int Decompress_PKLIB(char * pbOutBuffer, int * pcbOutBuffer, char * pbInB
 
     // Do the decompression
     explode(ReadInputData, WriteOutputData, work_buf, &Info);
-    
+
     // If PKLIB is unable to decompress the data, return 0;
     if(Info.pbOutBuff == pbOutBuffer)
         return 0;
@@ -345,12 +345,12 @@ static int Decompress_PKLIB(char * pbOutBuffer, int * pcbOutBuffer, char * pbInB
 /******************************************************************************/
 
 static void Compress_BZIP2(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * /* pCmpType */,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * /* pCmpType */,
+        int /* nCmpLevel */)
 {
     bz_stream strm;
     int blockSize100k = 9;
@@ -405,8 +405,8 @@ static int Decompress_BZIP2(char * pbOutBuffer, int * pcbOutBuffer, char * pbInB
         while(nResult != BZ_STREAM_END)
         {
             nResult = BZ2_bzDecompress(&strm);
-            
-            // If any error there, break the loop 
+
+            // If any error there, break the loop
             if(nResult < BZ_OK)
                 break;
         }
@@ -462,12 +462,12 @@ static void LZMA_Callback_Free(void *p, void *address)
 //
 
 /*static */ void Compress_LZMA(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * /* pCmpType */,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * /* pCmpType */,
+        int /* nCmpLevel */)
 {
     ICompressProgress Progress;
     CLzmaEncProps props;
@@ -491,16 +491,16 @@ static void LZMA_Callback_Free(void *p, void *address)
     destBuffer = (Byte *)pbOutBuffer + LZMA_HEADER_SIZE;
     destLen = *pcbOutBuffer - LZMA_HEADER_SIZE;
     nResult = LzmaEncode(destBuffer,
-                        &destLen,
-                 (Byte *)pbInBuffer,
+                         &destLen,
+                         (Byte *)pbInBuffer,
                          srcLen,
-                        &props,
+                         &props,
                          encodedProps,
-                        &encodedPropsSize,
+                         &encodedPropsSize,
                          0,
-                        &Progress,
-                        &SzAlloc,
-                        &SzAlloc);
+                         &Progress,
+                         &SzAlloc,
+                         &SzAlloc);
     if(nResult != SZ_OK)
         return;
 
@@ -540,7 +540,7 @@ static int Decompress_LZMA(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBu
     SRes nResult;
 
     // There must be at least 0x0E bytes in the buffer
-    if(srcLen <= LZMA_HEADER_SIZE) 
+    if(srcLen <= LZMA_HEADER_SIZE)
         return 0;
 
     // We only accept blocks that have no filter used
@@ -554,14 +554,14 @@ static int Decompress_LZMA(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBu
     // Perform compression
     srcLen = cbInBuffer - LZMA_HEADER_SIZE;
     nResult = LzmaDecode(destBuffer,
-                        &destLen,
+                         &destLen,
                          srcBuffer + LZMA_HEADER_SIZE,
-                        &srcLen,
-                         srcBuffer + 1, 
+                         &srcLen,
+                         srcBuffer + 1,
                          LZMA_PROPS_SIZE,
                          LZMA_FINISH_END,
-                        &LzmaStatus,
-                        &SzAlloc);
+                         &LzmaStatus,
+                         &SzAlloc);
     if(nResult != SZ_OK)
         return 0;
 
@@ -576,12 +576,12 @@ static int Decompress_LZMA(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBu
 /******************************************************************************/
 
 void Compress_SPARSE(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * /* pCmpType */,
-    int /* nCmpLevel */)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * /* pCmpType */,
+        int /* nCmpLevel */)
 {
     CompressSparse((unsigned char *)pbOutBuffer, pcbOutBuffer, (unsigned char *)pbInBuffer, cbInBuffer);
 }
@@ -598,12 +598,12 @@ int Decompress_SPARSE(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBuffer,
 /******************************************************************************/
 
 static void Compress_ADPCM_mono(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * pCmpType,
-    int nCmpLevel)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * pCmpType,
+        int nCmpLevel)
 {
     // Prepare the compression level for Huffmann compression,
     // which will be called as next step
@@ -638,12 +638,12 @@ static int Decompress_ADPCM_mono(char * pbOutBuffer, int * pcbOutBuffer, char * 
 /******************************************************************************/
 
 static void Compress_ADPCM_stereo(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    int * pCmpType,
-    int nCmpLevel)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        int * pCmpType,
+        int nCmpLevel)
 {
     // Prepare the compression level for Huffmann compression,
     // which will be called as next step
@@ -729,7 +729,7 @@ int WINAPI SCompExplode(char * pbOutBuffer, int * pcbOutBuffer, char * pbInBuffe
         memcpy(pbOutBuffer, pbInBuffer, cbInBuffer);
         return 1;
     }
-    
+
     // Perform decompression
     if(!Decompress_PKLIB(pbOutBuffer, &cbOutBuffer, pbInBuffer, cbInBuffer))
     {
@@ -768,13 +768,13 @@ static TCompressTable cmp_table[] =
 };
 
 int WINAPI SCompCompress(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer,
-    unsigned uCompressionMask,
-    int nCmpType,
-    int nCmpLevel)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer,
+        unsigned uCompressionMask,
+        int nCmpType,
+        int nCmpLevel)
 {
     COMPRESS CompressFuncArray[0x10];       // Array of compression functions, applied sequentially
     unsigned char CompressByte[0x10];       // CompressByte for each method in the CompressFuncArray array
@@ -920,10 +920,10 @@ static TDecompressTable dcmp_table[] =
 };
 
 int WINAPI SCompDecompress(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer)
 {
     char *   pbWorkBuffer = NULL;           // Temporary storage for decompressed data
     char *   pbOutput = pbOutBuffer;        // Where to store decompressed data
@@ -950,7 +950,7 @@ int WINAPI SCompDecompress(
     }
 
     // Get applied compression types and decrement data length
-    uCompressionMask = uCompressionCopy = (unsigned char)*pbInBuffer++;              
+    uCompressionMask = uCompressionCopy = (unsigned char)*pbInBuffer++;
     cbInBuffer--;
 
     // Get current compressed data and length of it
@@ -1001,7 +1001,7 @@ int WINAPI SCompDecompress(
             // Get the correct output buffer
             pbOutput = (nCompressIndex & 1) ? pbWorkBuffer : pbOutBuffer;
             nCompressIndex--;
-        
+
             // Perform the decompression
             cbOutBuffer = *pcbOutBuffer;
             nResult = dcmp_table[i].Decompress(pbOutput, &cbOutBuffer, pbInput, cbInLength);
@@ -1028,10 +1028,10 @@ int WINAPI SCompDecompress(
 }
 
 int WINAPI SCompDecompress2(
-    char * pbOutBuffer,
-    int * pcbOutBuffer,
-    char * pbInBuffer,
-    int cbInBuffer)
+        char * pbOutBuffer,
+        int * pcbOutBuffer,
+        char * pbInBuffer,
+        int cbInBuffer)
 {
     DECOMPRESS pfnDecompress1 = NULL;
     DECOMPRESS pfnDecompress2 = NULL;
@@ -1059,35 +1059,35 @@ int WINAPI SCompDecompress2(
     // We only recognize a fixed set of compression methods
     switch((unsigned char)CompressionMethod)
     {
-        case MPQ_COMPRESSION_ZLIB:
-            pfnDecompress1 = Decompress_ZLIB;
-            break;
+    case MPQ_COMPRESSION_ZLIB:
+        pfnDecompress1 = Decompress_ZLIB;
+        break;
 
-        case MPQ_COMPRESSION_PKWARE:
-            pfnDecompress1 = Decompress_PKLIB;
-            break;
+    case MPQ_COMPRESSION_PKWARE:
+        pfnDecompress1 = Decompress_PKLIB;
+        break;
 
-        case MPQ_COMPRESSION_BZIP2:
-            pfnDecompress1 = Decompress_BZIP2;
-            break;
+    case MPQ_COMPRESSION_BZIP2:
+        pfnDecompress1 = Decompress_BZIP2;
+        break;
 
-        case MPQ_COMPRESSION_LZMA:
-            pfnDecompress1 = Decompress_LZMA;
-            break;
+    case MPQ_COMPRESSION_LZMA:
+        pfnDecompress1 = Decompress_LZMA;
+        break;
 
-        case MPQ_COMPRESSION_SPARSE:
-            pfnDecompress1 = Decompress_SPARSE;
-            break;
+    case MPQ_COMPRESSION_SPARSE:
+        pfnDecompress1 = Decompress_SPARSE;
+        break;
 
-        case (MPQ_COMPRESSION_SPARSE | MPQ_COMPRESSION_ZLIB):
-            pfnDecompress1 = Decompress_ZLIB;
-            pfnDecompress2 = Decompress_SPARSE;
-            break;
+    case (MPQ_COMPRESSION_SPARSE | MPQ_COMPRESSION_ZLIB):
+        pfnDecompress1 = Decompress_ZLIB;
+        pfnDecompress2 = Decompress_SPARSE;
+        break;
 
-        case (MPQ_COMPRESSION_SPARSE | MPQ_COMPRESSION_BZIP2):
-            pfnDecompress1 = Decompress_BZIP2;
-            pfnDecompress2 = Decompress_SPARSE;
-            break;
+    case (MPQ_COMPRESSION_SPARSE | MPQ_COMPRESSION_BZIP2):
+        pfnDecompress1 = Decompress_BZIP2;
+        pfnDecompress2 = Decompress_SPARSE;
+        break;
 
         //
         // Note: Any combination including MPQ_COMPRESSION_ADPCM_MONO,
@@ -1095,9 +1095,9 @@ int WINAPI SCompDecompress2(
         // is not supported by newer MPQs.
         //
 
-        default:
-            SetLastError(ERROR_FILE_CORRUPT);
-            return 0;
+    default:
+        SetLastError(ERROR_FILE_CORRUPT);
+        return 0;
     }
 
     // If we have to use two decompressions, allocate temporary buffer
