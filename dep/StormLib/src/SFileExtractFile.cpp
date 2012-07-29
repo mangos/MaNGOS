@@ -12,7 +12,7 @@
 #include "StormLib.h"
 #include "StormCommon.h"
 
-bool WINAPI SFileExtractFile(HANDLE hMpq, const char * szToExtract, const char * szExtracted, DWORD dwSearchScope)
+bool WINAPI SFileExtractFile(HANDLE hMpq, const char * szToExtract, const TCHAR * szExtracted, DWORD dwSearchScope)
 {
     TFileStream * pLocalFile = NULL;
     HANDLE hMpqFile = NULL;
@@ -28,7 +28,7 @@ bool WINAPI SFileExtractFile(HANDLE hMpq, const char * szToExtract, const char *
     // Create the local file
     if(nError == ERROR_SUCCESS)
     {
-        pLocalFile = FileStream_CreateFile(szExtracted);
+        pLocalFile = FileStream_CreateFile(szExtracted, STREAM_PROVIDER_LINEAR | BASE_PROVIDER_FILE);
         if(pLocalFile == NULL)
             nError = GetLastError();
     }

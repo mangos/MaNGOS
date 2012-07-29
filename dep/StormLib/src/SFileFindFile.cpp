@@ -258,7 +258,7 @@ static int DoMPQSearch(TMPQSearch * hs, SFILE_FIND_DATA * lpFindFileData)
         pFileTableEnd = ha->pFileTable + ha->dwFileTableSize;
         pFileEntry = ha->pFileTable + hs->dwNextIndex;
 
-        // Get the start and end of the hash table
+        // Get the length of the patch prefix (0 if none)
         nPrefixLength = strlen(ha->szPatchPrefix);
 
         // Parse the file table
@@ -285,21 +285,18 @@ static int DoMPQSearch(TMPQSearch * hs, SFILE_FIND_DATA * lpFindFileData)
                     szFileName = pFileEntry->szFileName;
                     if(szFileName == NULL)
                     {
-                        // Open the file by index in order to check if the file exists
-                        if(SFileOpenFileEx((HANDLE)hs->ha, (char *)(DWORD_PTR)dwBlockIndex, SFILE_OPEN_BY_INDEX, &hFile))
-                            SFileCloseFile(hFile);
-
-                        // If the name was retrieved, use that one. Otherwise, just use generic pseudo-name
-                        szFileName = pFileEntry->szFileName;
-                        if(szFileName == NULL)
+                        // Open the file by its pseudo-name.
+                        // This also generates the file name with a proper extension
+                        sprintf(szPseudoName, "File%08u.xxx", dwBlockIndex);
+                        if(SFileOpenFileEx((HANDLE)hs->ha, szPseudoName, SFILE_OPEN_FROM_MPQ, &hFile))
                         {
-                            sprintf(szPseudoName, "File%08u.xxx", dwBlockIndex);
-                            szFileName = szPseudoName;
+                            szFileName = (pFileEntry->szFileName != NULL) ? pFileEntry->szFileName : szPseudoName;
+                            SFileCloseFile(hFile);
                         }
                     }
 
                     // Check the file name against the wildcard
-                    if(CheckWildCard(szFileName, hs->szSearchMask))
+                    if(CheckWildCard(szFileName + nPrefixLength, hs->szSearchMask))
                     {
                         // Fill the found entry
                         lpFindFileData->dwHashIndex  = pPatchEntry->dwHashIndex;
@@ -315,7 +312,7 @@ static int DoMPQSearch(TMPQSearch * hs, SFILE_FIND_DATA * lpFindFileData)
 
                         // Fill the file name and plain file name
                         strcpy(lpFindFileData->cFileName, szFileName + nPrefixLength);
-                        lpFindFileData->szPlainName = (char *)GetPlainFileName(lpFindFileData->cFileName);
+                        lpFindFileData->szPlainName = (char *)GetPlainFileNameA(lpFindFileData->cFileName);
                         return ERROR_SUCCESS;
                     }
 
@@ -339,8 +336,8 @@ static void FreeMPQSearch(TMPQSearch *& hs)
     if(hs != NULL)
     {
         if(hs->pSearchTable != NULL)
-            FREEMEM(hs->pSearchTable);
-        FREEMEM(hs);
+            STORM_FREE(hs->pSearchTable);
+        STORM_FREE(hs);
         hs = NULL;
     }
 }
@@ -371,7 +368,7 @@ HANDLE WINAPI SFileFindFirstFile(HANDLE hMpq, const char * szMask, SFILE_FIND_DA
     if(nError == ERROR_SUCCESS)
     {
         nSize = sizeof(TMPQSearch) + strlen(szMask) + 1;
-        if((hs = (TMPQSearch *)ALLOCMEM(char, nSize)) == NULL)
+        if((hs = (TMPQSearch *)STORM_ALLOC(char, nSize)) == NULL)
             nError = ERROR_NOT_ENOUGH_MEMORY;
     }
 
@@ -388,7 +385,7 @@ HANDLE WINAPI SFileFindFirstFile(HANDLE hMpq, const char * szMask, SFILE_FIND_DA
         if(ha->haPatch != NULL)
         {
             hs->dwSearchTableItems = GetSearchTableItems(ha);
-            hs->pSearchTable = ALLOCMEM(TFileEntry *, hs->dwSearchTableItems);
+            hs->pSearchTable = STORM_ALLOC(TFileEntry *, hs->dwSearchTableItems);
             hs->dwFlagMask = MPQ_FILE_EXISTS | MPQ_FILE_PATCH_FILE;
             if(hs->pSearchTable != NULL)
                 memset(hs->pSearchTable, 0, hs->dwSearchTableItems * sizeof(TFileEntry *));

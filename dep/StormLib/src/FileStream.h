@@ -15,54 +15,54 @@
 // Function prototypes
 
 typedef bool (*STREAM_READ)(
-        struct TFileStream * pStream,       // Pointer to an open stream
-        ULONGLONG * pByteOffset,            // Pointer to file byte offset. If NULL, it reads from the current position
-        void * pvBuffer,                    // Pointer to data to be read
-        DWORD dwBytesToRead                 // Number of bytes to read from the file
-        );
+    struct TFileStream * pStream,       // Pointer to an open stream
+    ULONGLONG * pByteOffset,            // Pointer to file byte offset. If NULL, it reads from the current position
+    void * pvBuffer,                    // Pointer to data to be read
+    DWORD dwBytesToRead                 // Number of bytes to read from the file
+    );
 
 typedef bool (*STREAM_WRITE)(
-        struct TFileStream * pStream,       // Pointer to an open stream
-        ULONGLONG * pByteOffset,            // Pointer to file byte offset. If NULL, it writes to the current position
-        const void * pvBuffer,              // Pointer to data to be written
-        DWORD dwBytesToWrite                // Number of bytes to read from the file
-        );
+    struct TFileStream * pStream,       // Pointer to an open stream
+    ULONGLONG * pByteOffset,            // Pointer to file byte offset. If NULL, it writes to the current position
+    const void * pvBuffer,              // Pointer to data to be written
+    DWORD dwBytesToWrite                // Number of bytes to read from the file
+    );
 
 typedef bool (*STREAM_GETPOS)(
-        struct TFileStream * pStream,       // Pointer to an open stream
-        ULONGLONG * pByteOffset             // Pointer to store current file position
-        );
+    struct TFileStream * pStream,       // Pointer to an open stream
+    ULONGLONG * pByteOffset             // Pointer to store current file position
+    );
 
 typedef bool (*STREAM_GETSIZE)(
-        struct TFileStream * pStream,       // Pointer to an open stream
-        ULONGLONG * pFileSize               // Receives the file size, in bytes
-        );
+    struct TFileStream * pStream,       // Pointer to an open stream
+    ULONGLONG * pFileSize               // Receives the file size, in bytes
+    );
 
 typedef bool (*STREAM_SETSIZE)(
-        struct TFileStream * pStream,       // Pointer to an open stream
-        ULONGLONG FileSize                  // New size for the file, in bytes
-        );
+    struct TFileStream * pStream,       // Pointer to an open stream
+    ULONGLONG FileSize                  // New size for the file, in bytes
+    );
 
 typedef bool (*STREAM_GETTIME)(
-        struct TFileStream * pStream,
-        ULONGLONG * pFT
-        );
+    struct TFileStream * pStream,
+    ULONGLONG * pFT
+    );
 
 typedef bool (*STREAM_SWITCH)(
-        struct TFileStream * pStream,
-        struct TFileStream * pNewStream
-        );
+    struct TFileStream * pStream,
+    struct TFileStream * pNewStream
+    );
 
 typedef bool (*STREAM_GETBMP)(
-        TFileStream * pStream,
-        TFileBitmap * pBitmap,
-        DWORD Length,
-        LPDWORD LengthNeeded
-        );
+    TFileStream * pStream,
+    TFileBitmap * pBitmap,
+    DWORD Length,
+    LPDWORD LengthNeeded
+    );
 
 typedef void (*STREAM_CLOSE)(
-        struct TFileStream * pStream
-        );
+    struct TFileStream * pStream
+    );
 
 //-----------------------------------------------------------------------------
 // Local structures - part file structure

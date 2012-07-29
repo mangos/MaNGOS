@@ -8,13 +8,12 @@ LIBRARY StormLib.dll
 
 EXPORTS
 
-    SFileGetGlobalFlags
-    SFileSetGlobalFlags
     SFileSetLocale
     SFileGetLocale
 
     SFileOpenArchive
     SFileCreateArchive
+    SFileGetArchiveBitmap
     SFileFlushArchive
     SFileCloseArchive
 
@@ -23,6 +22,7 @@ EXPORTS
     SFileSetCompactCallback
     SFileCompactArchive
     
+    SFileGetMaxFileCount
     SFileSetMaxFileCount    
     
     SFileGetAttributes
@@ -45,7 +45,7 @@ EXPORTS
     SFileExtractFile
 
     SFileVerifyFile
-
+    SFileVerifyRawData
     SFileVerifyArchive
 
     SFileFindFirstFile

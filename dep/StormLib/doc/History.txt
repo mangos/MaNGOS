@@ -2,6 +2,11 @@
   StormLib history
   ================
 
+ Version 8.02
+
+ - Support for UNICODE encoding for on-disk files
+ - Optimized file deleting
+
  Version 8.01
 
  - SFileFindFirstFile and SFileFindNextFile no longer find files that have

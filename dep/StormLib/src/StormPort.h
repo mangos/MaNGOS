@@ -9,7 +9,7 @@
 /* Computer: whiplash.flachland-chemnitz.de                                  */
 /* System: Linux 2.4.0 on i686                                               */
 /*                                                                           */
-/* Author: Sam Wilkins                                                       */
+/* Author: Sam Wilkins <swilkins1337@gmail.com>                              */
 /* System: Mac OS X and port to big endian processor                         */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
@@ -26,6 +26,12 @@
 #ifndef __STORMPORT_H__
 #define __STORMPORT_H__
 
+#ifndef __cplusplus
+  #define bool char
+  #define true 1
+  #define false 0
+#endif
+
 // Defines for Windows
 #if !defined(PLATFORM_DEFINED) && (defined(WIN32) || defined(WIN64))
 
@@ -35,10 +41,12 @@
   #define _CRT_NON_CONFORMING_SWPRINTFS
   #endif
 
-  #include <assert.h>      
-  #include <ctype.h>      
-  #include <stdio.h>      
-  #include <windows.h>      
+  #include <tchar.h>
+  #include <assert.h>
+  #include <ctype.h>
+  #include <stdio.h>
+  #include <windows.h>
+  #include <wininet.h>
   #define PLATFORM_LITTLE_ENDIAN
 
   #ifdef WIN64
@@ -52,20 +60,26 @@
 
 #endif
 
-// Defines for Mac Carbon 
-#if !defined(PLATFORM_DEFINED) && defined(__APPLE__)  // Mac Carbon API
+// Defines for Mac 
+#if !defined(PLATFORM_DEFINED) && defined(__APPLE__)  // Mac BSD API
 
-  // Macintosh using Carbon
-  #include <Carbon/Carbon.h> // Mac OS X
+  // Macintosh
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <sys/mman.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+  #include <stdlib.h>
+  #include <errno.h>
   
   #define    PKEXPORT
   #define    __SYS_ZLIB
   #define    __SYS_BZLIB
 
   #ifndef __BIG_ENDIAN__
-    #define PLATFORM_LITTLE_ENDIAN          // Apple is now making Macs with Intel CPUs
+    #define PLATFORM_LITTLE_ENDIAN
   #endif
-  
+
   #define PLATFORM_MAC
   #define PLATFORM_DEFINED                  // The platform is known now
 
@@ -76,6 +90,7 @@
 
   #include <sys/types.h>
   #include <sys/stat.h>
+  #include <sys/mman.h>
   #include <fcntl.h>
   #include <unistd.h>
   #include <stdint.h>
@@ -134,35 +149,32 @@
   #define FILE_CURRENT  SEEK_CUR
   #define FILE_END      SEEK_END
 
-  #define _stricmp strcasecmp
-  #define _strnicmp strncasecmp
-  
-  void  SetLastError(int err);
-  int   GetLastError();
+  #define _T(x)     x
+  #define _tcslen   strlen
+  #define _tcscpy   strcpy
+  #define _tcscat   strcat
+  #define _tcsrchr  strrchr
+  #define _tprintf  printf
+  #define _stprintf sprintf
+  #define _tremove  remove
 
+  #define _stricmp  strcasecmp
+  #define _strnicmp strncasecmp
+  #define _tcsnicmp strncasecmp
 
 #endif // !WIN32
 
-// Platform-specific error codes
-#ifdef PLATFORM_MAC
-  #define ERROR_SUCCESS                  noErr
-  #define ERROR_FILE_NOT_FOUND           fnfErr
-  #define ERROR_ACCESS_DENIED            permErr
-  #define ERROR_INVALID_HANDLE           rfNumErr
-  #define ERROR_NOT_ENOUGH_MEMORY        mFulErr
-  #define ERROR_BAD_FORMAT               200            // Returned when the opened file is in format that is not recognized by StormLib
-  #define ERROR_NO_MORE_FILES            errFSNoMoreItems
-  #define ERROR_HANDLE_EOF               eofErr
-  #define ERROR_NOT_SUPPORTED            201
-  #define ERROR_INVALID_PARAMETER        paramErr
-  #define ERROR_DISK_FULL                dskFulErr
-  #define ERROR_ALREADY_EXISTS           dupFNErr
-  #define ERROR_CAN_NOT_COMPLETE         202            // A generic error, when any operation fails from an unknown reason
-  #define ERROR_FILE_CORRUPT             203            // At any point when there is bad data format in the file
-  #define ERROR_INSUFFICIENT_BUFFER      errFSBadBuffer
+// 64-bit calls are supplied by "normal" calls on Mac
+#if defined(PLATFORM_MAC)
+  #define stat64  stat
+  #define fstat64 fstat
+  #define lseek64 lseek
+  #define off64_t off_t
+  #define O_LARGEFILE 0
 #endif
 
-#ifdef PLATFORM_LINUX
+// Platform-specific error codes for UNIX-based platforms
+#if defined(PLATFORM_MAC) || defined(PLATFORM_LINUX)
   #define ERROR_SUCCESS                  0
   #define ERROR_FILE_NOT_FOUND           ENOENT
   #define ERROR_ACCESS_DENIED            EPERM
@@ -194,6 +206,10 @@
     #define    BSWAP_TMPQUSERDATA(a)            {}
     #define    BSWAP_TMPQHEADER(a)              {}
 #else
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
     int16_t  SwapInt16(uint16_t);
     uint16_t SwapUInt16(uint16_t);
     int32_t  SwapInt32(uint32_t);
@@ -206,6 +222,9 @@
     void ConvertPartHeader(void * partHeader);
     void ConvertTMPQUserData(void *userData);
     void ConvertTMPQHeader(void *header);
+#ifdef __cplusplus
+  }
+#endif
     #define    BSWAP_INT16_SIGNED(a)            SwapInt16((a))
     #define    BSWAP_INT16_UNSIGNED(a)          SwapUInt16((a))
     #define    BSWAP_INT32_SIGNED(a)            SwapInt32((a))
