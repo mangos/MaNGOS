@@ -56,7 +56,7 @@ struct Unused
 class ByteBuffer
 {
     public:
-        const static size_t DEFAULT_SIZE = 0x1000;
+        const static size_t DEFAULT_SIZE = 64;
 
         // constructor
         ByteBuffer(): _rpos(0), _wpos(0), _bitpos(8), _curbitval(0)
