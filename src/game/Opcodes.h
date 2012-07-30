@@ -96,7 +96,7 @@ enum Opcodes
     SMSG_CHAR_CREATE                                      = 0x4BB,
     SMSG_CHAR_ENUM                                        = 0xA71,
     SMSG_CHAR_DELETE                                      = 0x23A,
-    CMSG_PLAYER_LOGIN                                     = 0x103E,
+    CMSG_PLAYER_LOGIN                                     = 0xD25,
     SMSG_NEW_WORLD                                        = 0x103F,
     SMSG_TRANSFER_PENDING                                 = 0x1040,
     SMSG_TRANSFER_ABORTED                                 = 0x1041,

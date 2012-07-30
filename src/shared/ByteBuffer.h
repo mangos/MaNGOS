@@ -459,20 +459,19 @@ class ByteBuffer
 
         uint64 ReadGuid(uint8* mask, uint8* bytes)
         {
-            uint8 guidMask[8];
-            uint8 guidBytes[8];
+            uint8 guidMask[8] = { 0 };
+            uint8 guidBytes[8]= { 0 };
 
             for (int i = 0; i < 8; i++)
                 guidMask[i] = ReadBit();
 
             for (uint8 i = 0; i < 8; i++)
-                if (guidMask[i])
-                    guidBytes[i] = uint8(read<uint8>() ^ 1);
+                if (guidMask[mask[i]])
+                    guidBytes[bytes[i]] = uint8(read<uint8>() ^ 1);
 
             uint64 guid = guidBytes[0];
-            for (int i = 0; i < 8; ++i)
-                if (guidBytes[i])
-                    guid += ((uint64)guidBytes[i]) << (i * 8);
+            for (int i = 1; i < 8; i++)
+                guid |= ((uint64)guidBytes[i]) << (i * 8);
 
             return guid;
         }

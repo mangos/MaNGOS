@@ -576,8 +576,10 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid playerGuid;
-    recv_data >> playerGuid;
+    uint8 guidMask[8] = { 5, 7, 6, 4, 3, 2, 0, 1 };
+    uint8 guidBytes[8] = { 4, 7, 1, 2, 6, 5, 3, 0 };
+
+    ObjectGuid playerGuid = ObjectGuid(recv_data.ReadGuid(guidMask, guidBytes));
 
     if (PlayerLoading() || GetPlayer() != NULL)
     {
@@ -587,7 +589,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 
     m_playerLoading = true;
 
-    DEBUG_LOG("WORLD: Recvd Player Logon Message");
+    DEBUG_LOG("WORLD: Recvd Player Logon Message. GUID: %u", playerGuid);
 
     LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
