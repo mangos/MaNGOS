@@ -140,12 +140,56 @@ class CharacterHandler
 void WorldSession::HandleCharEnum(QueryResult* result)
 {
     WorldPacket data(SMSG_CHAR_ENUM);
+    ByteBuffer dataBuffer;
 
-    data.WriteBits(0, 17);
-    data.WriteBits(0, 23);
-    data.WriteBit(1);
-    data.FlushBits();
+    uint32 count = result ? result->GetRowCount() : 0;
+    data.WriteBits(count, 17);
 
+    if (result)
+    {
+        do 
+        {
+            Field* fields = result->Fetch();
+
+            uint64 guid = fields[0].GetUInt64();
+            uint64 guildGuid = fields[13].GetUInt64();
+            std::string name = fields[1].GetString();
+            uint32 atLoginFlags = fields[15].GetUInt32();
+
+            uint8 GuidMask[8] = { 6, 0, 7, 5, 1, 2, 4, 3 };
+            uint8 GuildGuidMask[8] = { 1, 5, 1, 0, 4, 3, 6, 7 };
+
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 1);
+            data.WriteGuidMask(guid, GuidMask, 3);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 3, 1);
+            data.WriteGuidMask(guid, GuidMask, 1, 3);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 3, 4);
+            data.WriteGuidMask(guid, GuidMask, 3, 4);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 1, 7);
+
+            data.WriteBit(atLoginFlags & AT_LOGIN_FIRST);
+
+            data.WriteGuidMask(guid, GuidMask, 1, 7);
+
+            data.WriteBits(name.size(), 7);
+
+            if (Player::BuildEnumData(result, &dataBuffer))
+                DETAIL_LOG("Build enum data for char guid %u from account %u.", guid, GetAccountId());
+
+        } while (result->NextRow());
+
+        data.WriteBits(0, 23);
+        data.WriteBit(1);
+        data.FlushBits();
+
+        data.append(dataBuffer);
+    }
+    else
+    {
+        data.WriteBits(0, 23);
+        data.WriteBit(1);
+        data.FlushBits();
+    }
 
     SendPacket(&data);
 }
@@ -183,17 +227,15 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
 void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 {
     std::string name;
-    uint8 race_, class_;
+    uint8 race_, class_, gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
 
-    recv_data >> name;
+    recv_data >> hairColor >> facialHair >> race_ >> hairStyle >> class_;
+    recv_data >> face >> gender >> outfitId >> skin;
 
-    recv_data >> race_;
-    recv_data >> class_;
+    uint8 nameLength;
+    recv_data >> nameLength;
 
-    // extract other data required for player creating
-    uint8 gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
-    recv_data >> gender >> skin >> face;
-    recv_data >> hairStyle >> hairColor >> facialHair >> outfitId;
+    name = recv_data.ReadString(nameLength);
 
     WorldPacket data(SMSG_CHAR_CREATE, 1);                  // returned with diff.values in all cases
 
@@ -230,8 +272,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
+    // Expansions are handled by auth response now.
     // prevent character creating Expansion race without Expansion account
-    if (raceEntry->expansion > Expansion())
+    /*if (raceEntry->expansion > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
         sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->expansion, race_);
@@ -246,7 +289,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->expansion, class_);
         SendPacket(&data);
         return;
-    }
+    }*/
 
     // prevent character creating with invalid name
     if (!normalizePlayerName(name))
