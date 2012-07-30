@@ -246,12 +246,45 @@ World::AddSession_(WorldSession* s)
         return;
     }
 
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
+    QueryResult* result = LoginDatabase.PQuery("SELECT class, expansion FROM realm_classes WHERE realmId = %u", realmID);
+    QueryResult* result2 = LoginDatabase.PQuery("SELECT race, expansion FROM realm_races WHERE realmId = %u", realmID);
+
+    WorldPacket packet(SMSG_AUTH_RESPONSE);
+    
     packet << uint8(AUTH_OK);
-    packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
-    packet << uint32(0);                                    // BillingTimeRested
+
+    // BitPack
+    packet.WriteBit(1);                                     // HasAccountData
+    packet.WriteBits(result2->GetRowCount(), 25);           // Activation count for races
+    packet.WriteBits(result->GetRowCount(), 25);            // Activation count for classes
+    packet.WriteBits(0, 22);                                // Activate character template windows/button
+    packet.WriteBit(0);                                     // IsInQueue
+    packet.FlushBits();
+
     packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - Cataclysm, 4 - MoP. Must be set in database manually for each account.
+
+    do 
+    {
+        Field* fields = result->Fetch();
+
+        packet << fields[1].GetUInt8();
+        packet << fields[0].GetUInt8();
+    } while (result->NextRow());
+
+    do 
+    {
+        Field* fields = result2->Fetch();
+
+        packet << fields[0].GetUInt8();
+        packet << fields[1].GetUInt8();
+    } while (result2->NextRow());
+
+    packet << uint32(0);
+    packet << uint32(0);
+    packet << uint32(0);
+    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - Cataclysm, 4 - MoP. Must be set in database manually for each account.
+    packet << uint8(0);                                     // BillingPlanFlags
+
     s->SendPacket(&packet);
 
     s->SendAddonsInfo();
@@ -297,14 +330,46 @@ void World::AddQueuedSession(WorldSession* sess)
     m_QueuedSessions.push_back(sess);
 
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4 + 1);
-    packet << uint8(AUTH_WAIT_QUEUE);
-    packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
-    packet << uint32(0);                                    // BillingTimeRested
-    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, must be set in database manually for each account
+    QueryResult* result = LoginDatabase.PQuery("SELECT class, expansion FROM realm_classes WHERE realmId = %u", realmID);
+    QueryResult* result2 = LoginDatabase.PQuery("SELECT race, expansion FROM realm_races WHERE realmId = %u", realmID);
+
+    WorldPacket packet(SMSG_AUTH_RESPONSE);
+
+    packet << uint8(AUTH_OK);
+
+    // BitPack
+    packet.WriteBit(1);                                     // HasAccountData
+    packet.WriteBits(result2->GetRowCount(), 25);           // Activation count for races
+    packet.WriteBits(result->GetRowCount(), 25);            // Activation count for classes
+    packet.WriteBits(0, 22);                                // Activate character template windows/button
+    packet.WriteBit(1);                                     // IsInQueue
+    packet.FlushBits();
+
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
-    packet << uint8(0);                                     // unk 3.3.0
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - Cataclysm, 4 - MoP. Must be set in database manually for each account.
+
+    do 
+    {
+        Field* fields = result->Fetch();
+
+        packet << fields[1].GetUInt8();
+        packet << fields[0].GetUInt8();
+    } while (result->NextRow());
+
+    do 
+    {
+        Field* fields = result2->Fetch();
+
+        packet << fields[0].GetUInt8();
+        packet << fields[1].GetUInt8();
+    } while (result2->NextRow());
+
+    packet << uint32(0);
+    packet << uint32(0);
+    packet << uint32(0);
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - Cataclysm, 4 - MoP. Must be set in database manually for each account.
+    packet << uint8(0);                                     // BillingPlanFlags
+
     sess->SendPacket(&packet);
 }
 

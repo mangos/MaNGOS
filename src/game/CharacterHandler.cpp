@@ -139,27 +139,13 @@ class CharacterHandler
 
 void WorldSession::HandleCharEnum(QueryResult* result)
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
+    WorldPacket data(SMSG_CHAR_ENUM);
 
-    uint8 num = 0;
+    data.WriteBits(0, 17);
+    data.WriteBits(0, 23);
+    data.WriteBit(1);
+    data.FlushBits();
 
-    data << num;
-
-    if (result)
-    {
-        do
-        {
-            uint32 guidlow = (*result)[0].GetUInt32();
-            DETAIL_LOG("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data))
-                ++num;
-        }
-        while (result->NextRow());
-
-        delete result;
-    }
-
-    data.put<uint8>(0, num);
 
     SendPacket(&data);
 }

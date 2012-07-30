@@ -321,6 +321,15 @@ class ByteBuffer
             return guid;
         }
 
+        std::string ReadString(uint32 count)
+        {
+            std::string s;
+            for (uint32 i = 0; i < count; i++)
+                s += read<char>();
+
+            return s;
+        }
+
         const uint8* contents() const { return &_storage[0]; }
 
         size_t size() const { return _storage.size(); }

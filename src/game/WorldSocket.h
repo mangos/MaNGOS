@@ -130,6 +130,8 @@ class WorldSocket : protected WorldHandler
         WorldSocket(void);
         virtual ~WorldSocket(void);
 
+        int SendAuthChallenge();
+
         /// Called on open ,the void* is the acceptor.
         virtual int open(void*) override;
 
@@ -202,6 +204,7 @@ class WorldSocket : protected WorldHandler
 
         /// Fragment of the received header.
         ACE_Message_Block m_Header;
+        ACE_Message_Block m_WorldHeader;
 
         /// Mutex for protecting output related data.
         LockType m_OutBufferLock;

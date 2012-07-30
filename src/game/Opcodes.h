@@ -90,11 +90,11 @@ enum Opcodes
     CMSG_AUTH_SRP6_PROOF                                  = 0x1035,
     CMSG_AUTH_SRP6_RECODE                                 = 0x1036,
     CMSG_CHAR_CREATE                                      = 0x1037,
-    CMSG_CHAR_ENUM                                        = 0x1038,
+    CMSG_CHAR_ENUM                                        = 0xBA8,
     CMSG_CHAR_DELETE                                      = 0x1039,
     SMSG_AUTH_SRP6_RESPONSE                               = 0x103A,
     SMSG_CHAR_CREATE                                      = 0x103B,
-    SMSG_CHAR_ENUM                                        = 0x103C,
+    SMSG_CHAR_ENUM                                        = 0xA71,
     SMSG_CHAR_DELETE                                      = 0x103D,
     CMSG_PLAYER_LOGIN                                     = 0x103E,
     SMSG_NEW_WORLD                                        = 0x103F,
@@ -527,9 +527,10 @@ enum Opcodes
     MSG_GM_SUMMON                                         = 0x11EA,
     SMSG_ITEM_TIME_UPDATE                                 = 0x11EB,
     SMSG_ITEM_ENCHANT_TIME_UPDATE                         = 0x11EC,
-    SMSG_AUTH_CHALLENGE                                   = 0x11ED,
-    CMSG_AUTH_SESSION                                     = 0x11EE,
-    SMSG_AUTH_RESPONSE                                    = 0x11EF,
+    MSG_TRANSFER_INITIATE                                 = 0x4F57,
+    SMSG_AUTH_CHALLENGE                                   = 0xEE8,
+    CMSG_AUTH_SESSION                                     = 0xA82,
+    SMSG_AUTH_RESPONSE                                    = 0xBBF,
     MSG_GM_SHOWLABEL                                      = 0x11F0,
     CMSG_PET_CAST_SPELL                                   = 0x11F1,
     MSG_SAVE_GUILD_EMBLEM                                 = 0x11F2,
@@ -1373,6 +1374,7 @@ enum Opcodes
 };
 
 #define NUM_MSG_TYPES 0xFFF
+#define MAX_OPCODE_TABLE_SIZE 0xFFFF
 
 extern void InitializeOpcodes();
 
@@ -1404,12 +1406,12 @@ struct OpcodeHandler
     void (WorldSession::*handler)(WorldPacket& recvPacket);
 };
 
-extern OpcodeHandler opcodeTable[NUM_MSG_TYPES];
+extern OpcodeHandler opcodeTable[MAX_OPCODE_TABLE_SIZE];
 
 /// Lookup opcode name for human understandable logging
 inline const char* LookupOpcodeName(uint16 id)
 {
-    if (id >= NUM_MSG_TYPES)
+    if (id >= NUM_MSG_TYPES && id != MSG_TRANSFER_INITIATE)
         return "Received unknown opcode, it's more than max!";
     return opcodeTable[id].name;
 }
