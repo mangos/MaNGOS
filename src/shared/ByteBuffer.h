@@ -451,6 +451,26 @@ class ByteBuffer
             return value;
         }
 
+        uint64 ReadGuid(uint8* mask, uint8* bytes)
+        {
+            uint8 guidMask[8];
+            uint8 guidBytes[8];
+
+            for (int i = 0; i < 8; i++)
+                guidMask[i] = ReadBit();
+
+            for (uint8 i = 0; i < 8; i++)
+                if (guidMask[i])
+                    guidBytes[i] = uint8(read<uint8>() ^ 1);
+
+            uint64 guid = guidBytes[0];
+            for (int i = 0; i < 8; ++i)
+                if (guidBytes[i])
+                    guid += ((uint64)guidBytes[i]) << (i * 8);
+
+            return guid;
+        }
+
         template <typename T> void WriteBits(T value, size_t bits)
         {
             for (int32 i = bits-1; i >= 0; --i)
