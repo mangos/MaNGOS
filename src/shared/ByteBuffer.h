@@ -245,8 +245,7 @@ class ByteBuffer
         template<class T>
         ByteBuffer& operator>>(Unused<T> const&)
         {
-            read_skip<T>();
-            return *this;
+            return read_skip<T>();
         }
 
 
@@ -272,13 +271,19 @@ class ByteBuffer
         }
 
         template<typename T>
-        void read_skip() { read_skip(sizeof(T)); }
+        ByteBuffer& read_skip()
+        {
+            read_skip(sizeof(T));
+            return *this;
+        }
 
-        void read_skip(size_t skip)
+        ByteBuffer& read_skip(size_t skip)
         {
             if (_rpos + skip > size())
                 throw ByteBufferException(false, _rpos, skip, size());
             _rpos += skip;
+
+            return *this;
         }
 
         template <typename T> T read()
@@ -297,12 +302,14 @@ class ByteBuffer
             return val;
         }
 
-        void read(uint8* dest, size_t len)
+        ByteBuffer& read(uint8* dest, size_t len)
         {
             if (_rpos  + len > size())
                 throw ByteBufferException(false, _rpos, len, size());
             memcpy(dest, &_storage[_rpos], len);
             _rpos += len;
+
+            return *this;
         }
 
         uint64 readPackGUID()
@@ -351,25 +358,25 @@ class ByteBuffer
                 _storage.reserve(ressize);
         }
 
-        void append(const std::string& str)
+        ByteBuffer& append(const std::string& str)
         {
-            append((uint8 const*)str.c_str(), str.size() + 1);
+            return append((uint8 const*)str.c_str(), str.size() + 1);
         }
 
-        void append(const char* src, size_t cnt)
+        ByteBuffer& append(const char* src, size_t cnt)
         {
             return append((const uint8*)src, cnt);
         }
 
-        template<class T> void append(const T* src, size_t cnt)
+        template<class T> ByteBuffer& append(const T* src, size_t cnt)
         {
             return append((const uint8*)src, cnt * sizeof(T));
         }
 
-        void append(const uint8* src, size_t cnt)
+        ByteBuffer& append(const uint8* src, size_t cnt)
         {
             if (!cnt)
-                return;
+                return *this;
 
             MANGOS_ASSERT(size() < 10000000);
 
@@ -377,25 +384,31 @@ class ByteBuffer
                 _storage.resize(_wpos + cnt);
             memcpy(&_storage[_wpos], src, cnt);
             _wpos += cnt;
+
+            return *this;
         }
 
-        void append(const ByteBuffer& buffer)
+        ByteBuffer& append(const ByteBuffer& buffer)
         {
             if (buffer.wpos())
-                append(buffer.contents(), buffer.wpos());
+                return append(buffer.contents(), buffer.wpos());
+
+            return *this;
         }
 
         // can be used in SMSG_MONSTER_MOVE opcode
-        void appendPackXYZ(float x, float y, float z)
+        ByteBuffer& appendPackXYZ(float x, float y, float z)
         {
             uint32 packed = 0;
             packed |= ((int)(x / 0.25f) & 0x7FF);
             packed |= ((int)(y / 0.25f) & 0x7FF) << 11;
             packed |= ((int)(z / 0.25f) & 0x3FF) << 22;
             *this << packed;
+
+            return *this;
         }
 
-        void appendPackGUID(uint64 guid)
+        ByteBuffer& appendPackGUID(uint64 guid)
         {
             uint8 packGUID[8 + 1];
             packGUID[0] = 0;
@@ -412,7 +425,7 @@ class ByteBuffer
                 guid >>= 8;
             }
 
-            append(packGUID, size);
+            return append(packGUID, size);
         }
 
         void put(size_t pos, const uint8* src, size_t cnt)
@@ -587,10 +600,10 @@ class ByteBuffer
 
     private:
         // limited for internal use because can "append" any unexpected type (like pointer and etc) with hard detection problem
-        template <typename T> void append(T value)
+        template <typename T> ByteBuffer& append(T value)
         {
             EndianConvert(value);
-            append((uint8*)&value, sizeof(value));
+            return append((uint8*)&value, sizeof(value));
         }
 
     protected:
@@ -679,21 +692,23 @@ inline ByteBuffer& operator>>(ByteBuffer& b, std::map<K, V>& m)
 }
 
 template<>
-inline void ByteBuffer::read_skip<char*>()
+inline ByteBuffer& ByteBuffer::read_skip<char*>()
 {
     std::string temp;
     *this >> temp;
+
+    return *this;
 }
 
 template<>
-inline void ByteBuffer::read_skip<char const*>()
+inline ByteBuffer& ByteBuffer::read_skip<char const*>()
 {
-    read_skip<char*>();
+    return read_skip<char*>();
 }
 
 template<>
-inline void ByteBuffer::read_skip<std::string>()
+inline ByteBuffer& ByteBuffer::read_skip<std::string>()
 {
-    read_skip<char*>();
+    return read_skip<char*>();
 }
 #endif
