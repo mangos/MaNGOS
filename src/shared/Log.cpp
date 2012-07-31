@@ -717,6 +717,8 @@ void Log::outWorldPacketDump(uint32 socket, uint32 opcode, char const* opcodeNam
     if (!worldLogfile)
         return;
 
+    ACE_GUARD(ACE_Thread_Mutex, GuardObj, m_worldLogMtx);
+
     outTimestamp(worldLogfile);
 
     fprintf(worldLogfile, "\n%s:\nSOCKET: %u\nLENGTH: " SIZEFMTD "\nOPCODE: %s (0x%.4X)\nDATA:\n",
