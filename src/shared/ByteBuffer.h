@@ -34,8 +34,11 @@ class ByteBufferException
 
         void PrintPosError() const
         {
-            sLog.outError("Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD") value with size: " SIZEFMTD,
-                          (add ? "put" : "get"), pos, size, esize);
+            ACE_Stack_Trace trace;
+            sLog.outError(
+                "Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD") "
+                "value with size: " SIZEFMTD "\n%s",
+                (add ? "put" : "get"), pos, size, esize, trace.c_str());
         }
     private:
         bool add;
