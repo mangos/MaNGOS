@@ -59,19 +59,20 @@ class ByteBuffer
         const static size_t DEFAULT_SIZE = 64;
 
         // constructor
-        ByteBuffer(): _rpos(0), _wpos(0)
+        ByteBuffer(): _rpos(0), _wpos(0), _bitpos(8), _curbitval(0)
         {
             _storage.reserve(DEFAULT_SIZE);
         }
 
         // constructor
-        ByteBuffer(size_t res): _rpos(0), _wpos(0)
+        ByteBuffer(size_t res): _rpos(0), _wpos(0), _bitpos(8), _curbitval(0)
         {
             _storage.reserve(res);
         }
 
         // copy constructor
-        ByteBuffer(const ByteBuffer& buf): _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage) { }
+        ByteBuffer(const ByteBuffer& buf): _rpos(buf._rpos), _wpos(buf._wpos), _storage(buf._storage)
+                                           , _bitpos(buf._bitpos), _curbitval(buf._curbitval) { }
 
         void clear()
         {
@@ -330,6 +331,15 @@ class ByteBuffer
             return guid;
         }
 
+        std::string ReadString(uint32 count)
+        {
+            std::string s;
+            for (uint32 i = 0; i < count; i++)
+                s += read<char>();
+
+            return s;
+        }
+
         const uint8* contents() const { return &_storage[0]; }
 
         size_t size() const { return _storage.size(); }
@@ -425,6 +435,96 @@ class ByteBuffer
             memcpy(&_storage[pos], src, cnt);
         }
 
+        bool ReadBit()
+        {
+            ++_bitpos;
+            if (_bitpos > 7)
+            {
+                _bitpos = 0;
+                _curbitval = read<uint8>();
+            }
+
+            return ((_curbitval >> (7-_bitpos)) & 1) != 0;
+        }
+
+        template <typename T> bool WriteBit(T bit)
+        {
+            --_bitpos;
+            if (bit)
+                _curbitval |= (1 << (_bitpos));
+
+            if (_bitpos == 0)
+            {
+                _bitpos = 8;
+                append((uint8 *)&_curbitval, sizeof(_curbitval));
+                _curbitval = 0;
+            }
+
+            return (bit != 0);
+        }
+
+        uint32 ReadBits(size_t bits)
+        {
+            uint32 value = 0;
+            for (int32 i = bits-1; i >= 0; --i)
+                if (ReadBit())
+                    value |= (1 << i);
+
+            return value;
+        }
+
+        uint64 ReadGuid(uint8* mask, uint8* bytes)
+        {
+            uint8 guidMask[8] = { 0 };
+            uint8 guidBytes[8]= { 0 };
+
+            for (int i = 0; i < 8; i++)
+                guidMask[i] = ReadBit();
+
+            for (uint8 i = 0; i < 8; i++)
+                if (guidMask[mask[i]])
+                    guidBytes[bytes[i]] = uint8(read<uint8>() ^ 1);
+
+            uint64 guid = guidBytes[0];
+            for (int i = 1; i < 8; i++)
+                guid |= ((uint64)guidBytes[i]) << (i * 8);
+
+            return guid;
+        }
+
+        template <typename T> void WriteBits(T value, size_t bits)
+        {
+            for (int32 i = bits-1; i >= 0; --i)
+                WriteBit((value >> i) & 1);
+        }
+
+        void WriteGuidMask(uint64 guid, uint8* maskOrder, uint8 maskCount, uint8 maskPos = 0)
+        {
+            uint8* guidByte = ((uint8*)&guid);
+
+            for (uint8 i = 0; i < maskCount; i++)
+                WriteBit(guidByte[maskOrder[i + maskPos]]);
+        }
+
+        void WriteGuidBytes(uint64 guid, uint8* byteOrder, uint8 byteCount, uint8 bytePos)
+        {
+            uint8* guidByte = ((uint8*)&guid);
+
+            for (uint8 i = 0; i < byteCount; i++)
+                if (guidByte[byteOrder[i + bytePos]])
+                    (*this) << uint8(guidByte[byteOrder[i + bytePos]] ^ 1);
+        }
+
+        void FlushBits()
+        {
+            if (_bitpos == 8)
+                return;
+
+            append((uint8 *)&_curbitval, sizeof(uint8));
+            _curbitval = 0;
+            _bitpos = 8;
+        }
+
         void print_storage() const
         {
             if (!sLog.HasLogLevelOrHigher(LOG_LVL_DEBUG))   // optimize disabled debug output
@@ -507,7 +607,8 @@ class ByteBuffer
         }
 
     protected:
-        size_t _rpos, _wpos;
+        uint8 _curbitval;
+        size_t _rpos, _wpos, _bitpos;
         std::vector<uint8> _storage;
 };
 

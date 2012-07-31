@@ -3,10 +3,17 @@
 #include <cassert>
 #include <string>
 
+#ifdef _DLL
+#undef _DLL
+#endif
+
+#include "StormLib.h"
+
 class DBCFile
 {
 public:
     DBCFile(const std::string &filename);
+    DBCFile(HANDLE file);
     ~DBCFile();
 
     // Open database. It must be openened before it can be used.
@@ -107,6 +114,7 @@ public:
     size_t getMaxId();
 private:
     std::string filename;
+    HANDLE fileHandle;
     size_t recordSize;
     size_t recordCount;
     size_t fieldCount;
