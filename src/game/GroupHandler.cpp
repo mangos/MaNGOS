@@ -28,6 +28,8 @@
 #include "Group.h"
 #include "SocialMgr.h"
 #include "Util.h"
+#include "DB2Structure.h"
+#include "DB2Stores.h"
 
 /* differeces from off:
     -you can uninvite yourself - is is useful

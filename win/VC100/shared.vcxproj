@@ -439,6 +439,7 @@
     <ClCompile Include="..\..\src\shared\Config\Config.cpp" />
     <ClCompile Include="..\..\src\shared\Database\Database.cpp" />
     <ClCompile Include="..\..\src\shared\Database\DatabaseMysql.cpp" />
+    <ClCompile Include="..\..\src\shared\Database\DB2FileLoader.cpp" />
     <ClCompile Include="..\..\src\shared\Database\DBCFileLoader.cpp" />
     <ClCompile Include="..\..\src\shared\Database\Field.cpp" />
     <ClCompile Include="..\..\src\shared\Database\QueryResultMysql.cpp" />
@@ -461,6 +462,8 @@
     <ClInclude Include="..\..\src\shared\Auth\SARC4.h" />
     <ClInclude Include="..\..\src\shared\Auth\Sha1.h" />
     <ClInclude Include="..\..\src\shared\ByteBuffer.h" />
+    <ClInclude Include="..\..\src\shared\Database\DB2FileLoader.h" />
+    <ClInclude Include="..\..\src\shared\Database\DB2Store.h" />
     <ClInclude Include="..\..\src\shared\Database\SqlPreparedStatement.h" />
     <ClInclude Include="..\..\src\shared\WorldPacket.h" />
     <ClInclude Include="..\..\src\shared\Common.h" />
