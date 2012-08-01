@@ -774,6 +774,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleReportPvPAFK(WorldPacket& recv_data);
         void HandleBattlefieldExitRequest(WorldPacket& recv_data);
 		void HandleBattlefieldEntryInviteResponseOpcode(WorldPacket& recv_data);
+        void HandleBattlefieldQueueInviteResponseOpcode(WorldPacket& recv_data);
 
         void HandleWardenDataOpcode(WorldPacket& recv_data);
         void HandleWorldTeleportOpcode(WorldPacket& recv_data);

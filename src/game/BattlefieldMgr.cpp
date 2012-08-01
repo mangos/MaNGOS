@@ -70,7 +70,9 @@ void BattlefieldMgr::SendInvitePlayerToQueue(Player * player)
         send_data << uint8(true); // accepted
     }
     send_data << uint8(!GetQueueForBattlefield(BATTLEFIELD_WG)->HasEnoughSpace()); // can join
-    send_data << uint8(!battlefield->IsBattleInProgress()); // in warmup 
+    send_data << uint8(!battlefield->IsBattleInProgress()); // in warmup
+
+    GetQueueForBattlefield(BATTLEFIELD_WG)->AddPlayerToQueue(player);
     
     player->GetSession()->SendPacket(&send_data);
 }
@@ -112,4 +114,64 @@ void BattlefieldMgr::SendInvitePlayersToWar(uint8 battleId)
     {
         ((Player * )*itr)->GetSession()->SendPacket(&send_data);
     }
+}
+
+void BattlefieldMgr::PlayerEnterZone(Player * player, uint32 zoneId)
+{
+    Battlefield * battlefield;
+
+    if(zoneId == 4197)
+    {
+        battlefield = FindBattlefield(BATTLEFIELD_WG);
+    }
+
+    if(!player->IsFlying())
+    {
+        if(battlefield->IsBattleInProgress())
+        {
+            if(GetQueueForBattlefield(battlefield->GetBattleId())->HasEnoughSpace())
+            {
+                WorldPacket send_data(SMSG_BATTLEFIELD_MANAGER_ENTRY_INVITE,12);
+
+                send_data << uint32(battlefield->GetBattleId());
+                send_data << uint32(battlefield->GetZoneId());
+                send_data << uint32(time(NULL) + 20);
+
+                player->GetSession()->SendPacket(&send_data);
+            }            
+            else
+            {
+                //teleport player here
+                WorldPacket send_data(SMSG_BATTLEFIELD_MANAGER_EJECT_PENDING,5);
+
+                send_data << uint32(battlefield->GetBattleId());
+                send_data << uint8(true);
+
+                player->GetSession()->SendPacket(&send_data);
+            }
+        }
+    }
+
+    if(battlefield->m_map)
+    {
+        battlefield->m_map = player->GetMap();
+    }
+
+}
+
+void BattlefieldMgr::PlayerLeftZone(Player * player, uint32 zoneId)
+{
+
+}
+
+void BattlefieldMgr::RemovePlayerFromBattlefield(Player * player,Battlefield * battlefield,BFLeaveReason reason,bool relocated)
+{
+    WorldPacket send_data(SMSG_BATTLEFIELD_MANAGER_EJECTED,7);
+
+    send_data << uint32(battlefield->GetBattleId());
+    send_data << uint8(reason);
+    send_data << uint8(battlefield->IsBattleInProgress() ? 2 : 0);
+    send_data << uint8(false); //reloacted
+
+    player->GetSession()->SendPacket(&send_data);
 }

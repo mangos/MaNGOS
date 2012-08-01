@@ -20,11 +20,11 @@
 
 BattlefieldWG::BattlefieldWG() : Battlefield(BATTLEFIELD_WG)
 {
-    m_map = sMapMgr.FindMap(571);
     m_zoneId = 4197;
-    m_preBattleTimer = 12 * MINUTE * IN_MILLISECONDS;
-    m_nextBattleTimer = 20 * MINUTE * IN_MILLISECONDS;
+    m_preBattleTimer = 4 * MINUTE * IN_MILLISECONDS;
+    m_nextBattleTimer = 10 * MINUTE * IN_MILLISECONDS;
     m_battleDurationTimer = 8 * MINUTE * IN_MILLISECONDS;
+    m_controlledByTeam = ALLIANCE;
 }
 
 void BattlefieldWG::OnUpdate(uint32 uiDiff)
@@ -32,16 +32,43 @@ void BattlefieldWG::OnUpdate(uint32 uiDiff)
     if(m_preBattleTimer <= uiDiff)
     {
         //make avalaible to join queue
+        sBattlefieldMgr.UpdateWorldState(0x1117,true);
     }
 }
 
 void BattlefieldWG::BeforeBattleStarted()
 {
-    m_preBattleTimer = 12 * MINUTE * IN_MILLISECONDS;
-    m_nextBattleTimer = 20 * MINUTE * IN_MILLISECONDS;
+    m_preBattleTimer = 4 * MINUTE * IN_MILLISECONDS;
+    m_nextBattleTimer = 10 * MINUTE * IN_MILLISECONDS;
+    if(m_controlledByTeam == ALLIANCE)
+    {
+        sBattlefieldMgr.UpdateWorldState(0xeda,false);
+    }
+    else
+    {
+        sBattlefieldMgr.UpdateWorldState(0xedb,false);
+    }
+    sBattlefieldMgr.UpdateWorldState(0xe7e,true);
+    sBattlefieldMgr.UpdateWorldState(0xec5,uint32(time(NULL) + (m_battleDurationTimer/1000)));
+    sBattlefieldMgr.UpdateWorldState(0xda2,1);
+    sBattlefieldMgr.UpdateWorldState(0xda1,10);
+    sBattlefieldMgr.UpdateWorldState(0xe60,1);
+    sBattlefieldMgr.UpdateWorldState(0xe61,10);
+    sBattlefieldMgr.UpdateWorldState(0xED9, !m_battleInProgress);
 }
 
 void BattlefieldWG::AfterBattleEnded()
 {
+    sBattlefieldMgr.UpdateWorldState(0xe7e,false);
+    sBattlefieldMgr.UpdateWorldState(0xED9, !m_battleInProgress);
+    sBattlefieldMgr.UpdateWorldState(0x1102, uint32(time(NULL) + (m_nextBattleTimer/1000)));
+    if(m_controlledByTeam == ALLIANCE)
+    {
+        sBattlefieldMgr.UpdateWorldState(0xeda,true);
+    }
+    else
+    {
+        sBattlefieldMgr.UpdateWorldState(0xedb,true);
+    }
     m_battleDurationTimer = 8 * MINUTE * IN_MILLISECONDS;
 }

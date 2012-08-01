@@ -65,10 +65,21 @@ void Battlefield::Update(uint32 uiDiff)
 
         if(m_preBattleTimer <= uiDiff && !m_invitationSent)
         {
-            /*sBattlefieldMgr.ChangeState(this);*/ 
+            const Map::PlayerList players = m_map->GetPlayers();
 
-            sBattlefieldMgr.SendInvitePlayersToWar(m_battleId);
-            m_invitationSent = true;
+            WorldPacket send_data(SMSG_BATTLEFIELD_MANAGER_QUEUE_INVITE,5);
+
+            send_data << uint32(m_battleId);
+            send_data << uint8(!m_battleInProgress);
+
+            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(itr->getSource()->GetZoneId() == m_zoneId && !sBattlefieldMgr.GetQueueForBattlefield(m_battleId)->HasPlayerInQueue(itr->getSource()))
+                {
+                    itr->getSource()->GetSession()->SendPacket(&send_data);
+                }
+            }
+            //sBattlefieldMgr.SendInvitePlayersToWar(m_battleId);
         }
         else
             m_preBattleTimer -= uiDiff;
@@ -91,15 +102,14 @@ bool Battlefield::AddPlayerToGroup(Player * player)
 {
     Group* grp;
     if(player->GetTeam() == ALLIANCE)
-        grp = m_raidGroup[TEAM_ALLIANCE];
+        grp = m_raidGroup[0];
     else
-        grp = m_raidGroup[TEAM_HORDE];
+        grp = m_raidGroup[1];
 
     if(!grp->IsCreated())
     {
         grp->Create(player->GetObjectGuid(),player->GetName());
         grp->ConvertToRaid();
-        grp->AddMember(player->GetObjectGuid(),player->GetName());
     }
     else if(!grp->IsFull())
     {

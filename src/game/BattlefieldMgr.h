@@ -23,13 +23,14 @@
 #include "Player.h"
 #include "Common.h"
 #include "SharedDefines.h"
+#include "WorldSession.h"
 #include "Policies/Singleton.h"
 #include "ace/Recursive_Thread_Mutex.h"
 
 class Player;
 class Battlefield;
 
-typedef std::list<Player*> PlayerQueue;
+typedef std::set<Player*> PlayerQueue;
 typedef std::map<uint8,Battlefield* > BattlefieldMap;
 
 class BattlefieldQueue
@@ -40,8 +41,9 @@ class BattlefieldQueue
         BattlefieldQueue(uint8 battleId) { m_queueId = battleId; }
         uint64 GetId() { return m_queueId; }
         bool HasEnoughSpace() { return m_inQueue.size() <= 240 ? true : false ; }
-        void AddPlayerToQueue(Player * plr) { m_inQueue.push_back(plr); }
-        void RemovePlayerFromQueue(Player * plr) { m_inQueue.remove(plr); }
+        bool HasPlayerInQueue(Player * plr) { return m_inQueue.find(plr) != m_inQueue.end(); }
+        void AddPlayerToQueue(Player * plr) { m_inQueue.insert(plr); }
+        void RemovePlayerFromQueue(Player * plr) { m_inQueue.erase(plr); }
 
     private:
         PlayerQueue     m_inQueue;
@@ -66,11 +68,14 @@ class BattlefieldMgr
 
         void SendInvitePlayerToQueue(Player * player);
         void SendInvitePlayersToWar(uint8 battleId);
+        void SendInvitePlayersInZone(uint8 battleId);
         void ChangeState(Battlefield * battlefield);
         void UpdateWorldState(uint32 stateId, uint32 value);
 
         void PlayerEnterZone(Player * player, uint32 zoneId);
+        void PlayerLeftZone(Player * player, uint32 zoneId);
 
+        void RemovePlayerFromBattlefield(Player * player, Battlefield * battlefield, BFLeaveReason reason, bool relocated);
     private:
         BattlefieldQueueMap     m_queueMap;
         BattlefieldMap          m_battlefieldList;

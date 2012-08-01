@@ -32,12 +32,6 @@ enum Battlefields
     BATTLEFIELD_TB = 21
 };
 
-enum Teams
-{
-    TEAM_ALLIANCE,
-    TEAM_HORDE
-};
-
 #define MAX_TEAM 2
 
 typedef std::list<Player *> PlayerList;
@@ -63,8 +57,10 @@ class Battlefield
         bool AddPlayerToGroup(Player * player);
 
         uint8  GetBattleId() { return m_battleId; }
+        uint8  GetControllerTeam() { return m_controlledByTeam; }
         uint32 GetZoneId() { return m_zoneId; }
         uint32 GetTimeToNextBattle() { return m_nextBattleTimer; }
+        uint32 GetTimeTIllEndOfWar() { return m_battleDurationTimer; }
 
     protected:
         uint8           m_defenderTeam;
@@ -92,8 +88,6 @@ class Battlefield
         //Called on world tick
         virtual void OnUpdate(uint32 uiDiff) = 0;
 
-    private:
-        void InvitePlayersInZone();
 };
 
 #endif
