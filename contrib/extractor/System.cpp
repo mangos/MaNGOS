@@ -188,6 +188,22 @@ void AppendDBCFileListTo(HANDLE mpqHandle, std::set<std::string>& filelist)
     SFileFindClose(searchHandle);
 }
 
+void AppendDB2FileListTo(HANDLE mpqHandle, std::set<std::string>& filelist)
+{
+    SFILE_FIND_DATA findFileData;
+
+    HANDLE searchHandle = SFileFindFirstFile(mpqHandle, "*.db2", &findFileData, NULL);
+    if (!searchHandle)
+        return;
+
+    filelist.insert(findFileData.cFileName);
+
+    while (SFileFindNextFile(searchHandle, &findFileData))
+        filelist.insert(findFileData.cFileName);
+
+    SFileFindClose(searchHandle);
+}
+
 uint32 ReadBuild(int locale)
 {
     // include build info file also
@@ -965,7 +981,10 @@ void ExtractDBCFiles(int locale, bool basicLocale)
     // get DBC file list
     ArchiveSetBounds archives = GetArchivesBounds();
     for(ArchiveSet::const_iterator i = archives.first; i != archives.second;++i)
+    {
         AppendDBCFileListTo(*i, dbcfiles);
+        AppendDB2FileListTo(*i, dbcfiles);
+    }
 
     std::string path = output_path;
     path += "/dbc/";
@@ -995,7 +1014,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
         if (ExtractFile(iter->c_str(), filename))
             ++count;
     }
-    printf("Extracted %u DBC files\n\n", count);
+    printf("Extracted %u DBC/DB2 files\n\n", count);
 }
 
 typedef std::pair<std::string /*full_filename*/, char const* /*locale_prefix*/> UpdatesPair;

@@ -110,7 +110,7 @@ void LoadDB2Stores(const std::string& dataPath)
     // error checks
     if (bad_db2_files.size() >= DB2FileCount)
     {
-        sLog.outError("Incorrect DataDir value in worldserver.conf or ALL required *.db2 files (%d) not found by path: %sdb2", DB2FileCount, dataPath.c_str());
+        sLog.outError("Incorrect DataDir value in mangosd.conf or ALL required *.db2 files (%d) not found by path: %sdb2", DB2FileCount, dataPath.c_str());
         exit(1);
     }
     else if (!bad_db2_files.empty())
