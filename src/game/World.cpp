@@ -1166,7 +1166,7 @@ void World::SetInitialWorldSettings()
     sLog.outString( "Loading Achievements..." );
     sLog.outString();
     sAchievementMgr.LoadAchievementReferenceList();
-    sAchievementMgr.LoadAchievementCriteriaList();
+    //sAchievementMgr.LoadAchievementCriteriaList();
     sAchievementMgr.LoadAchievementCriteriaRequirements();
     sAchievementMgr.LoadRewards();
     sAchievementMgr.LoadRewardLocales();

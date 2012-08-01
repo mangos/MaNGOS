@@ -2214,7 +2214,7 @@ AchievementCriteriaEntryList const& AchievementGlobalMgr::GetAchievementCriteria
     return m_AchievementCriteriasByType[type];
 }
 
-void AchievementGlobalMgr::LoadAchievementCriteriaList()
+/*void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
     if (sAchievementCriteriaStore.GetNumRows()==0)
     {
@@ -2243,7 +2243,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
 
     sLog.outString();
     sLog.outString(">> Loaded %lu achievement criteria.",(unsigned long)m_AchievementCriteriasByType->size());
-}
+}*/
 
 void AchievementGlobalMgr::LoadAchievementReferenceList()
 {

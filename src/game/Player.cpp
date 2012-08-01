@@ -19140,7 +19140,7 @@ void Player::InitDisplayIds()
     }
 }
 
-void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
+/*void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
 {
     ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
 
@@ -19154,7 +19154,7 @@ void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
         if (extendedCost->reqitem[i])
             DestroyItemCount(extendedCost->reqitem[i], extendedCost->reqitemcount[i] * count, true);
     }
-}
+}*/
 
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
@@ -19239,9 +19239,9 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
         return false;
     }
 
-    if (uint32 extendedCostId = crItem->ExtendedCost)
+    /*if (uint32 extendedCostId = crItem->ExtendedCost)
     {
-        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
+         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
         {
             sLog.outError("Item %u have wrong ExtendedCost field value %u", pProto->ItemId, extendedCostId);
@@ -19279,7 +19279,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
             SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, NULL, NULL);
             return false;
         }
-    }
+    }*/
 
     uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
 
@@ -19307,8 +19307,8 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
         ModifyMoney(-int32(price));
 
-        if (crItem->ExtendedCost)
-            TakeExtendedCost(crItem->ExtendedCost, count);
+        /*if (crItem->ExtendedCost)
+            TakeExtendedCost(crItem->ExtendedCost, count);*/
 
         pItem = StoreNewItem(dest, item, true);
     }
@@ -19330,8 +19330,8 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
         ModifyMoney(-int32(price));
 
-        if (crItem->ExtendedCost)
-            TakeExtendedCost(crItem->ExtendedCost, count);
+        /*if (crItem->ExtendedCost)
+            TakeExtendedCost(crItem->ExtendedCost, count);*/
 
         pItem = EquipNewItem(dest, item, true);
 
@@ -21994,7 +21994,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         return;
 
     // Check if it requires another talent
-    if (talentInfo->DependsOn > 0)
+    /*if (talentInfo->DependsOn > 0)
     {
         if(TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
@@ -22010,7 +22010,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
             if (!hasEnoughRank)
                 return;
         }
-    }
+    }*/
 
     // Find out how many points we have in this field
     uint32 spentPoints = 0;
@@ -22108,7 +22108,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
         return;
 
     // Check if it requires another talent
-    if (talentInfo->DependsOn > 0)
+    /*if (talentInfo->DependsOn > 0)
     {
         if(TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
@@ -22122,7 +22122,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
             if (!hasEnoughRank)
                 return;
         }
-    }
+    }*/
 
     // Find out how many points we have in this field
     uint32 spentPoints = 0;

@@ -363,7 +363,7 @@ class AchievementGlobalMgr
             m_allCompletedAchievements.insert(achievement->ID);
         }
 
-        void LoadAchievementCriteriaList();
+        //void LoadAchievementCriteriaList();
         void LoadAchievementCriteriaRequirements();
         void LoadAchievementReferenceList();
         void LoadCompletedAchievements();
