@@ -23,7 +23,7 @@
 #include "Common.h"
 #include <cassert>
 
-enum
+/*enum
 {
     FT_NA='x',                                              //not used or unknown, 4 byte size
     FT_NA_BYTE='X',                                         //not used or unknown, byte
@@ -34,7 +34,7 @@ enum
     FT_SORT='d',                                            //sorted by this field, field is not included
     FT_IND='n',                                             //the same,but parsed to data
     FT_LOGIC='l'                                            //Logical (boolean)
-};
+};*/
 
 class DBCFileLoader
 {

@@ -2966,7 +2966,7 @@ enum TradeStatus
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC, WoW:WotLK and WoW:Cataclysm 4.4.4 client build 15595...
+// will only support WoW, WoW:TBC, WoW:WotLK and WoW:Cataclysm 4.3.4 client build 15595...
 
 #define EXPECTED_MANGOSD_CLIENT_BUILD        {15595, 0}
 

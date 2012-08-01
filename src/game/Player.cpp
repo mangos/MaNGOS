@@ -60,6 +60,7 @@
 #include "SocialMgr.h"
 #include "AchievementMgr.h"
 #include "Mail.h"
+#include "DB2Stores.h"
 
 #include <cmath>
 
@@ -19140,7 +19141,7 @@ void Player::InitDisplayIds()
     }
 }
 
-/*void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
+void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
 {
     ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
 
@@ -19154,7 +19155,7 @@ void Player::InitDisplayIds()
         if (extendedCost->reqitem[i])
             DestroyItemCount(extendedCost->reqitem[i], extendedCost->reqitemcount[i] * count, true);
     }
-}*/
+}
 
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
@@ -19239,7 +19240,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
         return false;
     }
 
-    /*if (uint32 extendedCostId = crItem->ExtendedCost)
+    if (uint32 extendedCostId = crItem->ExtendedCost)
     {
          ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
@@ -19279,7 +19280,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
             SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, NULL, NULL);
             return false;
         }
-    }*/
+    }
 
     uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? pProto->BuyPrice * count : 0;
 
@@ -19307,8 +19308,8 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
         ModifyMoney(-int32(price));
 
-        /*if (crItem->ExtendedCost)
-            TakeExtendedCost(crItem->ExtendedCost, count);*/
+        if (crItem->ExtendedCost)
+            TakeExtendedCost(crItem->ExtendedCost, count);
 
         pItem = StoreNewItem(dest, item, true);
     }
@@ -19330,8 +19331,8 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
         ModifyMoney(-int32(price));
 
-        /*if (crItem->ExtendedCost)
-            TakeExtendedCost(crItem->ExtendedCost, count);*/
+        if (crItem->ExtendedCost)
+            TakeExtendedCost(crItem->ExtendedCost, count);
 
         pItem = EquipNewItem(dest, item, true);
 

@@ -397,6 +397,7 @@
     <ClCompile Include="..\..\src\game\CreatureAISelector.cpp" />
     <ClCompile Include="..\..\src\game\CreatureEventAI.cpp" />
     <ClCompile Include="..\..\src\game\CreatureEventAIMgr.cpp" />
+    <ClCompile Include="..\..\src\game\DB2Stores.cpp" />
     <ClCompile Include="..\..\src\game\DBCStores.cpp" />
     <ClCompile Include="..\..\src\game\DBCStructure.cpp" />
     <ClCompile Include="..\..\src\game\debugcmds.cpp" />
@@ -556,6 +557,9 @@
     <ClInclude Include="..\..\src\game\CreatureAISelector.h" />
     <ClInclude Include="..\..\src\game\CreatureEventAI.h" />
     <ClInclude Include="..\..\src\game\CreatureEventAIMgr.h" />
+    <ClInclude Include="..\..\src\game\DB2fmt.h" />
+    <ClInclude Include="..\..\src\game\DB2Stores.h" />
+    <ClInclude Include="..\..\src\game\DB2Structure.h" />
     <ClInclude Include="..\..\src\game\DBCEnums.h" />
     <ClInclude Include="..\..\src\game\DBCfmt.h" />
     <ClInclude Include="..\..\src\game\DBCStores.h" />

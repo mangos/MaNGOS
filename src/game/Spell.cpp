@@ -44,6 +44,7 @@
 #include "BattleGround.h"
 #include "Util.h"
 #include "Chat.h"
+#include "DB2Stores.h"
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
