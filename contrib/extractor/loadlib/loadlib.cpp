@@ -45,7 +45,7 @@ bool ExtractFile( char const* mpq_name, std::string const& filename )
         if (!SFileOpenFileEx(*i, mpq_name, SFILE_OPEN_PATCHED_FILE, &fileHandle))
             continue;
 
-        if (SFileGetFileSize(fileHandle) == 0)              // some files removed in next updates and its reported  size 0
+        if (SFileGetFileSize(fileHandle, NULL) == 0)              // some files removed in next updates and its reported  size 0
         {
             SFileCloseFile(fileHandle);
             return true;
@@ -99,7 +99,7 @@ bool FileLoader::loadFile(char *filename, bool log)
         return false;
     }
 
-    data_size = SFileGetFileSize(fileHandle);
+    data_size = SFileGetFileSize(fileHandle, NULL);
 
     data = new uint8 [data_size];
     if (!data)
@@ -108,7 +108,7 @@ bool FileLoader::loadFile(char *filename, bool log)
         return false;
     }
 
-    if (!SFileReadFile(fileHandle, data, data_size))
+    if (!SFileReadFile(fileHandle, data, data_size, NULL, NULL))
     {
         if (log)
             printf("Can't read file %s\n", filename);

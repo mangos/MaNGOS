@@ -14,8 +14,6 @@
 /*****************************************************************************/
 
 #define __STORMLIB_SELF__
-#define __INCLUDE_COMPRESSION__
-#define __INCLUDE_CRYPTOGRAPHY__
 #include "StormLib.h"
 #include "StormCommon.h"
 
@@ -46,65 +44,65 @@ typedef struct _MPQ_SIGNATURE_INFO
 // Created by Jean-Francois Roy using OpenSSL
 
 static const char * szBlizzardWeakPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJJidwS/uILMBSO5DLGsBFknIXWWjQJe"
-    "2kfdfEk3G/j66w4KkhZ1V61Rt4zLaMVCYpDun7FLwRjkMDSepO1q2DcCAwEAAQ=="
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJJidwS/uILMBSO5DLGsBFknIXWWjQJe"
+        "2kfdfEk3G/j66w4KkhZ1V61Rt4zLaMVCYpDun7FLwRjkMDSepO1q2DcCAwEAAQ=="
+        "-----END PUBLIC KEY-----";
 
 static const char * szBlizzardStrongPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsQZ+ziT2h8h+J/iMQpgd"
-    "tH1HaJzOBE3agjU4yMPcrixaPOZoA4t8bwfey7qczfWywocYo3pleytFF+IuD4HD"
-    "Fl9OXN1SFyupSgMx1EGZlgbFAomnbq9MQJyMqQtMhRAjFgg4TndS7YNb+JMSAEKp"
-    "kXNqY28n/EVBHD5TsMuVCL579gIenbr61dI92DDEdy790IzIG0VKWLh/KOTcTJfm"
-    "Ds/7HQTkGouVW+WUsfekuqNQo7ND9DBnhLjLjptxeFE2AZqYcA1ao3S9LN3GL1tW"
-    "lVXFIX9c7fWqaVTQlZ2oNsI/ARVApOK3grNgqvwH6YoVYVXjNJEo5sQJsPsdV/hk"
-    "dwIDAQAB"
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsQZ+ziT2h8h+J/iMQpgd"
+        "tH1HaJzOBE3agjU4yMPcrixaPOZoA4t8bwfey7qczfWywocYo3pleytFF+IuD4HD"
+        "Fl9OXN1SFyupSgMx1EGZlgbFAomnbq9MQJyMqQtMhRAjFgg4TndS7YNb+JMSAEKp"
+        "kXNqY28n/EVBHD5TsMuVCL579gIenbr61dI92DDEdy790IzIG0VKWLh/KOTcTJfm"
+        "Ds/7HQTkGouVW+WUsfekuqNQo7ND9DBnhLjLjptxeFE2AZqYcA1ao3S9LN3GL1tW"
+        "lVXFIX9c7fWqaVTQlZ2oNsI/ARVApOK3grNgqvwH6YoVYVXjNJEo5sQJsPsdV/hk"
+        "dwIDAQAB"
+        "-----END PUBLIC KEY-----";
 
 static const char * szWarcraft3MapPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1BwklUUQ3UvjizOBRoF5"
-    "yyOVc7KD+oGOQH5i6eUk1yfs0luCC70kNucNrfqhmviywVtahRse1JtXCPrx2bd3"
-    "iN8Dx91fbkxjYIOGTsjYoHKTp0BbaFkJih776fcHgnFSb+7mJcDuJVvJOXxEH6w0"
-    "1vo6VtujCqj1arqbyoal+xtAaczF3us5cOEp45sR1zAWTn1+7omN7VWV4QqJPaDS"
-    "gBSESc0l1grO0i1VUSumayk7yBKIkb+LBvcG6WnYZHCi7VdLmaxER5m8oZfER66b"
-    "heHoiSQIZf9PAY6Guw2DT5BTc54j/AaLQAKf2qcRSgQLVo5kQaddF3rCpsXoB/74"
-    "6QIDAQAB"
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1BwklUUQ3UvjizOBRoF5"
+        "yyOVc7KD+oGOQH5i6eUk1yfs0luCC70kNucNrfqhmviywVtahRse1JtXCPrx2bd3"
+        "iN8Dx91fbkxjYIOGTsjYoHKTp0BbaFkJih776fcHgnFSb+7mJcDuJVvJOXxEH6w0"
+        "1vo6VtujCqj1arqbyoal+xtAaczF3us5cOEp45sR1zAWTn1+7omN7VWV4QqJPaDS"
+        "gBSESc0l1grO0i1VUSumayk7yBKIkb+LBvcG6WnYZHCi7VdLmaxER5m8oZfER66b"
+        "heHoiSQIZf9PAY6Guw2DT5BTc54j/AaLQAKf2qcRSgQLVo5kQaddF3rCpsXoB/74"
+        "6QIDAQAB"
+        "-----END PUBLIC KEY-----";
 
 static const char * szWowPatchPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwOsMV0LagAWPEtEQM6b9"
-    "6FHFkUyGbbyda2/Dfc9dyl21E9QvX+Yw7qKRMAKPzA2TlQQLZKvXpnKXF/YIK5xa"
-    "5uwg9CEHCEAYolLG4xn0FUOE0E/0PuuytI0p0ICe6rk00PifZzTr8na2wI/l/GnQ"
-    "bvnIVF1ck6cslATpQJ5JJVMXzoFlUABS19WESw4MXuJAS3AbMhxNWdEhVv7eO51c"
-    "yGjRLy9QjogZODZTY0fSEksgBqQxNCoYVJYI/sF5K2flDsGqrIp0OdJ6teJlzg1Y"
-    "UjYnb6bKjlidXoHEXI2TgA/mD6O3XFIt08I9s3crOCTgICq7cgX35qrZiIVWZdRv"
-    "TwIDAQAB"
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwOsMV0LagAWPEtEQM6b9"
+        "6FHFkUyGbbyda2/Dfc9dyl21E9QvX+Yw7qKRMAKPzA2TlQQLZKvXpnKXF/YIK5xa"
+        "5uwg9CEHCEAYolLG4xn0FUOE0E/0PuuytI0p0ICe6rk00PifZzTr8na2wI/l/GnQ"
+        "bvnIVF1ck6cslATpQJ5JJVMXzoFlUABS19WESw4MXuJAS3AbMhxNWdEhVv7eO51c"
+        "yGjRLy9QjogZODZTY0fSEksgBqQxNCoYVJYI/sF5K2flDsGqrIp0OdJ6teJlzg1Y"
+        "UjYnb6bKjlidXoHEXI2TgA/mD6O3XFIt08I9s3crOCTgICq7cgX35qrZiIVWZdRv"
+        "TwIDAQAB"
+        "-----END PUBLIC KEY-----";
 
 static const char * szWowSurveyPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnIt1DR6nRyyKsy2qahHe"
-    "MKLtacatn/KxieHcwH87wLBxKy+jZ0gycTmJ7SaTdBAEMDs/V5IPIXEtoqYnid2c"
-    "63TmfGDU92oc3Ph1PWUZ2PWxBhT06HYxRdbrgHw9/I29pNPi/607x+lzPORITOgU"
-    "BR6MR8au8HsQP4bn4vkJNgnSgojh48/XQOB/cAln7As1neP61NmVimoLR4Bwi3zt"
-    "zfgrZaUpyeNCUrOYJmH09YIjbBySTtXOUidoPHjFrMsCWpr6xs8xbETbs7MJFL6a"
-    "vcUfTT67qfIZ9RsuKfnXJTIrV0kwDSjjuNXiPTmWAehSsiHIsrUXX5RNcwsSjClr"
-    "nQIDAQAB"
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnIt1DR6nRyyKsy2qahHe"
+        "MKLtacatn/KxieHcwH87wLBxKy+jZ0gycTmJ7SaTdBAEMDs/V5IPIXEtoqYnid2c"
+        "63TmfGDU92oc3Ph1PWUZ2PWxBhT06HYxRdbrgHw9/I29pNPi/607x+lzPORITOgU"
+        "BR6MR8au8HsQP4bn4vkJNgnSgojh48/XQOB/cAln7As1neP61NmVimoLR4Bwi3zt"
+        "zfgrZaUpyeNCUrOYJmH09YIjbBySTtXOUidoPHjFrMsCWpr6xs8xbETbs7MJFL6a"
+        "vcUfTT67qfIZ9RsuKfnXJTIrV0kwDSjjuNXiPTmWAehSsiHIsrUXX5RNcwsSjClr"
+        "nQIDAQAB"
+        "-----END PUBLIC KEY-----";
 
 static const char * szStarcraft2MapPublicKey =
-    "-----BEGIN PUBLIC KEY-----"
-    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmk4GT8zb+ICC25a17KZB"
-    "q/ygKGJ2VSO6IT5PGHJlm1KfnHBA4B6SH3xMlJ4c6eG2k7QevZv+FOhjsAHubyWq"
-    "2VKqWbrIFKv2ILc2RfMn8J9EDVRxvcxh6slRrVL69D0w1tfVGjMiKq2Fym5yGoRT"
-    "E7CRgDqbAbXP9LBsCNWHiJLwfxMGzHbk8pIl9oia5pvM7ofZamSHchxlpy6xa4GJ"
-    "7xKN01YCNvklTL1D7uol3wkwcHc7vrF8QwuJizuA5bSg4poEGtH62BZOYi+UL/z0"
-    "31YK+k9CbQyM0X0pJoJoYz1TK+Y5J7vBnXCZtfcTYQ/ZzN6UcxTa57dJaiOlCh9z"
-    "nQIDAQAB"
-    "-----END PUBLIC KEY-----";
+        "-----BEGIN PUBLIC KEY-----"
+        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmk4GT8zb+ICC25a17KZB"
+        "q/ygKGJ2VSO6IT5PGHJlm1KfnHBA4B6SH3xMlJ4c6eG2k7QevZv+FOhjsAHubyWq"
+        "2VKqWbrIFKv2ILc2RfMn8J9EDVRxvcxh6slRrVL69D0w1tfVGjMiKq2Fym5yGoRT"
+        "E7CRgDqbAbXP9LBsCNWHiJLwfxMGzHbk8pIl9oia5pvM7ofZamSHchxlpy6xa4GJ"
+        "7xKN01YCNvklTL1D7uol3wkwcHc7vrF8QwuJizuA5bSg4poEGtH62BZOYi+UL/z0"
+        "31YK+k9CbQyM0X0pJoJoYz1TK+Y5J7vBnXCZtfcTYQ/ZzN6UcxTa57dJaiOlCh9z"
+        "nQIDAQAB"
+        "-----END PUBLIC KEY-----";
 
 //-----------------------------------------------------------------------------
 // Local functions
@@ -123,14 +121,9 @@ static void memrev(unsigned char *buf, size_t count)
 
 static bool is_valid_md5(void * pvMd5)
 {
-    unsigned char * pbMd5 = (unsigned char *)pvMd5;
-    unsigned char ByteSum = 0;
-    int i;
+    LPDWORD Md5 = (LPDWORD)pvMd5;
 
-    for(i = 0; i < MD5_DIGEST_SIZE; i++)
-        ByteSum |= pbMd5[i];
-
-    return ByteSum ? true : false;
+    return (Md5[0] | Md5[1] | Md5[2] | Md5[3]) ? true : false;
 }
 
 static bool decode_base64_key(const char * szKeyBase64, rsa_key * key)
@@ -159,14 +152,24 @@ static bool decode_base64_key(const char * szKeyBase64, rsa_key * key)
     return true;
 }
 
+static void GetPlainAnsiFileName(
+        const TCHAR * szFileName,
+        char * szPlainName)
+{
+    const TCHAR * szPlainNameT = GetPlainFileNameT(szFileName);
+
+    // Convert the plain name to ANSI
+    while(*szPlainNameT != 0)
+        *szPlainName++ = (char)*szPlainNameT++;
+    *szPlainName = 0;
+}
+
 // Calculate begin and end of the MPQ archive
 static void CalculateArchiveRange(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI)
 {
-    TMPQHeader * pHeader = ha->pHeader;
     ULONGLONG TempPos = 0;
-    ULONGLONG MaxPos;
     char szMapHeader[0x200];
 
     // Get the MPQ begin
@@ -183,39 +186,17 @@ static void CalculateArchiveRange(
         }
     }
 
-    // Get the MPQ data end. The end is calculated as the biggest
-    // value of (end of the last file), (end of block table),
-    // (end of ext block table), (end of hash table)
-    FindFreeMpqSpace(ha, &MaxPos);
-
-    // Check if hash table is beyond
-    TempPos = ha->MpqPos + MAKE_OFFSET64(pHeader->wHashTablePosHi, pHeader->dwHashTablePos) + pHeader->HashTableSize64;
-    if(TempPos > MaxPos)
-        MaxPos = TempPos;
-
-    // Check if block table is beyond
-    TempPos = ha->MpqPos + MAKE_OFFSET64(pHeader->wBlockTablePosHi, pHeader->dwBlockTablePos) + pHeader->BlockTableSize64;
-    if(TempPos > MaxPos)
-        MaxPos = TempPos;
-
-    // Check if ext block table is beyond
-    if(pHeader->HiBlockTablePos64 != 0)
-    {
-        TempPos = ha->MpqPos + pHeader->HiBlockTablePos64 + pHeader->HiBlockTableSize64;
-        if(TempPos > MaxPos)
-            MaxPos = TempPos;
-    }
-
-    // Give the end
-    pSI->EndMpqData = MaxPos;
+    // Get the MPQ data end. This is stored in our MPQ header,
+    // and it's been already prepared by SFileOpenArchive,
+    pSI->EndMpqData = ha->MpqPos + ha->pHeader->ArchiveSize64;
 
     // Get the size of the entire file
-    FileStream_GetSize(ha->pStream, pSI->EndOfFile);
+    FileStream_GetSize(ha->pStream, &pSI->EndOfFile);
 }
 
 static bool QueryMpqSignatureInfo(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI)
 {
     ULONGLONG ExtraBytes;
     TMPQFile * hf;
@@ -229,7 +210,7 @@ static bool QueryMpqSignatureInfo(
     if(SFileOpenFileEx((HANDLE)ha, SIGNATURE_NAME, SFILE_OPEN_FROM_MPQ, &hFile))
     {
         // Get the content of the signature
-        SFileReadFile(hFile, pSI->Signature, sizeof(pSI->Signature), &pSI->cbSignatureSize);
+        SFileReadFile(hFile, pSI->Signature, sizeof(pSI->Signature), &pSI->cbSignatureSize, NULL);
 
         // Verify the size of the signature
         hf = (TMPQFile *)hFile;
@@ -267,9 +248,9 @@ static bool QueryMpqSignatureInfo(
 }
 
 static bool CalculateMpqHashMd5(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI,
-    LPBYTE pMd5Digest)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI,
+        LPBYTE pMd5Digest)
 {
     hash_state md5_state;
     ULONGLONG BeginBuffer;
@@ -277,7 +258,7 @@ static bool CalculateMpqHashMd5(
     LPBYTE pbDigestBuffer = NULL;
 
     // Allocate buffer for creating the MPQ digest.
-    pbDigestBuffer = ALLOCMEM(BYTE, MPQ_DIGEST_UNIT_SIZE);
+    pbDigestBuffer = STORM_ALLOC(BYTE, MPQ_DIGEST_UNIT_SIZE);
     if(pbDigestBuffer == NULL)
         return false;
 
@@ -302,10 +283,10 @@ static bool CalculateMpqHashMd5(
         if(dwToRead == 0)
             break;
 
-        // Read the next chunk 
+        // Read the next chunk
         if(!FileStream_Read(ha->pStream, &BeginBuffer, pbDigestBuffer, dwToRead))
         {
-            FREEMEM(pbDigestBuffer);
+            STORM_FREE(pbDigestBuffer);
             return false;
         }
 
@@ -338,13 +319,13 @@ static bool CalculateMpqHashMd5(
 
     // Finalize the MD5 hash
     md5_done(&md5_state, pMd5Digest);
-    FREEMEM(pbDigestBuffer);
+    STORM_FREE(pbDigestBuffer);
     return true;
 }
 
 static void AddTailToSha1(
-    hash_state * psha1_state,
-    const char * szTail)
+        hash_state * psha1_state,
+        const char * szTail)
 {
     unsigned char szUpperCase[0x200];
     unsigned long nLength = 0;
@@ -361,19 +342,20 @@ static void AddTailToSha1(
 }
 
 static bool CalculateMpqHashSha1(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI,
-    unsigned char * sha1_tail0,
-    unsigned char * sha1_tail1,
-    unsigned char * sha1_tail2)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI,
+        unsigned char * sha1_tail0,
+        unsigned char * sha1_tail1,
+        unsigned char * sha1_tail2)
 {
     ULONGLONG BeginBuffer;
     hash_state sha1_state_temp;
     hash_state sha1_state;
     LPBYTE pbDigestBuffer = NULL;
+    char szPlainName[MAX_PATH];
 
     // Allocate buffer for creating the MPQ digest.
-    pbDigestBuffer = ALLOCMEM(BYTE, MPQ_DIGEST_UNIT_SIZE);
+    pbDigestBuffer = STORM_ALLOC(BYTE, MPQ_DIGEST_UNIT_SIZE);
     if(pbDigestBuffer == NULL)
         return false;
 
@@ -396,10 +378,10 @@ static bool CalculateMpqHashSha1(
         if(dwToRead == 0)
             break;
 
-        // Read the next chunk 
+        // Read the next chunk
         if(!FileStream_Read(ha->pStream, &BeginBuffer, pbDigestBuffer, dwToRead))
         {
-            FREEMEM(pbDigestBuffer);
+            STORM_FREE(pbDigestBuffer);
             return false;
         }
 
@@ -415,7 +397,8 @@ static bool CalculateMpqHashSha1(
     sha1_done(&sha1_state_temp, sha1_tail0);
 
     memcpy(&sha1_state_temp, &sha1_state, sizeof(hash_state));
-    AddTailToSha1(&sha1_state_temp, GetPlainFileName(ha->pStream->szFileName));
+    GetPlainAnsiFileName(FileStream_GetFileName(ha->pStream), szPlainName);
+    AddTailToSha1(&sha1_state_temp, szPlainName);
     sha1_done(&sha1_state_temp, sha1_tail1);
 
     memcpy(&sha1_state_temp, &sha1_state, sizeof(hash_state));
@@ -423,16 +406,15 @@ static bool CalculateMpqHashSha1(
     sha1_done(&sha1_state_temp, sha1_tail2);
 
     // Finalize the MD5 hash
-    FREEMEM(pbDigestBuffer);
+    STORM_FREE(pbDigestBuffer);
     return true;
 }
 
 static int VerifyRawMpqData(
-    TMPQArchive * ha,
-    ULONGLONG ByteOffset,
-    DWORD dwDataSize)
+        TMPQArchive * ha,
+        ULONGLONG ByteOffset,
+        DWORD dwDataSize)
 {
-    hash_state md5_state;
     ULONGLONG DataOffset = ha->MpqPos + ByteOffset;
     LPBYTE pbDataChunk;
     LPBYTE pbMD5Array1;                 // Calculated MD5 array
@@ -443,21 +425,23 @@ static int VerifyRawMpqData(
     DWORD dwMD5Size;
     int nError = ERROR_SUCCESS;
 
+    // Don't verify zero-sized blocks
+    if(dwDataSize == 0)
+        return ERROR_SUCCESS;
+
     // Get the number of data chunks to calculate MD5
     assert(dwChunkSize != 0);
-    dwChunkCount = dwDataSize / dwChunkSize;
-    if(dwDataSize % dwChunkSize)
-        dwChunkCount++;
+    dwChunkCount = ((dwDataSize - 1) / dwChunkSize) + 1;
     dwMD5Size = dwChunkCount * MD5_DIGEST_SIZE;
 
     // Allocate space for data chunk and for the MD5 array
-    pbDataChunk = ALLOCMEM(BYTE, dwChunkSize);
+    pbDataChunk = STORM_ALLOC(BYTE, dwChunkSize);
     if(pbDataChunk == NULL)
         return ERROR_NOT_ENOUGH_MEMORY;
 
     // Allocate space for MD5 array
-    pbMD5Array1 = ALLOCMEM(BYTE, dwMD5Size);
-    pbMD5Array2 = ALLOCMEM(BYTE, dwMD5Size);
+    pbMD5Array1 = STORM_ALLOC(BYTE, dwMD5Size);
+    pbMD5Array2 = STORM_ALLOC(BYTE, dwMD5Size);
     if(pbMD5Array1 == NULL || pbMD5Array2 == NULL)
         nError = ERROR_NOT_ENOUGH_MEMORY;
 
@@ -479,9 +463,7 @@ static int VerifyRawMpqData(
             }
 
             // Calculate MD5
-            md5_init(&md5_state);
-            md5_process(&md5_state, pbDataChunk, dwBytesInChunk);
-            md5_done(&md5_state, pbMD5);
+            CalculateDataBlockHash(pbDataChunk, dwBytesInChunk, pbMD5);
 
             // Move pointers and offsets
             DataOffset += dwBytesInChunk;
@@ -508,17 +490,17 @@ static int VerifyRawMpqData(
 
     // Free memory and return result
     if(pbMD5Array2 != NULL)
-        FREEMEM(pbMD5Array2);
+        STORM_FREE(pbMD5Array2);
     if(pbMD5Array1 != NULL)
-        FREEMEM(pbMD5Array1);
+        STORM_FREE(pbMD5Array1);
     if(pbDataChunk != NULL)
-        FREEMEM(pbDataChunk);
+        STORM_FREE(pbDataChunk);
     return nError;
 }
 
 static DWORD VerifyWeakSignature(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI)
 {
     BYTE RevSignature[MPQ_WEAK_SIGNATURE_SIZE];
     BYTE Md5Digest[MD5_DIGEST_SIZE];
@@ -545,9 +527,9 @@ static DWORD VerifyWeakSignature(
 }
 
 static DWORD VerifyStrongSignatureWithKey(
-    unsigned char * reversed_signature,
-    unsigned char * padded_digest,
-    const char * szPublicKey)
+        unsigned char * reversed_signature,
+        unsigned char * padded_digest,
+        const char * szPublicKey)
 {
     rsa_key key;
     int result = 0;
@@ -562,15 +544,15 @@ static DWORD VerifyStrongSignatureWithKey(
     // Verify the signature
     if(rsa_verify_simple(reversed_signature, MPQ_STRONG_SIGNATURE_SIZE, padded_digest, MPQ_STRONG_SIGNATURE_SIZE, &result, &key) != CRYPT_OK)
         return ERROR_VERIFY_FAILED;
-    
+
     // Free the key and return result
     rsa_free(&key);
     return result ? ERROR_STRONG_SIGNATURE_OK : ERROR_STRONG_SIGNATURE_ERROR;
 }
 
 static DWORD VerifyStrongSignature(
-    TMPQArchive * ha,
-    PMPQ_SIGNATURE_INFO pSI)
+        TMPQArchive * ha,
+        PMPQ_SIGNATURE_INFO pSI)
 {
     unsigned char reversed_signature[MPQ_STRONG_SIGNATURE_SIZE];
     unsigned char Sha1Digest_tail0[SHA1_DIGEST_SIZE];
@@ -631,10 +613,12 @@ static DWORD VerifyStrongSignature(
     return ERROR_STRONG_SIGNATURE_ERROR;
 }
 
-//-----------------------------------------------------------------------------
-// Public (exported) functions
-
-DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags)
+static DWORD VerifyFile(
+        HANDLE hMpq,
+        const char * szFileName,
+        LPDWORD pdwCrc32,
+        char * pMD5,
+        DWORD dwFlags)
 {
     hash_state md5_state;
     unsigned char * pFileMd5;
@@ -647,11 +631,40 @@ DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags
     DWORD dwSearchScope = SFILE_OPEN_FROM_MPQ;
     DWORD dwTotalBytes = 0;
     DWORD dwBytesRead;
-    DWORD dwCrc32;
+    DWORD dwCrc32 = 0;
 
     // Fix the open type for patched archives
     if(SFileIsPatchedArchive(hMpq))
         dwSearchScope = SFILE_OPEN_PATCHED_FILE;
+
+    // If we have to verify raw data MD5, do it before file open
+    if(dwFlags & SFILE_VERIFY_RAW_MD5)
+    {
+        TMPQArchive * ha = (TMPQArchive *)hMpq;
+
+        // Parse the base MPQ and all patches
+        while(ha != NULL)
+        {
+            // Does the archive have support for raw MD5?
+            if(ha->pHeader->dwRawChunkSize != 0)
+            {
+                // The file has raw MD5 if the archive supports it
+                dwVerifyResult |= VERIFY_FILE_HAS_RAW_MD5;
+
+                // Find file entry for the file
+                pFileEntry = GetFileEntryLocale(ha, szFileName, lcFileLocale);
+                if(pFileEntry != NULL)
+                {
+                    // If the file's raw MD5 doesn't match, don't bother with more checks
+                    if(VerifyRawMpqData(ha, pFileEntry->ByteOffset, pFileEntry->dwCmpSize) != ERROR_SUCCESS)
+                        return dwVerifyResult | VERIFY_FILE_RAW_MD5_ERROR;
+                }
+            }
+
+            // Move to the next patch
+            ha = ha->haPatch;
+        }
+    }
 
     // Attempt to open the file
     if(SFileOpenFileEx(hMpq, szFileName, dwSearchScope, &hFile))
@@ -664,17 +677,6 @@ DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags
         // Initialize the CRC32 and MD5 contexts
         md5_init(&md5_state);
         dwCrc32 = crc32(0, Z_NULL, 0);
-
-        // If we have to verify raw data MD5, do it
-        if(dwFlags & SFILE_VERIFY_RAW_MD5)
-        {
-            if(hf->ha->pHeader->dwRawChunkSize != 0)
-            {
-                dwVerifyResult |= VERIFY_FILE_HAS_RAW_MD5;
-                if(SFileVerifyRawData(hMpq, SFILE_VERIFY_FILE, szFileName) != ERROR_SUCCESS)
-                    dwVerifyResult |= VERIFY_FILE_RAW_MD5_ERROR;
-            }
-        }
 
         // Also turn on sector checksum verification
         if(dwFlags & SFILE_VERIFY_SECTOR_CRC)
@@ -695,7 +697,7 @@ DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags
             // Update CRC32 value
             if(dwFlags & SFILE_VERIFY_FILE_CRC)
                 dwCrc32 = crc32(dwCrc32, Buffer, dwBytesRead);
-            
+
             // Update MD5 value
             if(dwFlags & SFILE_VERIFY_FILE_MD5)
                 md5_process(&md5_state, Buffer, dwBytesRead);
@@ -766,7 +768,52 @@ DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags
         dwVerifyResult |= VERIFY_OPEN_ERROR;
     }
 
+    // If the caller required CRC32 and/or MD5, give it to him
+    if(pdwCrc32 != NULL)
+        *pdwCrc32 = dwCrc32;
+    if(pMD5 != NULL)
+        memcpy(pMD5, md5, MD5_DIGEST_SIZE);
+
     return dwVerifyResult;
+}
+
+//-----------------------------------------------------------------------------
+// Public (exported) functions
+
+bool WINAPI SFileGetFileChecksums(HANDLE hMpq, const char * szFileName, LPDWORD pdwCrc32, char * pMD5)
+{
+    DWORD dwVerifyResult;
+    DWORD dwVerifyFlags = 0;
+
+    if(pdwCrc32 != NULL)
+        dwVerifyFlags |= SFILE_VERIFY_FILE_CRC;
+    if(pMD5 != NULL)
+        dwVerifyFlags |= SFILE_VERIFY_FILE_MD5;
+
+    dwVerifyResult = VerifyFile(hMpq,
+                                szFileName,
+                                pdwCrc32,
+                                pMD5,
+                                dwVerifyFlags);
+
+    // If verification failed, return zero
+    if(dwVerifyResult & VERIFY_FILE_ERROR_MASK)
+    {
+        SetLastError(ERROR_FILE_CORRUPT);
+        return false;
+    }
+
+    return true;
+}
+
+
+DWORD WINAPI SFileVerifyFile(HANDLE hMpq, const char * szFileName, DWORD dwFlags)
+{
+    return VerifyFile(hMpq,
+                      szFileName,
+                      NULL,
+                      NULL,
+                      dwFlags);
 }
 
 // Verifies raw data of the archive Only works for MPQs version 4 or newer
@@ -788,54 +835,54 @@ int WINAPI SFileVerifyRawData(HANDLE hMpq, DWORD dwWhatToVerify, const char * sz
     // If we have to verify MPQ header, do it
     switch(dwWhatToVerify)
     {
-        case SFILE_VERIFY_MPQ_HEADER:
-            
-            // Only if the header is of version 4 or newer
-            if(pHeader->dwHeaderSize >= (MPQ_HEADER_SIZE_V4 - MD5_DIGEST_SIZE))
-                return VerifyRawMpqData(ha, 0, MPQ_HEADER_SIZE_V4 - MD5_DIGEST_SIZE);
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_MPQ_HEADER:
 
-        case SFILE_VERIFY_HET_TABLE:
+        // Only if the header is of version 4 or newer
+        if(pHeader->dwHeaderSize >= (MPQ_HEADER_SIZE_V4 - MD5_DIGEST_SIZE))
+            return VerifyRawMpqData(ha, 0, MPQ_HEADER_SIZE_V4 - MD5_DIGEST_SIZE);
+        return ERROR_SUCCESS;
 
-            // Only if we have HET table
-            if(pHeader->HetTablePos64 && pHeader->HetTableSize64)
-                return VerifyRawMpqData(ha, pHeader->HetTablePos64, (DWORD)pHeader->HetTableSize64);
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_HET_TABLE:
 
-        case SFILE_VERIFY_BET_TABLE:
+        // Only if we have HET table
+        if(pHeader->HetTablePos64 && pHeader->HetTableSize64)
+            return VerifyRawMpqData(ha, pHeader->HetTablePos64, (DWORD)pHeader->HetTableSize64);
+        return ERROR_SUCCESS;
 
-            // Only if we have BET table
-            if(pHeader->BetTablePos64 && pHeader->BetTableSize64)
-                return VerifyRawMpqData(ha, pHeader->BetTablePos64, (DWORD)pHeader->BetTableSize64);
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_BET_TABLE:
 
-        case SFILE_VERIFY_HASH_TABLE:
+        // Only if we have BET table
+        if(pHeader->BetTablePos64 && pHeader->BetTableSize64)
+            return VerifyRawMpqData(ha, pHeader->BetTablePos64, (DWORD)pHeader->BetTableSize64);
+        return ERROR_SUCCESS;
 
-            // Hash table is not protected by MD5
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_HASH_TABLE:
 
-        case SFILE_VERIFY_BLOCK_TABLE:
+        // Hash table is not protected by MD5
+        return ERROR_SUCCESS;
 
-            // Block table is not protected by MD5
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_BLOCK_TABLE:
 
-        case SFILE_VERIFY_HIBLOCK_TABLE:
+        // Block table is not protected by MD5
+        return ERROR_SUCCESS;
 
-            // It is unknown if the hi-block table is protected my MD5 or not.
-            return ERROR_SUCCESS;
+    case SFILE_VERIFY_HIBLOCK_TABLE:
 
-        case SFILE_VERIFY_FILE:
+        // It is unknown if the hi-block table is protected my MD5 or not.
+        return ERROR_SUCCESS;
 
-            // Verify parameters
-            if(szFileName == NULL || *szFileName == 0)
-                return ERROR_INVALID_PARAMETER;
+    case SFILE_VERIFY_FILE:
 
-            // Get the offset of a file
-            pFileEntry = GetFileEntryLocale(ha, szFileName, lcFileLocale);
-            if(pFileEntry == NULL)
-                return ERROR_FILE_NOT_FOUND;
+        // Verify parameters
+        if(szFileName == NULL || *szFileName == 0)
+            return ERROR_INVALID_PARAMETER;
 
-            return VerifyRawMpqData(ha, pFileEntry->ByteOffset, pFileEntry->dwCmpSize);
+        // Get the offset of a file
+        pFileEntry = GetFileEntryLocale(ha, szFileName, lcFileLocale);
+        if(pFileEntry == NULL)
+            return ERROR_FILE_NOT_FOUND;
+
+        return VerifyRawMpqData(ha, pFileEntry->ByteOffset, pFileEntry->dwCmpSize);
     }
 
     return ERROR_INVALID_PARAMETER;
@@ -860,14 +907,14 @@ DWORD WINAPI SFileVerifyArchive(HANDLE hMpq)
     // Verify the signature
     switch(si.nSignatureType)
     {
-        case SIGNATURE_TYPE_NONE:
-            return ERROR_NO_SIGNATURE;
+    case SIGNATURE_TYPE_NONE:
+        return ERROR_NO_SIGNATURE;
 
-        case SIGNATURE_TYPE_WEAK:
-            return VerifyWeakSignature(ha, &si);
+    case SIGNATURE_TYPE_WEAK:
+        return VerifyWeakSignature(ha, &si);
 
-        case SIGNATURE_TYPE_STRONG:
-            return VerifyStrongSignature(ha, &si);
+    case SIGNATURE_TYPE_STRONG:
+        return VerifyStrongSignature(ha, &si);
     }
 
     return ERROR_VERIFY_FAILED;

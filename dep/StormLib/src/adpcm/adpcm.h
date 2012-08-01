@@ -11,10 +11,6 @@
 #ifndef __ADPCM_H__
 #define __ADPCM_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //-----------------------------------------------------------------------------
 // Functions
 
@@ -22,9 +18,5 @@ extern "C" {
 
 int  CompressADPCM  (unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuffer, int dwInLength, int nCmpType, int nChannels);
 int  DecompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, unsigned char * pbInBuffer, int dwInLength, int nChannels);
-
-#ifdef __cplusplus
-}   // extern "C"
-#endif
 
 #endif // __ADPCM_H__

@@ -27,7 +27,7 @@ TABLE OF CONTENTS
 4. Revision History
 
 1. INTRODUCTION TO THE MOPAQ FORMAT
-The MoPaQ (or MPQ) format is an archive file format designed by Mike O'Brien (hence the name Mike O'brien PaCK) at Blizzard Entertainment. The format has been used in all Blizzard games since (and including) Diablo. It is heavily optimized to be a read-only game archive format, and excels at this role. 
+The MoPaQ (or MPQ) format is an archive file format designed by Mike O'Brien (hence the name Mike O'brien PaCK) at Blizzard Entertainment. The format has been used in all Blizzard games since (and including) Diablo. It is heavily optimized to be a read-only game archive format, and excels at this role.
 
 The Blizzard MoPaQ-reading functions are contained in the Storm module, which my be either statically or dynamically linked. The Blizzard MoPaQ-writing functions are contained in the MPQAPI module, which is always statically linked.
 
@@ -102,7 +102,7 @@ The data for each file is composed of the following structure:
 00h: int32(SectorsInFile + 1) SectorOffsetTable : Offsets to the start of each sector, relative to the beginning of the file data. The last entry contains the file size, making it possible to easily calculate the size of any given sector. This table is not present if this information can be calculated (see details below).
 immediately following SectorOffsetTable: SECTOR Sectors(SectorsInFile) : Data of each sector in the file, packed end to end (see details below).
 
-Normally, file data is split up into sectors, for simple streaming. All sectors, save for the last, will contain as many bytes of file data as specified in the archive header's SectorSizeShift; the last sector may contain less than this, depending on the size of the entire file's data. If the file is compressed or imploded, the sector will be smaller or the same size as the file data it contains. Individual sectors in a compressed or imploded file may be stored uncompressed; this occurs if and only if the file data the sector contains could not be compressed by the algorithm(s) used (if the compressed sector size was greater than or equal to the size of the file data), and is indicated by the sector's size in SectorOffsetTable being equal to the size of the file data in the sector (which may be calculated from the FileSize). 
+Normally, file data is split up into sectors, for simple streaming. All sectors, save for the last, will contain as many bytes of file data as specified in the archive header's SectorSizeShift; the last sector may contain less than this, depending on the size of the entire file's data. If the file is compressed or imploded, the sector will be smaller or the same size as the file data it contains. Individual sectors in a compressed or imploded file may be stored uncompressed; this occurs if and only if the file data the sector contains could not be compressed by the algorithm(s) used (if the compressed sector size was greater than or equal to the size of the file data), and is indicated by the sector's size in SectorOffsetTable being equal to the size of the file data in the sector (which may be calculated from the FileSize).
 
 The format of each sector depends on the kind of sector it is. Uncompressed sectors are simply the the raw file data contained in the sector. Imploded sectors are the raw compressed data following compression with the implode algorithm (these sectors can only be in imploded files). Compressed sectors (only found in compressed - not imploded - files) are compressed with one or more compression algorithms, and have the following structure:
 00h: byte CompressionMask : Mask of the compression types applied to this sector. If multiple compression types are used, they are applied in the order listed below, and decompression is performed in the opposite order. This byte counts towards the total sector size, meaning that the sector will be stored uncompressed if the data cannot be compressed by at least two bytes; as well, this byte is encrypted with the sector data, if applicable. The following compression types are defined (for implementations of these algorithms, see StormLib):
@@ -257,7 +257,7 @@ unsigned long HashString(const char *lpszString, unsigned long dwHashType)
 {
     assert(lpszString);
     assert(dwHashType <= MPQ_HASH_FILE_KEY);
-    
+
     unsigned long  seed1 = 0x7FED7FEDL;
     unsigned long  seed2 = 0xEEEEEEEEL;
     int    ch;
@@ -277,21 +277,21 @@ unsigned long HashString(const char *lpszString, unsigned long dwHashType)
 unsigned long ComputeFileKey(const char *lpszFilePath, const BlockTableEntry &blockEntry, unsigned long nArchiveOffset)
 {
 	assert(lpszFilePath);
-	
+
 	// Find the file name part of the path
 	const char *lpszFileName = strrchr(lpszFilePath, '\\');
 	if (lpszFileName)
 		lpszFileName++;	// Skip the \
 	else
 		lpszFileName = lpszFilePath;
-		
+
 	// Hash the name to get the base key
 	unsigned long nFileKey = HashString(lpszFileName, MPQ_HASH_FILE_KEY);
-	
+
 	// Offset-adjust the key if necessary
 	if (blockEntry.Flags & BLOCK_OFFSET_ADJUSTED_KEY)
 		nFileKey = (nFileKey + blockEntry.BlockOffset) ^ blockEntry.FileSize;
-		
+
 	return nFileKey;
 }
 
@@ -305,38 +305,38 @@ bool FindFileInHashTable(const HashTableEntry *lpHashTable, unsigned long nHashT
 	assert(lpHashTable);
 	assert(nHashTableSize);
 	assert(lpszFilePath);
-	
+
 	// Find the home entry in the hash table for the file
 	unsigned long iInitEntry = HashString(lpszFilePath, MPQ_HASH_TABLE_OFFSET) & (nHashTableSize - 1);
-		
+
 	// Is there anything there at all?
 	if (lpHashTable[iInitEntry].FileBlockIndex == MPQ_HASH_ENTRY_EMPTY)
 		return false;
-		
+
 	// Compute the hashes to compare the hash table entry against
 	unsigned long nNameHashA = HashString(lpszFilePath, MPQ_HASH_NAME_A),
 		nNameHashB = HashString(lpszFilePath, MPQ_HASH_NAME_B),
 		iCurEntry = iInitEntry;
-		
+
 	// Check each entry in the hash table till a termination point is reached
 	do
 	{
 		if (lpHashTable[iCurEntry].FileBlockIndex != MPQ_HASH_ENTRY_DELETED)
 		{
-			if (lpHashTable[iCurEntry].FilePathHashA == nNameHashA 
+			if (lpHashTable[iCurEntry].FilePathHashA == nNameHashA
 				&& lpHashTable[iCurEntry].FilePathHashB == nNameHashB
 				&& lpHashTable[iCurEntry].Language == nLang
 				&& lpHashTable[iCurEntry].Platform == nPlatform)
 			{
 				iFileHashEntry = iCurEntry;
-				
+
 				return true;
 			}
 		}
-			
+
 		iCurEntry = (iCurEntry + 1) & (nHashTableSize - 1);
 	} while (iCurEntry != iInitEntry && lpHashTable[iCurEntry].FileBlockIndex != MPQ_HASH_ENTRY_EMPTY);
-	
+
 	return false;
 }
 
@@ -347,25 +347,25 @@ bool DeleteFile(HashTableEntry *lpHashTable, unsigned long nHashTableSize, Block
 	assert(lpHashTable);
 	assert(nHashTableSize);
 	assert(lpBlockTable);
-	
+
 	// Find the file in the hash table
 	unsigned long iFileHashEntry;
-	
+
 	if (!FindFileInHashTable(lpHashTable, nHashTableSize, lpszFilePath, nLang, nPlatform, iFileHashEntry))
 		return false;
-	
+
 	// Get the block table index before we nuke the hash table entry
 	unsigned long iFileBlockEntry = lpHashTable[iFileHashEntry].FileBlockIndex;
-	
+
 	// Delete the file's entry in the hash table
 	memset(&lpHashTable[iFileHashEntry], 0xFF, sizeof(HashTableEntry));
-	
+
 	// If the next entry is empty, mark this one as empty; otherwise, mark this as deleted.
 	if (lpHashTable[(iFileHashEntry + 1) & (nHashTableSize - 1)].FileBlockIndex == MPQ_HASH_ENTRY_EMPTY)
 		lpHashTable[iFileHashEntry].FileBlockIndex = MPQ_HASH_ENTRY_EMPTY;
 	else
 		lpHashTable[iFileHashEntry].FileBlockIndex = MPQ_HASH_ENTRY_DELETED;
-	
+
 	// If the block occupies space, mark the block as free space; otherwise, clear the block table entry.
 	if (lpBlockTable[iFileBlockEntry].BlockSize > 0)
 	{
@@ -374,7 +374,7 @@ bool DeleteFile(HashTableEntry *lpHashTable, unsigned long nHashTableSize, Block
 	}
 	else
 		memset(&lpBlockTable[iFileBlockEntry], 0, sizeof(BlockTableEntry);
-		
+
 	return true;
 }
 

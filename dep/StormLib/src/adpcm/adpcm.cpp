@@ -17,17 +17,17 @@
 //------------------------------------------------------------------------------
 // Structures
 
-union TByteAndWordPtr
+typedef union _BYTE_AND_WORD_PTR
 {
     short * pw;
     unsigned char * pb;
-};
+} BYTE_AND_WORD_PTR;
 
-union TWordAndByteArray
+typedef union _WORD_AND_BYTE_ARRAY
 {
     short w;
     unsigned char b[2];
-};
+} WORD_AND_BYTE_ARRAY;
 
 //-----------------------------------------------------------------------------
 // Tables necessary dor decompression
@@ -36,8 +36,8 @@ static long Table1503F120[] =
 {
     0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0x00000004, 0xFFFFFFFF, 0x00000002, 0xFFFFFFFF, 0x00000006,
     0xFFFFFFFF, 0x00000001, 0xFFFFFFFF, 0x00000005, 0xFFFFFFFF, 0x00000003, 0xFFFFFFFF, 0x00000007,
-    0xFFFFFFFF, 0x00000001, 0xFFFFFFFF, 0x00000005, 0xFFFFFFFF, 0x00000003, 0xFFFFFFFF, 0x00000007,  
-    0xFFFFFFFF, 0x00000002, 0xFFFFFFFF, 0x00000004, 0xFFFFFFFF, 0x00000006, 0xFFFFFFFF, 0x00000008  
+    0xFFFFFFFF, 0x00000001, 0xFFFFFFFF, 0x00000005, 0xFFFFFFFF, 0x00000003, 0xFFFFFFFF, 0x00000007,
+    0xFFFFFFFF, 0x00000002, 0xFFFFFFFF, 0x00000004, 0xFFFFFFFF, 0x00000006, 0xFFFFFFFF, 0x00000008
 };
 
 static long step_table[] =
@@ -63,8 +63,8 @@ static long step_table[] =
 int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuffer, int dwInLength, int nChannels, int nCmpLevel)
 //                ECX                          EDX
 {
-    TWordAndByteArray Wcmp;
-    TByteAndWordPtr out;                    // Pointer to the output buffer
+    WORD_AND_BYTE_ARRAY Wcmp;
+    BYTE_AND_WORD_PTR out;                    // Pointer to the output buffer
     long SInt32Array1[2];
     long SInt32Array2[2];
     long SInt32Array3[2];
@@ -83,6 +83,7 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
     int nLength;
     int nIndex;
     int nValue;
+    int i, chnl;
 
     // If less than 2 bytes remain, don't decompress anything
 //  pbSaveOutBuffer = pbOutBuffer;
@@ -99,7 +100,7 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
 
     SInt32Array1[0] = SInt32Array1[1] = 0x2C;
 
-    for(int i = 0; i < nChannels; i++)
+    for(i = 0; i < nChannels; i++)
     {
         nOneWord = BSWAP_INT16_SIGNED(*pwInBuffer++);
         *out.pw++ = BSWAP_INT16_SIGNED((short)nOneWord);
@@ -113,13 +114,13 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
 
     nLength = (nLength / 2) - (int)(out.pb - pbOutBuffer);
     nLength = (nLength < 0) ? 0 : nLength;
-    
+
     nIndex  = nChannels - 1;            // edi
     nWordsRemains = dwInLength / 2;     // eax
-    
+
     // ebx - nChannels
     // ecx - pwOutPos
-    for(int chnl = nChannels; chnl < nWordsRemains; chnl++)
+    for(chnl = nChannels; chnl < nWordsRemains; chnl++)
     {
         // 1500F030
         if((out.pb - pbOutBuffer + 2) > nBytesRemains)
@@ -185,7 +186,7 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
                 }
                 if(dwBit == dwStopBit)
                     break;
-               
+
                 nTableValue >>= 1;
             }
 
@@ -206,7 +207,7 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
             SInt32Array2[nIndex]  = nValue;
             *out.pb++ = (unsigned char)(dwBitBuff | ebx);
             nTableValue = Table1503F120[dwBitBuff & 0x1F];
-            SInt32Array1[nIndex]  = SInt32Array1[nIndex] + nTableValue; 
+            SInt32Array1[nIndex]  = SInt32Array1[nIndex] + nTableValue;
             if(SInt32Array1[nIndex] < 0)
                 SInt32Array1[nIndex] = 0;
             else if(SInt32Array1[nIndex] > 0x58)
@@ -223,14 +224,14 @@ int CompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, short * pwInBuff
 // 1500F230
 int DecompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, unsigned char * pbInBuffer, int dwInLength, int nChannels)
 {
-    TByteAndWordPtr out;                // Output buffer
-    TByteAndWordPtr in;
+    BYTE_AND_WORD_PTR out;                // Output buffer
+    BYTE_AND_WORD_PTR in;
     unsigned char * pbInBufferEnd = (pbInBuffer + dwInLength);
     long SInt32Array1[2];
     long SInt32Array2[2];
     long nOneWord;
-    int dwOutLengthCopy = dwOutLength;
     int nIndex;
+    int i;
 
     SInt32Array1[0] = SInt32Array1[1] = 0x2C;
     out.pb = pbOutBuffer;
@@ -238,15 +239,15 @@ int DecompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, unsigned char 
     in.pw++;
 
     // Fill the Uint32Array2 array by channel values.
-    for(int i = 0; i < nChannels; i++)
+    for(i = 0; i < nChannels; i++)
     {
         nOneWord = BSWAP_INT16_SIGNED(*in.pw++);
         SInt32Array2[i] = nOneWord;
-        if(dwOutLengthCopy < 2)
+        if(dwOutLength < 2)
             return (int)(out.pb - pbOutBuffer);
 
         *out.pw++ = BSWAP_INT16_SIGNED((short)nOneWord);
-        dwOutLengthCopy -= sizeof(short);
+        dwOutLength -= sizeof(short);
     }
 
     // Get the initial index
@@ -270,7 +271,7 @@ int DecompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, unsigned char 
                     if(SInt32Array1[nIndex] != 0)
                         SInt32Array1[nIndex]--;
 
-                    if(dwOutLengthCopy < 2)
+                    if(dwOutLength < 2)
                         return (int)(out.pb - pbOutBuffer);
 
                     *out.pw++ = BSWAP_INT16_SIGNED((unsigned short)SInt32Array2[nIndex]);
@@ -281,7 +282,7 @@ int DecompressADPCM(unsigned char * pbOutBuffer, int dwOutLength, unsigned char 
                     SInt32Array1[nIndex] += 8;
                     if(SInt32Array1[nIndex] > 0x58)
                         SInt32Array1[nIndex] = 0x58;
-                    
+
                     if(nChannels == 2)
                         nIndex = (nIndex == 0) ? 1 : 0;
                     break;

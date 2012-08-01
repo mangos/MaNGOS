@@ -14,7 +14,6 @@
 /*****************************************************************************/
 
 #define __STORMLIB_SELF__
-#define __INCLUDE_CRYPTOGRAPHY__
 #include "StormLib.h"
 #include "StormCommon.h"
 
@@ -31,6 +30,34 @@ static bool IsAviFile(void * pvFileBegin)
 
     // Test for 'RIFF', 'AVI ' or 'LIST'
     return (DwordValue0 == 0x46464952 && DwordValue2 == 0x20495641 && DwordValue3 == 0x5453494C);
+}
+
+static TFileBitmap * CreateFileBitmap(TMPQArchive * ha, TMPQBitmap * pMpqBitmap, bool bFileIsComplete)
+{
+    TFileBitmap * pBitmap;
+    size_t nLength;
+
+    // Calculate the length of the bitmap in blocks and in bytes
+    nLength = (size_t)(((ha->pHeader->ArchiveSize64 - 1) / pMpqBitmap->dwBlockSize) + 1);
+    nLength = (size_t)(((nLength - 1) / 8) + 1);
+
+    // Allocate the file bitmap
+    pBitmap = (TFileBitmap *)STORM_ALLOC(BYTE, sizeof(TFileBitmap) + nLength);
+    if(pBitmap != NULL)
+    {
+        // Fill the structure
+        pBitmap->StartOffset = ha->MpqPos;
+        pBitmap->EndOffset = ha->MpqPos + ha->pHeader->ArchiveSize64;
+        pBitmap->IsComplete = bFileIsComplete ? 1 : 0;
+        pBitmap->BitmapSize = (DWORD)nLength;
+        pBitmap->BlockSize = pMpqBitmap->dwBlockSize;
+        pBitmap->Reserved = 0;
+
+        // Copy the file bitmap
+        memcpy((pBitmap + 1), (pMpqBitmap + 1), nLength);
+    }
+
+    return pBitmap;
 }
 
 // This function gets the right positions of the hash table and the block table.
@@ -92,19 +119,6 @@ static int VerifyMpqTablePositions(TMPQArchive * ha, ULONGLONG FileSize)
 // SFileGetLocale and SFileSetLocale
 // Set the locale for all newly opened files
 
-DWORD WINAPI SFileGetGlobalFlags()
-{
-    return dwGlobalFlags;
-}
-
-DWORD WINAPI SFileSetGlobalFlags(DWORD dwNewFlags)
-{
-    DWORD dwOldFlags = dwGlobalFlags;
-
-    dwGlobalFlags = dwNewFlags;
-    return dwOldFlags;
-}
-
 LCID WINAPI SFileGetLocale()
 {
     return lcFileLocale;
@@ -124,18 +138,17 @@ LCID WINAPI SFileSetLocale(LCID lcNewLocale)
 //   dwFlags    - See MPQ_OPEN_XXX in StormLib.h
 //   phMpq      - Pointer to store open archive handle
 
-//extern "C" void wow_SFileVerifyMpqHeaderMD5(TMPQHeader * ha);
-
 bool WINAPI SFileOpenArchive(
-    const char * szMpqName,
-    DWORD dwPriority,
-    DWORD dwFlags,
-    HANDLE * phMpq)
+        const TCHAR * szMpqName,
+        DWORD dwPriority,
+        DWORD dwFlags,
+        HANDLE * phMpq)
 {
     TFileStream * pStream = NULL;       // Open file stream
     TMPQArchive * ha = NULL;            // Archive handle
+    TFileEntry * pFileEntry;
     ULONGLONG FileSize = 0;             // Size of the file
-    int nError = ERROR_SUCCESS;   
+    int nError = ERROR_SUCCESS;
 
     // Verify the parameters
     if(szMpqName == NULL || *szMpqName == 0 || phMpq == NULL)
@@ -148,25 +161,17 @@ bool WINAPI SFileOpenArchive(
     // Open the MPQ archive file
     if(nError == ERROR_SUCCESS)
     {
-        if(!(dwFlags & MPQ_OPEN_ENCRYPTED))
-        {
-            pStream = FileStream_OpenFile(szMpqName, (dwFlags & MPQ_OPEN_READ_ONLY) ? false : true);
-            if(pStream == NULL)
-                nError = GetLastError();
-        }
-        else
-        {
-            pStream = FileStream_OpenEncrypted(szMpqName);
-            if(pStream == NULL)
-                nError = GetLastError();
-        }
+        // Initialize the stream
+        pStream = FileStream_OpenFile(szMpqName, (dwFlags & STREAM_OPTIONS_MASK));
+        if(pStream == NULL)
+            nError = GetLastError();
     }
-    
+
     // Allocate the MPQhandle
     if(nError == ERROR_SUCCESS)
     {
-        FileStream_GetSize(pStream, FileSize);
-        if((ha = ALLOCMEM(TMPQArchive, 1)) == NULL)
+        FileStream_GetSize(pStream, &FileSize);
+        if((ha = STORM_ALLOC(TMPQArchive, 1)) == NULL)
             nError = ERROR_NOT_ENOUGH_MEMORY;
     }
 
@@ -178,7 +183,7 @@ bool WINAPI SFileOpenArchive(
         pStream = NULL;
 
         // Remember if the archive is open for write
-        if(ha->pStream->StreamFlags & (STREAM_FLAG_READ_ONLY | STREAM_FLAG_ENCRYPTED_FILE))
+        if(FileStream_IsReadOnly(ha->pStream))
             ha->dwFlags |= MPQ_FLAG_READ_ONLY;
 
         // Also remember if we shall check sector CRCs when reading file
@@ -244,7 +249,7 @@ bool WINAPI SFileOpenArchive(
 
                 // Now convert the header to version 4
                 BSWAP_TMPQHEADER(ha->pHeader);
-                ConvertMpqHeaderToFormat4(ha, FileSize, dwFlags);
+                nError = ConvertMpqHeaderToFormat4(ha, FileSize, dwFlags);
                 break;
             }
 
@@ -261,7 +266,7 @@ bool WINAPI SFileOpenArchive(
     if(nError == ERROR_SUCCESS)
     {
         // Dump the header
-//      DumpMpqHeader(ha->pHeader);
+        //      DumpMpqHeader(ha->pHeader);
 
         // W3x Map Protectors use the fact that War3's Storm.dll ignores the MPQ user data,
         // and probably ignores the MPQ format version as well. The trick is to
@@ -279,15 +284,29 @@ bool WINAPI SFileOpenArchive(
         if(dwFlags & (MPQ_OPEN_NO_LISTFILE | MPQ_OPEN_NO_ATTRIBUTES))
             ha->dwFlags |= MPQ_FLAG_READ_ONLY;
 
-        // Set the default file flags for (listfile) and (attributes)
-        ha->dwFileFlags1 =
-        ha->dwFileFlags2 = MPQ_FILE_ENCRYPTED | MPQ_FILE_COMPRESS | MPQ_FILE_REPLACEEXISTING;
-
         // Set the size of file sector
         ha->dwSectorSize = (0x200 << ha->pHeader->wSectorSize);
 
         // Verify if any of the tables doesn't start beyond the end of the file
         nError = VerifyMpqTablePositions(ha, FileSize);
+    }
+
+    // Check if the MPQ has data bitmap. If yes, we can verify if the MPQ is complete
+    if(nError == ERROR_SUCCESS && ha->pHeader->wFormatVersion >= MPQ_FORMAT_VERSION_4)
+    {
+        TFileBitmap * pBitmap;
+        bool bFileIsComplete = true;
+
+        LoadMpqDataBitmap(ha, FileSize, &bFileIsComplete);
+        if(ha->pBitmap != NULL && bFileIsComplete == false)
+        {
+            // Convert the MPQ bitmap to the file bitmap
+            pBitmap = CreateFileBitmap(ha, ha->pBitmap, bFileIsComplete);
+
+            // Set the data bitmap into the file stream for additional checks
+            FileStream_SetBitmap(ha->pStream, pBitmap);
+            ha->dwFlags |= MPQ_FLAG_READ_ONLY;
+        }
     }
 
     // Read the hash table. Ignore the result, as hash table is no longer required
@@ -308,7 +327,6 @@ bool WINAPI SFileOpenArchive(
     if(nError == ERROR_SUCCESS && (ha->dwFlags & MPQ_FLAG_PROTECTED) == 0)
     {
         TFileEntry * pFileTableEnd = ha->pFileTable + ha->pHeader->dwBlockTableSize;
-        TFileEntry * pFileEntry = ha->pFileTable;
 //      ULONGLONG ArchiveSize = 0;
         ULONGLONG RawFilePos;
 
@@ -338,8 +356,8 @@ bool WINAPI SFileOpenArchive(
                 }
 
                 // Also, we remember end of the file
-//              if(RawFilePos > ArchiveSize)
-//                  ArchiveSize = RawFilePos;
+                //              if(RawFilePos > ArchiveSize)
+                //                  ArchiveSize = RawFilePos;
             }
         }
     }
@@ -347,6 +365,11 @@ bool WINAPI SFileOpenArchive(
     // Load the internal listfile and include it to the file table
     if(nError == ERROR_SUCCESS && (dwFlags & MPQ_OPEN_NO_LISTFILE) == 0)
     {
+        // Save the flags for (listfile)
+        pFileEntry = GetFileEntryLocale(ha, LISTFILE_NAME, LANG_NEUTRAL);
+        if(pFileEntry != NULL)
+            ha->dwFileFlags1 = pFileEntry->dwFlags;
+
         // Ignore result of the operation. (listfile) is optional.
         SFileAddListFile((HANDLE)ha, NULL);
     }
@@ -354,6 +377,11 @@ bool WINAPI SFileOpenArchive(
     // Load the "(attributes)" file and merge it to the file table
     if(nError == ERROR_SUCCESS && (dwFlags & MPQ_OPEN_NO_ATTRIBUTES) == 0)
     {
+        // Save the flags for (attributes)
+        pFileEntry = GetFileEntryLocale(ha, ATTRIBUTES_NAME, LANG_NEUTRAL);
+        if(pFileEntry != NULL)
+            ha->dwFileFlags2 = pFileEntry->dwFlags;
+
         // Ignore result of the operation. (attributes) is optional.
         SAttrLoadAttributes(ha);
     }
@@ -369,6 +397,16 @@ bool WINAPI SFileOpenArchive(
 
     *phMpq = ha;
     return (nError == ERROR_SUCCESS);
+}
+
+//-----------------------------------------------------------------------------
+// SFileGetArchiveBitmap
+
+bool WINAPI SFileGetArchiveBitmap(HANDLE hMpq, TFileBitmap * pBitmap, DWORD Length, LPDWORD LengthNeeded)
+{
+    TMPQArchive * ha = (TMPQArchive *)hMpq;
+
+    return FileStream_GetBitmap(ha->pStream, pBitmap, Length, LengthNeeded);
 }
 
 //-----------------------------------------------------------------------------
@@ -393,21 +431,25 @@ bool WINAPI SFileFlushArchive(HANDLE hMpq)
         return false;
     }
 
-    // If the archive has been changed, update the changes on the disk drive.
-    // Save listfile (if created), attributes (if created) and also save MPQ tables.
-    if(ha->dwFlags & MPQ_FLAG_CHANGED)
+    // If the (listfile) has been invalidated, save it
+    if(ha->dwFlags & MPQ_FLAG_INV_LISTFILE)
     {
-        // Save the (listfile)
         nError = SListFileSaveToMpq(ha);
         if(nError != ERROR_SUCCESS)
             nResultError = nError;
+    }
 
-        // Save the (attributes)
+    // If the (attributes) has been invalidated, save it
+    if(ha->dwFlags & MPQ_FLAG_INV_ATTRIBUTES)
+    {
         nError = SAttrFileSaveToMpq(ha);
         if(nError != ERROR_SUCCESS)
             nResultError = nError;
+    }
 
-        // Save HET table, BET table, hash table, block table, hi-block table
+    // Save HET table, BET table, hash table, block table, hi-block table
+    if(ha->dwFlags & MPQ_FLAG_CHANGED)
+    {
         nError = SaveMPQTables(ha);
         if(nError != ERROR_SUCCESS)
             nResultError = nError;

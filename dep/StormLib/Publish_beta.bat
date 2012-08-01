@@ -10,13 +10,12 @@ zip.exe -ur9 ..\WWW\web\download\stormlib_beta.zip StormLib\storm_dll\*
 zip.exe -ur9 ..\WWW\web\download\stormlib_beta.zip StormLib\StormLib.xcodeproj\*
 zip.exe -ur9 ..\WWW\web\download\stormlib_beta.zip StormLib\stormlib_dll\*
 zip.exe -ur9 ..\WWW\web\download\stormlib_beta.zip StormLib\test\*
-zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\makefile*
+zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\CMakeLists.txt
+zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\makefile.*
+zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\Info.plist
 zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.bat
 zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.sln
 zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.vcproj
-zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.plist
-zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.txt
-zip.exe -u9  ..\WWW\web\download\stormlib_beta.zip StormLib\*.kdev4
 echo.
 
 echo Press any key to exit ...

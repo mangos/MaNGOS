@@ -19,7 +19,7 @@ bool DBCFile::open()
     char header[4];
     unsigned int na,nb,es,ss;
 
-    if (!SFileReadFile(fileHandle, header, 4))              // Magic header
+    if (!SFileReadFile(fileHandle, header, 4, NULL, NULL))              // Magic header
     {
         SFileCloseFile(fileHandle);
         return false;
@@ -31,25 +31,25 @@ bool DBCFile::open()
         return false;
     }
 
-    if (!SFileReadFile(fileHandle, &na, 4))                 // Number of records
+    if (!SFileReadFile(fileHandle, &na, 4, NULL, NULL))                 // Number of records
     {
         SFileCloseFile(fileHandle);
         return false;
     }
 
-    if (!SFileReadFile(fileHandle, &nb, 4))                 // Number of fields
+    if (!SFileReadFile(fileHandle, &nb, 4, NULL, NULL))                 // Number of fields
     {
         SFileCloseFile(fileHandle);
         return false;
     }
 
-    if (!SFileReadFile(fileHandle, &es, 4))                 // Size of a record
+    if (!SFileReadFile(fileHandle, &es, 4, NULL, NULL))                 // Size of a record
     {
         SFileCloseFile(fileHandle);
         return false;
     }
 
-    if (!SFileReadFile(fileHandle, &ss, 4))                 // String size
+    if (!SFileReadFile(fileHandle, &ss, 4, NULL, NULL))                 // String size
     {
         SFileCloseFile(fileHandle);
         return false;
@@ -70,7 +70,7 @@ bool DBCFile::open()
 
     size_t data_size = recordSize*recordCount+stringSize;
 
-    if (!SFileReadFile(fileHandle, data, data_size))
+    if (!SFileReadFile(fileHandle, data, data_size, NULL, NULL))
     {
         SFileCloseFile(fileHandle);
         return false;

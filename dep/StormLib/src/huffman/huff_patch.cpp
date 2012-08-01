@@ -20,15 +20,11 @@
 
 #include "huff.h"
 
-// Special for Mac - we have to know if normal pointer greater or less
-// than 0x80000000. This variable is used in the PTR_VALID and PTR_INVALID
-// macros
-static long mul = 1;
+THTreeItem * gcpFirst, * gpFirst, * gcpItem3054, * gpItem3054;
 
-#define PTR_VALID(ptr)           (((LONG_PTR)(ptr) * mul) > 0)
-#define PTR_INVALID(ptr)         (((LONG_PTR)(ptr) * mul) < 0)
-#define PTR_INVALID_OR_NULL(ptr) (((LONG_PTR)(ptr) * mul) <= 0)
-
+#define PTR_VALID(ptr)           ((ptr) != gcpFirst && (ptr) != gcpItem3054)
+#define PTR_INVALID(ptr)         (!PTR_VALID(ptr))
+#define PTR_INVALID_OR_NULL(ptr) (0 == (ptr) || PTR_INVALID(ptr))
 
 //-----------------------------------------------------------------------------
 // Methods of the THTreeItem struct
@@ -42,19 +38,14 @@ THTreeItem * THTreeItem::Call1501DB70(THTreeItem * pLast)
 }
 
 // Gets previous Huffman tree item (?)
-THTreeItem * THTreeItem::GetPrevItem(LONG_PTR value)
+THTreeItem * THTreeItem::GetPrevItem(SIntPtr value)
 {
     if(PTR_INVALID(prev))
         return PTR_NOT(prev);
 
-    if(value == -1 || PTR_INVALID(value))
-        value = (LONG_PTR)(this - next->prev);
+    if(value == -1 || PTR_INVALID((THTreeItem *) value))
+        value = (SIntPtr)(this - next->prev);
     return prev + value;
-
-// OLD VERSION
-//  if(PTR_INT(value) < 0)
-//      value = PTR_INT((item - item->next->prev));
-//  return (THTreeItem *)((char *)prev + value);
 }
 
 // 1500F5E0
@@ -72,7 +63,7 @@ void THTreeItem::RemoveItem()
     {
         pTemp = prev;
 
-        if(PTR_INVALID_OR_NULL(pTemp))
+        if(PTR_INVALID(pTemp))
             pTemp = PTR_NOT(pTemp);
         else
             pTemp += (this - next->prev);
@@ -82,32 +73,6 @@ void THTreeItem::RemoveItem()
         next = prev = NULL;
     }
 }
-
-/*
-// OLD VERSION : Removes item from the tree (?)
-static void RemoveItem(THTreeItem * item)
-{
-    THTreeItem * next = item->next;     // ESI
-    THTreeItem * prev = item->prev;     // EDX
-
-    if(next == NULL)
-        return;
-
-    if(PTR_INT(prev) < 0)
-        prev = PTR_NOT(prev);
-    else
-        // ??? usually item == next->prev, so what is it ?
-        prev = (THTreeItem *)((unsigned char *)prev + (unsigned long)((unsigned char *)item - (unsigned char *)(next->prev)));
-
-    // Remove HTree item from the chain
-    prev->next = next;                  // Sets the 'first' pointer
-    next->prev = item->prev;
-
-    // Invalidate pointers
-    item->next = NULL;
-    item->prev = NULL;
-}
-*/
 
 //-----------------------------------------------------------------------------
 // TOutputStream functions
@@ -217,12 +182,12 @@ void TInputStream::SkipBits(unsigned int dwBitsToSkip)
 // Functions for huffmann tree items
 
 // Inserts item into the tree (?)
-static void InsertItem(THTreeItem ** itemPtr, THTreeItem * item, unsigned long nWhere, THTreeItem * item2)
+static void InsertItem(THTreeItem ** itemPtr, THTreeItem * item, unsigned long where, THTreeItem * item2)
 {
     THTreeItem * next = item->next;     // EDI - next to the first item
     THTreeItem * prev = item->prev;     // ESI - prev to the first item
     THTreeItem * prev2;                 // Pointer to previous item
-    LONG_PTR next2;                     // Pointer to the next item
+    THTreeItem * next2;                     // Pointer to the next item
 
     // The same code like in RemoveItem(item);
     if(next != 0)                       // If the first item already has next one
@@ -245,7 +210,7 @@ static void InsertItem(THTreeItem ** itemPtr, THTreeItem * item, unsigned long n
     if(item2 == NULL)                   // EDX - If the second item is not entered,
         item2 = PTR_PTR(&itemPtr[1]);   // take the first tree item
 
-    switch(nWhere)
+    switch(where)
     {
         case SWITCH_ITEMS :             // Switch the two items
             item->next  = item2->next;  // item2->next (Pointer to pointer to first)
@@ -258,29 +223,22 @@ static void InsertItem(THTreeItem ** itemPtr, THTreeItem * item, unsigned long n
             item->next = item2;         // Set next item (or pointer to pointer to first item)
             item->prev = item2->prev;   // Set prev item (or last item in the tree)
 
-            next2 = PTR_INT(itemPtr[0]);// Usually NULL
+            next2 = itemPtr[0];// Usually NULL
             prev2 = item2->prev;        // Prev item to the second (or last tree item)
 
             if(PTR_INVALID(prev2))
             {
-                if(prev != NULL)
-                {
-                    prev2 = PTR_NOT(prev);
-                    if(prev2 != NULL)
-                    {
-                        prev2->next = item;
-                        item2->prev = item;     // Next after last item
-                    }
-                }
+                prev2 = PTR_NOT(prev);
+
+                prev2->next = item;
+                item2->prev = item;     // Next after last item
                 return;
             }
 
             if(PTR_INVALID(next2))
-                next2 = (LONG_PTR)(item2 - item2->next->prev);
-//              next2 = (THTreeItem *)(unsigned long)((unsigned char *)item2 - (unsigned char *)(item2->next->prev));
+                next2 = (THTreeItem *)(item2 - item2->next->prev);
 
-//          prev2 = (THTreeItem *)((char *)prev2 + (unsigned long)next2);// ???
-            prev2 += next2;
+            prev2 += (long) next2;
             prev2->next = item;
             item2->prev = item;         // Set the next/last item
             return;
@@ -295,9 +253,6 @@ static void InsertItem(THTreeItem ** itemPtr, THTreeItem * item, unsigned long n
 
 THuffmannTree::THuffmannTree()
 {
-    // We have to check if the "this" pointer is less than zero
-    if((LONG_PTR)this < 0)
-        mul = -1;
 }
 
 void THuffmannTree::InitTree(bool bCompression)
@@ -309,13 +264,17 @@ void THuffmannTree::InitTree(bool bCompression)
     for(pItem = items0008, nCount = 0x203; nCount != 0; pItem++, nCount--)
         pItem->ClearItemLinks();
 
+    gcpItem3054 = (THTreeItem *) &gcpItem3054;
     pItem3050 = NULL;
     pItem3054 = PTR_PTR(&pItem3054);
-    pItem3058 = PTR_NOT(pItem3054);
+    pItem3058 = gcpItem3054;
+    gpItem3054 = pItem3054;
 
+    gcpFirst = (THTreeItem *) &gcpFirst;
     pItem305C = NULL;
     pFirst    = PTR_PTR(&pFirst);
-    pLast     = PTR_NOT(pFirst);
+    pLast     = gcpFirst;
+    gpFirst = pFirst;
 
     offs0004  = 1;
     nItems    = 0;
@@ -348,7 +307,7 @@ void THuffmannTree::BuildTree(unsigned int nCmpType)
         pItem3058   = PTR_PTR(&pItem3054);  // [EDI+4]
         pLast->prev = pItem3058;            // EAX
 
-        temp = PTR_PTR(&pItem3054)->GetPrevItem(PTR_INT(&pItem3050));
+        temp = PTR_PTR(&pItem3054)->GetPrevItem((SIntPtr)(&pItem3050));
 
         temp->next = pLast;
         pItem3054  = pLast;
@@ -519,145 +478,6 @@ void THuffmannTree::BuildTree(unsigned int nCmpType)
     // 15006C88
     offs0004 = 1;
 }
-/*
-// Modifies Huffman tree. Adds new item and changes
-void THuffmannTree::ModifyTree(unsigned long dwIndex)
-{
-    THTreeItem * pItem1 = pItem3058;                              // ESI
-    THTreeItem * pSaveLast = (PTR_INT(pLast) <= 0) ? NULL : pLast;  // EBX
-    THTreeItem * temp;                                              // EAX
-
-    // Prepare the first item to insert to the tree
-    if(PTR_INT(pItem1) <= 0)
-        pItem1 = &items0008[nItems++];
-
-    // If item has any next item, remove it from the chain
-    if(pItem1->next != NULL)
-    {
-        THTreeItem * temp = pItem1->GetPrevItem(-1);                  // EAX
-
-        temp->next = pItem1->next;
-        pItem1->next->prev = pItem1->prev;
-        pItem1->next = NULL;
-        pItem1->prev = NULL;
-    }
-
-    pItem1->next = PTR_PTR(&pFirst);
-    pItem1->prev = pLast;
-    temp = pItem1->next->GetPrevItem(PTR_INT(pItem305C));
-
-    // 150068E9
-    temp->next = pItem1;
-    pLast  = pItem1;
-
-    pItem1->parent = NULL;
-    pItem1->child  = NULL;
-
-    // 150068F6
-    pItem1->dcmpByte  = pSaveLast->dcmpByte;   // Copy item index
-    pItem1->byteValue = pSaveLast->byteValue;  // Copy item byte value
-    pItem1->parent    = pSaveLast;             // Set parent to last item
-    items306C[pSaveLast->dcmpByte] = pItem1;  // Insert item into item pointer array
-
-    // Prepare the second item to insert into the tree
-    if(PTR_INT((pItem1 = pItem3058)) <= 0)
-        pItem1 = &items0008[nItems++];
-
-    // 1500692E
-    if(pItem1->next != NULL)
-    {
-        temp = pItem1->GetPrevItem(-1);   // EAX
-
-        temp->next = pItem1->next;
-        pItem1->next->prev = pItem1->prev;
-        pItem1->next = NULL;
-        pItem1->prev = NULL;
-    }
-    // 1500694C
-    pItem1->next = PTR_PTR(&pFirst);
-    pItem1->prev = pLast;
-    temp = pItem1->next->GetPrevItem(PTR_INT(pItem305C));
-
-    // 15006968
-    temp->next = pItem1;
-    pLast      = pItem1;
-
-    // 1500696E
-    pItem1->child     = NULL;
-    pItem1->dcmpByte  = dwIndex;
-    pItem1->byteValue = 0;
-    pItem1->parent    = pSaveLast;
-    pSaveLast->child   = pItem1;
-    items306C[dwIndex] = pItem1;
-
-    do
-    {
-        THTreeItem  * pItem2 = pItem1;
-        THTreeItem  * pItem3;
-        unsigned long byteValue;
-
-        // 15006993
-        byteValue = ++pItem1->byteValue;
-
-        // Pass through all previous which have its value greater than byteValue
-        while(PTR_INT((pItem3 = pItem2->prev)) > 0)  // EBX
-        {
-            if(pItem3->byteValue >= byteValue)
-                goto _150069AE;
-
-            pItem2 = pItem2->prev;
-        }
-        // 150069AC
-        pItem3 = NULL;
-
-        _150069AE:
-        if(pItem2 == pItem1)
-            continue;
-
-        // 150069B2
-        // Switch pItem2 with item
-        InsertItem(&pItem305C, pItem2, SWITCH_ITEMS, pItem1);
-        InsertItem(&pItem305C, pItem1, SWITCH_ITEMS, pItem3);
-
-        // 150069D0
-        // Switch parents of pItem1 and pItem2
-        temp = pItem2->parent->child;
-        if(pItem1 == pItem1->parent->child)
-            pItem1->parent->child = pItem2;
-
-        if(pItem2 == temp)
-            pItem2->parent->child = pItem1;
-
-        // 150069ED
-        // Switch parents of pItem1 and pItem3
-        temp = pItem1->parent;
-        pItem1 ->parent = pItem2->parent;
-        pItem2->parent = temp;
-        offs0004++;
-    }
-    while(PTR_INT((pItem1 = pItem1->parent)) > 0);
-}
-
-void THuffmannTree::UninitTree()
-{
-    while(PTR_INT(pLast) > 0)
-    {
-        pItem = pItem305C->Call1501DB70(pLast);
-        pItem->RemoveItem();
-    }
-
-    for(pItem = pFirst; PTR_INT(pItem3058) > 0; pItem = pItem3058)
-        pItem->RemoveItem();
-    PTR_PTR(&pItem3054)->RemoveItem();
-
-    for(pItem = items0008 + 0x203, nCount = 0x203; nCount != 0; nCount--)
-    {
-        pItem--;
-        pItem->RemoveItem();
-        pItem->RemoveItem();
-    }
-}
-*/
 
 THTreeItem * THuffmannTree::Call1500E740(unsigned int nValue)
 {
@@ -681,7 +501,7 @@ THTreeItem * THuffmannTree::Call1500E740(unsigned int nValue)
     if(pNext != NULL)
     {
         pPrev = pItem1->prev;
-        if(PTR_INVALID_OR_NULL(pPrev))
+        if(PTR_INVALID(pPrev))
             pPrev = PTR_NOT(pPrev);
         else
             pPrev += (pItem1 - pItem1->next->prev);
@@ -711,7 +531,7 @@ THTreeItem * THuffmannTree::Call1500E740(unsigned int nValue)
         pItem1->prev = ppItem[1];
         // edi = pItem305C;
         pPrev = ppItem[1];      // ecx
-        if(PTR_INVALID_OR_NULL(pPrev))
+        if(PTR_INVALID(pPrev))
         {
             pPrev = PTR_NOT(pPrev);
             pPrev->next = pItem1;
@@ -725,7 +545,7 @@ THTreeItem * THuffmannTree::Call1500E740(unsigned int nValue)
             if(PTR_INVALID(pItem305C))
                 pPrev += (THTreeItem *)ppItem - (*ppItem)->prev;
             else
-                pPrev += PTR_INT(pItem305C);
+                pPrev += (long)pItem305C;
 
             pPrev->next    = pItem1;
             ppItem[1]      = pItem2;
@@ -1014,8 +834,8 @@ unsigned int THuffmannTree::DoDecompression(unsigned char * pbOutBuffer, unsigne
     for(;;)
     {
         // Security check: If we are at the end of the input buffer,
-        // it means that the data is corrupt
-        if(is->BitCount == 0 && is->pbInBuffer >= is->pbInBufferEnd)
+        // it means that the data are corrupt.
+        if(is->pbInBuffer > is->pbInBufferEnd)
             return 0;
 
         // Get 7 bits from input stream
@@ -1051,9 +871,6 @@ _1500E549:
 
             do
             {
-                if(pItem1 == NULL)
-                    return 0;
-
                 pItem1 = pItem1->child;     // Move down by one level
                 if(is->GetBit())            // If current bit is set, move to previous
                     pItem1 = pItem1->prev;

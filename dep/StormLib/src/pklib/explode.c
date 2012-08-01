@@ -16,7 +16,7 @@
 
 #include "pklib.h"
 
-#define PKDCL_OK                    0       
+#define PKDCL_OK                    0
 #define PKDCL_STREAM_END            1   // All data from the input stream is read
 #define PKDCL_NEED_DICT             2   // Need more data (dictionary)
 #define PKDCL_CONTINUE             10   // Internal flag, not returned to user
@@ -31,7 +31,7 @@ char CopyrightPkware[] = "PKWARE Data Compression Library for Win32\r\n"
 //-----------------------------------------------------------------------------
 // Tables
 
-static unsigned char DistBits[] = 
+static unsigned char DistBits[] =
 {
     0x02, 0x04, 0x04, 0x05, 0x05, 0x05, 0x05, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06,
     0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07,
@@ -39,7 +39,7 @@ static unsigned char DistBits[] =
     0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x08
 };
 
-static unsigned char DistCode[] = 
+static unsigned char DistCode[] =
 {
     0x03, 0x0D, 0x05, 0x19, 0x09, 0x11, 0x01, 0x3E, 0x1E, 0x2E, 0x0E, 0x36, 0x16, 0x26, 0x06, 0x3A,
     0x1A, 0x2A, 0x0A, 0x32, 0x12, 0x22, 0x42, 0x02, 0x7C, 0x3C, 0x5C, 0x1C, 0x6C, 0x2C, 0x4C, 0x0C,
@@ -88,7 +88,7 @@ static unsigned char ChBitsAsc[] =
     0x0D, 0x0D, 0x0C, 0x0C, 0x0C, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D, 0x0D
 };
 
-static unsigned short ChCodeAsc[] = 
+static unsigned short ChCodeAsc[] =
 {
     0x0490, 0x0FE0, 0x07E0, 0x0BE0, 0x03E0, 0x0DE0, 0x05E0, 0x09E0,
     0x01E0, 0x00B8, 0x0062, 0x0EE0, 0x06E0, 0x0022, 0x0AE0, 0x02E0,
@@ -121,7 +121,7 @@ static unsigned short ChCodeAsc[] =
     0x0300, 0x0D40, 0x1D00, 0x0D00, 0x1500, 0x0540, 0x0500, 0x1900,
     0x0900, 0x0940, 0x1100, 0x0100, 0x1E00, 0x0E00, 0x0140, 0x1600,
     0x0600, 0x1A00, 0x0E40, 0x0640, 0x0A40, 0x0A00, 0x1200, 0x0200,
-    0x1C00, 0x0C00, 0x1400, 0x0400, 0x1800, 0x0800, 0x1000, 0x0000  
+    0x1C00, 0x0C00, 0x1400, 0x0400, 0x1800, 0x0800, 0x1000, 0x0000
 };
 
 //-----------------------------------------------------------------------------
@@ -278,11 +278,11 @@ static unsigned long DecodeLit(TDcmpStruct * pWork)
     {
         // Remove one bit from the input data
         if(WasteBits(pWork, 1))
-            return 0x306;   
-                      
+            return 0x306;
+
         // The next 8 bits hold the index to the length code table
         length_code = pWork->LengthCodes[pWork->bit_buff & 0xFF];
-        
+
         // Remove the apropriate number of bits
         if(WasteBits(pWork, pWork->LenBits[length_code]))
             return 0x306;
@@ -442,7 +442,7 @@ static unsigned long Expand(TDcmpStruct * pWork)
         {
             pWork->out_buff[pWork->outputPos++] = (unsigned char)next_literal;
         }
-    
+
         // Flush the output buffer, if number of extracted bytes has reached the end
         if(pWork->outputPos >= 0x2000)
         {
@@ -495,7 +495,7 @@ unsigned int explode(
     pWork->in_pos     = 3;                 // Position in input buffer
 
     // Test for the valid dictionary size
-    if(4 > pWork->dsize_bits || pWork->dsize_bits > 6) 
+    if(4 > pWork->dsize_bits || pWork->dsize_bits > 6)
         return CMP_INVALID_DICTSIZE;
 
     pWork->dsize_mask = 0xFFFF >> (0x10 - pWork->dsize_bits); // Shifted by 'sar' instruction
@@ -517,6 +517,6 @@ unsigned int explode(
     GenDecodeTabs(pWork->DistPosCodes, DistCode, pWork->DistBits, sizeof(pWork->DistBits));
     if(Expand(pWork) != 0x306)
         return CMP_NO_ERROR;
-        
+
     return CMP_ABORT;
 }

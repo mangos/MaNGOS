@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -23,7 +23,6 @@
 		221F6ABB116854730026C852 /* LzHash.h in Headers */ = {isa = PBXBuildFile; fileRef = 221F6AB9116854730026C852 /* LzHash.h */; };
 		221F6ABD116854870026C852 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 221F6ABC116854870026C852 /* Types.h */; };
 		221F6ABE116854870026C852 /* Types.h in Headers */ = {isa = PBXBuildFile; fileRef = 221F6ABC116854870026C852 /* Types.h */; };
-		22549055119489060044424D /* libgcc_s.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22549054119489060044424D /* libgcc_s.1.dylib */; };
 		2254917B11948CE70044424D /* crypt_ltc_mp_descriptor.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9184811933FCF0083AC69 /* crypt_ltc_mp_descriptor.c */; settings = {COMPILER_FLAGS = "-fno-common"; }; };
 		225530DB1056BC7900FA646A /* huff.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED009D0D03542A00AB0B4E /* huff.h */; };
 		225530DE1056BC7900FA646A /* pklib.h in Headers */ = {isa = PBXBuildFile; fileRef = 32ED00A80D03542A00AB0B4E /* pklib.h */; };
@@ -77,7 +76,6 @@
 		22954AD311D463B50064B264 /* libStormLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 225530D41056BAC800FA646A /* libStormLib.a */; };
 		22954AD611D463BE0064B264 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8A0CF3902D00230E7A /* libbz2.dylib */; };
 		22954AD711D463BE0064B264 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 32D20A8B0CF3902D00230E7A /* libz.dylib */; };
-		22954AD811D463BE0064B264 /* libgcc_s.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22549054119489060044424D /* libgcc_s.1.dylib */; };
 		2299D9D71167EFA8005C19BF /* adpcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2299D9D51167EFA8005C19BF /* adpcm.cpp */; };
 		2299D9D81167EFA8005C19BF /* adpcm.h in Headers */ = {isa = PBXBuildFile; fileRef = 2299D9D61167EFA8005C19BF /* adpcm.h */; };
 		2299D9D91167EFA8005C19BF /* adpcm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2299D9D51167EFA8005C19BF /* adpcm.cpp */; };
@@ -90,8 +88,6 @@
 		2299DA4F1167FD16005C19BF /* SFileAddFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2299DA4D1167FD16005C19BF /* SFileAddFile.cpp */; };
 		22AEA122123125D800359B16 /* SFilePatchArchives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22AEA121123125D800359B16 /* SFilePatchArchives.cpp */; };
 		22AEA123123125D800359B16 /* SFilePatchArchives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22AEA121123125D800359B16 /* SFilePatchArchives.cpp */; };
-		22B2515E12F234FF0059A0E8 /* SBaseDumpData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22B2515D12F234FF0059A0E8 /* SBaseDumpData.cpp */; };
-		22B2515F12F234FF0059A0E8 /* SBaseDumpData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22B2515D12F234FF0059A0E8 /* SBaseDumpData.cpp */; };
 		22C9187D11933FCF0083AC69 /* hash_memory.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9182B11933FCF0083AC69 /* hash_memory.c */; };
 		22C9187E11933FCF0083AC69 /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9182C11933FCF0083AC69 /* md5.c */; };
 		22C9187F11933FCF0083AC69 /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C9182D11933FCF0083AC69 /* sha1.c */; };
@@ -481,6 +477,8 @@
 		22C91A791193400A0083AC69 /* tommath_class.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C919871193400A0083AC69 /* tommath_class.h */; };
 		22C91A7A1193400A0083AC69 /* tommath_superclass.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C919881193400A0083AC69 /* tommath_superclass.h */; };
 		22C91A7B1193400A0083AC69 /* tommath.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C919891193400A0083AC69 /* tommath.h */; };
+		22EC6044154B28A000679228 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 22EC6043154B28A000679228 /* FileStream.h */; };
+		22EC6045154B28A000679228 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 22EC6043154B28A000679228 /* FileStream.h */; };
 		22F5A9C51193DFBA00F8B121 /* SFileVerify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22F5A9C41193DFBA00F8B121 /* SFileVerify.cpp */; };
 		22F5A9C61193DFBA00F8B121 /* SFileVerify.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22F5A9C41193DFBA00F8B121 /* SFileVerify.cpp */; };
 /* End PBXBuildFile section */
@@ -505,7 +503,6 @@
 		221F6AB9116854730026C852 /* LzHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LzHash.h; path = C/LzHash.h; sourceTree = "<group>"; };
 		221F6ABC116854870026C852 /* Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Types.h; path = C/Types.h; sourceTree = "<group>"; };
 		2253A19F10568A83001909F9 /* StormLib.exp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.exports; name = StormLib.exp; path = stormlib_dll/StormLib.exp; sourceTree = "<group>"; };
-		22549054119489060044424D /* libgcc_s.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libgcc_s.1.dylib; path = /usr/lib/libgcc_s.1.dylib; sourceTree = "<absolute>"; };
 		225530D41056BAC800FA646A /* libStormLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libStormLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		225C734B1257CCC70009E8DA /* lookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lookup.h; sourceTree = "<group>"; };
 		225C734C1257CCC70009E8DA /* lookup3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lookup3.c; sourceTree = "<group>"; };
@@ -716,6 +713,7 @@
 		22C919871193400A0083AC69 /* tommath_class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tommath_class.h; sourceTree = "<group>"; };
 		22C919881193400A0083AC69 /* tommath_superclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tommath_superclass.h; sourceTree = "<group>"; };
 		22C919891193400A0083AC69 /* tommath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tommath.h; sourceTree = "<group>"; };
+		22EC6043154B28A000679228 /* FileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileStream.h; path = src/FileStream.h; sourceTree = "<group>"; };
 		22F5A9C41193DFBA00F8B121 /* SFileVerify.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SFileVerify.cpp; path = src/SFileVerify.cpp; sourceTree = "<group>"; };
 		32D20A8A0CF3902D00230E7A /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = /usr/lib/libbz2.dylib; sourceTree = "<absolute>"; };
 		32D20A8B0CF3902D00230E7A /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = /usr/lib/libz.dylib; sourceTree = "<absolute>"; };
@@ -754,7 +752,6 @@
 			files = (
 				225FADD40E53C06600DA2CAE /* libbz2.dylib in Frameworks */,
 				225FADD50E53C06600DA2CAE /* libz.dylib in Frameworks */,
-				22549055119489060044424D /* libgcc_s.1.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -764,7 +761,6 @@
 			files = (
 				22954AD611D463BE0064B264 /* libbz2.dylib in Frameworks */,
 				22954AD711D463BE0064B264 /* libz.dylib in Frameworks */,
-				22954AD811D463BE0064B264 /* libgcc_s.1.dylib in Frameworks */,
 				22954AD311D463B50064B264 /* libStormLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -800,7 +796,6 @@
 			children = (
 				32D20A8A0CF3902D00230E7A /* libbz2.dylib */,
 				32D20A8B0CF3902D00230E7A /* libz.dylib */,
-				22549054119489060044424D /* libgcc_s.1.dylib */,
 			);
 			name = "External Frameworks and Libraries";
 			sourceTree = "<group>";
@@ -1167,6 +1162,7 @@
 				32ED00A40D03542A00AB0B4E /* pklib */,
 				2299D9DB1167EFC6005C19BF /* sparse */,
 				228B538311BF7D0D001A58DA /* FileStream.cpp */,
+				22EC6043154B28A000679228 /* FileStream.h */,
 				32ED00AA0D03542A00AB0B4E /* SBaseCommon.cpp */,
 				225C73531257CD0C0009E8DA /* SBaseFileTable.cpp */,
 				32ED00AC0D03542A00AB0B4E /* SCompression.cpp */,
@@ -1246,6 +1242,7 @@
 				22C91A011193400A0083AC69 /* tommath_superclass.h in Headers */,
 				22C91A021193400A0083AC69 /* tommath.h in Headers */,
 				225C734F1257CCC70009E8DA /* lookup.h in Headers */,
+				22EC6044154B28A000679228 /* FileStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1282,6 +1279,7 @@
 				22C91A7A1193400A0083AC69 /* tommath_superclass.h in Headers */,
 				22C91A7B1193400A0083AC69 /* tommath.h in Headers */,
 				225C734D1257CCC70009E8DA /* lookup.h in Headers */,
+				22EC6045154B28A000679228 /* FileStream.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1345,9 +1343,16 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
 			buildConfigurationList = 1DEB916408733D950010E9CD /* Build configuration list for PBXProject "StormLib" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 0867D691FE84028FC02AAC07 /* stormlib */;
 			productRefGroup = 034768DDFF38A45A11DB9C8B /* Products */;
 			projectDirPath = "";
@@ -1816,28 +1821,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ONLY_ACTIVE_ARCH_PRE_XCODE_3_1)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = (
 					_7ZIP_ST,
 					_DEBUG,
 				);
-				GCC_VERSION = 4.0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				ONLY_ACTIVE_ARCH_PRE_XCODE_3_1 = "$(NATIVE_ARCH_ACTUAL)";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				SDKROOT_i386 = macosx10.4;
-				SDKROOT_ppc = macosx10.4;
-				SDKROOT_x86_64 = macosx10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -1847,27 +1845,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = _7ZIP_ST;
-				GCC_VERSION = 4.0;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				SDKROOT_i386 = macosx10.4;
-				SDKROOT_ppc = macosx10.4;
-				SDKROOT_x86_64 = macosx10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -1876,10 +1865,8 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = StormLib;
 			};
 			name = Debug;
@@ -1888,11 +1875,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				INSTALL_PATH = /usr/local/lib;
-				PREBINDING = NO;
 				PRODUCT_NAME = StormLib;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -1904,7 +1888,10 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				PREBINDING = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/lib/clang/3.1/lib/darwin,
+				);
 				PRODUCT_NAME = StormLib;
 			};
 			name = Debug;
@@ -1916,7 +1903,10 @@
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				PREBINDING = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/lib/clang/3.1/lib/darwin,
+				);
 				PRODUCT_NAME = StormLib;
 			};
 			name = Release;
@@ -1927,11 +1917,17 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = (
+					_7ZIP_ST,
+					_DEBUG,
+					__STORMLIB_TEST__,
+				);
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/lib/clang/3.1/lib/darwin,
+				);
 				PRODUCT_NAME = StormLib_Test;
 			};
 			name = Debug;
@@ -1942,12 +1938,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/lib/clang/3.1/lib/darwin,
+				);
 				PRODUCT_NAME = StormLib_Test;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};

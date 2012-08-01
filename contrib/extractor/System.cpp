@@ -218,12 +218,12 @@ uint32 ReadBuild(int locale)
         exit(1);
     }
 
-    unsigned int data_size = SFileGetFileSize(fileHandle);
+    unsigned int data_size = SFileGetFileSize(fileHandle, NULL);
 
     std::string text;
     text.resize(data_size);
 
-    if (!SFileReadFile(fileHandle, &text[0], data_size))
+    if (!SFileReadFile(fileHandle, &text[0], data_size, NULL, NULL))
     {
         printf("Fatal error: Can't read %s file!\n", filename.c_str());
         exit(1);
