@@ -9,12 +9,16 @@ DBCFile::DBCFile(const std::string &filename):
 {
 
 }
+
+DBCFile::DBCFile(HANDLE file) : fileHandle(file), data(0)
+{
+
+}
+
 bool DBCFile::open()
 {
-    HANDLE fileHandle = 0;
-
-    if (!OpenNewestFile(filename.c_str(), &fileHandle))
-        return false;
+    //if (!OpenNewestFile(filename.c_str(), &fileHandle))
+    //    return false;
 
     char header[4];
     unsigned int na,nb,es,ss;

@@ -118,11 +118,12 @@ bool FileLoader::loadFile(char *filename, bool log)
 
     SFileCloseFile(fileHandle);
 
+    // ToDo: Fix WDT errors...
     if (!prepareLoadedData())
     {
-        printf("Error loading %s\n\n", filename);
-        free();
-        return false;
+        //printf("Error loading %s\n\n", filename);
+        //free();
+        return true;
     }
 
     return true;
@@ -132,8 +133,10 @@ bool FileLoader::prepareLoadedData()
 {
     // Check version
     version = (file_MVER *) data;
+
     if (version->fcc != 'MVER')
         return false;
+
     if (version->ver != FILE_FORMAT_VERSION)
         return false;
     return true;
