@@ -1077,7 +1077,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void Update(uint32 update_diff, uint32 time) override;
 
-        static bool BuildEnumData(QueryResult* result,  WorldPacket* p_data);
+        static bool BuildEnumData(QueryResult* result,  ByteBuffer* p_data );
 
         void SetInWater(bool apply);
 
