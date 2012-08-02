@@ -133,6 +133,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
+    if (packet->GetOpcode() >= NUM_MSG_TYPES && packet->GetOpcode() != MSG_WOW_CONNECTION)
+        return;
+
     #ifdef MANGOS_DEBUG
 
     // Code for network use statistic
