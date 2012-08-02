@@ -242,19 +242,22 @@ int WorldSocket::open(void* a)
 
     m_Address = remote_addr.get_host_addr();
 
+    WorldPacket wowConnection(MSG_WOW_CONNECTION,46);
+
+    wowConnection << std::string("RLD OF WARCRAFT CONNECTION - SERVER TO CLIENT");
+
+    SendPacket(wowConnection);
+
     // Send startup packet.
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 37);
 
-    BigNumber seed1;
-    seed1.SetRand(16 * 8);
-    packet.append(seed1.AsByteArray(16), 16);               // new encryption seeds
+    for(uint8 i = 0; i < 8; ++i)
+    {
+        packet << uint32(0);
+    }
 
-    BigNumber seed2;
-    seed2.SetRand(16 * 8);
-    packet.append(seed2.AsByteArray(16), 16);               // new encryption seeds
-
-    packet << uint8(1);                                     // 1...31
     packet << uint32(m_Seed);
+    packet << uint8(1);                                     // 1...31
 
     if (SendPacket (packet) == -1)
         return -1;
@@ -680,6 +683,8 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     {
         switch (opcode)
         {
+            case MSG_WOW_CONNECTION:
+                return HandleWowConnection(*new_pct);
             case CMSG_PING:
                 return HandlePing(*new_pct);
             case CMSG_AUTH_SESSION:
@@ -743,9 +748,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
     uint8 digest[20];
-    uint32 clientSeed, id, security;
-    uint16 ClientBuild;
-    uint8 expansion = 0;
+    uint16 ClientBuild, security;
+    uint32 clientSeed, id, expansion, addonsSize;
     LocaleConstant locale;
     std::string account;
     Sha1Hash sha1;
@@ -753,14 +757,47 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     WorldPacket packet;
 
     // Read the content of the packet
-    recvPacket.read(digest, 20);
-    recvPacket.read_skip<uint64>();
-    recvPacket.read_skip<uint32>();
-    recvPacket >> clientSeed;
-    recvPacket >> ClientBuild;
+    uint32 unkInt32[6];
+    int8 curr = 0;
+    recvPacket >> unkInt32[curr++];
+    recvPacket >> unkInt32[curr++];
     recvPacket.read_skip<uint8>();
-    recvPacket >> account;
-    recvPacket.read_skip<uint32>();                         // addon data size
+    recvPacket >> digest[10];
+    recvPacket >> digest[18];
+    recvPacket >> digest[12];
+    recvPacket >> digest[5];
+    recvPacket.read_skip<uint64>();
+    recvPacket >> digest[15];
+    recvPacket >> digest[9];
+    recvPacket >> digest[19];
+    recvPacket >> digest[4];
+    recvPacket >> digest[7];
+    recvPacket >> digest[16];
+    recvPacket >> digest[3];
+    recvPacket >> ClientBuild;
+    recvPacket >> digest[8];
+    recvPacket >> unkInt32[curr++];
+    recvPacket.read_skip<uint8>();
+    recvPacket >> digest[17];
+    recvPacket >> digest[6];
+    recvPacket >> digest[0];
+    recvPacket >> digest[1];
+    recvPacket >> digest[11];
+    recvPacket >> clientSeed;
+    recvPacket >> digest[2];
+    recvPacket >> unkInt32[curr++];
+    recvPacket >> digest[14];
+    recvPacket >> digest[13];
+    size_t _beforeAddonSize = recvPacket.rpos();
+    recvPacket >> addonsSize;
+    recvPacket.read_skip(addonsSize);
+
+    uint8 _size[2];
+    recvPacket >> _size[0];
+    recvPacket >> _size[1];
+    uint8 size = (_size[0] << 4) | _size[1] >> 3;
+    account.resize(size);
+    recvPacket.read((uint8*)account.data(), size);
 
     DEBUG_LOG("WorldSocket::HandleAuthSession: client build %u, account %s, clientseed %X",
               ClientBuild,
@@ -1011,4 +1048,12 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
     WorldPacket packet(SMSG_PONG, 4);
     packet << ping;
     return SendPacket(packet);
+}
+
+int WorldSocket::HandleWowConnection(WorldPacket& recv_packet)
+{
+    std::string msgFromClient;
+    recv_packet >> msgFromClient;
+
+    return 0;
 }
