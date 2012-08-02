@@ -668,7 +668,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
 
     const ACE_UINT16 opcode = new_pct->GetOpcode ();
 
-    if (opcode >= NUM_MSG_TYPES)
+    if (opcode >= NUM_MSG_TYPES && opcode != MSG_WOW_CONNECTION)
     {
         sLog.outError( "SESSION: received nonexistent opcode 0x%.4X", opcode);
         return -1;

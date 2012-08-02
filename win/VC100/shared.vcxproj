@@ -434,6 +434,7 @@
     <ClCompile Include="..\..\src\shared\Auth\md5.c" />
     <ClCompile Include="..\..\src\shared\Auth\SARC4.cpp" />
     <ClCompile Include="..\..\src\shared\Auth\Sha1.cpp" />
+    <ClCompile Include="..\..\src\shared\ByteBuffer.cpp" />
     <ClCompile Include="..\..\src\shared\Common.cpp" />
     <ClCompile Include="..\..\src\shared\Config\Config.cpp" />
     <ClCompile Include="..\..\src\shared\Database\Database.cpp" />

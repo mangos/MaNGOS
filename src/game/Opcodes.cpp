@@ -100,11 +100,11 @@ void InitializeOpcodes()
     //OPCODE(CMSG_AUTH_SRP6_PROOF,                         STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_AUTH_SRP6_RECODE,                        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_CHAR_CREATE,                             STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleCharCreateOpcode          );
-    //OPCODE(CMSG_CHAR_ENUM,                               STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleCharEnumOpcode            );
+    OPCODE(CMSG_CHAR_ENUM,                               STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleCharEnumOpcode            );
     //OPCODE(CMSG_CHAR_DELETE,                             STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleCharDeleteOpcode          );
     //OPCODE(SMSG_AUTH_SRP6_RESPONSE,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_CHAR_CREATE,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(SMSG_CHAR_ENUM,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(SMSG_CHAR_ENUM,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_CHAR_DELETE,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_PLAYER_LOGIN,                            STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandlePlayerLoginOpcode         );
     //OPCODE(SMSG_NEW_WORLD,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
@@ -1321,7 +1321,7 @@ void InitializeOpcodes()
     //OPCODE(SMSG_DEBUG_SERVER_GEO,                        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_LOOT_UPDATE,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(UMSG_UPDATE_GROUP_INFO,                       STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    //OPCODE(CMSG_READY_FOR_ACCOUNT_DATA_TIMES,            STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleReadyForAccountDataTimesOpcode);
+    OPCODE(CMSG_READY_FOR_ACCOUNT_DATA_TIMES,            STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleReadyForAccountDataTimesOpcode);
     //OPCODE(CMSG_QUERY_GET_ALL_QUESTS,                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleQueryQuestsCompletedOpcode);
     //OPCODE(SMSG_ALL_QUESTS_COMPLETED,                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_GMLAGREPORT_SUBMIT,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
