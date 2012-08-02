@@ -21,6 +21,14 @@
 
 #include "Battlefield.h"
 
+enum eSpells
+{
+    SPELL_ALLIANCE_CONTROLLS = 55774,
+    SPELL_ALLIANCE_CONTROLLS_FACTORIES = 56617,
+    SPELL_HORDE_CONTROLLS = 55773,
+    SPELL_HORDE_CONTROLLS_FACTORIES = 56618
+};
+
 class BattlefieldWG : public Battlefield
 {
     public:
@@ -29,6 +37,8 @@ class BattlefieldWG : public Battlefield
         void OnUpdate(uint32 uiDiff);
         void BeforeBattleStarted();
         void AfterBattleEnded();
+        void OnPlayerEnter(Player * player);
+        void OnPlayerExit(Player* player);
 };
 
 #endif

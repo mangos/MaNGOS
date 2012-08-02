@@ -79,7 +79,6 @@ void Battlefield::Update(uint32 uiDiff)
                     itr->getSource()->GetSession()->SendPacket(&send_data);
                 }
             }
-            //sBattlefieldMgr.SendInvitePlayersToWar(m_battleId);
         }
         else
             m_preBattleTimer -= uiDiff;
@@ -121,3 +120,12 @@ bool Battlefield::AddPlayerToGroup(Player * player)
     return true;
 }
 
+void Battlefield::PlayerJoin(Player* player)
+{
+    OnPlayerEnter(player);
+}
+
+void Battlefield::PlayerLeave(Player* player)
+{
+
+}

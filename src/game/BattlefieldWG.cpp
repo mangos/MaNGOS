@@ -50,10 +50,6 @@ void BattlefieldWG::BeforeBattleStarted()
     }
     sBattlefieldMgr.UpdateWorldState(0xe7e,true);
     sBattlefieldMgr.UpdateWorldState(0xec5,uint32(time(NULL) + (m_battleDurationTimer/1000)));
-    sBattlefieldMgr.UpdateWorldState(0xda2,1);
-    sBattlefieldMgr.UpdateWorldState(0xda1,10);
-    sBattlefieldMgr.UpdateWorldState(0xe60,1);
-    sBattlefieldMgr.UpdateWorldState(0xe61,10);
     sBattlefieldMgr.UpdateWorldState(0xED9, !m_battleInProgress);
 }
 
@@ -71,4 +67,32 @@ void BattlefieldWG::AfterBattleEnded()
         sBattlefieldMgr.UpdateWorldState(0xedb,true);
     }
     m_battleDurationTimer = 8 * MINUTE * IN_MILLISECONDS;
+}
+
+void BattlefieldWG::OnPlayerEnter(Player* player)
+{
+    if(player->GetTeam() == ALLIANCE)
+    {
+        player->CastSpell(player,SPELL_ALLIANCE_CONTROLLS,false);
+        player->CastSpell(player,SPELL_HORDE_CONTROLLS_FACTORIES,false);
+    }
+    else
+    {
+        player->CastSpell(player,SPELL_HORDE_CONTROLLS,false);
+        player->CastSpell(player,SPELL_ALLIANCE_CONTROLLS_FACTORIES,false);
+    }
+}
+
+void BattlefieldWG::OnPlayerExit(Player* player)
+{
+    if(player->HasAura(SPELL_ALLIANCE_CONTROLLS))
+    {
+        player->RemoveAurasDueToSpellByCancel(SPELL_ALLIANCE_CONTROLLS);
+        player->RemoveAurasDueToSpellByCancel(SPELL_HORDE_CONTROLLS_FACTORIES);
+    }
+    else if(player->HasAura(SPELL_HORDE_CONTROLLS))
+    {
+        player->RemoveAurasDueToSpellByCancel(SPELL_HORDE_CONTROLLS);
+        player->RemoveAurasDueToSpellByCancel(SPELL_ALLIANCE_CONTROLLS_FACTORIES);
+    }
 }

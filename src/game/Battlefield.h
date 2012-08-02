@@ -88,6 +88,12 @@ class Battlefield
         //Called on world tick
         virtual void OnUpdate(uint32 uiDiff) = 0;
 
+        //Called when a player enters WG
+        virtual void OnPlayerEnter(Player* player) = 0;
+
+        //Called when a player leaves WG
+        virtual void OnPlayerExit(Player* player) = 0;
+
 };
 
 #endif
