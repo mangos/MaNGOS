@@ -243,22 +243,21 @@ int WorldSocket::open (void *a)
 
     m_Address = remote_addr.get_host_addr ();
 
-    WorldPacket wowConnection(MSG_WOW_CONNECTION,46);
+    std::string ServerToClient = "RLD OF WARCRAFT CONNECTION - SERVER TO CLIENT";
+    WorldPacket data(MSG_WOW_CONNECTION,46);
 
-    wowConnection << std::string("RLD OF WARCRAFT CONNECTION - SERVER TO CLIENT");
+    data << ServerToClient;
 
-    SendPacket(wowConnection);
+    if (SendPacket(data) == -1)
+        return -1;
 
     // Send startup packet.
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 37);
-
-    for(uint8 i = 0; i < 8; ++i)
-    {
+    for (uint32 i = 0; i < 8; i++)
         packet << uint32(0);
-    }
 
-    packet << uint32(m_Seed);
-    packet << uint8(1);                                     // 1...31
+    packet << m_Seed;
+    packet << uint8(1);
 
     if (SendPacket (packet) == -1)
         return -1;
@@ -273,6 +272,13 @@ int WorldSocket::open (void *a)
     // reactor takes care of the socket from now on
     remove_reference ();
 
+    return 0;
+}
+
+int WorldSocket::HandleWowConnection(WorldPacket& recvPacket)
+{
+    std::string ClientToServerMsg;
+    recvPacket >> ClientToServerMsg;
     return 0;
 }
 
@@ -749,64 +755,50 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
     uint8 digest[20];
-    uint16 ClientBuild, security;
-    uint32 clientSeed, id, expansion, addonsSize;
+    uint16 clientBuild, security;
+    uint32 id, m_addonSize, clientSeed, expansion;
+    std::string accountName;
     LocaleConstant locale;
-    std::string account;
+
     Sha1Hash sha1;
     BigNumber v, s, g, N, K;
     WorldPacket packet;
 
-    // Read the content of the packet
-    uint32 unkInt32[6];
-    int8 curr = 0;
-    recvPacket >> unkInt32[curr++];
-    recvPacket >> unkInt32[curr++];
+    recvPacket.read_skip<uint32>();
+    recvPacket.read_skip<uint32>();
     recvPacket.read_skip<uint8>();
-    recvPacket >> digest[10];
-    recvPacket >> digest[18];
-    recvPacket >> digest[12];
-    recvPacket >> digest[5];
+    recvPacket.read(digest, 4);
     recvPacket.read_skip<uint64>();
-    recvPacket >> digest[15];
-    recvPacket >> digest[9];
-    recvPacket >> digest[19];
-    recvPacket >> digest[4];
-    recvPacket >> digest[7];
-    recvPacket >> digest[16];
-    recvPacket >> digest[3];
-    recvPacket >> ClientBuild;
-    recvPacket >> digest[8];
-    recvPacket >> unkInt32[curr++];
+    recvPacket.read(digest, 7);
+    recvPacket >> clientBuild;
+    recvPacket.read(digest, 1);
+    recvPacket.read_skip<uint32>();
     recvPacket.read_skip<uint8>();
-    recvPacket >> digest[17];
-    recvPacket >> digest[6];
-    recvPacket >> digest[0];
-    recvPacket >> digest[1];
-    recvPacket >> digest[11];
+    recvPacket.read(digest, 5);
+    recvPacket.read_skip<uint32>();
+    recvPacket.read(digest, 1);
     recvPacket >> clientSeed;
-    recvPacket >> digest[2];
-    recvPacket >> unkInt32[curr++];
-    recvPacket >> digest[14];
-    recvPacket >> digest[13];
-    size_t _beforeAddonSize = recvPacket.rpos();
-    recvPacket >> addonsSize;
-    recvPacket.read_skip(addonsSize);
+    recvPacket.read(digest, 2);
 
-    uint8 _size[2];
-    recvPacket >> _size[0];
-    recvPacket >> _size[1];
-    uint8 size = (_size[0] << 4) | _size[1] >> 3;
-    account.resize(size);
-    recvPacket.read((uint8*)account.data(), size);
+    recvPacket >> m_addonSize;                            // addon data size
 
-    DEBUG_LOG ("WorldSocket::HandleAuthSession: client build %u, account %s, clientseed %X",
-                ClientBuild,
-                account.c_str(),
+    size_t addonInfoPos = recvPacket.rpos();
+    recvPacket.rpos(recvPacket.rpos() + m_addonSize);     // skip it
+
+    recvPacket.read_skip<uint8>();
+    recvPacket.read_skip<uint8>();
+
+    recvPacket.FlushBits();
+
+    recvPacket >> accountName;
+
+    DEBUG_LOG("WorldSocket::HandleAuthSession: client build %u, account %s, clientseed %X",
+                clientBuild,
+                accountName.c_str(),
                 clientSeed);
 
     // Check the version of client trying to connect
-    if(!IsAcceptableClientBuild(ClientBuild))
+    if(!IsAcceptableClientBuild(clientBuild))
     {
         packet.Initialize (SMSG_AUTH_RESPONSE, 1);
         packet << uint8 (AUTH_VERSION_MISMATCH);
@@ -818,7 +810,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     }
 
     // Get the account information from the realmd database
-    std::string safe_account = account; // Duplicate, else will screw the SHA hash verification below
+    std::string safe_account = accountName; // Duplicate, else will screw the SHA hash verification below
     LoginDatabase.escape_string (safe_account);
     // No SQL injection, username escaped.
 
@@ -940,14 +932,14 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     uint32 t = 0;
     uint32 seed = m_Seed;
 
-    sha.UpdateData (account);
+    sha.UpdateData (accountName);
     sha.UpdateData ((uint8 *) & t, 4);
     sha.UpdateData ((uint8 *) & clientSeed, 4);
     sha.UpdateData ((uint8 *) & seed, 4);
     sha.UpdateBigNumbers (&K, NULL);
     sha.Finalize ();
 
-    if (memcmp (sha.GetDigest (), digest, 20))
+    /*if (memcmp (sha.GetDigest (), digest, 20))
     {
         packet.Initialize (SMSG_AUTH_RESPONSE, 1);
         packet << uint8 (AUTH_FAILED);
@@ -956,12 +948,12 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
 
         sLog.outError ("WorldSocket::HandleAuthSession: Sent Auth Response (authentification failed).");
         return -1;
-    }
+    }*/
 
     std::string address = GetRemoteAddress ();
 
     DEBUG_LOG ("WorldSocket::HandleAuthSession: Client '%s' authenticated successfully from %s.",
-                account.c_str (),
+                accountName.c_str (),
                 address.c_str ());
 
     // Update the last_ip in the database
@@ -969,7 +961,7 @@ int WorldSocket::HandleAuthSession (WorldPacket& recvPacket)
     static SqlStatementID updAccount;
 
     SqlStatement stmt = LoginDatabase.CreateStatement(updAccount, "UPDATE account SET last_ip = ? WHERE username = ?");
-    stmt.PExecute(address.c_str(), account.c_str());
+    stmt.PExecute(address.c_str(), accountName.c_str());
 
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN (m_Session, WorldSession (id, this, AccountTypes(security), expansion, mutetime, locale), -1);
@@ -1049,12 +1041,4 @@ int WorldSocket::HandlePing (WorldPacket& recvPacket)
     WorldPacket packet (SMSG_PONG, 4);
     packet << ping;
     return SendPacket (packet);
-}
-
-int WorldSocket::HandleWowConnection(WorldPacket& recv_packet)
-{
-    std::string msgFromClient;
-    recv_packet >> msgFromClient;
-
-    return 0;
 }

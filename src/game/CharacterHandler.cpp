@@ -164,7 +164,7 @@ void WorldSession::HandleCharEnum(QueryResult * result)
 
         do
         {
-            uint64 GuidLow = (*result)[0].GetUInt64();
+            uint32 GuidLow = (*result)[0].GetUInt32();
             uint32 atLoginFlags = (*result)[15].GetUInt32();
             uint64 GuildGuid = (*result)[13].GetUInt64();
 
@@ -180,11 +180,11 @@ void WorldSession::HandleCharEnum(QueryResult * result)
 
             sLog.outDetail("Loading char guid %u from account %u.", GuidLow, GetAccountId());
 
-            /*if (!Player::BuildEnumData(result, &buffer))
+            if (!Player::BuildEnumData(result, &buffer))
             {
                 sLog.outError("Building enum data for SMSG_CHAR_ENUM has failed, aborting");
                 return;
-            }*/
+            }
             _allowedCharsToLogin.insert(GuidLow);
         }
         while (result->NextRow());
