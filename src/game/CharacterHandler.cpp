@@ -137,29 +137,109 @@ class CharacterHandler
         }
 } chrHandler;
 
-void WorldSession::HandleCharEnum(QueryResult* result)
+struct charEnumInfo
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
+    uint8 nameLenghts;
+    bool firstLogin;
+};
 
-    uint8 num = 0;
+void WorldSession::HandleCharEnum(QueryResult * result)
+{
+    WorldPacket data(SMSG_CHAR_ENUM, 270);
 
-    data << num;
+    uint8 charCount = 0;
+    ByteBuffer buffer;
+
+    data.WriteBits(0, 23);
+    data.WriteBit(1);
+    data.WriteBits(result ? (*result).GetRowCount() : 0 , 17);
+
+    std::vector<charEnumInfo> charInfoList;
+    charInfoList.resize(result ? (*result).GetRowCount() : 0);
 
     if (result)
     {
+        typedef std::pair<uint64, uint64> Guids;
+        std::vector<Guids> guidsVect;
+        _allowedCharsToLogin.clear();
+
         do
         {
-            uint32 guidlow = (*result)[0].GetUInt32();
-            DETAIL_LOG("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data))
-                ++num;
+            uint32 GuidLow = (*result)[0].GetUInt32();
+            uint32 atLoginFlags = (*result)[15].GetUInt32();
+            uint64 GuildGuid = (*result)[13].GetUInt64();
+
+            charEnumInfo charInfo = charEnumInfo();
+            std::string name = (*result)[1].GetString();
+            uint32 nameLen = name.length();
+            charInfo.nameLenghts =  nameLen;
+            charInfo.firstLogin = atLoginFlags & AT_LOGIN_FIRST ? true : false;
+            charInfoList[charCount] = charInfo;
+            charCount++;
+
+            guidsVect.push_back(std::make_pair(GuidLow, atLoginFlags));
+
+            sLog.outDetail("Loading char guid %u from account %u.", GuidLow, GetAccountId());
+
+            if (!Player::BuildEnumData(result, &buffer))
+            {
+                sLog.outError("Building enum data for SMSG_CHAR_ENUM has failed, aborting");
+                return;
+            }
+            _allowedCharsToLogin.insert(GuidLow);
         }
         while (result->NextRow());
 
-        delete result;
-    }
+        int counter = 0;
+        for (std::vector<Guids>::iterator itr = guidsVect.begin(); itr != guidsVect.end(); ++itr)
+        {
+            uint32 Guid = (*itr).first;
+            uint64 GuildGuid = (*itr).second;
 
-    data.put<uint8>(0, num);
+            uint8 Guid0 = uint8(Guid);
+            uint8 Guid1 = uint8(Guid >> 8);
+            uint8 Guid2 = uint8(Guid >> 16);
+            uint8 Guid3 = uint8(Guid >> 24);
+
+            for (int i = 0; i < 18; ++i)
+            {
+                switch (i)
+                {
+                    case 14:
+                        data.WriteBit(Guid0 ? 1 : 0);
+                        break;
+                    case 10:
+                        data.WriteBit(Guid1 ? 1 : 0);
+                        break;
+                    case 15:
+                        data.WriteBit(Guid2 ? 1 : 0);
+                        break;
+                    case 0:
+                        data.WriteBit(Guid3 ? 1 : 0);
+                        break;
+                    case 4:
+                        data.WriteBits(charInfoList[counter].nameLenghts, 7);
+                        break;
+                    case 13:
+                        data.WriteBit(charInfoList[counter].firstLogin ? 1 : 0);
+                        break;
+                    default:
+                        data.WriteBit(0);
+                        break;
+                }
+            }
+
+            counter++;
+        }
+
+        data.FlushBits();
+        data.append(buffer);
+    }
+    else
+    {
+        data.WriteBit(1);
+        data.FlushBits();
+    }
 
     SendPacket(&data);
 }
