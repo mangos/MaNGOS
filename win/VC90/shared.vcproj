@@ -628,6 +628,10 @@
 			Name="Util"
 			>
 			<File
+				RelativePath="..\..\src\shared\ByteBuffer.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\shared\ByteBuffer.h"
 				>
 			</File>
