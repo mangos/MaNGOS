@@ -45,6 +45,9 @@
     <ClCompile Include="..\..\src\shared\Database\DBCFileLoader.cpp">
       <Filter>Database\DataStores</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\shared\ByteBuffer.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\shared\Log.cpp">
       <Filter>Log</Filter>
     </ClCompile>
