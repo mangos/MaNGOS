@@ -23,6 +23,26 @@
 #include "Log.h"
 #include "Utilities/ByteConverter.h"
 
+#define BITS_1 uint8 _1
+#define BITS_2 BITS_1, uint8 _2
+#define BITS_3 BITS_2, uint8 _3
+#define BITS_4 BITS_3, uint8 _4
+#define BITS_5 BITS_4, uint8 _5
+#define BITS_6 BITS_5, uint8 _6
+#define BITS_7 BITS_6, uint8 _7
+#define BITS_8 BITS_7, uint8 _8
+
+#define BIT_VALS_1 _1
+#define BIT_VALS_2 BIT_VALS_1, _2
+#define BIT_VALS_3 BIT_VALS_2, _3
+#define BIT_VALS_4 BIT_VALS_3, _4
+#define BIT_VALS_5 BIT_VALS_4, _5
+#define BIT_VALS_6 BIT_VALS_5, _6
+#define BIT_VALS_7 BIT_VALS_6, _7
+#define BIT_VALS_8 BIT_VALS_7, _8
+
+class ObjectGuid;
+
 class ByteBufferException
 {
     public:
@@ -205,6 +225,74 @@ class ByteBuffer
                 if (guidByte[byteOrder[i + bytePos]])
                     (*this) << uint8(guidByte[byteOrder[i + bytePos]] ^ 1);
         }
+
+        template<BITS_1>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_2>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_3>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_4>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_5>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_6>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_7>
+            void ReadGuidMask(ObjectGuid& guid);
+        template<BITS_8>
+            void ReadGuidMask(ObjectGuid& guid);
+
+        template<BITS_1>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_2>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_3>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_4>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_5>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_6>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_7>
+            void WriteGuidMask(ObjectGuid& guid);
+        template<BITS_8>
+            void WriteGuidMask(ObjectGuid& guid);
+
+        template<BITS_1>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_2>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_3>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_4>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_5>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_6>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_7>
+            void ReadGuidBytes(ObjectGuid& guid);
+        template<BITS_8>
+            void ReadGuidBytes(ObjectGuid& guid);
+
+        template<BITS_1>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_2>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_3>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_4>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_5>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_6>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_7>
+            void WriteGuidBytes(ObjectGuid& guid);
+        template<BITS_8>
+            void WriteGuidBytes(ObjectGuid& guid);
 
         template <typename T> void put(size_t pos, T value)
         {
@@ -424,7 +512,6 @@ class ByteBuffer
 
             return *this;
         }
-
 
         template <typename T> T read()
         {
