@@ -327,7 +327,6 @@ enum UnitMods
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
-    UNIT_MOD_HAPPINESS,
     UNIT_MOD_RUNE,
     UNIT_MOD_RUNIC_POWER,
     UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existing order, it's accessed by index values of SpellSchools enum.

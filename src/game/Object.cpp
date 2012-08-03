@@ -539,6 +539,10 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     if (!target)
         return;
 
+    uint32 valuesCount = m_valuesCount;
+    if(GetTypeId() == TYPEID_PLAYER && target != this)
+        valuesCount = PLAYER_END_NOT_SELF;
+
     bool IsActivateToQuest = false;
     bool IsPerCasterAuraState = false;
 
@@ -588,7 +592,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     // 2 specialized loops for speed optimization in non-unit case
     if (isType(TYPEMASK_UNIT))                              // unit (creature/player) case
     {
-        for(uint16 index = 0; index < m_valuesCount; ++index)
+        for(uint16 index = 0; index < valuesCount; ++index)
         {
             if (updateMask->GetBit(index))
             {
@@ -674,7 +678,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     }
     else if (isType(TYPEMASK_GAMEOBJECT))                   // gameobject case
     {
-        for(uint16 index = 0; index < m_valuesCount; ++index)
+        for(uint16 index = 0; index < valuesCount; ++index)
         {
             if (updateMask->GetBit(index))
             {
@@ -721,7 +725,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     }
     else                                                    // other objects case (no special index checks)
     {
-        for(uint16 index = 0; index < m_valuesCount; ++index)
+        for(uint16 index = 0; index < valuesCount; ++index)
         {
             if (updateMask->GetBit(index))
             {
@@ -770,18 +774,26 @@ bool Object::LoadValues(const char* data)
     return true;
 }
 
-void Object::_SetUpdateBits(UpdateMask *updateMask, Player* /*target*/) const
+void Object::_SetUpdateBits(UpdateMask *updateMask, Player* target) const
 {
-    for( uint16 index = 0; index < m_valuesCount; ++index )
+    uint32 valuesCount = m_valuesCount;
+    if(GetTypeId() == TYPEID_PLAYER && target != this)
+        valuesCount = PLAYER_END_NOT_SELF;
+
+    for( uint16 index = 0; index < valuesCount; ++index )
     {
         if(m_uint32Values_mirror[index]!= m_uint32Values[index])
             updateMask->SetBit(index);
     }
 }
 
-void Object::_SetCreateBits(UpdateMask *updateMask, Player* /*target*/) const
+void Object::_SetCreateBits(UpdateMask *updateMask, Player* target) const
 {
-    for( uint16 index = 0; index < m_valuesCount; ++index )
+    uint32 valuesCount = m_valuesCount;
+    if(GetTypeId() == TYPEID_PLAYER && target != this)
+        valuesCount = PLAYER_END_NOT_SELF;
+
+    for (uint16 index = 0; index < valuesCount; ++index)
     {
         if(GetUInt32Value(index) != 0)
             updateMask->SetBit(index);

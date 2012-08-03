@@ -5355,10 +5355,6 @@ void Unit::setPowerType(Powers new_powertype)
         case POWER_ENERGY:
             SetMaxPower(POWER_ENERGY,GetCreatePowers(POWER_ENERGY));
             break;
-        case POWER_HAPPINESS:
-            SetMaxPower(POWER_HAPPINESS,GetCreatePowers(POWER_HAPPINESS));
-            SetPower(POWER_HAPPINESS,GetCreatePowers(POWER_HAPPINESS));
-            break;
     }
 }
 
@@ -9061,7 +9057,6 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RAGE:
         case UNIT_MOD_FOCUS:
         case UNIT_MOD_ENERGY:
-        case UNIT_MOD_HAPPINESS:
         case UNIT_MOD_RUNE:
         case UNIT_MOD_RUNIC_POWER:          UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod));          break;
 
@@ -9182,7 +9177,6 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         case UNIT_MOD_RAGE:       return POWER_RAGE;
         case UNIT_MOD_FOCUS:      return POWER_FOCUS;
         case UNIT_MOD_ENERGY:     return POWER_ENERGY;
-        case UNIT_MOD_HAPPINESS:  return POWER_HAPPINESS;
         case UNIT_MOD_RUNE:       return POWER_RUNE;
         case UNIT_MOD_RUNIC_POWER:return POWER_RUNIC_POWER;
         default:                  return POWER_MANA;
@@ -9316,12 +9310,6 @@ void Unit::SetPower(Powers power, uint32 val)
             if(owner && (owner->GetTypeId() == TYPEID_PLAYER) && ((Player*)owner)->GetGroup())
                 ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
         }
-
-        // Update the pet's character sheet with happiness damage bonus
-        if(pet->getPetType() == HUNTER_PET && power == POWER_HAPPINESS)
-        {
-            pet->UpdateDamagePhysical(BASE_ATTACK);
-        }
     }
 }
 
@@ -9416,7 +9404,6 @@ uint32 Unit::GetCreatePowers( Powers power ) const
                 return 100;
             return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->IsPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:      return 100;
-        case POWER_HAPPINESS:   return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->IsPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 1050000);
         case POWER_RUNE:        return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 8 : 0);
         case POWER_RUNIC_POWER: return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 1000 : 0);
         case POWER_SOUL_SHARDS: return 0;                   // TODO: fix me
