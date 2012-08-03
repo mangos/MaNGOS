@@ -2492,6 +2492,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
             }
             break;
 		case SPELLFAMILY_MONK:
+			break;
         default:
             break;
     }
