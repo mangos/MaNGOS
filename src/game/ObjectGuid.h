@@ -85,8 +85,6 @@ struct PackedGuidReader
     ObjectGuid* m_guidPtr;
 };
 
-#define NUM_GUID_BYTES 8
-
 class MANGOS_DLL_SPEC ObjectGuid
 {
     public:                                                 // constructors
@@ -176,23 +174,23 @@ class MANGOS_DLL_SPEC ObjectGuid
 
         uint8& operator[] (uint8 index)
         {
-            MANGOS_ASSERT(index < NUM_GUID_BYTES);
+            MANGOS_ASSERT(index < 8);
 
 #if MANGOS_ENDIAN == MANGOS_LITTLEENDIAN
             return m_guidBytes[index];
 #else
-            return m_guidBytes[NUM_GUID_BYTES - 1 - index];
+            return m_guidBytes[7 - index];
 #endif
         }
 
         uint8 const& operator[] (uint8 index) const
         {
-            MANGOS_ASSERT(index < NUM_GUID_BYTES);
+            MANGOS_ASSERT(index < 8);
 
 #if MANGOS_ENDIAN == MANGOS_LITTLEENDIAN
             return m_guidBytes[index];
 #else
-            return m_guidBytes[NUM_GUID_BYTES - 1 - index];
+            return m_guidBytes[7 - index];
 #endif
         }
 
@@ -230,7 +228,7 @@ class MANGOS_DLL_SPEC ObjectGuid
         union
         {
             uint64 m_guid;
-            uint8 m_guidBytes[NUM_GUID_BYTES];
+            uint8 m_guidBytes[8];
         };
 };
 
