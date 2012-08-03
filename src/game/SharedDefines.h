@@ -593,10 +593,14 @@ enum Language
     LANG_GOBLIN_BINARY  = 38,
     LANG_WORGEN         = 39,
     LANG_GOBLIN         = 40,
+	LANG_PANDAREN_NEUT  = 42,
+	LANG_PANDAREN_ALLI  = 43,
+	LANG_PANDAREN_HORDE = 44,
+	LANG_RIKKITUN       = 168,
     LANG_ADDON          = 0xFFFFFFFF                        // used by addons, in 2.4.0 not exit, replaced by messagetype?
 };
 
-#define LANGUAGES_COUNT   21
+#define LANGUAGES_COUNT   25
 
 // In fact !=0 values is alliance/horde root faction ids
 enum Team
@@ -2048,7 +2052,8 @@ enum LockType
     LOCKTYPE_SLOW_CLOSE            = 18,
     LOCKTYPE_FISHING               = 19,
     LOCKTYPE_INSCRIPTION           = 20,
-    LOCKTYPE_OPEN_FROM_VEHICLE     = 21
+    LOCKTYPE_OPEN_FROM_VEHICLE     = 21,
+	LOCKTYPE_ARCHAEOLOGY           = 22
 };
 
 enum TrainerType                                            // this is important type for npcs!
@@ -2076,7 +2081,8 @@ enum CreatureType
     CREATURE_TYPE_NOT_SPECIFIED    = 10,
     CREATURE_TYPE_TOTEM            = 11,
     CREATURE_TYPE_NON_COMBAT_PET   = 12,
-    CREATURE_TYPE_GAS_CLOUD        = 13
+    CREATURE_TYPE_GAS_CLOUD        = 13,
+    CREATURE_TYPE_WILD_PET         = 14
 };
 
 uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
@@ -2126,7 +2132,32 @@ enum CreatureFamily
     CREATURE_FAMILY_RHINO          = 43,
     CREATURE_FAMILY_WASP           = 44,
     CREATURE_FAMILY_CORE_HOUND     = 45,
-    CREATURE_FAMILY_SPIRIT_BEAST   = 46
+    CREATURE_FAMILY_SPIRIT_BEAST   = 46,
+	CREATURE_FAMILY_WATER_ELEMENTAL = 49,
+	CREATURE_FAMILY_FOX            = 50,
+	CREATURE_FAMILY_MONKEY         = 51,
+	CREATURE_FAMILY_DOG            = 52,
+	CREATURE_FAMILY_BEETLE         = 53,
+	CREATURE_FAMILY_SHALE_SPIDER   = 55,
+	CREATURE_FAMILY_ZOMBIE         = 56,
+	CREATURE_FAMILY_QA_TEST        = 57,
+	CREATURE_FAMILY_SILITHID_2     = 59,
+	CREATURE_FAMILY_WASP_2         = 66,
+	CREATURE_FAMILY_HYDRA          = 68,
+	CREATURE_FAMILY_FEL_IMP        = 100,
+	CREATURE_FAMILY_VOIDLORD       = 101,
+	CREATURE_FAMILY_SHIVARRA       = 102,
+	CREATURE_FAMILY_OBSERVER       = 103,
+	CREATURE_FAMILY_WRATHGUARD     = 104,
+	CREATURE_FAMILY_INFERNAL       = 108,
+	CREATURE_FAMILY_FIRE_ELEMENTAL = 116,
+	CREATURE_FAMILY_EARTH_ELEMENTAL = 117,
+	CREATURE_FAMILY_CRANE          = 125,
+	CREATURE_FAMILY_WATER_STRIDER  = 126,
+	CREATURE_FAMILY_PORCUPINE      = 127,
+	CREATURE_FAMILY_QUILEN         = 128,
+	CREATURE_FAMILY_GOAT           = 129,
+	CREATURE_FAMILY_BASILISK       = 130
 };
 
 enum CreatureTypeFlags
@@ -2203,7 +2234,17 @@ enum HolidayIds
     HOLIDAY_PILGRIMS_BOUNTY          = 404,
     HOLIDAY_WOTLK_LAUNCH             = 406,
     HOLIDAY_DAY_OF_DEAD              = 409,
-    HOLIDAY_CALL_TO_ARMS_ISLE_OF_C   = 420
+    HOLIDAY_CALL_TO_ARMS_ISLE_OF_C   = 420,
+	HOLIDAY_KALUAK_FISHING_DERBY     = 424,
+	HOLIDAY_CALL_TO_ARMS_BATLLE_FO   = 435,
+	HOLIDAY_CALL_TO_ARMS_TWIN_PEAK   = 436,
+	HOLIDAY_CALL_TO_ARMS_15_V_15     = 442,
+	HOLIDAY_CALL_TO_ARMS_25_v_25     = 443,
+	HOLIDAY_WOWS_7TH_ANIVERSARY      = 467,
+	HOLIDAY_DARKMOON_FAIRE_TEROKKAR  = 479,
+	HOLIDAY_WOWS_8TH_ANIVERSARY      = 484,
+	HOLIDAY_CALL_TO_ARMS_SILVERSHA   = 488,
+	HOLIDAY_CALL_TO_ARMS_TEMPLE_OF   = 489
 };
 
 // values based at QuestSort.dbc
@@ -2246,7 +2287,19 @@ enum QuestSort
     QUEST_SORT_BREWFEST            = 370,
     QUEST_SORT_INSCRIPTION         = 371,
     QUEST_SORT_DEATH_KNIGHT        = 372,
-    QUEST_SORT_JEWELCRAFTING       = 373
+    QUEST_SORT_JEWELCRAFTING       = 373,
+	QUEST_SORT_NOBELGARDEN         = 374,
+	QUEST_SORT_PILGRIMS_BOUNTY     = 375,
+	QUEST_SORT_LOVE_IS_IN_THE_AIR  = 376,
+	QUEST_SORT_ARCHAEOLOGY         = 377,
+	QUEST_SORT_CHILDRENS_WEEK      = 378,
+	QUEST_SORT_FIRELANDS_INVASION  = 379,
+	QUEST_SORT_THE_ZANDALARI       = 380,
+	QUEST_SORT_ELEMENTAL_BONDS     = 381,
+	QUEST_SORT_PANDAREN_BREWMASTERS = 391,
+	QUEST_SORT_SCENARIO            = 392,
+	QUEST_SORT_BATTLE_PETS         = 394,
+	QUEST_SORT_MONK                = 395
 };
 
 inline uint8 ClassByQuestSort(int32 QuestSort)
@@ -2263,6 +2316,7 @@ inline uint8 ClassByQuestSort(int32 QuestSort)
         case QUEST_SORT_PRIEST:         return CLASS_PRIEST;
         case QUEST_SORT_DRUID:          return CLASS_DRUID;
         case QUEST_SORT_DEATH_KNIGHT:   return CLASS_DEATH_KNIGHT;
+		case QUEST_SORT_MONK:           return CLASS_MONK;
     }
     return 0;
 }
@@ -2435,10 +2489,53 @@ enum SkillType
     SKILL_GENERAL_SHAMAN           = 801,
     SKILL_GENERAL_WARLOCK          = 802,
     SKILL_GENERAL_WARRIOR          = 803,
-    SKILL_GENERAL_PRIEST           = 804
+    SKILL_GENERAL_PRIEST           = 804,
+	SKILL_PET_WATER_ELEMENTAL      = 805,
+    SKILL_PET_FOX                  = 808,
+    SKILL_ALL_GLYPHS               = 810,
+    SKILL_PET_DOG                  = 811,
+    SKILL_PET_MONKEY               = 815,
+    SKILL_PET_SHALE_SPIDER         = 817,
+    SKILL_PET_BEETLE               = 818,
+    SKILL_ALL_GUILD_PERKS          = 821,
+    SKILL_PET_HYDRA                = 824,
+    SKILL_GENERAL_MONK             = 829,
+    SKILL_GENERAL_WARRIOR_2        = 840,
+    SKILL_GENERAL_WARLOCK_2        = 849,
+    SKILL_RACIAL_PANDAREN          = 899,
+    SKILL_GENERAL_MAGE_2           = 904,
+    SKILL_LANG_PANDAREN_NEUTRAL    = 905,
+    SKILL_LANG_PANDAREN_ALLIANCE   = 906,
+    SKILL_LANG_PANDAREN_HORDE      = 907,
+    SKILL_GENERAL_ROGUE_2          = 921,
+    SKILL_GENERAL_SHAMAN_2         = 924,
+    SKILL_PET_FEL_IMP              = 927,
+    SKILL_PET_VOIDLORD             = 928,
+    SKILL_PET_SHIVARRA             = 929,
+    SKILL_PET_OBSERVER             = 930,
+    SKILL_PET_WRATHGUARD           = 931,
+    SKILL_ALL_SPECIALIZATIONS      = 934,
+    SKILL_RUNEFORGING_2            = 960,
+    SKILL_PET_PRIMAL_FIRE_ELE      = 962,
+    SKILL_PET_PRIMAL_EARTH_ELE     = 963,
+    SKILL_WAY_OF_THE_GRILL         = 975,
+    SKILL_WAY_OF_THE_WOK           = 976,
+    SKILL_WAY_OF_THE_POT           = 977,
+    SKILL_WAY_OF_THE_STEAMER       = 978,
+    SKILL_WAY_OF_THE_OVEN          = 979,
+    SKILL_WAY_OF_THE_BREW          = 980,
+    SKILL_APPRENTICE_COOKING       = 981,
+    SKILL_JOURNEYMAN_COOKBOOK      = 982,
+    SKILL_PET_PORCUPINE            = 983,
+    SKILL_PET_CRANE                = 984,
+    SKILL_PET_WATER_STRIDER        = 985,
+    SKILL_PET_QUILEN               = 986,
+    SKILL_PET_GOAT                 = 987,
+    SKILL_PET_BASILISK             = 988,
+    SKILL_NO_PLAYERS               = 999
 };
 
-#define MAX_SKILL_TYPE               805
+#define MAX_SKILL_TYPE               1000
 
 inline SkillType SkillByLockType(LockType locktype)
 {
@@ -2449,6 +2546,7 @@ inline SkillType SkillByLockType(LockType locktype)
         case LOCKTYPE_MINING:      return SKILL_MINING;
         case LOCKTYPE_FISHING:     return SKILL_FISHING;
         case LOCKTYPE_INSCRIPTION: return SKILL_INSCRIPTION;
+		case LOCKTYPE_ARCHAEOLOGY: return SKILL_ARCHAEOLOGY;
         default: break;
     }
     return SKILL_NONE;
@@ -2473,22 +2571,22 @@ enum TotemCategory
     TC_AIR_TOTEM                   = 3,
     TC_FIRE_TOTEM                  = 4,
     TC_WATER_TOTEM                 = 5,
-    TC_COPPER_ROD                  = 6,
-    TC_SILVER_ROD                  = 7,
-    TC_GOLDEN_ROD                  = 8,
-    TC_TRUESILVER_ROD              = 9,
-    TC_ARCANITE_ROD                = 10,
+    TC_COPPER_ROD_1                = 6, //MOP MERGED ENCHANTING RODS
+    TC_COPPER_ROD_2                = 7,
+    TC_COPPER_ROD_3                = 8,
+    TC_COPPER_ROD_4                = 9,
+    TC_COPPER_ROD_5                = 10,
     TC_MINING_PICK_OLD             = 11,
     TC_PHILOSOPHERS_STONE          = 12,
     TC_BLACKSMITH_HAMMER_OLD       = 13,
     TC_ARCLIGHT_SPANNER            = 14,
     TC_GYROMATIC_MA                = 15,
     TC_MASTER_TOTEM                = 21,
-    TC_FEL_IRON_ROD                = 41,
-    TC_ADAMANTITE_ROD              = 62,
-    TC_ETERNIUM_ROD                = 63,
+    TC_COPPER_ROD_6                = 41,
+    TC_COPPER_ROD_7                = 62,
+    TC_COPPER_ROD_8                = 63,
     TC_HOLLOW_QUILL                = 81,
-    TC_RUNED_AZURITE_ROD           = 101,
+    TC_COPPER_ROD_9                = 101,
     TC_VIRTUOSO_INKING_SET         = 121,
     TC_DRUMS                       = 141,
     TC_GNOMISH_ARMY_KNIFE          = 161,
@@ -2498,8 +2596,11 @@ enum TotemCategory
     TC_HAMMER_PICK                 = 167,
     TC_BLADED_PICKAXE              = 168,
     TC_FLINT_AND_TINDER            = 169,
-    TC_RUNED_COBALT_ROD            = 189,
-    TC_RUNED_TITANIUM_ROD          = 190
+    TC_COPPER_ROD_10               = 189,
+    TC_COPPER_ROD_11               = 190,
+	TC_COPPER_ROD_12               = 209,
+	TC_HIGH_POWERED_BOLT_GUN       = 210,
+	TC_COPPER_ROD_13               = 230
 };
 
 enum UnitDynFlags
@@ -2716,10 +2817,12 @@ enum ShapeshiftForm
     FORM_BATTLESTANCE       = 0x11,
     FORM_DEFENSIVESTANCE    = 0x12,
     FORM_BERSERKERSTANCE    = 0x13,
-    FORM_TEST               = 0x14,
+    FORM_SERPENTSTANCE      = 0x14,
     FORM_ZOMBIE             = 0x15,
     FORM_METAMORPHOSIS      = 0x16,
-    FORM_UNDEAD             = 0x19,
+    FORM_OXSTANCE           = 0x17,
+	FORM_TIGERSTANCE        = 0x18,
+	FORM_UNDEAD             = 0x19,
     FORM_FRENZY             = 0x1A,
     FORM_FLIGHT_EPIC        = 0x1B,
     FORM_SHADOW             = 0x1C,
@@ -2879,11 +2982,21 @@ enum BattleGroundTypeId
     BATTLEGROUND_RV            = 11,
     BATTLEGROUND_IC            = 30,
     BATTLEGROUND_RB            = 32,                        // random battleground
+	BATTLEGROUND_RBG10         = 100,                       // rated BG 10v10
+	BATTLEGROUND_RBG15         = 101,                       // rated BG 15v15
+	BATTLEGROUND_RBG25         = 102,                       // rated BG 25v25
     BATTLEGROUND_TP            = 108,                       // 4.0.0
-    BATTLEGROUND_BG            = 118                        // 4.0.0
+    BATTLEGROUND_BG            = 120,                       // 4.0.0
+	BATTLEGROUND_ICC           = 441,                       // 4.0.0
+	BATTLEGROUND_RS            = 443,                       // 4.0.0
+	BATTLEGROUND_REY           = 656,                       // 4.0.0 rated eye of storm
+	BATTLEGROUND_TK            = 699,                       // 5.0.0
+	BATTLEGROUND_CT            = 706,                       // 5.0.0 CTF3
+	BATTLEGROUND_SM            = 708,                       // 5.0.0
+	BATTLEGROUND_TA            = 719                        // 5.0.0
 };
 
-#define MAX_BATTLEGROUND_TYPE_ID 119
+#define MAX_BATTLEGROUND_TYPE_ID 720
 
 enum ArenaType
 {
