@@ -63,11 +63,8 @@ bool QueryResultPostgre::NextRow()
 
 void QueryResultPostgre::EndQuery()
 {
-    if (mCurrentRow)
-    {
-        delete [] mCurrentRow;
-        mCurrentRow = 0;
-    }
+    delete[] mCurrentRow;
+    mCurrentRow = 0;
 
     if (mResult)
     {

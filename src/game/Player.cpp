@@ -570,8 +570,7 @@ Player::~Player()
     // Note: buy back item already deleted from DB when player was saved
     for (int i = 0; i < PLAYER_SLOTS_COUNT; ++i)
     {
-        if (m_items[i])
-            delete m_items[i];
+        delete m_items[i];
     }
     CleanupChannels();
 
@@ -590,8 +589,7 @@ Player::~Player()
     }
 
     for (size_t x = 0; x < ItemSetEff.size(); ++x)
-        if (ItemSetEff[x])
-            delete ItemSetEff[x];
+        delete ItemSetEff[x];
 
     // clean up player-instance binds, may unload some instance saves
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
@@ -15338,10 +15336,9 @@ void Player::_LoadDeclinedNames(QueryResult* result)
     if (!result)
         return;
 
-    if (m_declinedname)
-        delete m_declinedname;
-
+    delete m_declinedname;
     m_declinedname = new DeclinedName;
+
     Field* fields = result->Fetch();
     for (int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
         m_declinedname->name[i] = fields[i].GetCppString();
@@ -15580,11 +15577,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
         SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid());
         SetVisibleItemSlot(slot, NULL);
 
-        if (m_items[slot])
-        {
-            delete m_items[slot];
-            m_items[slot] = NULL;
-        }
+        delete m_items[slot];
+        m_items[slot] = NULL;
     }
 
     DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "Load Basic value of player %s is: ", m_name.c_str());

@@ -312,10 +312,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
         if (result)
         {
-            if (m_declinedname)
-                delete m_declinedname;
-
+            delete m_declinedname;
             m_declinedname = new DeclinedName;
+
             Field* fields2 = result->Fetch();
             for (int i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
                 m_declinedname->name[i] = fields2[i].GetCppString();

@@ -81,8 +81,7 @@ class ReactorRunnable : protected ACE_Task_Base
             Stop();
             Wait();
 
-            if (m_Reactor)
-                delete m_Reactor;
+            delete m_Reactor;
         }
 
         void Stop()
@@ -216,11 +215,8 @@ WorldSocketMgr::WorldSocketMgr():
 
 WorldSocketMgr::~WorldSocketMgr()
 {
-    if (m_NetThreads)
-        delete [] m_NetThreads;
-
-    if (m_Acceptor)
-        delete m_Acceptor;
+    delete[] m_NetThreads;
+    delete m_Acceptor;
 }
 
 int WorldSocketMgr::StartReactiveIO(ACE_UINT16 port, const char* address)

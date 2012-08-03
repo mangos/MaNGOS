@@ -117,8 +117,7 @@ WorldSocket::WorldSocket(void) :
 
 WorldSocket::~WorldSocket(void)
 {
-    if (m_RecvWPct)
-        delete m_RecvWPct;
+    delete m_RecvWPct;
 
     if (m_OutBuffer)
         m_OutBuffer->release();

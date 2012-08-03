@@ -150,24 +150,17 @@ bool Database::Initialize(const char* infoString, int nConns /*= 1*/)
 void Database::StopServer()
 {
     HaltDelayThread();
-    /*Delete objects*/
-    if (m_pResultQueue)
-    {
-        delete m_pResultQueue;
-        m_pResultQueue = NULL;
-    }
 
-    if (m_pAsyncConn)
-    {
-        delete m_pAsyncConn;
-        m_pAsyncConn = NULL;
-    }
+    delete m_pResultQueue;
+    delete m_pAsyncConn;
+
+    m_pResultQueue = NULL;
+    m_pAsyncConn = NULL;
 
     for (size_t i = 0; i < m_pQueryConnections.size(); ++i)
         delete m_pQueryConnections[i];
 
     m_pQueryConnections.clear();
-
 }
 
 SqlDelayThread* Database::CreateDelayThread()
@@ -644,9 +637,6 @@ SqlTransaction* Database::TransHelper::detach()
 
 void Database::TransHelper::reset()
 {
-    if (m_pTrans)
-    {
-        delete m_pTrans;
-        m_pTrans = NULL;
-    }
+    delete m_pTrans;
+    m_pTrans = NULL;
 }

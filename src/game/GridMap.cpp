@@ -117,20 +117,11 @@ bool GridMap::loadData(char* filename)
 
 void GridMap::unloadData()
 {
-    if (m_area_map)
-        delete[] m_area_map;
-
-    if (m_V9)
-        delete[] m_V9;
-
-    if (m_V8)
-        delete[] m_V8;
-
-    if (m_liquid_type)
-        delete[] m_liquid_type;
-
-    if (m_liquid_map)
-        delete[] m_liquid_map;
+    delete[] m_area_map;
+    delete[] m_V9;
+    delete[] m_V8;
+    delete[] m_liquid_type;
+    delete[] m_liquid_map;
 
     m_area_map = NULL;
     m_V9 = NULL;
@@ -588,12 +579,12 @@ bool GridMap::ExistMap(uint32 mapid, int gx, int gy)
             !IsAcceptableClientBuild(header.buildMagic))
     {
         sLog.outError("Map file '%s' is non-compatible version (outdated?). Please, create new using ad.exe program.", tmp);
-        delete [] tmp;
+        delete[] tmp;
         fclose(pf);                                         // close file before return
         return false;
     }
 
-    delete [] tmp;
+    delete[] tmp;
     fclose(pf);
     return true;
 }
@@ -1073,7 +1064,7 @@ GridMap* TerrainInfo::LoadMapAndVMap(const uint32 x, const uint32 y)
                 // ASSERT(false);
             }
 
-            delete [] tmp;
+            delete[] tmp;
             m_GridMaps[x][y] = map;
 
             // load VMAPs for current map/grid...
