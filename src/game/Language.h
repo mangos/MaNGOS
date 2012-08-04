@@ -938,7 +938,8 @@ enum MangosStrings
     LANG_AHBOT_ITEMS_AMOUNT             = 1190,
     LANG_AHBOT_ITEMS_RATIO              = 1191,
     LANG_MOVEGENS_EFFECT                = 1192,
-    // Room for more level 3              1193-1199 not used
+    LANG_GEARSCORE                      = 1193,
+    // Room for more level 3              1194-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

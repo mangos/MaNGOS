@@ -46,7 +46,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "movement/MoveSplineInit.h"
-#include "movement/MoveSpline.h"
+#include "CreatureLinkingMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -351,8 +351,10 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
 
     SetUInt32Value(UNIT_NPC_FLAGS,GetCreatureInfo()->npcflag);
 
-    SetAttackTime(BASE_ATTACK,  GetCreatureInfo()->baseattacktime);
-    SetAttackTime(OFF_ATTACK,   GetCreatureInfo()->baseattacktime);
+    uint32 attackTimer = GetCreatureInfo()->baseattacktime;
+
+    SetAttackTime(BASE_ATTACK,  attackTimer);
+    SetAttackTime(OFF_ATTACK,   attackTimer - attackTimer/4);
     SetAttackTime(RANGED_ATTACK,GetCreatureInfo()->rangeattacktime);
 
     uint32 unitFlags = GetCreatureInfo()->unit_flags;
@@ -468,7 +470,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             break;
         case DEAD:
         {
-            if( m_respawnTime <= time(NULL) )
+            if (m_respawnTime <= time(NULL) && (!m_isSpawningLinked || GetMap()->GetCreatureLinkingHolder()->CanSpawn(this)))
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
                 m_respawnTime = 0;
@@ -505,12 +507,17 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 if (AI())
                     AI()->JustRespawned();
 
+                if (m_isCreatureLinkingTrigger)
+                    GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
+
                 GetMap()->Add(this);
             }
             break;
         }
         case CORPSE:
         {
+            Unit::Update(update_diff, diff);
+
             if (m_isDeadByDefault)
                 break;
 
@@ -588,10 +595,6 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 break;
             RegenerateAll(update_diff);
             break;
-        }
-        case CORPSE_FALLING:
-        {
-            SetDeathState(CORPSE);
         }
         default:
             break;
@@ -772,7 +775,16 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
             break;
     }
 
-    LoadCreatureAddon();
+    // Add to CreatureLinkingHolder if needed
+    if (sCreatureLinkingMgr.GetLinkedTriggerInformation(this))
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddSlaveToHolder(this);
+    if (sCreatureLinkingMgr.IsLinkedEventTrigger(this))
+    {
+        m_isCreatureLinkingTrigger = true;
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddMasterToHolder(this);
+    }
+
+    LoadCreatureAddon(false);
 
     return true;
 }
@@ -1177,8 +1189,11 @@ void Creature::SelectLevel(const CreatureInfo *cinfo, float percentHealth, float
     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg * damagemod);
     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg * damagemod);
 
-    SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE,cinfo->minrangedmg * damagemod);
-    SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE,cinfo->maxrangedmg * damagemod);
+    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cinfo->mindmg * damagemod);
+    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cinfo->maxdmg * damagemod);
+
+    SetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE, cinfo->minrangedmg * damagemod);
+    SetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE, cinfo->maxrangedmg * damagemod);
 
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cinfo->attackpower * damagemod);
 }
@@ -1313,6 +1328,23 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
             curhealth = 1;
     }
 
+    if (sCreatureLinkingMgr.IsSpawnedByLinkedMob(this))
+    {
+        m_isSpawningLinked = true;
+        if (m_deathState == ALIVE && !GetMap()->GetCreatureLinkingHolder()->CanSpawn(this))
+        {
+            m_deathState = DEAD;
+
+            // Just set to dead, so need to relocate like above
+            if (CanFly())
+            {
+                float tz = GetTerrain()->GetHeight(data->posX, data->posY, data->posZ, false);
+                if (data->posZ - tz > 0.1)
+                    Relocate(data->posX, data->posY, tz);
+            }
+        }
+    }
+
     SetHealth(m_deathState == ALIVE ? curhealth : 0);
     SetPower(POWER_MANA, data->curmana);
 
@@ -1322,6 +1354,11 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
     AIM_Initialize();
+
+    // Creature Linking, Initial load is handled like respawn
+    if (m_isCreatureLinkingTrigger && isAlive())
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
+
     return true;
 }
 
@@ -1474,9 +1511,8 @@ void Creature::SetDeathState(DeathState s)
             UpdateSpeed(MOVE_RUN, false);
         }
 
-        // return, since we promote to CORPSE_FALLING. CORPSE_FALLING is promoted to CORPSE at next update.
-        if (CanFly() && FallGround())
-            return;
+        if (CanFly())
+            i_motionMaster.MoveFall();
 
         Unit::SetDeathState(CORPSE);
     }
@@ -1495,7 +1531,7 @@ void Creature::SetDeathState(DeathState s)
         Unit::SetDeathState(ALIVE);
 
         clearUnitState(UNIT_STAT_ALL_STATE);
-        i_motionMaster.Clear();
+        i_motionMaster.Initialize();
 
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
@@ -1509,44 +1545,6 @@ void Creature::SetDeathState(DeathState s)
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
     }
-}
-
-bool Creature::FallGround()
-{
-    // Only if state is JUST_DIED. CORPSE_FALLING is set below and promoted to CORPSE later
-    if (getDeathState() != JUST_DIED)
-        return false;
-
-    // use larger distance for vmap height search than in most other cases
-    float tz = GetTerrain()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ(), true, MAX_FALL_DISTANCE);
-
-    if (tz <= INVALID_HEIGHT)
-    {
-        DEBUG_LOG("FallGround: creature %u at map %u (x: %f, y: %f, z: %f), not able to retrive a proper GetHeight (z: %f).",
-            GetEntry(), GetMap()->GetId(), GetPositionX(), GetPositionX(), GetPositionZ(), tz);
-        return false;
-    }
-
-    // Abort too if the ground is very near
-    if (fabs(GetPositionZ() - tz) < 0.1f)
-        return false;
-
-    Unit::SetDeathState(CORPSE_FALLING);
-
-    // For creatures that are moving towards target and dies, the visual effect is not nice.
-    // It is possibly caused by a xyz mismatch in DestinationHolder's GetLocationNow and the location
-    // of the mob in client. For mob that are already reached target or dies while not moving
-    // the visual appear to be fairly close to the expected.
-
-    Movement::MoveSplineInit init(*this);
-    init.MoveTo(GetPositionX(),GetPositionY(),tz);
-    init.SetFall();
-    init.Launch();
-
-    // hacky solution: by some reason died creatures not updated, that's why need finalize movement state
-    GetMap()->CreatureRelocation(this, GetPositionX(), GetPositionY(), tz, GetOrientation());
-    DisableSpline();
-    return true;
 }
 
 void Creature::Respawn()
@@ -1961,26 +1959,26 @@ bool Creature::LoadCreatureAddon(bool reload)
     if (cainfo->splineFlags & SPLINEFLAG_FLYING)
         SetLevitate(true);
 
-    if(cainfo->auras)
+    if (cainfo->auras)
     {
         for (uint32 const* cAura = cainfo->auras; *cAura; ++cAura)
         {
-            SpellEntry const *AdditionalSpellInfo = sSpellStore.LookupEntry(*cAura);
-            if (!AdditionalSpellInfo)
-            {
-                sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u ) has wrong spell %u defined in `auras` field.",GetGUIDLow(),GetEntry(), *cAura);
-                continue;
-            }
-
-            if (HasAura(*cAura))
+            if (HasAuraOfDifficulty(*cAura))
             {
                 if (!reload)
-                    sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u) has duplicate spell %u in `auras` field.", GetGUIDLow(), GetEntry(), *cAura);
+                    sLog.outErrorDb("Creature (GUIDLow: %u Entry: %u) has spell %u in `auras` field, but aura is already applied.", GetGUIDLow(), GetEntry(), *cAura);
 
                 continue;
             }
 
-            CastSpell(this, AdditionalSpellInfo, true);
+            SpellEntry const* spellInfo = sSpellStore.LookupEntry(*cAura);  // Already checked on load
+
+            // Get Difficulty mode for initial case (npc not yet added to world)
+            if (spellInfo->SpellDifficultyId && !reload && GetMap()->IsDungeon())
+                if (SpellEntry const* spellEntry = GetSpellEntryByDifficulty(spellInfo->SpellDifficultyId, GetMap()->GetDifficulty(), GetMap()->IsRaid()))
+                    spellInfo = spellEntry;
+
+            CastSpell(this, spellInfo, true);
         }
     }
     return true;
@@ -2048,6 +2046,8 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
         return false;
 
     if (selectFlags & SELECT_FLAG_IN_MELEE_RANGE && !CanReachWithMeleeAttack(pTarget))
+        return false;
+    if (selectFlags & SELECT_FLAG_NOT_IN_MELEE_RANGE && CanReachWithMeleeAttack(pTarget))
         return false;
 
     if (selectFlags & SELECT_FLAG_IN_LOS && !IsWithinLOSInMap(pTarget))
@@ -2421,26 +2421,6 @@ void Creature::ClearTemporaryFaction()
 
     m_temporaryFactionFlags = TEMPFACTION_NONE;
     setFaction(GetCreatureInfo()->faction_A);
-}
-
-void Creature::SetActiveObjectState( bool on )
-{
-    if(m_isActiveObject==on)
-        return;
-
-    bool world = IsInWorld();
-
-    Map* map;
-    if(world)
-    {
-        map = GetMap();
-        map->Remove(this,false);
-    }
-
-    m_isActiveObject = on;
-
-    if(world)
-        map->Add(this);
 }
 
 void Creature::SendAreaSpiritHealerQueryOpcode(Player *pl)

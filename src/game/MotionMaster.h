@@ -109,6 +109,7 @@ class MANGOS_DLL_SPEC MotionMaster : private std::stack<MovementGenerator *>
         void MoveTaxiFlight(uint32 path, uint32 pathnode);
         void MoveDistract(uint32 timeLimit);
         void MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id = 0);
+        void MoveFall();
 
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
 

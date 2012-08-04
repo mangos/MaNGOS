@@ -159,12 +159,8 @@ void PetAI::UpdateAI(const uint32 diff)
                     return;
             }
             // not required to be stopped case
-            else if (m_creature->isAttackReady() && meleeReach)
+            else if (DoMeleeAttackIfReady())
             {
-                m_creature->AttackerStateUpdate(m_creature->getVictim());
-
-                m_creature->resetAttackTimer();
-
                 if (!m_creature->getVictim())
                     return;
 

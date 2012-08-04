@@ -119,7 +119,7 @@ void LootStore::LoadLootTable()
             uint32 cond_value1         = fields[7].GetUInt32();
             uint32 cond_value2         = fields[8].GetUInt32();
 
-            if(maxcount > std::numeric_limits<uint8>::max())
+            if (maxcount > std::numeric_limits<uint8>::max())
             {
                 sLog.outErrorDb("Table '%s' entry %d item %d: maxcount value (%u) to large. must be less %u - skipped", GetName(), entry, item, maxcount,std::numeric_limits<uint8>::max());
                 continue;                                   // error already printed to log/console.
@@ -127,12 +127,11 @@ void LootStore::LoadLootTable()
 
             if (mincountOrRef < 0 && condition != CONDITION_NONE)
             {
-                sLog.outErrorDb("Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped",
-                    GetName(), entry, mincountOrRef);
+                sLog.outErrorDb("Table '%s' entry %u mincountOrRef %i < 0 and not allowed has condition, skipped", GetName(), entry, mincountOrRef);
                 continue;
             }
 
-            if(!PlayerCondition::IsValid(condition,cond_value1, cond_value2))
+            if (!PlayerCondition::IsValid(condition,cond_value1, cond_value2))
             {
                 sLog.outErrorDb("... in table '%s' entry %u item %u", GetName(), entry, item);
                 continue;                                   // error already printed to log/console.
@@ -261,7 +260,7 @@ bool LootStoreItem::Roll(bool rate) const
 // Checks correctness of values
 bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 {
-    if(group >= 1 << 7)                                     // it stored in 7 bit field
+    if (group >= 1 << 7)                                    // it stored in 7 bit field
     {
         sLog.outErrorDb("Table '%s' entry %d item %d: group (%u) must be less %u - skipped", store.GetName(), entry, itemid, group, 1 << 7);
         return false;
@@ -273,7 +272,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
         return false;
     }
 
-    if( mincountOrRef > 0 )                                 // item (quest or non-quest) entry, maybe grouped
+    if (mincountOrRef > 0)                                  // item (quest or non-quest) entry, maybe grouped
     {
         ItemPrototype const *proto = ObjectMgr::GetItemPrototype(itemid);
         if(!proto)
@@ -282,20 +281,19 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
             return false;
         }
 
-        if( chance == 0 && group == 0)                      // Zero chance is allowed for grouped entries only
+        if (chance == 0 && group == 0)                      // Zero chance is allowed for grouped entries only
         {
             sLog.outErrorDb("Table '%s' entry %d item %d: equal-chanced grouped entry, but group not defined - skipped", store.GetName(), entry, itemid);
             return false;
         }
 
-        if( chance != 0 && chance < 0.000001f )             // loot with low chance
+        if (chance != 0 && chance < 0.000001f)              // loot with low chance
         {
-            sLog.outErrorDb("Table '%s' entry %d item %d: low chance (%f) - skipped",
-                store.GetName(), entry, itemid, chance);
+            sLog.outErrorDb("Table '%s' entry %d item %d: low chance (%f) - skipped", store.GetName(), entry, itemid, chance);
             return false;
         }
 
-        if( maxcount < mincountOrRef)                       // wrong max count
+        if (maxcount < mincountOrRef)                       // wrong max count
         {
             sLog.outErrorDb("Table '%s' entry %d item %d: max count (%u) less that min count (%i) - skipped", store.GetName(), entry, itemid, uint32(maxcount), mincountOrRef);
             return false;
@@ -305,8 +303,11 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
     else                                                    // mincountOrRef < 0
     {
         if (needs_quest)
-            sLog.outErrorDb("Table '%s' entry %d item %d: quest chance will be treated as non-quest chance", store.GetName(), entry, itemid);
-        else if( chance == 0 )                              // no chance for the reference
+        {
+            sLog.outErrorDb("Table '%s' entry %d item %d: negative chance is specified for a reference, skipped", store.GetName(), entry, itemid);
+            return false;
+        }
+        else if (chance == 0)                               // no chance for the reference
         {
             sLog.outErrorDb("Table '%s' entry %d item %d: zero chance is specified for a reference, skipped", store.GetName(), entry, itemid);
             return false;

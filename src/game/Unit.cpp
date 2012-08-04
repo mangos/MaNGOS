@@ -49,6 +49,7 @@
 #include "MovementGenerator.h"
 #include "movement/MoveSplineInit.h"
 #include "movement/MoveSpline.h"
+#include "CreatureLinkingMgr.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -57,9 +58,9 @@ float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
     2.5f,                                                   // MOVE_WALK
     7.0f,                                                   // MOVE_RUN
-    2.5f,                                                   // MOVE_RUN_BACK
+    4.5f,                                                   // MOVE_RUN_BACK
     4.722222f,                                              // MOVE_SWIM
-    4.5f,                                                   // MOVE_SWIM_BACK
+    2.5f,                                                   // MOVE_SWIM_BACK
     3.141594f,                                              // MOVE_TURN_RATE
     7.0f,                                                   // MOVE_FLIGHT
     4.5f,                                                   // MOVE_FLIGHT_BACK
@@ -209,8 +210,6 @@ Unit::Unit() :
 
     m_castCounter = 0;
 
-    m_addDmgOnce = 0;
-
     //m_Aura = NULL;
     //m_AurasCheck = 2000;
     //m_removeAuraTimer = 4;
@@ -234,7 +233,8 @@ Unit::Unit() :
         m_auraModifiersGroup[i][TOTAL_VALUE] = 0.0f;
         m_auraModifiersGroup[i][TOTAL_PCT] = 1.0f;
     }
-                                                            // implement 50% base damage from offhand
+
+    // implement 50% base damage from offhand
     m_auraModifiersGroup[UNIT_MOD_DAMAGE_OFFHAND][TOTAL_PCT] = 0.5f;
 
     for (int i = 0; i < MAX_ATTACK; ++i)
@@ -264,6 +264,9 @@ Unit::Unit() :
     // remove aurastates allowing special moves
     for(int i=0; i < MAX_REACTIVE; ++i)
         m_reactiveTimer[i] = 0;
+
+    m_isCreatureLinkingTrigger = false;
+    m_isSpawningLinked = false;
 }
 
 Unit::~Unit()
@@ -341,6 +344,11 @@ void Unit::Update( uint32 update_diff, uint32 p_time )
         setAttackTimer(BASE_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff) );
     }
 
+    if (uint32 base_att = getAttackTimer(OFF_ATTACK))
+    {
+        setAttackTimer(OFF_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff) );
+    }
+
     // update abilities available only for fraction of time
     UpdateReactives( update_diff );
 
@@ -351,6 +359,67 @@ void Unit::Update( uint32 update_diff, uint32 p_time )
     i_motionMaster.UpdateMotion(p_time);
 }
 
+bool Unit::UpdateMeleeAttackingState()
+{
+    Unit *victim = getVictim();
+    if (!victim || IsNonMeleeSpellCasted(false))
+        return false;
+
+    if (!isAttackReady(BASE_ATTACK) && !(isAttackReady(OFF_ATTACK) && haveOffhandWeapon()))
+        return false;
+
+    uint8 swingError = 0;
+    if (!CanReachWithMeleeAttack(victim))
+    {
+        setAttackTimer(BASE_ATTACK,100);
+        setAttackTimer(OFF_ATTACK,100);
+        swingError = 1;
+    }
+    //120 degrees of radiant range
+    else if (!HasInArc(2*M_PI_F/3, victim))
+    {
+        setAttackTimer(BASE_ATTACK,100);
+        setAttackTimer(OFF_ATTACK,100);
+        swingError = 2;
+    }
+    else
+    {
+        if (isAttackReady(BASE_ATTACK))
+        {
+            // prevent base and off attack in same time, delay attack at 0.2 sec
+            if (haveOffhandWeapon())
+            {
+                if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
+                    setAttackTimer(OFF_ATTACK,ATTACK_DISPLAY_DELAY);
+            }
+            AttackerStateUpdate(victim, BASE_ATTACK);
+            resetAttackTimer(BASE_ATTACK);
+        }
+        if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
+        {
+            // prevent base and off attack in same time, delay attack at 0.2 sec
+            uint32 base_att = getAttackTimer(BASE_ATTACK);
+            if (base_att < ATTACK_DISPLAY_DELAY)
+                setAttackTimer(BASE_ATTACK,ATTACK_DISPLAY_DELAY);
+            // do attack
+            AttackerStateUpdate(victim, OFF_ATTACK);
+            resetAttackTimer(OFF_ATTACK);
+        }
+    }
+
+    Player* player = (GetTypeId() == TYPEID_PLAYER ? (Player*)this : NULL);
+    if (player && swingError != player->LastSwingErrorMsg())
+    {
+        if (swingError == 1)
+            player->SendAttackSwingNotInRange();
+        else if (swingError == 2)
+            player->SendAttackSwingBadFacingAttack();
+        player->SwingErrorMsg(swingError);
+    }
+
+    return swingError == 0;
+}
+
 bool Unit::haveOffhandWeapon() const
 {
     if (!CanUseEquippedWeapon(OFF_ATTACK))
@@ -359,7 +428,16 @@ bool Unit::haveOffhandWeapon() const
     if(GetTypeId() == TYPEID_PLAYER)
         return ((Player*)this)->GetWeaponForAttack(OFF_ATTACK,true,true);
     else
+    {
+        // ToDo: Fix me!
+        /*uint32 ItemId = GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1);
+        ItemEntry const* itemInfo = sItemStore.LookupEntry(ItemId);
+
+        if (itemInfo && itemInfo->Class == ITEM_CLASS_WEAPON)
+            return true;*/
+
         return false;
+    }
 }
 
 void Unit::SendHeartBeat()
@@ -776,6 +854,9 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             if (InstanceData* mapInstance = cVictim->GetInstanceData())
                 mapInstance->OnCreatureDeath(cVictim);
 
+            if (cVictim->IsLinkingEventTrigger())
+                cVictim->GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_DIE, cVictim);
+
             // Dungeon specific stuff, only applies to players killing creatures
             if(cVictim->GetInstanceId())
             {
@@ -799,7 +880,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                         if (save->GetResetTime() < resettime)
                             save->SetResetTime(resettime);
                     }
-                    
+
                     // update encounter state if needed
                     ((DungeonMap*)m)->GetPersistanceState()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, ((Creature*)cVictim)->GetEntry());
                 }
@@ -7758,6 +7839,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
 
         if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEnterCombat(pCreature);
+
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_AGGRO, pCreature, enemy);
     }
 }
 
@@ -8383,8 +8467,9 @@ void Unit::SetDeathState(DeathState s)
         RemoveMiniPet();
         UnsummonAllTotems();
 
+        i_motionMaster.Clear(false,true);
+        i_motionMaster.MoveIdle();
         StopMoving();
-        DisableSpline();
 
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
         ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
@@ -8488,10 +8573,14 @@ void Unit::TauntApply(Unit* taunter)
     if (target && target == taunter)
         return;
 
-    SetInFront(taunter);
+    // Only attack taunter if this is a valid target
+    if (!hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED) && !IsSecondChoiceTarget(taunter, true))
+    {
+        SetInFront(taunter);
 
-    if (((Creature*)this)->AI())
-        ((Creature*)this)->AI()->AttackStart(taunter);
+        if (((Creature*)this)->AI())
+            ((Creature*)this)->AI()->AttackStart(taunter);
+    }
 
     m_ThreatManager.tauntApply(taunter);
 }
@@ -8521,6 +8610,9 @@ void Unit::TauntFadeOut(Unit *taunter)
         if (InstanceData* mapInstance = GetInstanceData())
             mapInstance->OnCreatureEvade((Creature*)this);
 
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
+
         return;
     }
 
@@ -8534,6 +8626,18 @@ void Unit::TauntFadeOut(Unit *taunter)
         if (((Creature*)this)->AI())
             ((Creature*)this)->AI()->AttackStart(target);
     }
+}
+
+//======================================================================
+
+bool Unit::IsSecondChoiceTarget(Unit* pTarget, bool checkThreatArea)
+{
+    MANGOS_ASSERT(pTarget && GetTypeId() == TYPEID_UNIT);
+
+    return
+        pTarget->IsImmunedToDamage(GetMeleeDamageSchoolMask()) ||
+        pTarget->hasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_DAMAGE) ||
+        checkThreatArea && ((Creature*)this)->IsOutOfThreatArea(pTarget);
 }
 
 //======================================================================
@@ -8554,6 +8658,7 @@ bool Unit::SelectHostileTarget()
         return false;
 
     Unit* target = NULL;
+    Unit* oldTarget = getVictim();
 
     // First checking if we have some taunt on us
     const AuraList& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
@@ -8561,26 +8666,17 @@ bool Unit::SelectHostileTarget()
     {
         Unit* caster;
 
-        // The last taunt aura caster is alive an we are happy to attack him
-        if ((caster = tauntAuras.back()->GetCaster()) && caster->isAlive())
-            return true;
-        else if (tauntAuras.size() > 1)
+        // Find first available taunter target
+        // Auras are pushed_back, last caster will be on the end
+        for (AuraList::const_reverse_iterator aura = tauntAuras.rbegin(); aura != tauntAuras.rend(); ++aura)
         {
-            // We do not have last taunt aura caster but we have more taunt auras,
-            // so find first available target
-
-            // Auras are pushed_back, last caster will be on the end
-            AuraList::const_iterator aura = --tauntAuras.end();
-            do
+            if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) &&
+                caster->isTargetableForAttack() && caster->isInAccessablePlaceFor((Creature*)this) &&
+                !IsSecondChoiceTarget(caster, true))
             {
-                --aura;
-                if ((caster = (*aura)->GetCaster()) && caster->IsInMap(this) &&
-                    caster->isTargetableForAttack() && caster->isInAccessablePlaceFor((Creature*)this))
-                {
-                    target = caster;
-                    break;
-                }
-            }while (aura != tauntAuras.begin());
+                target = caster;
+                break;
+            }
         }
     }
 
@@ -8593,7 +8689,8 @@ bool Unit::SelectHostileTarget()
         if (!hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED))
         {
             SetInFront(target);
-            ((Creature*)this)->AI()->AttackStart(target);
+            if (oldTarget != target)
+                ((Creature*)this)->AI()->AttackStart(target);
         }
         return true;
     }
@@ -8620,6 +8717,9 @@ bool Unit::SelectHostileTarget()
 
     if (InstanceData* mapInstance = GetInstanceData())
         mapInstance->OnCreatureEvade((Creature*)this);
+
+    if (m_isCreatureLinkingTrigger)
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
 
     return false;
 }

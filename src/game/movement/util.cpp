@@ -155,14 +155,14 @@ namespace Movement
 
     const char * g_SplineFlag_names[32]=
     {
-        STR(Forward      ),// 0x00000001,
-        STR(Backward     ),// 0x00000002,
-        STR(Strafe_Left  ),// 0x00000004,
-        STR(Strafe_Right ),// 0x00000008,
-        STR(Left         ),// 0x00000010,
-        STR(Right        ),// 0x00000020,
-        STR(Pitch_Up     ),// 0x00000040,
-        STR(Pitch_Down   ),// 0x00000080,
+        STR(AnimBit1     ),// 0x00000001,
+        STR(AnimBit2     ),// 0x00000002,
+        STR(AnimBit3     ),// 0x00000004,
+        STR(AnimBit4     ),// 0x00000008,
+        STR(AnimBit5     ),// 0x00000010,
+        STR(AnimBit6     ),// 0x00000020,
+        STR(AnimBit7     ),// 0x00000040,
+        STR(AnimBit8     ),// 0x00000080,
         STR(Done         ),// 0x00000100,
         STR(Falling      ),// 0x00000200,           // Not Compartible With Trajectory Movement
         STR(No_Spline    ),// 0x00000400,
@@ -174,7 +174,7 @@ namespace Movement
         STR(Final_Target ),// 0x00010000,
         STR(Final_Angle  ),// 0x00020000,
         STR(Catmullrom   ),// 0x00040000,           // Used Catmullrom Interpolation Mode
-        STR(Cyclic       ),// 0x00080000,           // Movement By Cycled Spline 
+        STR(Cyclic       ),// 0x00080000,           // Movement By Cycled Spline
         STR(Enter_Cycle  ),// 0x00100000,           // Everytime Appears With Cyclic Flag In Monster Move Packet
         STR(Animation    ),// 0x00200000,           // Animationid (0...3), Uint32 Time, Not Compartible With Trajectory And Fall Movement
         STR(Unknown4     ),// 0x00400000,           // Disables Movement By Path
@@ -182,7 +182,7 @@ namespace Movement
         STR(Unknown6     ),// 0x01000000,
         STR(Unknown7     ),// 0x02000000,
         STR(Unknown8     ),// 0x04000000,
-        STR(Backward     ),// 0x08000000,           // Appears With Walkmode Flag, Nodes ),// 1, Handles Orientation
+        STR(OrientationInversed ),// 0x08000000,           // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
         STR(Unknown10    ),// 0x10000000,
         STR(Unknown11    ),// 0x20000000,
         STR(Unknown12    ),// 0x40000000,
@@ -193,7 +193,7 @@ namespace Movement
     void print_flags(Flags t, const char* (&names)[N], std::string& str)
     {
         for (int i = 0; i < N; ++i)
-        { 
+        {
             if ((t & (Flags)(1 << i)) && names[i] != NULL)
                 str.append(" ").append(names[i]);
         }

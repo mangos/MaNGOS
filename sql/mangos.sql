@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_11785_01_mangos_instance_encounters` bit(1) default NULL
+  `required_11831_02_mangos_command` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -581,6 +581,7 @@ INSERT INTO `command` VALUES
 ('event stop',2,'Syntax: .event stop #event_id\r\nStop event #event_id. Set start time for event to time in past that make current moment is event stop time (change not saved in DB).'),
 ('explorecheat',3,'Syntax: .explorecheat #flag\r\n\r\nReveal  or hide all maps for the selected player. If no player is selected, hide or reveal maps to you.\r\n\r\nUse a #flag of value 1 to reveal, use a #flag value of 0 to hide all maps.'),
 ('flusharenapoints','3','Syntax: .flusharenapoints\r\n\r\nUse it to distribute arena points based on arena team ratings, and start a new week.'),
+('gearscore',3,'Syntax: .gearscore [#withBags] [#withBank]\r\n\r\nShow selected player\'s gear score. Check items in bags if #withBags != 0 and check items in Bank if #withBank != 0. Default: 1 for bags and 0 for bank'),
 ('gm',1,'Syntax: .gm [on/off]\r\n\r\nEnable or Disable in game GM MODE or show current state of on/off not provided.'),
 ('gm chat',1,'Syntax: .gm chat [on/off]\r\n\r\nEnable or disable chat GM MODE (show gm badge in messages) or show current state of on/off not provided.'),
 ('gm fly',3,'Syntax: .gm fly [on/off]\r\nEnable/disable gm fly mode.'),
@@ -943,6 +944,28 @@ CREATE TABLE `creature_involvedrelation` (
 LOCK TABLES `creature_involvedrelation` WRITE;
 /*!40000 ALTER TABLE `creature_involvedrelation` DISABLE KEYS */;
 /*!40000 ALTER TABLE `creature_involvedrelation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `creature_linking_template`
+--
+
+DROP TABLE IF EXISTS creature_linking_template;
+CREATE TABLE creature_linking_template (
+  entry INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'creature_template.entry of the slave mob that is linked',
+  map MEDIUMINT(8) UNSIGNED NOT NULL COMMENT 'Id of map of the mobs',
+  master_entry INT(10) UNSIGNED NOT NULL COMMENT 'master to trigger events',
+  flag MEDIUMINT(8) UNSIGNED NOT NULL COMMENT 'flag - describing what should happen when',
+  PRIMARY KEY (entry, map)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature Linking System';
+
+--
+-- Dumping data for table `creature_linking_template`
+--
+
+LOCK TABLES `creature_linking_template` WRITE;
+/*!40000 ALTER TABLE `creature_linking_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `creature_linking_template` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1876,6 +1899,29 @@ CREATE TABLE `gameobject` (
 LOCK TABLES `gameobject` WRITE;
 /*!40000 ALTER TABLE `gameobject` DISABLE KEYS */;
 /*!40000 ALTER TABLE `gameobject` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `gameobject_addon`
+--
+
+DROP TABLE IF EXISTS `gameobject_addon`;
+CREATE TABLE `gameobject_addon` (
+  `guid` int(10) unsigned NOT NULL default '0',
+  `path_rotation0` float NOT NULL default '0',
+  `path_rotation1` float NOT NULL default '0',
+  `path_rotation2` float NOT NULL default '0',
+  `path_rotation3` float NOT NULL default '1',
+  PRIMARY KEY  (`guid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gameobject System';
+
+--
+-- Dumping data for table `gameobject_addon`
+--
+
+LOCK TABLES `gameobject_addon` WRITE;
+/*!40000 ALTER TABLE `gameobject_addon` DISABLE KEYS */;
+/*!40000 ALTER TABLE `gameobject_addon` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -3712,7 +3758,7 @@ INSERT INTO `mangos_string` VALUES
 (704,'The Arena battle has begun!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (705,'You must wait %s before speaking again.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (706,'This item(s) have problems with equipping/storing in inventory.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(707,'%s wishes to not be disturbed and cannot receive whisper messages: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(707,'%s does not wish to be disturbed: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (708,'%s is Away from Keyboard: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (709,'Do not Disturb',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (710,'Away from Keyboard',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -3920,6 +3966,7 @@ INSERT INTO `mangos_string` VALUES
 (1189,'Yellow',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1190,'Amount of %s items is set to %u.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1191,'Items ratio for %s is set to %u.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1193,'Gear Score of Player %s is %u.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1200,'You try to view cinemitic %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1201,'You try to view movie %u but it doesn\'t exist.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1202,'Spell %u %s = %f (*1.88 = %f) DB = %f AP = %f',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),

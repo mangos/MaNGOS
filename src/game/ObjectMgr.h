@@ -344,7 +344,7 @@ enum ConditionType
     CONDITION_TEAM                  = 6,                    // player_team  0,      (469 - Alliance 67 - Horde)
     CONDITION_SKILL                 = 7,                    // skill_id     skill_value
     CONDITION_QUESTREWARDED         = 8,                    // quest_id     0
-    CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,      for condition true while quest active.
+    CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,1,2   for condition true while quest active (0 any state, 1 if quest incomplete, 2 if quest completed).
     CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD commission aura active
     CONDITION_NO_AURA               = 11,                   // spell_id     effindex
     CONDITION_ACTIVE_GAME_EVENT     = 12,                   // event_id     0
@@ -367,6 +367,9 @@ enum ConditionType
                                                             // True when player can learn ability (using min skill value from SkillLineAbility).
                                                             // Item_id can be defined in addition, to check if player has one (1) item in inventory or bank.
                                                             // When player has spell or has item (when defined), condition return false.
+    CONDITION_SKILL_BELOW           = 29,                   // skill_id     skill_value
+                                                            // True if player has skill skill_id and skill less than (and not equal) skill_value (for skill_value > 1)
+                                                            // If skill_value == 1, then true if player has not skill skill_id
 };
 
 struct PlayerCondition
@@ -654,7 +657,8 @@ class ObjectMgr
         void LoadCreatureModelRace();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
-        void LoadGameobjects();
+        void LoadGameObjects();
+        void LoadGameObjectAddon();
         void LoadItemPrototypes();
         void LoadItemConverts();
         void LoadItemExpireConverts();
@@ -1020,7 +1024,7 @@ class ObjectMgr
         {
             return m_ItemRequiredTarget.equal_range(uiItemEntry);
         }
-        
+
         DungeonEncounterMapBounds GetDungeonEncounterBounds(uint32 creditEntry) const
         {
             return m_DungeonEncounters.equal_range(creditEntry);

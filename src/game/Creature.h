@@ -207,6 +207,12 @@ struct CreatureData
     ObjectGuid GetObjectGuid(uint32 lowguid) const;
 };
 
+enum SplineFlags
+{
+    SPLINEFLAG_WALKMODE     = 0x00001000,
+    SPLINEFLAG_FLYING       = 0x00002000,
+};
+
 // from `creature_addon` and `creature_template_addon`tables
 struct CreatureDataAddon
 {
@@ -292,13 +298,14 @@ enum AttackingTarget
 
 enum SelectFlags
 {
-    SELECT_FLAG_IN_LOS          = 0x001,                    // Default Selection Requirement for Spell-targets
-    SELECT_FLAG_PLAYER          = 0x002,
-    SELECT_FLAG_POWER_MANA      = 0x004,                    // For Energy based spells, like manaburn
-    SELECT_FLAG_POWER_RAGE      = 0x008,
-    SELECT_FLAG_POWER_ENERGY    = 0x010,
-    SELECT_FLAG_POWER_RUNIC     = 0x020,
-    SELECT_FLAG_IN_MELEE_RANGE  = 0x040,
+    SELECT_FLAG_IN_LOS              = 0x001,                // Default Selection Requirement for Spell-targets
+    SELECT_FLAG_PLAYER              = 0x002,
+    SELECT_FLAG_POWER_MANA          = 0x004,                // For Energy based spells, like manaburn
+    SELECT_FLAG_POWER_RAGE          = 0x008,
+    SELECT_FLAG_POWER_ENERGY        = 0x010,
+    SELECT_FLAG_POWER_RUNIC         = 0x020,
+    SELECT_FLAG_IN_MELEE_RANGE      = 0x040,
+    SELECT_FLAG_NOT_IN_MELEE_RANGE  = 0x080,
 };
 
 // Vendors
@@ -456,7 +463,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void RemoveFromWorld();
 
         bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team = TEAM_NONE, const CreatureData *data = NULL, GameEventCreatureData const* eventData = NULL);
-        bool LoadCreatureAddon(bool reload = false);
+        bool LoadCreatureAddon(bool reload);
         void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
@@ -576,7 +583,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         const char* GetNameForLocaleIdx(int32 locale_idx) const;
 
         void SetDeathState(DeathState s);                   // overwrite virtual Unit::SetDeathState
-        bool FallGround();
 
         bool LoadFromDB(uint32 guid, Map *map);
         void SaveToDB();
@@ -681,8 +687,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonPos.x; fY = m_summonPos.y; fZ = m_summonPos.z; fOrient = m_summonPos.o; }
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
-
-        void SetActiveObjectState(bool on);
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();
