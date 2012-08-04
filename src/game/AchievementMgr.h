@@ -70,8 +70,6 @@ enum AchievementCriteriaRequirementType
     ACHIEVEMENT_CRITERIA_REQUIRE_KNOWN_TITLE         = 21,  // title_id                     known (pvp) title, values from dbc
 };
 
-#define MAX_ACHIEVEMENT_CRITERIA_REQUIREMENT_TYPE      22   // maximum value in AchievementCriteriaRequirementType enum
-
 class Player;
 class Unit;
 

@@ -1323,6 +1323,7 @@ enum SpellRangeIndex
 {
     SPELL_RANGE_IDX_SELF_ONLY = 1,                          // 0.0
     SPELL_RANGE_IDX_COMBAT    = 2,                          // 5.5 (but dynamic)
+    SPELL_RANGE_IDX_ANYWHERE  = 13,                         // 500000 (anywhere)
 };
 
 enum DamageEffectType
@@ -2964,6 +2965,12 @@ enum TradeStatus
     TRADE_STATUS_TARGET_LOGOUT  = 20,
     TRADE_STATUS_TRIAL_ACCOUNT  = 21,                       // Trial accounts can not perform that action
     TRADE_STATUS_ONLY_CONJURED  = 22                        // You can only trade conjured items... (cross realm BG related).
+};
+
+enum EncounterCreditType
+{	
+    ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
+    ENCOUNTER_CREDIT_CAST_SPELL     = 1
 };
 
 // we need to stick to 1 version or half of the stuff will work for someone

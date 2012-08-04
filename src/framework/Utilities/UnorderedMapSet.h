@@ -31,7 +31,7 @@
 #elif COMPILER == COMPILER_GNU && __GNUC__ >= 3
 #  include <ext/hash_map>
 #  include <ext/hash_set>
-#elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1500 && _HAS_TR1   // VC9.0 SP1 and later
+#elif COMPILER == COMPILER_MICROSOFT && (_MSC_VER > 1500 || _MSC_VER == 1500 && _HAS_TR1)   // VC9.0 SP1 and later
 #  include <unordered_map>
 #  include <unordered_set>
 #else
@@ -47,8 +47,8 @@
 using std::hash_map;
 using std::hash_set;
 #elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1600    // VS100
-#  define UNORDERED_MAP std::tr1::unordered_map
-#  define UNORDERED_SET std::tr1::unordered_set
+#  define UNORDERED_MAP std::unordered_map
+#  define UNORDERED_SET std::unordered_set
 #  define HASH_NAMESPACE_START namespace std {
 #  define HASH_NAMESPACE_END }
 #elif COMPILER == COMPILER_MICROSOFT && _MSC_VER >= 1500 && _HAS_TR1

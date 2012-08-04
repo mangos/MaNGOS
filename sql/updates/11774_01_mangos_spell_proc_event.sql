@@ -1,0 +1,5 @@
+ALTER TABLE db_version CHANGE COLUMN required_11773_02_mangos_spell_chain required_11774_01_mangos_spell_proc_event bit;
+
+DELETE FROM spell_proc_event WHERE entry = 11129;
+INSERT INTO spell_proc_event VALUES
+(11129, 0x00,  3, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000003, 0.000000, 0.000000, 0);

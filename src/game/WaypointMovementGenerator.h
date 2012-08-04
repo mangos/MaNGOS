@@ -43,8 +43,6 @@ class MANGOS_DLL_SPEC PathMovementBase
         PathMovementBase() : i_currentNode(0) {}
         virtual ~PathMovementBase() {};
 
-        bool MovementInProgress(void) const { return (i_currentNode+1) < i_path->size(); }
-
         // template pattern, not defined .. override required
         void LoadPath(T &);
         uint32 GetCurrentNode() const { return i_currentNode; }

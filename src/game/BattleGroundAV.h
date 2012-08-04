@@ -68,6 +68,8 @@
 #define BG_AV_REP_OWNED_MINE                24
 #define BG_AV_REP_OWNED_MINE_HOLIDAY        36
 
+#define BG_AV_EVENT_START_BATTLE            9166
+
 enum BG_AV_Sounds
 {
     BG_AV_SOUND_NEAR_LOSE               = 8456,             // not confirmed yet

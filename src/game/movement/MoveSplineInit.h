@@ -102,15 +102,6 @@ namespace Movement
         MoveSplineInitArgs args;
         Unit&  unit;
     };
-    
-    inline void MoveJumpInit(Unit& st, const Vector3& dest, float velocity, float parabolic_heigth = 0.5f)
-    {
-        MoveSplineInit init(st);
-        init.MoveTo(dest);
-        init.SetParabolic(parabolic_heigth,0,false);
-        init.SetVelocity(velocity);
-        init.Launch();
-    }
 
     inline void MoveSplineInit::SetFly() { args.flags.EnableFlying();}
     inline void MoveSplineInit::SetWalk(bool enable) { args.flags.walkmode = enable;}

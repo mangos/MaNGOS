@@ -154,6 +154,7 @@ enum EYBattleGroundObjectTypes
 
 #define BG_EY_NotEYWeekendHonorTicks    330
 #define BG_EY_EYWeekendHonorTicks       200
+#define BG_EY_EVENT_START_BATTLE        13180
 
 enum BG_EY_Score
 {

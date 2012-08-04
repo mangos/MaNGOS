@@ -312,16 +312,21 @@ void FlightPathMovementGenerator::Reset(Player & player)
 
 bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
 {
-    int32 pointId = player.movespline->currentPathIdx();
-    // currentPathIdx returns lastIdx + 1 at arrive
-    while (i_currentNode < pointId)
+    uint32 pointId = (uint32)player.movespline->currentPathIdx();
+    if (pointId > i_currentNode)
     {
-        DoEventIfAny(player,(*i_path)[i_currentNode],true);
-        DoEventIfAny(player,(*i_path)[i_currentNode],false);
-        ++i_currentNode;
+        bool departureEvent = true;
+        do
+        {
+            DoEventIfAny(player,(*i_path)[i_currentNode],departureEvent);
+            if (pointId == i_currentNode)
+                break;
+            i_currentNode += (uint32)departureEvent;
+            departureEvent = !departureEvent;
+        } while(true);
     }
-    
-    return MovementInProgress();
+
+    return i_currentNode < (i_path->size()-1);
 }
 
 void FlightPathMovementGenerator::SetCurrentNodeAfterTeleport()

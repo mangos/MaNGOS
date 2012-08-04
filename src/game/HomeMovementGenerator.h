@@ -32,7 +32,7 @@ class MANGOS_DLL_SPEC HomeMovementGenerator<Creature>
 {
     public:
 
-        HomeMovementGenerator() {}
+        HomeMovementGenerator() : arrived(false) {}
         ~HomeMovementGenerator() {}
 
         void Initialize(Creature &);
@@ -40,11 +40,10 @@ class MANGOS_DLL_SPEC HomeMovementGenerator<Creature>
         void Interrupt(Creature &) {}
         void Reset(Creature &);
         bool Update(Creature &, const uint32 &);
-        void modifyTravelTime(uint32 travel_time) { i_travel_timer = travel_time; }
         MovementGeneratorType GetMovementGeneratorType() const { return HOME_MOTION_TYPE; }
 
     private:
         void _setTargetLocation(Creature &);
-        uint32 i_travel_timer;
+        bool arrived;
 };
 #endif

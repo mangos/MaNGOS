@@ -38,7 +38,6 @@
 #include "BattleGround.h"
 #include "DBCStores.h"
 #include "SharedDefines.h"
-#include "SpellAuras.h"
 
 #include<string>
 #include<vector>
@@ -1996,7 +1995,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CastItemUseSpell(Item *item,SpellCastTargets const& targets,uint8 cast_count, uint32 glyphIndex);
 
         void ApplyItemOnStoreSpell(Item *item, bool apply);
-        void DestroyItemWithOnStoreSpell(Item* item);
+        void DestroyItemWithOnStoreSpell(Item* item, uint32 spellId);
 
         void SendEquipmentSetList();
         void SetEquipmentSet(uint32 index, EquipmentSet eqset);
@@ -2637,42 +2636,5 @@ class MANGOS_DLL_SPEC Player : public Unit
 
 void AddItemsSetItem(Player*player,Item *item);
 void RemoveItemsSetItem(Player*player,ItemPrototype const *proto);
-
-// "the bodies of template functions must be made available in a header file"
-template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell const* spell)
-{
-    SpellEntry const *spellInfo = sSpellStore.LookupEntry(spellId);
-    if (!spellInfo) return 0;
-    int32 totalpct = 0;
-    int32 totalflat = 0;
-    for (AuraList::iterator itr = m_spellMods[op].begin(); itr != m_spellMods[op].end(); ++itr)
-    {
-        Aura *aura = *itr;
-        
-        Modifier const* mod = aura->GetModifier();
-
-        if (!aura->isAffectedOnSpell(spellInfo))
-            continue;
-
-        if (mod->m_auraname == SPELL_AURA_ADD_FLAT_MODIFIER)
-            totalflat += mod->m_amount;
-        else
-        {
-            // skip percent mods for null basevalue (most important for spell mods with charges )
-            if (basevalue == T(0))
-                continue;
-
-            // special case (skip >10sec spell casts for instant cast setting)
-            if (mod->m_miscvalue == SPELLMOD_CASTING_TIME  && basevalue >= T(10*IN_MILLISECONDS) && mod->m_amount <= -100)
-                continue;
-
-            totalpct += mod->m_amount;
-        }
-    }
-
-    float diff = (float)basevalue*(float)totalpct/100.0f + (float)totalflat;
-    basevalue = T((float)basevalue + diff);
-    return T(diff);
-}
 
 #endif

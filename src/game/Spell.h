@@ -64,6 +64,13 @@ enum SpellCastFlags
     CAST_FLAG_IMMUNITY          = 0x04000000                // spell cast school imminity info
 };
 
+enum SpellFlags
+{
+    SPELL_FLAG_NORMAL       = 0x00,
+    SPELL_FLAG_REFLECTED    = 0x01,     // reflected spell
+    SPELL_FLAG_REDIRECTED   = 0x02      // redirected spell
+};
+
 enum SpellNotifyPushType
 {
     PUSH_IN_FRONT,
@@ -514,6 +521,7 @@ class Spell
         int32 m_casttime;                                   // Calculated spell cast time initialized only in Spell::prepare
         int32 m_duration;
         bool m_canReflect;                                  // can reflect this spell?
+        uint8 m_spellFlags;                                 // for spells whose target was changed in cast i.e. due to reflect
         bool m_autoRepeat;
         uint8 m_runesState;
 
@@ -615,7 +623,7 @@ class Spell
         void HandleDelayedSpellLaunch(TargetInfo *target);
         void InitializeDamageMultipliers();
         void ResetEffectDamageAndHeal();
-        void DoSpellHitOnUnit(Unit *unit, uint32 effectMask, bool isReflected = false);
+        void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool IsAliveUnitPresentInTargetList();

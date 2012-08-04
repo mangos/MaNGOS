@@ -28,6 +28,7 @@
 #include "WaypointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "movement/MoveSpline.h"
+#include "movement/MoveSplineInit.h"
 
 #include <cassert>
 
@@ -58,8 +59,14 @@ void MotionMaster::Initialize()
 
 MotionMaster::~MotionMaster()
 {
-    // clear ALL movement generators (including default)
-    DirectClean(false,true);
+    // just deallocate movement generator, but do not Finalize since it may access to already deallocated owner's memory
+    while(!empty())
+    {
+        MovementGenerator * m = top();
+        pop();
+        if (!isStatic(m))
+            delete m;
+    }
 }
 
 void MotionMaster::UpdateMotion(uint32 diff)
@@ -415,6 +422,7 @@ void MotionMaster::Mutate(MovementGenerator *m)
             case HOME_MOTION_TYPE:
             // DistractMovement interrupted by any other movement
             case DISTRACT_MOTION_TYPE:
+            case EFFECT_MOTION_TYPE:
                 MovementExpired(false);
             default:
                 break;
@@ -461,4 +469,14 @@ void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
 {
     if (!empty())
         top()->UpdateFinalDistance(fDistance);
+}
+
+void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id)
+{
+    Movement::MoveSplineInit init(*m_owner);
+    init.MoveTo(x,y,z);
+    init.SetParabolic(max_height,0,false);
+    init.SetVelocity(horizontalSpeed);
+    init.Launch();
+    Mutate(new EffectMovementGenerator(id));
 }

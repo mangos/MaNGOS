@@ -1363,6 +1363,22 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     DoCreateItem(effect, newitemid);
                     return;
                 }
+                case 40962:                                 // Blade's Edge Terrace Demon Boss Summon Branch
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    uint32 spell_id = 0;
+                    switch (urand(1,4))
+                    {
+                        case 1: spell_id = 40957; break;    // Blade's Edge Terrace Demon Boss Summon 1
+                        case 2: spell_id = 40959; break;    // Blade's Edge Terrace Demon Boss Summon 2
+                        case 3: spell_id = 40960; break;    // Blade's Edge Terrace Demon Boss Summon 3
+                        case 4: spell_id = 40961; break;    // Blade's Edge Terrace Demon Boss Summon 4
+                    }
+                    unitTarget->CastSpell(unitTarget, spell_id, true);
+                    return;
+                }
                 case 42287:                                 // Salvage Wreckage
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1390,7 +1406,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     // set loot recipient, prevent re-use same target
                     pCreature->SetLootRecipient(m_caster);
 
-                    pCreature->ForcedDespawn(GetSpellDuration(m_spellInfo));
+                    pCreature->ForcedDespawn(m_duration);
 
                     // EFFECT_INDEX_2 has 0 miscvalue for effect 134, doing the killcredit here instead (only one known case exist where 0)
                     ((Player*)m_caster)->KilledMonster(pCreature->GetCreatureInfo(), pCreature->GetObjectGuid());
@@ -1591,7 +1607,7 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
                     if (const SpellEntry *pSpell = sSpellStore.LookupEntry(45991))
                     {
                         unitTarget->CastSpell(unitTarget, pSpell, true);
-                        ((Creature*)unitTarget)->ForcedDespawn(GetSpellDuration(pSpell) + 1);
+                        ((Creature*)unitTarget)->ForcedDespawn(m_duration);
                     }
 
                     return;
@@ -4985,9 +5001,9 @@ void Spell::EffectAddFarsight(SpellEffectEntry const* effect)
     if(m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    int32 duration = GetSpellDuration(m_spellInfo);
     DynamicObject* dynObj = new DynamicObject;
 
+    int32 duration = GetSpellDuration(m_spellInfo);
     // set radius to 0: spell not expected to work as persistent aura
     if(!dynObj->Create(m_caster->GetMap()->GenerateLocalLowGuid(HIGHGUID_DYNAMICOBJECT), m_caster, m_spellInfo->Id, SpellEffectIndex(effect->EffectIndex), m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, duration, 0, DYNAMIC_OBJECT_FARSIGHT_FOCUS))
     {
@@ -5066,7 +5082,7 @@ void Spell::DoSummonWild(SpellEffectEntry const* effect, uint32 forceFaction)
             }
         }
 
-        if(Creature *summon = m_caster->SummonCreature(creature_entry, px, py, pz, m_caster->GetOrientation(), summonType, duration))
+        if (Creature *summon = m_caster->SummonCreature(creature_entry, px, py, pz, m_caster->GetOrientation(), summonType, m_duration))
         {
             summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
@@ -6157,9 +6173,7 @@ void Spell::EffectSummonObjectWild(SpellEffectEntry const* effect)
         return;
     }
 
-    int32 duration = GetSpellDuration(m_spellInfo);
-
-    pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
+    pGameObj->SetRespawnTime(m_duration > 0 ? m_duration/IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
 
     // Wild object not have owner and check clickable by players
@@ -6531,6 +6545,22 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                         return;
 
                     unitTarget->CastSpell(unitTarget, 38353, true, NULL, NULL, m_caster->GetObjectGuid());
+                    return;
+                }
+                case 29395:                                 // Break Kaliri Egg
+                {
+                    uint32 creature_id = 0;
+                    uint32 rand = urand(0, 99);
+
+                    if (rand < 10)
+                        creature_id = 17034;
+                    else if (rand < 60)
+                        creature_id = 17035;
+                    else
+                        creature_id = 17039;
+
+                    if (WorldObject* pSource = GetAffectiveCasterObject())
+                        pSource->SummonCreature(creature_id, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120*IN_MILLISECONDS);
                     return;
                 }
                 case 41055:                                 // Copy Weapon
@@ -7332,6 +7362,32 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                     if (unitTarget)
                         unitTarget->CastSpell(unitTarget, effect->CalculateSimpleValue(), true);
                     return;
+                case 68871:                                 // Wailing Souls
+                    // Left or Right direction?
+                    m_caster->CastSpell(m_caster, urand(0, 1) ? 68875 : 68876, false);
+                    // Clear TargetGuid for sweeping
+                    m_caster->SetTargetGuid(ObjectGuid());
+                    return;
+                case 69048:                                 // Mirrored Soul
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // This is extremely strange!
+                    // The spell should send MSG_CHANNEL_START, SMSG_SPELL_START
+                    // However it has cast time 2s, but should send SMSG_SPELL_GO instantly.
+                    m_caster->CastSpell(unitTarget, 69051, true);
+                    return;
+                }
+                case 69051:                                 // Mirrored Soul
+                {
+                    if (!unitTarget)
+                        return;
+
+                    // Actually this spell should be sent with SMSG_SPELL_START
+                    unitTarget->CastSpell(m_caster, 69023, true);
+                    return;
+                }
                 case 69377:                                 // Fortitude
                 {
                     if (!unitTarget)
@@ -7846,8 +7902,8 @@ void Spell::EffectDuel(SpellEffectEntry const* effect)
 
     pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction() );
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel()+1 );
-    int32 duration = GetSpellDuration(m_spellInfo);
-    pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
+
+    pGameObj->SetRespawnTime(m_duration > 0 ? m_duration/IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
 
     m_caster->AddGameObject(pGameObj);
@@ -8209,9 +8265,8 @@ void Spell::EffectSummonObject(SpellEffectEntry const* effect)
         return;
     }
 
-    pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL,m_caster->getLevel());
-    int32 duration = GetSpellDuration(m_spellInfo);
-    pGameObj->SetRespawnTime(duration > 0 ? duration/IN_MILLISECONDS : 0);
+    pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
+    pGameObj->SetRespawnTime(m_duration > 0 ? m_duration/IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
     m_caster->AddGameObject(pGameObj);
 
@@ -8542,9 +8597,8 @@ void Spell::DoSummonCritter(SpellEffectEntry const* effect, uint32 forceFaction)
                                                             // some mini-pets have quests
 
     // set timer for unsummon
-    int32 duration = GetSpellDuration(m_spellInfo);
-    if(duration > 0)
-        critter->SetDuration(duration);
+    if(m_duration > 0)
+        critter->SetDuration(m_duration);
 
     m_caster->SetMiniPet(critter);
 
@@ -8818,7 +8872,7 @@ void Spell::EffectTransmitted(SpellEffectEntry const* effect)
         return;
     }
 
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_duration;
 
     switch(goinfo->type)
     {
