@@ -514,7 +514,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
                     sender_accId = sender->GetSession()->GetAccountId();
                     sender_name = sender->GetName();
                 }
-                else
+                else if (sender_guid)
                 {
                     // can be calculated early
                     sender_accId = sObjectMgr.GetPlayerAccountIdByGUID(sender_guid);
@@ -525,7 +525,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data )
                 sLog.outCommand(GetAccountId(), "GM %s (Account: %u) receive mail item: %s (Entry: %u Count: %u) and send COD money: %u to player: %s (Account: %u)",
                     GetPlayerName(), GetAccountId(), it->GetProto()->Name1, it->GetEntry(), it->GetCount(), m->COD, sender_name.c_str(), sender_accId);
             }
-            else if(!sender)
+            else if (!sender)
                 sender_accId = sObjectMgr.GetPlayerAccountIdByGUID(sender_guid);
 
             // check player existence

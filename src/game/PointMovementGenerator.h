@@ -20,9 +20,8 @@
 #define MANGOS_POINTMOVEMENTGENERATOR_H
 
 #include "MovementGenerator.h"
-#include "DestinationHolder.h"
-#include "Traveller.h"
 #include "FollowerReference.h"
+#include "Creature.h"
 
 template<class T>
 class MANGOS_DLL_SPEC PointMovementGenerator
@@ -30,7 +29,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 {
     public:
         PointMovementGenerator(uint32 _id, float _x, float _y, float _z) : id(_id),
-            i_x(_x), i_y(_y), i_z(_z), i_nextMoveTime(0) {}
+            i_x(_x), i_y(_y), i_z(_z) {}
 
         void Initialize(T &);
         void Finalize(T &);
@@ -46,8 +45,6 @@ class MANGOS_DLL_SPEC PointMovementGenerator
     private:
         uint32 id;
         float i_x,i_y,i_z;
-        TimeTracker i_nextMoveTime;
-        DestinationHolder< Traveller<T> > i_destinationHolder;
 };
 
 class MANGOS_DLL_SPEC AssistanceMovementGenerator

@@ -17,10 +17,11 @@
  */
 
 #include "ConfusedMovementGenerator.h"
-#include "Creature.h"
 #include "MapManager.h"
-#include "Opcodes.h"
-#include "DestinationHolderImp.h"
+#include "Creature.h"
+#include "Player.h"
+#include "movement/MoveSplineInit.h"
+#include "movement/MoveSpline.h"
 
 template<class T>
 void
@@ -71,8 +72,6 @@ template<>
 void
 ConfusedMovementGenerator<Creature>::_InitSpecific(Creature &creature, bool &is_water_ok, bool &is_land_ok)
 {
-    creature.RemoveSplineFlag(SPLINEFLAG_WALKMODE);
-
     is_water_ok = creature.CanSwim();
     is_land_ok  = creature.CanWalk();
 }
@@ -97,7 +96,6 @@ void ConfusedMovementGenerator<T>::Reset(T &unit)
 {
     i_nextMove = 1;
     i_nextMoveTime.Reset(0);
-    i_destinationHolder.ResetUpdate();
     unit.StopMoving();
     unit.addUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
 }
@@ -105,9 +103,6 @@ void ConfusedMovementGenerator<T>::Reset(T &unit)
 template<class T>
 bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 {
-    if(!&unit)
-        return true;
-
     // ignore in case other no reaction state
     if (unit.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_CONFUSED))
         return true;
@@ -116,36 +111,30 @@ bool ConfusedMovementGenerator<T>::Update(T &unit, const uint32 &diff)
     {
         // currently moving, update location
         unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
-        Traveller<T> traveller(unit);
-        if (i_destinationHolder.UpdateTraveller(traveller, diff, false))
+
+        if (unit.movespline->Finalized())
         {
-            if (!IsActive(unit))                            // force stop processing (movement can move out active zone with cleanup movegens list)
-                return true;                                // not expire now, but already lost
-
-            if (i_destinationHolder.HasArrived())
-            {
-                // arrived, stop and wait a bit
-                unit.StopMoving();
-
-                i_nextMove = urand(1,MAX_CONF_WAYPOINTS);
-                i_nextMoveTime.Reset(urand(0, 1500-1));     // TODO: check the minimum reset time, should be probably higher
-            }
+            i_nextMove = urand(1,MAX_CONF_WAYPOINTS);
+            i_nextMoveTime.Reset(urand(0, 1500-1));     // TODO: check the minimum reset time, should be probably higher
         }
     }
     else
     {
         // waiting for next move
         i_nextMoveTime.Update(diff);
-        if( i_nextMoveTime.Passed() )
+        if(i_nextMoveTime.Passed() )
         {
             // start moving
             unit.addUnitState(UNIT_STAT_CONFUSED_MOVE);
+
             MANGOS_ASSERT( i_nextMove <= MAX_CONF_WAYPOINTS );
-            const float x = i_waypoints[i_nextMove][0];
-            const float y = i_waypoints[i_nextMove][1];
-            const float z = i_waypoints[i_nextMove][2];
-            Traveller<T> traveller(unit);
-            i_destinationHolder.SetDestination(traveller, x, y, z);
+            float x = i_waypoints[i_nextMove][0];
+            float y = i_waypoints[i_nextMove][1];
+            float z = i_waypoints[i_nextMove][2];
+            Movement::MoveSplineInit init(unit);
+            init.MoveTo(x, y, z);
+            init.SetWalk(true);
+            init.Launch();
         }
     }
     return true;
@@ -161,7 +150,6 @@ template<>
 void ConfusedMovementGenerator<Creature>::Finalize(Creature &unit)
 {
     unit.clearUnitState(UNIT_STAT_CONFUSED|UNIT_STAT_CONFUSED_MOVE);
-    unit.AddSplineFlag(SPLINEFLAG_WALKMODE);
 }
 
 template void ConfusedMovementGenerator<Player>::Initialize(Player &player);

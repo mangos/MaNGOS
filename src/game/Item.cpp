@@ -787,13 +787,6 @@ int32 Item::GenerateItemRandomPropertyId(uint32 item_id)
     if ((!itemProto->RandomProperty) && (!itemProto->RandomSuffix))
         return 0;
 
-    // item can have not null only one from field values
-    if ((itemProto->RandomProperty) && (itemProto->RandomSuffix))
-    {
-        sLog.outErrorDb("Item template %u have RandomProperty==%u and RandomSuffix==%u, but must have one from field =0", itemProto->ItemId, itemProto->RandomProperty, itemProto->RandomSuffix);
-        return 0;
-    }
-
     // Random Property case
     if (itemProto->RandomProperty)
     {
@@ -874,7 +867,8 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
     if (uState == ITEM_NEW && state == ITEM_REMOVED)
     {
         // pretend the item never existed
-        RemoveFromUpdateQueueOf(forplayer);
+        if (forplayer || GetOwnerGuid())
+            RemoveFromUpdateQueueOf(forplayer);
         delete this;
         return;
     }
@@ -883,7 +877,9 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
     {
         // new items must stay in new state until saved
         if (uState != ITEM_NEW) uState = state;
-        AddToUpdateQueueOf(forplayer);
+
+        if (forplayer || GetOwnerGuid())
+            AddToUpdateQueueOf(forplayer);
     }
     else
     {
@@ -1217,7 +1213,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->GetSession()->SendPacket(&data);
 }
 
-Item* Item::CreateItem( uint32 item, uint32 count, Player const* player )
+Item* Item::CreateItem( uint32 item, uint32 count, Player const* player, uint32 randomPropertyId)
 {
     if (count < 1)
         return NULL;                                        //don't create item at zero count
@@ -1233,6 +1229,9 @@ Item* Item::CreateItem( uint32 item, uint32 count, Player const* player )
         if (pItem->Create(sObjectMgr.GenerateItemLowGuid(), item, player))
         {
             pItem->SetCount(count);
+            if (uint32 randId = randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item))
+                pItem->SetItemRandomProperties(randId);
+
             return pItem;
         }
         else
@@ -1243,7 +1242,7 @@ Item* Item::CreateItem( uint32 item, uint32 count, Player const* player )
 
 Item* Item::CloneItem(uint32 count, Player const* player) const
 {
-    Item* newItem = CreateItem(GetEntry(), count, player);
+    Item* newItem = CreateItem(GetEntry(), count, player, GetItemRandomPropertyId());
     if (!newItem)
         return NULL;
 
@@ -1251,7 +1250,6 @@ Item* Item::CloneItem(uint32 count, Player const* player) const
     newItem->SetGuidValue(ITEM_FIELD_GIFTCREATOR, GetGuidValue(ITEM_FIELD_GIFTCREATOR));
     newItem->SetUInt32Value(ITEM_FIELD_FLAGS,     GetUInt32Value(ITEM_FIELD_FLAGS));
     newItem->SetUInt32Value(ITEM_FIELD_DURATION,  GetUInt32Value(ITEM_FIELD_DURATION));
-    newItem->SetItemRandomProperties(GetItemRandomPropertyId());
     return newItem;
 }
 

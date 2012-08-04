@@ -37,7 +37,6 @@ class Player;
 class Spell;
 class Unit;
 struct CreatureInfo;
-struct SpellModifier;
 
 // only used in code
 enum SpellCategories
@@ -119,6 +118,26 @@ inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
     return false;
 }
 
+inline bool IsAuraApplyEffect(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
+{
+    SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(effecIdx);
+    if(!effectEntry)
+        return false;
+
+    switch (effectEntry->Effect)
+    {
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+            return true;
+    }
+    return false;
+}
+
 inline bool IsSpellAppliesAura(SpellEntry const *spellInfo, uint32 effectMask = ((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)))
 {
     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -157,6 +176,21 @@ inline bool IsEffectHandledOnDelayedSpellLaunch(SpellEntry const *spellInfo, Spe
         case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
         case SPELL_EFFECT_WEAPON_DAMAGE:
         case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+            return true;
+        default:
+            return false;
+    }
+}
+
+inline bool IsPeriodicRegenerateEffect(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
+{
+    SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(effecIdx);
+    AuraType aurNameReal = AuraType(effectEntry ? effectEntry->EffectApplyAuraName : SPELL_AURA_NONE);
+    switch (aurNameReal)
+    {
+        case SPELL_AURA_PERIODIC_ENERGIZE:
+        case SPELL_AURA_PERIODIC_HEAL:
+        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
             return true;
         default:
             return false;
@@ -639,6 +673,13 @@ enum ProcFlags
                                PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT | \
                                PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT)
 
+#define SPELL_CAST_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT    | \
+                                 PROC_FLAG_SUCCESSFUL_RANGED_HIT         | \
+                                 PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT   | \
+                                 PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT   | \
+                                 PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT      | \
+                                 PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL     | \
+                                 PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)
 enum ProcFlagsEx
 {
     PROC_EX_NONE                = 0x0000000,                // If none can tigger on Hit/Crit only (passive spells MUST defined by SpellFamily flag)

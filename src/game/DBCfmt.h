@@ -72,6 +72,7 @@ const char ItemArmorTotalfmt[]="niffff";
 const char ItemBagFamilyfmt[]="nx";
 //const char ItemDisplayTemplateEntryfmt[]="nxxxxxxxxxxixxxxxxxxxxx";
 //const char ItemCondExtCostsEntryfmt[]="xiii";
+//const char ItemExtendedCostEntryfmt[]="niiiiiiiiiiiiiix";
 const char ItemDamagefmt[]="nfffffffi";
 const char ItemLimitCategoryEntryfmt[]="nxii";
 const char ItemRandomPropertiesfmt[]="nxiiiiis";

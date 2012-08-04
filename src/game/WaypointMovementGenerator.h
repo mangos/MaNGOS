@@ -26,10 +26,7 @@
  */
 
 #include "MovementGenerator.h"
-#include "DestinationHolder.h"
 #include "WaypointManager.h"
-#include "Path.h"
-#include "Traveller.h"
 
 #include "Player.h"
 
@@ -46,18 +43,15 @@ class MANGOS_DLL_SPEC PathMovementBase
         PathMovementBase() : i_currentNode(0) {}
         virtual ~PathMovementBase() {};
 
-        bool MovementInProgress(void) const { return i_currentNode < i_path->size(); }
+        bool MovementInProgress(void) const { return (i_currentNode+1) < i_path->size(); }
 
         // template pattern, not defined .. override required
         void LoadPath(T &);
         uint32 GetCurrentNode() const { return i_currentNode; }
 
-        bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x,y,z); return true; }
-        bool GetPosition(float& x, float& y, float& z) const { i_destinationHolder.GetLocationNowNoMicroMovement(x,y,z); return true; }
     protected:
-        uint32 i_currentNode;
-        DestinationHolder< Traveller<T> > i_destinationHolder;
         P i_path;
+        uint32 i_currentNode;
 };
 
 /** WaypointMovementGenerator loads a series of way points
@@ -74,7 +68,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), m_isArrivalDone(false), m_isStoppedByPlayer(false) {}
+        WaypointMovementGenerator(Creature &) : i_nextMoveTime(0), m_isArrivalDone(false) {}
         ~WaypointMovementGenerator() { i_path = NULL; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
@@ -89,19 +83,31 @@ public PathMovementBase<Creature, WaypointPath const*>
         // now path movement implmementation
         void LoadPath(Creature &c);
 
-        // Player stoping creature
-        bool IsStoppedByPlayer() { return m_isStoppedByPlayer; }
-        void SetStoppedByPlayer(bool val) { m_isStoppedByPlayer = val; }
-
-        // allow use for overwrite empty implementation
-        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Creature, WaypointPath const*>::GetDestination(x,y,z); }
-
         bool GetResetPosition(Creature&, float& x, float& y, float& z);
 
     private:
+
+        void Stop(int32 time) { i_nextMoveTime.Reset(time);}
+
+        bool Stopped() { return !i_nextMoveTime.Passed();}
+
+        bool CanMove(int32 diff)
+        {
+            i_nextMoveTime.Update(diff);
+            return i_nextMoveTime.Passed();
+        }
+
+        void OnArrived(Creature&);
+        void StartMove(Creature&);
+
+        void StartMoveNow(Creature& creature)
+        {
+            i_nextMoveTime.Reset(0);
+            StartMove(creature);
+        }
+
         ShortTimeTracker i_nextMoveTime;
         bool m_isArrivalDone;
-        bool m_isStoppedByPlayer;
 };
 
 /** FlightPathMovementGenerator generates movement of the player for the paths
@@ -130,8 +136,6 @@ public PathMovementBase<Player,TaxiPathNodeList const*>
         void SetCurrentNodeAfterTeleport();
         void SkipCurrentNode() { ++i_currentNode; }
         void DoEventIfAny(Player& player, TaxiPathNodeEntry const& node, bool departure);
-
-        // allow use for overwrite empty implementation
-        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Player,TaxiPathNodeList const*>::GetDestination(x,y,z); }
+        bool GetResetPosition(Player&, float& x, float& y, float& z);
 };
 #endif

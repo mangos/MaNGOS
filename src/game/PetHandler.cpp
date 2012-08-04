@@ -327,25 +327,18 @@ void WorldSession::SendPetNameQuery(ObjectGuid petguid, uint32 petnumber)
         return;
     }
 
-    std::string name = pet->GetName();
+    char const* name = pet->GetName();
 
     // creature pets have localization like other creatures
     if (!pet->GetOwnerGuid().IsPlayer())
     {
         int loc_idx = GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-        {
-            if (CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(pet->GetEntry()))
-            {
-                if (cl->Name.size() > size_t(loc_idx) && !cl->Name[loc_idx].empty())
-                    name = cl->Name[loc_idx];
-            }
-        }
+        sObjectMgr.GetCreatureLocaleStrings(pet->GetEntry(), loc_idx, &name);
     }
 
-    WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+name.size()+1));
+    WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4+4+strlen(name)+1));
     data << uint32(petnumber);
-    data << name.c_str();
+    data << name;
     data << uint32(pet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
 
     if (pet->IsPet() && ((Pet*)pet)->GetDeclinedNames())
