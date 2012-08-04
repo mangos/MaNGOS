@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1092,6 +1092,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // data->guid = guid don't must be update at save
     data.id = GetEntry();
     data.mapid = mapid;
+    data.spawnMask = spawnMask;
     data.phaseMask = phaseMask;
     data.modelid_override = displayId;
     data.equipmentId = GetEquipmentId();
@@ -1109,7 +1110,6 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     // prevent add data integrity problems
     data.movementType = !m_respawnradius && GetDefaultMovementType()==RANDOM_MOTION_TYPE
         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
-    data.spawnMask = spawnMask;
 
     // updated in DB
     WorldDatabase.BeginTransaction();
@@ -1119,23 +1119,23 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     std::ostringstream ss;
     ss << "INSERT INTO creature VALUES ("
         << GetGUIDLow() << ","
-        << GetEntry() << ","
-        << mapid <<","
-        << uint32(spawnMask) << ","                         // cast to prevent save as symbol
-        << uint16(GetPhaseMask()) << ","                    // prevent out of range error
-        << displayId <<","
-        << GetEquipmentId() <<","
-        << GetPositionX() << ","
-        << GetPositionY() << ","
-        << GetPositionZ() << ","
-        << GetOrientation() << ","
-        << m_respawnDelay << ","                            //respawn time
-        << (float) m_respawnradius << ","                   //spawn distance (float)
-        << (uint32) (0) << ","                              //currentwaypoint
-        << GetHealth() << ","                               //curhealth
-        << GetPower(POWER_MANA) << ","                      //curmana
-        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
-        << GetDefaultMovementType() << ")";                 //default movement generator type
+        << data.id << ","
+        << data.mapid <<","
+        << uint32(data.spawnMask) << ","                    // cast to prevent save as symbol
+        << uint16(data.phaseMask) << ","                    // prevent out of range error
+        << data.modelid_override <<","
+        << data.equipmentId <<","
+        << data.posX << ","
+        << data.posY << ","
+        << data.posZ << ","
+        << data.orientation << ","
+        << data.spawntimesecs << ","                        //respawn time
+        << (float) data.spawndist << ","                    //spawn distance (float)
+        << data.currentwaypoint << ","                      //currentwaypoint
+        << data.curhealth << ","                            //curhealth
+        << data.curmana << ","                              //curmana
+        << (data.is_dead  ? 1 : 0) << ","                   //is_dead
+        << uint32(data.movementType) << ")";                //default movement generator type, cast to prevent save as symbol
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
@@ -1772,7 +1772,8 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if( !m_AlreadyCallAssistance && getVictim() && !IsPet() && !isCharmed())
+    // FIXME: should player pets call for assistance?
+    if (!m_AlreadyCallAssistance && getVictim() && !isCharmed())
     {
         SetNoCallAssistance(true);
 

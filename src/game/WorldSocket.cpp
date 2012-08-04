@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -708,7 +708,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
                 {
                     // OK ,give the packet to WorldSession
                     aptr.release ();
-                    // WARNINIG here we call it with locks held.
+                    // WARNING here we call it with locks held.
                     // Its possible to cause deadlock if QueuePacket calls back
                     m_Session->QueuePacket (new_pct);
                     return 0;

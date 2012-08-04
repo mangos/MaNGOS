@@ -278,7 +278,8 @@ CleanCharacterDB = 1
 #
 #    WorldLogFile
 #        Packet logging file for the worldserver
-#        Default: "world.log"
+#        Default: ""          - no log file created
+#                 "world.log" - recommended name to create a log file
 #
 #    WorldLogTimestamp
 #        Logfile with timestamp of server start in name
@@ -946,11 +947,11 @@ TalentsInspecting = 1
 #
 #    ListenRange.Say
 #        Distance from player to listen text that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.TextEmote
 #        Distance from player to listen textemote that creature (or other world object) say
-#        Default: 25
+#        Default: 40
 #
 #    ListenRange.Yell
 #        Distance from player to listen text that creature (or other world object) yell

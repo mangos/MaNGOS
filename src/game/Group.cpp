@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -585,7 +585,7 @@ void Group::SendLootAllPassed(Roll const& r)
     }
 }
 
-void Group::GroupLoot(Creature *creature, Loot *loot)
+void Group::GroupLoot(WorldObject* pSource, Loot* loot)
 {
     uint32 maxEnchantingSkill = GetMaxSkillValueForGroup(SKILL_ENCHANTING);
 
@@ -601,13 +601,13 @@ void Group::GroupLoot(Creature *creature, Loot *loot)
 
         //roll for over-threshold item if it's one-player loot
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(creature, GROUP_LOOT, loot, itemSlot, maxEnchantingSkill);
+            StartLootRool(pSource, GROUP_LOOT, loot, itemSlot, maxEnchantingSkill);
         else
             lootItem.is_underthreshold = 1;
     }
 }
 
-void Group::NeedBeforeGreed(Creature *creature, Loot *loot)
+void Group::NeedBeforeGreed(WorldObject* pSource, Loot* loot)
 {
     uint32 maxEnchantingSkill = GetMaxSkillValueForGroup(SKILL_ENCHANTING);
 
@@ -623,13 +623,13 @@ void Group::NeedBeforeGreed(Creature *creature, Loot *loot)
 
         //only roll for one-player items, not for ones everyone can get
         if (itemProto->Quality >= uint32(m_lootThreshold) && !lootItem.freeforall)
-            StartLootRool(creature, NEED_BEFORE_GREED, loot, itemSlot, maxEnchantingSkill);
+            StartLootRool(pSource, NEED_BEFORE_GREED, loot, itemSlot, maxEnchantingSkill);
         else
             lootItem.is_underthreshold = 1;
     }
 }
 
-void Group::MasterLoot(Creature *creature, Loot* loot)
+void Group::MasterLoot(WorldObject* pSource, Loot* loot)
 {
     for (LootItemList::iterator i=loot->items.begin(); i != loot->items.end(); ++i)
     {
@@ -651,7 +651,7 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
         if (!looter->IsInWorld())
             continue;
 
-        if (looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+        if (looter->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
         {
             data << looter->GetObjectGuid();
             ++real_count;
@@ -663,7 +663,7 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
     for(GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
         Player *looter = itr->getSource();
-        if (looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+        if (looter->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             looter->GetSession()->SendPacket(&data);
     }
 }
@@ -743,7 +743,7 @@ bool Group::CountRollVote(ObjectGuid const& playerGUID, Rolls::iterator& rollI, 
     return false;
 }
 
-void Group::StartLootRool(Creature* lootTarget, LootMethod method, Loot* loot, uint8 itemSlot, uint32 maxEnchantingSkill)
+void Group::StartLootRool(WorldObject* lootTarget, LootMethod method, Loot* loot, uint8 itemSlot, uint32 maxEnchantingSkill)
 {
     if (itemSlot >= loot->items.size())
         return;
@@ -778,11 +778,15 @@ void Group::StartLootRool(Creature* lootTarget, LootMethod method, Loot* loot, u
             r->playerVote.begin()->second = ROLL_NEED;
         else
         {
+            // Only GO-group looting and NPC-group looting possible
+            MANGOS_ASSERT(lootTarget->isType(TYPEMASK_CREATURE_OR_GAMEOBJECT));
+
             r->CalculateCommonVoteMask(maxEnchantingSkill); // dependent from item and possible skill
 
             SendLootStartRoll(LOOT_ROLL_TIMEOUT, lootTarget->GetMapId(), *r);
             loot->items[itemSlot].is_blocked = true;
-            lootTarget->StartGroupLoot(this,LOOT_ROLL_TIMEOUT);
+
+            lootTarget->StartGroupLoot(this, LOOT_ROLL_TIMEOUT);
         }
 
         RollId.push_back(r);
@@ -1164,6 +1168,7 @@ bool Group::_addMember(ObjectGuid guid, const char* name, bool isAssistant, uint
     member.name      = name;
     member.group     = group;
     member.assistant = isAssistant;
+    member.lastMap   = player->GetMapId();
     m_memberSlots.push_back(member);
 
     SubGroupCounterIncrease(group);
@@ -1488,7 +1493,7 @@ uint32 Group::GetMaxSkillValueForGroup( SkillType skill )
     return maxvalue;
 }
 
-void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
+void Group::UpdateLooterGuid(WorldObject* pSource, bool ifneed)
 {
     switch (GetLootMethod())
     {
@@ -1508,7 +1513,7 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
         {
             // not update if only update if need and ok
             Player* looter = ObjectAccessor::FindPlayer(guid_itr->guid);
-            if (looter && looter->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+            if (looter && looter->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                 return;
         }
         ++guid_itr;
@@ -1521,16 +1526,16 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
         {
             if (Player* pl = ObjectAccessor::FindPlayer(itr->guid))
             {
-                if (pl->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                if (pl->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
                 {
-                    bool refresh = pl->GetLootGuid() == creature->GetObjectGuid();
+                    bool refresh = pl->GetLootGuid() == pSource->GetObjectGuid();
 
                     //if(refresh)                           // update loot for new looter
                     //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                     SetLooterGuid(pl->GetObjectGuid());
                     SendUpdate();
                     if (refresh)                            // update loot for new looter
-                        pl->SendLoot(creature->GetObjectGuid(), LOOT_CORPSE);
+                        pl->SendLoot(pSource->GetObjectGuid(), LOOT_CORPSE);
                     return;
                 }
             }
@@ -1542,16 +1547,16 @@ void Group::UpdateLooterGuid( Creature* creature, bool ifneed )
     {
         if (Player* pl = ObjectAccessor::FindPlayer(itr->guid))
         {
-            if (pl->IsWithinDist(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+            if (pl->IsWithinDist(pSource, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
             {
-                bool refresh = pl->GetLootGuid() == creature->GetObjectGuid();
+                bool refresh = pl->GetLootGuid() == pSource->GetObjectGuid();
 
                 //if(refresh)                               // update loot for new looter
                 //    pl->GetSession()->DoLootRelease(pl->GetLootGUID());
                 SetLooterGuid(pl->GetObjectGuid());
                 SendUpdate();
                 if (refresh)                                // update loot for new looter
-                    pl->SendLoot(creature->GetObjectGuid(), LOOT_CORPSE);
+                    pl->SendLoot(pSource->GetObjectGuid(), LOOT_CORPSE);
                 return;
             }
         }
@@ -1663,9 +1668,21 @@ bool Group::InCombatToInstance(uint32 instanceId)
     return false;
 }
 
+bool Group::SetPlayerMap(const ObjectGuid guid, uint32 mapid)
+{
+    member_witerator slot = _getMemberWSlot(guid);
+    if (slot != m_memberSlots.end())
+    {
+        slot->lastMap = mapid;
+        DEBUG_LOG("Group::SetPlayerMap> map is updated");
+        return true;
+    }
+    return false;
+}
+
 void Group::ResetInstances(InstanceResetMethod method, bool isRaid, Player* SendMsgTo)
 {
-    if(isBGGroup())
+    if (isBGGroup())
         return;
 
     // method can be INSTANCE_RESET_ALL, INSTANCE_RESET_CHANGE_DIFFICULTY, INSTANCE_RESET_GROUP_DISBAND
@@ -1673,17 +1690,30 @@ void Group::ResetInstances(InstanceResetMethod method, bool isRaid, Player* Send
     // we assume that when the difficulty changes, all instances that can be reset will be
     Difficulty diff = GetDifficulty(isRaid);
 
-    for(BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
+    typedef std::set<uint32> OfflineMapSet;
+    OfflineMapSet mapsWithOfflinePlayer;                    // to store map of offline players
+
+    if (method != INSTANCE_RESET_GROUP_DISBAND)
     {
-        DungeonPersistentState *state = itr->second.state;
-        const MapEntry *entry = sMapStore.LookupEntry(itr->first);
+        // Store maps in which are offline members for instance reset check.
+        for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
+        {
+            if (!ObjectAccessor::FindPlayer(itr->guid))
+                mapsWithOfflinePlayer.insert(itr->lastMap); // add last map from offline player
+        }
+    }
+
+    for (BoundInstancesMap::iterator itr = m_boundInstances[diff].begin(); itr != m_boundInstances[diff].end();)
+    {
+        DungeonPersistentState* state = itr->second.state;
+        const MapEntry* entry = sMapStore.LookupEntry(itr->first);
         if (!entry || entry->IsRaid() != isRaid || (!state->CanReset() && method != INSTANCE_RESET_GROUP_DISBAND))
         {
             ++itr;
             continue;
         }
 
-        if(method == INSTANCE_RESET_ALL)
+        if (method == INSTANCE_RESET_ALL)
         {
             // the "reset all instances" method can only reset normal maps
             if (entry->map_type == MAP_RAID || diff == DUNGEON_DIFFICULTY_HEROIC)
@@ -1694,9 +1724,13 @@ void Group::ResetInstances(InstanceResetMethod method, bool isRaid, Player* Send
         }
 
         bool isEmpty = true;
-        // if the map is loaded, reset it
-        if (Map *map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
-            if (map->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !state->CanReset()))
+        // check if there are offline members on the map
+        if (method != INSTANCE_RESET_GROUP_DISBAND && mapsWithOfflinePlayer.find(state->GetMapId()) != mapsWithOfflinePlayer.end())
+            isEmpty = false;
+
+        // if the map is loaded, reset it if can
+        if (isEmpty && entry->IsDungeon() && !(method == INSTANCE_RESET_GROUP_DISBAND && !state->CanReset()))
+            if (Map* map = sMapMgr.FindMap(state->GetMapId(), state->GetInstanceId()))
                 isEmpty = ((DungeonMap*)map)->Reset(method);
 
         if (SendMsgTo)
@@ -1707,6 +1741,7 @@ void Group::ResetInstances(InstanceResetMethod method, bool isRaid, Player* Send
                 SendMsgTo->SendResetInstanceFailed(0, state->GetMapId());
         }
 
+        // TODO - Adapt here when clear how difficulty changes must be handled
         if (isEmpty || method == INSTANCE_RESET_GROUP_DISBAND || method == INSTANCE_RESET_CHANGE_DIFFICULTY)
         {
             // do not reset the instance, just unbind if others are permanently bound to it

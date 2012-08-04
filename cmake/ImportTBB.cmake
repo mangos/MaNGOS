@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2005-2011 MaNGOS project <http://getmangos.com/>
+# Copyright (C) 2005-2012 MaNGOS project <http://getmangos.com/>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

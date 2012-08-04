@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -536,7 +536,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         break;
                     }
                     case ACTION_T_SET_FACTION:
-                        if (action.set_faction.factionId !=0 && !sFactionStore.LookupEntry(action.set_faction.factionId))
+                        if (action.set_faction.factionId !=0 && !sFactionTemplateStore.LookupEntry(action.set_faction.factionId))
                         {
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u uses nonexistent FactionId %u.", i, j+1, action.set_faction.factionId);
                             action.set_faction.factionId = 0;

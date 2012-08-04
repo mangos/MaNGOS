@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1155,6 +1155,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             return NULL;
         }
         bool Attack(Unit *victim, bool meleeAttack);
+        void AttackedBy(Unit* attacker);
         void CastStop(uint32 except_spellid = 0);
         bool AttackStop(bool targetSwitch = false);
         void RemoveAllAttackers();

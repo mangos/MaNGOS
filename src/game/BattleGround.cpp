@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -212,7 +212,7 @@ BattleGround::BattleGround()
     m_Status            = STATUS_NONE;
     m_ClientInstanceID  = 0;
     m_EndTime           = 0;
-    m_BracketId         = BG_BRACKET_ID_FIRST;
+    m_BracketId         = BG_BRACKET_ID_TEMPLATE;
     m_InvitedAlliance   = 0;
     m_InvitedHorde      = 0;
     m_ArenaType         = ARENA_TYPE_NONE;
@@ -286,7 +286,11 @@ BattleGround::~BattleGround()
         DelObject(i);
 
     sBattleGroundMgr.RemoveBattleGround(GetInstanceID(), GetTypeID());
-    sBattleGroundMgr.DeleteClientVisibleInstanceId(GetTypeID(), GetBracketId(), GetClientInstanceID());
+
+    // skip template bgs as they were never added to visible bg list
+    BattleGroundBracketId bracketId = GetBracketId();
+    if (bracketId != BG_BRACKET_ID_TEMPLATE)
+        sBattleGroundMgr.DeleteClientVisibleInstanceId(GetTypeID(), bracketId, GetClientInstanceID());
 
     // unload map
     // map can be null at bg destruction

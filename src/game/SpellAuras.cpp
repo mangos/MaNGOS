@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1086,10 +1086,12 @@ void Aura::TriggerSpell()
     // generic casting code with custom spells and target/caster customs
     uint32 trigger_spell_id = m_spellEffect->EffectTriggerSpell;
 
-    SpellEntry const *triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
-    SpellEntry const *auraSpellInfo = GetSpellProto();
+    SpellEntry const* triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
+    SpellEntry const* auraSpellInfo = GetSpellProto();
     uint32 auraId = auraSpellInfo->Id;
     Unit* target = GetTarget();
+    Unit* triggerCaster = triggerTarget;
+    WorldObject* triggerTargetObject = NULL;
 
     // specific code for cases with no trigger spell provided in field
     if (triggeredSpellInfo == NULL)
@@ -1615,8 +1617,17 @@ void Aura::TriggerSpell()
 //                    case 58040: break;
 //                    // Draw Magic
 //                    case 58185: break;
-//                    // Food
-//                    case 58886: break;
+                    case 58886:                             // Food
+                    {
+                        if (GetAuraTicks() != 1)
+                            return;
+
+                        uint32 randomBuff[5] = {57288, 57139, 57111, 57286, 57291};
+
+                        trigger_spell_id = urand(0, 1) ? 58891 : randomBuff[urand(0, 4)];
+
+                        break;
+                    }
 //                    // Shadow Sickle
 //                    case 59103: break;
 //                    // Time Bomb
@@ -1635,8 +1646,7 @@ void Aura::TriggerSpell()
 //                    case 62571: break;
 //                    // Mulgore Hatchling
 //                    case 62586: break;
-                    // Durotar Scorpion
-                    case 62679:
+                    case 62679:                             // Durotar Scorpion
                         trigger_spell_id = auraSpellInfo->CalculateSimpleValue(m_effIndex);
                         break;
 //                    // Fighting Fish
@@ -1864,22 +1874,46 @@ void Aura::TriggerSpell()
         // Reget trigger spell proto
         triggeredSpellInfo = sSpellStore.LookupEntry(trigger_spell_id);
     }
-    else
+    else                                                    // initial triggeredSpellInfo != NULL
     {
+        // for channeled spell cast applied from aura owner to channel target (persistent aura affects already applied to true target)
+        // come periodic casts applied to targets, so need seelct proper caster (ex. 15790)
+        if (IsChanneledSpell(GetSpellProto()) && m_spellEffect->Effect != SPELL_EFFECT_PERSISTENT_AREA_AURA)
+        {
+            // interesting 2 cases: periodic aura at caster of channeled spell
+            if (target->GetObjectGuid() == casterGUID)
+            {
+                triggerCaster = target;
+
+                if (WorldObject* channelTarget = target->GetMap()->GetWorldObject(target->GetChannelObjectGuid()))
+                {
+                    if (channelTarget->isType(TYPEMASK_UNIT))
+                        triggerTarget = (Unit*)channelTarget;
+                    else
+                        triggerTargetObject = channelTarget;
+                }
+            }
+            // or periodic aura at caster channel target
+            else if (Unit* caster = GetCaster())
+            {
+                if (target->GetObjectGuid() == caster->GetChannelObjectGuid())
+                {
+                    triggerCaster = caster;
+                    triggerTarget = target;
+                }
+            }
+        }
+
         // Spell exist but require custom code
         switch(auraId)
         {
             case 9347:                                      // Mortal Strike
             {
-                // expected selection current fight target
-                triggerTarget = GetTarget()->getVictim();
-                if (!triggerTarget)
+                if (target->GetTypeId() != TYPEID_UNIT)
                     return;
-
-                // avoid triggering for far target
-                SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(triggeredSpellInfo->rangeIndex);
-                float max_range = GetSpellMaxRange(srange);
-                if (!triggerTarget->IsWithinDist(GetTarget(),max_range))
+                // expected selection current fight target
+                triggerTarget = ((Creature*)target)->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, triggeredSpellInfo);
+                if (!triggerTarget)
                     return;
 
                 break;
@@ -1933,6 +1967,12 @@ void Aura::TriggerSpell()
                     caster->CastSpell(triggerTarget, trigger_spell_id, true, NULL, this);
                 return;
             }
+            case 44883:                                     // Encapsulate
+            {
+                // Self cast spell, hence overwrite caster (only channeled spell where the triggered spell deals dmg to SELF)
+                triggerCaster = triggerTarget;
+                break;
+            }
             case 53563:                                     // Beacon of Light
                 // original caster must be target (beacon)
                 target->CastSpell(target, trigger_spell_id, true, NULL, this, target->GetObjectGuid());
@@ -1947,8 +1987,9 @@ void Aura::TriggerSpell()
         }
     }
 
-    Unit* triggerCaster = triggerTarget;
-    WorldObject* triggerTargetObject = NULL;
+    // ToDo: Fix me!
+    //Unit* triggerCaster = triggerTarget;
+    //WorldObject* triggerTargetObject = NULL;
 
     // for channeled spell cast applied from aura owner to channel target (persistent aura affects already applied to true target)
     // come periodic casts applied to targets, so need seelct proper caster (ex. 15790)
@@ -2534,6 +2575,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 43681:                                     // Inactive
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE && target->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)target)->ToggleAFK();
+                return;
+            }
             case 43969:                                     // Feathered Charm
             {
                 // Steelfeather Quest Credit, Are there any requirements for this, like area?
@@ -2657,6 +2704,13 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     target->CastSpell(target, 58601, true); // Remove Flight Auras (also triggered Parachute (45472))
                 }
+                return;
+            }
+            case 61900:                                     // Electrical Charge
+            {
+                if (m_removeMode == AURA_REMOVE_BY_DEATH)
+                    target->CastSpell(target, GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_0), true);
+
                 return;
             }
             case 68839:                                     // Corrupt Soul
@@ -4022,9 +4076,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
         if(target->GetTypeId() == TYPEID_UNIT)
         {
             ((Creature*)target)->AIM_Initialize();
-
-            if (((Creature*)target)->AI())
-                ((Creature*)target)->AI()->AttackedBy(caster);
+            target->AttackedBy(caster);
         }
     }
 }
@@ -4217,8 +4269,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if(target->GetTypeId() == TYPEID_UNIT)
         {
             ((Creature*)target)->AIM_Initialize();
-            if (((Creature*)target)->AI())
-                ((Creature*)target)->AI()->AttackedBy(caster);
+            target->AttackedBy(caster);
         }
     }
 }
@@ -7391,20 +7442,20 @@ void Aura::PeriodicTick()
             if (!target->isAlive())
                 return;
 
-            if(m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue >= MAX_POWERS)
+            if (m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue >= MAX_POWERS)
                 return;
 
             Powers power = Powers(m_modifier.m_miscvalue);
 
             // power type might have changed between aura applying and tick (druid's shapeshift)
-            if(target->getPowerType() != power)
+            if (target->getPowerType() != power)
                 return;
 
-            Unit *pCaster = GetCaster();
-            if(!pCaster)
+            Unit* pCaster = GetCaster();
+            if (!pCaster)
                 return;
 
-            if(!pCaster->isAlive())
+            if (!pCaster->isAlive())
                 return;
 
             if( GetSpellProto()->GetSpellEffectIdByIndex(GetEffIndex()) == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
@@ -7412,7 +7463,7 @@ void Aura::PeriodicTick()
                 return;
 
             // Check for immune (not use charges)
-            if(target->IsImmunedToDamage(GetSpellSchoolMask(spellProto)))
+            if (target->IsImmunedToDamage(GetSpellSchoolMask(spellProto)))
                 return;
 
             // ignore non positive values (can be result apply spellmods to aura damage
@@ -7425,7 +7476,7 @@ void Aura::PeriodicTick()
                 // max value
                 uint32 maxmana = pCaster->GetMaxPower(power)  * pdamage * 2 / 100;
                 pdamage = target->GetMaxPower(power) * pdamage / 100;
-                if(pdamage > maxmana)
+                if (pdamage > maxmana)
                     pdamage = maxmana;
             }
 
@@ -7440,13 +7491,13 @@ void Aura::PeriodicTick()
 
             target->ModifyPower(power, -drain_amount);
 
-            float gain_multiplier = 0;
+            float gain_multiplier = 0.0f;
 
-            if(pCaster->GetMaxPower(power) > 0)
+            if (pCaster->GetMaxPower(power) > 0)
             {
                 gain_multiplier = m_spellEffect->EffectMultipleValue;
 
-                if(Player *modOwner = pCaster->GetSpellModOwner())
+                if (Player *modOwner = pCaster->GetSpellModOwner())
                     modOwner->ApplySpellMod(GetId(), SPELLMOD_MULTIPLE_VALUE, gain_multiplier);
             }
 
@@ -7463,6 +7514,42 @@ void Aura::PeriodicTick()
                             pCaster->CastCustomSpell(pCaster, 32554, &pet_gain, NULL, NULL, true);
 
                 target->AddThreat(pCaster, float(gain) * 0.5f, pInfo.critical, GetSpellSchoolMask(spellProto), spellProto);
+            }
+
+            // Some special cases
+            switch (GetId())
+            {
+                case 32960:                                 // Mark of Kazzak
+                {
+                    if (target->GetTypeId() == TYPEID_PLAYER && target->getPowerType() == POWER_MANA)
+                    {
+                        // Drain 5% of target's mana
+                        pdamage = target->GetMaxPower(POWER_MANA) * 5 / 100;
+                        drain_amount = target->GetPower(POWER_MANA) > pdamage ? pdamage : target->GetPower(POWER_MANA);
+                        target->ModifyPower(POWER_MANA, -drain_amount);
+
+                        SpellPeriodicAuraLogInfo pInfo(this, drain_amount, 0, 0, 0, 0.0f);
+                        target->SendPeriodicAuraLog(&pInfo);
+                    }
+                    // no break here
+                }
+                case 21056:                                 // Mark of Kazzak
+                case 31447:                                 // Mark of Kaz'rogal
+                {
+                    uint32 triggerSpell = 0;
+                    switch (GetId())
+                    {
+                        case 21056: triggerSpell = 21058; break;
+                        case 31447: triggerSpell = 31463; break;
+                        case 32960: triggerSpell = 32961; break;
+                    }
+                    if (target->GetTypeId() == TYPEID_PLAYER && target->GetPower(power) == 0)
+                    {
+                        target->CastSpell(target, triggerSpell, true, NULL, this);
+                        target->RemoveAurasDueToSpell(GetId());
+                    }
+                    break;
+                }
             }
             break;
         }
@@ -7832,7 +7919,19 @@ void Aura::PeriodicDummyTick()
 //              case 49313: break; // Proximity Mine Area Aura
 //              // Mole Machine Portal Schedule
 //              case 49466: break;
-//              case 49555: break; // Corpse Explode
+                case 49555:                                 // Corpse Explode (Drak'tharon Keep - Trollgore)
+                case 59807:                                 // Corpse Explode (heroic)
+                {
+                    if (GetAuraTicks() == 3 && target->GetTypeId() == TYPEID_UNIT)
+                        ((Creature*)target)->ForcedDespawn();
+                    if (GetAuraTicks() != 2)
+                        return;
+
+                    if (Unit* pCaster = GetCaster())
+                        pCaster->CastSpell(target, spell->Id == 49555 ? 49618 : 59809, true);
+
+                    return;
+                }
 //              case 49592: break; // Temporal Rift
 //              case 49957: break; // Cutting Laser
 //              case 50085: break; // Slow Fall
@@ -7879,6 +7978,11 @@ void Aura::PeriodicDummyTick()
                         case 2: target->CastSpell(target, 55739, true); break;
                     }
                     return;
+                case 62019:                                 // Rune of Summoning
+                {
+                    target->CastSpell(target, 62020, true, NULL, this);
+                    return;
+                }
                 case 62566:                                 // Healthy Spore Summon Periodic
                 {
                     target->CastSpell(target, 62582, true);

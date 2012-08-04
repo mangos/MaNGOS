@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ class WorldSession;
 class Creature;
 class Player;
 class Unit;
+class Group;
 class Map;
 class UpdateMask;
 class InstanceData;
@@ -356,6 +357,7 @@ class MANGOS_DLL_SPEC Object
 
         virtual bool HasQuest(uint32 /* quest_id */) const { return false; }
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
+
     protected:
 
         Object ( );
@@ -586,6 +588,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // ASSERT print helper
         bool PrintCoordinatesError(float x, float y, float z, char const* descr) const;
+
+        virtual void StartGroupLoot(Group* group, uint32 timer) {}
+
     protected:
         explicit WorldObject();
 
@@ -594,6 +599,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         //mapId/instanceId should be set in SetMap() function!
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
+
+        virtual void StopGroupLoot() {}
 
         std::string m_name;
 
