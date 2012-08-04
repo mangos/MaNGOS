@@ -607,7 +607,9 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool HasStaticDBSpawnData() const;                  // listed in `gameobject` table and have fixed in DB guid
 
         // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-        void SetRotationAngles(float z_rot, float y_rot, float x_rot);
+        void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
+        void SetWorldRotation(float qx, float qy, float qz, float qw);   
+        void SetTransportPathRotation(float qx, float qy, float qz, float qw);      // transforms(rotates) transport's path
         int64 GetRotation() const { return m_rotation; }
 
         // overwrite WorldObject function for proper name localization
@@ -745,9 +747,9 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GameObjectInfo const* m_goInfo;
         GameObjectDisplayInfoEntry const* m_displayInfo;
         int64 m_rotation;
+        float m_quatX, m_quatY, m_quatZ, m_quatW;
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);
-        void SetRotationQuat(float qx, float qy, float qz, float qw);
 
         GridReference<GameObject> m_gridRef;
 };

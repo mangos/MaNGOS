@@ -2412,6 +2412,66 @@ void ObjectMgr::LoadItemConverts()
     sLog.outString(">> Loaded %u Item converts", count);
 }
 
+void ObjectMgr::LoadItemExpireConverts()
+{
+    m_ItemExpireConvert.clear();                            // needed for reload case
+
+    uint32 count = 0;
+
+    QueryResult *result = WorldDatabase.Query("SELECT entry,item FROM item_expire_convert");
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 Item expire converts . DB table `item_expire_convert` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 itemEntry    = fields[0].GetUInt32();
+        uint32 itemTargetId = fields[1].GetUInt32();
+
+        ItemPrototype const* pItemEntryProto = sItemStorage.LookupEntry<ItemPrototype>(itemEntry);
+        if (!pItemEntryProto)
+        {
+            sLog.outErrorDb("Table `item_expire_convert`: Item %u not exist in `item_template`.", itemEntry);
+            continue;
+        }
+
+        ItemPrototype const* pItemTargetProto = sItemStorage.LookupEntry<ItemPrototype>(itemTargetId);
+        if (!pItemTargetProto)
+        {
+            sLog.outErrorDb("Table `item_expire_convert`: Item target %u for original item %u not exist in `item_template`.", itemTargetId, itemEntry);
+            continue;
+        }
+
+        // Expire convert possible only for items with duration
+        if (pItemEntryProto->Duration == 0)
+        {
+            sLog.outErrorDb("Table `item_expire_convert` not appropriate item %u conversion to %u. Table can be used for items with duration.", itemEntry, itemTargetId);
+            continue;
+        }
+
+        m_ItemExpireConvert[itemEntry] = itemTargetId;
+
+        ++count;
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u Item expire converts", count);
+}
 
 void ObjectMgr::LoadItemRequiredTarget()
 {
@@ -2457,8 +2517,7 @@ void ObjectMgr::LoadItemRequiredTarget()
         {
             if (SpellEntry const* pSpellInfo = sSpellStore.LookupEntry(pItemProto->Spells[i].SpellId))
             {
-                if (pItemProto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE ||
-                    pItemProto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+                if (pItemProto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
                 {
                     SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(pSpellInfo->Id);
                     if (bounds.first != bounds.second)

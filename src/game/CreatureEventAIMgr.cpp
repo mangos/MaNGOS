@@ -815,6 +815,20 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
 
         delete result;
 
+        // post check
+        for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+        {
+            if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+            {
+                bool ainame = strcmp(cInfo->AIName, "EventAI") == 0;
+                bool hasevent = m_CreatureEventAI_Event_Map.find(i) != m_CreatureEventAI_Event_Map.end();
+                if (ainame && !hasevent)
+                    sLog.outErrorDb("CreatureEventAI: EventAI not has script for creature entry (%u), but AIName = '%s'.", i, cInfo->AIName);
+                else if (!ainame && hasevent)
+                    sLog.outErrorDb("CreatureEventAI: EventAI has script for creature entry (%u), but AIName = '%s' instead 'EventAI'.", i, cInfo->AIName);
+            }
+        }
+
         CheckUnusedAITexts();
         CheckUnusedAISummons();
 

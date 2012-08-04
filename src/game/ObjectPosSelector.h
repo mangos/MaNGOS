@@ -23,133 +23,51 @@
 
 #include<map>
 
-enum UsedPosType { USED_POS_PLUS, USED_POS_MINUS };
+enum UsedAreaSide { USED_POS_PLUS, USED_POS_MINUS };
 
-inline UsedPosType operator ~(UsedPosType uptype)
+inline UsedAreaSide operator ~(UsedAreaSide side)
 {
-    return uptype==USED_POS_PLUS ? USED_POS_MINUS : USED_POS_PLUS;
+    return side == USED_POS_PLUS ? USED_POS_MINUS : USED_POS_PLUS;
+}
+
+inline float SignOf(UsedAreaSide side)
+{
+    return side == USED_POS_PLUS ? 1.0f : -1.0f;
 }
 
 struct ObjectPosSelector
 {
-    struct UsedPos
-    {
-        UsedPos(float sign_, float size_,float dist_) : sign(sign_), size(size_),dist(dist_) {}
+    typedef std::multimap<float,float> UsedAreaList;        // angle pos -> angle offset
+    typedef UsedAreaList::value_type UsedArea;
 
-        float sign;
+    ObjectPosSelector(float x, float y, float dist, float searcher_size);
 
-        float size;                                         // size of point
-        float dist;                                         // dist to central point (including central point size)
-    };
+    void AddUsedArea(float size, float angle, float dist);
 
-    typedef std::multimap<float,UsedPos> UsedPosList;       // abs(angle)->Node
+    bool CheckOriginalAngle() const;
 
-    ObjectPosSelector(float x,float y,float size,float dist);
-
-    void AddUsedPos(float size,float angle,float dist);
     void InitializeAngle();
 
-    bool FirstAngle(float& angle);
     bool NextAngle(float& angle);
     bool NextUsedAngle(float& angle);
 
-    bool NextPosibleAngle( float& angle );
+    bool CheckAngle(UsedArea const& usedArea, UsedAreaSide side, float angle) const;
+    bool CheckSideAngle(UsedAreaSide side, float angle) const;
+    void InitializeAngle(UsedAreaSide side);
+    void UpdateNextAreaStart(UsedAreaSide side);
+    bool NextSideAngle(UsedAreaSide side, float& angle);
 
-    bool CheckAngle(UsedPosList::value_type const& nextUsedPos, float sign, float angle ) const
-    {
-        float angle_step2  = GetAngle(nextUsedPos.second);
+    float m_centerX;
+    float m_centerY;
+    float m_searcherDist;                                   // distance for searching pos (including searcher size and target object size)
+    float m_searcherSize;                                   // searcher object radius
+    float m_searcherHalfSize;                               // angle size/2 of searcher object (at dist distance)
 
-        float next_angle = nextUsedPos.first;
-        if(nextUsedPos.second.sign * sign < 0)              // last node from diff. list (-pi+alpha)
-            next_angle = 2.0f*M_PI_F-next_angle;                 // move to positive
+    UsedAreaList m_UsedAreaLists[2];                        // list left/right side used angles (with angle size)
 
-        return fabs(angle)+angle_step2 <= next_angle;
-    }
+    UsedAreaList::const_iterator m_nextUsedAreaItr[2];      // next used used areas for check at left/right side, possible angles selected in range m_smallStepAngle..m_nextUsedAreaItr
+    float m_nextUsedAreaStart[2];                           // cached angle for next used area from m_nextUsedAreaItr or another side
 
-    bool CheckOriginal() const
-    {
-        return (m_UsedPosLists[USED_POS_PLUS].empty()  || CheckAngle( *m_UsedPosLists[USED_POS_PLUS].begin(),1.0,0)) &&
-            (m_UsedPosLists[USED_POS_MINUS].empty() || CheckAngle( *m_UsedPosLists[USED_POS_MINUS].begin(),-1.0,0));
-    }
-
-    bool IsNonBalanced() const { return m_UsedPosLists[USED_POS_PLUS].empty() != m_UsedPosLists[USED_POS_MINUS].empty(); }
-
-    bool NextAngleFor( UsedPosList::value_type const& usedPos, float sign, UsedPosType uptype, float &angle )
-    {
-        float angle_step  = GetAngle(usedPos.second);
-
-        // next possible angle
-        angle  = usedPos.first * usedPos.second.sign + angle_step * sign;
-
-        UsedPosList::value_type const* nextNode = nextUsedPos(uptype);
-        if(nextNode)
-        {
-            // if next node permit use selected angle, then do it
-            if(!CheckAngle(*nextNode, sign, angle))
-            {
-                m_smallStepOk[uptype] = false;
-                return false;
-            }
-        }
-
-        // possible more points
-        m_smallStepOk[uptype] = true;
-        m_smallStepAngle[uptype] = angle;
-        m_smallStepNextUsedPos[uptype] = nextNode;
-
-        return true;
-    }
-
-    bool NextSmallStepAngle( float sign, UsedPosType uptype, float &angle )
-    {
-        // next possible angle
-        angle  = m_smallStepAngle[uptype] + m_anglestep * sign;
-
-        if(fabs(angle) > M_PI)
-        {
-            m_smallStepOk[uptype] = false;
-            return false;
-        }
-
-        if(m_smallStepNextUsedPos[uptype])
-        {
-            if(fabs(angle) >= m_smallStepNextUsedPos[uptype]->first)
-            {
-                m_smallStepOk[uptype] = false;
-                return false;
-            }
-
-            // if next node permit use selected angle, then do it
-            if(!CheckAngle(*m_smallStepNextUsedPos[uptype], sign, angle))
-            {
-                m_smallStepOk[uptype] = false;
-                return false;
-            }
-        }
-
-        // possible more points
-        m_smallStepAngle[uptype] = angle;
-        return true;
-    }
-
-    // next used post for m_nextUsedPos[uptype]
-    UsedPosList::value_type const* nextUsedPos(UsedPosType uptype);
-
-    // angle from used pos to next possible free pos
-    float GetAngle(UsedPos const& usedPos) const { return acos(m_dist/(usedPos.dist+usedPos.size+m_size)); }
-
-    float m_center_x;
-    float m_center_y;
-    float m_size;                                           // size of object in center
-    float m_dist;                                           // distance for searching pos (including central object size)
-    float m_anglestep;
-
-    UsedPosList m_UsedPosLists[2];
-    UsedPosList::const_iterator m_nextUsedPos[2];
-
-    // field for small step from first after next used pos until next pos
-    float m_smallStepAngle[2];
-    bool  m_smallStepOk[2];
-    UsedPosList::value_type const* m_smallStepNextUsedPos[2];
+    float m_stepAngle[2];                                   // current checked angle position at sides (less m_nextUsedArea), positive value
 };
 #endif

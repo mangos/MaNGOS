@@ -1019,7 +1019,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     else if (missInfo == SPELL_MISS_REFLECT)                // In case spell reflect from target, do all effect on caster (if hit)
     {
         if (target->reflectResult == SPELL_MISS_NONE)       // If reflected spell hit caster -> do all effect on him
-            DoSpellHitOnUnit(m_caster, mask);
+        {
+            DoSpellHitOnUnit(m_caster, mask, true);
+            unitTarget = m_caster;
+        }
     }
     else if(missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_RESIST)
     {
@@ -1161,7 +1164,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         ((Creature*)m_caster)->AI()->SpellHitTarget(unit, m_spellInfo);
 }
 
-void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
+void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask, bool isReflected)
 {
     if (!unit || !effectMask)
         return;
@@ -1313,7 +1316,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
             if (duration > 0)
             {
                 int32 limitduration = GetDiminishingReturnsLimitDuration(m_diminishGroup, m_spellInfo);
-                unit->ApplyDiminishingToDuration(m_diminishGroup, duration, m_caster, m_diminishLevel, limitduration);
+                unit->ApplyDiminishingToDuration(m_diminishGroup, duration, m_caster, m_diminishLevel, limitduration, isReflected);
 
                 // Fully diminished
                 if (duration == 0)
@@ -1402,7 +1405,8 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
     // Fill base damage struct (unitTarget - is real spell target)
     SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, m_spellSchoolMask);
 
-    if (missInfo == SPELL_MISS_NONE)
+    // keep damage amount for reflected spells
+    if (missInfo == SPELL_MISS_NONE || (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE))
     {
         for (int32 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
         {
@@ -1580,6 +1584,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 802:                                   // Mutate Bug
                 case 804:                                   // Explode Bug
                 case 23138:                                 // Gate of Shazzrah
+                case 28560:                                 // Summon Blizzard
                 case 31347:                                 // Doom TODO: exclude top threat target from target selection
                 case 33711:                                 // Murmur's Touch
                 case 38794:                                 // Murmur's Touch (h)
@@ -1620,6 +1625,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             if (m_spellInfo->Id == 38194)                   // Blink
                 unMaxTargets = 1;
+            break;
+        }
+        case SPELLFAMILY_WARRIOR:
+        {
+            // Sunder Armor (main spell)
+            if (m_spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000000004000), 0x00000000) && m_spellInfo->SpellVisual[0] == 406)
+                if (m_caster->HasAura(58387))               // Glyph of Sunder Armor
+                    EffectChainTarget = 2;
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -1671,6 +1684,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             targetUnitMap.push_back(m_caster);
             break;
         }
+        case TARGET_91:
         case TARGET_RANDOM_NEARBY_DEST:
         {
             radius *= sqrtf(rand_norm_f()); // Get a random point in circle. Use sqrt(rand) to correct distribution when converting polar to Cartesian coordinates.
@@ -1681,7 +1695,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             m_caster->UpdateGroundPositionZ(dest_x, dest_y, dest_z);
             m_targets.setDestination(dest_x, dest_y, dest_z);
 
-            if (radius > 0.0f)
+            if (targetMode == TARGET_RANDOM_NEARBY_DEST && radius > 0.0f)
             {
                 // caster included here?
                 FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_ALL);
@@ -3026,6 +3040,16 @@ void Spell::cast(bool skipCheck)
             // Ice Block
             if (classOpt && classOpt->SpellFamilyFlags & UI64LIT(0x0000008000000000))
                 AddPrecastSpell(41425);                     // Hypothermia
+            // Icy Veins
+            else if (m_spellInfo->Id == 12472)
+            {
+                if (m_caster->HasAura(56374))               // Glyph of Icy Veins
+                {
+                    // not exist spell do it so apply directly
+                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_DECREASE_SPEED);
+                    m_caster->RemoveSpellsCausingAura(SPELL_AURA_HASTE_SPELLS);
+                }
+            }
             // Fingers of Frost
             else if (m_spellInfo->Id == 44544)
                 AddPrecastSpell(74396);                     // Fingers of Frost
@@ -3038,6 +3062,12 @@ void Spell::cast(bool skipCheck)
             {
                 if (m_caster->HasAura(58375))               // Glyph of Blocking
                     AddTriggeredSpell(58374);               // Glyph of Blocking
+            }
+            // Bloodrage
+            if (classOpt && (classOpt->SpellFamilyFlags & UI64LIT(0x0000000000000100)))
+            {
+                if (m_caster->HasAura(70844))               // Item - Warrior T10 Protection 4P Bonus
+                    AddTriggeredSpell(70845);               // Stoicism
             }
             // Bloodsurge (triggered), Sudden Death (triggered)
             else if (m_spellInfo->Id == 46916 || m_spellInfo->Id == 52437)
@@ -3114,8 +3144,14 @@ void Spell::cast(bool skipCheck)
         }
         case SPELLFAMILY_PALADIN:
         {
+            // Divine Illumination
+            if (m_spellInfo->Id == 31842)
+            {
+                if (m_caster->HasAura(70755))               // Item - Paladin T10 Holy 2P Bonus
+                    AddPrecastSpell(71166);                 // Divine Illumination
+            }
             // Hand of Reckoning
-            if (m_spellInfo->Id == 62124)
+            else if (m_spellInfo->Id == 62124)
             {
                 if (m_targets.getUnitTarget() && m_targets.getUnitTarget()->getVictim() != m_caster)
                     AddPrecastSpell(67485);                 // Hand of Rekoning (no typos in name ;) )
@@ -4596,19 +4632,10 @@ SpellCastResult Spell::CheckCast(bool strict)
     }
     // only check at first call, Stealth auras are already removed at second call
     // for now, ignore triggered spells
-    if( strict && !m_IsTriggeredSpell)
+    if (strict && !m_IsTriggeredSpell)
     {
-        bool checkForm = true;
         // Ignore form req aura
-        Unit::AuraList const& ignore = m_caster->GetAurasByType(SPELL_AURA_MOD_IGNORE_SHAPESHIFT);
-        for(Unit::AuraList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
-        {
-            if (!(*i)->isAffectedOnSpell(m_spellInfo))
-                continue;
-            checkForm = false;
-            break;
-        }
-        if (checkForm)
+        if (!m_caster->HasAffectedAura(SPELL_AURA_MOD_IGNORE_SHAPESHIFT, m_spellInfo))
         {
             // Cannot be used in this stance/form
             SpellCastResult shapeError = GetErrorAtShapeshiftedCast(m_spellInfo, m_caster->GetShapeshiftForm());
@@ -6911,6 +6938,14 @@ bool Spell::CheckTarget( Unit* target, SpellEffectIndex eff )
                     if (!target->IsWithinLOSInMap(caster))
                         return false;
             break;
+    }
+
+    switch (m_spellInfo->Id)
+    {
+        case 37433:                                         // Spout (The Lurker Below), only players affected if its not in water
+            if (target->GetTypeId() != TYPEID_PLAYER || target->IsInWater())
+                return false;
+        default: break;
     }
 
     return true;

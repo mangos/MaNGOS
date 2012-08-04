@@ -290,6 +290,10 @@ void WorldSession::HandlePVPLogDataOpcode( WorldPacket & /*recv_data*/ )
     if (!bg)
         return;
 
+    // arena finish version will send in BattleGround::EndBattleGround directly
+    if (bg->isArena())
+        return;
+
     WorldPacket data;
     sBattleGroundMgr.BuildPvpLogDataPacket(&data, bg);
     SendPacket(&data);
