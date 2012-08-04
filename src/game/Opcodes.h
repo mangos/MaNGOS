@@ -32,7 +32,7 @@
 #include "WorldSession.h"
 
 /// List of Opcodes
-/// Not updated opcodes: NUM_MSG_TYPES + i, Max Opcode value in 4.3.4.15595 is 65535
+/// Max Opcode value in 4.3.4.15595 is 65535
 enum Opcodes
 {
     MSG_WOW_CONNECTION                                    = 0x4F57,
@@ -100,12 +100,12 @@ enum Opcodes
     SMSG_CHAR_CREATE                                      = 0x2D05,
     SMSG_CHAR_ENUM                                        = 0x10B0,
     SMSG_CHAR_DELETE                                      = 0x0304,
-    CMSG_PLAYER_LOGIN                                     = 0xD25,
+    CMSG_PLAYER_LOGIN                                     = 0x05B1,
     SMSG_NEW_WORLD                                        = 0x103F,
     SMSG_TRANSFER_PENDING                                 = 0x1040,
     SMSG_TRANSFER_ABORTED                                 = 0x1041,
     SMSG_CHARACTER_LOGIN_FAILED                           = 0x1042,
-    SMSG_LOGIN_SETTIMESPEED                               = 0x1043,
+    SMSG_LOGIN_SETTIMESPEED                               = 0x4D15,
     SMSG_GAMETIME_UPDATE                                  = 0x1044,
     CMSG_GAMETIME_SET                                     = 0x1045,
     SMSG_GAMETIME_SET                                     = 0x1046,
@@ -289,10 +289,10 @@ enum Opcodes
     MSG_MOVE_HOVER                                        = 0x10F8,
     CMSG_TRIGGER_CINEMATIC_CHEAT                          = 0x10F9,
     CMSG_OPENING_CINEMATIC                                = 0x10FA,
-    SMSG_TRIGGER_CINEMATIC                                = 0x10FB,
+    SMSG_TRIGGER_CINEMATIC                                = 0x6C27,
     CMSG_NEXT_CINEMATIC_CAMERA                            = 0x10FC,
     CMSG_COMPLETE_CINEMATIC                               = 0x10FD,
-    SMSG_TUTORIAL_FLAGS                                   = 0x10FE,
+    SMSG_TUTORIAL_FLAGS                                   = 0x0B35,
     CMSG_TUTORIAL_FLAG                                    = 0x10FF,
     CMSG_TUTORIAL_CLEAR                                   = 0x1100,
     CMSG_TUTORIAL_RESET                                   = 0x1101,
@@ -329,14 +329,14 @@ enum Opcodes
     CMSG_SET_TRADE_GOLD                                   = 0x1120,
     SMSG_TRADE_STATUS                                     = 0x1121,
     SMSG_TRADE_STATUS_EXTENDED                            = 0x1122,
-    SMSG_INITIALIZE_FACTIONS                              = 0x1123,
+    SMSG_INITIALIZE_FACTIONS                              = 0x4634,
     SMSG_SET_FACTION_VISIBLE                              = 0x1124,
     SMSG_SET_FACTION_STANDING                             = 0x1125,
     CMSG_SET_FACTION_ATWAR                                = 0x1126,
     CMSG_SET_FACTION_CHEAT                                = 0x1127,
     SMSG_SET_PROFICIENCY                                  = 0x1128,
     CMSG_SET_ACTION_BUTTON                                = 0x1129,
-    SMSG_ACTION_BUTTONS                                   = 0x112A,
+    SMSG_ACTION_BUTTONS                                   = 0x38B5,
     SMSG_INITIAL_SPELLS                                   = 0x112B,
     SMSG_LEARNED_SPELL                                    = 0x112C,
     SMSG_SUPERCEDED_SPELL                                 = 0x112D,
@@ -380,7 +380,7 @@ enum Opcodes
     SMSG_BREAK_TARGET                                     = 0x1153,
     CMSG_SAVE_PLAYER                                      = 0x1154,
     CMSG_SETDEATHBINDPOINT                                = 0x1155,
-    SMSG_BINDPOINTUPDATE                                  = 0x1156,
+    SMSG_BINDPOINTUPDATE                                  = 0x0527,
     CMSG_GETDEATHBINDZONE                                 = 0x1157,
     SMSG_BINDZONEREPLY                                    = 0x1158,
     SMSG_PLAYERBOUND                                      = 0x1159,
@@ -602,7 +602,7 @@ enum Opcodes
     CMSG_GUILD_DEL_RANK                                   = 0x1234,
     CMSG_GUILD_SET_PUBLIC_NOTE                            = 0x1235,
     CMSG_GUILD_SET_OFFICER_NOTE                           = 0x1236,
-    SMSG_LOGIN_VERIFY_WORLD                               = 0x1237,
+    SMSG_LOGIN_VERIFY_WORLD                               = 0x2005,
     CMSG_CLEAR_EXPLORATION                                = 0x1238,
     CMSG_SEND_MAIL                                        = 0x1239,
     SMSG_SEND_MAIL_RESULT                                 = 0x123A,
@@ -787,7 +787,7 @@ enum Opcodes
     SMSG_BATTLEGROUND_PLAYER_JOINED                       = 0x12ED,
     SMSG_BATTLEGROUND_PLAYER_LEFT                         = 0x12EE,
     CMSG_BATTLEMASTER_JOIN                                = 0x12EF,
-    SMSG_ADDON_INFO                                       = 0x12F0,
+    SMSG_ADDON_INFO                                       = 0x2C14,
     CMSG_PET_UNLEARN                                      = 0x12F1,
     SMSG_PET_UNLEARN_CONFIRM                              = 0x12F2,
     SMSG_PARTY_MEMBER_STATS_FULL                          = 0x12F3,
@@ -865,7 +865,7 @@ enum Opcodes
     SMSG_DEFENSE_MESSAGE                                  = 0x133B,
     SMSG_INSTANCE_DIFFICULTY                              = 0x133C,
     MSG_GM_RESETINSTANCELIMIT                             = 0x133D,
-    SMSG_MOTD                                             = 0x133E,
+    SMSG_MOTD                                             = 0x0A35,
     SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY     = 0x133F,
     SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY   = 0x1340,
     CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK = 0x1341,
@@ -948,7 +948,7 @@ enum Opcodes
     CMSG_MOVE_CHNG_TRANSPORT                              = 0x138E,
     MSG_PARTY_ASSIGNMENT                                  = 0x138F,
     SMSG_OFFER_PETITION_ERROR                             = 0x1390,
-    SMSG_TIME_SYNC_REQ                                    = 0x1391,
+    SMSG_TIME_SYNC_REQ                                    = 0x3CA4,
     CMSG_TIME_SYNC_RESP                                   = 0x1392,
     CMSG_SEND_LOCAL_EVENT                                 = 0x1393,
     CMSG_SEND_GENERAL_TRIGGER                             = 0x1394,
@@ -1005,7 +1005,7 @@ enum Opcodes
     MSG_RAID_READY_CHECK_FINISHED                         = 0x13C7,
     CMSG_COMPLAIN                                         = 0x13C8,
     SMSG_COMPLAIN_RESULT                                  = 0x13C9,
-    SMSG_FEATURE_SYSTEM_STATUS                            = 0x13CA,
+    SMSG_FEATURE_SYSTEM_STATUS                            = 0x3DB7,
     CMSG_GM_SHOW_COMPLAINTS                               = 0x13CB,
     CMSG_GM_UNSQUELCH                                     = 0x13CC,
     CMSG_CHANNEL_SILENCE_VOICE                            = 0x13CD,
@@ -1090,7 +1090,7 @@ enum Opcodes
     CMSG_QUERY_SERVER_BUCK_DATA                           = 0x141C,
     CMSG_CLEAR_SERVER_BUCK_DATA                           = 0x141D,
     SMSG_SERVER_BUCK_DATA                                 = 0x141E,
-    SMSG_SEND_UNLEARN_SPELLS                              = 0x141F,
+    SMSG_SEND_UNLEARN_SPELLS                              = 0x4E25,
     SMSG_PROPOSE_LEVEL_GRANT                              = 0x1420,
     CMSG_ACCEPT_LEVEL_GRANT                               = 0x1421,
     SMSG_REFER_A_FRIEND_FAILURE                           = 0x1422,
@@ -1145,7 +1145,7 @@ enum Opcodes
     SMSG_DANCE_QUERY_RESPONSE                             = 0x1453,
     SMSG_INVALIDATE_DANCE                                 = 0x1454,
     CMSG_DELETE_DANCE                                     = 0x1455,
-    SMSG_LEARNED_DANCE_MOVES                              = 0x1456,
+    SMSG_LEARNED_DANCE_MOVES                              = 0x0E05,
     CMSG_LEARN_DANCE_MOVE                                 = 0x1457,
     CMSG_UNLEARN_DANCE_MOVE                               = 0x1458,
     CMSG_SET_RUNE_COUNT                                   = 0x1459,
@@ -1231,7 +1231,7 @@ enum Opcodes
     CMSG_RIDE_VEHICLE_INTERACT                            = 0x14A9,
     CMSG_CONTROLLER_EJECT_PASSENGER                       = 0x14AA,
     SMSG_PET_GUIDS                                        = 0x14AB,
-    SMSG_CLIENTCACHE_VERSION                              = 0x14AC,
+    SMSG_CLIENTCACHE_VERSION                              = 0x2734,
     CMSG_CHANGE_GDF_ARENA_RATING                          = 0x14AD,
     CMSG_SET_ARENA_TEAM_RATING_BY_INDEX                   = 0x14AE,
     CMSG_SET_ARENA_TEAM_WEEKLY_GAMES                      = 0x14AF,
@@ -1373,7 +1373,6 @@ enum Opcodes
     UMSG_UNKNOWN_1334                                     = 0x1537,
 };
 
-#define NUM_MSG_TYPES 65535
 #define MAX_OPCODE_TABLE_SIZE 0xFFFF
 
 extern void InitializeOpcodes();
@@ -1411,8 +1410,6 @@ extern OpcodeHandler opcodeTable[MAX_OPCODE_TABLE_SIZE];
 /// Lookup opcode name for human understandable logging
 inline const char* LookupOpcodeName(uint16 id)
 {
-    if (id >= NUM_MSG_TYPES && id != MSG_WOW_CONNECTION)
-        return "Received unknown opcode, it's more than max!";
     return opcodeTable[id].name;
 }
 #endif

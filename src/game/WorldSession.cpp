@@ -133,8 +133,11 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
         return;
 
-    if (packet->GetOpcode() >= NUM_MSG_TYPES && packet->GetOpcode() != MSG_WOW_CONNECTION)
+    if (opcodeTable[packet->GetOpcode()].status == STATUS_UNHANDLED)
+    {
+        sLog.outError("SESSION: tried to send an unhandled opcode 0x%.4X", packet->GetOpcode());
         return;
+    }
 
     #ifdef MANGOS_DEBUG
 
@@ -269,7 +272,7 @@ bool WorldSession::Update(PacketFilter& updater)
                         packet->GetOpcode());
                     break;
                 case STATUS_UNHANDLED:
-                    DEBUG_LOG("SESSION: received not handled opcode %s (0x%.4X)",
+                    sLog.outError("SESSION: received not handled opcode %s (0x%.4X)",
                         LookupOpcodeName(packet->GetOpcode()),
                         packet->GetOpcode());
                     break;

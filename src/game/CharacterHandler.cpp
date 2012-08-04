@@ -626,9 +626,6 @@ void WorldSession::HandleCharDeleteOpcode( WorldPacket & recv_data )
 
 void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 {
-    ObjectGuid playerGuid;
-    recv_data >> playerGuid;
-
     if(PlayerLoading() || GetPlayer() != NULL)
     {
         sLog.outError("Player tryes to login again, AccountId = %d", GetAccountId());
@@ -637,9 +634,14 @@ void WorldSession::HandlePlayerLoginOpcode( WorldPacket & recv_data )
 
     m_playerLoading = true;
 
-    DEBUG_LOG( "WORLD: Recvd Player Logon Message" );
+    ObjectGuid playerGuid;
 
-    LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
+    recv_data.ReadGuidMask<2, 3, 0, 6, 4, 5, 1, 7>(playerGuid);
+    recv_data.ReadGuidBytes<2, 7, 0, 3, 5, 6, 1, 4>(playerGuid);
+
+    DEBUG_LOG("WORLD: Recvd Player Logon Message from %s", playerGuid.GetString().c_str());
+
+    LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
     {
         delete holder;                                      // delete all unprocessed queries
@@ -683,9 +685,22 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     LoadAccountData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA),PER_CHARACTER_CACHE_MASK);
     SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
 
-    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
-    data << uint8(2);                                       // unknown value
-    data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
+    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 34);        // added in 2.2.0
+    data << uint8(2);                                       // status
+    data << uint32(1);                                      // Scrolls of Ressurection?
+    data << uint32(1);
+    data << uint32(2);
+    data << uint32(0);
+    data.WriteBit(true);
+    data.WriteBit(true);
+    data.WriteBit(false);
+    data.WriteBit(true);
+    data.WriteBit(false);
+    data.WriteBit(false);                                   // enable(1)/disable(0) voice chat interface in client
+    data << uint32(1);
+    data << uint32(0);
+    data << uint32(10);
+    data << uint32(60);
     SendPacket(&data);
 
     // Send MOTD
@@ -761,8 +776,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     }
 
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4+4);
-    data << uint32(0);
-    data << uint32(0);
+    data << uint64(0);
     SendPacket(&data);
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
