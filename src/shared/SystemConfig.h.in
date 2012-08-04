@@ -74,19 +74,19 @@
 # define _AUCTIONHOUSEBOT_CONFIG   SYSCONFDIR"ahbot.conf"
 #else
 # if defined  (__FreeBSD__)
-#  define _ENDIAN_PLATFORM "FreeBSD_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "FreeBSD_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # elif defined(__NetBSD__)
-#  define _ENDIAN_PLATFORM "NetBSD_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "NetBSD_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # elif defined(__OpenBSD__)
-#  define _ENDIAN_PLATFORM "OpenBSD_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "OpenBSD_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # elif defined(__DragonFly__)
-#  define _ENDIAN_PLATFORM "DragonFlyBSD_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "DragonFlyBSD_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # elif defined(__APPLE__)
-#  define _ENDIAN_PLATFORM "MacOSX_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "MacOSX_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # elif defined(__linux) || defined(__linux__)
-#  define _ENDIAN_PLATFORM "Linux_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "Linux_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # else
-#  define _ENDIAN_PLATFORM "Unix_"ARCHITECTURE" (" _ENDIAN_STRING ")"
+#  define _ENDIAN_PLATFORM "Unix_" ARCHITECTURE " (" _ENDIAN_STRING ")"
 # endif
 # define _MANGOSD_CONFIG  SYSCONFDIR"mangosd.conf"
 # define _REALMD_CONFIG  SYSCONFDIR"realmd.conf"
