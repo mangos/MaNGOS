@@ -224,8 +224,6 @@ enum SpellTargets
     SPELL_TARGETS_ALL
 };
 
-#define SPELL_SPELL_CHANNEL_UPDATE_INTERVAL (1*IN_MILLISECONDS)
-
 typedef std::multimap<uint64, uint64> SpellTargetTimeMap;
 
 class Spell

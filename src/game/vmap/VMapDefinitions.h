@@ -35,6 +35,12 @@ namespace VMAP
     #include "Errors.h"
     #include "Log.h"
     #define ERROR_LOG(...) sLog.outError(__VA_ARGS__);
+#elif defined MMAP_GENERATOR
+    #include <assert.h>
+    #define MANGOS_ASSERT(x) assert(x)
+    #define DEBUG_LOG(...) 0
+    #define DETAIL_LOG(...) 0
+    #define ERROR_LOG(...) do{ printf("ERROR:"); printf(__VA_ARGS__); printf("\n"); } while(0)
 #else
     #include <assert.h>
     #define MANGOS_ASSERT(x) assert(x)

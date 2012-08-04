@@ -121,10 +121,8 @@ namespace VMAP
     StaticMapTree::StaticMapTree(uint32 mapID, const std::string &basePath):
         iMapID(mapID), iTreeValues(0), iBasePath(basePath)
     {
-        if (iBasePath.length() > 0 && (iBasePath[iBasePath.length()-1] != '/' || iBasePath[iBasePath.length()-1] != '\\'))
-        {
+        if (iBasePath.length() > 0 && (iBasePath[iBasePath.length()-1] != '/' && iBasePath[iBasePath.length()-1] != '\\'))
             iBasePath.append("/");
-        }
     }
 
     //=========================================================
@@ -235,7 +233,7 @@ namespace VMAP
     bool StaticMapTree::CanLoadMap(const std::string &vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
     {
         std::string basePath = vmapPath;
-        if (basePath.length() > 0 && (basePath[basePath.length()-1] != '/' || basePath[basePath.length()-1] != '\\'))
+        if (basePath.length() > 0 && (basePath[basePath.length()-1] != '/' && basePath[basePath.length()-1] != '\\'))
             basePath.append("/");
         std::string fullname = basePath + VMapManager2::getMapFileName(mapID);
         bool success = true;

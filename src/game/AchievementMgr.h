@@ -287,7 +287,7 @@ class AchievementMgr
             return iter != m_criteriaProgress.end() ? iter->second.counter : 0;
         }
 
-        static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry);
+        static uint32 GetCriteriaProgressMaxCounter(AchievementCriteriaEntry const* entry, AchievementEntry const* achievement);
 
         // Use PROGRESS_SET only for reset/downgrade criteria progress
         enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST };

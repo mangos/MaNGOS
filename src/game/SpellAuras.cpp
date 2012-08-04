@@ -680,7 +680,7 @@ void AreaAura::Update(uint32 diff)
                 }
             }
 
-            for(Spell::UnitList::iterator tIter = targets.begin(); tIter != targets.end(); tIter++)
+            for(Spell::UnitList::iterator tIter = targets.begin(); tIter != targets.end(); ++tIter)
             {
                 // flag for seelction is need apply aura to current iteration target
                 bool apply = true;
@@ -1141,24 +1141,40 @@ void Aura::TriggerSpell()
                     }
                     case 23184:                             // Mark of Frost
                     case 25041:                             // Mark of Nature
+                    case 37125:                             // Mark of Death
                     {
                         std::list<Player*> targets;
 
                         // spells existed in 1.x.x; 23183 - mark of frost; 25042 - mark of nature; both had radius of 100.0 yards in 1.x.x DBC
                         // spells are used by Azuregos and the Emerald dragons in order to put a stun debuff on the players which resurrect during the encounter
                         // in order to implement the missing spells we need to make a grid search for hostile players and check their auras; if they are marked apply debuff
+                        // spell 37127 used for the Mark of Death, is used server side, so it needs to be implemented here
 
-                        // Mark of Frost or Mark of Nature
-                        uint32 markSpellId = auraId == 23184 ? 23182 : 25040;
-                        // Aura of Frost or Aura of Nature
-                        uint32 debufSpellId = auraId == 23184 ? 23186 : 25043;
+                        uint32 markSpellId = 0;
+                        uint32 debuffSpellId = 0;
+
+                        switch (auraId)
+                        {
+                            case 23184:
+                                markSpellId = 23182;
+                                debuffSpellId = 23186;
+                                break;
+                            case 25041:
+                                markSpellId = 25040;
+                                debuffSpellId = 25043;
+                                break;
+                            case 37125:
+                                markSpellId = 37128;
+                                debuffSpellId = 37131;
+                                break;
+                        }
 
                         MaNGOS::AnyPlayerInObjectRangeWithAuraCheck u_check(GetTarget(), 100.0f, markSpellId);
                         MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeWithAuraCheck > checker(targets, u_check);
                         Cell::VisitWorldObjects(GetTarget(), checker, 100.0f);
 
                         for (std::list<Player*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                            (*itr)->CastSpell((*itr), debufSpellId, true, NULL, NULL, casterGUID);
+                            (*itr)->CastSpell((*itr), debuffSpellId, true, NULL, NULL, casterGUID);
 
                         return;
                     }
@@ -1262,8 +1278,15 @@ void Aura::TriggerSpell()
                         triggerTarget->CastCustomSpell(triggerTarget, 29879, &bpDamage, NULL, NULL, true, NULL, this, casterGUID);
                         return;
                     }
-//                    // Detonate Mana
-//                    case 27819: break;
+                    // Detonate Mana
+                    case 27819:
+                    {
+                        // 33% Mana Burn on normal mode, 50% on heroic mode
+                        int32 bpDamage = (int32)triggerTarget->GetPower(POWER_MANA) / (triggerTarget->GetMap()->GetDifficulty() ? 2 : 3);
+                        triggerTarget->ModifyPower(POWER_MANA, -bpDamage);
+                        triggerTarget->CastCustomSpell(triggerTarget, 27820, &bpDamage, NULL, NULL, true, NULL, this, triggerTarget->GetObjectGuid());
+                        return;
+                    }
 //                    // Controller Timer
 //                    case 28095: break;
                     // Stalagg Chain and Feugen Chain
@@ -2931,8 +2954,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                             target->PlayDirectSound(14972, (Player *)target);
                     }
                     return;
-                case 40131:
+                case 10848:
                 case 27978:
+                case 40131:
                     if (apply)
                         target->m_AuraFlags |= UNIT_AURAFLAG_ALIVE_INVISIBLE;
                     else
@@ -3265,14 +3289,10 @@ void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)
 
 void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 {
-    if(!Real)
+    if (!Real)
         return;
 
-    uint32 modelid = 0;
-    Powers PowerType = POWER_MANA;
     ShapeshiftForm form = ShapeshiftForm(m_modifier.m_miscvalue);
-
-    Unit *target = GetTarget();
 
     SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
     if (!ssEntry)
@@ -3280,6 +3300,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         sLog.outError("Unknown shapeshift form %u in spell %u", form, GetId());
         return;
     }
+
+    uint32 modelid = 0;
+    Powers PowerType = POWER_MANA;
+    Unit* target = GetTarget();
 
     if (ssEntry->modelID_A)
     {
@@ -3414,10 +3438,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                             target->CastCustomSpell(target, 17099, &furorChance, NULL, NULL, true, NULL, this);
                         }
                     }
-                    else if(furorChance)                    // only if talent known
+                    else if (furorChance)                   // only if talent known
                     {
                         target->SetPower(POWER_RAGE, 0);
-                        if(irand(1,100) <= furorChance)
+                        if (irand(1, 100) <= furorChance)
                             target->CastSpell(target, 17057, true, NULL, this);
                     }
                     break;
@@ -3428,12 +3452,14 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 {
                     uint32 Rage_val = 0;
                     // Stance mastery + Tactical mastery (both passive, and last have aura only in defense stance, but need apply at any stance switch)
-                    if(target->GetTypeId() == TYPEID_PLAYER)
+                    if (target->GetTypeId() == TYPEID_PLAYER)
                     {
                         PlayerSpellMap const& sp_list = ((Player *)target)->GetSpellMap();
                         for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
                         {
-                            if(itr->second.state == PLAYERSPELL_REMOVED) continue;
+                            if (itr->second.state == PLAYERSPELL_REMOVED)
+                                continue;
+
                             SpellEntry const *spellInfo = sSpellStore.LookupEntry(itr->first);
                             if (spellInfo && spellInfo->GetSpellFamilyName() == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
                                 Rage_val += target->CalculateSpellDamage(target, spellInfo, EFFECT_INDEX_0) * 10;
@@ -3457,28 +3483,29 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             for (uint32 i = 0; i < 8; ++i)
                 if (ssEntry->spellId[i])
                     ((Player*)target)->addSpell(ssEntry->spellId[i], true, false, false, false);
-
     }
     else
     {
-        if(modelid > 0)
+        if (modelid > 0)
             target->SetDisplayId(target->GetNativeDisplayId());
-        if(target->getClass() == CLASS_DRUID)
+
+        if (target->getClass() == CLASS_DRUID)
             target->setPowerType(POWER_MANA);
+
         target->SetShapeshiftForm(FORM_NONE);
 
-        switch(form)
+        switch (form)
         {
             // Nordrassil Harness - bonus
             case FORM_BEAR:
             case FORM_DIREBEAR:
             case FORM_CAT:
-                if(Aura* dummy = target->GetDummyAura(37315) )
+                if (Aura* dummy = target->GetDummyAura(37315))
                     target->CastSpell(target, 37316, true, NULL, dummy);
                 break;
             // Nordrassil Regalia - bonus
             case FORM_MOONKIN:
-                if(Aura* dummy = target->GetDummyAura(37324) )
+                if (Aura* dummy = target->GetDummyAura(37324))
                     target->CastSpell(target, 37325, true, NULL, dummy);
                 break;
             default:
@@ -3490,14 +3517,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             for (uint32 i = 0; i < 8; ++i)
                 if (ssEntry->spellId[i])
                     ((Player*)target)->removeSpell(ssEntry->spellId[i], false, false, false);
-
     }
 
     // adding/removing linked auras
     // add/remove the shapeshift aura's boosts
     HandleShapeshiftBoosts(apply);
 
-    if(target->GetTypeId() == TYPEID_PLAYER)
+    if (target->GetTypeId() == TYPEID_PLAYER)
         ((Player*)target)->InitDataForForm();
 }
 

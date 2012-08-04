@@ -100,7 +100,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         static Unit* GetUnit(WorldObject const& obj, ObjectGuid guid);
 
         // Player access
-        static Player* FindPlayer(ObjectGuid guid);         // if need player at specific map better use Map::GetPlayer
+        static Player* FindPlayer(ObjectGuid guid, bool inWorld = true);// if need player at specific map better use Map::GetPlayer
         static Player* FindPlayerByName(const char *name);
         static void KickPlayer(ObjectGuid guid);
 

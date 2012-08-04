@@ -40,72 +40,65 @@ class SpellCastTargets;
 class Unit;
 class WorldObject;
 
-enum eScriptCommand
+enum ScriptCommand                                          // resSource, resTarget are the resulting Source/ Target after buddy search is done
 {
-    SCRIPT_COMMAND_TALK                     = 0,            // source = WorldObject, target = any/none, datalong (see enum ChatType for supported CHAT_TYPE_'s)
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius, datalong4 = language
-                                                            // data_flags = flag_target_player_as_source    = 0x01
-                                                            //              flag_original_source_as_target  = 0x02
-                                                            //              flag_buddy_as_target            = 0x04
-                                                            // dataint = text entry from db_script_string -table. dataint2-4 optional for random selected text.
-    SCRIPT_COMMAND_EMOTE                    = 1,            // source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
-                                                            // datalong = emote_id
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
-                                                            // data_flags = flag_target_as_source           = 0x01
-    SCRIPT_COMMAND_FIELD_SET                = 2,            // source = any, datalong = field_id, datalong2 = value
-    SCRIPT_COMMAND_MOVE_TO                  = 3,            // source = Creature, datalong2 = time, x/y/z
-    SCRIPT_COMMAND_FLAG_SET                 = 4,            // source = any, datalong = field_id, datalong2 = bitmask
-    SCRIPT_COMMAND_FLAG_REMOVE              = 5,            // source = any, datalong = field_id, datalong2 = bitmask
-    SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source or target with Player, datalong = map_id, x/y/z
-    SCRIPT_COMMAND_QUEST_EXPLORED           = 7,            // one from source or target must be Player, another GO/Creature, datalong=quest_id, datalong2=distance or 0
-    SCRIPT_COMMAND_KILL_CREDIT              = 8,            // source or target with Player, datalong = creature entry, datalong2 = bool (0=personal credit, 1=group credit)
-    SCRIPT_COMMAND_RESPAWN_GAMEOBJECT       = 9,            // source = any (summoner), datalong=db_guid, datalong2=despawn_delay
-    SCRIPT_COMMAND_TEMP_SUMMON_CREATURE     = 10,           // source = any (summoner), datalong=creature entry, datalong2=despawn_delay
-    SCRIPT_COMMAND_OPEN_DOOR                = 11,           // source = unit, datalong=db_guid, datalong2=reset_delay
-    SCRIPT_COMMAND_CLOSE_DOOR               = 12,           // source = unit, datalong=db_guid, datalong2=reset_delay
+    SCRIPT_COMMAND_TALK                     = 0,            // resSource = WorldObject, resTarget = Unit/none
+                                                            // datalong1 (see enum ChatType for supported CHAT_TYPE_'s), datalong2 = language
+                                                            // dataint = text entry from db_script_string -table. dataint2-4 optional for random selected texts.
+    SCRIPT_COMMAND_EMOTE                    = 1,            // resSource = Unit, resTarget = Unit/none
+                                                            // datalong1 = emote_id
+    SCRIPT_COMMAND_FIELD_SET                = 2,            // source = any, datalong3 = field_id, datalong2 = value
+    SCRIPT_COMMAND_MOVE_TO                  = 3,            // resSource = Creature, datalong2 = travel_speed*100, x/y/z
+                                                            // data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: teleport unit to position
+    SCRIPT_COMMAND_FLAG_SET                 = 4,            // source = any, datalong3 = field_id, datalong2 = bitmask
+    SCRIPT_COMMAND_FLAG_REMOVE              = 5,            // source = any, datalong3 = field_id, datalong2 = bitmask
+    SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source or target with Player, datalong2 = map_id, x/y/z
+    SCRIPT_COMMAND_QUEST_EXPLORED           = 7,            // one from source or target must be Player, another GO/Creature, datalong3=quest_id, datalong2=distance or 0
+    SCRIPT_COMMAND_KILL_CREDIT              = 8,            // source or target with Player, datalong3 = creature entry, datalong2 = bool (0=personal credit, 1=group credit)
+    SCRIPT_COMMAND_RESPAWN_GAMEOBJECT       = 9,            // source = any, datalong=db_guid, datalong2=despawn_delay
+    SCRIPT_COMMAND_TEMP_SUMMON_CREATURE     = 10,           // source = any, datalong=creature entry, datalong2=despawn_delay
+                                                            // data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL = summon active
+    SCRIPT_COMMAND_OPEN_DOOR                = 11,           // datalong=db_guid (or not provided), datalong2=reset_delay
+    SCRIPT_COMMAND_CLOSE_DOOR               = 12,           // datalong=db_guid (or not provided), datalong2=reset_delay
     SCRIPT_COMMAND_ACTIVATE_OBJECT          = 13,           // source = unit, target=GO
-    SCRIPT_COMMAND_REMOVE_AURA              = 14,           // source (datalong2!=0) or target (datalong==0) unit, datalong = spell_id
-    SCRIPT_COMMAND_CAST_SPELL               = 15,           // source/target cast spell at target/source
-                                                            // datalong2: 0: s->t 1: s->s 2: t->t 3: t->s (this values in 2 bits), and 0x4 mask for cast triggered can be added to
-    SCRIPT_COMMAND_PLAY_SOUND               = 16,           // source = any object, target=any/player, datalong (sound_id), datalong2 (bitmask: 0/1=anyone/target, 0/2=with distance dependent, so 1|2 = 3 is target with distance dependent)
-    SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source or target must be player, datalong = item entry, datalong2 = amount
-    SCRIPT_COMMAND_DESPAWN_SELF             = 18,           // source or target must be creature, datalong = despawn delay
+    SCRIPT_COMMAND_REMOVE_AURA              = 14,           // resSource = Unit, datalong = spell_id
+    SCRIPT_COMMAND_CAST_SPELL               = 15,           // resSource = Unit, cast spell at resTarget = Unit
+                                                            // datalong=spellid
+                                                            // data_flags &  SCRIPT_FLAG_COMMAND_ADDITIONAL = cast triggered
+    SCRIPT_COMMAND_PLAY_SOUND               = 16,           // resSource = WorldObject, target=any/player, datalong (sound_id), datalong2 (bitmask: 0/1=anyone/target, 0/2=with distance dependent, so 1|2 = 3 is target with distance dependent)
+    SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source or target must be player, datalong3 = item entry, datalong2 = amount
+    SCRIPT_COMMAND_DESPAWN_SELF             = 18,           // resSource = Creature, datalong = despawn delay
     SCRIPT_COMMAND_PLAY_MOVIE               = 19,           // target can only be a player, datalog = movie id
-    SCRIPT_COMMAND_MOVEMENT                 = 20,           // source or target must be creature. datalong = MovementType (0:idle, 1:random or 2:waypoint)
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
-    SCRIPT_COMMAND_SET_ACTIVEOBJECT         = 21,           // source=any, target=creature
+    SCRIPT_COMMAND_MOVEMENT                 = 20,           // resSource = Creature. datalong = MovementType (0:idle, 1:random or 2:waypoint)
+    SCRIPT_COMMAND_SET_ACTIVEOBJECT         = 21,           // resSource = Creature
                                                             // datalong=bool 0=off, 1=on
-                                                            // datalong2=creature entry, datalong3=search radius
-    SCRIPT_COMMAND_SET_FACTION              = 22,           // source=any, target=creature
-                                                            // datalong=factionId,
-                                                            // datalong2=creature entry, datalong3=search radius
-    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source=any, target=creature
-                                                            // datalong=creature entry/modelid (depend on data_flags)
-                                                            // datalong2=creature entry, datalong3=search radius
-                                                            // dataflags= 0x01 to use datalong value as modelid explicit
-    SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL  = 24,           // source=any, target=creature
-                                                            // datalong=creature entry/modelid (depend on data_flags)
-                                                            // datalong2=creature entry, datalong3=search radius
-                                                            // dataflags= 0x01 to use datalong value as modelid explicit
-    SCRIPT_COMMAND_SET_RUN                  = 25,           // source=any, target=creature
+    SCRIPT_COMMAND_SET_FACTION              = 22,           // resSource = Creature
+                                                            // datalong=factionId, datalong2=faction_flags
+    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // resSource = Creature, datalong=creature entry/modelid
+                                                            // data_flags &  SCRIPT_FLAG_COMMAND_ADDITIONAL = use datalong value as modelid explicit
+    SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL  = 24,           // resSource = Creature, datalong=creature entry/modelid
+                                                            // data_flags &  SCRIPT_FLAG_COMMAND_ADDITIONAL = use datalong value as modelid explicit
+    SCRIPT_COMMAND_SET_RUN                  = 25,           // resSource = Creature
                                                             // datalong= bool 0=off, 1=on
-                                                            // datalong2=creature entry, datalong3=search radius
-    SCRIPT_COMMAND_ATTACK_START             = 26,           // source = Creature (or WorldObject when creature entry are defined), target = Player
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
-    SCRIPT_COMMAND_GO_LOCK_STATE            = 27,           // source or target must be WorldObject
+    SCRIPT_COMMAND_ATTACK_START             = 26,           // resSource = Creature, resTarget = Unit
+    SCRIPT_COMMAND_GO_LOCK_STATE            = 27,           // resSource = GameObject
                                                             // datalong= 1=lock, 2=unlock, 4=set not-interactable, 8=set interactable
-                                                            // datalong2= go entry, datalong3= go search radius
-    SCRIPT_COMMAND_STAND_STATE              = 28,           // source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
+    SCRIPT_COMMAND_STAND_STATE              = 28,           // resSource = Creature
                                                             // datalong = stand state (enum UnitStandStateType)
-                                                            // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
-                                                            // data_flags = flag_target_as_source           = 0x01
-    SCRIPT_COMMAND_MODIFY_NPC_FLAGS         = 29,           // source=worldobject or target=worldobject (datalong1==0), else creature
+    SCRIPT_COMMAND_MODIFY_NPC_FLAGS         = 29,           // resSource = Creature
                                                             // datalong=NPCFlags
-                                                            // datalong1=creature entry, datalong2=search radius
-                                                            // data_flags = 0x01=add, 0x02=remove
+                                                            // datalong2:0x00=toggle, 0x01=add, 0x02=remove
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
+
+enum ScriptInfoDataFlags
+{                                                           // default: s/b -> t
+    SCRIPT_FLAG_BUDDY_AS_TARGET             = 0x01,         // s -> b
+    SCRIPT_FLAG_REVERSE_DIRECTION           = 0x02,         // t* -> s* (* result after previous flag is evaluated)
+    SCRIPT_FLAG_SOURCE_TARGETS_SELF         = 0x04,         // s* -> s* (* result after previous flag is evaluated)
+    SCRIPT_FLAG_COMMAND_ADDITIONAL          = 0x08,         // command dependend
+};
 
 struct ScriptInfo
 {
@@ -118,20 +111,13 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_TALK (0)
         {
             uint32 chatType;                                // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 language;                                // datalong4
-            uint32 flags;                                   // data_flags
-            int32  textId[MAX_TEXT_ID];                     // dataint to dataint4
+            uint32 language;                                // datalong2
         } talk;
 
         struct                                              // SCRIPT_COMMAND_EMOTE (1)
         {
             uint32 emoteId;                                 // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 unused1;                                 // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 unused1;                                 // datalong2
         } emote;
 
         struct                                              // SCRIPT_COMMAND_FIELD_SET (2)
@@ -143,7 +129,7 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_MOVE_TO (3)
         {
             uint32 unused1;                                 // datalong
-            uint32 travelTime;                              // datalong2
+            uint32 travelSpeed;                             // datalong2
         } moveTo;
 
         struct                                              // SCRIPT_COMMAND_FLAG_SET (4)
@@ -161,6 +147,7 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_TELEPORT_TO (6)
         {
             uint32 mapId;                                   // datalong
+            uint32 empty;                                   // datalong2
         } teleportTo;
 
         struct                                              // SCRIPT_COMMAND_QUEST_EXPLORED (7)
@@ -178,42 +165,38 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (9)
         {
             uint32 goGuid;                                  // datalong
-            int32 despawnDelay;                             // datalong2
+            uint32 despawnDelay;                            // datalong2
         } respawnGo;
 
         struct                                              // SCRIPT_COMMAND_TEMP_SUMMON_CREATURE (10)
         {
             uint32 creatureEntry;                           // datalong
             uint32 despawnDelay;                            // datalong2
-            uint32 unused1;                                 // datalong3
-            uint32 unused2;                                 // datalong4
-            uint32 flags;                                   // data_flags
         } summonCreature;
 
-        struct                                              // SCRIPT_COMMAND_OPEN_DOOR (11)
-        {
-            uint32 goGuid;                                  // datalong
-            int32 resetDelay;                               // datalong2
-        } openDoor;
-
+                                                            // SCRIPT_COMMAND_OPEN_DOOR (11)
         struct                                              // SCRIPT_COMMAND_CLOSE_DOOR (12)
         {
             uint32 goGuid;                                  // datalong
-            int32 resetDelay;                               // datalong2
-        } closeDoor;
+            uint32 resetDelay;                              // datalong2
+        } changeDoor;
 
-                                                            // SCRIPT_COMMAND_ACTIVATE_OBJECT (13)
+        struct                                              // SCRIPT_COMMAND_ACTIVATE_OBJECT (13)
+        {
+            uint32 empty1;                                  // datalong
+            uint32 empty2;                                  // datalong;
+        } activateObject;
 
         struct                                              // SCRIPT_COMMAND_REMOVE_AURA (14)
         {
             uint32 spellId;                                 // datalong
-            uint32 isSourceTarget;                          // datalong2
+            uint32 empty;                                   // datalong2
         } removeAura;
 
         struct                                              // SCRIPT_COMMAND_CAST_SPELL (15)
         {
             uint32 spellId;                                 // datalong
-            uint32 flags;                                   // datalong2
+            uint32 empty;                                   // datalong2
         } castSpell;
 
         struct                                              // SCRIPT_COMMAND_PLAY_SOUND (16)
@@ -231,100 +214,87 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_DESPAWN_SELF (18)
         {
             uint32 despawnDelay;                            // datalong
+            uint32 empty;                                   // datalong2
         } despawn;
 
         struct                                              // SCRIPT_COMMAND_PLAY_MOVIE (19)
         {
             uint32 movieId;                                 // datalong
+            uint32 empty;                                   // datalong2
         } playMovie;
 
         struct                                              // SCRIPT_COMMAND_MOVEMENT (20)
         {
             uint32 movementType;                            // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
+            uint32 empty;                                   // datalong2
         } movement;
 
         struct                                              // SCRIPT_COMMAND_SET_ACTIVEOBJECT (21)
         {
             uint32 activate;                                // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
+            uint32 empty;                                   // datalong2
         } activeObject;
 
         struct                                              // SCRIPT_COMMAND_SET_FACTION (22)
         {
             uint32 factionId;                               // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 empty1;                                  // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 flags;                                   // datalong2
         } faction;
 
         struct                                              // SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (23)
         {
             uint32 creatureOrModelEntry;                    // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 empty1;                                  // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 empty1;                                  // datalong2
         } morph;
 
         struct                                              // SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL (24)
         {
             uint32 creatureOrModelEntry;                    // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 empty1;                                  // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 empty1;                                  // datalong2
         } mount;
 
         struct                                              // SCRIPT_COMMAND_SET_RUN (25)
         {
             uint32 run;                                     // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
+            uint32 empty;                                   // datalong2
         } run;
 
         struct                                              // SCRIPT_COMMAND_ATTACK_START (26)
         {
             uint32 empty1;                                  // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 empty2;                                  // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 empty2;                                  // datalong2
         } attack;
 
         struct                                              // SCRIPT_COMMAND_GO_LOCK_STATE (27)
         {
             uint32 lockState;                               // datalong
-            uint32 goEntry;                                 // datalong2
-            uint32 searchRadius;                            // datalong3
+            uint32 empty;                                   // datalong
         } goLockState;
 
         struct                                              // SCRIPT_COMMAND_STAND_STATE (28)
         {
             uint32 stand_state;                             // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 unused1;                                 // datalong4
-            uint32 flags;                                   // data_flags
+            uint32 unused1;                                 // datalong2
         } standState;
 
         struct                                              // SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
         {
             uint32 flag;                                    // datalong
-            uint32 creatureEntry;                           // datalong2
-            uint32 searchRadius;                            // datalong3
-            uint32 empty1;                                  // datalong4
-            uint32 data_flags;                              // data_flags
+            uint32 change_flag;                             // datalong2
         } npcFlag;
 
         struct
         {
-            uint32 data[9];
+            uint32 data[2];
         } raw;
     };
+
+    // Buddy system (entry can be npc or go entry, depending on command)
+    uint32 buddyEntry;                                      // datalong3 -> buddy_entry
+    uint32 searchRadius;                                    // datalong4 -> search_radius
+    uint8 data_flags;                                       // data_flags
+
+    int32 textId[MAX_TEXT_ID];                              // dataint to dataint4
 
     float x;
     float y;
@@ -334,34 +304,86 @@ struct ScriptInfo
     // helpers
     uint32 GetGOGuid() const
     {
-        switch(command)
+        switch (command)
         {
-            case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT: return respawnGo.goGuid;
-            case SCRIPT_COMMAND_OPEN_DOOR: return openDoor.goGuid;
-            case SCRIPT_COMMAND_CLOSE_DOOR: return closeDoor.goGuid;
-            default: return 0;
+            case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
+                return respawnGo.goGuid;
+            case SCRIPT_COMMAND_OPEN_DOOR:
+            case SCRIPT_COMMAND_CLOSE_DOOR:
+                return changeDoor.goGuid;
+            default:
+                return 0;
+        }
+    }
+
+    bool IsCreatureBuddy() const
+    {
+        switch (command)
+        {
+            case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT:
+            case SCRIPT_COMMAND_OPEN_DOOR:
+            case SCRIPT_COMMAND_CLOSE_DOOR:
+            case SCRIPT_COMMAND_ACTIVATE_OBJECT:
+            case SCRIPT_COMMAND_GO_LOCK_STATE:
+                return false;
+            default:
+                return true;
+        }
+    }
+
+    bool HasAdditionalScriptFlag() const
+    {
+        switch (command)
+        {
+            case SCRIPT_COMMAND_MOVE_TO:
+            case SCRIPT_COMMAND_TEMP_SUMMON_CREATURE:
+            case SCRIPT_COMMAND_CAST_SPELL:
+            case SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL:
+            case SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL:
+                return true;
+            default:
+                return false;
         }
     }
 };
 
-struct ScriptAction
+class ScriptAction
 {
-    ObjectGuid sourceGuid;
-    ObjectGuid targetGuid;
-    ObjectGuid ownerGuid;                                   // owner of source if source is item
-    ScriptInfo const* script;                               // pointer to static script data
+    public:
+        ScriptAction(const char* _table, Map* _map, ObjectGuid _sourceGuid, ObjectGuid _targetGuid, ObjectGuid _ownerGuid, ScriptInfo const* _script) :
+            m_table(_table), m_map(_map), m_sourceGuid(_sourceGuid), m_targetGuid(_targetGuid), m_ownerGuid(_ownerGuid), m_script(_script)
+        {}
+
+        void HandleScriptStep();
+
+    private:
+        ObjectGuid m_sourceGuid;
+        ObjectGuid m_targetGuid;
+        ObjectGuid m_ownerGuid;                             // owner of source if source is item
+        const char* m_table;                                // of which table the script was started
+        ScriptInfo const* m_script;                         // pointer to static script data
+        Map* m_map;                                         // Map on which the action will be executed
+
+        // Helper functions
+        bool GetScriptCommandObject(const ObjectGuid guid, bool includeItem, Object*& resultObject);
+        bool GetScriptProcessTargets(WorldObject* pOrigSource, WorldObject* pOrigTarget, WorldObject*& pFinalSource, WorldObject*& pFinalTarget);
+        bool LogIfNotCreature(WorldObject* pWorldObject);
+        bool LogIfNotUnit(WorldObject* pWorldObject);
+        bool LogIfNotGameObject(WorldObject* pWorldObject);
+        Player* GetPlayerTargetOrSourceAndLog(WorldObject* pSource, WorldObject* pTarget);
 };
 
 typedef std::multimap<uint32 /*delay*/, ScriptInfo> ScriptMap;
 typedef std::map<uint32 /*id*/, ScriptMap > ScriptMapMap;
+typedef std::pair<const char*, ScriptMapMap> ScriptMapMapName;
 
-extern ScriptMapMap sQuestEndScripts;
-extern ScriptMapMap sQuestStartScripts;
-extern ScriptMapMap sSpellScripts;
-extern ScriptMapMap sGameObjectScripts;
-extern ScriptMapMap sEventScripts;
-extern ScriptMapMap sGossipScripts;
-extern ScriptMapMap sCreatureMovementScripts;
+extern ScriptMapMapName sQuestEndScripts;
+extern ScriptMapMapName sQuestStartScripts;
+extern ScriptMapMapName sSpellScripts;
+extern ScriptMapMapName sGameObjectScripts;
+extern ScriptMapMapName sEventScripts;
+extern ScriptMapMapName sGossipScripts;
+extern ScriptMapMapName sCreatureMovementScripts;
 
 enum ScriptLoadResult
 {
@@ -432,8 +454,8 @@ class ScriptMgr
         bool OnAuraDummy(Aura const* pAura, bool apply);
 
     private:
-        void LoadScripts(ScriptMapMap& scripts, const char* tablename);
-        void CheckScriptTexts(ScriptMapMap const& scripts, std::set<int32>& ids);
+        void LoadScripts(ScriptMapMapName& scripts, const char* tablename);
+        void CheckScriptTexts(ScriptMapMapName const& scripts, std::set<int32>& ids);
 
         template<class T>
         void GetScriptHookPtr(T& ptr, const char* name)

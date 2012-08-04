@@ -36,25 +36,26 @@ enum LogLevel
 // bitmask (not forgot update logFilterData content)
 enum LogFilters
 {
-    LOG_FILTER_TRANSPORT_MOVES    = 0x0001,                 //  0 any related to transport moves
-    LOG_FILTER_CREATURE_MOVES     = 0x0002,                 //  1 creature move by cells
-    LOG_FILTER_VISIBILITY_CHANGES = 0x0004,                 //  2 update visibility for diff objects and players
-    LOG_FILTER_ACHIEVEMENT_UPDATES= 0x0008,                 //  3 achievement update broadcasts
-    LOG_FILTER_WEATHER            = 0x0010,                 //  4 weather changes
-    LOG_FILTER_PLAYER_STATS       = 0x0020,                 //  5 player save data
-    LOG_FILTER_SQL_TEXT           = 0x0040,                 //  6 raw SQL text send to DB engine
-    LOG_FILTER_PLAYER_MOVES       = 0x0080,                 //  7 player moves by grid/cell
-    LOG_FILTER_PERIODIC_AFFECTS   = 0x0100,                 //  8 DoT/HoT apply trace
-    LOG_FILTER_AI_AND_MOVEGENSS   = 0x0200,                 //  9 AI/movement generators debug output
-    LOG_FILTER_DAMAGE             = 0x0400,                 // 10 Direct/Area damage trace
-    LOG_FILTER_COMBAT             = 0x0800,                 // 11 attack states/roll attack results/etc
-    LOG_FILTER_SPELL_CAST         = 0x1000,                 // 12 spell cast/aura apply/spell proc events
-    LOG_FILTER_DB_STRICTED_CHECK  = 0x2000,                 // 13 stricted DB data checks output (with possible false reports) for DB devs
-    LOG_FILTER_AHBOT_SELLER       = 0x4000,                 // 14 Auction House Bot seller part
-    LOG_FILTER_AHBOT_BUYER        = 0x8000,                 // 15 Auction House Bot buyer part
+    LOG_FILTER_TRANSPORT_MOVES    = 0x000001,               //  0 any related to transport moves
+    LOG_FILTER_CREATURE_MOVES     = 0x000002,               //  1 creature move by cells
+    LOG_FILTER_VISIBILITY_CHANGES = 0x000004,               //  2 update visibility for diff objects and players
+    LOG_FILTER_ACHIEVEMENT_UPDATES= 0x000008,               //  3 achievement update broadcasts
+    LOG_FILTER_WEATHER            = 0x000010,               //  4 weather changes
+    LOG_FILTER_PLAYER_STATS       = 0x000020,               //  5 player save data
+    LOG_FILTER_SQL_TEXT           = 0x000040,               //  6 raw SQL text send to DB engine
+    LOG_FILTER_PLAYER_MOVES       = 0x000080,               //  7 player moves by grid/cell
+    LOG_FILTER_PERIODIC_AFFECTS   = 0x000100,               //  8 DoT/HoT apply trace
+    LOG_FILTER_AI_AND_MOVEGENSS   = 0x000200,               //  9 AI/movement generators debug output
+    LOG_FILTER_DAMAGE             = 0x000400,               // 10 Direct/Area damage trace
+    LOG_FILTER_COMBAT             = 0x000800,               // 11 attack states/roll attack results/etc
+    LOG_FILTER_SPELL_CAST         = 0x001000,               // 12 spell cast/aura apply/spell proc events
+    LOG_FILTER_DB_STRICTED_CHECK  = 0x002000,               // 13 stricted DB data checks output (with possible false reports) for DB devs
+    LOG_FILTER_AHBOT_SELLER       = 0x004000,               // 14 Auction House Bot seller part
+    LOG_FILTER_AHBOT_BUYER        = 0x008000,               // 15 Auction House Bot buyer part
+    LOG_FILTER_PATHFINDING        = 0x010000,               // 16 Pathfinding
 };
 
-#define LOG_FILTER_COUNT            16
+#define LOG_FILTER_COUNT            17
 
 struct LogFilterData
 {

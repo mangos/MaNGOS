@@ -356,7 +356,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         ResetDoorOrButton();
                     break;
                 case GAMEOBJECT_TYPE_CHEST:
-                    if (m_groupLootTimer)
+                    if (m_groupLootId)
                     {
                         if (m_groupLootTimer <= update_diff)
                             StopGroupLoot();
@@ -942,6 +942,9 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 
 void GameObject::Use(Unit* user)
 {
+    // user must be provided
+    MANGOS_ASSERT(user || PrintEntryError("GameObject::Use (without user)"));
+
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;
@@ -1507,11 +1510,8 @@ void GameObject::Use(Unit* user)
                     switch(info->id)
                     {
                         case 179785:                        // Silverwing Flag
-                            // check if it's correct bg
-                            if (bg->GetTypeID() == BATTLEGROUND_WS)
-                                bg->EventPlayerClickedOnFlag(player, this);
-                            break;
                         case 179786:                        // Warsong Flag
+                            // check if it's correct bg
                             if (bg->GetTypeID() == BATTLEGROUND_WS)
                                 bg->EventPlayerClickedOnFlag(player, this);
                             break;
@@ -1820,14 +1820,13 @@ void GameObject::SetDisplayId(uint32 modelId)
 void GameObject::StartGroupLoot(Group* group, uint32 timer)
 {
     m_groupLootId = group->GetId();
-    m_groupLootTimer = timer;
+
+    if (m_groupLootId)
+        m_groupLootTimer = timer;
 }
 
 void GameObject::StopGroupLoot()
 {
-    if (!m_groupLootId)
-        return;
-
     if (Group* group = sObjectMgr.GetGroupById(m_groupLootId))
         group->EndRoll();
 

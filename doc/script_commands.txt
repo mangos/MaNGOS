@@ -33,20 +33,39 @@ The action to execute.
 ## datalong
 -- --------------------------
 
-4 multipurpose fields, store raw data as unsigned values
+2 multipurpose fields, store raw data as unsigned values
+
+-- --------------------------
+## buddy_entry
+-- --------------------------
+
+1 field to store the entry of a "buddy" (depending on command can be both GameObject and Creature entry)
+
+-- --------------------------
+## search_radius
+-- --------------------------
+
+Range in which the buddy defined in buddy_entry will be searched
 
 -- --------------------------
 ## data_flags
 -- --------------------------
 
-1 multipurpose field, generally intended for bitmask based data
+Field which holds a combination of these flags:
+
+    SCRIPT_FLAG_BUDDY_AS_TARGET             = 0x01
+    SCRIPT_FLAG_REVERSE_DIRECTION           = 0x02
+    SCRIPT_FLAG_SOURCE_TARGETS_SELF         = 0x04
+    SCRIPT_FLAG_COMMAND_ADDITIONAL          = 0x08      (Only for some commands possible)
+
+Detailed meaning described below!
 
 -- --------------------------
 ## dataint
 -- --------------------------
 
 4 multipurpose fields, store raw data as signed values
-Note: currently used only for text id
+Note: currently used only for text ids
 
 -- --------------------------
 ## x y z o
@@ -69,14 +88,14 @@ event_scripts
                             `gameobject_template`
                                 Source: User (player/creature). Target: GO
                             Spell (effect 61)
-                                Source: caster. Target: GO (spell focus)
+                                Source: caster. Target: Target
 gameobject_scripts
                             Gameobject use
-                                Source: user: Target: GO (only type door/button)
+                                Source: user: Target: GO
 gossip_scripts
                             `gossip_menu_option`
-                                Source: creature. Target: player
-                                Source: player. Target: GO
+                                Source: creature. Target: player (in case of NPC-Gossip)
+                                Source: player. Target: GO (in case of GO-Gossip)
 quest_end_scripts
                             `quest_template`
                                 Source: quest taker (creature/GO). Target: player
@@ -88,32 +107,51 @@ spell_scripts
                                 Source: caster: Target: target of spell (Unit)
 
 -- --------------------------
+## Buddy concept
+-- --------------------------
+
+Commands except the ones requiring a player (like KILL_CREDIT) have support for the buddy concept.
+This means that if an entry for buddy_entry is provided,
+aside from source and target as listed above also a "buddy" is available.
+
+Which one on the three (originalSource, originalTarget, buddy) will be used in the command, depends on the data_flags
+Note that some commands (like EMOTE) use only the resulting source for an action.
+
+Possible combinations of the flags
+    SCRIPT_FLAG_BUDDY_AS_TARGET             = 0x01
+    SCRIPT_FLAG_REVERSE_DIRECTION           = 0x02
+    SCRIPT_FLAG_SOURCE_TARGETS_SELF         = 0x04
+are:
+0: originalSource / buddyIfProvided  ->  originalTarget
+1: originalSource  ->  buddy
+2: originalTarget  ->  originalSource / buddyIfProvided
+3: buddy  ->  originalSource
+4: originalSource / buddyIfProvided  ->  originalSource / buddyIfProvided
+5: originalSource  ->  originalSource
+6: originalTarget  ->  originalTarget
+7: buddy  ->  buddy
+Where "A  ->  B" means that the command is executed from A with B as target.
+
+-- --------------------------
 ## Each command has different parameters, and are as follows:
 -- --------------------------
 
- 0 SCRIPT_COMMAND_TALK                      source = WorldObject, target = any/none
+ 0 SCRIPT_COMMAND_TALK                      resultingSource = WorldObject, resultingTarget = Unit/none
                                             * datalong (see enum ChatType for supported CHAT_TYPE_'s)
-                                            * datalong2 = creature entry (searching for a buddy, closest to source)
-                                            * datalong3 = creature search radius
-                                            * datalong4 = language
-                                            * data_flags =  flag_target_player_as_source    = 0x01
-                                                            flag_original_source_as_target  = 0x02
-                                                            flag_buddy_as_target            = 0x04
+                                            * datalong2 = language
                                             * dataint = text entry from db_script_string -table. dataint2-dataint4 optionally, for random selection of text
 
- 1 SCRIPT_COMMAND_EMOTE                     source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
+ 1 SCRIPT_COMMAND_EMOTE                     resultingSource = Unit, resultingTarget = Unit/none
                                             * datalong = emote_id
-                                            * datalong2 = creature entry (searching for a buddy, closest to source)
-                                            * datalong3 = creature search radius
-                                            * data_flags =  flag_target_as_source    = 0x01
 
  2 SCRIPT_COMMAND_FIELD_SET                 source = any
                                             * datalong = field_id
                                             * datalong2 = field value
 
- 3 SCRIPT_COMMAND_MOVE_TO                   source = Creature
+ 3 SCRIPT_COMMAND_MOVE_TO                   resultingSource = Creature
                                             If position is very near to current position, or x=y=z=0, then only orientation is changed
-                                            * datalong2 = travel time
+                                            * datalong2 = travel_speed*100 (use 0 for creature default movement)
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: teleport unit to position
                                             * x/y/z/o
 
  4 SCRIPT_COMMAND_FLAG_SET                  source = any
@@ -136,32 +174,31 @@ spell_scripts
                                             * datalong = creature entry
                                             * datalong2 = bool (0=personal credit, 1=group credit)
 
- 9 SCRIPT_COMMAND_RESPAWN_GAMEOBJECT        source = any (summoner)
-                                            * datalong=db_guid
+ 9 SCRIPT_COMMAND_RESPAWN_GAMEOBJECT        source = any, target = any
+                                            * datalong=db_guid (can be skipped for buddy)
                                             * datalong2 = despawn_delay
 
-10 SCRIPT_COMMAND_TEMP_SUMMON_CREATURE      source = any (summoner)
+10 SCRIPT_COMMAND_TEMP_SUMMON_CREATURE      source = any, target = any
                                             * datalong = creature entry
                                             * datalong2 = despawn_delay
-                                            * data_flags = summon_as_active_object = 0x01
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: summon as active object
 
-11 SCRIPT_COMMAND_OPEN_DOOR                 source = unit
-                                            * datalong = db_guid
+11 SCRIPT_COMMAND_OPEN_DOOR                 source = any
+                                            * datalong = db_guid (can be skipped for buddy)
                                             * datalong2 = reset_delay
 
-12 SCRIPT_COMMAND_CLOSE_DOOR                source = unit
-                                            * datalong = db_guid
+12 SCRIPT_COMMAND_CLOSE_DOOR                source = any
+                                            * datalong = db_guid (can be skipped for buddy)
                                             * datalong2 = reset_delay
 
 13 SCRIPT_COMMAND_ACTIVATE_OBJECT           source = unit, target=GO
 
-14 SCRIPT_COMMAND_REMOVE_AURA               source (datalong2!=0) or target (datalong==0) unit
+14 SCRIPT_COMMAND_REMOVE_AURA               resultingSource = Unit
                                             * datalong = spell_id
-                                            * datalong2 = bool source is target of action
 
-15 SCRIPT_COMMAND_CAST_SPELL                source/target cast spell at target/source
+15 SCRIPT_COMMAND_CAST_SPELL                resultingSource = Unit, cast spell at resultingTarget = Unit
                                             * datalong = spell id
-                                            * datalong2 = 0: s->t 1: s->s 2: t->t 3: t->s 4: cast triggered
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: cast triggered
 
 16 SCRIPT_COMMAND_PLAY_SOUND                source = any object, target=any/player
                                             * datalong = sound_id
@@ -171,69 +208,46 @@ spell_scripts
                                             * datalong = item entry
                                             * datalong2 = amount
 
-18 SCRIPT_COMMAND_DESPAWN_SELF              source or target must be creature
+18 SCRIPT_COMMAND_DESPAWN_SELF              resultingSource = Creature
                                             * datalong = despawn delay
 
 19 SCRIPT_COMMAND_PLAY_MOVIE                target can only be a player
                                             * datalog = movie id
 
-20 SCRIPT_COMMAND_MOVEMENT                  source or target must be creature
+20 SCRIPT_COMMAND_MOVEMENT                  resultingSource = Creature
                                             * datalong = MovementType (0:idle, 1:random or 2:waypoint)
-                                            * datalong2 = creature entry (searching for a buddy, closest to source)
-                                            * datalong3 = creature search radius
 
-21 SCRIPT_COMMAND_SET_ACTIVEOBJECT          source=worldobject, target=creature
+21 SCRIPT_COMMAND_SET_ACTIVEOBJECT          resultingSource = Creature
                                             * datalong=bool 0=off, 1=on
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
 
-22 SCRIPT_COMMAND_SET_FACTION               source=worldobject, target=creature
+22 SCRIPT_COMMAND_SET_FACTION               resultingSource = Creature
                                             * datalong=factionId OR 0 to restore original faction from creature_template
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
-                                            * data_flags = enum TemporaryFactionFlags
+                                            * datalong2=enum TemporaryFactionFlags
                                                     TEMPFACTION_NONE                    = 0x00,  // When no flag is used in temporary faction change, faction will be persistent. It will then require manual change back to default/another faction when changed once
                                                     TEMPFACTION_RESTORE_RESPAWN         = 0x01,  // Default faction will be restored at respawn
                                                     TEMPFACTION_RESTORE_COMBAT_STOP     = 0x02,  // ... at CombatStop() (happens at creature death, at evade or custom scripte among others)
                                                     TEMPFACTION_RESTORE_REACH_HOME      = 0x04,  // ... at reaching home in home movement (evade), if not already done at CombatStop()
 
-23 SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL   source=worldobject, target=creature
+23 SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL   resultingSource = Creature
                                             * datalong=creature entry/modelid (depend on data_flags) OR 0 to demorph
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
-                                            * dataflags= 0x01 to use datalong value as modelid explicit
+                                            * data_flags= 0x01 to use datalong value as modelid explicit
 
-24 SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL   source=worldobject, target=creature
+24 SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL   resultingSource = Creature
                                             * datalong=creature entry/modelid (depend on data_flags) OR 0 to dismount
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
-                                            * dataflags= 0x01 to use datalong value as modelid explicit
+                                            * data_flags= 0x01 to use datalong value as modelid explicit
 
-25 SCRIPT_COMMAND_SET_RUN                   source=worldobject, target=creature
+25 SCRIPT_COMMAND_SET_RUN                   resultingSource = Creature
                                             * datalong= bool 0=off, 1=on
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
 
-26 SCRIPT_COMMAND_ATTACK_START              source = WorldObject (but Creature must be final source/attacker, set with datalong-fields where needed), target = Unit/none
-                                            * datalong2 = creature entry (searching for a buddy, closest to source)
-                                            * datalong3 = creature search radius
-                                            * data_flags =  flag_original_source_as_target  = 0x02
-                                                            flag_buddy_as_target            = 0x04 (When this flag is not set, buddy will be the attacker when buddy is defined)
+26 SCRIPT_COMMAND_ATTACK_START              resultingSource = Creature, resultingTarget = Unit
 
-27 SCRIPT_COMMAND_GO_LOCK_STATE             source or target must be WorldObject
+27 SCRIPT_COMMAND_GO_LOCK_STATE             resultingSource = GO
                                             * datalong = flag_go_lock        = 0x01, flag_go_unlock   = 0x02,
                                                          flag_go_nonInteract = 0x04, flag_go_interact = 0x08
-                                            * datalong2 = go entry (searching closest to source (if worldobject) or target
-                                            * datalong3 = go search radius
 
-28 SCRIPT_COMMAND_STAND_STATE               source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
+28 SCRIPT_COMMAND_STAND_STATE               resultingSource = Creature
                                             * datalong = stand state (enum UnitStandStateType)
-                                            * datalong2 = creature entry (searching for a buddy, closest to source)
-                                            * datalong3 = creature search radius
-                                            * data_flags =  flag_target_as_source    = 0x01
 
-29 SCRIPT_COMMAND_MODIFY_NPC_FLAGS          source=worldobject or target=worldobject (datalong1==0), else source or target = creature
+29 SCRIPT_COMMAND_MODIFY_NPC_FLAGS          resultingSource = Creature
                                             * datalong=NPCFlags
-                                            * datalong2=creature entry
-                                            * datalong3=search radius
-                                            * data_flags = 0x00=toggle, 0x01=add, 0x02=remove
+                                            * datalong2= 0x00=toggle, 0x01=add, 0x02=remove

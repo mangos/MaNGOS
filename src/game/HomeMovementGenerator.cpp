@@ -46,7 +46,8 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
         owner.GetRespawnCoord(x, y, z, &o);
         init.SetFacing(o);
     }
-    init.MoveTo(x,y,z);
+
+    init.MoveTo(x, y, z, true);
     init.SetWalk(false);
     init.Launch();
 

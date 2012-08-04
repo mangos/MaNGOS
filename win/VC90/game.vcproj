@@ -875,6 +875,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\game\MoveMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\MoveMap.h"
+				>
+			</File>
+            <File
+				RelativePath="..\..\src\game\MoveMapSharedDefines.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\MovementHandler.cpp"
 				>
 			</File>
@@ -1092,6 +1104,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\MovementGenerator.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\PathFinder.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\PathFinder.h"
 				>
 			</File>
 			<File
