@@ -22,6 +22,7 @@
 #include "ProgressBar.h"
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
+#include "SpellAuraDefines.h"
 
 #include "DBCfmt.h"
 
