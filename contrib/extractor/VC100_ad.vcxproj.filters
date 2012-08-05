@@ -14,37 +14,13 @@
     <ClCompile Include="loadlib\adt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libmpq\common.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dbcfile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libmpq\explode.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libmpq\extract.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libmpq\huffman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="loadlib\loadlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libmpq\mpq.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mpq_libmpq.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libmpq\parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="system.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libmpq\wave.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="loadlib\wdt.cpp">
@@ -55,28 +31,10 @@
     <ClInclude Include="loadlib\adt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libmpq\common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dbcfile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libmpq\explode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="libmpq\huffman.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="loadlib\loadlib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="libmpq\mpq.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mpq_libmpq.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="libmpq\wave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="loadlib\wdt.h">

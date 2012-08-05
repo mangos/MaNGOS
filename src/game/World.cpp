@@ -940,7 +940,7 @@ void World::SetInitialWorldSettings()
     {
         sLog.outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map and vmap files in appropriate directories or correct the DataDir value in the mangosd.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
         Log::WaitBeforeContinueIfNeed();
-        //exit(1);
+        exit(1);
     }
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
