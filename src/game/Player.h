@@ -1054,6 +1054,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
+        void SendTeleportPacket(float oldX, float oldY, float oldZ, float oldO);
         bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
 
         bool TeleportTo(WorldLocation const& loc, uint32 options = 0)

@@ -80,7 +80,8 @@ void MovementInfo::Read(ByteBuffer& data)
     data >> pos.z;
     data >> pos.o;
 
-    if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    // comment, anyway movementInfo read/write system will be reimplemented soon
+    //if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         data >> t_guid.ReadAsPacked();
         data >> t_pos.x;
@@ -111,7 +112,7 @@ void MovementInfo::Read(ByteBuffer& data)
 
     if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
     {
-        data >> u_unk1;
+        data >> splineElevation;
     }
 }
 
@@ -125,7 +126,8 @@ void MovementInfo::Write(ByteBuffer& data) const
     data << pos.z;
     data << pos.o;
 
-    if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    // comment, anyway movementInfo read/write system will be reimplemented soon
+    //if (HasMovementFlag(MOVEFLAG_ONTRANSPORT))
     {
         data << t_guid.WriteAsPacked();
         data << t_pos.x;
@@ -156,7 +158,7 @@ void MovementInfo::Write(ByteBuffer& data) const
 
     if (HasMovementFlag(MOVEFLAG_SPLINE_ELEVATION))
     {
-        data << u_unk1;
+        data << splineElevation;
     }
 }
 
@@ -191,7 +193,7 @@ Unit::Unit() :
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
 
-    m_updateFlag = (UPDATEFLAG_HIGHGUID | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
+    m_updateFlag = UPDATEFLAG_LIVING;
 
     m_attackTimer[BASE_ATTACK]   = 0;
     m_attackTimer[OFF_ATTACK]    = 0;
@@ -11040,6 +11042,11 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD));
+    m_movementInfo.RemoveMovementFlag(MOVEFLAG_FORWARD);
     movespline->_Interrupt();
+}
+
+bool Unit::IsSplineEnabled() const
+{
+    return !movespline->Finalized();
 }

@@ -31,7 +31,8 @@ namespace Movement
         public:
 
             static void WriteMonsterMove(const MoveSpline& mov, WorldPacket& data);
-            static void WriteCreate(const MoveSpline& mov, ByteBuffer& data);
+            static void WriteCreateBits(const MoveSpline& mov, ByteBuffer& data);
+            static void WriteCreateBytes(const MoveSpline& mov, ByteBuffer& data);
     };
 }
 #endif // MANGOSSERVER_PACKET_BUILDER_H

@@ -1647,6 +1647,38 @@ uint8 Player::GetChatTag() const
     return tag;
 }
 
+void Player::SendTeleportPacket(float oldX, float oldY, float oldZ, float oldO)
+{
+    ObjectGuid guid = GetObjectGuid();
+    ObjectGuid transportGuid = m_movementInfo.GetTransportGuid();
+
+    WorldPacket data(MSG_MOVE_TELEPORT, 38);
+    data.WriteGuidMask<6, 0, 3, 2>(guid);
+    data.WriteBit(0);       // unknown
+    data.WriteBit(!transportGuid.IsEmpty());
+    data.WriteGuidMask<1>(guid);
+    if (transportGuid)
+        data.WriteGuidMask<1, 3, 2, 5, 0, 7, 6, 4>(transportGuid);
+
+    data.WriteGuidMask<4, 7, 5>(guid);
+
+    if (transportGuid)
+        data.WriteGuidBytes<5, 6, 1, 7, 0, 2, 4, 3>(transportGuid);
+
+    data << uint32(0);  // counter
+    data.WriteGuidBytes<1, 2, 3, 5>(guid);
+    data << float(GetPositionX());
+    data.WriteGuidBytes<4>(guid);
+    data << float(GetOrientation());
+    data.WriteGuidBytes<7>(guid);
+    data << float(GetPositionZ());
+    data.WriteGuidBytes<0, 6>(guid);
+    data << float(GetPositionY());
+
+    Relocate(oldX, oldY, oldZ, oldO);
+    SendDirectMessage(&data);
+}
+
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
 {
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
@@ -1740,9 +1772,11 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
         {
-            WorldPacket data;
-            BuildTeleportAckMsg(data, x, y, z, orientation);
-            GetSession()->SendPacket(&data);
+            float oldX, oldY, oldZ;
+            float oldO = GetOrientation();
+            GetPosition(oldX, oldY, oldZ);;
+            Relocate(x, y, z, orientation);
+            SendTeleportPacket(oldX, oldY, oldZ, oldO);
         }
     }
     else
@@ -1812,12 +1846,14 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             {
                 // send transfer packet to display load screen
                 WorldPacket data(SMSG_TRANSFER_PENDING, (4 + 4 + 4));
-                data << uint32(mapid);
+                data.WriteBit(0);       // unknown
                 if (m_transport)
                 {
-                    data << uint32(m_transport->GetEntry());
                     data << uint32(GetMapId());
+                    data << uint32(m_transport->GetEntry());
                 }
+
+                data << uint32(mapid);
                 GetSession()->SendPacket(&data);
             }
 
@@ -1851,22 +1887,26 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             if (!GetSession()->PlayerLogout())
             {
                 // transfer finished, inform client to start load
-                WorldPacket data(SMSG_NEW_WORLD, (20));
-                data << uint32(mapid);
+                WorldPacket data(SMSG_NEW_WORLD, 20);
                 if (m_transport)
                 {
                     data << float(m_movementInfo.GetTransportPos()->x);
-                    data << float(m_movementInfo.GetTransportPos()->y);
-                    data << float(m_movementInfo.GetTransportPos()->z);
                     data << float(m_movementInfo.GetTransportPos()->o);
+                    data << float(m_movementInfo.GetTransportPos()->z);
                 }
                 else
                 {
                     data << float(final_x);
-                    data << float(final_y);
-                    data << float(final_z);
                     data << float(final_o);
+                    data << float(final_z);
                 }
+
+                data << uint32(mapid);
+
+                if (m_transport)
+                    data << float(m_movementInfo.GetTransportPos()->y);
+                else
+                    data << float(final_y);
 
                 GetSession()->SendPacket(&data);
                 SendSavedInstances();
@@ -20817,7 +20857,7 @@ void Player::UpdateForQuestWorldObjects()
     if (m_clientGUIDs.empty())
         return;
 
-    UpdateData udata;
+    UpdateData udata(GetMapId());
     WorldPacket packet;
     for (GuidSet::const_iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {

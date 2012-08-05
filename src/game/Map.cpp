@@ -887,7 +887,7 @@ void Map::SendInitSelf(Player* player)
 {
     DETAIL_LOG("Creating player data for himself %u", player->GetGUIDLow());
 
-    UpdateData data;
+    UpdateData data(player->GetMapId());
 
     // attach to player data current transport data
     if (Transport* transport = player->GetTransport())
@@ -924,7 +924,7 @@ void Map::SendInitTransports(Player* player)
     if (tmap.find(player->GetMapId()) == tmap.end())
         return;
 
-    UpdateData transData;
+    UpdateData transData(player->GetMapId());
 
     MapManager::TransportSet& tset = tmap[player->GetMapId()];
 
@@ -951,7 +951,7 @@ void Map::SendRemoveTransports(Player* player)
     if (tmap.find(player->GetMapId()) == tmap.end())
         return;
 
-    UpdateData transData;
+    UpdateData transData(player->GetMapId());
 
     MapManager::TransportSet& tset = tmap[player->GetMapId()];
 
