@@ -283,10 +283,12 @@ uint32 Quest::CalculateRewardHonor(uint32 level) const
     if (GetRewHonorAddition() > 0 || GetRewHonorMultiplier() > 0.0f)
     {
         // values stored from 0.. for 1...
-        TeamContributionPoints const* tc = sTeamContributionPoints.LookupEntry(level - 1);
-        if (!tc)
+        /* not exist in 4.x
+        TeamContributionPoints const* tc = sTeamContributionPoints.LookupEntry(level-1);
+        if(!tc)
             return 0;
-        uint32 i_honor = uint32(tc->Value * GetRewHonorMultiplier() * 0.1f);
+        */
+        uint32 i_honor = uint32(/*tc->Value*/1.0f * GetRewHonorMultiplier() * 0.1f);
         honor = i_honor + GetRewHonorAddition();
     }
 

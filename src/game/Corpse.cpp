@@ -224,7 +224,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
     SetUInt32Value(CORPSE_FIELD_BYTES_1, ((0x00) | (race << 8) | (gender << 16) | (skin << 24)));
     SetUInt32Value(CORPSE_FIELD_BYTES_2, ((face) | (hairstyle << 8) | (haircolor << 16) | (facialhair << 24)));
 
-    SetUInt32Value(CORPSE_FIELD_GUILD, guildId);
+    //SetUInt32Value(CORPSE_FIELD_GUILD, guildId);
 
     uint32 flags = CORPSE_FLAG_UNK2;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)

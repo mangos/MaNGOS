@@ -1341,11 +1341,35 @@ enum Opcodes
     MSG_MOVE_SET_COLLISION_HGT                      = 0x518,
     CMSG_CLEAR_RANDOM_BG_WIN_TIME                   = 0x519,
     CMSG_CLEAR_HOLIDAY_BG_WIN_TIME                  = 0x51A,
-    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B,// lua: CommentatorSetSkirmishMatchmakingMode/CommentatorRequestSkirmishQueueData/CommentatorRequestSkirmishMode/CommentatorStartSkirmishMatch
-    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1         = 0x51C,// event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST, CGCommentator::QueueNode
-    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2         = 0x51D,// event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
-    SMSG_COMPRESSED_UNKNOWN_1310                    = 0x51E,// some compressed packet
-    NUM_MSG_TYPES                                   = 0x51F
+    CMSG_COMMENTATOR_SKIRMISH_QUEUE_COMMAND         = 0x51B, // Lua_CommentatorSetSkirmishMatchmakingMode and Lua_CommentatorRequestSkirmishQueueData
+    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1         = 0x51C, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST, CGCommentator::QueueNode
+    SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2         = 0x51D, // event EVENT_COMMENTATOR_SKIRMISH_QUEUE_REQUEST
+    SMSG_COMPRESSED_UNKNOWN_1310                    = 0x51E, // some compressed packet
+    SMSG_UNKNOWN_1311                               = 0x51F, // related to transform
+    SMSG_UNKNOWN_1312                               = 0x520, // related to transform
+    UMSG_UNKNOWN_1313                               = 0x521, // not found
+    SMSG_UNKNOWN_1314                               = 0x522, // sets unit+4336 to value from packet
+    SMSG_UNKNOWN_1315                               = 0x523, // related to opcode 0x522
+    SMSG_UNKNOWN_1316                               = 0x524, // sets unit+4338 to value from packet
+    SMSG_UNKNOWN_1317                               = 0x525, // sets unit+4340 to value from packet
+    UMSG_UNKNOWN_1318                               = 0x526, // not found
+    UMSG_UNKNOWN_1319                               = 0x527, // not found
+    CMSG_UNKNOWN_1320                               = 0x528, // setcurrency console command?
+    UMSG_UNKNOWN_1321                               = 0x529, // not found
+    UMSG_UNKNOWN_1322                               = 0x52A, // not found
+    UMSG_UNKNOWN_1323                               = 0x52B, // not found
+    UMSG_UNKNOWN_1324                               = 0x52C, // not found
+    UMSG_UNKNOWN_1325                               = 0x52D, // not found
+    UMSG_UNKNOWN_1326                               = 0x52E, // not found
+    UMSG_UNKNOWN_1327                               = 0x52F, // not found
+    UMSG_UNKNOWN_1328                               = 0x530, // not found
+    SMSG_UNKNOWN_1329                               = 0x531, // faction related
+    UMSG_UNKNOWN_1330                               = 0x532, // not found
+    UMSG_UNKNOWN_1331                               = 0x533, // not found
+    UMSG_UNKNOWN_1332                               = 0x534, // not found
+    UMSG_UNKNOWN_1333                               = 0x535, // not found
+    UMSG_UNKNOWN_1334                               = 0x536, // not found
+    NUM_MSG_TYPES                                   = 0x537
 };
 
 /// Player state

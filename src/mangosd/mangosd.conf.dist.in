@@ -764,7 +764,7 @@ LogColors = ""
 
 GameType = 1
 RealmZone = 1
-Expansion = 2
+Expansion = 3
 DBC.Locale = 255
 DeclinedNames = 0
 StrictPlayerNames = 0
@@ -779,7 +779,7 @@ CharactersPerRealm = 10
 HeroicCharactersPerRealm = 1
 MinLevelForHeroicCharacterCreating = 55
 SkipCinematics = 0
-MaxPlayerLevel = 80
+MaxPlayerLevel = 85
 StartPlayerLevel = 1
 StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0

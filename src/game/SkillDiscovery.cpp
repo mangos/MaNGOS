@@ -99,9 +99,9 @@ void LoadSkillDiscoveryTable()
             }
 
             // mechanic discovery
-            if (reqSpellEntry->Mechanic != MECHANIC_DISCOVERY &&
-                    // explicit discovery ability
-                    !IsExplicitDiscoverySpell(reqSpellEntry))
+            if (reqSpellEntry->GetMechanic() != MECHANIC_DISCOVERY &&
+                // explicit discovery ability
+                !IsExplicitDiscoverySpell(reqSpellEntry))
             {
                 if (reportedReqSpells.find(reqSkillOrSpell) == reportedReqSpells.end())
                 {

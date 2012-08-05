@@ -416,4 +416,3 @@ BattleGroundMap* MapManager::CreateBattleGroundMap(uint32 id, uint32 InstanceId,
 
     return map;
 }
-

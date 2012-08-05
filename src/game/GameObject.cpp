@@ -1858,8 +1858,8 @@ float GameObject::GetObjectBoundingRadius() const
     // FIXME:
     // 1. This is clearly hack way because GameObjectDisplayInfoEntry have 6 floats related to GO sizes, but better that use DEFAULT_WORLD_OBJECT_SIZE
     // 2. In some cases this must be only interactive size, not GO size, current way can affect creature target point auto-selection in strange ways for big underground/virtual GOs
-    if (m_displayInfo)
-        return fabs(m_displayInfo->unknown12) * GetObjectScale();
+    /*if (m_displayInfo)
+        return fabs(m_displayInfo->unknown12) * GetObjectScale();*/
 
     return DEFAULT_WORLD_OBJECT_SIZE;
 }
