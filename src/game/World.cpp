@@ -247,10 +247,10 @@ World::AddSession_(WorldSession* s)
         return;
     }
 
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 16);
+    WorldPacket packet(SMSG_AUTH_RESPONSE, 17);
 
-    packet.WriteBit(false);
-    packet.WriteBit(true);
+    packet.WriteBit(false);                                 // has queue
+    packet.WriteBit(true);                                  // has account info
 
     packet << uint32(0);                                    // Unknown - 4.3.2
     packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. must be set in database manually for each account
@@ -307,14 +307,14 @@ void World::AddQueuedSession(WorldSession* sess)
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
     WorldPacket packet (SMSG_AUTH_RESPONSE, 21);
 
-    packet.WriteBit(true);
-    packet.WriteBit(true);
+    packet.WriteBit(true);                                  // has queue
+    packet.WriteBit(false);                                 // unk queue-related
+    packet.WriteBit(true);                                  // has account data
 
-    packet << uint8(0);                                     // unk 3.3.0
     packet << uint32(0);                                    // Unknown - 4.3.2
-    packet << uint8(sess->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. must be set in database manually for each account
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. must be set in database manually for each account
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(sess->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. Must be set in database manually for each account.
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. Must be set in database manually for each account.
     packet << uint32(0);                                    // BillingTimeRested
     packet << uint8(0);                                     // BillingPlanFlags
     packet << uint8(AUTH_WAIT_QUEUE);

@@ -237,7 +237,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SizeError(WorldPacket const& packet, uint32 size) const;
 
-        void ReadAddonsInfo(WorldPacket& data);
+        void ReadAddonsInfo(ByteBuffer &data);
         void SendAddonsInfo();
 
         void SendPacket(WorldPacket const* packet);

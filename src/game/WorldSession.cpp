@@ -613,16 +613,20 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 {
     if (position == 0)
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
-        packet << uint8(AUTH_OK);
+        WorldPacket packet( SMSG_AUTH_RESPONSE, 2 );
+        packet.WriteBit(false);
+        packet.WriteBit(false);
+        packet << uint8( AUTH_OK );
         SendPacket(&packet);
     }
     else
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1);
+        WorldPacket packet( SMSG_AUTH_RESPONSE, 1+4+1 );
+        packet.WriteBit(true);      // has queue
+        packet.WriteBit(false);     // unk queue-related
+        packet.WriteBit(false);     // has account info
         packet << uint8(AUTH_WAIT_QUEUE);
         packet << uint32(position);
-        packet << uint8(0);                                 // unk 3.3.0
         SendPacket(&packet);
     }
 }
@@ -798,7 +802,7 @@ void WorldSession::SaveTutorialsData()
     m_tutorialState = TUTORIALDATA_UNCHANGED;
 }
 
-void WorldSession::ReadAddonsInfo(WorldPacket& data)
+void WorldSession::ReadAddonsInfo(ByteBuffer &data)
 {
     if (data.rpos() + 4 > data.size())
         return;
