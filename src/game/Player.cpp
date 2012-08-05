@@ -5902,7 +5902,6 @@ void Player::SendInitialActionButtons() const
     DETAIL_LOG("Initializing Action Buttons for '%u' spec '%u'", GetGUIDLow(), m_activeSpec);
 
     WorldPacket data(SMSG_ACTION_BUTTONS, 1 + (MAX_ACTION_BUTTONS * 4));
-    data << uint8(1);                                       // talent spec amount (in packet)
     ActionButtonList const& currentActionButtonList = m_actionButtons[m_activeSpec];
     for (uint8 button = 0; button < MAX_ACTION_BUTTONS; ++button)
     {
@@ -5912,7 +5911,7 @@ void Player::SendInitialActionButtons() const
         else
             data << uint32(0);
     }
-
+    data << uint8(1);                                       // talent spec amount (in packet)
     GetSession()->SendPacket(&data);
     DETAIL_LOG("Action Buttons for '%u' spec '%u' Initialized", GetGUIDLow(), m_activeSpec);
 }
