@@ -738,11 +738,11 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (!sAreaStore.LookupEntry(4713)              ||       // last area (areaflag) added in 4.3.0a
-        !sCharTitlesStore.LookupEntry(287)         ||       // last char title added in 4.3.0a
-        !sGemPropertiesStore.LookupEntry(2250)     ||       // last gem property added in 4.3.0a
-        !sMapStore.LookupEntry(980)                ||       // last map added in 4.3.0a
-        !sSpellStore.LookupEntry(110966)           )        // last added spell in 4.3.0a
+    if (!sAreaStore.LookupEntry(4713)                  ||       // last area (areaflag) added in 4.3.4
+            !sCharTitlesStore.LookupEntry(287)         ||       // last char title added in 4.3.4
+            !sGemPropertiesStore.LookupEntry(2250)     ||       // last gem property added in 4.3.4
+            !sMapStore.LookupEntry(980)                ||       // last map added in 4.3.4
+            !sSpellStore.LookupEntry(110966)           )        // last added spell in 4.3.4
     {
         sLog.outError("\nYou have mixed version DBC files. Please re-extract DBC files for one from client build: %s",AcceptableClientBuildsListStr().c_str());
         Log::WaitBeforeContinueIfNeed();

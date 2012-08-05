@@ -522,7 +522,7 @@ LogColors = ""
 #    MaxPlayerLevel
 #        Max level that can be reached by a player for experience (in range from 1 to 100).
 #        Change not recommended
-#        Default: 80
+#        Default: 85
 #
 #    StartPlayerLevel
 #        Staring level that have character at creating (in range 1 to MaxPlayerLevel)
