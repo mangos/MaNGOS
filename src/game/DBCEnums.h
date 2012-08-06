@@ -110,6 +110,7 @@ enum AchievementCriteriaTypes
     // you have to complete a daily quest x times in a row
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY = 10,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE = 11,
+    ACHIEVEMENT_CRITERIA_TYPE_CURRENCY_EARNED = 12,
     ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE = 13,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST = 14,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND= 15,
@@ -215,22 +216,37 @@ enum AchievementCriteriaTypes
     // 121 unused
     // 122 unused
     // 123 unused
-    // 124 Spend X gold on guildmember repairs.
-    // 125 Reach guild level X
-    // 126 Craft X items
-    // 127 Catch X fish from fishing pools.
-    // 128 Purchase the X guild bank tab.
-    // 129 Earn X guild achievement points.
-    // 130 Win X rated battlegrounds.
+    ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS = 124,
+    ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL = 125,
+    ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEMS_GUILD = 126,
+    ACHIEVEMENT_CRITERIA_TYPE_CATCH_FROM_POOL = 127,
+    ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS = 128,
+    ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS = 129,
+    ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND = 130,
     // 131 unused
-    // 132 Earn a battleground rating of X.
-    // 133 Create and purchase a guild crest.
-    // 134 Complete quests
-    // 135 Honorable kills
-    // 0..135 => 136 criteria types total
+    ACHIEVEMENT_CRITERIA_TYPE_REACH_BG_RATING = 132,
+    ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD = 133,
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD = 134,
+    ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD = 135,
+    ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD = 136,
+    // 137 no achievements
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE = 138,
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_2 = 139,
+    // 140 no achievements
+    // 141 no achievements
+    // 142 no achievements
+    // 143 no achievements
+    // 144 no achievements
+    // 145 no achievements
+    // 146 no achievements
+    // 147 no achievements
+    // 148 no achievements
+    // 149 no achievements
+    // 150 no achievements
+    // 0..150 => 151 criteria types total
 };
 
-#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 136
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 151
 
 enum AchievementCriteriaMoreReqType
 {
