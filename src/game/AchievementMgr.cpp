@@ -2309,7 +2309,7 @@ void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement
     m_allCompletedAchievements.insert(achievement->ID);
 }
 
-/*void AchievementGlobalMgr::LoadAchievementCriteriaList()
+void AchievementGlobalMgr::LoadAchievementCriteriaList()
 {
     if (sAchievementCriteriaStore.GetNumRows() == 0)
     {
@@ -2349,7 +2349,7 @@ void AchievementGlobalMgr::SetRealmCompleted(AchievementEntry const* achievement
 
     sLog.outString();
     sLog.outString(">> Loaded %u achievement criteria.", count);
-}*/
+}
 
 void AchievementGlobalMgr::LoadAchievementReferenceList()
 {

@@ -203,6 +203,9 @@ static uint32 sTalentTabPages[MAX_CLASSES][3];
 DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
 TaxiMask sOldContinentsNodesMask;
+TaxiMask sHordeTaxiNodesMask;
+TaxiMask sAllianceTaxiNodesMask;
+TaxiMask sDeathKnightTaxiNodesMask;
 
 // DBC used only for initialization sTaxiPathSetBySource at startup.
 TaxiPathSetBySource sTaxiPathSetBySource;
@@ -219,6 +222,7 @@ DBCStorage <WMOAreaTableEntry>  sWMOAreaTableStore(WMOAreaTableEntryfmt);
 DBCStorage <WorldMapAreaEntry>  sWorldMapAreaStore(WorldMapAreaEntryfmt);
 DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
 DBCStorage <WorldSafeLocsEntry> sWorldSafeLocsStore(WorldSafeLocsEntryfmt);
+DBCStorage <WorldPvPAreaEntry>  sWorldPvPAreaStore(WorldPvPAreaEnrtyfmt);
 
 typedef std::list<std::string> StoreProblemList;
 
@@ -669,6 +673,9 @@ void LoadDBCStores(const std::string& dataPath)
 
         memset(sTaxiNodesMask,0,sizeof(sTaxiNodesMask));
         memset(sOldContinentsNodesMask,0,sizeof(sTaxiNodesMask));
+        memset(sHordeTaxiNodesMask, 0, sizeof(sHordeTaxiNodesMask));
+        memset(sAllianceTaxiNodesMask, 0, sizeof(sAllianceTaxiNodesMask));
+        memset(sDeathKnightTaxiNodesMask, 0, sizeof(sDeathKnightTaxiNodesMask));
         for(uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
         {
             TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
@@ -698,9 +705,21 @@ void LoadDBCStores(const std::string& dataPath)
             uint32 submask = 1<<((i-1)%32);
             sTaxiNodesMask[field] |= submask;
 
+            if (node->MountCreatureID[0] && node->MountCreatureID[0] != 32981)
+                sHordeTaxiNodesMask[field] |= submask;
+            if (node->MountCreatureID[1] && node->MountCreatureID[1] != 32981)
+                sAllianceTaxiNodesMask[field] |= submask;
+            if (node->MountCreatureID[0] == 32981 || node->MountCreatureID[1] == 32981)
+                sDeathKnightTaxiNodesMask[field] |= submask;
+
             // old continent node (+ nodes virtually at old continents, check explicitly to avoid loading map files for zone info)
             if (node->map_id < 2 || i == 82 || i == 83 || i == 93 || i == 94)
                 sOldContinentsNodesMask[field] |= submask;
+
+            // fix DK node at Ebon Hold
+            if (i == 315) {
+                ((TaxiNodesEntry*)node)->MountCreatureID[1] = 32981;
+            }
         }
     }
 
@@ -738,11 +757,11 @@ void LoadDBCStores(const std::string& dataPath)
     }
 
     // Check loaded DBC files proper version
-    if (!sAreaStore.LookupEntry(4713)                  ||       // last area (areaflag) added in 4.3.4
-            !sCharTitlesStore.LookupEntry(287)         ||       // last char title added in 4.3.4
-            !sGemPropertiesStore.LookupEntry(2250)     ||       // last gem property added in 4.3.4
-            !sMapStore.LookupEntry(980)                ||       // last map added in 4.3.4
-            !sSpellStore.LookupEntry(110966)           )        // last added spell in 4.3.4
+    if (!sAreaStore.LookupEntry(4713)              ||       // last area (areaflag) added in 4.3.4
+        !sCharTitlesStore.LookupEntry(287)         ||       // last char title added in 4.3.4
+        !sGemPropertiesStore.LookupEntry(2250)     ||       // last gem property added in 4.3.4
+        !sMapStore.LookupEntry(980)                ||       // last map added in 4.3.4
+        !sSpellStore.LookupEntry(121820)           )        // last added spell in 4.3.4
     {
         sLog.outError("\nYou have mixed version DBC files. Please re-extract DBC files for one from client build: %s",AcceptableClientBuildsListStr().c_str());
         Log::WaitBeforeContinueIfNeed();
@@ -851,30 +870,27 @@ uint32 GetAreaFlagByMapId(uint32 mapid)
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {
-    if(mapid != 530 && mapid != 571)                        // speed for most cases
+    if (mapid != 530 && mapid != 571 && mapid != 732)            // speed for most cases
         return mapid;
 
-    if(WorldMapAreaEntry const* wma = sWorldMapAreaStore.LookupEntry(zoneId))
+    if (WorldMapAreaEntry const* wma = sWorldMapAreaStore.LookupEntry(zoneId))
         return wma->virtual_map_id >= 0 ? wma->virtual_map_id : wma->map_id;
 
     return mapid;
 }
 
-ContentLevels GetContentLevelsForMapAndZone(uint32 mapid, uint32 zoneId)
+ContentLevels GetContentLevelsForMap(uint32 mapid)
 {
-    mapid = GetVirtualMapForMapAndZone(mapid,zoneId);
-    if(mapid < 2)
-        return CONTENT_1_60;
-
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapid);
-    if(!mapEntry)
+    if (!mapEntry)
         return CONTENT_1_60;
 
-    switch(mapEntry->Expansion())
+    switch (mapEntry->Expansion())
     {
         default: return CONTENT_1_60;
         case 1:  return CONTENT_61_70;
         case 2:  return CONTENT_71_80;
+        case 3:  return CONTENT_81_85;
     }
 }
 
