@@ -2551,7 +2551,7 @@ void ObjectMgr::LoadItemRequiredTarget()
                     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
                     {
                         SpellEffectEntry const* spellEffect = pSpellInfo->GetSpellEffect(SpellEffectIndex(j));
-                        if(!pSpellInfo)
+                        if(!spellEffect)
                             continue;
 
                         if (spellEffect->EffectImplicitTargetA == TARGET_CHAIN_DAMAGE ||
