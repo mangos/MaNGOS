@@ -253,21 +253,21 @@ class ByteBuffer
             void ReadGuidMask(ObjectGuid& guid);
 
         template<BITS_1>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_2>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_3>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_4>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_5>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_6>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_7>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
         template<BITS_8>
-            void WriteGuidMask(ObjectGuid& guid);
+            void WriteGuidMask(ObjectGuid guid);
 
         template<BITS_1>
             void ReadGuidBytes(ObjectGuid& guid);
@@ -287,21 +287,21 @@ class ByteBuffer
             void ReadGuidBytes(ObjectGuid& guid);
 
         template<BITS_1>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_2>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_3>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_4>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_5>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_6>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_7>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
         template<BITS_8>
-            void WriteGuidBytes(ObjectGuid& guid);
+            void WriteGuidBytes(ObjectGuid guid);
 
         template <typename T> void put(size_t pos, T value)
         {

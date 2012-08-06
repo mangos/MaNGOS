@@ -164,8 +164,8 @@ namespace Movement
             case MoveSplineFlag::Final_Target:
             {
                 data.WriteBits(2, 2);
-                ObjectGuid guid = ObjectGuid(move_spline.facing.target);
-                data.WriteGuidMask<4, 3, 7, 2, 6, 1, 0, 5>(guid);
+
+                data.WriteGuidMask<4, 3, 7, 2, 6, 1, 0, 5>(ObjectGuid(move_spline.facing.target));
                 break;
             }
             case MoveSplineFlag::Final_Angle:
@@ -198,10 +198,7 @@ namespace Movement
         if (move_spline.splineflags & MoveSplineFlag::Final_Angle)
             data << move_spline.facing.angle;
         else if (move_spline.splineflags & MoveSplineFlag::Final_Target)
-        {
-             ObjectGuid guid = ObjectGuid(move_spline.facing.target);
-             data.WriteGuidMask<5, 3, 7, 1, 6, 4, 2, 0>(guid);
-        }
+             data.WriteGuidBytes<5, 3, 7, 1, 6, 4, 2, 0>(ObjectGuid(move_spline.facing.target));
 
         for (uint32 i = 0; i < nodes; ++i)
         {
