@@ -1168,7 +1168,7 @@ enum Opcodes
     SMSG_DYNAMIC_DROP_ROLL_RESULT                         = 0x146A,
     SMSG_CRITERIA_UPDATE                                  = 0x146B,
     CMSG_QUERY_INSPECT_ACHIEVEMENTS                       = 0x146C,
-    SMSG_RESPOND_INSPECT_ACHIEVEMENTS                     = 0x146D,
+    SMSG_RESPOND_INSPECT_ACHIEVEMENTS                     = 0x15B0,
     CMSG_DISMISS_CONTROLLED_VEHICLE                       = 0x146E,
     CMSG_COMPLETE_ACHIEVEMENT_CHEAT                       = 0x146F,
     SMSG_QUESTUPDATE_ADD_PVP_KILL                         = 0x1470,
