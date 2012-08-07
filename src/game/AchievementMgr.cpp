@@ -2216,68 +2216,59 @@ void AchievementMgr::SendAllAchievementData()
     // since we don't know the exact size of the packed GUIDs this is just an approximation
     WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, 4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
 
-    uint8 guidMask[] = { 4, 5, 3, 0, 2, 7, 6, 1 };
-    uint8 counterMask[] = { 3, 0, 6, 4, 7, 2, 1, 5 };
-
-    uint8 guidBytes[] = { 3, 4, 6, 2, 5, 0, 7, 1 };
-    uint8 counterBytes[] = { 5, 6, 2, 0, 3, 1, 4, 7 };
-
     ObjectGuid guid = m_player->GetObjectGuid();
 
-    uint32 criteriaCount = m_criteriaProgress.size();
-
-    data.WriteBits(criteriaCount, 21);
+    data.WriteBits(m_criteriaProgress.size(), 21);
 
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
     {
-        uint64 counter = iter->second.counter;
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
 
-        data.WriteGuidMask(guid, guidMask, 1);
-        data.WriteGuidMask(counter, counterMask, 1);
-        data.WriteGuidMask(guid, guidMask, 1, 1);
-        data.WriteGuidMask(counter, counterMask, 2, 1);
-        data.WriteGuidMask(guid, guidMask, 2, 2);
+        data.WriteGuidMask<4>(guid);
+        data.WriteGuidMask<3>(counter);
+        data.WriteGuidMask<5>(guid);
+        data.WriteGuidMask<0, 6>(counter);
+        data.WriteGuidMask<3, 0>(guid);
 
-        data.WriteGuidMask(counter, counterMask, 1, 3);
-        data.WriteGuidMask(guid, guidMask, 1, 4);
-        data.WriteGuidMask(counter, counterMask, 1, 4);
-        data.WriteGuidMask(guid, guidMask, 1, 5);
+        data.WriteGuidMask<4>(counter);
+        data.WriteGuidMask<2>(guid);
+        data.WriteGuidMask<7>(counter);
+        data.WriteGuidMask<7>(guid);
         uint8 flags = 0;                                        // Seems always 0
         data.WriteBits(flags, 2);
-        data.WriteGuidMask(guid, guidMask, 1, 6);
+        data.WriteGuidMask<6>(guid);
 
-        data.WriteGuidMask(counter, counterMask, 3, 5);
-        data.WriteGuidMask(guid, guidMask, 1, 7);
+        data.WriteGuidMask<2, 1, 5>(counter);
+        data.WriteGuidMask<1>(guid);
     }
 
-    uint32 achievCount = m_completedAchievements.size();
-    data.WriteBits(achievCount, 23);
+    data.WriteBits(m_completedAchievements.size(), 23);
 
     time_t now = time(NULL);
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
-        uint64 counter = iter->second.counter;
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
 
-        data.WriteGuidBytes(guid, guidBytes, 1, 0);
-        data.WriteGuidBytes(counter, counterBytes, 2, 0);
-        data.WriteGuidBytes(guid, guidBytes, 2, 1);
-        data.WriteGuidBytes(counter, counterBytes, 1, 2);
+        data.WriteGuidBytes<3>(guid);
+        data.WriteGuidBytes<5, 6>(counter);
+        data.WriteGuidBytes<4, 6>(guid);
+        data.WriteGuidBytes<2>(counter);
 
         data << uint32(now - iter->second.date);               // Timer 2
 
-        data.WriteGuidBytes(guid, guidBytes, 1, 3);
+        data.WriteGuidBytes<2>(guid);
 
         data << uint32(iter->first);
 
-        data.WriteGuidBytes(guid, guidBytes, 1, 4);
-        data.WriteGuidBytes(counter, counterBytes, 4, 3);
-        data.WriteGuidBytes(guid, guidBytes, 2, 5);
-        data.WriteGuidBytes(counter, counterBytes, 1, 7);
+        data.WriteGuidBytes<5>(guid);
+        data.WriteGuidBytes<0, 3, 1, 4>(counter);
+        data.WriteGuidBytes<0, 7>(guid);
+        data.WriteGuidBytes<7>(counter);
 
         data << uint32(now - iter->second.date);               // Timer 1
         data << uint32(secsToTimeBitFields(now));
 
-        data.WriteGuidBytes(guid, guidBytes, 1, 7);
+        data.WriteGuidBytes<1>(guid);
     }
 
     for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
@@ -2294,74 +2285,69 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player)
     // since we don't know the exact size of the packed GUIDs this is just an approximation
     WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
 
-    uint8 targetGuidMask[] = { 7, 4, 1, 0, 3, 2, 6, 5 };
-    uint8 guidMask[] = { 5, 3, 6, 4, 1, 2, 0, 7 };
-    uint8 counterMask[] = { 1, 4, 2, 0, 3, 7, 5, 6 };
-
-    uint8 targetGuidBytes[] = { 1, 6, 3, 0, 2, 7, 4, 5 };
-    uint8 guidBytes[] = { 4, 3, 7, 0, 6, 1, 5, 2 };
-    uint8 counterBytes[] = { 3, 1, 5, 4, 2, 6, 7, 0 };
-
     ObjectGuid targetGuid = m_player->GetObjectGuid();
     ObjectGuid guid = m_player->GetObjectGuid();
 
-    data.WriteGuidMask(targetGuid, targetGuidMask, 3, 0);
+    data.WriteGuidMask<7, 4, 1>(targetGuid);
 
     data.WriteBits(m_completedAchievements.size(), 23);
 
-    data.WriteGuidMask(targetGuid, targetGuidMask, 2, 3);
+    data.WriteGuidMask<0, 3>(targetGuid);
 
     data.WriteBits(m_criteriaProgress.size(), 21);
 
-    data.WriteGuidMask(targetGuid, targetGuidMask, 1, 5);
+    data.WriteGuidMask<2>(targetGuid);
 
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
-        uint64 counter = iter->second.counter;
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
 
-        data.WriteGuidMask(guid, guidMask, 2, 0);
-        data.WriteGuidMask(counter, counterMask, 3, 0);
-        data.WriteGuidMask(guid, guidMask, 1, 2);
-        data.WriteGuidMask(counter, counterMask, 1, 3);
-        data.WriteGuidMask(guid, guidMask, 3, 3);
-        data.WriteGuidMask(counter, counterMask, 2, 4);
+        data.WriteGuidMask<5, 3>(guid);
+        data.WriteGuidMask<1, 4, 2>(counter);
+        data.WriteGuidMask<6>(guid);
+        data.WriteGuidMask<0>(counter);
+        data.WriteGuidMask<4, 1, 2>(guid);
+        data.WriteGuidMask<3, 7>(counter);
 
-        data.WriteBits(0, 2);                               // Seems always 0
+        uint8 flags = 0;                                    // Seems always 0
+        data.WriteBits(flags, 2);
 
-        data.WriteGuidMask(guid, guidMask, 1, 6);
-        data.WriteGuidMask(counter, counterMask, 2, 6);
-        data.WriteGuidMask(guid, guidMask, 1, 7);
+        data.WriteGuidMask<0>(guid);
+        data.WriteGuidMask<5, 6>(counter);
+        data.WriteGuidMask<7>(guid);
     }
 
-    data.WriteGuidMask(targetGuid, targetGuidMask, 2, 6);
+    data.WriteGuidMask<6, 5>(targetGuid);
 
     time_t now = time(NULL);
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
-        uint64 counter = iter->second.counter;
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
 
-        data.WriteGuidBytes(counter, counterBytes, 1, 0);
-        data.WriteGuidBytes(guid, guidBytes, 1, 0);
+        data.WriteGuidBytes<3>(counter);
+        data.WriteGuidBytes<4>(guid);
 
         data << uint32(now - iter->second.date);            // Timer 1
+
+        data.WriteGuidBytes<1>(counter);
+
         data << uint32(secsToTimeBitFields(now));
 
-        data.WriteGuidBytes(counter, counterBytes, 1, 1);
-        data.WriteGuidBytes(guid, guidBytes, 2, 1);
-        data.WriteGuidBytes(counter, counterBytes, 1, 2);
-        data.WriteGuidBytes(guid, guidBytes, 1, 3);
-        data.WriteGuidBytes(counter, counterBytes, 4, 3);
-        data.WriteGuidBytes(guid, guidBytes, 1, 4);
+        data.WriteGuidBytes<3, 7>(guid);
+        data.WriteGuidBytes<5>(counter);
+        data.WriteGuidBytes<0>(guid);
+        data.WriteGuidBytes<4, 2, 6, 7>(counter);
+        data.WriteGuidBytes<6>(guid);
 
         data << uint32(iter->first);
         data << uint32(now - iter->second.date);            // Timer 2
 
-        data.WriteGuidBytes(guid, guidBytes, 2, 5);
-        data.WriteGuidBytes(counter, counterBytes, 1, 7);
-        data.WriteGuidBytes(guid, guidBytes, 1, 7);
+        data.WriteGuidBytes<1, 5>(guid);
+        data.WriteGuidBytes<0>(counter);
+        data.WriteGuidBytes<2>(guid);
     }
 
-    data.WriteGuidBytes(targetGuid, targetGuidBytes, 5, 0);
+    data.WriteGuidBytes<1, 6, 3, 0, 2>(targetGuid);
 
     for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
     {
@@ -2369,7 +2355,7 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player)
         data << uint32(secsToTimeBitFields(iter->second.date));
     }
 
-    data.WriteGuidBytes(targetGuid, targetGuidBytes, 3, 5);
+    data.WriteGuidBytes<7, 4, 5>(targetGuid);
 
     player->GetSession()->SendPacket(&data);
 }

@@ -521,7 +521,7 @@ inline bool IsNeedCastSpellAtFormApply(SpellEntry const* spellInfo, ShapeshiftFo
         return false;
 
     SpellShapeshiftEntry const* shapeShift = spellInfo->GetSpellShapeshift();
-    if (shapeShift)
+    if (!shapeShift)
         return false;
 
     // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!

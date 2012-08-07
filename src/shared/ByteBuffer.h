@@ -166,6 +166,11 @@ class ByteBuffer
             _bitpos = 8;
         }
 
+        void ResetBitReader()
+        {
+            _bitpos = 8;
+        }
+
         template <typename T> bool WriteBit(T bit)
         {
             --_bitpos;
@@ -187,8 +192,8 @@ class ByteBuffer
             ++_bitpos;
             if (_bitpos > 7)
             {
-                _bitpos = 0;
                 _curbitval = read<uint8>();
+                _bitpos = 0;
             }
 
             return ((_curbitval >> (7-_bitpos)) & 1) != 0;
@@ -515,6 +520,7 @@ class ByteBuffer
 
         ByteBuffer& read_skip(size_t skip)
         {
+            ResetBitReader();
             if(_rpos + skip > size())
                 throw ByteBufferException(false, _rpos, skip, size());
             _rpos += skip;
@@ -524,6 +530,7 @@ class ByteBuffer
 
         template <typename T> T read()
         {
+            ResetBitReader();
             T r = read<T>(_rpos);
             _rpos += sizeof(T);
             return r;
@@ -540,6 +547,7 @@ class ByteBuffer
 
         ByteBuffer& read(uint8* dest, size_t len)
         {
+            ResetBitReader();
             if(_rpos  + len > size())
                 throw ByteBufferException(false, _rpos, len, size());
             memcpy(dest, &_storage[_rpos], len);

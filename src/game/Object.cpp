@@ -383,7 +383,6 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
         if (hasTransport)
         {
             ObjectGuid tGuid = unit->m_movementInfo.GetTransportGuid();
-            uint8 guidBytes[] = { 5, 7, 3, 0, 1, 6, 2, 4 };
 
             data->WriteGuidBytes<5, 7>(tGuid);
             *data << unit->m_movementInfo.GetTransportTime();

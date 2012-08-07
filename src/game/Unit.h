@@ -675,8 +675,8 @@ class MovementInfo
             t_time(0), t_seat(-1), t_time2(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
-        void Read(ByteBuffer& data);
-        void Write(ByteBuffer& data) const;
+        void Read(ByteBuffer& data, uint16 opcode);
+        void Write(ByteBuffer& data, uint16 opcode) const;
 
         // Movement flags manipulations
         void AddMovementFlag(MovementFlags f) { moveFlags |= f; }
@@ -708,6 +708,7 @@ class MovementInfo
             t_time = 0;
             t_seat = -1;
         }
+        ObjectGuid const& GetGuid() const { return guid; }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
         Position const* GetTransportPos() const { return &t_pos; }
         int8 GetTransportSeat() const { return t_seat; }
@@ -723,12 +724,30 @@ class MovementInfo
             float   velocity, sinAngle, cosAngle, xyspeed;
         };
 
+        // used only for SMSG_PLAYER_MOVE currently
+        struct StatusInfo
+        {
+            StatusInfo() : hasFallData(false), hasFallDirection(false), hasOrientation(false), 
+                hasPitch(false), hasSpline(false), hasSplineElevation(false), 
+                hasTimeStamp(false), hasTransportTime2(false), hasTransportTime3(false) { }
+            bool hasFallData        : 1;
+            bool hasFallDirection   : 1;
+            bool hasOrientation     : 1;
+            bool hasPitch           : 1;
+            bool hasSpline          : 1;
+            bool hasSplineElevation : 1;
+            bool hasTimeStamp       : 1;
+            bool hasTransportTime2  : 1;
+            bool hasTransportTime3  : 1;
+        };
+
         JumpInfo const& GetJumpInfo() const { return jump; }
         float GetSplineElevation() const { return splineElevation; }
         float GetPitch() const { return s_pitch; }
 
     private:
         // common
+        ObjectGuid guid;
         uint32   moveFlags;                                 // see enum MovementFlags
         uint16   moveFlags2;                                // see enum MovementFlags2
         uint32   time;
@@ -747,17 +766,19 @@ class MovementInfo
         JumpInfo jump;
         // spline
         float    splineElevation;
+        // status info
+        StatusInfo si;
 };
 
-inline ByteBuffer& operator<< (ByteBuffer& buf, MovementInfo const& mi)
+inline WorldPacket& operator<< (WorldPacket& buf, MovementInfo const& mi)
 {
-    mi.Write(buf);
+    mi.Write(buf, buf.GetOpcode());
     return buf;
 }
 
-inline ByteBuffer& operator>> (ByteBuffer& buf, MovementInfo& mi)
+inline WorldPacket& operator>> (WorldPacket& buf, MovementInfo& mi)
 {
-    mi.Read(buf);
+    mi.Read(buf, buf.GetOpcode());
     return buf;
 }
 

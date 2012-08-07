@@ -402,7 +402,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             ObjectGuid guid;                                // guid - unused
             MovementInfo movementInfo;
 
-            recvPacket >> Unused<uint32>();                 // >> MSG_MOVE_STOP
+            recvPacket >> Unused<uint32>();                 // >> CMSG_MOVE_STOP
             recvPacket >> guid.ReadAsPacked();
             recvPacket >> movementInfo;
         }

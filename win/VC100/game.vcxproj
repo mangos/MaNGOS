@@ -603,6 +603,7 @@
     <ClInclude Include="..\..\src\game\MoveMap.h" />
     <ClInclude Include="..\..\src\game\MoveMapSharedDefines.h" />
     <ClInclude Include="..\..\src\game\MovementGenerator.h" />
+    <ClInclude Include="..\..\src\game\movement\MovementStructures.h" />
     <ClInclude Include="..\..\src\game\movement\MoveSpline.h" />
     <ClInclude Include="..\..\src\game\movement\MoveSplineFlag.h" />
     <ClInclude Include="..\..\src\game\movement\MoveSplineInit.h" />
