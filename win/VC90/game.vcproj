@@ -882,7 +882,7 @@
 				RelativePath="..\..\src\game\MoveMap.h"
 				>
 			</File>
-            <File
+			<File
 				RelativePath="..\..\src\game\MoveMapSharedDefines.h"
 				>
 			</File>
@@ -1762,6 +1762,10 @@
 		<Filter
 			Name="Movement"
 			>
+			<File
+				RelativePath="..\..\src\game\MovementStructures.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\game\Movement\MoveSpline.cpp"
 				>

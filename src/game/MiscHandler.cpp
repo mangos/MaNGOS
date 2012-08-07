@@ -1033,31 +1033,16 @@ void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_MOVE_FEATHER_FALL_ACK");
 
-    // no used
+    // not used
     recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
 }
 
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
 {
-    // no used
+    // not used
     recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
     /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if(_player->GetGUID() != guid)
-        {
-            recv_data.rpos(recv_data.wpos());               // prevent warnings spam
-            return;
-        }
-
-        DEBUG_LOG( "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK" );
-
-        recv_data.read_skip<uint32>();                      // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
+        bitsream packet
     */
 }
 
@@ -1066,22 +1051,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // no used
     recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
     /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if(_player->GetObjectGuid() != guid)
-        {
-            recv_data.rpos(recv_data.wpos());               // prevent warnings spam
-            return;
-        }
-
-        DEBUG_LOG( "WORLD: CMSG_FORCE_MOVE_ROOT_ACK" );
-
-        recv_data.read_skip<uint32>();                      // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
+        bitsream packet
     */
 }
 
