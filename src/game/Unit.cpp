@@ -92,7 +92,7 @@ void MovementInfo::Read(ByteBuffer& data, uint16 opcode)
 
         if (element >= MSEGuidBit0 && element <= MSEGuidBit7)
         {
-            guid[element - MSEGuidByte0] = data.ReadBit();
+            guid[element - MSEGuidBit0] = data.ReadBit();
             continue;
         }
 
@@ -293,7 +293,7 @@ void MovementInfo::Write(ByteBuffer& data, uint16 opcode) const
 
         if (element >= MSETransportGuidByte0 && element <= MSETransportGuidByte7)
         {
-            if (hasTransportData && t_guid[element - MSEGuidByte0])
+            if (hasTransportData && t_guid[element - MSETransportGuidByte0])
                 data << uint8((t_guid[element - MSETransportGuidByte0] ^ 1));
             continue;
         }
