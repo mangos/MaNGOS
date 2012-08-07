@@ -948,6 +948,9 @@
     <ClInclude Include="..\..\src\game\vmap\WorldModel.h">
       <Filter>vmaps</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\game\movement\MovementStructures.h">
+      <Filter>Movement</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\game\movement\MoveSpline.h">
       <Filter>Movement</Filter>
     </ClInclude>
