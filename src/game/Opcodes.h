@@ -501,8 +501,8 @@ enum Opcodes
     SMSG_NOTIFICATION                                     = 0x11CC,
     CMSG_PLAYED_TIME                                      = 0x11CD,
     SMSG_PLAYED_TIME                                      = 0x11CE,
-    CMSG_QUERY_TIME                                       = 0x11CF,
-    SMSG_QUERY_TIME_RESPONSE                              = 0x11D0,
+    CMSG_QUERY_TIME                                       = 0x0A36, //Wow 4.3.4 15595
+    SMSG_QUERY_TIME_RESPONSE                              = 0x2124, //Wow 4.3.4 15595
     SMSG_LOG_XPGAIN                                       = 0x11D1,
     SMSG_AURACASTLOG                                      = 0x11D2,
     CMSG_RECLAIM_CORPSE                                   = 0x11D3,
@@ -774,9 +774,9 @@ enum Opcodes
     CMSG_FORCE_TURN_RATE_CHANGE_ACK                       = 0x12E0,
     MSG_PVP_LOG_DATA                                      = 0x12E1,
     CMSG_LEAVE_BATTLEFIELD                                = 0x12E2,
-    CMSG_AREA_SPIRIT_HEALER_QUERY                         = 0x12E3,
-    CMSG_AREA_SPIRIT_HEALER_QUEUE                         = 0x12E4,
-    SMSG_AREA_SPIRIT_HEALER_TIME                          = 0x12E5,
+    CMSG_AREA_SPIRIT_HEALER_QUERY                         = 0x4907, // Wow 4.3.4 15595
+    CMSG_AREA_SPIRIT_HEALER_QUEUE                         = 0x4815, // Wow 4.3.4 15595
+    SMSG_AREA_SPIRIT_HEALER_TIME                          = 0x0734, // Wow 4.3.4 15595
     CMSG_GM_UNTEACH                                       = 0x12E6,
     SMSG_WARDEN_DATA                                      = 0x12E7,
     CMSG_WARDEN_DATA                                      = 0x12E8,
