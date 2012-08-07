@@ -135,8 +135,8 @@ enum Opcodes
     SMSG_QUEST_QUERY_RESPONSE                             = 0x105E,
     CMSG_GAMEOBJECT_QUERY                                 = 0x105F,
     SMSG_GAMEOBJECT_QUERY_RESPONSE                        = 0x1060,
-    CMSG_CREATURE_QUERY                                   = 0x1061,
-    SMSG_CREATURE_QUERY_RESPONSE                          = 0x1062,
+    CMSG_CREATURE_QUERY                                   = 0x2706, // 4.3.4 15595
+    SMSG_CREATURE_QUERY_RESPONSE                          = 0x6024, // 4.3.4 15595
     CMSG_WHO                                              = 0x6C15,
     SMSG_WHO                                              = 0x6907,
     CMSG_WHOIS                                            = 0x6B05,
@@ -188,7 +188,7 @@ enum Opcodes
     SMSG_GUILD_EVENT                                      = 0x1093,
     SMSG_GUILD_COMMAND_RESULT                             = 0x1094,
     UMSG_UPDATE_GUILD                                     = 0x1095,
-    CMSG_MESSAGECHAT                                      = 0x1096,
+    CMSG_MESSAGECHAT_SAY                                  = 0x1154,
     SMSG_MESSAGECHAT                                      = 0x1097,
     CMSG_JOIN_CHANNEL                                     = 0x0156,
     CMSG_LEAVE_CHANNEL                                    = 0x1099,

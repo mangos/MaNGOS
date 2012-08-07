@@ -157,8 +157,8 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     {
         int loc_idx = GetSessionDbLocaleIndex();
 
-        char const* name = ci->Name;
-        char const* subName = ci->SubName;
+        std::string name = ci->Name;
+        std::string subName = ci->SubName;
         sObjectMgr.GetCreatureLocaleStrings(entry, loc_idx, &name, &subName);
 
         DETAIL_LOG("WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->Name, entry);
@@ -166,10 +166,14 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
         data << uint32(entry);                              // creature entry
         data << name;
-        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
+
+        for (uint8 i = 0; i < 7; ++i)
+            data << uint8(0);            // name2, name3, name4, always empty
+
         data << subName;
         data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
         data << uint32(ci->type_flags);                     // flags
+        data << uint32(0);                                  // unk
         data << uint32(ci->type);                           // CreatureType.dbc
         data << uint32(ci->family);                         // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
@@ -185,6 +189,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
         for (uint32 i = 0; i < 6; ++i)
             data << uint32(ci->questItems[i]);              // itemId[6], quest drop
         data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
+        data << uint32(0);                                  //unk
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
