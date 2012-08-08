@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_00014_01_realmd_account_access` bit(1) default NULL
+  `required_0014_xxxxx_01_realmd_account_access` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -86,7 +86,7 @@ CREATE TABLE `account_access` (
   `gmlevel` tinyint(3) unsigned NOT NULL,
   `RealmID` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`,`RealmID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MYISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `account_access`
