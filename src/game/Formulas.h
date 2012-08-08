@@ -84,6 +84,7 @@ namespace MaNGOS
                 case CONTENT_1_60:  nBaseExp = 45;  break;
                 case CONTENT_61_70: nBaseExp = 235; break;
                 case CONTENT_71_80: nBaseExp = 580; break;
+                case CONTENT_81_85: nBaseExp = 1878; break;
                 default:
                     sLog.outError("BaseGain: Unsupported content level %u", content);
                     nBaseExp = 45;  break;
