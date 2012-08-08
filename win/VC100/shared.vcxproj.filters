@@ -101,9 +101,6 @@
     <ClInclude Include="..\..\src\shared\Database\Field.h">
       <Filter>Database</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\shared\Database\MySQLDelayThread.h">
-      <Filter>Database</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\shared\Database\QueryResult.h">
       <Filter>Database</Filter>
     </ClInclude>
