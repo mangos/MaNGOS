@@ -891,9 +891,7 @@ void Map::SendInitSelf(Player* player)
 
     // attach to player data current transport data
     if (Transport* transport = player->GetTransport())
-    {
         transport->BuildCreateUpdateBlockForPlayer(&data, player);
-    }
 
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
@@ -939,6 +937,11 @@ void Map::SendInitTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(&packet);
+
+    // Prevent sending transport maps in player update object
+    if (packet.ReadUInt16() != player->GetMapId())
+        return;
+
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -962,6 +965,11 @@ void Map::SendRemoveTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(&packet);
+
+    // Prevent sending transport maps in player update object
+    if (packet.ReadUInt16() != player->GetMapId())
+        return;
+
     player->GetSession()->SendPacket(&packet);
 }
 
