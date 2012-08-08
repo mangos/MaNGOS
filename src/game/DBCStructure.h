@@ -1058,6 +1058,16 @@ struct GtRegenMPPerSptEntry
     float    ratio;
 };
 
+struct GtOCTBaseHPByClassEntry
+{
+    float ratio;
+};
+
+struct GtOCTBaseMPByClassEntry
+{
+    float ratio;
+};
+
 /*struct HolidayDescriptionsEntry
 {
     uint32 ID;                                              // 0,       m_ID this is NOT holiday id
