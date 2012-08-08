@@ -35,10 +35,10 @@
 /// Max Opcode value in 4.3.4.15595 is 65535
 enum Opcodes
 {
-    MSG_WOW_CONNECTION                                    = 0x4F57,
-    SMSG_AUTH_CHALLENGE                                   = 0x4542,
-    CMSG_AUTH_SESSION                                     = 0x0449,
-    SMSG_AUTH_RESPONSE                                    = 0x5DB6,
+    MSG_WOW_CONNECTION                                    = 0x4F57, // 4.3.4 15595
+    SMSG_AUTH_CHALLENGE                                   = 0x4542, // 4.3.4 15595
+    CMSG_AUTH_SESSION                                     = 0x0449, // 4.3.4 15595
+    SMSG_AUTH_RESPONSE                                    = 0x5DB6, // 4.3.4 15595
     MSG_NULL_ACTION                                       = 0x1001,
     CMSG_BOOTME                                           = 0x1002,
     CMSG_DBLOOKUP                                         = 0x1003,
@@ -93,15 +93,15 @@ enum Opcodes
     CMSG_AUTH_SRP6_BEGIN                                  = 0x1034,
     CMSG_AUTH_SRP6_PROOF                                  = 0x1035,
     CMSG_AUTH_SRP6_RECODE                                 = 0x1036,
-    CMSG_CHAR_CREATE                                      = 0x4A36,
-    CMSG_CHAR_ENUM                                        = 0x0502,
-    CMSG_CHAR_DELETE                                      = 0x6425,
+    CMSG_CHAR_CREATE                                      = 0x4A36, // 4.3.4 15595
+    CMSG_CHAR_ENUM                                        = 0x0502, // 4.3.4 15595
+    CMSG_CHAR_DELETE                                      = 0x6425, // 4.3.4 15595
     SMSG_AUTH_SRP6_RESPONSE                               = 0x103A,
-    SMSG_CHAR_CREATE                                      = 0x2D05,
-    SMSG_CHAR_ENUM                                        = 0x10B0,
-    SMSG_CHAR_DELETE                                      = 0x0304,
-    CMSG_PLAYER_LOGIN                                     = 0x05B1,
-    SMSG_NEW_WORLD                                        = 0x79B1,
+    SMSG_CHAR_CREATE                                      = 0x2D05, // 4.3.4 15595
+    SMSG_CHAR_ENUM                                        = 0x10B0, // 4.3.4 15595
+    SMSG_CHAR_DELETE                                      = 0x0304, // 4.3.4 15595
+    CMSG_PLAYER_LOGIN                                     = 0x05B1, // 4.3.4 15595
+    SMSG_NEW_WORLD                                        = 0x79B1, // 4.3.4 15595
     SMSG_TRANSFER_PENDING                                 = 0x1040,
     SMSG_TRANSFER_ABORTED                                 = 0x1041,
     SMSG_CHARACTER_LOGIN_FAILED                           = 0x1042,
@@ -501,8 +501,8 @@ enum Opcodes
     SMSG_NOTIFICATION                                     = 0x11CC,
     CMSG_PLAYED_TIME                                      = 0x11CD,
     SMSG_PLAYED_TIME                                      = 0x11CE,
-    CMSG_QUERY_TIME                                       = 0x0A36, //Wow 4.3.4 15595
-    SMSG_QUERY_TIME_RESPONSE                              = 0x2124, //Wow 4.3.4 15595
+    CMSG_QUERY_TIME                                       = 0x0A36, // 4.3.4 15595
+    SMSG_QUERY_TIME_RESPONSE                              = 0x2124, // 4.3.4 15595
     SMSG_LOG_XPGAIN                                       = 0x11D1,
     SMSG_AURACASTLOG                                      = 0x11D2,
     CMSG_RECLAIM_CORPSE                                   = 0x11D3,
@@ -774,9 +774,9 @@ enum Opcodes
     CMSG_FORCE_TURN_RATE_CHANGE_ACK                       = 0x12E0,
     MSG_PVP_LOG_DATA                                      = 0x12E1,
     CMSG_LEAVE_BATTLEFIELD                                = 0x12E2,
-    CMSG_AREA_SPIRIT_HEALER_QUERY                         = 0x4907, // Wow 4.3.4 15595
-    CMSG_AREA_SPIRIT_HEALER_QUEUE                         = 0x4815, // Wow 4.3.4 15595
-    SMSG_AREA_SPIRIT_HEALER_TIME                          = 0x0734, // Wow 4.3.4 15595
+    CMSG_AREA_SPIRIT_HEALER_QUERY                         = 0x4907, // 4.3.4 15595
+    CMSG_AREA_SPIRIT_HEALER_QUEUE                         = 0x4815, // 4.3.4 15595
+    SMSG_AREA_SPIRIT_HEALER_TIME                          = 0x0734, // 4.3.4 15595
     CMSG_GM_UNTEACH                                       = 0x12E6,
     SMSG_WARDEN_DATA                                      = 0x12E7,
     CMSG_WARDEN_DATA                                      = 0x12E8,
