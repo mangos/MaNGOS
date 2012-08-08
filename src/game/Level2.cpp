@@ -2579,7 +2579,7 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT username,gmlevel,last_ip,last_login FROM account WHERE id = '%u'", accId);
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.last_ip,a.last_login FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE id = '%u'", accId);
     if (result)
     {
         Field* fields = result->Fetch();
@@ -4460,7 +4460,7 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE email "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE email "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }
@@ -4479,7 +4479,7 @@ bool ChatHandler::HandleLookupAccountIpCommand(char* args)
     LoginDatabase.escape_string(ip);
 
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE last_ip "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }
@@ -4500,7 +4500,7 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
 
     LoginDatabase.escape_string(account);
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE username "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE username "_LIKE_" "_CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }

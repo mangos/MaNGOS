@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `realmd_db_version`;
 CREATE TABLE `realmd_db_version` (
-  `required_0001_xxxxx_01_realmd` bit(1) default NULL
+  `required_00014_01_realmd_account_access` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -76,6 +76,19 @@ INSERT INTO `account` VALUES
 (4,'PLAYER','3ce8a96d17c5ae88a30681024e86279f1a38c041',0,'','0','0','','2006-04-25 10:19:35','127.0.0.1',0,0,'0000-00-00 00:00:00',0,0,0,0);
 /*!40000 ALTER TABLE `account` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table Stucture for table `account `account_access`
+--
+
+DROP TABLE IF EXISTS `account_access`;
+
+CREATE TABLE `account_access` (
+  `id` int(10) unsigned NOT NULL,
+  `gmlevel` tinyint(3) unsigned NOT NULL,
+  `RealmID` int(11) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`id`,`RealmID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Table structure for table `account_banned`
