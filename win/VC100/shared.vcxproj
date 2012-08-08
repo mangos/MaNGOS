@@ -472,7 +472,6 @@
     <ClInclude Include="..\..\src\shared\Database\DBCFileLoader.h" />
     <ClInclude Include="..\..\src\shared\Database\DBCStore.h" />
     <ClInclude Include="..\..\src\shared\Database\Field.h" />
-    <ClInclude Include="..\..\src\shared\Database\MySQLDelayThread.h" />
     <ClInclude Include="..\..\src\shared\Database\QueryResult.h" />
     <ClInclude Include="..\..\src\shared\Database\QueryResultMysql.h" />
     <ClInclude Include="..\..\src\shared\Database\SqlDelayThread.h" />
