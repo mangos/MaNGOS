@@ -157,8 +157,8 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     {
         int loc_idx = GetSessionDbLocaleIndex();
 
-        std::string name = ci->Name;
-        std::string subName = ci->SubName;
+        char const* name = ci->Name;
+        char const* subName = ci->SubName;
         sObjectMgr.GetCreatureLocaleStrings(entry, loc_idx, &name, &subName);
 
         DETAIL_LOG("WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->Name, entry);

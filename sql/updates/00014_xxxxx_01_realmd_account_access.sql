@@ -9,7 +9,7 @@ CREATE TABLE `account_access` (
   `gmlevel` tinyint(3) unsigned NOT NULL,
   `RealmID` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`,`RealmID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MYISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `account_access` VALUES
 (1,3,-1),
