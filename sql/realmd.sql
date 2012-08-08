@@ -41,25 +41,25 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account` (
-  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
-  `username`      VARCHAR(32) NOT NULL DEFAULT '',
-  `sha_pass_hash` VARCHAR(40) NOT NULL DEFAULT '',
-  `sessionkey` LONGTEXT,
-  `v` LONGTEXT,
-  `s` LONGTEXT,
-  `email` TEXT,
-  `joindate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_ip` VARCHAR(30) NOT NULL DEFAULT '0.0.0.0',
-  `failed_logins` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `locked` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  `last_login` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `active_realm_id` INT(11) UNSIGNED NOT NULL DEFAULT '0',
-  `expansion` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-  `mutetime` BIGINT(40) UNSIGNED NOT NULL DEFAULT '0',
-  `locale` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
+  `id` int(11) unsigned NOT NULL auto_increment COMMENT 'Identifier',
+  `username`      varchar(32) NOT NULL default '',
+  `sha_pass_hash` varchar(40) NOT NULL default '',
+  `sessionkey` longtext,
+  `v` longtext,
+  `s` longtext,
+  `email` text,
+  `joindate` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `last_ip` varchar(30) NOT NULL default '0.0.0.0',
+  `failed_logins` int(11) unsigned NOT NULL default '0',
+  `locked` tinyint(3) unsigned NOT NULL default '0',
+  `last_login` timestamp NOT NULL default '0000-00-00 00:00:00',
+  `active_realm_id` int(11) unsigned NOT NULL default '0',
+  `expansion` tinyint(3) unsigned NOT NULL default '0',
+  `mutetime` bigint(40) unsigned NOT NULL default '0',
+  `locale` tinyint(3) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `idx_username` (`username`)
-) ENGINE=MYISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ROW_FORMAT=DYNAMIC COMMENT='Account System';
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci ROW_FORMAT=DYNAMIC COMMENT='Account System';
 
 --
 -- Dumping data for table `account`
@@ -86,7 +86,7 @@ CREATE TABLE `account_access` (
   `gmlevel` tinyint(3) unsigned NOT NULL,
   `RealmID` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`,`RealmID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='account access system';
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Account Access System';
 
 --
 -- Dumping data for table `account_access`
