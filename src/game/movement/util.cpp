@@ -133,22 +133,24 @@ namespace Movement
         STR(Safe_Fall),          // 0x08000000,             // Active Rogue Safe Fall Spell (Passive)
         STR(Hover),              // 0x10000000,
         STR(Unknown11),          // 0x20000000
-        STR(NoStrafe),
-        STR(NoJumping),
-        STR(Unk3),
-        STR(Fullspeedturning),
-        STR(Fullspeedpitching),
-        STR(Allow_Pitching),
-        STR(Unk4),
-        STR(Unk5),
-        STR(Unk6),
-        STR(Unk7),
-        STR(Interp_Move),
-        STR(Interp_Turning),
-        STR(Interp_Pitching),
-        STR(Unk8),
-        STR(Unk9),
-        STR(Unk10),
+        STR(None31),             // 0x40000000
+        STR(None32),             // 0x80000000
+        STR(NoStrafe),           // 0x0001
+        STR(NoJumping),          // 0x0002
+        STR(Unk3),               // 0x0004
+        STR(Fullspeedturning),   // 0x0008
+        STR(Fullspeedpitching),  // 0x0010
+        STR(Allow_Pitching),     // 0x0020
+        STR(Unk4),               // 0x0040
+        STR(Unk5),               // 0x0080
+        STR(Unk6),               // 0x0100
+        STR(Interp_Move),        // 0x0200
+        STR(Interp_Turning),     // 0x0400
+        STR(Interp_Pitching),    // 0x0800
+        STR(Unk8),               // 0x1000
+        STR(Unk9),               // 0x2000
+        STR(Unk10),              // 0x4000
+        STR(Unk11),              // 0x8000
     };
 
     const char* g_SplineFlag_names[32] =
@@ -156,8 +158,8 @@ namespace Movement
         STR(AnimBit1),     // 0x00000001,
         STR(AnimBit2),     // 0x00000002,
         STR(AnimBit3),     // 0x00000004,
-        STR(AnimBit4),     // 0x00000008,
-        STR(Unknown1),     // 0x00000010,
+        STR(Unknown0),     // 0x00000008,
+        STR(FallingSlow),  // 0x00000010,
         STR(Done),         // 0x00000020,
         STR(Falling),      // 0x00000040,           // Not Compartible With Trajectory Movement
         STR(No_Spline),    // 0x00000080,
@@ -173,7 +175,7 @@ namespace Movement
         STR(Unknown3),     // 0x00020000,
         STR(Unknown4),     // 0x00040000,
         STR(OrientationInversed), // 0x00080000,           // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
-        STR(Unknown5),     // 0x00100000
+        STR(SmoothGroundPath),    // 0x00100000
         STR(Walkmode),     // 0x00200000,
         STR(UncompressedPath), // 0x00400000
         STR(Unknown6),     // 0x00800000

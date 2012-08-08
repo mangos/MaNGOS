@@ -56,7 +56,7 @@ namespace Movement
         }
         else
         {
-            if (!splineflags.hasFlag(MoveSplineFlag::OrientationFixed | MoveSplineFlag::Falling))
+            if (!splineflags.hasFlag(MoveSplineFlag::OrientationFixed | MoveSplineFlag::Falling | MoveSplineFlag::Unknown0))
             {
                 Vector3 hermite;
                 spline.evaluate_derivative(point_Idx, u, hermite);
@@ -216,7 +216,7 @@ namespace Movement
 // each vertex offset packed into 11 bytes
     bool MoveSplineInitArgs::_checkPathBounds() const
     {
-        if (!(flags & MoveSplineFlag::Mask_CatmullRom) && path.size() > 2)
+        if (!(flags & MoveSplineFlag::Catmullrom) && path.size() > 2)
         {
             enum
             {

@@ -37,7 +37,8 @@ namespace Movement
             {
                 None                = 0x00000000,
                                                             // x00-xF(first byte) used as animation Ids storage in pair with Animation flag
-                Unknown1            = 0x00000010,           // NOT VERIFIED
+                Unknown0            = 0x00000008,           // NOT VERIFIED
+                FallingSlow         = 0x00000010,
                 Done                = 0x00000020,
                 Falling             = 0x00000040,           // Affects elevation computation, can't be combined with Trajectory flag
                 No_Spline           = 0x00000080,
@@ -53,7 +54,7 @@ namespace Movement
                 Unknown3            = 0x00020000,           // NOT VERIFIED
                 Unknown4            = 0x00040000,           // NOT VERIFIED
                 OrientationInversed = 0x00080000,
-                Unknown5            = 0x00100000,           // NOT VERIFIED
+                SmoothGroundPath    = 0x00100000,
                 Walkmode            = 0x00200000,
                 UncompressedPath    = 0x00400000,
                 Unknown6            = 0x00800000,           // NOT VERIFIED
@@ -69,13 +70,11 @@ namespace Movement
                 // Masks
                 Mask_Final_Facing = Final_Point | Final_Target | Final_Angle,
                 // animation ids stored here, see AnimType enum, used with Animation flag
-                Mask_Animations = 0xF,
+                Mask_Animations = 0x7,
                 // flags that shouldn't be appended into SMSG_MONSTER_MOVE\SMSG_MONSTER_MOVE_TRANSPORT packet, should be more probably
                 Mask_No_Monster_Move = Mask_Final_Facing | Mask_Animations | Done,
-                // CatmullRom interpolation mode used
-                Mask_CatmullRom = Catmullrom,
                 // Unused, not suported flags
-                Mask_Unused = No_Spline | Enter_Cycle | Frozen | UncompressedPath | Unknown1 | Unknown2 | Unknown3 | Unknown4 | Unknown5 | Unknown6 | Unknown7 | Unknown8 | Unknown9,
+                Mask_Unused = No_Spline | Enter_Cycle | Frozen | FallingSlow | Unknown2 | Unknown3 | Unknown4 | SmoothGroundPath | Unknown6 | Unknown7 | Unknown8 | Unknown9,
             };
 
             inline uint32& raw() { return (uint32&)*this;}
@@ -87,7 +86,7 @@ namespace Movement
 
             // Constant interface
 
-            bool isSmooth() const { return raw() & Mask_CatmullRom;}
+            bool isSmooth() const { return raw() & Catmullrom;}
             bool isLinear() const { return !isSmooth();}
             bool isFacing() const { return raw() & Mask_Final_Facing;}
 
@@ -103,19 +102,19 @@ namespace Movement
             void operator &= (uint32 f) { raw() &= f;}
             void operator |= (uint32 f) { raw() |= f;}
 
-            void EnableAnimation(uint8 anim) { raw() = (raw() & ~(Mask_Animations | Falling | Trajectory))  | Animation | anim;}
-            void EnableParabolic()           { raw() = (raw() & ~(Mask_Animations | Falling | Animation))   | Trajectory;}
+            void EnableAnimation(uint8 anim) { raw() = (raw() & ~(Mask_Animations | Falling | Trajectory | FallingSlow)) | Animation | (anim & Mask_Animations);}
+            void EnableParabolic()           { raw() = (raw() & ~(Mask_Animations | Falling | Animation | FallingSlow)) | Trajectory;}
             void EnableFalling()             { raw() = (raw() & ~(Mask_Animations | Trajectory | Animation))| Falling;}
-            void EnableFlying()              { raw() = (raw() & ~Catmullrom)                                | Flying; }
-            void EnableCatmullRom()          { raw() = (raw() & ~Flying)                                    | Catmullrom; }
-            void EnableFacingPoint()         { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Point;}
-            void EnableFacingAngle()         { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Angle;}
-            void EnableFacingTarget()        { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Target;}
-            void EnableTransportEnter()      { raw() = (raw() & ~TransportExit)                             | TransportEnter; }
-            void EnableTransportExit()       { raw() = (raw() & ~TransportEnter)                            | TransportExit; }
+            void EnableCatmullRom()          { raw() = (raw() & ~SmoothGroundPath) | Catmullrom | UncompressedPath; }
+            void EnableFacingPoint()         { raw() = (raw() & ~Mask_Final_Facing) | Final_Point;}
+            void EnableFacingAngle()         { raw() = (raw() & ~Mask_Final_Facing) | Final_Angle;}
+            void EnableFacingTarget()        { raw() = (raw() & ~Mask_Final_Facing) | Final_Target;}
+            void EnableTransportEnter()      { raw() = (raw() & ~TransportExit) | TransportEnter; }
+            void EnableTransportExit()       { raw() = (raw() & ~TransportEnter) | TransportExit; }
 
-            uint8 animId             : 4;
-            bool unknown1            : 1;
+            uint8 animId             : 3;
+            bool unknown0            : 1;
+            bool fallingSlow         : 1;
             bool done                : 1;
             bool falling             : 1;
             bool no_spline           : 1;
@@ -131,7 +130,7 @@ namespace Movement
             bool unknown3            : 1;
             bool unknown4            : 1;
             bool orientationInversed : 1;
-            bool unknown5            : 1;
+            bool smoothGroundPath    : 1;
             bool walkmode            : 1;
             bool uncompressedPath    : 1;
             bool unknown6            : 1;

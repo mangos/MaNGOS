@@ -11320,5 +11320,5 @@ void Unit::DisableSpline()
 
 bool Unit::IsSplineEnabled() const
 {
-    return !movespline->Finalized();
+    return movespline->Initialized();
 }

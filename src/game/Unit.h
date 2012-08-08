@@ -651,20 +651,20 @@ enum MovementFlags2
     MOVEFLAG2_NONE              = 0x0000,
     MOVEFLAG2_NO_STRAFE         = 0x0001,
     MOVEFLAG2_NO_JUMPING        = 0x0002,
-    MOVEFLAG2_UNK3              = 0x0004,
-    MOVEFLAG2_FULLSPEEDTURNING  = 0x0008,
-    MOVEFLAG2_FULLSPEEDPITCHING = 0x0010,
-    MOVEFLAG2_ALLOW_PITCHING    = 0x0020,
-    MOVEFLAG2_UNK4              = 0x0040,
-    MOVEFLAG2_UNK5              = 0x0080,
-    MOVEFLAG2_UNK6              = 0x0100,                   // transport related
-    MOVEFLAG2_UNK7              = 0x0200,
-    MOVEFLAG2_INTERP_MOVEMENT   = 0x0400,
-    MOVEFLAG2_INTERP_TURNING    = 0x0800,
-    MOVEFLAG2_INTERP_PITCHING   = 0x1000,
-    MOVEFLAG2_UNK8              = 0x2000,
-    MOVEFLAG2_UNK9              = 0x4000,
-    MOVEFLAG2_UNK10             = 0x8000,
+    MOVEFLAG2_FULLSPEEDTURNING  = 0x0004,
+    MOVEFLAG2_FULLSPEEDPITCHING = 0x0008,
+    MOVEFLAG2_ALLOW_PITCHING    = 0x0010,
+    MOVEFLAG2_UNK4              = 0x0020,
+    MOVEFLAG2_UNK5              = 0x0040,
+    MOVEFLAG2_UNK6              = 0x0080,                   // transport related
+    MOVEFLAG2_UNK7              = 0x0100,
+    MOVEFLAG2_INTERP_MOVEMENT   = 0x0200,
+    MOVEFLAG2_INTERP_TURNING    = 0x0400,
+    MOVEFLAG2_INTERP_PITCHING   = 0x0800,
+    MOVEFLAG2_UNK8              = 0x1000,
+    MOVEFLAG2_UNK9              = 0x2000,
+    MOVEFLAG2_UNK10             = 0x4000,
+    MOVEFLAG2_UNK11             = 0x8000,
     MOVEFLAG2_INTERP_MASK       = MOVEFLAG2_INTERP_MOVEMENT | MOVEFLAG2_INTERP_TURNING | MOVEFLAG2_INTERP_PITCHING
 };
 
@@ -682,6 +682,7 @@ class MovementInfo
         void AddMovementFlag(MovementFlags f) { moveFlags |= f; }
         void RemoveMovementFlag(MovementFlags f) { moveFlags &= ~f; }
         bool HasMovementFlag(MovementFlags f) const { return moveFlags & f; }
+        bool HasMovementFlag2(MovementFlags2 f) const { return moveFlags2 & f; }
         MovementFlags GetMovementFlags() const { return MovementFlags(moveFlags); }
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
         MovementFlags2 GetMovementFlags2() const { return MovementFlags2(moveFlags2); }
@@ -713,6 +714,7 @@ class MovementInfo
         Position const* GetTransportPos() const { return &t_pos; }
         int8 GetTransportSeat() const { return t_seat; }
         uint32 GetTransportTime() const { return t_time; }
+        uint32 GetTransportTime2() const { return t_time2; }
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
@@ -742,6 +744,7 @@ class MovementInfo
         };
 
         JumpInfo const& GetJumpInfo() const { return jump; }
+        StatusInfo const& GetStatusInfo() const { return si; }
         float GetSplineElevation() const { return splineElevation; }
         float GetPitch() const { return s_pitch; }
 
