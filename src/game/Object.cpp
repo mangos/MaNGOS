@@ -469,16 +469,16 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
     {
         ObjectGuid transGuid;
 
-        data->WriteGuidMask<0, 5>(transGuid);
+        data->WriteGuidBytes<0, 5>(transGuid);
         if (hasTransportTime3)
             *data << uint32(0);
 
-        data->WriteGuidMask<3>(transGuid);
+        data->WriteGuidBytes<3>(transGuid);
         *data << float(0.0f);   // x offset
-        data->WriteGuidMask<4, 6, 1>(transGuid);
+        data->WriteGuidBytes<4, 6, 1>(transGuid);
         *data << uint32(0);     // transport time
         *data << float(0.0f);   // y offset
-        data->WriteGuidMask<2, 7>(transGuid);
+        data->WriteGuidBytes<2, 7>(transGuid);
         *data << float(0.0f);   // z offset
         *data << int8(-1);      // transport seat
         *data << float(0.0f);   // o offset
