@@ -563,7 +563,7 @@ const float Player::m_diminishing_k[MAX_CLASSES] =
     0.9880f,  // Shaman
     0.9830f,  // Mage
     0.9830f,  // Warlock
-    0.0f,     // ??
+    0.9880f,  // Monk
     0.9720f   // Druid
 };
 
@@ -580,7 +580,7 @@ void Player::UpdateParryPercentage()
         145.560408f,  // Shaman
         0.0f,       // Mage
         0.0f,       // Warlock
-        0.0f,       // ??
+        0.0f,       // Monk
         0.0f        // Druid
     };
 
@@ -619,7 +619,7 @@ void Player::UpdateDodgePercentage()
         145.560408f,  // Shaman
         150.375940f,  // Mage
         150.375940f,  // Warlock
-        0.0f,       // ??
+        145.560408f,  // Monk
         116.890707f   // Druid
     };
 

@@ -828,6 +828,44 @@ bool ChatHandler::HandleModifyRunicPowerCommand(char* args)
     return true;
 }
 
+// Edit Player Chi
+bool ChatHandler::HandleModifyChiCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    int32 chi = atoi(args) * 10;
+    int32 chim = atoi(args) * 10;
+
+    if (chi <= 0 || chim <= 0 || chim < chi)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* chr = getSelectedPlayer();
+    if (!chr)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(chr))
+        return false;
+
+    PSendSysMessage(LANG_YOU_CHANGE_CHI, GetNameLink(chr).c_str(), chi / 10, chim / 10);
+    if (needReportToTarget(chr))
+        ChatHandler(chr).PSendSysMessage(LANG_YOURS_CHI_CHANGED, GetNameLink().c_str(), chi / 10, chim / 10);
+
+    chr->SetMaxPower(POWER_CHI, chim);
+    chr->SetPower(POWER_CHI, chi);
+
+    return true;
+}
+
 // Edit Player Faction
 bool ChatHandler::HandleModifyFactionCommand(char* args)
 {
