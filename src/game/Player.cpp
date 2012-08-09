@@ -846,6 +846,9 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     }
     // all item positions resolved
 
+    if (info->phaseMap != 0)
+        CharacterDatabase.PExecute("REPLACE INTO `character_phase_data` (`guid`, `map`) VALUES (%u, %u)", guidlow, info->phaseMap);
+
     return true;
 }
 
@@ -15371,9 +15374,8 @@ void Player::SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver)
     {
         for (QuestPhaseMapsVector::const_iterator itr = QuestPhaseVector->begin(); itr != QuestPhaseVector->end(); ++itr)
         {
-            GetSession()->SendSetPhaseShift(itr->MapId, itr->PhaseMask);
-            CharacterDatabase.PExecute("DELETE FROM character_phase_data` WHERE `guid` = %u", GetSession()->GetPlayer()->GetGUIDLow()); 
-            CharacterDatabase.PExecute("INSERT INTO character_phase_data` (`guid`, `map`, `phase`) VALUES (%u, %u, %u)", GetSession()->GetPlayer()->GetGUIDLow(), itr->MapId, itr->PhaseMask);
+            GetSession()->SendSetPhaseShift(itr->PhaseMask, itr->MapId);
+            CharacterDatabase.PExecute("REPLACE INTO character_phase_data` (`guid`, `map`, `phase`) VALUES (%u, %u, %u)", GetSession()->GetPlayer()->GetGUIDLow(), itr->MapId, itr->PhaseMask);
         }
     }
 }

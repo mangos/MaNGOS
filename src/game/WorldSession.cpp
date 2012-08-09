@@ -572,8 +572,6 @@ void WorldSession::SendNotification(int32 string_id, ...)
 void WorldSession::SendSetPhaseShift(uint32 phaseMask, uint16 mapId)
 {
     ObjectGuid guid = _player->GetObjectGuid();
-    uint8 guidMask[] = { 2, 3, 1, 6, 4, 5, 0, 7 };
-    uint8 guidBytes[] = { 1, 2, 6, 3, 0, 5 };
 
     uint32 phaseFlags = 0;
 
@@ -589,7 +587,7 @@ void WorldSession::SendSetPhaseShift(uint32 phaseMask, uint16 mapId)
         }
     }
 
-    WorldPacket data(SMSG_PHASE_SHIFT_CHANGE, 30);
+    WorldPacket data(SMSG_SET_PHASE_SHIFT, 30);
     data.WriteGuidMask<2, 3, 1, 6, 4, 5, 0, 7>(guid);
     data.WriteGuidBytes<7, 4>(guid);
 
