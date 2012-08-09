@@ -14209,7 +14209,7 @@ CREATE TABLE `quest_phase_maps` (
   `map` smallint(6) NOT NULL,
   `phase` int(11) NOT NULL,
   PRIMARY KEY (`questId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `quest_phase_maps`
