@@ -337,9 +337,9 @@ enum Opcodes
     SMSG_SET_PROFICIENCY                                  = 0x1128,
     CMSG_SET_ACTION_BUTTON                                = 0x1129,
     SMSG_ACTION_BUTTONS                                   = 0x38B5, // 4.3.4 15595
-    SMSG_INITIAL_SPELLS                                   = 0x112B,
-    SMSG_LEARNED_SPELL                                    = 0x112C,
-    SMSG_SUPERCEDED_SPELL                                 = 0x112D,
+    SMSG_INITIAL_SPELLS                                   = 0x0104, // 4.3.4 15595
+    SMSG_LEARNED_SPELL                                    = 0x58A2, // 4.3.4 15595
+    SMSG_SUPERCEDED_SPELL                                 = 0x35B0, // 4.3.4 15595
     CMSG_NEW_SPELL_SLOT                                   = 0x112E,
     CMSG_CAST_SPELL                                       = 0x112F,
     CMSG_CANCEL_CAST                                      = 0x1130,
@@ -551,7 +551,7 @@ enum Opcodes
     SMSG_LFG_TELEPORT_DENIED                              = 0x1201,
     CMSG_UNLEARN_SPELL                                    = 0x1202,
     CMSG_UNLEARN_SKILL                                    = 0x1203,
-    SMSG_REMOVED_SPELL                                    = 0x1204,
+    SMSG_REMOVED_SPELL                                    = 0x4804, // 4.3.4 15595
     CMSG_DECHARGE                                         = 0x1205,
     CMSG_GMTICKET_CREATE                                  = 0x1206,
     SMSG_GMTICKET_CREATE                                  = 0x1207,
@@ -1209,8 +1209,8 @@ enum Opcodes
     SMSG_PET_UPDATE_COMBO_POINTS                          = 0x1493,
     CMSG_ENABLETAXI                                       = 0x1494,
     SMSG_PRE_RESURRECT                                    = 0x1495,
-    SMSG_AURA_UPDATE_ALL                                  = 0x1496,
-    SMSG_AURA_UPDATE                                      = 0x1497,
+    SMSG_AURA_UPDATE_ALL                                  = 0x6916, // 4.3.4 15595
+    SMSG_AURA_UPDATE                                      = 0x4707, // 4.3.4 15595
     CMSG_FLOOD_GRACE_CHEAT                                = 0x1498,
     SMSG_SERVER_FIRST_ACHIEVEMENT                         = 0x1499,
     SMSG_PET_LEARNED_SPELL                                = 0x149A,

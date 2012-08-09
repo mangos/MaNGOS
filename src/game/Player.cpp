@@ -3344,7 +3344,7 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
     {
         WorldPacket data(SMSG_LEARNED_SPELL, 6);
         data << uint32(spell_id);
-        data << uint16(0);                                  // 3.3.3 unk
+        data << uint32(0);                                  // 3.3.3 unk
         GetSession()->SendPacket(&data);
     }
 
