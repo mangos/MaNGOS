@@ -2711,7 +2711,8 @@ enum LockType
     LOCKTYPE_FISHING               = 19,
     LOCKTYPE_INSCRIPTION           = 20,
     LOCKTYPE_OPEN_FROM_VEHICLE     = 21,
-    LOCKTYPE_ARCHAEOLOGY           = 22
+    LOCKTYPE_ARCHAEOLOGY           = 22,
+    LOCKTYPE_PVP_OPEN_FAST         = 23
 };
 
 enum TrainerType                                            // this is important type for npcs!
