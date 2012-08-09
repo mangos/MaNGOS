@@ -240,7 +240,7 @@ enum ItemClass
     ITEM_CLASS_PERMANENT                        = 14,
     ITEM_CLASS_MISC                             = 15,
     ITEM_CLASS_GLYPH                            = 16,
-	ITEM_CLASS_BATTLE_PET                       = 17
+    ITEM_CLASS_BATTLE_PET                       = 17
 };
 
 #define MAX_ITEM_CLASS                            18
@@ -249,13 +249,13 @@ enum ItemSubclassConsumable
 {
     ITEM_SUBCLASS_CONSUMABLE                    = 0,
     ITEM_SUBCLASS_FOOD                          = 1,
-	ITEM_SUBCLASS_POTION                        = 2,
+    ITEM_SUBCLASS_POTION                        = 2,
     ITEM_SUBCLASS_ELIXIR                        = 3,
     ITEM_SUBCLASS_FLASK                         = 4,
     ITEM_SUBCLASS_BANDAGE                       = 5,
-	ITEM_SUBCLASS_ITEM_ENHANCEMENT              = 6,
+    ITEM_SUBCLASS_ITEM_ENHANCEMENT              = 6,
     ITEM_SUBCLASS_SCROLL                        = 7,
-	ITEM_SUBCLASS_CONSUMABLE_OTHER              = 8
+    ITEM_SUBCLASS_CONSUMABLE_OTHER              = 8
 };
 
 #define MAX_ITEM_SUBCLASS_CONSUMABLE              9
@@ -271,7 +271,7 @@ enum ItemSubclassContainer
     ITEM_SUBCLASS_MINING_CONTAINER              = 6,
     ITEM_SUBCLASS_LEATHERWORKING_CONTAINER      = 7,
     ITEM_SUBCLASS_INSCRIPTION_CONTAINER         = 8,
-	ITEM_SUBCLASS_FISHING_CONTAINER             = 9
+    ITEM_SUBCLASS_FISHING_CONTAINER             = 9
 };
 
 #define MAX_ITEM_SUBCLASS_CONTAINER               10
@@ -314,9 +314,9 @@ enum ItemSubclassGem
     ITEM_SUBCLASS_GEM_META                      = 6,
     ITEM_SUBCLASS_GEM_SIMPLE                    = 7,
     ITEM_SUBCLASS_GEM_PRISMATIC                 = 8,
-	ITEM_SUBCLASS_GEM_HYDRAULIC                 = 9,
-	ITEM_SUBCLASS_GEM_COGWHEEL                  = 10
-	};
+    ITEM_SUBCLASS_GEM_HYDRAULIC                 = 9,
+    ITEM_SUBCLASS_GEM_COGWHEEL                  = 10
+    };
 
 #define MAX_ITEM_SUBCLASS_GEM                     11
 
@@ -333,7 +333,7 @@ enum ItemSubclassArmor
     ITEM_SUBCLASS_ARMOR_IDOL                    = 8,
     ITEM_SUBCLASS_ARMOR_TOTEM                   = 9,
     ITEM_SUBCLASS_ARMOR_SIGIL                   = 10,
-	ITEM_SUBCLASS_ARMOR_RELIC                   = 11
+    ITEM_SUBCLASS_ARMOR_RELIC                   = 11
 };
 
 #define MAX_ITEM_SUBCLASS_ARMOR                   12
@@ -398,7 +398,7 @@ enum ItemSubclassRecipe
     ITEM_SUBCLASS_ENCHANTING_FORMULA            = 8,
     ITEM_SUBCLASS_FISHING_MANUAL                = 9,
     ITEM_SUBCLASS_JEWELCRAFTING_RECIPE          = 10,
-	ITEM_SUBCLASS_INSCRIPTION_RECIPE            = 11
+    ITEM_SUBCLASS_INSCRIPTION_RECIPE            = 11
 };
 
 #define MAX_ITEM_SUBCLASS_RECIPE                  12
@@ -465,7 +465,7 @@ enum ItemSubclassGlyph
     ITEM_SUBCLASS_GLYPH_SHAMAN                  = 7,
     ITEM_SUBCLASS_GLYPH_MAGE                    = 8,
     ITEM_SUBCLASS_GLYPH_WARLOCK                 = 9,
-	ITEM_SUBCLASS_GLYPH_MONK                    = 10,
+    ITEM_SUBCLASS_GLYPH_MONK                    = 10,
     ITEM_SUBCLASS_GLYPH_DRUID                   = 11
 };
 
@@ -497,7 +497,7 @@ const uint32 MaxItemSubclassValues[MAX_ITEM_CLASS] =
     MAX_ITEM_SUBCLASS_PERMANENT,
     MAX_ITEM_SUBCLASS_JUNK,
     MAX_ITEM_SUBCLASS_GLYPH,
-	MAX_ITEM_SUBCLASS_BATTLE_PET
+    MAX_ITEM_SUBCLASS_BATTLE_PET
 };
 
 inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemSubClass)

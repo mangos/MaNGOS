@@ -73,7 +73,7 @@ enum AchievementFlags
     ACHIEVEMENT_FLAG_UNK4                   = 0x00001000,   // as guild group?
     ACHIEVEMENT_FLAG_UNK5                   = 0x00002000,   // as guild group?
     ACHIEVEMENT_FLAG_GUILD                  = 0x00004000,   //
-    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS	    = 0x00008000,   //
+    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS     = 0x00008000,   //
     ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS  = 0x00010000,   //
 };
 
