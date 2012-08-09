@@ -20,7 +20,6 @@
 #define _BYTEBUFFER_H
 
 #include "Common.h"
-#include "Log.h"
 #include "Utilities/ByteConverter.h"
 
 class ByteBufferException
@@ -32,14 +31,7 @@ class ByteBufferException
             PrintPosError();
         }
 
-        void PrintPosError() const
-        {
-            ACE_Stack_Trace trace;
-            sLog.outError(
-                "Attempted to %s in ByteBuffer (pos: " SIZEFMTD " size: "SIZEFMTD") "
-                "value with size: " SIZEFMTD "\n%s",
-                (add ? "put" : "get"), pos, size, esize, trace.c_str());
-        }
+        void PrintPosError() const;
     private:
         bool add;
         size_t pos;

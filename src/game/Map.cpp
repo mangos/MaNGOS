@@ -48,11 +48,8 @@ Map::~Map()
     if (m_persistentState)
         m_persistentState->SetUsedByMapState(NULL);         // field pointer can be deleted after this
 
-    if (i_data)
-    {
-        delete i_data;
-        i_data = NULL;
-    }
+    delete i_data;
+    i_data = NULL;
 
     // unload instance specific navigation data
     MMAP::MMapFactory::createOrGetMMapManager()->unloadMapInstance(m_TerrainData->GetMapId(), GetInstanceId());

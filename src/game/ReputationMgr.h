@@ -103,13 +103,13 @@ class ReputationMgr
         }
 
     public:                                                 // modifiers
-        bool SetReputation(FactionEntry const* factionEntry, int32 standing)
+        void SetReputation(FactionEntry const* factionEntry, int32 standing)
         {
-            return SetReputation(factionEntry, standing, false);
+            SetReputation(factionEntry, standing, false);
         }
-        bool ModifyReputation(FactionEntry const* factionEntry, int32 standing)
+        void ModifyReputation(FactionEntry const* factionEntry, int32 standing)
         {
-            return SetReputation(factionEntry, standing, true);
+            SetReputation(factionEntry, standing, true);
         }
 
         void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
@@ -122,12 +122,12 @@ class ReputationMgr
     public:                                                 // senders
         void SendInitialReputations();
         void SendForceReactions();
-        void SendState(FactionState const* faction);
+        void SendState(FactionState const* faction, bool anyRankIncreased);
 
     private:                                                // internal helper functions
         void Initialize();
         uint32 GetDefaultStateFlags(const FactionEntry* factionEntry) const;
-        bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
+        void SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);
         void SetAtWar(FactionState* faction, bool atWar);

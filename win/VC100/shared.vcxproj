@@ -434,6 +434,7 @@
     <ClCompile Include="..\..\src\shared\Auth\md5.c" />
     <ClCompile Include="..\..\src\shared\Auth\SARC4.cpp" />
     <ClCompile Include="..\..\src\shared\Auth\Sha1.cpp" />
+    <ClCompile Include="..\..\src\shared\ByteBuffer.cpp" />
     <ClCompile Include="..\..\src\shared\Common.cpp" />
     <ClCompile Include="..\..\src\shared\Config\Config.cpp" />
     <ClCompile Include="..\..\src\shared\Database\Database.cpp" />
@@ -471,7 +472,6 @@
     <ClInclude Include="..\..\src\shared\Database\DBCFileLoader.h" />
     <ClInclude Include="..\..\src\shared\Database\DBCStore.h" />
     <ClInclude Include="..\..\src\shared\Database\Field.h" />
-    <ClInclude Include="..\..\src\shared\Database\MySQLDelayThread.h" />
     <ClInclude Include="..\..\src\shared\Database\QueryResult.h" />
     <ClInclude Include="..\..\src\shared\Database\QueryResultMysql.h" />
     <ClInclude Include="..\..\src\shared\Database\SqlDelayThread.h" />

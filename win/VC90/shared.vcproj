@@ -544,10 +544,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\shared\Database\MySQLDelayThread.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\shared\Database\QueryResult.h"
 				>
 			</File>
@@ -627,6 +623,10 @@
 		<Filter
 			Name="Util"
 			>
+			<File
+				RelativePath="..\..\src\shared\ByteBuffer.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\shared\ByteBuffer.h"
 				>

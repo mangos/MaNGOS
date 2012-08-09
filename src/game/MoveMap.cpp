@@ -67,17 +67,11 @@ namespace MMAP
 
     void MMapFactory::clear()
     {
-        if (g_mmapDisabledIds)
-        {
-            delete g_mmapDisabledIds;
-            g_mmapDisabledIds = NULL;
-        }
+        delete g_mmapDisabledIds;
+        delete g_MMapManager;
 
-        if (g_MMapManager)
-        {
-            delete g_MMapManager;
-            g_MMapManager = NULL;
-        }
+        g_mmapDisabledIds = NULL;
+        g_MMapManager = NULL;
     }
 
     // ######################## MMapManager ########################
@@ -105,7 +99,7 @@ namespace MMAP
         if (!file)
         {
             sLog.outDebug("MMAP:loadMapData: Error: Could not open mmap file '%s'", fileName);
-            delete [] fileName;
+            delete[] fileName;
             return false;
         }
 
@@ -119,11 +113,11 @@ namespace MMAP
         {
             dtFreeNavMesh(mesh);
             sLog.outError("MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s", mapId, fileName);
-            delete [] fileName;
+            delete[] fileName;
             return false;
         }
 
-        delete [] fileName;
+        delete[] fileName;
 
         sLog.outDetail("MMAP:loadMapData: Loaded %03i.mmap", mapId);
 
@@ -167,10 +161,10 @@ namespace MMAP
         if (!file)
         {
             sLog.outDebug("MMAP:loadMap: Could not open mmtile file '%s'", fileName);
-            delete [] fileName;
+            delete[] fileName;
             return false;
         }
-        delete [] fileName;
+        delete[] fileName;
 
         // read header
         MmapTileHeader fileHeader;

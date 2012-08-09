@@ -30,13 +30,8 @@ DBCFileLoader::DBCFileLoader()
 
 bool DBCFileLoader::Load(const char* filename, const char* fmt)
 {
-
     uint32 header;
-    if (data)
-    {
-        delete [] data;
-        data = NULL;
-    }
+    delete[] data;
 
     FILE* f = fopen(filename, "rb");
     if (!f)return false;
@@ -91,10 +86,8 @@ bool DBCFileLoader::Load(const char* filename, const char* fmt)
 
 DBCFileLoader::~DBCFileLoader()
 {
-    if (data)
-        delete [] data;
-    if (fieldsOffset)
-        delete [] fieldsOffset;
+    delete[] data;
+    delete[] fieldsOffset;
 }
 
 DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)

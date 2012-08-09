@@ -109,8 +109,7 @@ Group::~Group()
             itr2->second.state->RemoveGroup(this);
 
     // Sub group counters clean up
-    if (m_subGroupsCounts)
-        delete[] m_subGroupsCounts;
+    delete[] m_subGroupsCounts;
 }
 
 bool Group::Create(ObjectGuid guid, const char* name)

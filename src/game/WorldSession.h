@@ -248,6 +248,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendLfgJoinResult(LfgJoinResult result);
         void SendLfgUpdate(bool isGroup, LfgUpdateType updateType, uint32 id);
         void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
+        void SendGroupInvite(Player* player, bool alreadyInGroup = false);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
         void SendSetPhaseShift(uint32 phaseShift);
         void SendQueryTimeResponse();
@@ -372,6 +373,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendTaxiMenu(Creature* unit);
         void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
         bool SendLearnNewTaxiNode(Creature* unit);
+        void SendActivateTaxiReply(ActivateTaxiReply reply);
 
         // Guild/Arena Team
         void SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult);
