@@ -2579,7 +2579,7 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.last_ip,a.last_login FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE id = '%u'", accId);
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.last_ip,a.last_login FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE a.id = '%u'", accId);
     if (result)
     {
         Field* fields = result->Fetch();
