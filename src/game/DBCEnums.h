@@ -312,7 +312,7 @@ enum Difficulty
 
     DUNGEON_DIFFICULTY_NORMAL    = 0,
     DUNGEON_DIFFICULTY_HEROIC    = 1,
-    //DUNGEON_DIFFICULTY_EPIC    = 2,                       // not used, but exists
+    DUNGEON_DIFFICULTY_CHALLENGE = 2,                      // 5.0.0 Challenge mode dungeons
 
     RAID_DIFFICULTY_10MAN_NORMAL = 0,
     RAID_DIFFICULTY_25MAN_NORMAL = 1,
@@ -320,7 +320,7 @@ enum Difficulty
     RAID_DIFFICULTY_25MAN_HEROIC = 3,
 };
 
-#define MAX_DUNGEON_DIFFICULTY     2
+#define MAX_DUNGEON_DIFFICULTY     3
 #define MAX_RAID_DIFFICULTY        4
 #define MAX_DIFFICULTY             4
 
@@ -330,7 +330,8 @@ enum SpawnMask
 
     SPAWNMASK_DUNGEON_NORMAL    = (1 << DUNGEON_DIFFICULTY_NORMAL),
     SPAWNMASK_DUNGEON_HEROIC    = (1 << DUNGEON_DIFFICULTY_HEROIC),
-    SPAWNMASK_DUNGEON_ALL       = (SPAWNMASK_DUNGEON_NORMAL | SPAWNMASK_DUNGEON_HEROIC),
+    SPAWNMASK_DUNGEON_CHALLENGE = (1 << DUNGEON_DIFFICULTY_CHALLENGE),
+    SPAWNMASK_DUNGEON_ALL       = (SPAWNMASK_DUNGEON_NORMAL | SPAWNMASK_DUNGEON_HEROIC | SPAWNMASK_DUNGEON_CHALLENGE),
 
     SPAWNMASK_RAID_10MAN_NORMAL = (1 << RAID_DIFFICULTY_10MAN_NORMAL),
     SPAWNMASK_RAID_25MAN_NORMAL = (1 << RAID_DIFFICULTY_25MAN_NORMAL),
@@ -364,7 +365,8 @@ enum MapTypes                                               // Lua_IsInInstance
     MAP_INSTANCE        = 1,                                // party
     MAP_RAID            = 2,                                // raid
     MAP_BATTLEGROUND    = 3,                                // pvp
-    MAP_ARENA           = 4                                 // arena
+    MAP_ARENA           = 4,                                // arena
+    MAP_SCENARIO        = 5                                 // scenario
 };
 
 enum AbilytyLearnType
@@ -450,11 +452,12 @@ enum TotemCategoryType
 // SummonProperties.dbc, col 1
 enum SummonPropGroup
 {
-    SUMMON_PROP_GROUP_WILD           = 0,
-    SUMMON_PROP_GROUP_FRIENDLY       = 1,
-    SUMMON_PROP_GROUP_PETS           = 2,
-    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,
-    SUMMON_PROP_GROUP_VEHICLE        = 4
+    SUMMON_PROP_GROUP_WILD              = 0,
+    SUMMON_PROP_GROUP_FRIENDLY          = 1,
+    SUMMON_PROP_GROUP_PETS              = 2,
+    SUMMON_PROP_GROUP_CONTROLLABLE      = 3,
+    SUMMON_PROP_GROUP_VEHICLE           = 4,
+    SUMMON_PROP_GROUP_UNK1              = 5                 // 5.0.0
 };
 
 // SummonProperties.dbc, col 3
@@ -546,7 +549,7 @@ enum SpellFamily
     SPELLFAMILY_SHAMAN      = 11,
     SPELLFAMILY_UNK2        = 12,                           // 2 spells (silence resistance)
     SPELLFAMILY_POTION      = 13,
-    // 14 - unused
+    SPELLFAMILY_MONK        = 14,
     SPELLFAMILY_DEATHKNIGHT = 15,
     // 16 - unused
     SPELLFAMILY_PET         = 17

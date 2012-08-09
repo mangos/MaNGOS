@@ -587,6 +587,8 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if (spellInfo->GetCategory() == 47)
                 return SPELL_PRESENCE;
             break;
+        case SPELLFAMILY_MONK:
+            break;
     }
 
     // Tracking spells (exclude Well Fed, some other always allowed cases)
@@ -2153,6 +2155,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
                     break;
                 }
+                case SPELLFAMILY_MONK:
+                    break;
             }
             // Dragonmaw Illusion, Blood Elf Illusion, Human Illusion, Illidari Agent Illusion, Scarlet Crusade Disguise
             if (spellInfo_1->SpellIconID == 1691 && spellInfo_2->SpellIconID == 1691)
@@ -2503,6 +2507,8 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
                 if (spellInfo_1->SpellIconID == 2636 && spellInfo_2->SpellIconID == 2636)
                     return false;
             }
+            break;
+        case SPELLFAMILY_MONK:
             break;
         default:
             break;

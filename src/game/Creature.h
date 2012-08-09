@@ -313,6 +313,7 @@ enum SelectFlags
     SELECT_FLAG_POWER_RUNIC         = 0x020,
     SELECT_FLAG_IN_MELEE_RANGE      = 0x040,
     SELECT_FLAG_NOT_IN_MELEE_RANGE  = 0x080,
+    SELECT_FLAG_POWER_CHI           = 0x100,
 };
 
 // Vendors

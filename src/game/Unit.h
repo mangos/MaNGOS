@@ -340,7 +340,8 @@ enum UnitMods
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
-    UNIT_MOD_HAPPINESS,                                     // REQUIRED for fast indexing to work.
+    UNIT_MOD_CHI,
+    UNIT_MOD_HAPPINESS,
     UNIT_MOD_RUNE,
     UNIT_MOD_RUNIC_POWER,
     UNIT_MOD_SOUL_SHARDS,
@@ -1668,7 +1669,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         {
             ShapeshiftForm form = GetShapeshiftForm();
             return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
-                   form != FORM_SHADOW;
+                   form != FORM_SHADOW && form != FORM_SERPENTSTANCE && form != FORM_OXSTANCE && form != FORM_TIGERSTANCE;
         }
 
         float m_modMeleeHitChance;
