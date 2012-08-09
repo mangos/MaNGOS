@@ -4005,7 +4005,25 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
         }
     }
 
+    SetPhaseAndMap(target);
     Unit::BuildCreateUpdateBlockForPlayer(data, target);
+}
+
+void Player::SetPhaseAndMap(Player* target) const
+{
+    QueryResult *result = CharacterDatabase.PQuery("SELECT map, phase FROM character_phase_data WHERE guid = '%u'", target->GetGUIDLow());
+
+    if (result)
+    {
+        Field *fields = result->Fetch();
+
+        uint16 mapId = fields[0].GetUInt16();
+        uint32 phase = fields[1].GetUInt32();
+
+        target->GetSession()->SendSetPhaseShift(phase, mapId);
+
+        delete result;
+    }
 }
 
 void Player::DestroyForPlayer(Player* target, bool anim) const
@@ -15347,6 +15365,17 @@ void Player::SendQuestReward(Quest const* pQuest, uint32 XP, Object* questGiver)
     data << uint32(pQuest->GetBonusTalents());              // bonus talents
     data << uint32(0);                                      // arena points
     GetSession()->SendPacket(&data);
+
+    QuestPhaseMapsVector const* QuestPhaseVector = sObjectMgr.GetQuestPhaseMapVector(questid);
+    if (QuestPhaseVector)
+    {
+        for (QuestPhaseMapsVector::const_iterator itr = QuestPhaseVector->begin(); itr != QuestPhaseVector->end(); ++itr)
+        {
+            GetSession()->SendSetPhaseShift(itr->MapId, itr->PhaseMask);
+            CharacterDatabase.PExecute("DELETE FROM character_phase_data` WHERE `guid` = %u", GetSession()->GetPlayer()->GetGUIDLow()); 
+            CharacterDatabase.PExecute("INSERT INTO character_phase_data` (`guid`, `map`, `phase`) VALUES (%u, %u, %u)", GetSession()->GetPlayer()->GetGUIDLow(), itr->MapId, itr->PhaseMask);
+        }
+    }
 }
 
 void Player::SendQuestFailed(uint32 quest_id, InventoryResult reason)

@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_0001_xxxxx_01_characters` bit(1) default NULL
+  `required_0028_01_characters_character_phase_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -668,6 +668,27 @@ CREATE TABLE `character_pet_declinedname` (
 LOCK TABLES `character_pet_declinedname` WRITE;
 /*!40000 ALTER TABLE `character_pet_declinedname` DISABLE KEYS */;
 /*!40000 ALTER TABLE `character_pet_declinedname` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `character_phase_data`
+--
+
+DROP TABLE IF EXISTS `character_phase_data`;
+CREATE TABLE `character_phase_data` (
+  `guid` int(11) NOT NULL,
+  `map` smallint(6) NOT NULL,
+  `phase` int(11) NOT NULL,
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+
+--
+-- Dumping data for table `character_phase_data`
+--
+
+LOCK TABLES `character_phase_data` WRITE;
+/*!40000 ALTER TABLE `character_phase_data` DISABLE KEYS */;
+/*!40000 ALTER TABLE `character_phase_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

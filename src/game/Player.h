@@ -56,9 +56,9 @@ class Item;
 
 typedef std::deque<Mail*> PlayerMails;
 
-#define PLAYER_MAX_SKILLS           127
+#define PLAYER_MAX_SKILLS           128
 #define PLAYER_MAX_DAILY_QUESTS     25
-#define PLAYER_EXPLORED_ZONES_SIZE  128
+#define PLAYER_EXPLORED_ZONES_SIZE  156
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
@@ -1841,6 +1841,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetSession(WorldSession* s) { m_session = s; }
 
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
+        void SetPhaseAndMap(Player* target) const;
         void DestroyForPlayer(Player* target, bool anim = false) const override;
         void SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP);
 

@@ -6650,6 +6650,50 @@ void ObjectMgr::LoadQuestPOI()
     sLog.outString(">> Loaded %u quest POI definitions", count);
 }
 
+void ObjectMgr::LoadQuestPhaseMaps()
+{
+    mQuestPhaseMap.clear();                              // need for reload case
+
+    uint32 count = 0;
+
+    //                                                0        1 
+    QueryResult *result = WorldDatabase.Query("SELECT questId, map, phase FROM quest_phase_maps");
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 quest phase maps definitions. DB table `quest_phase_maps` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 questId          = fields[0].GetUInt32();
+        uint16 mapId            = fields[1].GetUInt16();
+        uint32 phase            = fields[2].GetUInt32();
+
+        QuestPhaseMaps QuestPhase(mapId, phase);
+
+        mQuestPhaseMap[questId].push_back(QuestPhase);
+
+        ++count;
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u quest phase maps definitions", count);
+}
+
 void ObjectMgr::LoadNPCSpellClickSpells()
 {
     uint32 count = 0;

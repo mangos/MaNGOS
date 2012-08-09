@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_0023_xxxxx_01_mangos_player_classlevelstats` bit(1) default NULL
+  `required_0028_03_mangos_playercreateinfo` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -10622,6 +10622,7 @@ CREATE TABLE `playercreateinfo` (
   `position_y` float NOT NULL default '0',
   `position_z` float NOT NULL default '0',
   `orientation` float NOT NULL default '0',
+  `phaseMap` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -14198,6 +14199,26 @@ LOCK TABLES `quest_end_scripts` WRITE;
 /*!40000 ALTER TABLE `quest_end_scripts` ENABLE KEYS */;
 UNLOCK TABLES;
 
+--
+-- Table structure for table `quest_phase_maps`
+--
+
+DROP TABLE IF EXISTS `quest_phase_maps`;
+CREATE TABLE `quest_phase_maps` (
+  `questId` int(11) NOT NULL,
+  `map` smallint(6) NOT NULL,
+  `phase` int(11) NOT NULL,
+  PRIMARY KEY (`questId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `quest_phase_maps`
+--
+
+LOCK TABLES `quest_phase_maps` WRITE;
+/*!40000 ALTER TABLE `quest_phase_maps` DISABLE KEYS */;
+/*!40000 ALTER TABLE `quest_phase_maps` ENABLE KEYS */;
+UNLOCK TABLES;
 --
 -- Table structure for table `quest_poi`
 --

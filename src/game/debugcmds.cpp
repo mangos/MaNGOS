@@ -666,8 +666,12 @@ bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(char* args)
     if (!*args)
         return false;
 
-    uint32 PhaseShift = atoi(args);
-    m_session->SendSetPhaseShift(PhaseShift);
+    char* m = strtok((char*)args, " ");
+    char* p = strtok(NULL, " ");
+
+    uint16 MapId = atoi(m);
+    uint32 PhaseShift = atoi(p);
+    m_session->SendSetPhaseShift(PhaseShift, MapId);
     return true;
 }
 

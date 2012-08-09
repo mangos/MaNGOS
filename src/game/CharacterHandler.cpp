@@ -553,6 +553,18 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
     LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", GetAccountId(), realmID);
     LoginDatabase.PExecute("INSERT INTO realmcharacters (numchars, acctid, realmid) VALUES (%u, %u, %u)",  charcount, GetAccountId(), realmID);
 
+    result = WorldDatabase.PQuery("SELECT phaseMap FROM playercreateinfo WHERE race = '%u' AND class = '%u'", race_, class_);
+    if(result)
+    {
+        Field* field = result->Fetch();
+        uint16 mapId = field[0].GetUInt16();
+
+        if (mapId != 0)
+            CharacterDatabase.PExecute("INSERT INTO character_phase_data (`guid`, `map`) VALUES (%u, %u)", pNewChar->GetGUIDLow(), mapId);
+
+        delete result;
+    }
+
     data << (uint8)CHAR_CREATE_SUCCESS;
     SendPacket(&data);
 
