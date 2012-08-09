@@ -262,18 +262,18 @@ enum Opcodes
     CMSG_MOVE_START_SWIM                                  = 0x3206, // 4.3.4 15595
     CMSG_MOVE_STOP_SWIM                                   = 0x3802, // 4.3.4 15595
     MSG_MOVE_SET_RUN_SPEED_CHEAT                          = 0x10CD,
-    MSG_MOVE_SET_RUN_SPEED                                = 0x10CE,
+    SMSG_MOVE_SET_RUN_SPEED                               = 0x3DB5, // 4.3.4 15595
     MSG_MOVE_SET_RUN_BACK_SPEED_CHEAT                     = 0x10CF,
-    MSG_MOVE_SET_RUN_BACK_SPEED                           = 0x10D0,
+    SMSG_MOVE_SET_RUN_BACK_SPEED                          = 0x71B1, // 4.3.4 15595
     MSG_MOVE_SET_WALK_SPEED_CHEAT                         = 0x10D1,
-    MSG_MOVE_SET_WALK_SPEED                               = 0x10D2,
+    SMSG_MOVE_SET_WALK_SPEED                              = 0x1DA4, // 4.3.4 15595
     MSG_MOVE_SET_SWIM_SPEED_CHEAT                         = 0x10D3,
-    MSG_MOVE_SET_SWIM_SPEED                               = 0x10D4,
+    SMSG_MOVE_SET_SWIM_SPEED                              = 0x15A7, // 4.3.4 15595
     MSG_MOVE_SET_SWIM_BACK_SPEED_CHEAT                    = 0x10D5,
-    MSG_MOVE_SET_SWIM_BACK_SPEED                          = 0x10D6,
+    SMSG_MOVE_SET_SWIM_BACK_SPEED                         = 0x5CA6, // 4.3.4 15595
     MSG_MOVE_SET_ALL_SPEED_CHEAT                          = 0x10D7,
     MSG_MOVE_SET_TURN_RATE_CHEAT                          = 0x10D8,
-    MSG_MOVE_SET_TURN_RATE                                = 0x10D9,
+    SMSG_MOVE_SET_TURN_RATE                               = 0x30A5, // 4.3.4 15595
     MSG_MOVE_TOGGLE_COLLISION_CHEAT                       = 0x10DA,
     CMSG_MOVE_SET_FACING                                  = 0x7914, // 4.3.4 15595
     CMSG_MOVE_SET_PITCH                                   = 0x7312, // 4.3.4 15595
@@ -889,8 +889,8 @@ enum Opcodes
     CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK = 0x1341,
     MSG_MOVE_START_SWIM_CHEAT                             = 0x1342,
     MSG_MOVE_STOP_SWIM_CHEAT                              = 0x1343,
-    SMSG_MOVE_SET_CAN_FLY                                 = 0x1344,
-    SMSG_MOVE_UNSET_CAN_FLY                               = 0x1345,
+    SMSG_MOVE_SET_CAN_FLY                                 = 0x3DA1, // 4.3.4 15595
+    SMSG_MOVE_UNSET_CAN_FLY                               = 0x15A2, // 4.3.4 15595
     CMSG_MOVE_SET_CAN_FLY_ACK                             = 0x1346,
     CMSG_MOVE_SET_FLY                                     = 0x1347,
     CMSG_SOCKET_GEMS                                      = 0x1348,
@@ -948,9 +948,9 @@ enum Opcodes
     CMSG_CHEAT_SET_HONOR_CURRENCY                         = 0x137C,
     CMSG_CHEAT_SET_ARENA_CURRENCY                         = 0x137D,
     MSG_MOVE_SET_FLIGHT_SPEED_CHEAT                       = 0x137E,
-    MSG_MOVE_SET_FLIGHT_SPEED                             = 0x137F,
+    SMSG_MOVE_SET_FLIGHT_SPEED                            = 0x71A6, // 4.3.4 15595
     MSG_MOVE_SET_FLIGHT_BACK_SPEED_CHEAT                  = 0x1380,
-    MSG_MOVE_SET_FLIGHT_BACK_SPEED                        = 0x1381,
+    SMSG_MOVE_SET_FLIGHT_BACK_SPEED                       = 0x30A2, // 4.3.4 15595
     SMSG_FORCE_FLIGHT_SPEED_CHANGE                        = 0x1382,
     CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK                    = 0x1383,
     SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE                   = 0x1384,
@@ -1169,7 +1169,7 @@ enum Opcodes
     CMSG_SET_RUNE_COUNT                                   = 0x1459,
     CMSG_SET_RUNE_COOLDOWN                                = 0x145A,
     MSG_MOVE_SET_PITCH_RATE_CHEAT                         = 0x145B,
-    MSG_MOVE_SET_PITCH_RATE                               = 0x145C,
+    SMSG_MOVE_SET_PITCH_RATE                              = 0x75B0, // 4.3.4 15595
     SMSG_FORCE_PITCH_RATE_CHANGE                          = 0x145D,
     CMSG_FORCE_PITCH_RATE_CHANGE_ACK                      = 0x145E,
     SMSG_SPLINE_SET_PITCH_RATE                            = 0x145F,
@@ -1390,6 +1390,15 @@ enum Opcodes
     UMSG_UNKNOWN_1333                                     = 0x1536,
     UMSG_UNKNOWN_1334                                     = 0x1537,
     SMSG_PLAYER_MOVE                                      = 0x79A2, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_FLIGHT_BACK_SPEED                = 0x38B3, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_FLIGHT_SPEED                     = 0x39A0, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_PITCH_RATE                       = 0x14B0, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_RUN_BACK_SPEED                   = 0x3DB3, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_RUN_SPEED                        = 0x51B7, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_SWIM_SPEED                       = 0x39A4, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_SWIM_BACK_SPEED                  = 0x59A1, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_TURN_RATE                        = 0x78B5, // 4.3.4 15595
+    SMSG_SPLINE_MOVE_SET_WALK_SPEED                       = 0x34A5, // 4.3.4 15595
 };
 
 #define MAX_OPCODE_TABLE_SIZE 0xFFFF

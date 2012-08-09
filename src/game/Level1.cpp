@@ -1477,17 +1477,23 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     chr->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
     chr->Mount(mId);
 
-    WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4 + 1 + 4));
-    data << chr->GetPackGUID();
-    data << (uint32)0;
-    data << (uint8)0;                                       // new 2.1.0
+    ObjectGuid guid = chr->GetObjectGuid();
+
+    WorldPacket data(SMSG_MOVE_SET_RUN_SPEED, 8 + 4 + 4);
+    data.WriteGuidMask<6, 1, 5, 2, 7, 0, 3, 4>(guid);
+    data.WriteGuidBytes<5, 3, 1, 4>(guid);
+    data << uint32(0);
     data << float(speed);
+    data.WriteGuidBytes<6, 0, 7, 2>(guid);
     chr->SendMessageToSet(&data, true);
 
-    data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4 + 4));
-    data << chr->GetPackGUID();
-    data << (uint32)0;
+    data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, 8 + 4 + 4);
+    data.WriteGuidMask<5, 4, 7, 3, 2, 0, 1, 6>(guid);
+    data.WriteGuidBytes<0>(guid);
+    data << uint32(0);
+    data.WriteGuidBytes<6, 3, 5, 2>(guid);
     data << float(speed);
+    data.WriteGuidBytes<1, 7, 4>(guid);
     chr->SendMessageToSet(&data, true);
 
     return true;

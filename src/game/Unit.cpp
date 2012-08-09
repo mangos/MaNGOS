@@ -8731,18 +8731,8 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         m_speed_rate[mtype] = rate;
         propagateSpeedChange();
 
-        const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2] =
-        {
-            {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
-            {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
-            {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
-            {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
-            {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
-            {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
-            {MSG_MOVE_SET_FLIGHT_SPEED,     SMSG_FORCE_FLIGHT_SPEED_CHANGE},
-            {MSG_MOVE_SET_FLIGHT_BACK_SPEED, SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE},
-            {MSG_MOVE_SET_PITCH_RATE,       SMSG_FORCE_PITCH_RATE_CHANGE},
-        };
+        WorldPacket data;
+        ObjectGuid guid = GetObjectGuid();
 
         if (forced)
         {
@@ -8753,22 +8743,201 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
                 ++((Player*)this)->m_forced_speed_changes[mtype];
             }
 
-            WorldPacket data(SetSpeed2Opc_table[mtype][1], 18);
-            data << GetPackGUID();
-            data << (uint32)0;                              // moveEvent, NUM_PMOVE_EVTS = 0x39
-            if (mtype == MOVE_RUN)
-                data << uint8(0);                           // new 2.1.0
-            data << float(GetSpeed(mtype));
+            switch (mtype)
+            {
+                case MOVE_WALK:
+                {
+                    data.Initialize(SMSG_MOVE_SET_WALK_SPEED, 1 + 8 + 4 + 4);
+                    data.WriteGuidMask<0, 4, 5, 2, 3, 1, 6, 7>(guid);
+                    data.WriteGuidBytes<6, 1, 5>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<2>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<4, 0, 7, 3>(guid);
+                    break;
+                }
+                case MOVE_RUN:
+                {
+                    data.Initialize(SMSG_MOVE_SET_RUN_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<6, 1, 5, 2, 7, 0, 3, 4>(guid);
+                    data.WriteGuidBytes<5, 3, 1, 4>(guid);
+                    data << uint32(0);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<6, 0, 7, 2>(guid);
+                    break;
+                }
+                case MOVE_RUN_BACK:
+                {
+                    data.Initialize(SMSG_MOVE_SET_RUN_BACK_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<0, 6, 2, 1, 3, 5, 4, 7>(guid);
+                    data.WriteGuidBytes<5>(guid);
+                    data << uint32(0);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<0, 4, 7, 3, 1, 2, 6>(guid);
+                    break;
+                }
+                case MOVE_SWIM:
+                {
+                    data.Initialize(SMSG_MOVE_SET_SWIM_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<5, 4, 7, 3, 2, 0, 1, 6>(guid);
+                    data.WriteGuidBytes<0>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<6, 3, 5, 2>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<1, 7, 4>(guid);
+                    break;
+                }
+                case MOVE_SWIM_BACK:
+                {
+                    data.Initialize(SMSG_MOVE_SET_SWIM_BACK_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<4, 2, 3, 6, 5, 1, 0, 7>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<0, 3, 4, 6, 5, 1>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<0, 7>(guid);
+                    break;
+                }
+                case MOVE_TURN_RATE:
+                {
+                    data.Initialize(SMSG_MOVE_SET_TURN_RATE, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<7, 2, 1, 0, 4, 5, 6, 3>(guid);
+                    data.WriteGuidBytes<5, 7, 2>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<3, 1, 0>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<6, 4>(guid);
+                    break;
+                }
+                case MOVE_FLIGHT:
+                {
+                    data.Initialize(SMSG_MOVE_SET_FLIGHT_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<0, 5, 1, 6, 3, 2, 7, 4>(guid);
+                    data.WriteGuidBytes<0, 1, 7, 5>(guid);
+                    data << float(GetSpeed(mtype));
+                    data << uint32(0);
+                    data.WriteGuidBytes<2, 6, 3, 4>(guid);
+                    break;
+                }
+                case MOVE_FLIGHT_BACK:
+                {
+                    data.Initialize(SMSG_MOVE_SET_FLIGHT_BACK_SPEED, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<1, 2, 6, 4, 7, 3, 0, 5>(guid);
+
+                    data.WriteGuidBytes<3>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<6>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<1, 2, 4, 0, 5, 7>(guid);
+                    break;
+                }
+                case MOVE_PITCH_RATE:
+                {
+                    data.Initialize(SMSG_MOVE_SET_PITCH_RATE, 1 + 8 + 4 + 4 );
+                    data.WriteGuidMask<1, 2, 6, 7, 0, 3, 5, 4>(guid);
+
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<6, 4, 0>(guid);
+                    data << uint32(0);
+                    data.WriteGuidBytes<1, 2, 7, 3, 5>(guid);
+                    break;
+                }
+                default:
+                    sLog.outError("Unit::SetSpeed: Unsupported move type (%d), data not sent to client.", mtype);
+                    return;
+            }
+
             SendMessageToSet(&data, true);
         }
         else
         {
             m_movementInfo.UpdateTime(WorldTimer::getMSTime());
 
-            WorldPacket data(SetSpeed2Opc_table[mtype][0], 64);
-            data << GetPackGUID();
-            data << m_movementInfo;
-            data << float(GetSpeed(mtype));
+            switch (mtype)
+            {
+                case MOVE_WALK:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_WALK_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<0, 6, 7, 3, 5, 1, 2, 4>(guid);
+                    data.WriteGuidBytes<0, 4, 7, 1, 5, 3>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<6, 2>(guid);
+                    break;
+                }
+                case MOVE_RUN:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<4, 0, 5, 7, 6, 3, 1, 2>(guid);
+                    data.WriteGuidBytes<0, 7, 6, 5, 3, 4>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<2, 1>(guid);
+                    break;
+                }
+                case MOVE_RUN_BACK:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_RUN_BACK_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<1, 2, 6, 0, 3, 7, 5, 4>(guid);
+                    data.WriteGuidBytes<1>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<2, 4, 0, 3, 6, 5, 7>(guid);
+                    break;
+                }
+                case MOVE_SWIM:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_SWIM_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<4, 2, 5, 0, 7, 6, 3, 1>(guid);
+                    data.WriteGuidBytes<5, 6, 1, 0, 2, 4>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<7, 3>(guid);
+                    break;
+                }
+                case MOVE_SWIM_BACK:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_SWIM_BACK_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<0, 1, 3, 6, 4, 5, 7, 2>(guid);
+                    data.WriteGuidBytes<5, 3, 1, 0, 7, 6>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<4, 2>(guid);
+                    break;
+                }
+                case MOVE_TURN_RATE:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_TURN_RATE, 1 + 8 + 4);
+                    data.WriteGuidMask<2, 4, 6, 1, 3, 5, 7, 0>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<1, 5, 3, 2, 7, 4, 6, 0>(guid);
+                    break;
+                }
+                case MOVE_FLIGHT:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_FLIGHT_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<7, 4, 0, 1, 3, 6, 5, 2>(guid);
+                    data.WriteGuidBytes<0, 5, 4, 7, 3, 2, 1, 6>(guid);
+                    data << float(GetSpeed(mtype));
+                    break;
+                }
+                case MOVE_FLIGHT_BACK:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_FLIGHT_BACK_SPEED, 1 + 8 + 4);
+                    data.WriteGuidMask<2, 1, 6, 5, 0, 3, 4, 7>(guid);
+                    data.WriteGuidBytes<5>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<6, 1, 0, 2, 3, 7, 4>(guid);
+                    break;
+                }
+                case MOVE_PITCH_RATE:
+                {
+                    data.Initialize(SMSG_SPLINE_MOVE_SET_PITCH_RATE, 1 + 8 + 4);
+                    data.WriteGuidMask<3, 5, 6, 1, 0, 4, 7, 2>(guid);
+                    data.WriteGuidBytes<1, 5, 7, 0, 6, 3, 2>(guid);
+                    data << float(GetSpeed(mtype));
+                    data.WriteGuidBytes<4>(guid);
+                    break;
+                }
+                default:
+                    sLog.outError("Unit::SetSpeed: Unsupported move type (%d), data not sent to client.", mtype);
+                    return;
+            }
+
             SendMessageToSet(&data, true);
         }
     }
