@@ -1,0 +1,3 @@
+ALTER TABLE db_version CHANGE COLUMN required_0038_xxxxx_01_mangos_player_classlevelstats required_0040_xxxxx_01_mangos_playercreateinfo bit;
+
+UPDATE playercreateinfo SET phaseMap=638 WHERE race=22;
