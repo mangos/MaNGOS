@@ -326,7 +326,7 @@ enum Opcodes
     CMSG_AUTOEQUIP_ITEM                                   = 0x110B,
     CMSG_AUTOSTORE_BAG_ITEM                               = 0x110C,
     CMSG_SWAP_ITEM                                        = 0x110D,
-    CMSG_SWAP_INV_ITEM                                    = 0x110E,
+    CMSG_SWAP_INV_ITEM                                    = 0x2614, // 4.3.4 15595
     CMSG_SPLIT_ITEM                                       = 0x110F,
     CMSG_AUTOEQUIP_ITEM_SLOT                              = 0x1110,
     CMSG_UNCLAIM_LICENSE                                  = 0x1111,
