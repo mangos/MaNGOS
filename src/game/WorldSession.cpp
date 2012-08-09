@@ -139,7 +139,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
-    packet->FlushBits();
+    const_cast<WorldPacket*>(packet)->FlushBits();
 
 #ifdef MANGOS_DEBUG
 
