@@ -70,10 +70,10 @@ bool LoginQueryHolder::Initialize()
     // NOTE: all fields in `characters` must be read to prevent lost character data at next save in case wrong DB structure.
     // !!! NOTE: including unused `zone`,`online`
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADFROM,            "SELECT guid, account, name, race, class, gender, level, xp, money, playerBytes, playerBytes2, playerFlags,"
-                     "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
-                     "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
-                     "arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-                     "health, power1, power2, power3, power4, power5, power6, power7, specCount, activeSpec, exploredZones, equipmentCache, ammoId, knownTitles, actionBars FROM characters WHERE guid = '%u'", m_guid.GetCounter());
+        "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
+        "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
+        "arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
+        "health, power1, power2, power3, power4, power5, power6, power7, power8, power9, power10, specCount, activeSpec, exploredZones, equipmentCache, knownTitles, actionBars FROM characters WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT groupId FROM group_member WHERE memberGuid ='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT id, permanent, map, difficulty, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'", m_guid.GetCounter());
@@ -139,27 +139,57 @@ class CharacterHandler
 
 void WorldSession::HandleCharEnum(QueryResult* result)
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
+    WorldPacket data(SMSG_CHAR_ENUM);
+    ByteBuffer dataBuffer;
 
-    uint8 num = 0;
-
-    data << num;
+    uint32 count = result ? result->GetRowCount() : 0;
+    data.WriteBits(count, 17);
 
     if (result)
     {
-        do
+        do 
         {
-            uint32 guidlow = (*result)[0].GetUInt32();
-            DETAIL_LOG("Build enum data for char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data))
-                ++num;
-        }
-        while (result->NextRow());
+            Field* fields = result->Fetch();
 
-        delete result;
+            uint64 guid = fields[0].GetUInt64();
+            uint64 guildGuid = fields[13].GetUInt64();
+            std::string name = fields[1].GetString();
+            uint32 atLoginFlags = fields[15].GetUInt32();
+
+            uint8 GuidMask[8] = { 6, 0, 7, 5, 1, 2, 4, 3 };
+            uint8 GuildGuidMask[8] = { 1, 5, 1, 0, 4, 3, 6, 7 };
+
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 1);
+            data.WriteGuidMask(guid, GuidMask, 3);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 3, 1);
+            data.WriteGuidMask(guid, GuidMask, 1, 3);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 3, 4);
+            data.WriteGuidMask(guid, GuidMask, 3, 4);
+            data.WriteGuidMask(guildGuid, GuildGuidMask, 1, 7);
+
+            data.WriteBit(atLoginFlags & AT_LOGIN_FIRST);
+
+            data.WriteGuidMask(guid, GuidMask, 1, 7);
+
+            data.WriteBits(name.size(), 7);
+
+            if (Player::BuildEnumData(result, &dataBuffer))
+                DETAIL_LOG("Build enum data for char guid %u from account %u.", guid, GetAccountId());
+
+        } while (result->NextRow());
+
+        data.WriteBits(0, 23);
+        data.WriteBit(1);
+        data.FlushBits();
+
+        data.append(dataBuffer);
     }
-
-    data.put<uint8>(0, num);
+    else
+    {
+        data.WriteBits(0, 23);
+        data.WriteBit(1);
+        data.FlushBits();
+    }
 
     SendPacket(&data);
 }
@@ -197,17 +227,15 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
 void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 {
     std::string name;
-    uint8 race_, class_;
+    uint8 race_, class_, gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
 
-    recv_data >> name;
+    recv_data >> hairColor >> facialHair >> race_ >> hairStyle >> class_;
+    recv_data >> face >> gender >> outfitId >> skin;
 
-    recv_data >> race_;
-    recv_data >> class_;
+    uint8 nameLength;
+    recv_data >> nameLength;
 
-    // extract other data required for player creating
-    uint8 gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
-    recv_data >> gender >> skin >> face;
-    recv_data >> hairStyle >> hairColor >> facialHair >> outfitId;
+    name = recv_data.ReadString(nameLength);
 
     WorldPacket data(SMSG_CHAR_CREATE, 1);                  // returned with diff.values in all cases
 
@@ -244,8 +272,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
+    // Expansions are handled by auth response now.
     // prevent character creating Expansion race without Expansion account
-    if (raceEntry->expansion > Expansion())
+    /*if (raceEntry->expansion > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
         sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->expansion, race_);
@@ -260,7 +289,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         sLog.outError("Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->expansion, class_);
         SendPacket(&data);
         return;
-    }
+    }*/
 
     // prevent character creating with invalid name
     if (!normalizePlayerName(name))
@@ -547,8 +576,10 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid playerGuid;
-    recv_data >> playerGuid;
+    uint8 guidMask[8] = { 5, 7, 6, 4, 3, 2, 0, 1 };
+    uint8 guidBytes[8] = { 4, 7, 1, 2, 6, 5, 3, 0 };
+
+    ObjectGuid playerGuid = ObjectGuid(recv_data.ReadGuid(guidMask, guidBytes));
 
     if (PlayerLoading() || GetPlayer() != NULL)
     {
@@ -558,7 +589,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 
     m_playerLoading = true;
 
-    DEBUG_LOG("WORLD: Recvd Player Logon Message");
+    DEBUG_LOG("WORLD: Recvd Player Logon Message. GUID: %u", playerGuid);
 
     LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())

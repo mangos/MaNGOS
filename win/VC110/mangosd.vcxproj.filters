@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="doc">
+      <UniqueIdentifier>{bd80d2f0-aa7d-498e-b4f7-fca7f5bf0599}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\AUTHORS">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\ChangeLog">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\COPYING">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\INSTALL">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\NEWS">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\README">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\THANKS">
+      <Filter>doc</Filter>
+    </None>
+    <None Include="..\..\WARNING">
+      <Filter>doc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\mangosd\CliRunnable.cpp" />
+    <ClCompile Include="..\..\src\mangosd\Main.cpp" />
+    <ClCompile Include="..\..\src\mangosd\MaNGOSsoap.cpp" />
+    <ClCompile Include="..\..\src\mangosd\Master.cpp" />
+    <ClCompile Include="..\..\src\mangosd\RASocket.cpp" />
+    <ClCompile Include="..\..\src\mangosd\soapC.cpp" />
+    <ClCompile Include="..\..\src\mangosd\soapServer.cpp" />
+    <ClCompile Include="..\..\dep\src\gsoap\stdsoap2.cpp" />
+    <ClCompile Include="..\..\src\shared\WheatyExceptionReport.cpp" />
+    <ClCompile Include="..\..\src\mangosd\WorldRunnable.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\mangosd\CliRunnable.h" />
+    <ClInclude Include="..\..\src\mangosd\MaNGOSsoap.h" />
+    <ClInclude Include="..\..\src\mangosd\Master.h" />
+    <ClInclude Include="..\..\src\mangosd\RASocket.h" />
+    <ClInclude Include="..\..\src\mangosd\soapH.h" />
+    <ClInclude Include="..\..\src\mangosd\soapStub.h" />
+    <ClInclude Include="..\..\dep\include\gsoap\stdsoap2.h" />
+    <ClInclude Include="..\..\src\shared\WheatyExceptionReport.h" />
+    <ClInclude Include="..\..\src\mangosd\WorldRunnable.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\src\mangosd\mangosd.rc" />
+  </ItemGroup>
+</Project>

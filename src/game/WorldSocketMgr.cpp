@@ -43,6 +43,7 @@
 #include "Config/Config.h"
 #include "Database/DatabaseEnv.h"
 #include "WorldSocket.h"
+#include "Opcodes.h"
 
 /**
 * This is a helper class to WorldSocketMgr ,that manages
@@ -211,6 +212,7 @@ WorldSocketMgr::WorldSocketMgr():
     m_UseNoDelay(true),
     m_Acceptor(0)
 {
+    InitializeOpcodes();
 }
 
 WorldSocketMgr::~WorldSocketMgr()

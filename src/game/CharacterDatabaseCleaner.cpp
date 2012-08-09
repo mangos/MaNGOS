@@ -128,7 +128,7 @@ bool CharacterDatabaseCleaner::TalentCheck(uint32 talent_id)
     if (!talentInfo)
         return false;
 
-    return sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+    return false;
 }
 
 void CharacterDatabaseCleaner::CleanCharacterTalent()

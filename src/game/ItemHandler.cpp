@@ -331,27 +331,30 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         {
             data << pProto->ItemStat[i].ItemStatType;
             data << pProto->ItemStat[i].ItemStatValue;
+            data << uint32(0);                              // 4.0.0
+            data << uint32(0);                              // 4.0.0
         }
         data << pProto->ScalingStatDistribution;            // scaling stats distribution
         data << pProto->ScalingStatValue;                   // some kind of flags used to determine stat values column
-        for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-        {
-            data << pProto->Damage[i].DamageMin;
-            data << pProto->Damage[i].DamageMax;
-            data << pProto->Damage[i].DamageType;
-        }
+        //for(int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        //{
+        //    data << pProto->Damage[i].DamageMin;
+        //    data << pProto->Damage[i].DamageMax;
+        //    data << pProto->Damage[i].DamageType;
+        //}
 
         // resistances (7)
-        data << pProto->Armor;
-        data << pProto->HolyRes;
-        data << pProto->FireRes;
-        data << pProto->NatureRes;
-        data << pProto->FrostRes;
-        data << pProto->ShadowRes;
-        data << pProto->ArcaneRes;
+        //data << pProto->Armor;
+        //data << pProto->HolyRes;
+        //data << pProto->FireRes;
+        //data << pProto->NatureRes;
+        //data << pProto->FrostRes;
+        //data << pProto->ShadowRes;
+        //data << pProto->ArcaneRes;
 
+        data << uint32(0);                                  // DamageType
+        //data << pProto->AmmoType;
         data << pProto->Delay;
-        data << pProto->AmmoType;
         data << pProto->RangedModRange;
 
         for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
@@ -375,9 +378,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
                 }
                 else
                 {
-                    data << uint32(spell->RecoveryTime);
-                    data << uint32(spell->Category);
-                    data << uint32(spell->CategoryRecoveryTime);
+                    data << uint32(spell->GetRecoveryTime());
+                    data << uint32(spell->GetCategory());
+                    data << uint32(spell->GetCategoryRecoveryTime());
                 }
             }
             else
@@ -420,7 +423,10 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << uint32(pProto->Duration);                   // added in 2.4.2.8209, duration (seconds)
         data << uint32(pProto->ItemLimitCategory);          // WotLK, ItemLimitCategory
         data << uint32(pProto->HolidayId);                  // Holiday.dbc?
-        SendPacket(&data);
+        data << float(0);                                   // damage/armor scaling factor
+        data << uint32(0);                                  // 4.0.0
+        data << uint32(0);                                  // 4.0.0
+        SendPacket( &data );
     }
     else
     {
@@ -1086,7 +1092,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
     else
     {
         // listed in dbc or not expected to exist unknown item
-        if (sItemStore.LookupEntry(itemid))
+        if(true/*sItemStore.LookupEntry(itemid)*/)
             sLog.outErrorDb("WORLD: CMSG_ITEM_NAME_QUERY for item %u failed (item listed in Item.dbc but not exist in DB)", itemid);
         else
             sLog.outError("WORLD: CMSG_ITEM_NAME_QUERY for item %u failed (unknown item, not listed in Item.dbc)", itemid);

@@ -479,8 +479,8 @@ enum CombatRating
     CR_HIT_TAKEN_MELEE          = 11,
     CR_HIT_TAKEN_RANGED         = 12,
     CR_HIT_TAKEN_SPELL          = 13,
-    CR_CRIT_TAKEN_MELEE         = 14,
-    CR_CRIT_TAKEN_RANGED        = 15,
+    CR_CRIT_TAKEN_MELEE         = 14,                     // COMBAT_RATING_RESILIENCE_CRIT_TAKEN
+    CR_CRIT_TAKEN_RANGED        = 15,                     // COMBAT_RATING_RESILIENCE_PLAYER_DAMAGE_TAKEN
     CR_CRIT_TAKEN_SPELL         = 16,
     CR_HASTE_MELEE              = 17,
     CR_HASTE_RANGED             = 18,
@@ -489,10 +489,11 @@ enum CombatRating
     CR_WEAPON_SKILL_OFFHAND     = 21,
     CR_WEAPON_SKILL_RANGED      = 22,
     CR_EXPERTISE                = 23,
-    CR_ARMOR_PENETRATION        = 24
+    CR_ARMOR_PENETRATION        = 24,
+    CR_MASTERY                  = 25
 };
 
-#define MAX_COMBAT_RATING         25
+#define MAX_COMBAT_RATING         26
 
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
@@ -562,6 +563,9 @@ enum UnitFlags2
     UNIT_FLAG2_UNK9                 = 0x00000200,
     UNIT_FLAG2_DISARM_RANGED        = 0x00000400,
     UNIT_FLAG2_REGENERATE_POWER     = 0x00000800,
+    UNIT_FLAG2_WORGEN_TRANSFORM     = 0x00080000,           // transform to worgen
+    UNIT_FLAG2_WORGEN_TRANSFORM2    = 0x00100000,           // transform to worgen, but less animation?
+    UNIT_FLAG2_WORGEN_TRANSFORM3    = 0x00200000            // transform to worgen, but less animation?
 };
 
 /// Non Player Character flags
