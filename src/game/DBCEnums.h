@@ -296,7 +296,7 @@ enum Difficulty
 
     DUNGEON_DIFFICULTY_NORMAL    = 0,
     DUNGEON_DIFFICULTY_HEROIC    = 1,
-    // DUNGEON_DIFFICULTY_EPIC    = 2,                      // not used, but exists
+    DUNGEON_DIFFICULTY_CHALLENGE = 2,
 
     RAID_DIFFICULTY_10MAN_NORMAL = 0,
     RAID_DIFFICULTY_25MAN_NORMAL = 1,
@@ -304,7 +304,7 @@ enum Difficulty
     RAID_DIFFICULTY_25MAN_HEROIC = 3,
 };
 
-#define MAX_DUNGEON_DIFFICULTY     2
+#define MAX_DUNGEON_DIFFICULTY     3
 #define MAX_RAID_DIFFICULTY        4
 #define MAX_DIFFICULTY             4
 
@@ -314,7 +314,8 @@ enum SpawnMask
 
     SPAWNMASK_DUNGEON_NORMAL    = (1 << DUNGEON_DIFFICULTY_NORMAL),
     SPAWNMASK_DUNGEON_HEROIC    = (1 << DUNGEON_DIFFICULTY_HEROIC),
-    SPAWNMASK_DUNGEON_ALL       = (SPAWNMASK_DUNGEON_NORMAL | SPAWNMASK_DUNGEON_HEROIC),
+    SPAWNMASK_DUNGEON_CHALLENGE = (1 << DUNGEON_DIFFICULTY_CHALLENGE),
+    SPAWNMASK_DUNGEON_ALL       = (SPAWNMASK_DUNGEON_NORMAL | SPAWNMASK_DUNGEON_HEROIC | SPAWNMASK_DUNGEON_CHALLENGE),
 
     SPAWNMASK_RAID_10MAN_NORMAL = (1 << RAID_DIFFICULTY_10MAN_NORMAL),
     SPAWNMASK_RAID_25MAN_NORMAL = (1 << RAID_DIFFICULTY_25MAN_NORMAL),
@@ -348,7 +349,8 @@ enum MapTypes                                               // Lua_IsInInstance
     MAP_INSTANCE        = 1,                                // party
     MAP_RAID            = 2,                                // raid
     MAP_BATTLEGROUND    = 3,                                // pvp
-    MAP_ARENA           = 4                                 // arena
+    MAP_ARENA           = 4,                                // arena
+    MAP_SCENARIO        = 5                                 // scenario
 };
 
 enum AbilytyLearnType
@@ -406,7 +408,8 @@ enum SummonPropGroup
     SUMMON_PROP_GROUP_FRIENDLY          = 1,
     SUMMON_PROP_GROUP_PETS              = 2,
     SUMMON_PROP_GROUP_CONTROLLABLE      = 3,
-    SUMMON_PROP_GROUP_VEHICLE           = 4
+    SUMMON_PROP_GROUP_VEHICLE           = 4,
+    SUMMON_PROP_GROUP_UNK1              = 5
 };
 
 // SummonProperties.dbc, col 2          == FactionId        (m_faction)
@@ -425,7 +428,13 @@ enum UnitNameSummonTitle
     UNITNAME_SUMMON_TITLE_VEHICLE       = 9,                // 's Vehicle,       summon different vehicles, 14 spells in 3.0.3
     UNITNAME_SUMMON_TITLE_MOUNT         = 10,               // 's Mount,         summon drake (vehicle), 3 spells
     UNITNAME_SUMMON_TITLE_LIGHTWELL     = 11,               // 's Lightwell,     summon lightwell, 6 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_BUTLER        = 12                // 's Butler,        summon repair bot, 1 spells in 3.2.2a
+    UNITNAME_SUMMON_TITLE_BUTLER        = 12,               // 's Butler,        summon repair bot, 1 spells in 3.2.2a
+    UNITNAME_SUMMON_TITLE_UNK1          = 13,
+    UNITNAME_SUMMON_TITLE_UNK2          = 14,
+    UNITNAME_SUMMON_TITLE_UNK3          = 15,
+    UNITNAME_SUMMON_TITLE_UNK4          = 16,
+    UNITNAME_SUMMON_TITLE_UNK5          = 17,
+    UNITNAME_SUMMON_TITLE_UNK6          = 18
 };
 
 // SummonProperties.dbc, col 4          == Slot             (m_slot)
