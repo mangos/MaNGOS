@@ -1627,6 +1627,8 @@ void WorldObject::BuildMonsterChat(WorldPacket* data, ObjectGuid senderGuid, uin
     *data << uint32(strlen(text) + 1);
     *data << text;
     *data << uint8(0);                                      // ChatTag
+    *data << float(0.0f);
+    *data << uint8(0);
 }
 
 void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/)

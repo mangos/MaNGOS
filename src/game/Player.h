@@ -1159,7 +1159,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void Yell(const std::string& text, const uint32 language);
         void TextEmote(const std::string& text);
         void Whisper(const std::string& text, const uint32 language, ObjectGuid receiver);
-        void BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language) const;
+        void WhisperAddon(const std::string& text, const std::string& prefix, ObjectGuid receiver);
+        void BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language, const char* addonPrefix = NULL) const;
 
         /*********************************************************/
         /***                    STORAGE SYSTEM                 ***/

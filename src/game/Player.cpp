@@ -18572,13 +18572,16 @@ void Player::RemovePet(PetSaveMode mode)
         pet->Unsummon(mode, this);
 }
 
-void Player::BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language) const
+void Player::BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language, const char* addonPrefix) const
 {
     *data << uint8(msgtype);
     *data << uint32(language);
-    *data << ObjectGuid(GetObjectGuid());
-    *data << uint32(language);                              // language 2.1.0 ?
-    *data << ObjectGuid(GetObjectGuid());
+    *data << GetObjectGuid();
+    *data << uint32(0);                                     // constant unknown time 4.3.4
+    if (addonPrefix)
+        *data << addonPrefix;
+    else
+        *data << GetObjectGuid();
     *data << uint32(text.length() + 1);
     *data << text;
     *data << uint8(GetChatTag());
@@ -18607,22 +18610,15 @@ void Player::TextEmote(const std::string& text)
 
 void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiver)
 {
-    if (language != LANG_ADDON)                             // if not addon data
-        language = LANG_UNIVERSAL;                          // whispers should always be readable
-
     Player* rPlayer = sObjectMgr.GetPlayer(receiver);
 
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildPlayerChat(&data, CHAT_MSG_WHISPER, text, language);
     rPlayer->GetSession()->SendPacket(&data);
 
-    // not send confirmation for addon messages
-    if (language != LANG_ADDON)
-    {
-        data.Initialize(SMSG_MESSAGECHAT, 200);
-        rPlayer->BuildPlayerChat(&data, CHAT_MSG_WHISPER_INFORM, text, language);
-        GetSession()->SendPacket(&data);
-    }
+    data.Initialize(SMSG_MESSAGECHAT, 200);
+    rPlayer->BuildPlayerChat(&data, CHAT_MSG_WHISPER_INFORM, text, language);
+    GetSession()->SendPacket(&data);
 
     if (!isAcceptWhispers())
     {
@@ -18635,6 +18631,17 @@ void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiv
         ChatHandler(this).PSendSysMessage(LANG_PLAYER_AFK, rPlayer->GetName(), rPlayer->autoReplyMsg.c_str());
     else if (rPlayer->isDND())
         ChatHandler(this).PSendSysMessage(LANG_PLAYER_DND, rPlayer->GetName(), rPlayer->autoReplyMsg.c_str());
+}
+
+void Player::WhisperAddon(const std::string& text, const std::string& prefix, ObjectGuid receiver)
+{
+    Player* rPlayer = sObjectMgr.GetPlayer(receiver);
+
+    std::string _text(text);
+
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildPlayerChat(&data, CHAT_MSG_WHISPER, _text, LANG_UNIVERSAL, prefix.c_str());
+    rPlayer->GetSession()->SendPacket(&data);
 }
 
 void Player::PetSpellInitialize()

@@ -693,6 +693,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendWrongFactionNotice();
         void SendChatRestrictedNotice(ChatRestrictionType restriction);
         void HandleMessagechatOpcode(WorldPacket& recvPacket);
+        void HandleAddonMessagechatOpcode(WorldPacket& recvPacket);
         void HandleTextEmoteOpcode(WorldPacket& recvPacket);
         void HandleChatIgnoredOpcode(WorldPacket& recvPacket);
 

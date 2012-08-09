@@ -2043,7 +2043,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 }
 
 // Note: target_guid used only in CHAT_MSG_WHISPER_INFORM mode (in this case channelName ignored)
-void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker)
+void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker, const char* addonPrefix /*= NULL*/)
 {
     uint32 messageLength = (message ? strlen(message) : 0) + 1;
 
@@ -2097,6 +2097,12 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
             *data << uint32(messageLength);
             *data << message;
             *data << uint8(0);
+
+            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE)
+            {
+                *data << float(0.0f);                       // Added in 4.2.0, unk
+                *data << uint8(0);                          // Added in 4.2.0, unk
+            }
             return;
         }
         default:
@@ -2112,9 +2118,16 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     {
         MANGOS_ASSERT(channelName);
         *data << channelName;
+        *data << ObjectGuid(targetGuid);
     }
+    else if (type == CHAT_MSG_ADDON)
+    {
+        MANGOS_ASSERT(addonPrefix);
+        *data << addonPrefix;
+    }
+    else
+        *data << ObjectGuid(targetGuid);
 
-    *data << ObjectGuid(targetGuid);
     *data << uint32(messageLength);
     *data << message;
     if (session != 0 && type != CHAT_MSG_WHISPER_INFORM && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)

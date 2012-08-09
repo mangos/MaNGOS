@@ -69,7 +69,7 @@ class MANGOS_DLL_SPEC ChatHandler
         explicit ChatHandler(Player* player);
         ~ChatHandler();
 
-        static void FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker);
+        static void FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker, const char* addonPrefix = NULL);
 
         static void FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, ObjectGuid targetGuid, const char* message)
         {
