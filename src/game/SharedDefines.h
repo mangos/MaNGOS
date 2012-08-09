@@ -2996,9 +2996,9 @@ enum WorldStateType
 
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
-// will only support WoW, WoW:TBC, WoW:WotLK, WoW:Cataclysm and WoW:MoP client build 15913...
+// will only support WoW, WoW:TBC, WoW:WotLK, WoW:Cataclysm and WoW:MoP client build 15952...
 
-#define EXPECTED_MANGOSD_CLIENT_BUILD        {15913, 0}
+#define EXPECTED_MANGOSD_CLIENT_BUILD        {15952, 0}
 
 // max supported expansion level in mangosd
 // NOTE: not set it more that supported by targeted client version with all expansions installed
