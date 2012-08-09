@@ -139,6 +139,8 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
+    packet->FlushBits();
+
 #ifdef MANGOS_DEBUG
 
     // Code for network use statistic
