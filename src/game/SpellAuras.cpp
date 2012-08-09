@@ -3456,6 +3456,9 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             case FORM_DEFENSIVESTANCE:
                 PowerType = POWER_RAGE;
                 break;
+            case FORM_SERPENTSTANCE:
+            case FORM_OXSTANCE:
+            case FORM_TIGERSTANCE:
             default:
                 break;
         }
@@ -3531,6 +3534,9 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                         target->SetPower(POWER_RAGE, Rage_val);
                     break;
                 }
+                case FORM_SERPENTSTANCE:
+                case FORM_OXSTANCE:
+                case FORM_TIGERSTANCE:
                 default:
                     break;
             }
@@ -6646,6 +6652,15 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             break;
         case FORM_BERSERKERSTANCE:
             spellId1 = 7381;
+            break;
+        case FORM_SERPENTSTANCE:
+            spellId1 = 115070;
+            break;
+        case FORM_OXSTANCE:
+            spellId1 = 115069;
+            break;
+        case FORM_TIGERSTANCE:
+            spellId1 = 103985;
             break;
         case FORM_MOONKIN:
             spellId1 = 24905;

@@ -159,15 +159,30 @@ enum LfgUpdateType
     LFG_UPDATE_LEAVE    = 7,
 };
 
+//LfgDungeonGroup.DBC
 enum LfgType
 {
     LFG_TYPE_NONE                 = 0,
-    LFG_TYPE_DUNGEON              = 1,
-    LFG_TYPE_RAID                 = 2,
-    LFG_TYPE_QUEST                = 3,
-    LFG_TYPE_ZONE                 = 4,
-    LFG_TYPE_HEROIC_DUNGEON       = 5,
-    LFG_TYPE_RANDOM_DUNGEON       = 6
+    LFG_TYPE_CLASSIC_DUNGEON      = 1,
+    LFG_TYPE_TBC_DUNGEON_NORMAL   = 2,
+    LFG_TYPE_TBC_DUNGEON_HEROIC   = 3,
+    LFG_TYPE_WOTLK_DUNGEON_NORMAL = 4,
+    LFG_TYPE_WOTLK_DUNGEON_HEROIC = 5,
+    LFG_TYPE_CLASSIC_RAID         = 6,
+    LFG_TYPE_TBC_RAID             = 7,
+    LFG_TYPE_WOTLK_RAID_10        = 8,
+    LFG_TYPE_WOTLK_RAID_25        = 9,
+    LFG_TYPE_WORLD_EVENTS         = 11,
+    LFG_TYPE_CATA_DUNGEON_HEROIC  = 12,
+    LFG_TYPE_CATA_DUNGEON_NORMAL  = 13,
+    LFG_TYPE_CATA_RAID_25         = 14,
+    LFG_TYPE_CATA_RAID_10         = 15,
+    LFG_TYPE_HOUR_OF_TWI_HEROIC   = 33,
+    LFG_TYPE_MOP_DUNGEON_HEROIC   = 36,
+    LFG_TYPE_MOP_DUNGEON_NORMAL   = 37,
+    LFG_TYPE_SCENARIOS            = 38,
+    LFG_TYPE_MOP_RAID_25          = 40,
+    LFG_TYPE_MOP_RAID_10          = 41,
 };
 
 enum ChatRestrictionType
