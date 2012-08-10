@@ -525,7 +525,7 @@ enum Opcodes
     SMSG_AURACASTLOG                                      = 0x11D2,
     CMSG_RECLAIM_CORPSE                                   = 0x11D3,
     CMSG_WRAP_ITEM                                        = 0x11D4,
-    SMSG_LEVELUP_INFO                                     = 0x11D5,
+    SMSG_LEVELUP_INFO                                     = 0x0435, // 4.3.4 15595
     MSG_MINIMAP_PING                                      = 0x11D6,
     SMSG_RESISTLOG                                        = 0x11D7,
     SMSG_ENCHANTMENTLOG                                   = 0x11D8,
