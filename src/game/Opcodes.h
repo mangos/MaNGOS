@@ -374,7 +374,7 @@ enum Opcodes
     MSG_CHANNEL_UPDATE                                    = 0x113B,
     CMSG_CANCEL_CHANNELLING                               = 0x113C,
     SMSG_AI_REACTION                                      = 0x113D,
-    CMSG_SET_SELECTION                                    = 0x113E,
+    CMSG_SET_SELECTION                                    = 0x0506, // 4.3.4 15595
     CMSG_DELETEEQUIPMENT_SET                              = 0x113F,
     CMSG_INSTANCE_LOCK_RESPONSE                           = 0x1140,
     CMSG_DEBUG_PASSIVE_AURA                               = 0x1141,

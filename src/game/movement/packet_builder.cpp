@@ -18,9 +18,9 @@
 
 #include "packet_builder.h"
 #include "MoveSpline.h"
+#include "Util.h"
 #include "WorldPacket.h"
 #include "../Creature.h"
-
 
 namespace Movement
 {
@@ -69,7 +69,7 @@ namespace Movement
                 break;
             case MoveSplineFlag::Final_Angle:
                 data << uint8(MonsterMoveFacingAngle);
-                data << move_spline.facing.angle;
+                data << NormalizeOrientation(move_spline.facing.angle);
                 break;
             case MoveSplineFlag::Final_Point:
                 data << uint8(MonsterMoveFacingSpot);
@@ -201,7 +201,7 @@ namespace Movement
             data << int32(move_spline.timePassed());
 
             if (move_spline.splineflags & MoveSplineFlag::Final_Angle)
-                data << float(move_spline.facing.angle);
+                data << float(NormalizeOrientation(move_spline.facing.angle));
             else if (move_spline.splineflags & MoveSplineFlag::Final_Target)
                  data.WriteGuidBytes<5, 3, 7, 1, 6, 4, 2, 0>(ObjectGuid(move_spline.facing.target));
 
