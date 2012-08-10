@@ -1242,7 +1242,12 @@ void ScriptAction::HandleScriptStep()
             }
 
             if (m_script->killCredit.isGroupCredit)
-                pPlayer->RewardPlayerAndGroupAtEvent(creatureEntry, pRewardSource);
+            {
+                WorldObject* pSearcher = pRewardSource ? pRewardSource : (pSource ? pSource : pTarget);
+                if (pSearcher != pRewardSource)
+                    sLog.outDebug(" DB-SCRIPTS: Process table `%s` id %u, SCRIPT_COMMAND_KILL_CREDIT called for groupCredit without creature as searcher, script might need adjustment.", m_table, m_script->id);
+                pPlayer->RewardPlayerAndGroupAtEvent(creatureEntry, pSearcher);
+            }
             else
                 pPlayer->KilledMonsterCredit(creatureEntry, pRewardSource ? pRewardSource->GetObjectGuid() : ObjectGuid());
 
