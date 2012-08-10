@@ -323,7 +323,7 @@ enum Opcodes
     CMSG_AUTOSTORE_GROUND_ITEM                            = 0x1108,
     CMSG_AUTOSTORE_LOOT_ITEM                              = 0x1109,
     CMSG_STORE_LOOT_IN_SLOT                               = 0x110A,
-    CMSG_AUTOEQUIP_ITEM                                   = 0x110B,
+    CMSG_AUTOEQUIP_ITEM                                   = 0x4304, // 4.3.4 15595
     CMSG_AUTOSTORE_BAG_ITEM                               = 0x110C,
     CMSG_SWAP_ITEM                                        = 0x110D,
     CMSG_SWAP_INV_ITEM                                    = 0x2614, // 4.3.4 15595
@@ -331,7 +331,7 @@ enum Opcodes
     CMSG_AUTOEQUIP_ITEM_SLOT                              = 0x1110,
     CMSG_UNCLAIM_LICENSE                                  = 0x1111,
     CMSG_DESTROYITEM                                      = 0x1112,
-    SMSG_INVENTORY_CHANGE_FAILURE                         = 0x1113,
+    SMSG_INVENTORY_CHANGE_FAILURE                         = 0x2236, // 4.3.4 15595
     SMSG_OPEN_CONTAINER                                   = 0x1114,
     CMSG_INSPECT                                          = 0x1115,
     SMSG_INSPECT_RESULTS_UPDATE                           = 0x1116,
@@ -406,11 +406,11 @@ enum Opcodes
     CMSG_REPOP_REQUEST                                    = 0x115B,
     SMSG_RESURRECT_REQUEST                                = 0x115C,
     CMSG_RESURRECT_RESPONSE                               = 0x115D,
-    CMSG_LOOT                                             = 0x115E,
+    CMSG_LOOT                                             = 0x0127, // 4.3.4 15595
     CMSG_LOOT_MONEY                                       = 0x115F,
-    CMSG_LOOT_RELEASE                                     = 0x1160,
-    SMSG_LOOT_RESPONSE                                    = 0x1161,
-    SMSG_LOOT_RELEASE_RESPONSE                            = 0x1162,
+    CMSG_LOOT_RELEASE                                     = 0x2007, // 4.3.4 15595
+    SMSG_LOOT_RESPONSE                                    = 0x4C16, // 4.3.4 15595
+    SMSG_LOOT_RELEASE_RESPONSE                            = 0x6D25, // 4.3.4 15595
     SMSG_LOOT_REMOVED                                     = 0x1163,
     SMSG_LOOT_MONEY_NOTIFY                                = 0x1164,
     SMSG_LOOT_ITEM_NOTIFY                                 = 0x1165,
