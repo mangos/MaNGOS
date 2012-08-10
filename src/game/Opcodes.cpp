@@ -1100,7 +1100,7 @@ void InitializeOpcodes()
     //OPCODE(SMSG_SPELL_CHANCE_RESIST_PUSHBACK,            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_IGNORE_DIMINISHING_RETURNS_CHEAT,        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(SMSG_IGNORE_DIMINISHING_RETURNS_CHEAT,        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_KEEP_ALIVE,                              STATUS_NEVER,    PROCESS_THREADUNSAFE, &WorldSession::Handle_EarlyProccess            );
+    OPCODE(CMSG_KEEP_ALIVE,                              STATUS_NEVER,    PROCESS_THREADUNSAFE, &WorldSession::Handle_EarlyProccess            );
     //OPCODE(SMSG_RAID_READY_CHECK_ERROR,                  STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_OPT_OUT_OF_LOOT,                         STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleOptOutOfLootOpcode        );
     //OPCODE(MSG_QUERY_GUILD_BANK_TEXT,                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleQueryGuildBankTabText     );
