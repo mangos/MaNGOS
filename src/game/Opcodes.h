@@ -577,7 +577,7 @@ enum Opcodes
     SMSG_GMTICKET_UPDATETEXT                              = 0x6535, // 4.3.4 15595
     SMSG_ACCOUNT_DATA_TIMES                               = 0x4B05, // 4.3.4 15595
     CMSG_REQUEST_ACCOUNT_DATA                             = 0x120B,
-    CMSG_UPDATE_ACCOUNT_DATA                              = 0x120C,
+    CMSG_UPDATE_ACCOUNT_DATA                              = 0x4736,
     SMSG_UPDATE_ACCOUNT_DATA                              = 0x120D,
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                        = 0x120E,
     SMSG_CHANGEPLAYER_DIFFICULTY_RESULT                   = 0x120F,
@@ -1177,7 +1177,7 @@ enum Opcodes
     SMSG_CALENDAR_EVENT_INVITE_NOTES                      = 0x1461,
     SMSG_CALENDAR_EVENT_INVITE_NOTES_ALERT                = 0x1462,
     CMSG_UPDATE_MISSILE_TRAJECTORY                        = 0x1463,
-    SMSG_UPDATE_ACCOUNT_DATA_COMPLETE                     = 0x1464,
+    SMSG_UPDATE_ACCOUNT_DATA_COMPLETE                     = 0x2015, // 4.3.4 15595
     SMSG_TRIGGER_MOVIE                                    = 0x1465,
     CMSG_COMPLETE_MOVIE                                   = 0x1466,
     CMSG_SET_GLYPH_SLOT                                   = 0x1467,

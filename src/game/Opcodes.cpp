@@ -592,7 +592,7 @@ void InitializeOpcodes()
     OPCODE(SMSG_GMTICKET_UPDATETEXT,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_ACCOUNT_DATA_TIMES,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_REQUEST_ACCOUNT_DATA,                    STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleRequestAccountData        );
-    //OPCODE(CMSG_UPDATE_ACCOUNT_DATA,                     STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleUpdateAccountData);
+    OPCODE(CMSG_UPDATE_ACCOUNT_DATA,                     STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleUpdateAccountData);
     //OPCODE(SMSG_UPDATE_ACCOUNT_DATA,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE,               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_CHANGEPLAYER_DIFFICULTY_RESULT,          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
@@ -1192,7 +1192,7 @@ void InitializeOpcodes()
     //OPCODE(SMSG_CALENDAR_EVENT_INVITE_NOTES,             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(SMSG_CALENDAR_EVENT_INVITE_NOTES_ALERT,       STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_UPDATE_MISSILE_TRAJECTORY,               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    //OPCODE(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE,            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE,            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_TRIGGER_MOVIE,                           STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_COMPLETE_MOVIE,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_SET_GLYPH_SLOT,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
