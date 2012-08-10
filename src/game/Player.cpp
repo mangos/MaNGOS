@@ -18435,7 +18435,7 @@ void Player::BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string
     *data << uint8(msgtype);
     *data << uint32(language);
     *data << ObjectGuid(GetObjectGuid());
-    *data << uint32(language);                              // language 2.1.0 ?
+    *data << uint32(0);                                     // 2.1.0
     *data << ObjectGuid(GetObjectGuid());
     *data << uint32(text.length() + 1);
     *data << text;
