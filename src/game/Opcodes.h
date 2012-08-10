@@ -530,9 +530,9 @@ enum Opcodes
     SMSG_RESISTLOG                                        = 0x11D7,
     SMSG_ENCHANTMENTLOG                                   = 0x11D8,
     CMSG_SET_SKILL_CHEAT                                  = 0x11D9,
-    SMSG_START_MIRROR_TIMER                               = 0x11DA,
-    SMSG_PAUSE_MIRROR_TIMER                               = 0x11DB,
-    SMSG_STOP_MIRROR_TIMER                                = 0x11DC,
+    SMSG_START_MIRROR_TIMER                               = 0x6824, // 4.3.4 15595
+    SMSG_PAUSE_MIRROR_TIMER                               = 0x4015, // 4.3.4 15595
+    SMSG_STOP_MIRROR_TIMER                                = 0x0B06, // 4.3.4 15595
     CMSG_PING                                             = 0x444D, // 4.3.4 15595
     SMSG_PONG                                             = 0x4D42, // 4.3.4 15595
     SMSG_CLEAR_COOLDOWN                                   = 0x11DF,
