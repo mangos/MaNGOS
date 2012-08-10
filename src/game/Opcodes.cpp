@@ -976,8 +976,8 @@ void InitializeOpcodes()
     //OPCODE(SMSG_FLIGHT_SPLINE_SYNC,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_SET_TAXI_BENCHMARK_MODE,                 STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleSetTaxiBenchmarkOpcode    );
     //OPCODE(SMSG_JOINED_BATTLEGROUND_QUEUE,               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(SMSG_REALM_SPLIT,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_REALM_SPLIT,                             STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleRealmSplitOpcode          );
+    OPCODE(SMSG_REALM_SPLIT,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_REALM_SPLIT,                             STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleRealmSplitOpcode          );
     OPCODE(CMSG_MOVE_CHNG_TRANSPORT,                     STATUS_LOGGEDIN, PROCESS_THREADSAFE,   &WorldSession::HandleMovementOpcodes           );
     //OPCODE(MSG_PARTY_ASSIGNMENT,                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePartyAssignmentOpcode     );
     //OPCODE(SMSG_OFFER_PETITION_ERROR,                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );

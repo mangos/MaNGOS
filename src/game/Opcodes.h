@@ -961,8 +961,8 @@ enum Opcodes
     SMSG_FLIGHT_SPLINE_SYNC                               = 0x1389,
     CMSG_SET_TAXI_BENCHMARK_MODE                          = 0x138A,
     SMSG_JOINED_BATTLEGROUND_QUEUE                        = 0x138B,
-    SMSG_REALM_SPLIT                                      = 0x138C,
-    CMSG_REALM_SPLIT                                      = 0x138D,
+    SMSG_REALM_SPLIT                                      = 0x2714, // 4.3.4 15595
+    CMSG_REALM_SPLIT                                      = 0x2906, // 4.3.4 15595
     CMSG_MOVE_CHNG_TRANSPORT                              = 0x3102, // 4.3.4 15595
     MSG_PARTY_ASSIGNMENT                                  = 0x138F,
     SMSG_OFFER_PETITION_ERROR                             = 0x1390,
