@@ -311,9 +311,9 @@ enum Opcodes
     CMSG_NEXT_CINEMATIC_CAMERA                            = 0x10FC,
     CMSG_COMPLETE_CINEMATIC                               = 0x10FD,
     SMSG_TUTORIAL_FLAGS                                   = 0x0B35, // 4.3.4 15595
-    CMSG_TUTORIAL_FLAG                                    = 0x10FF,
-    CMSG_TUTORIAL_CLEAR                                   = 0x1100,
-    CMSG_TUTORIAL_RESET                                   = 0x1101,
+    CMSG_TUTORIAL_FLAG                                    = 0x6C26, // 4.3.4 15595
+    CMSG_TUTORIAL_CLEAR                                   = 0x6515, // 4.3.4 15595
+    CMSG_TUTORIAL_RESET                                   = 0x2726, // 4.3.4 15595
     CMSG_STANDSTATECHANGE                                 = 0x0535, // 4.3.4 15595
     CMSG_EMOTE                                            = 0x4C26, // 4.3.4 15595
     SMSG_EMOTE                                            = 0x0A34, // 4.3.4 15595
@@ -577,8 +577,8 @@ enum Opcodes
     SMSG_GMTICKET_UPDATETEXT                              = 0x6535, // 4.3.4 15595
     SMSG_ACCOUNT_DATA_TIMES                               = 0x4B05, // 4.3.4 15595
     CMSG_REQUEST_ACCOUNT_DATA                             = 0x120B,
-    CMSG_UPDATE_ACCOUNT_DATA                              = 0x4736,
-    SMSG_UPDATE_ACCOUNT_DATA                              = 0x120D,
+    CMSG_UPDATE_ACCOUNT_DATA                              = 0x4736, // 4.3.4 15595
+    SMSG_UPDATE_ACCOUNT_DATA                              = 0x6837, // 4.3.4 15595
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                        = 0x120E,
     SMSG_CHANGEPLAYER_DIFFICULTY_RESULT                   = 0x120F,
     CMSG_GM_TEACH                                         = 0x1210,
