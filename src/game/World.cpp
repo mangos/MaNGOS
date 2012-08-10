@@ -1733,6 +1733,28 @@ void World::SendZoneText(uint32 zone, const char* text, WorldSession* self /*= N
     SendZoneMessage(zone, &data, self, team);
 }
 
+/// Sends a server wide defense message to all players (or players of the specified team)
+void World::SendDefenseMessage(uint32 zoneId, int32 textId, Team team /*= TEAM_NONE*/)
+{
+    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    {
+        if (itr->second &&
+                itr->second->GetPlayer() &&
+                itr->second->GetPlayer()->IsInWorld() &&
+                (team == TEAM_NONE || itr->second->GetPlayer()->GetTeam() == team))
+        {
+            char const* message = itr->second->GetMangosString(textId);
+            uint32 messageLength = strlen(message) + 1;
+
+            WorldPacket data(SMSG_DEFENSE_MESSAGE, 4 + 4 + messageLength);
+            data << uint32(zoneId);
+            data << uint32(messageLength);
+            data << message;
+            itr->second->SendPacket(&data);
+        }
+    }
+}
+
 /// Kick (and save) all players
 void World::KickAll()
 {
