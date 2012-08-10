@@ -1085,7 +1085,7 @@ enum Opcodes
     SMSG_SPELL_CHANCE_RESIST_PUSHBACK                     = 0x1405,
     CMSG_IGNORE_DIMINISHING_RETURNS_CHEAT                 = 0x1406,
     SMSG_IGNORE_DIMINISHING_RETURNS_CHEAT                 = 0x1407,
-    CMSG_KEEP_ALIVE                                       = 0x1408,
+    CMSG_KEEP_ALIVE                                       = 0x0015, // 4.3.4 15595
     SMSG_RAID_READY_CHECK_ERROR                           = 0x1409,
     CMSG_OPT_OUT_OF_LOOT                                  = 0x140A,
     MSG_QUERY_GUILD_BANK_TEXT                             = 0x140B,
