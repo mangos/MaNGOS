@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_0040_xxxxx_01_mangos_playercreateinfo` bit(1) default NULL
+  `required_0046_xxxxx_01_mangos_player_xp_for_level` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -14447,16 +14447,21 @@ INSERT INTO `player_xp_for_level` VALUES
 ('67', '585000'),
 ('68', '648000'),
 ('69', '717000'),
-('70', '1523800'),
-('71', '1539600'),
-('72', '1555700'),
-('73', '1571800'),
-('74', '1587900'),
-('75', '1604200'),
-('76', '1620700'),
-('77', '1637400'),
-('78', '1653900'),
-('79', '1670800');
+('70', '1219040'),
+('71', '1231680'),
+('72', '1244560'),
+('73', '1257440'),
+('74', '1270320'),
+('75', '1283360'),
+('76', '1296560'),
+('77', '1309920'),
+('78', '1323120'),
+('79', '1336640'),
+('80', '1686300'),
+('81', '2121500'),
+('82', '4004000'),
+('83', '5203400'),
+('84', '9165100');
 /*!40000 ALTER TABLE `player_xp_for_level` ENABLE KEYS */;
 UNLOCK TABLES;
 
