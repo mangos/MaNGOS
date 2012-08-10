@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_0040_xxxxx_01_mangos_playercreateinfo required_0046_xxxxx_01_mangos_player_xp_for_level bit;
 
-DELETE FROM player_xp_for_level WHERE lvl IN (70,71,72,73,74,75,76,77,78,79,80,81,83,83,84);
+DELETE FROM player_xp_for_level WHERE lvl BETWEEN 70 AND 84;
 
 INSERT INTO `player_xp_for_level` VALUES
 ('70', '1219040'),
