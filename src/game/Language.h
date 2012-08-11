@@ -177,7 +177,9 @@ enum MangosStrings
     LANG_YOU_CHANGE_RUNIC_POWER         = 173,
     LANG_YOURS_RUNIC_POWER_CHANGED      = 174,
     LANG_LIQUID_STATUS                  = 175,
-    // Room for more level 1              176-199 not used
+    LANG_YOU_CHANGE_CHI                 = 176,
+    LANG_YOURS_CHI_CHANGED              = 177,
+    // Room for more level 1              178-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,

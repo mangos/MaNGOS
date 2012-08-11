@@ -1594,6 +1594,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
             switch (getClass())                             // upper for melee classes
             {
                 case CLASS_WARRIOR:
+                case CLASS_MONK:
                 case CLASS_ROGUE:
                     maxLowEnd = 0.91f;                      // If the attacker is a melee class then instead the lower value of 0.91
             }
@@ -9136,6 +9137,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RAGE:
         case UNIT_MOD_FOCUS:
         case UNIT_MOD_ENERGY:
+        case UNIT_MOD_CHI:                 UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod)); break;
         case UNIT_MOD_HAPPINESS:
         case UNIT_MOD_RUNE:
         case UNIT_MOD_RUNIC_POWER:         UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod)); break;
@@ -9257,6 +9259,7 @@ Powers Unit::GetPowerTypeByAuraGroup(UnitMods unitMod) const
         case UNIT_MOD_RAGE:       return POWER_RAGE;
         case UNIT_MOD_FOCUS:      return POWER_FOCUS;
         case UNIT_MOD_ENERGY:     return POWER_ENERGY;
+        case UNIT_MOD_CHI:        return POWER_CHI;
         case UNIT_MOD_HAPPINESS:  return POWER_HAPPINESS;
         case UNIT_MOD_RUNE:       return POWER_RUNE;
         case UNIT_MOD_RUNIC_POWER: return POWER_RUNIC_POWER;
@@ -9495,6 +9498,7 @@ uint32 Unit::GetCreatePowers(Powers power) const
         case POWER_SOUL_SHARDS: return 0;                   // TODO: fix me
         case POWER_ECLIPSE:     return 0;                   // TODO: fix me
         case POWER_HOLY_POWER:  return 0;
+        case POWER_CHI:         return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_MONK ? 1000 : 0);
     }
 
     return 0;

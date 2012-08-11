@@ -332,6 +332,7 @@ enum UnitMods
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
+    UNIT_MOD_CHI,
     UNIT_MOD_HAPPINESS,
     UNIT_MOD_RUNE,
     UNIT_MOD_RUNIC_POWER,
@@ -354,7 +355,7 @@ enum UnitMods
     UNIT_MOD_RESISTANCE_START = UNIT_MOD_ARMOR,
     UNIT_MOD_RESISTANCE_END = UNIT_MOD_RESISTANCE_ARCANE + 1,
     UNIT_MOD_POWER_START = UNIT_MOD_MANA,
-    UNIT_MOD_POWER_END = UNIT_MOD_RUNIC_POWER + 1
+    UNIT_MOD_POWER_END = UNIT_MOD_CHI + 1
 };
 
 enum BaseModGroup
@@ -1617,7 +1618,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         {
             ShapeshiftForm form = GetShapeshiftForm();
             return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
-                   form != FORM_SHADOW;
+                   form != FORM_SHADOW && form != FORM_SERPENTSTANCE && form != FORM_OXSTANCE && form != FORM_TIGERSTANCE;
         }
 
         float m_modMeleeHitChance;

@@ -2028,6 +2028,9 @@ void Player::RegenerateAll(uint32 diff)
             Regenerate(POWER_RAGE, diff);
             if (getClass() == CLASS_DEATH_KNIGHT)
                 Regenerate(POWER_RUNIC_POWER, diff);
+
+            if (getClass() == CLASS_MONK)
+                Regenerate(POWER_CHI, diff);
         }
     }
 
@@ -2108,13 +2111,19 @@ void Player::Regenerate(Powers power, uint32 diff)
                 }
             }
         }   break;
+        case POWER_CHI:                                  // Regenerate chi (monk)
+        {
+            float ChiRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_CHI);
+            addvalue = 20 * ChiRate;
+            break;
+        }
         case POWER_HAPPINESS:
         case POWER_HEALTH:
             break;
     }
 
     // Mana regen calculated in Player::UpdateManaRegen()
-    // Exist only for POWER_MANA, POWER_ENERGY, POWER_FOCUS auras
+    // Exist only for POWER_MANA, POWER_ENERGY, POWER_FOCUS, POWER_CHI auras
     if (power != POWER_MANA)
     {
         AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
@@ -2126,7 +2135,7 @@ void Player::Regenerate(Powers power, uint32 diff)
     // addvalue computed on a 2sec basis. => update to diff time
     addvalue *= float(diff) / REGEN_TIME_FULL;
 
-    if (power != POWER_RAGE && power != POWER_RUNIC_POWER)
+    if (power != POWER_RAGE && power != POWER_RUNIC_POWER && power != POWER_CHI)
     {
         curValue += uint32(addvalue);
         if (curValue > maxValue)
@@ -2778,6 +2787,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetPower(POWER_FOCUS, 0);
     SetPower(POWER_HAPPINESS, 0);
     SetPower(POWER_RUNIC_POWER, 0);
+    SetPower(POWER_CHI, 0);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -5066,7 +5076,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         0.021080f, // Shaman
         0.036587f, // Mage
         0.024211f, // Warlock
-        0.0f,      // ??
+        0.056097f, // Monk
         0.056097f  // Druid
     };
     // Crit/agility to dodge/agility coefficient multipliers; 3.2.0 increased required agility by 15%
@@ -5081,7 +5091,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         1.60f / 1.15f,  // Shaman
         1.00f / 1.15f,  // Mage
         0.97f / 1.15f,  // Warlock (?)
-        0.0f,           // ??
+        2.00f / 1.15f,  // Monk
         2.00f / 1.15f   // Druid
     };
 
@@ -19225,6 +19235,24 @@ void Player::InitDataForForm(bool reapplyMods)
         {
             if (getPowerType() != POWER_RAGE)
                 setPowerType(POWER_RAGE);
+            break;
+        }
+        case FORM_OXSTANCE:
+        {
+            if (getPowerType() != POWER_ENERGY)
+                setPowerType(POWER_ENERGY);
+            break;
+        }
+        case FORM_SERPENTSTANCE:
+        {
+            if (getPowerType() != POWER_MANA)
+                setPowerType(POWER_MANA);
+            break;
+        }
+        case FORM_TIGERSTANCE:
+        {
+            if (getPowerType() != POWER_ENERGY)
+                setPowerType(POWER_ENERGY);
             break;
         }
         default:                                            // 0, for example

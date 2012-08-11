@@ -520,6 +520,7 @@ void World::LoadConfigSettings(bool reload)
     setConfigPos(CONFIG_FLOAT_RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss",   1.0f);
     setConfig(CONFIG_FLOAT_RATE_POWER_FOCUS,             "Rate.Focus", 1.0f);
     setConfig(CONFIG_FLOAT_RATE_POWER_ENERGY,            "Rate.Energy", 1.0f);
+    setConfig(CONFIG_FLOAT_RATE_POWER_CHI,               "Rate.Chi", 1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_SKILL_DISCOVERY,      "Rate.Skill.Discovery",      1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_DROP_ITEM_POOR,       "Rate.Drop.Item.Poor",       1.0f);
     setConfigPos(CONFIG_FLOAT_RATE_DROP_ITEM_NORMAL,     "Rate.Drop.Item.Normal",     1.0f);

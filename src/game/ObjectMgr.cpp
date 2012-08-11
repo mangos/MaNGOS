@@ -3201,6 +3201,14 @@ void ObjectMgr::LoadPlayerInfo()
             if (sWorld.getConfig(CONFIG_UINT32_EXPANSION) < 2 && class_ == CLASS_DEATH_KNIGHT)
                 continue;
 
+            // skip expansion races if not playing with expansion
+            if (sWorld.getConfig(CONFIG_UINT32_EXPANSION) < 3 && (race == RACE_WORGEN || race == RACE_GOBLIN))
+                continue;
+
+            // skip expansion classes / races if not playing with expansion
+            if (sWorld.getConfig(CONFIG_UINT32_EXPANSION) < 4 && class_ == CLASS_MONK || race == RACE_PANDAREN_NEUTRAL || race == RACE_PANDAREN_ALLI || race == RACE_PANDAREN_HORDE)
+                continue;
+
             // fatal error if no level 1 data
             if (!pInfo->levelInfo || pInfo->levelInfo[0].stats[0] == 0)
             {
@@ -3386,6 +3394,14 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
                 info->stats[STAT_AGILITY]   += (lvl > 38 ? 2 : (lvl > 8 && (lvl % 2) ? 1 : 0));
                 info->stats[STAT_INTELLECT] += (lvl > 38 ? 3 : (lvl > 4 ? 1 : 0));
                 info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
+                break;
+            case CLASS_MONK:
+                info->stats[STAT_STRENGTH]  += (lvl > 38 ? 2 : (lvl > 6 && (lvl % 2) ? 1 : 0));
+                info->stats[STAT_STAMINA]   += (lvl > 32 ? 2 : (lvl > 4 ? 1 : 0));
+                info->stats[STAT_AGILITY]   += (lvl > 38 ? 2 : (lvl > 8 && (lvl % 2) ? 1 : 0));
+                info->stats[STAT_INTELLECT] += (lvl > 38 ? 3 : (lvl > 4 ? 1 : 0));
+                info->stats[STAT_SPIRIT]    += (lvl > 38 ? 3 : (lvl > 5 ? 1 : 0));
+                break;
         }
     }
 }
