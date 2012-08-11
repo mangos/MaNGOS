@@ -9137,7 +9137,7 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_RAGE:
         case UNIT_MOD_FOCUS:
         case UNIT_MOD_ENERGY:
-        case UNIT_MOD_CHI:
+        case UNIT_MOD_CHI:                 UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod)); break;
         case UNIT_MOD_HAPPINESS:
         case UNIT_MOD_RUNE:
         case UNIT_MOD_RUNIC_POWER:         UpdateMaxPower(GetPowerTypeByAuraGroup(unitMod)); break;
@@ -9498,7 +9498,7 @@ uint32 Unit::GetCreatePowers(Powers power) const
         case POWER_SOUL_SHARDS: return 0;                   // TODO: fix me
         case POWER_ECLIPSE:     return 0;                   // TODO: fix me
         case POWER_HOLY_POWER:  return 0;
-        case POWER_CHI:         return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_MONK ? 8 : 0);
+        case POWER_CHI:         return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_MONK ? 1000 : 0);
     }
 
     return 0;
