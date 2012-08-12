@@ -9874,11 +9874,15 @@ void Unit::SetPowerByIndex(uint32 powerIndex, int32 val)
 
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
-    WorldPacket data(SMSG_POWER_UPDATE);
-    data << GetPackGUID();
-    data << uint8(powerIndex);
-    data << uint32(val);
-    SendMessageToSet(&data, true);
+    if (IsInWorld())
+    {
+        WorldPacket data(SMSG_POWER_UPDATE);
+        data << GetPackGUID();
+        data << uint32(1); // iteration count
+        data << uint8(powerIndex);
+        data << uint32(val);
+        SendMessageToSet(&data, true);
+    }
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
