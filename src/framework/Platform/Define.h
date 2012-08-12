@@ -122,6 +122,11 @@ typedef uint32      DWORD;
 #if COMPILER == COMPILER_GNU
 #  if !defined(__GXX_EXPERIMENTAL_CXX0X__) || (__GNUC__ < 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
 #    define override
+#    define static_assert(a, b)
+#  endif
+#elif COMPILER == COMPILER_MICROSOFT
+#  if _MSC_VER < 1600
+#    define static_assert(a, b)
 #  endif
 #endif
 
