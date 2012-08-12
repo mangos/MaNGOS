@@ -154,7 +154,7 @@ enum Powers
     POWER_SOUL_SHARDS                   = 7,
     POWER_ECLIPSE                       = 8,
     POWER_HOLY_POWER                    = 9,
-    POWER_ALTERNATE                     = 10,
+    POWER_ALTERNATIVE                   = 10,
     MAX_POWERS                          = 11,
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
