@@ -63,6 +63,8 @@
 #include "SpellAuras.h"
 #include "DBCStores.h"
 #include "SQLStorages.h"
+#include "BattlefieldMgr.h"
+#include "SharedDefines.h"
 
 #include <cmath>
 
@@ -6713,6 +6715,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if (m_zoneUpdateId != newZone)
     {
+
         SendInitWorldStates(newZone, newArea);              // only if really enters to new zone, not just area change, works strange...
 
         if (sWorld.getConfig(CONFIG_BOOL_WEATHER))
@@ -6725,6 +6728,16 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
                 Weather::SendFineWeatherUpdateToPlayer(this);
             }
         }
+    }
+
+    if(newZone == 4197 || newZone == 5095)
+    {
+        sBattlefieldMgr.PlayerEnterZone(this,newZone);
+    }
+
+    if(GetZoneId() == 4197 || GetZoneId() == 5095)
+    {
+        sBattlefieldMgr.PlayerLeftZone(this,m_zoneUpdateId);
     }
 
     m_zoneUpdateId    = newZone;
@@ -8625,9 +8638,9 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
     FillInitialWorldState(data, count, 0xC77, sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID));
     // 3901 8 Previous arena season
     FillInitialWorldState(data, count, 0xF3D, sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_PREVIOUS_ID));
-    FillInitialWorldState(data, count, 0xED9, 1);           // 3801 9  0 - Battle for Wintergrasp in progress, 1 - otherwise
-    // 4354 10 Time when next Battle for Wintergrasp starts
-    FillInitialWorldState(data, count, 0x1102, uint32(time(NULL) + 9000));
+    Battlefield * WG = sBattlefieldMgr.FindBattlefield(BATTLEFIELD_WG);
+    FillInitialWorldState(data, count, 0xED9, !WG->IsBattleInProgress());           // 3801 9  0 - Battle for Wintergrasp in progress, 1 - otherwise
+    FillInitialWorldState(data, count, 0x1102, uint32(time(NULL) + (WG->GetTimeToNextBattle()/1000))); // 4354 10 Time when next Battle for Wintergrasp starts
 
     if (mapid == 530)                                       // Outland
     {
@@ -8711,6 +8724,28 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             }
             break;
         case 3703:                                          // Shattrath City
+            break;
+        case 4197:                                          // Wintergrasp
+            if(WG->IsBattleInProgress())
+            {
+                FillInitialWorldState(data,count,0xe7e,true);
+                FillInitialWorldState(data,count,0xec5,uint32(time(NULL) + (WG->GetTimeTIllEndOfWar()/1000)));
+                FillInitialWorldState(data,count,0xda2,1);
+                FillInitialWorldState(data,count,0xda1,10);
+                FillInitialWorldState(data,count,0xe60,1);
+                FillInitialWorldState(data,count,0xe61,10);
+            }
+            else
+            {
+                if(WG->GetControllerTeam() == ALLIANCE)
+                {
+                    FillInitialWorldState(data,count,0xeda,true);
+                }
+                else
+                {
+                    FillInitialWorldState(data,count,0xedb,true);
+                }
+            }
             break;
         default:
             FillInitialWorldState(data, count, 0x914, 0x0); // 2324 7

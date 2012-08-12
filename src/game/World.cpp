@@ -65,6 +65,7 @@
 #include "AuctionHouseBot/AuctionHouseBot.h"
 #include "CharacterDatabaseCleaner.h"
 #include "CreatureLinkingMgr.h"
+#include "BattlefieldMgr.h"
 
 INSTANTIATE_SINGLETON_1(World);
 
@@ -1370,6 +1371,10 @@ void World::SetInitialWorldSettings()
     sBattleGroundMgr.CreateInitialBattleGrounds();
     sBattleGroundMgr.InitAutomaticArenaPointDistribution();
 
+    /// - Initialize Battlefields
+    sLog.outString("Starting Battlefield system...");
+    sBattlefieldMgr.Initialize();
+
     // Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
     sLog.outString("Loading Transports...");
     sMapMgr.LoadTransports();
@@ -1538,6 +1543,7 @@ void World::Update(uint32 diff)
     ///- Update objects (maps, transport, creatures,...)
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
+    sBattlefieldMgr.Update(diff);
 
     ///- Delete all characters which have been deleted X days before
     if (m_timers[WUPDATE_DELETECHARS].Passed())

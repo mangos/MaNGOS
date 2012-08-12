@@ -185,6 +185,15 @@ enum TutorialDataState
     TUTORIALDATA_NEW       = 2
 };
 
+enum BFLeaveReason
+{
+    BF_LEAVE_REASON_CLOSE       = 0x00000001,
+    BF_LEAVE_REASON_UNK1        = 0x00000002,
+    BF_LEAVE_REASON_UNK2        = 0x00000004,
+    BF_LEAVE_REASON_EXITED      = 0x00000008,
+    BF_LEAVE_REASON_LOW_LEVEL   = 0x00000010,
+};
+
 // class to deal with packet processing
 // allows to determine if next packet is safe to be processed
 class PacketFilter
@@ -765,6 +774,9 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleLeaveBattlefieldOpcode(WorldPacket& recv_data);
         void HandleBattlemasterJoinArena(WorldPacket& recv_data);
         void HandleReportPvPAFK(WorldPacket& recv_data);
+        void HandleBattlefieldExitRequest(WorldPacket& recv_data);
+		void HandleBattlefieldEntryInviteResponseOpcode(WorldPacket& recv_data);
+        void HandleBattlefieldQueueInviteResponseOpcode(WorldPacket& recv_data);
 
         void HandleWardenDataOpcode(WorldPacket& recv_data);
         void HandleWorldTeleportOpcode(WorldPacket& recv_data);
