@@ -69,6 +69,8 @@ DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrPowerTypesEntry> sChrPowerTypesStore(ChrClassesXPowerTypesfmt);
+// pair<class,power> => powerIndex
+uint32 sChrClassXPowerTypesStore[MAX_CLASSES][MAX_POWERS];
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -438,7 +440,33 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCharTitlesStore,          dbcPath,"CharTitles.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChatChannelsStore,        dbcPath,"ChatChannels.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrClassesStore,          dbcPath,"ChrClasses.dbc");
-    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrPowerTypesStore,       dbcPath, "ChrClassesXPowerTypes.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrPowerTypesStore,       dbcPath,"ChrClassesXPowerTypes.dbc");
+    for (uint32 i = 0; i < MAX_CLASSES; ++i)
+    {
+        for (uint32 j = 0; j < MAX_POWERS; ++j)
+            sChrClassXPowerTypesStore[i][j] = INVALID_POWER_INDEX;
+    }
+    for (uint32 i = 0; i < sChrPowerTypesStore.GetNumRows(); ++i)
+    {
+        ChrPowerTypesEntry const* entry = sChrPowerTypesStore.LookupEntry(i);
+        if (!entry)
+            continue;
+
+        MANGOS_ASSERT(entry->classId < MAX_CLASSES && "MAX_CLASSES not updated");
+        MANGOS_ASSERT(entry->power < MAX_POWERS && "MAX_POWERS not updated");
+
+        uint32 index = 0;
+
+        for (uint32 j = 0; j < MAX_POWERS; ++j)
+        {
+            if (sChrClassXPowerTypesStore[entry->classId][j] != INVALID_POWER_INDEX)
+                ++index;
+        }
+
+        MANGOS_ASSERT(index < MAX_STORED_POWERS && "MAX_STORED_POWERS not updated");
+
+        sChrClassXPowerTypesStore[entry->classId][entry->power] = index;
+    }
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrRacesStore,            dbcPath,"ChrRaces.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCinematicSequencesStore,  dbcPath,"CinematicSequences.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCreatureDisplayInfoStore, dbcPath,"CreatureDisplayInfo.dbc");
