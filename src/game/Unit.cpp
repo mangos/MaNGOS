@@ -9802,20 +9802,81 @@ void Unit::SetHealthPercent(float percent)
     SetHealth(newHealth);
 }
 
-void Unit::SetPower(Powers power, uint32 val)
+uint32 Unit::GetPowerIndexByClass(Powers powerId, uint32 classId)
 {
-    if (GetPower(power) == val)
+    MANGOS_ASSERT(powerId < MAX_POWERS);
+    MANGOS_ASSERT(classId < MAX_CLASSES);
+
+    return sChrClassXPowerTypesStore[classId][uint32(powerId)];
+};
+
+int32 Unit::GetPower(Powers power) const
+{
+    if (power == POWER_HEALTH)
+        return GetHealth();
+
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
+    if (powerIndex == INVALID_POWER_INDEX)
+        return 0;
+
+    return GetUInt32Value(UNIT_FIELD_POWER1 + powerIndex);
+}
+
+int32 Unit::GetPowerByIndex(uint32 index) const
+{
+    MANGOS_ASSERT(index < MAX_STORED_POWERS);
+
+    return GetUInt32Value(UNIT_FIELD_POWER1 + index);
+}
+
+uint32 Unit::GetMaxPower(Powers power) const
+{
+    if (power == POWER_HEALTH)
+        return GetMaxHealth();
+
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
+    if (powerIndex == INVALID_POWER_INDEX)
+        return 0;
+
+    return GetUInt32Value(UNIT_FIELD_MAXPOWER1 + powerIndex);
+}
+
+uint32 Unit::GetMaxPowerByIndex(uint32 index) const
+{
+    MANGOS_ASSERT(index < MAX_STORED_POWERS);
+
+    return GetUInt32Value(UNIT_FIELD_MAXPOWER1 + index);
+}
+
+void Unit::SetPower(Powers power, int32 val)
+{
+    if (power == POWER_HEALTH)
+        return SetHealth(val >= 0 ? val : 0);
+
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
+    if (powerIndex == INVALID_POWER_INDEX)
         return;
 
-    uint32 maxPower = GetMaxPower(power);
-    if (maxPower < val)
+    return SetPowerByIndex(powerIndex, val);
+}
+
+void Unit::SetPowerByIndex(uint32 powerIndex, int32 val)
+{
+    int32 maxPower = GetMaxPowerByIndex(powerIndex);
+    if (val > maxPower)
         val = maxPower;
 
-    SetStatInt32Value(UNIT_FIELD_POWER1 + power, val);
+    if (val < 0)
+        val = 0;
+
+    if (GetPowerByIndex(powerIndex) == val)
+        return;
+
+    SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
     WorldPacket data(SMSG_POWER_UPDATE);
     data << GetPackGUID();
-    data << uint8(power);
+    data << uint8(powerIndex);
     data << uint32(val);
     SendMessageToSet(&data, true);
 
@@ -9837,10 +9898,23 @@ void Unit::SetPower(Powers power, uint32 val)
     }
 }
 
-void Unit::SetMaxPower(Powers power, uint32 val)
+void Unit::SetMaxPower(Powers power, int32 val)
 {
-    uint32 cur_power = GetPower(power);
-    SetStatInt32Value(UNIT_FIELD_MAXPOWER1 + power, val);
+    if (power == POWER_HEALTH)
+        return SetMaxHealth(val >= 0 ? val : 0);
+
+    uint32 powerIndex = GetPowerIndexByClass(power, getClass());
+    if (powerIndex == INVALID_POWER_INDEX)
+        return;
+
+    return SetMaxPowerByIndex(powerIndex, val);
+}
+
+void Unit::SetMaxPowerByIndex(uint32 powerIndex, int32 val)
+{
+    int32 cur_power = GetPowerByIndex(powerIndex);
+
+    SetStatInt32Value(UNIT_FIELD_MAXPOWER1 + powerIndex, val);
 
     // group update
     if (GetTypeId() == TYPEID_PLAYER)
@@ -9860,7 +9934,7 @@ void Unit::SetMaxPower(Powers power, uint32 val)
     }
 
     if (val < cur_power)
-        SetPower(power, val);
+        SetPowerByIndex(powerIndex, val);
 }
 
 void Unit::ApplyPowerMod(Powers power, uint32 val, bool apply)

@@ -1237,13 +1237,20 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Powers getPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
         void setPowerType(Powers power);
-        uint32 GetPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   + power); }
-        uint32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER1 + power); }
-        void SetPower(Powers power, uint32 val);
-        void SetMaxPower(Powers power, uint32 val);
+        int32 GetPower(Powers power) const;
+        int32 GetPowerByIndex(uint32 index) const;
+        uint32 GetMaxPower(Powers power) const;
+        uint32 GetMaxPowerByIndex(uint32 index) const;
+        void SetPowerByIndex(uint32 power, int32 val);
+        void SetMaxPowerByIndex(uint32 power, int32 val);
+        void SetPower(Powers power, int32 val);
+        void SetMaxPower(Powers power, int32 val);
         int32 ModifyPower(Powers power, int32 val);
         void ApplyPowerMod(Powers power, uint32 val, bool apply);
         void ApplyMaxPowerMod(Powers power, uint32 val, bool apply);
+
+        static uint32 GetPowerIndexByClass(Powers power, uint32 classId);
+        uint32 GetPowerIndex(Powers power) const { return GetPowerIndexByClass(power, getClass()); }
 
         uint32 GetAttackTime(WeaponAttackType att) const { return (uint32)(GetFloatValue(UNIT_FIELD_BASEATTACKTIME + att) / m_modAttackSpeedPct[att]); }
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME + att, val * m_modAttackSpeedPct[att]); }
