@@ -246,6 +246,9 @@ void MovementInfo::Read(ByteBuffer& data, uint16 opcode)
                 if (hasTransportData && si.hasTransportTime3)
                     data >> fallTime;
                 break;
+            case MSEMovementCounter:
+                data.read_skip<uint32>();
+                break;
             default:
                 MANGOS_ASSERT(false && "Wrong movement status element");
                 break;
@@ -426,6 +429,9 @@ void MovementInfo::Write(ByteBuffer& data, uint16 opcode) const
             case MSETransportTime3:
                 if (hasTransportData && si.hasTransportTime3)
                     data << uint32(fallTime);
+                break;
+            case MSEMovementCounter:
+                data << uint32(0);
                 break;
             default:
                 MANGOS_ASSERT(false && "Wrong movement status element");
@@ -11491,3 +11497,75 @@ bool Unit::IsSplineEnabled() const
 {
     return movespline->Initialized();
 }
+
+void Unit::BuildForceMoveRootPacket(WorldPacket* data, bool apply, uint32 value)
+{
+    if (apply)
+    {
+        data->Initialize(SMSG_FORCE_MOVE_ROOT, 13);
+        data->WriteGuidMask<2, 7, 6, 0, 5, 4, 1, 3>(GetObjectGuid());
+        data->WriteGuidBytes<1, 0, 2, 5>(GetObjectGuid());
+        *data << uint32(value);
+        data->WriteGuidBytes<3, 4, 7, 6>(GetObjectGuid());
+    }
+    else
+    {
+        data->Initialize(SMSG_FORCE_MOVE_UNROOT, 13);
+        data->WriteGuidMask<0, 1, 3, 7, 5, 2, 4, 6>(GetObjectGuid());
+        data->WriteGuidBytes<3, 6, 1>(GetObjectGuid());
+        *data << uint32(value);
+        data->WriteGuidBytes<2, 0, 7, 4, 5>(GetObjectGuid());
+    }
+}
+
+void Unit::BuildMoveSetCanFlyPacket(WorldPacket* data, bool apply, uint32 value)
+{
+    if (apply)
+    {
+        data->Initialize(SMSG_MOVE_SET_CAN_FLY, 13);
+        data->WriteGuidMask<1, 6, 5, 0, 7, 4, 2, 3>(GetObjectGuid());
+        data->WriteGuidBytes<6, 3>(GetObjectGuid());
+        *data << uint32(value);
+        data->WriteGuidBytes<2, 1, 4, 7, 0, 5>(GetObjectGuid());
+    }
+    else
+    {
+        data->Initialize(SMSG_MOVE_UNSET_CAN_FLY, 13);
+        data->WriteGuidMask<1, 4, 2, 5, 0, 3, 6, 7>(GetObjectGuid());
+        data->WriteGuidBytes<4, 6>(GetObjectGuid());
+        *data << uint32(value);
+        data->WriteGuidBytes<1, 0, 2, 3, 5, 7>(GetObjectGuid());
+    }
+}
+
+void Unit::BuildSendPlayVisualPacket(WorldPacket* data, uint32 value, bool impact)
+{
+    data->Initialize(SMSG_PLAY_SPELL_VISUAL, 21);
+    *data << uint32(0);         // unk, seems always 0
+    *data << uint32(value);
+    *data << uint32(impact ? 1 : 0);
+
+    data->WriteGuidMask<4, 7, 5, 3, 1, 2, 0, 6>(GetObjectGuid());
+    data->WriteGuidBytes<0, 4, 1, 6, 7, 2, 3, 5>(GetObjectGuid());
+}
+
+
+void Unit::BuildMoveWaterWalkPacket(WorldPacket* data, bool apply, uint32 value)
+{
+    if (apply)
+    {
+        data->Initialize(SMSG_MOVE_WATER_WALK, 13);
+        data->WriteGuidMask<4, 7, 6, 0, 1, 3, 5, 2>(GetObjectGuid());
+        data->WriteGuidBytes<0, 5, 2>(GetObjectGuid());
+        *data << uint32(value);
+        data->WriteGuidBytes<7, 3, 4, 1, 6>(GetObjectGuid());
+    }
+    else
+    {
+        data->Initialize(SMSG_MOVE_LAND_WALK, 13);
+        data->WriteGuidMask<5, 1, 6, 2, 3, 4, 0, 7>(GetObjectGuid());
+        data->WriteGuidBytes<6, 1, 7, 5, 4, 0, 3, 2>(GetObjectGuid());
+        *data << uint32(value);
+    }
+}
+

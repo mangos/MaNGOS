@@ -279,8 +279,8 @@ enum Opcodes
     CMSG_MOVE_SET_PITCH                                   = 0x7312, // 4.3.4 15595
     MSG_MOVE_WORLDPORT_ACK                                = 0x10DD,
     SMSG_MONSTER_MOVE                                     = 0x6E17, // 4.3.4 15595
-    SMSG_MOVE_WATER_WALK                                  = 0x10DF,
-    SMSG_MOVE_LAND_WALK                                   = 0x10E0,
+    SMSG_MOVE_WATER_WALK                                  = 0x75B1, // 4.3.4 15595
+    SMSG_MOVE_LAND_WALK                                   = 0x34B7, // 4.3.4 15595
     CMSG_MOVE_CHARM_PORT_CHEAT                            = 0x10E1,
     CMSG_MOVE_SET_RAW_POSITION                            = 0x10E2,
     SMSG_FORCE_RUN_SPEED_CHANGE                           = 0x10E3,
@@ -289,10 +289,10 @@ enum Opcodes
     CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK                  = 0x10E6,
     SMSG_FORCE_SWIM_SPEED_CHANGE                          = 0x10E7,
     CMSG_FORCE_SWIM_SPEED_CHANGE_ACK                      = 0x10E8,
-    SMSG_FORCE_MOVE_ROOT                                  = 0x10E9,
-    CMSG_FORCE_MOVE_ROOT_ACK                              = 0x10EA,
-    SMSG_FORCE_MOVE_UNROOT                                = 0x10EB,
-    CMSG_FORCE_MOVE_UNROOT_ACK                            = 0x10EC,
+    SMSG_FORCE_MOVE_ROOT                                  = 0x7DA0, // 4.3.4 15595
+    CMSG_FORCE_MOVE_ROOT_ACK                              = 0x701E, // 4.3.4 15595
+    SMSG_FORCE_MOVE_UNROOT                                = 0x7DB4, // 4.3.4 15595
+    CMSG_FORCE_MOVE_UNROOT_ACK                            = 0x7808, // 4.3.4 15595
     MSG_MOVE_ROOT                                         = 0x10ED,
     MSG_MOVE_UNROOT                                       = 0x10EE,
     MSG_MOVE_HEARTBEAT                                    = 0x3914, // 4.3.4 15595
@@ -553,11 +553,10 @@ enum Opcodes
     CMSG_PET_CAST_SPELL                                   = 0x11F1,
     MSG_SAVE_GUILD_EMBLEM                                 = 0x11F2,
     MSG_TABARDVENDOR_ACTIVATE                             = 0x11F3,
-    SMSG_PLAY_SPELL_VISUAL                                = 0x11F4,
+    SMSG_PLAY_SPELL_VISUAL                                = 0x55A5, // 4.3.4 15595
     CMSG_ZONEUPDATE                                       = 0x11F5,
     SMSG_PARTYKILLLOG                                     = 0x11F6,
     SMSG_COMPRESSED_UPDATE_OBJECT                         = 0x11F7,
-    SMSG_PLAY_SPELL_IMPACT                                = 0x11F8,
     SMSG_EXPLORATION_EXPERIENCE                           = 0x11F9,
     CMSG_GM_SET_SECURITY_GROUP                            = 0x11FA,
     CMSG_GM_NUKE                                          = 0x11FB,
@@ -774,7 +773,7 @@ enum Opcodes
     CMSG_REQUEST_RAID_INFO                                = 0x12CE,
     CMSG_MOVE_TIME_SKIPPED                                = 0x12CF,
     CMSG_MOVE_FEATHER_FALL_ACK                            = 0x12D0,
-    CMSG_MOVE_WATER_WALK_ACK                              = 0x12D1,
+    CMSG_MOVE_WATER_WALK_ACK                              = 0x3B00, // 4.3.4 15595
     CMSG_MOVE_NOT_ACTIVE_MOVER                            = 0x12D2,
     SMSG_PLAY_SOUND                                       = 0x12D3,
     CMSG_BATTLEFIELD_STATUS                               = 0x12D4,
@@ -891,7 +890,7 @@ enum Opcodes
     MSG_MOVE_STOP_SWIM_CHEAT                              = 0x1343,
     SMSG_MOVE_SET_CAN_FLY                                 = 0x3DA1, // 4.3.4 15595
     SMSG_MOVE_UNSET_CAN_FLY                               = 0x15A2, // 4.3.4 15595
-    CMSG_MOVE_SET_CAN_FLY_ACK                             = 0x1346,
+    CMSG_MOVE_SET_CAN_FLY_ACK                             = 0x790C, // 4.3.4 15595
     CMSG_MOVE_SET_FLY                                     = 0x1347,
     CMSG_SOCKET_GEMS                                      = 0x1348,
     CMSG_ARENA_TEAM_CREATE                                = 0x1349,

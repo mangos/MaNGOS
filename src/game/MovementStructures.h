@@ -88,6 +88,7 @@ enum MovementStatusElements
     MSETransportTime,
     MSETransportTime2,
     MSETransportTime3,
+    MSEMovementCounter,
     MSEEnd,
     MSE_COUNT
 };
@@ -2035,6 +2036,79 @@ MovementStatusElements MovementFallResetSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MovementSetCanFlyAckSequence[] =
+{
+    MSEPositionY,
+    MSEMovementCounter,
+    MSEPositionX,
+    MSEPositionZ,
+    MSEGuidBit3,
+    MSEHasTimestamp,
+    MSEGuidBit4,
+    MSEGuidBit0,
+    MSEHasOrientation,
+    MSEHasFallData,
+    MSEGuidBit2,
+    MSEGuidBit5,
+    MSEHasSplineElevation,
+    MSEHasMovementFlags2,
+    MSEHasUnknownBit,
+    MSEGuidBit7,
+    MSEHasSpline,
+    MSEGuidBit6,
+    MSEGuidBit1,
+    MSEHasMovementFlags,
+    MSEHasTransportData,
+    MSEHasPitch,
+    MSETransportGuidBit3,
+    MSETransportGuidBit1,
+    MSETransportGuidBit2,
+    MSEHasTransportTime3,
+    MSEHasTransportTime2,
+    MSETransportGuidBit0,
+    MSETransportGuidBit5,
+    MSETransportGuidBit7,
+    MSETransportGuidBit4,
+    MSETransportGuidBit6,
+    MSEFlags2,
+    MSEFlags,
+    MSEHasFallDirection,
+    MSEGuidByte1,
+    MSEGuidByte0,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEGuidByte7,
+    MSEGuidByte6,
+    MSEGuidByte4,
+    MSEGuidByte5,
+    MSETransportTime2,
+    MSETransportGuidByte6,
+    MSETransportTime,
+    MSETransportTime3,
+    MSETransportGuidByte7,
+    MSETransportPositionZ,
+    MSETransportGuidByte3,
+    MSETransportPositionY,
+    MSETransportGuidByte5,
+    MSETransportPositionX,
+    MSETransportGuidByte2,
+    MSETransportPositionO,
+    MSETransportSeat,
+    MSETransportGuidByte1,
+    MSETransportGuidByte0,
+    MSETransportGuidByte4,
+    MSEFallTime,
+    MSEFallCosAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallSinAngle,
+    MSEFallVerticalSpeed,
+    MSEPitch,
+    MSEPositionO,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(uint16 opcode)
 {
     switch(opcode)
@@ -2047,6 +2121,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(uint16 opcode)
             return MovementFallResetSequence;
         case CMSG_MOVE_JUMP:
             return MovementJumpSequence;
+        case CMSG_MOVE_SET_CAN_FLY_ACK:
+            return MovementSetCanFlyAckSequence;
         case CMSG_MOVE_SET_FACING:
             return MovementSetFacingSequence;
         case CMSG_MOVE_SET_PITCH:
