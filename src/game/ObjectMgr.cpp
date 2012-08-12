@@ -1251,7 +1251,8 @@ void ObjectMgr::LoadCreatures()
         }
 
         // Map 0 was removed from dbc as of 4.x.x
-        if ((data.spawnMask & ~spawnMasks[data.mapid]) && data.mapid !=0)
+        spawnMasks[0] = 1;
+        if (data.spawnMask & ~spawnMasks[data.mapid])
             sLog.outErrorDb("Table `creature` have creature (GUID: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).", guid, data.spawnMask, data.mapid);
 
         bool ok = true;
