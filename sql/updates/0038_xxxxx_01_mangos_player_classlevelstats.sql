@@ -1,0 +1,3 @@
+ALTER TABLE db_version CHANGE COLUMN required_0034_xxxxx_03_mangos_player_classlevelstats required_0038_xxxxx_01_mangos_player_classlevelstats bit;
+
+DROP TABLE IF EXISTS `player_classlevelstats`;

@@ -448,7 +448,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
         *data << float(unit->GetSpeed(MOVE_TURN_RATE));
 
         if (hasOrientation)
-            *data << float(unit->GetOrientation());
+            *data << float(NormalizeOrientation(unit->GetOrientation()));
 
         *data << float(unit->GetSpeed(MOVE_RUN));
 
@@ -460,7 +460,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
     if (updateFlags & UPDATEFLAG_VEHICLE)
     {
-        *data << float(((WorldObject*)this)->GetOrientation());
+        *data << float(NormalizeOrientation(((WorldObject*)this)->GetOrientation()));
         *data << uint32(((Unit*)this)->GetVehicleInfo()->GetEntry()->m_ID); // vehicle id
     }
 
@@ -469,16 +469,16 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
     {
         ObjectGuid transGuid;
 
-        data->WriteGuidMask<0, 5>(transGuid);
+        data->WriteGuidBytes<0, 5>(transGuid);
         if (hasTransportTime3)
             *data << uint32(0);
 
-        data->WriteGuidMask<3>(transGuid);
+        data->WriteGuidBytes<3>(transGuid);
         *data << float(0.0f);   // x offset
-        data->WriteGuidMask<4, 6, 1>(transGuid);
+        data->WriteGuidBytes<4, 6, 1>(transGuid);
         *data << uint32(0);     // transport time
         *data << float(0.0f);   // y offset
-        data->WriteGuidMask<2, 7>(transGuid);
+        data->WriteGuidBytes<2, 7>(transGuid);
         *data << float(0.0f);   // z offset
         *data << int8(-1);      // transport seat
         *data << float(0.0f);   // o offset
@@ -513,7 +513,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint16 updateFlags) const
 
     if (updateFlags & UPDATEFLAG_HAS_POSITION)
     {
-        *data << float(((WorldObject*)this)->GetOrientation());
+        *data << float(NormalizeOrientation(((WorldObject*)this)->GetOrientation()));
         *data << float(((WorldObject*)this)->GetPositionX());
         *data << float(((WorldObject*)this)->GetPositionY());
         *data << float(((WorldObject*)this)->GetPositionZ());
@@ -1364,13 +1364,13 @@ bool WorldObject::HasInArc(const float arcangle, const WorldObject* obj) const
     float arc = arcangle;
 
     // move arc to range 0.. 2*pi
-    arc = MapManager::NormalizeOrientation(arc);
+    arc = NormalizeOrientation(arc);
 
     float angle = GetAngle(obj);
     angle -= m_position.o;
 
     // move angle to range -pi ... +pi
-    angle = MapManager::NormalizeOrientation(angle);
+    angle = NormalizeOrientation(angle);
     if (angle > M_PI_F)
         angle -= 2.0f * M_PI_F;
 
@@ -1627,6 +1627,8 @@ void WorldObject::BuildMonsterChat(WorldPacket* data, ObjectGuid senderGuid, uin
     *data << uint32(strlen(text) + 1);
     *data << text;
     *data << uint8(0);                                      // ChatTag
+    *data << float(0.0f);
+    *data << uint8(0);
 }
 
 void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/)
@@ -1734,7 +1736,7 @@ namespace MaNGOS
     {
         public:
             NearUsedPosDo(WorldObject const& obj, WorldObject const* searcher, float absAngle, ObjectPosSelector& selector)
-                : i_object(obj), i_searcher(searcher), i_absAngle(MapManager::NormalizeOrientation(absAngle)), i_selector(selector) {}
+                : i_object(obj), i_searcher(searcher), i_absAngle(NormalizeOrientation(absAngle)), i_selector(selector) {}
 
             void operator()(Corpse*) const {}
             void operator()(DynamicObject*) const {}

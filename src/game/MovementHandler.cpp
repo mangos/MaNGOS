@@ -468,26 +468,23 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_MOVE_HOVER_ACK");
 
-    ObjectGuid guid;                                        // guid - unused
+    recv_data.rfinish();
+    /*
     MovementInfo movementInfo;
-
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // unk1
     recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk2
+    */
 }
 
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_MOVE_WATER_WALK_ACK");
 
-    ObjectGuid guid;                                        // guid - unused
-    MovementInfo movementInfo;
+    recv_data.rfinish();
 
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // unk1
+    /*
+    MovementInfo movementInfo;
     recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk2
+    */
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)

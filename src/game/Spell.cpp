@@ -4544,9 +4544,9 @@ void Spell::SendPlaySpellVisual(uint32 SpellID)
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
-    data << m_caster->GetObjectGuid();
-    data << uint32(SpellID);                                // spell visual id?
+    WorldPacket data;
+    m_caster->BuildSendPlayVisualPacket(&data, SpellID, false);
+
     ((Player*)m_caster)->GetSession()->SendPacket(&data);
 }
 

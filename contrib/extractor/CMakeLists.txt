@@ -11,20 +11,12 @@
 cmake_minimum_required (VERSION 2.6)
 project (MANGOS_MAP_EXTRACTOR)
 
-message(FATAL_ERROR
-  "This project CMakeLists.txt outdated after switch use dep/libmpq and need update use existed Visual Studio projects for build."
-)
-
-add_subdirectory (libmpq)
 add_subdirectory (loadlib)
 
-include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
 include_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
-link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/libmpq)
 link_directories (${MANGOS_MAP_EXTRACTOR_SOURCE_DIR}/loadlib)
 
-add_executable (ad dbcfile.cpp mpq_libmpq.cpp System.cpp)
+add_executable (ad dbcfile.cpp System.cpp)
 
-target_link_libraries (ad libmpq)
-target_link_libraries (ad loadlib)
+target_link_libraries (ad loadlib libStormLib)

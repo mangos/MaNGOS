@@ -66,6 +66,8 @@ class UpdateData
 
         GuidSet const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
 
+        void SetMapId(uint16 mapId) { m_map = mapId; }
+
     protected:
         uint16 m_map;
         uint32 m_blockCount;
