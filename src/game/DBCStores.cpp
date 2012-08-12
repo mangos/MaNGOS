@@ -69,6 +69,10 @@ DBCStorage <CharTitlesEntry> sCharTitlesStore(CharTitlesEntryfmt);
 DBCStorage <ChatChannelsEntry> sChatChannelsStore(ChatChannelsEntryfmt);
 DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrPowerTypesEntry> sChrPowerTypesStore(ChrClassesXPowerTypesfmt);
+// pair<class,power> => powerIndex
+uint32 sChrClassXPowerTypesStore[MAX_CLASSES][MAX_POWERS];
+// pair<class,powerIndex> => power
+uint32 sChrClassXPowerIndexStore[MAX_CLASSES][MAX_STORED_POWERS];
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -438,7 +442,36 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCharTitlesStore,          dbcPath,"CharTitles.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChatChannelsStore,        dbcPath,"ChatChannels.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrClassesStore,          dbcPath,"ChrClasses.dbc");
-    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrPowerTypesStore,       dbcPath, "ChrClassesXPowerTypes.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrPowerTypesStore,       dbcPath,"ChrClassesXPowerTypes.dbc");
+    for (uint32 i = 0; i < MAX_CLASSES; ++i)
+    {
+        for (uint32 j = 0; j < MAX_POWERS; ++j)
+            sChrClassXPowerTypesStore[i][j] = INVALID_POWER_INDEX;
+        for (uint32 j = 0; j < MAX_STORED_POWERS; ++j)
+            sChrClassXPowerIndexStore[i][j] = INVALID_POWER;
+    }
+    for (uint32 i = 0; i < sChrPowerTypesStore.GetNumRows(); ++i)
+    {
+        ChrPowerTypesEntry const* entry = sChrPowerTypesStore.LookupEntry(i);
+        if (!entry)
+            continue;
+
+        MANGOS_ASSERT(entry->classId < MAX_CLASSES && "MAX_CLASSES not updated");
+        MANGOS_ASSERT(entry->power < MAX_POWERS && "MAX_POWERS not updated");
+
+        uint32 index = 0;
+
+        for (uint32 j = 0; j < MAX_POWERS; ++j)
+        {
+            if (sChrClassXPowerTypesStore[entry->classId][j] != INVALID_POWER_INDEX)
+                ++index;
+        }
+
+        MANGOS_ASSERT(index < MAX_STORED_POWERS && "MAX_STORED_POWERS not updated");
+
+        sChrClassXPowerTypesStore[entry->classId][entry->power] = index;
+        sChrClassXPowerIndexStore[entry->classId][index] = entry->power;
+    }
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrRacesStore,            dbcPath,"ChrRaces.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCinematicSequencesStore,  dbcPath,"CinematicSequences.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCreatureDisplayInfoStore, dbcPath,"CreatureDisplayInfo.dbc");
@@ -550,8 +583,21 @@ void LoadDBCStores(const std::string& dataPath)
 
     for(uint32 i = 1; i < sSpellEffectStore.GetNumRows(); ++i)
     {
-        if(SpellEffectEntry const *spellEffect = sSpellEffectStore.LookupEntry(i))
+        if (SpellEffectEntry const *spellEffect = sSpellEffectStore.LookupEntry(i))
+        {
+            switch (spellEffect->EffectApplyAuraName)
+            {
+                case SPELL_AURA_MOD_INCREASE_ENERGY:
+                case SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT:
+                case SPELL_AURA_PERIODIC_MANA_LEECH:
+                case SPELL_AURA_PERIODIC_ENERGIZE:
+                case SPELL_AURA_POWER_BURN_MANA:
+                    MANGOS_ASSERT(spellEffect->EffectMiscValue >= 0 && spellEffect->EffectMiscValue < MAX_POWERS);
+                    break;
+            }
+
             sSpellEffectMap[spellEffect->EffectSpellId].effects[spellEffect->EffectIndex] = spellEffect;
+        }
     }
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sSpellEquippedItemsStore,  dbcPath,"SpellEquippedItems.dbc");

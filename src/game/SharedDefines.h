@@ -154,11 +154,15 @@ enum Powers
     POWER_SOUL_SHARDS                   = 7,
     POWER_ECLIPSE                       = 8,
     POWER_HOLY_POWER                    = 9,
-    POWER_ALTERNATE                     = 10,
+    POWER_ALTERNATIVE                   = 10,
+    MAX_POWERS                          = 11,
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
-#define MAX_POWERS                        5
+#define MAX_STORED_POWERS               5
+// Setting this value to something high helps debugging
+#define INVALID_POWER_INDEX             10000
+#define INVALID_POWER                   MAX_POWERS
 
 enum SpellSchools
 {
