@@ -2064,8 +2064,15 @@ void Player::RegenerateAll(uint32 diff)
 // diff contains the time in milliseconds since last regen.
 void Player::Regenerate(Powers power, uint32 diff)
 {
-    uint32 curValue = GetPower(power);
-    uint32 maxValue = GetMaxPower(power);
+    uint32 powerIndex = GetPowerIndex(power);
+    if (powerIndex == INVALID_POWER_INDEX)
+        return;
+
+    uint32 maxValue = GetMaxPowerByIndex(powerIndex);
+    if (!maxValue)
+        return;
+
+    uint32 curValue = GetPowerByIndex(powerIndex);
 
     float addvalue = 0.0f;
 
@@ -2537,7 +2544,7 @@ void Player::GiveLevel(uint32 level)
     sObjectMgr.GetPlayerClassLevelInfo(getClass(), level, basehp, basemana);
 
     // send levelup info to client
-    WorldPacket data(SMSG_LEVELUP_INFO, (4 + 4 + MAX_POWERS * 4 + MAX_STATS * 4));
+    WorldPacket data(SMSG_LEVELUP_INFO, (4 + 4 + MAX_STORED_POWERS * 4 + MAX_STATS * 4));
     data << uint32(level);
     data << uint32(int32(basehp) - int32(GetCreateHealth()));
     // for(int i = 0; i < MAX_POWERS; ++i)                  // Powers loop (0-4)
@@ -16151,10 +16158,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     uint32 savedhealth = fields[50].GetUInt32();
     SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
 
-    for(uint32 i = 0; i < MAX_POWERS; ++i)
+    for(uint32 i = 0; i < MAX_STORED_POWERS; ++i)
     {
         uint32 savedpower = fields[51 + i].GetUInt32();
-        SetPower(Powers(i), savedpower > GetMaxPower(Powers(i)) ? GetMaxPower(Powers(i)) : savedpower);
+        SetPowerByIndex(i, std::min(savedpower, GetMaxPowerByIndex(i)));
     }
 
     DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s after load item and aura is: ", m_name.c_str());
@@ -17585,8 +17592,8 @@ void Player::SaveToDB()
 
     uberInsert.addUInt32(GetHealth());
 
-    for (uint32 i = 0; i < MAX_POWERS; ++i)
-        uberInsert.addUInt32(GetPower(Powers(i)));
+    for (uint32 i = 0; i < MAX_STORED_POWERS; ++i)
+        uberInsert.addUInt32(GetPowerByIndex(i));
 
     uberInsert.addUInt32(uint32(m_specsCount));
     uberInsert.addUInt32(uint32(m_activeSpec));
@@ -18260,8 +18267,8 @@ void Player::_SaveStats()
 
     stmt.addUInt32(GetGUIDLow());
     stmt.addUInt32(GetMaxHealth());
-    for (int i = 0; i < MAX_POWERS; ++i)
-        stmt.addUInt32(GetMaxPower(Powers(i)));
+    for (int i = 0; i < MAX_STORED_POWERS; ++i)
+        stmt.addUInt32(GetMaxPowerByIndex(i));
     for (int i = 0; i < MAX_STATS; ++i)
         stmt.addFloat(GetStat(Stats(i)));
     // armor + school resistances
