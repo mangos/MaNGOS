@@ -9810,6 +9810,14 @@ uint32 Unit::GetPowerIndexByClass(Powers powerId, uint32 classId)
     return sChrClassXPowerTypesStore[classId][uint32(powerId)];
 };
 
+Powers Unit::GetPowerTypeByIndex(uint32 index, uint32 classId)
+{
+    MANGOS_ASSERT(index < MAX_STORED_POWERS);
+    MANGOS_ASSERT(classId < MAX_CLASSES);
+
+    return Powers(sChrClassXPowerIndexStore[classId][index]);
+}
+
 int32 Unit::GetPower(Powers power) const
 {
     if (power == POWER_HEALTH)
@@ -9872,14 +9880,18 @@ void Unit::SetPowerByIndex(uint32 powerIndex, int32 val)
     if (GetPowerByIndex(powerIndex) == val)
         return;
 
+    MANGOS_ASSERT(powerIndex < MAX_STORED_POWERS);
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
     if (IsInWorld())
     {
+        Powers power = getPowerType(powerIndex);
+        MANGOS_ASSERT(power != INVALID_POWER);
+
         WorldPacket data(SMSG_POWER_UPDATE);
         data << GetPackGUID();
         data << uint32(1); // iteration count
-        data << uint8(powerIndex);
+        data << uint8(power);
         data << uint32(val);
         SendMessageToSet(&data, true);
     }

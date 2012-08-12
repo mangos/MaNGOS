@@ -71,6 +71,8 @@ DBCStorage <ChrClassesEntry> sChrClassesStore(ChrClassesEntryfmt);
 DBCStorage <ChrPowerTypesEntry> sChrPowerTypesStore(ChrClassesXPowerTypesfmt);
 // pair<class,power> => powerIndex
 uint32 sChrClassXPowerTypesStore[MAX_CLASSES][MAX_POWERS];
+// pair<class,powerIndex> => power
+uint32 sChrClassXPowerIndexStore[MAX_CLASSES][MAX_STORED_POWERS];
 DBCStorage <ChrRacesEntry> sChrRacesStore(ChrRacesEntryfmt);
 DBCStorage <CinematicSequencesEntry> sCinematicSequencesStore(CinematicSequencesEntryfmt);
 DBCStorage <CreatureDisplayInfoEntry> sCreatureDisplayInfoStore(CreatureDisplayInfofmt);
@@ -445,6 +447,8 @@ void LoadDBCStores(const std::string& dataPath)
     {
         for (uint32 j = 0; j < MAX_POWERS; ++j)
             sChrClassXPowerTypesStore[i][j] = INVALID_POWER_INDEX;
+        for (uint32 j = 0; j < MAX_STORED_POWERS; ++j)
+            sChrClassXPowerIndexStore[i][j] = INVALID_POWER;
     }
     for (uint32 i = 0; i < sChrPowerTypesStore.GetNumRows(); ++i)
     {
@@ -466,6 +470,7 @@ void LoadDBCStores(const std::string& dataPath)
         MANGOS_ASSERT(index < MAX_STORED_POWERS && "MAX_STORED_POWERS not updated");
 
         sChrClassXPowerTypesStore[entry->classId][entry->power] = index;
+        sChrClassXPowerIndexStore[entry->classId][index] = entry->power;
     }
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sChrRacesStore,            dbcPath,"ChrRaces.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCinematicSequencesStore,  dbcPath,"CinematicSequences.dbc");

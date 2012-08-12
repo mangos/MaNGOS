@@ -162,6 +162,7 @@ enum Powers
 #define MAX_STORED_POWERS               5
 // Setting this value to something high helps debugging
 #define INVALID_POWER_INDEX             10000
+#define INVALID_POWER                   MAX_POWERS
 
 enum SpellSchools
 {
