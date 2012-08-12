@@ -119,9 +119,18 @@ typedef uint16      WORD;
 typedef uint32      DWORD;
 #endif // COMPILER
 
+#define CONCAT(x, y) CONCAT1(x, y)
+#define CONCAT1(x, y) x##y
+#define STATIC_ASSERT_WORKAROUND(expr, msg) typedef char CONCAT(static_assert_failed_at_line_, __LINE__) [(expr) ? 1 : -1]
+
 #if COMPILER == COMPILER_GNU
 #  if !defined(__GXX_EXPERIMENTAL_CXX0X__) || (__GNUC__ < 4) || (__GNUC__ == 4) && (__GNUC_MINOR__ < 7)
 #    define override
+#    define static_assert(a, b) STATIC_ASSERT_WORKAROUND(a, b)
+#  endif
+#elif COMPILER == COMPILER_MICROSOFT
+#  if _MSC_VER < 1600
+#    define static_assert(a, b) STATIC_ASSERT_WORKAROUND(a, b)
 #  endif
 #endif
 
