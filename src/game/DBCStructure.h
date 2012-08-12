@@ -42,28 +42,28 @@ typedef char const* const* DBCString;                       //char* DBCStrings[M
 
 struct AchievementEntry
 {
-    uint32      ID;                                           // 0        m_ID
-    uint32      factionFlag;                                  // 1        m_faction -1=all, 0=horde, 1=alliance
-    uint32      mapID;                                        // 2        m_instance_id -1=none
-    uint32      parentAchievement;                            // 3        m_supercedes its Achievement parent (can`t start while parent uncomplete, use its Criteria if don`t have own, use its progress on begin)
-    DBCString   name;                                         // 4        m_title_lang
-    DBCString   description;                                  // 5        m_description_lang
-    uint32      categoryId;                                   // 6        m_category
-    uint32      points;                                       // 7        m_points
-    uint32      OrderInCategory;                              // 8        m_ui_order
-    uint32      flags;                                        // 9        m_flags
-    uint32      icon;                                         // 10       m_iconID
-    DBCString   titleReward;                                 // 11       m_reward_lang
-    uint32      count;                                        // 12       m_minimum_criteria - need this count of completed criterias (own or referenced achievement criterias)
-    uint32      refAchievement;                               // 13       m_shares_criteria - referenced achievement (counting of all completed criterias)
+    uint32      ID;                                         // 0        m_ID
+    uint32      factionFlag;                                // 1        m_faction -1=all, 0=horde, 1=alliance
+    uint32      mapID;                                      // 2        m_instance_id -1=none
+    uint32      parentAchievement;                          // 3        m_supercedes its Achievement parent (can`t start while parent uncomplete, use its Criteria if don`t have own, use its progress on begin)
+    DBCString   name;                                       // 4        m_title_lang
+    DBCString   description;                                // 5        m_description_lang
+    uint32      categoryId;                                 // 6        m_category
+    uint32      points;                                     // 7        m_points
+    uint32      OrderInCategory;                            // 8        m_ui_order
+    uint32      flags;                                      // 9        m_flags
+    uint32      icon;                                       // 10       m_iconID
+    DBCString   titleReward;                                // 11       m_reward_lang
+    uint32      count;                                      // 12       m_minimum_criteria - need this count of completed criterias (own or referenced achievement criterias)
+    uint32      refAchievement;                             // 13       m_shares_criteria - referenced achievement (counting of all completed criterias)
 };
 
 struct AchievementCategoryEntry
 {
     uint32    ID;                                           // 0        m_ID
     uint32    parentCategory;                               // 1        m_parent -1 for main category
-    DBCString name;                                           // 2        m_name_lang
-    uint32    sortOrder;                                  // 3        m_ui_order
+    DBCString name;                                         // 2        m_name_lang
+    uint32    sortOrder;                                    // 3        m_ui_order
 };
 
 struct AchievementCriteriaEntry
