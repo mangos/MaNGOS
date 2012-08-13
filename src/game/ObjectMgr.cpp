@@ -6791,6 +6791,59 @@ void ObjectMgr::LoadNPCSpellClickSpells()
     sLog.outString(">> Loaded %u spellclick definitions", count);
 }
 
+static char* SERVER_SIDE_SPELL      = "MaNGOS server-side spell";
+
+struct SQLSpellLoader : public SQLStorageLoaderBase<SQLSpellLoader>
+{
+    template<class S, class D>
+    void default_fill(uint32 field_pos, S src, D &dst)
+    {
+        if (field_pos == 65)                                // EquippedItemClass
+            dst = D(-1);
+        else
+            dst = D(src);
+    }
+
+    void default_fill_to_str(uint32 field_pos, char const* /*src*/, char * & dst)
+    {
+        if (field_pos == 132)                               // SpellName[0]
+        {
+            dst = SERVER_SIDE_SPELL;
+        }
+        else
+        {
+            dst = new char[1];
+            *dst = 0;
+        }
+    }
+};
+
+void ObjectMgr::LoadSpellTemplate()
+{
+    SQLSpellLoader loader;
+    loader.Load(sSpellTemplate);
+
+    sLog.outString(">> Loaded %u spell definitions", sSpellTemplate.RecordCount);
+    sLog.outString();
+
+    for (uint32 i = 1; i < sSpellTemplate.MaxEntry; ++i)
+    {
+        // check data correctness
+        SpellEntry const* spellEntry = sSpellTemplate.LookupEntry<SpellEntry>(i);
+        if (!spellEntry)
+            continue;
+
+        // insert serverside spell data
+        if (sSpellStore.GetNumRows() <= i)
+        {
+            sLog.outErrorDb("Loading Spell Template for spell %u, index out of bounds (max = %)", i, sSpellStore.GetNumRows());
+            continue;
+        }
+        else
+            sSpellStore.InsertEntry(const_cast<SpellEntry*>(spellEntry), i);
+    }
+}
+
 void ObjectMgr::LoadWeatherZoneChances()
 {
     uint32 count = 0;
