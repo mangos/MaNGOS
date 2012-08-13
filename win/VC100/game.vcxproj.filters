@@ -978,6 +978,7 @@
     </ClInclude>
     <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h">
       <Filter>World/Handlers</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\game\DB2fmt.h">
       <Filter>Server</Filter>
     </ClInclude>
