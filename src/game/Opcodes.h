@@ -102,8 +102,8 @@ enum Opcodes
     SMSG_CHAR_DELETE                                      = 0x0304, // 4.3.4 15595
     CMSG_PLAYER_LOGIN                                     = 0x05B1, // 4.3.4 15595
     SMSG_NEW_WORLD                                        = 0x79B1, // 4.3.4 15595
-    SMSG_TRANSFER_PENDING                                 = 0x1040,
-    SMSG_TRANSFER_ABORTED                                 = 0x1041,
+    SMSG_TRANSFER_PENDING                                 = 0x18A6, // 4.3.4 15595
+    SMSG_TRANSFER_ABORTED                                 = 0x0537, // 4.3.4 15595
     SMSG_CHARACTER_LOGIN_FAILED                           = 0x1042,
     SMSG_LOGIN_SETTIMESPEED                               = 0x4D15, // 4.3.4 15595
     SMSG_GAMETIME_UPDATE                                  = 0x1044,
@@ -254,9 +254,9 @@ enum Opcodes
     CMSG_MOVE_SET_RUN_MODE                                = 0x791A, // 4.3.4 15595
     CMSG_MOVE_SET_WALK_MODE                               = 0x7002, // 4.3.4 15595
     MSG_MOVE_TOGGLE_LOGGING                               = 0x10C5,
-    MSG_MOVE_TELEPORT                                     = 0x55A0, // 4.3.4 15595
+    SMSG_MOVE_TELEPORT                                    = 0x55A0, // 4.3.4 15595
     MSG_MOVE_TELEPORT_CHEAT                               = 0x10C7,
-    MSG_MOVE_TELEPORT_ACK                                 = 0x10C8,
+    CMSG_MOVE_TELEPORT_ACK                                = 0x390C, // 4.3.4 15595
     MSG_MOVE_TOGGLE_FALL_LOGGING                          = 0x10C9,
     CMSG_MOVE_FALL_LAND                                   = 0x380A, // 4.3.4 15595
     CMSG_MOVE_START_SWIM                                  = 0x3206, // 4.3.4 15595
@@ -277,7 +277,7 @@ enum Opcodes
     MSG_MOVE_TOGGLE_COLLISION_CHEAT                       = 0x10DA,
     CMSG_MOVE_SET_FACING                                  = 0x7914, // 4.3.4 15595
     CMSG_MOVE_SET_PITCH                                   = 0x7312, // 4.3.4 15595
-    MSG_MOVE_WORLDPORT_ACK                                = 0x10DD,
+    MSG_MOVE_WORLDPORT_ACK                                = 0x2411, // 4.3.4 15595
     SMSG_MONSTER_MOVE                                     = 0x6E17, // 4.3.4 15595
     SMSG_MOVE_WATER_WALK                                  = 0x75B1, // 4.3.4 15595
     SMSG_MOVE_LAND_WALK                                   = 0x34B7, // 4.3.4 15595
@@ -809,7 +809,7 @@ enum Opcodes
     SMSG_PET_UNLEARN_CONFIRM                              = 0x12F2,
     SMSG_PARTY_MEMBER_STATS_FULL                          = 0x12F3,
     CMSG_PET_SPELL_AUTOCAST                               = 0x12F4,
-    SMSG_WEATHER                                          = 0x12F5,
+    SMSG_WEATHER                                          = 0x2904, // 4.3.4 15595
     SMSG_PLAY_TIME_WARNING                                = 0x12F6,
     SMSG_MINIGAME_SETUP                                   = 0x12F7,
     SMSG_MINIGAME_STATE                                   = 0x12F8,

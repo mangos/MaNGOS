@@ -139,6 +139,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         return;
     }
 
+    sLog.outError("SESSION: sent packet 0x%.4X (%s) to %s (%u)", packet->GetOpcode(),
+        LookupOpcodeName(packet->GetOpcode()), GetPlayerName(), GetAccountId());
+
     const_cast<WorldPacket*>(packet)->FlushBits();
 
 #ifdef MANGOS_DEBUG
@@ -218,6 +221,9 @@ bool WorldSession::Update(PacketFilter& updater)
                         LookupOpcodeName(packet->GetOpcode()),
                         packet->GetOpcode());
         #endif*/
+
+        sLog.outError("SESSION: received packet 0x%.4X (%s) from %s (%u)", packet->GetOpcode(),
+            LookupOpcodeName(packet->GetOpcode()), GetPlayerName(), GetAccountId());
 
         OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try

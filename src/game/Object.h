@@ -25,6 +25,7 @@
 #include "UpdateData.h"
 #include "ObjectGuid.h"
 #include "Camera.h"
+#include "Util.h"
 
 #include <set>
 #include <string>
@@ -88,9 +89,9 @@ struct WorldLocation
     float coord_z;
     float orientation;
     explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(_o) {}
+        : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(NormalizeOrientation(_o)) {}
     WorldLocation(WorldLocation const& loc)
-        : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
+        : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(NormalizeOrientation(loc.orientation)) {}
 };
 
 

@@ -202,14 +202,15 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("MSG_MOVE_TELEPORT_ACK");
+    DEBUG_LOG("CMSG_MOVE_TELEPORT_ACK");
 
     ObjectGuid guid;
-
-    recv_data >> guid.ReadAsPacked();
-
     uint32 counter, time;
     recv_data >> counter >> time;
+
+    recv_data.ReadGuidMask<5, 0, 1, 6, 3, 7, 2, 4>(guid);
+    recv_data.ReadGuidBytes<4, 2, 7, 6, 5, 1, 3, 0>(guid);
+
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
     DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
