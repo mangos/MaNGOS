@@ -123,9 +123,9 @@ void LoadDB2Stores(const std::string& dataPath)
         exit(1);
     }
 
-    // Check loaded DBC files proper version
-    if (!sItemStore.LookupEntry(68815)     ||           // last client known item added in 4.2.0
-        !sItemExtendedCostStore.LookupEntry(3652))      // last item extended cost added in 4.2.0
+    // Check loaded DB2 files proper version
+    if (!sItemStore.LookupEntry(83086)             ||       // last item added in 4.3.4 (15595)
+        !sItemExtendedCostStore.LookupEntry(3872)  )        // last item extended cost added in 4.3.4 (15595)
     {
         sLog.outString("");
         sLog.outError("Please extract correct db2 files from build %s", AcceptableClientBuildsListStr().c_str());
