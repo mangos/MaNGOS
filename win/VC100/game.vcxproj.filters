@@ -513,6 +513,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\game\CreatureLinkingMgr.cpp">
       <Filter>World/Handlers</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\src\game\DB2Stores.cpp">
       <Filter>Server</Filter>
     </ClCompile>
@@ -977,6 +978,7 @@
     </ClInclude>
     <ClInclude Include="..\..\src\game\CreatureLinkingMgr.h">
       <Filter>World/Handlers</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\game\DB2fmt.h">
       <Filter>Server</Filter>
     </ClInclude>
