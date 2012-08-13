@@ -2482,8 +2482,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             break;
         case TARGET_IN_FRONT_OF_CASTER:
         {
-            bool inFront = m_spellInfo->SpellVisual[0] != 3879;
-            FillAreaTargets(targetUnitMap, radius, inFront ? PUSH_IN_FRONT : PUSH_IN_BACK, SPELL_TARGETS_AOE_DAMAGE);
+            SpellNotifyPushType pushType = PUSH_IN_FRONT;
+            switch (m_spellInfo->SpellVisual[0])            // Some spell require a different target fill
+            {
+                case 3879: pushType = PUSH_IN_BACK;     break;
+                case 7441: pushType = PUSH_IN_FRONT_15; break;
+            }
+            FillAreaTargets(targetUnitMap, radius, pushType, SPELL_TARGETS_AOE_DAMAGE);
             break;
         }
         case TARGET_LARGE_FRONTAL_CONE:
