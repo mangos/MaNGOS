@@ -517,8 +517,8 @@ enum Opcodes
     SMSG_FISH_ESCAPED                                     = 0x11CA,
     CMSG_BUG                                              = 0x11CB,
     SMSG_NOTIFICATION                                     = 0x14A0, // 4.3.4 15595
-    CMSG_PLAYED_TIME                                      = 0x11CD,
-    SMSG_PLAYED_TIME                                      = 0x11CE,
+    CMSG_PLAYED_TIME                                      = 0x0804, // 4.3.4 15595
+    SMSG_PLAYED_TIME                                      = 0x6037, // 4.3.4 15595
     CMSG_QUERY_TIME                                       = 0x0A36, // 4.3.4 15595
     SMSG_QUERY_TIME_RESPONSE                              = 0x2124, // 4.3.4 15595
     SMSG_LOG_XPGAIN                                       = 0x11D1,
