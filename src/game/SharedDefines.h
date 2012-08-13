@@ -773,7 +773,25 @@ enum SpellEffects
     SPELL_EFFECT_TALENT_SPEC_SELECT        = 162,
     SPELL_EFFECT_163                       = 163,
     SPELL_EFFECT_CANCEL_AURA               = 164,
-    TOTAL_SPELL_EFFECTS                    = 165
+    SPELL_EFFECT_165                       = 165,
+    SPELL_EFFECT_166                       = 166,
+    SPELL_EFFECT_167                       = 167,
+    SPELL_EFFECT_168                       = 168,
+    SPELL_EFFECT_169                       = 169,
+    SPELL_EFFECT_170                       = 170,
+    SPELL_EFFECT_171                       = 171,
+    SPELL_EFFECT_MASS_RESSURECTION         = 172,
+    SPELL_EFFECT_BUY_GUILD_BANKSLOT        = 173,
+    SPELL_EFFECT_174                       = 174,
+    SPELL_EFFECT_175                       = 175,
+    SPELL_EFFECT_176                       = 176,
+    SPELL_EFFECT_177                       = 177,
+    SPELL_EFFECT_178                       = 178,
+    SPELL_EFFECT_179                       = 179,
+    SPELL_EFFECT_180                       = 180,
+    SPELL_EFFECT_181                       = 181,
+    SPELL_EFFECT_182                       = 182,
+    TOTAL_SPELL_EFFECTS                    = 183,
 };
 
 enum SpellCastResult

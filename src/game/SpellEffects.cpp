@@ -225,6 +225,24 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectActivateSpec,                             //162 SPELL_EFFECT_TALENT_SPEC_SELECT       activate primary/secondary spec
     &Spell::EffectUnused,                                   //163 unused in 3.3.5a
     &Spell::EffectCancelAura,                               //164 SPELL_EFFECT_CANCEL_AURA
+    &Spell::EffectNULL,                                     //165 SPELL_EFFECT_165                      82 spells in 4.3.4
+    &Spell::EffectNULL,                                     //166 SPELL_EFFECT_166                      56 spells in 4.3.4
+    &Spell::EffectNULL,                                     //167 SPELL_EFFECT_167                      42 spells in 4.3.4
+    &Spell::EffectNULL,                                     //168 SPELL_EFFECT_168                      2 spells in 4.3.4 Allows give commands to controlled pet
+    &Spell::EffectNULL,                                     //169 SPELL_EFFECT_169                      9 spells in 4.3.4 removes something
+    &Spell::EffectNULL,                                     //170 SPELL_EFFECT_170                      70 spells in 4.3.4
+    &Spell::EffectNULL,                                     //171 SPELL_EFFECT_171                      19 spells in 4.3.4 related to GO summon
+    &Spell::EffectNULL,                                     //172 SPELL_EFFECT_MASS_RESSURECTION        Mass Ressurection (Guild Perk)
+    &Spell::EffectNULL,                                     //173 SPELL_EFFECT_BUY_GUILD_BANKSLOT       4 spells in 4.3.4 basepoints - slot
+    &Spell::EffectNULL,                                     //174 SPELL_EFFECT_174                      13 spells some sort of area aura apply effect
+    &Spell::EffectUnused,                                   //175 SPELL_EFFECT_175                      unused in 4.3.4
+    &Spell::EffectNULL,                                     //176 SPELL_EFFECT_176                      4 spells in 4.3.4
+    &Spell::EffectNULL,                                     //177 SPELL_EFFECT_177                      2 spells in 4.3.4 Deluge(100757) and test spell
+    &Spell::EffectUnused,                                   //178 SPELL_EFFECT_178                      unused in 4.3.4
+    &Spell::EffectNULL,                                     //179 SPELL_EFFECT_179                      15 spells in 4.3.4
+    &Spell::EffectUnused,                                   //180 SPELL_EFFECT_180                      unused in 4.3.4
+    &Spell::EffectUnused,                                   //181 SPELL_EFFECT_181                      unused in 4.3.4
+    &Spell::EffectNULL,                                     //182 SPELL_EFFECT_182                      3 spells 4.3.4
 };
 
 void Spell::EffectEmpty(SpellEffectEntry const* /*effect*/)
