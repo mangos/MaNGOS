@@ -234,10 +234,10 @@ enum Opcodes
     SMSG_READ_ITEM_OK                                     = 0x10AF,
     SMSG_READ_ITEM_FAILED                                 = 0x10B0,
     SMSG_ITEM_COOLDOWN                                    = 0x10B1,
-    CMSG_GAMEOBJ_USE                                      = 0x10B2,
+    CMSG_GAMEOBJ_USE                                      = 0x4E17, // 4.3.4 15595
     CMSG_DESTROY_ITEMS                                    = 0x10B3,
     SMSG_GAMEOBJECT_CUSTOM_ANIM                           = 0x10B4,
-    CMSG_AREATRIGGER                                      = 0x10B5,
+    CMSG_AREATRIGGER                                      = 0x0937, // 4.3.4 15595
     CMSG_MOVE_START_FORWARD                               = 0x7814, // 4.3.4 15595
     CMSG_MOVE_START_BACKWARD                              = 0x330A, // 4.3.4 15595
     CMSG_MOVE_STOP                                        = 0x320A, // 4.3.4 15595
@@ -516,7 +516,7 @@ enum Opcodes
     SMSG_FISH_NOT_HOOKED                                  = 0x11C9,
     SMSG_FISH_ESCAPED                                     = 0x11CA,
     CMSG_BUG                                              = 0x11CB,
-    SMSG_NOTIFICATION                                     = 0x11CC,
+    SMSG_NOTIFICATION                                     = 0x14A0, // 4.3.4 15595
     CMSG_PLAYED_TIME                                      = 0x11CD,
     SMSG_PLAYED_TIME                                      = 0x11CE,
     CMSG_QUERY_TIME                                       = 0x0A36, // 4.3.4 15595
@@ -650,7 +650,7 @@ enum Opcodes
     SMSG_RESURRECT_FAILED                                 = 0x1253,
     CMSG_TOGGLE_PVP                                       = 0x1254,
     SMSG_ZONE_UNDER_ATTACK                                = 0x1255,
-    MSG_AUCTION_HELLO                                     = 0x1256,
+    MSG_AUCTION_HELLO                                     = 0x2307, // 4.3.4 15595
     CMSG_AUCTION_SELL_ITEM                                = 0x1257,
     CMSG_AUCTION_REMOVE_ITEM                              = 0x1258,
     CMSG_AUCTION_LIST_ITEMS                               = 0x1259,
@@ -1115,9 +1115,9 @@ enum Opcodes
     SMSG_SPLINE_MOVE_UNSET_FLYING                         = 0x1424,
     SMSG_SUMMON_CANCEL                                    = 0x1425,
     CMSG_CHANGE_PERSONAL_ARENA_RATING                     = 0x1426,
-    CMSG_ALTER_APPEARANCE                                 = 0x1427,
-    SMSG_ENABLE_BARBER_SHOP                               = 0x1428,
-    SMSG_BARBER_SHOP_RESULT                               = 0x1429,
+    CMSG_ALTER_APPEARANCE                                 = 0x0914, // 4.3.4 15595
+    SMSG_ENABLE_BARBER_SHOP                               = 0x2D16, // 4.3.4 15595
+    SMSG_BARBER_SHOP_RESULT                               = 0x6125, // 4.3.4 15595
     CMSG_CALENDAR_GET_CALENDAR                            = 0x142A,
     CMSG_CALENDAR_GET_EVENT                               = 0x142B,
     CMSG_CALENDAR_GUILD_FILTER                            = 0x142C,
@@ -1206,7 +1206,7 @@ enum Opcodes
     CMSG_FORCE_SAY_CHEAT                                  = 0x147F,
     SMSG_HEALTH_UPDATE                                    = 0x1480,
     SMSG_POWER_UPDATE                                     = 0x1481,
-    CMSG_GAMEOBJ_REPORT_USE                               = 0x1482,
+    CMSG_GAMEOBJ_REPORT_USE                               = 0x4827, // 4.3.4 15595
     SMSG_HIGHEST_THREAT_UPDATE                            = 0x1483,
     SMSG_THREAT_UPDATE                                    = 0x1484,
     SMSG_THREAT_REMOVE                                    = 0x1485,
