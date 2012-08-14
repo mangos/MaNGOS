@@ -32,13 +32,13 @@
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     uint8 bagIndex, slot;
-    uint8 unk_flags;                                        // flags (if 0x02 - some additional data are received)
+    uint8 cast_flags;                                       // flags (if 0x02 - some additional data are received)
     uint8 cast_count;                                       // next cast if exists (single or not)
     ObjectGuid itemGuid;
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellid;                                         // casted spell id
 
-    recvPacket >> bagIndex >> slot >> cast_count >> spellid >> itemGuid >> glyphIndex >> unk_flags;
+    recvPacket >> bagIndex >> slot >> cast_count >> spellid >> itemGuid >> glyphIndex >> cast_flags;
 
     // TODO: add targets.read() check
     Player* pUser = _player;
@@ -73,7 +73,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = %i", bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, unk_flags, (uint32)recvPacket.size());
+    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = %i", bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, cast_flags, (uint32)recvPacket.size());
 
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
@@ -156,6 +156,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     recvPacket >> targets.ReadForCaster(pUser);
 
     targets.Update(pUser);
+
+    targets.ReadAdditionalData(recvPacket, cast_flags);
 
     if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
     {
@@ -336,11 +338,11 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
-    uint32 spellId;
-    uint8  cast_count, unk_flags;
+    uint32 spellId, glyphIndex;
+    uint8  cast_count, cast_flags;
     recvPacket >> cast_count;
-    recvPacket >> spellId;
-    recvPacket >> unk_flags;                                // flags (if 0x02 - some additional data are received)
+    recvPacket >> spellId >> glyphIndex;
+    recvPacket >> cast_flags;                           // flags (if 0x02 - some additional data are received)
 
     // ignore for remote control state (for player case)
     Unit* mover = _player->GetMover();
@@ -350,8 +352,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, cast_count: %u, unk_flags %u, data length = %i",
-              spellId, cast_count, unk_flags, (uint32)recvPacket.size());
+    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, cast_count: %u, cast_flags %u, data length = %i",
+              spellId, cast_count, cast_flags, (uint32)recvPacket.size());
 
     SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellId);
 
@@ -389,24 +391,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     recvPacket >> targets.ReadForCaster(mover);
 
-    // some spell cast packet including more data (for projectiles?)
-    if (unk_flags & 0x02)
-    {
-        uint8 unk1;
-
-        recvPacket >> Unused<float>();                      // unk1, coords?
-        recvPacket >> Unused<float>();                      // unk1, coords?
-        recvPacket >> unk1;                                 // >> 1 or 0
-        if (unk1)
-        {
-            ObjectGuid guid;                                // guid - unused
-            MovementInfo movementInfo;
-
-            recvPacket >> Unused<uint32>();                 // >> CMSG_MOVE_STOP
-            recvPacket >> guid.ReadAsPacked();
-            recvPacket >> movementInfo;
-        }
-    }
+    targets.ReadAdditionalData(recvPacket, cast_flags);
 
     // auto-selection buff level base at target level (in spellInfo)
     if (Unit* target = targets.getUnitTarget())

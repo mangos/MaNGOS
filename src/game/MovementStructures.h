@@ -2109,10 +2109,86 @@ MovementStatusElements MovementSetCanFlyAckSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MovementCastSpellSequence[] =
+{
+    MSEPositionZ,
+    MSEPositionY,
+    MSEPositionX,
+    MSEHasFallData,
+    MSEHasTimestamp,
+    MSEHasOrientation,
+    MSEHasSpline,
+    MSEHasUnknownBit,
+    MSEGuidBit6,
+    MSEGuidBit4,
+    MSEHasMovementFlags2,
+    MSEGuidBit3,
+    MSEGuidBit5,
+    MSEHasSplineElevation,
+    MSEHasPitch,
+    MSEGuidBit7,
+    MSEHasTransportData,
+    MSEGuidBit2,
+    MSEHasMovementFlags,
+    MSEGuidBit1,
+    MSEGuidBit0,
+    MSETransportGuidBit6,
+    MSETransportGuidBit2,
+    MSETransportGuidBit5,
+    MSEHasTransportTime2,
+    MSETransportGuidBit7,
+    MSETransportGuidBit4,
+    MSEHasTransportTime3,
+    MSETransportGuidBit0,
+    MSETransportGuidBit1,
+    MSETransportGuidBit3,
+    MSEFlags2,
+    MSEFlags,
+    MSEHasFallDirection,
+    MSEGuidByte1,
+    MSEGuidByte4,
+    MSEGuidByte7,
+    MSEGuidByte3,
+    MSEGuidByte0,
+    MSEGuidByte2,
+    MSEGuidByte5,
+    MSEGuidByte6,
+    MSETransportSeat,
+    MSETransportPositionO,
+    MSETransportTime,
+    MSETransportGuidByte6,
+    MSETransportGuidByte5,
+    MSETransportTime3,
+    MSETransportPositionX,
+    MSETransportGuidByte4,
+    MSETransportPositionZ,
+    MSETransportGuidByte2,
+    MSETransportGuidByte0,
+    MSETransportTime2,
+    MSETransportGuidByte1,
+    MSETransportGuidByte3,
+    MSETransportPositionY,
+    MSETransportGuidByte7,
+    MSEPositionO,
+    MSESplineElevation,
+    MSEFallTime,
+    MSEFallHorizontalSpeed,
+    MSEFallCosAngle,
+    MSEFallSinAngle,
+    MSEFallVerticalSpeed,
+    MSETimestamp,
+    MSEPitch,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(uint16 opcode)
 {
     switch(opcode)
     {
+        case CMSG_CAST_SPELL:
+        case CMSG_PET_CAST_SPELL:
+        case CMSG_USE_ITEM:
+            return MovementCastSpellSequence;
         case CMSG_MOVE_CHNG_TRANSPORT:
             return MovementChngTransportSequence;
         case CMSG_MOVE_FALL_LAND:

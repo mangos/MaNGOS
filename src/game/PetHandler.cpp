@@ -633,11 +633,11 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     ObjectGuid guid;
     uint32 spellid;
     uint8  cast_count;
-    uint8  unk_flags;                                       // flags (if 0x02 - some additional data are received)
+    uint8  cast_flags;                                      // flags (if 0x02 - some additional data are received)
 
-    recvPacket >> guid >> cast_count >> spellid >> unk_flags;
+    recvPacket >> guid >> cast_count >> spellid >> cast_flags;
 
-    DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, %s, cast_count: %u, spellid %u, unk_flags %u", guid.GetString().c_str(), cast_count, spellid, unk_flags);
+    DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, %s, cast_count: %u, spellid %u, cast_flags %u", guid.GetString().c_str(), cast_count, spellid, cast_flags);
 
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
 
@@ -665,6 +665,8 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     SpellCastTargets targets;
 
     recvPacket >> targets.ReadForCaster(pet);
+
+    targets.ReadAdditionalData(recvPacket, cast_flags);
 
     pet->clearUnitState(UNIT_STAT_MOVING);
 

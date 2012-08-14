@@ -61,7 +61,12 @@ enum SpellCastFlags
     CAST_FLAG_VISUAL_CHAIN      = 0x00080000,               // wotlk
     CAST_FLAG_UNKNOWN21         = 0x00100000,
     CAST_FLAG_PREDICTED_RUNES   = 0x00200000,               // wotlk, rune cooldown list
-    CAST_FLAG_IMMUNITY          = 0x04000000                // spell cast school imminity info
+    CAST_FLAG_IMMUNITY          = 0x04000000,               // spell cast school imminity info
+    CAST_FLAG_UNKNOWN24         = 0x08000000,
+    CAST_FLAG_UNKNOWN25         = 0x10000000,
+    CAST_FLAG_UNKNOWN26         = 0x20000000,
+    CAST_FLAG_HEAL_PREDICTION   = 0x40000000,               // heal prediction
+    CAST_FLAG_UNKNOWN28         = 0x80000000,
 };
 
 enum SpellFlags
@@ -111,6 +116,7 @@ class SpellCastTargets
         void write(ByteBuffer& data) const;
 
         SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this, caster); }
+        void ReadAdditionalData(WorldPacket& data, uint8& cast_flags);
 
         SpellCastTargets& operator=(const SpellCastTargets& target)
         {
@@ -138,6 +144,9 @@ class SpellCastTargets
             m_strTarget = target.m_strTarget;
 
             m_targetMask = target.m_targetMask;
+
+            m_elevation = target.m_elevation;
+            m_speed = target.m_speed;
 
             return *this;
         }
@@ -177,6 +186,9 @@ class SpellCastTargets
         float m_destX, m_destY, m_destZ;
         std::string m_strTarget;
 
+        float GetElevation() const { return m_elevation; }
+        float GetSpeed() const { return m_speed; }
+
         uint32 m_targetMask;
     private:
         // objects (can be used at spell creating and after Update at casting
@@ -192,6 +204,9 @@ class SpellCastTargets
         ObjectGuid m_srcTransportGUID;
         ObjectGuid m_destTransportGUID;
         uint32 m_itemTargetEntry;
+
+        float m_elevation;
+        float m_speed;
 };
 
 inline ByteBuffer& operator<< (ByteBuffer& buf, SpellCastTargets const& targets)
