@@ -64,6 +64,7 @@ const char GtOCTRegenHPfmt[]="xf";
 //const char GtOCTRegenMPfmt[]="f";
 const char GtRegenHPPerSptfmt[]="xf";
 const char GtRegenMPPerSptfmt[]="xf";
+const char GtSpellScalingfmt[]="df";
 const char GtOCTBaseHPByClassfmt[]="df";
 const char GtOCTBaseMPByClassfmt[]="df";
 const char Holidaysfmt[]="nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";

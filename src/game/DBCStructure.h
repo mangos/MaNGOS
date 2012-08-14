@@ -1058,6 +1058,11 @@ struct GtRegenMPPerSptEntry
     float    ratio;
 };
 
+struct GtSpellScalingEntry
+{
+    float value;
+};
+
 struct GtOCTBaseHPByClassEntry
 {
     float ratio;
