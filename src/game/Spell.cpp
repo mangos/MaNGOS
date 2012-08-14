@@ -121,6 +121,9 @@ SpellCastTargets::SpellCastTargets()
     m_srcX = m_srcY = m_srcZ = m_destX = m_destY = m_destZ = 0.0f;
     m_strTarget = "";
     m_targetMask = 0;
+
+    m_elevation = 0.0f;
+    m_speed = 0.0f;
 }
 
 SpellCastTargets::~SpellCastTargets()
@@ -326,6 +329,7 @@ void SpellCastTargets::ReadAdditionalData(WorldPacket& data, uint8& cast_flags)
         {
             MovementInfo mi;
             data >> mi;
+            setSource(mi.GetPos()->x, mi.GetPos()->y, mi.GetPos()->z);
         }
     }
     else if (cast_flags & 0x08)         // has archaeology weight
@@ -916,8 +920,24 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     // spell fly from visual cast object
     WorldObject* affectiveObject = GetAffectiveCasterObject();
 
-    // Spell have speed - need calculate incoming time
-    if (m_spellInfo->speed > 0.0f && affectiveObject && pVictim != affectiveObject)
+    // Spell has trajectory - need calculate incoming time
+    if (affectiveObject && m_targets.GetSpeed() > 0.0f)
+    {
+        float dist;
+        if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+            dist = affectiveObject->GetDistance(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ);
+        else
+            dist = affectiveObject->GetDistance(pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ());
+        float speed = m_targets.GetSpeed() * cos(m_targets.GetElevation());
+
+        target.timeDelay = (uint64) floor(dist / speed * 1000.0f);
+
+        // Calculate minimum incoming time
+        if (m_delayMoment == 0 || m_delayMoment>target.timeDelay)
+            m_delayMoment = target.timeDelay;
+    }
+    // Spell has speed - need calculate incoming time
+    else if (m_spellInfo->speed > 0.0f && affectiveObject && pVictim != affectiveObject)
     {
         // calculate spell incoming interval
         float dist = affectiveObject->GetDistance(pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ());
@@ -928,6 +948,15 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
         // Calculate minimum incoming time
         if (m_delayMoment == 0 || m_delayMoment > target.timeDelay)
             m_delayMoment = target.timeDelay;
+    }
+    // Spell casted on self - mostly TRIGGER_MISSILE code
+    else if (m_spellInfo->speed > 0.0f && affectiveObject && pVictim == affectiveObject)
+    {
+        float dist = 0.0f;
+        if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+            dist = affectiveObject->GetDistance(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ);
+
+        target.timeDelay = (uint64) floor(dist / m_spellInfo->speed * 1000.0f);
     }
     else
         target.timeDelay = UI64LIT(0);
@@ -987,8 +1016,24 @@ void Spell::AddGOTarget(GameObject* pVictim, SpellEffectIndex effIndex)
     // spell fly from visual cast object
     WorldObject* affectiveObject = GetAffectiveCasterObject();
 
-    // Spell have speed - need calculate incoming time
-    if (m_spellInfo->speed > 0.0f && affectiveObject && pVictim != affectiveObject)
+    // Spell has trajectory - need calculate incoming time
+    if (affectiveObject && m_targets.GetSpeed() > 0.0f)
+    {
+        float dist;
+        if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
+            dist = affectiveObject->GetDistance(m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ);
+        else
+            dist = affectiveObject->GetDistance(pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ());
+
+        float speed = m_targets.GetSpeed() * cos(m_targets.GetElevation());
+
+        target.timeDelay = (uint64) floor(dist / speed * 1000.0f);
+
+        if (m_delayMoment == 0 || m_delayMoment > target.timeDelay)
+            m_delayMoment = target.timeDelay;
+    }
+    // Spell has speed - need calculate incoming time
+    else if (m_spellInfo->speed > 0.0f && affectiveObject && pVictim != affectiveObject)
     {
         // calculate spell incoming interval
         float dist = affectiveObject->GetDistance(pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ());
