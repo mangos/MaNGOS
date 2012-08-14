@@ -1981,6 +1981,7 @@ struct SpellEntry
     inline bool HasAttribute(SpellAttributesEx5 attribute) const { return AttributesEx5 & attribute; }
     inline bool HasAttribute(SpellAttributesEx6 attribute) const { return AttributesEx6 & attribute; }
     inline bool HasAttribute(SpellAttributesEx7 attribute) const { return AttributesEx7 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx8 attribute) const { return AttributesEx8 & attribute; }
 
     private:
         // prevent creating custom entries (copy data from original in fact)

@@ -8876,7 +8876,22 @@ void SpellAuraHolder::_AddSpellAuraHolder()
         if (m_auras[i])
             flags |= (1 << i);
     }
-    flags |= ((GetCasterGuid() == GetTarget()->GetObjectGuid()) ? AFLAG_NOT_CASTER : AFLAG_NONE) | ((GetSpellMaxDuration(m_spellProto) > 0) ? AFLAG_DURATION : AFLAG_NONE) | (IsPositive() ? AFLAG_POSITIVE : AFLAG_NEGATIVE);
+
+    if (GetCasterGuid() == GetTarget()->GetObjectGuid())
+        flags |= AFLAG_NOT_CASTER;
+
+    if (!m_spellProto->HasAttribute(SPELL_ATTR_EX5_HIDE_DURATION) && GetSpellMaxDuration(m_spellProto) > 0)
+        flags |= AFLAG_DURATION;
+
+    if (IsPositive())
+        flags |= AFLAG_POSITIVE;
+    else
+        flags |= AFLAG_NEGATIVE;
+
+    if (m_spellProto->HasAttribute(SPELL_ATTR_EX8_AURA_SENDS_AMOUNT) &&
+        flags & (AFLAG_EFF_INDEX_0 | AFLAG_EFF_INDEX_1 | AFLAG_EFF_INDEX_2))
+        flags |= AFLAG_EFFECT_AMOUNT_SEND;
+
     SetAuraFlags(flags);
 
     SetAuraLevel(caster ? caster->getLevel() : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
@@ -9252,6 +9267,14 @@ void SpellAuraHolder::BuildUpdatePacket(WorldPacket& data) const
     {
         data << uint32(GetAuraMaxDuration());
         data << uint32(GetAuraDuration());
+    }
+
+    if (auraFlags & AFLAG_EFFECT_AMOUNT_SEND)
+    {
+        for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (auraFlags & (1 << i))
+                if (Aura const* aura = m_auras[i])
+                    data << int32(aura->GetModifier()->m_amount);
     }
 }
 
