@@ -300,7 +300,7 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_UNK19                        = 0x00080000,// 19
     SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS      = 0x00100000,// 20 Req combo points on target
     SPELL_ATTR_EX_UNK21                        = 0x00200000,// 21
-    SPELL_ATTR_EX_REQ_COMBO_POINTS             = 0x00400000,// 22 Use combo points (in 4.x not required combo point target selected)
+    SPELL_ATTR_EX_REQ_COMBO_POINTS             = 0x00400000,// 22 Use combo points
     SPELL_ATTR_EX_UNK23                        = 0x00800000,// 23
     SPELL_ATTR_EX_UNK24                        = 0x01000000,// 24 Req fishing pole??
     SPELL_ATTR_EX_UNK25                        = 0x02000000,// 25
@@ -549,7 +549,7 @@ enum SpellAttributesEx8
     SPELL_ATTR_EX8_UNK16                       = 0x00010000,// 16
     SPELL_ATTR_EX8_UNK17                       = 0x00020000,// 17
     SPELL_ATTR_EX8_UNK18                       = 0x00040000,// 18 Dark Simulacrum, Soul Swap
-    SPELL_ATTR_EX8_UNK19                       = 0x00080000,// 19 Slice and Dice, Savage Roar, Recuperate
+    SPELL_ATTR_EX8_IGNORE_TARGET_FOR_COMBO_POINTS = 0x00080000,// 19 Slice and Dice, Savage Roar, Recuperate
     SPELL_ATTR_EX8_ARMOR_SPECIALIZATION        = 0x00100000,// 20
     SPELL_ATTR_EX8_UNK21                       = 0x00200000,// 21 some spells that summon smth
     SPELL_ATTR_EX8_UNK22                       = 0x00400000,// 22 some health-affecting spells
