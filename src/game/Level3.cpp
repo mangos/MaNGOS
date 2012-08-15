@@ -6607,7 +6607,7 @@ bool ChatHandler::HandleInstanceSaveDataCommand(char* /*args*/)
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
     ///- Get the accounts with GM Level >0
-    QueryResult* result = LoginDatabase.Query("SELECT a.username,aa.gmlevel FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE gmlevel > 0");
+    QueryResult* result = LoginDatabase.Query("SELECT a.username,aa.gmlevel FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE aa.gmlevel > 0");
     if (result)
     {
         SendSysMessage(LANG_GMLIST);
