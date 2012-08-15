@@ -558,7 +558,7 @@ void WorldSession::HandleTotemDestroyed(WorldPacket& recvPacket)
 {
     uint8 slotId;
 
-    recvPacket >> slotId;
+    recvPacket >> slotId >> Unused<uint64>();
 
     // ignore for remote control state
     if (!_player->IsSelfMover())

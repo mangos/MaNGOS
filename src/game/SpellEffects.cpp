@@ -8089,7 +8089,7 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                         return;
 
                     // This is extremely strange!
-                    // The spell should send MSG_CHANNEL_START, SMSG_SPELL_START
+                    // The spell should send SMSG_CHANNEL_START, SMSG_SPELL_START
                     // However it has cast time 2s, but should send SMSG_SPELL_GO instantly.
                     m_caster->CastSpell(unitTarget, 69051, true);
                     return;

@@ -4431,6 +4431,7 @@ void Spell::SendLogExecute()
             switch(spellEffect->Effect)
             {
                 case SPELL_EFFECT_POWER_DRAIN:
+                case SPELL_EFFECT_POWER_BURN:
                     if (Unit* unit = m_targets.getUnitTarget())
                         data << unit->GetPackGUID();
                     else
@@ -4468,6 +4469,7 @@ void Spell::SendLogExecute()
                         data << uint8(0);
                     break;
                 case SPELL_EFFECT_CREATE_ITEM:
+                case SPELL_EFFECT_CREATE_RANDOM_ITEM:
                 case SPELL_EFFECT_CREATE_ITEM_2:
                     data << uint32(spellEffect->EffectItemType);
                     break;
@@ -4478,9 +4480,10 @@ void Spell::SendLogExecute()
                 case SPELL_EFFECT_CREATE_HOUSE:
                 case SPELL_EFFECT_DUEL:
                 case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:
-                case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
-                case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
-                case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
+                //case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
+                //case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
+                //case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
+                case SPELL_EFFECT_171:
                     if (Unit* unit = m_targets.getUnitTarget())
                         data << unit->GetPackGUID();
                     else if (m_targets.getItemTargetGuid())
@@ -4501,6 +4504,7 @@ void Spell::SendLogExecute()
                     break;
                 case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
+                case SPELL_EFFECT_MASS_RESSURECTION:
                     if (Unit* unit = m_targets.getUnitTarget())
                         data << unit->GetPackGUID();
                     else
@@ -4581,7 +4585,7 @@ void Spell::SendChannelUpdate(uint32 time)
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
 
-    WorldPacket data(MSG_CHANNEL_UPDATE, 8 + 4);
+    WorldPacket data(SMSG_CHANNEL_UPDATE, 8 + 4);
     data << m_caster->GetPackGUID();
     data << uint32(time);
     m_caster->SendMessageToSet(&data, true);
@@ -4619,10 +4623,26 @@ void Spell::SendChannelStart(uint32 duration)
         }
     }
 
-    WorldPacket data(MSG_CHANNEL_START, (8 + 4 + 4));
+    WorldPacket data(SMSG_CHANNEL_START, (8 + 4 + 4));
     data << m_caster->GetPackGUID();
     data << uint32(m_spellInfo->Id);
     data << uint32(duration);
+    data << uint8(0);       // unk1
+    //if (unk1)
+    //{
+    //    data << uint32(0);
+    //    data << uint32(0);
+    //}
+    data << uint8(0);       // unk2
+    //if (unk1)
+    //{
+    //    data << ObjectGuid().WriteAsPacked();
+    //    data << uint32(0);
+    //    data << uint8(0);   // unk3
+    //    if (unk3 == 2)
+    //        data << ObjectGuid().WriteAsPacked();
+    //}
+
     m_caster->SendMessageToSet(&data, true);
 
     m_timer = duration;
