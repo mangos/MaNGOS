@@ -411,6 +411,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
         void HandleCharEnum(QueryResult* result);
         void HandlePlayerLogin(LoginQueryHolder* holder);
+        void HandleReorderCharactersOpcode(WorldPacket& recvPacket);
 
         // played time
         void HandlePlayedTime(WorldPacket& recvPacket);
@@ -872,14 +873,6 @@ class MANGOS_DLL_SPEC WorldSession
         // logging helper
         void LogUnexpectedOpcode(WorldPacket* packet, const char* reason);
         void LogUnprocessedTail(WorldPacket* packet);
-
-        // EnumData helpers
-        bool CharCanLogin(uint32 lowGUID)
-        {
-            return _allowedCharsToLogin.find(lowGUID) != _allowedCharsToLogin.end();
-        }
-
-        std::set<uint64> _allowedCharsToLogin;
 
         uint32 m_GUIDLow;                                   // set logged or recently logout player (while m_playerRecentlyLogout set)
         Player* _player;

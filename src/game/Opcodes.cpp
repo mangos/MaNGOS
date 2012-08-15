@@ -1380,4 +1380,5 @@ void InitializeOpcodes()
     //OPCODE(SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2,      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_COMPRESSED_UNKNOWN_1310,                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_PLAYER_MOVE,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_REORDER_CHARACTERS,                      STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleReorderCharactersOpcode   );
 };

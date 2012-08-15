@@ -1398,6 +1398,7 @@ enum Opcodes
     SMSG_SPLINE_MOVE_SET_SWIM_BACK_SPEED                  = 0x59A1, // 4.3.4 15595
     SMSG_SPLINE_MOVE_SET_TURN_RATE                        = 0x78B5, // 4.3.4 15595
     SMSG_SPLINE_MOVE_SET_WALK_SPEED                       = 0x34A5, // 4.3.4 15595
+    CMSG_REORDER_CHARACTERS                               = 0x0593, // 4.3.4 15595
 };
 
 #define MAX_OPCODE_TABLE_SIZE 0xFFFF

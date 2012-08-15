@@ -73,7 +73,7 @@ bool LoginQueryHolder::Initialize()
         "position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
         "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
         "arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-        "health, power1, power2, power3, power4, power5, specCount, activeSpec, exploredZones, equipmentCache, knownTitles, actionBars FROM characters WHERE guid = '%u'", m_guid.GetCounter());
+        "health, power1, power2, power3, power4, power5, specCount, activeSpec, exploredZones, equipmentCache, knownTitles, actionBars, slot FROM characters WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT groupId FROM group_member WHERE memberGuid ='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT id, permanent, map, difficulty, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'", m_guid.GetCounter());
@@ -137,108 +137,32 @@ class CharacterHandler
         }
 } chrHandler;
 
-struct charEnumInfo
-{
-    uint8 nameLenghts;
-    bool firstLogin;
-};
-
 void WorldSession::HandleCharEnum(QueryResult * result)
 {
     WorldPacket data(SMSG_CHAR_ENUM, 270);
 
-    uint8 charCount = 0;
     ByteBuffer buffer;
 
     data.WriteBits(0, 23);
     data.WriteBit(1);
-    data.WriteBits(result ? (*result).GetRowCount() : 0 , 17);
-
-    std::vector<charEnumInfo> charInfoList;
-    charInfoList.resize(result ? (*result).GetRowCount() : 0);
+    data.WriteBits(result ? result->GetRowCount() : 0, 17);
 
     if (result)
     {
-        typedef std::pair<uint64, uint64> Guids;
-        std::vector<Guids> guidsVect;
-        _allowedCharsToLogin.clear();
-
         do
         {
-            uint32 GuidLow = (*result)[0].GetUInt32();
-            uint32 atLoginFlags = (*result)[15].GetUInt32();
-            uint64 GuildGuid = (*result)[13].GetUInt64();
+            sLog.outDetail("Loading char guid %u from account %u.", (*result)[0].GetUInt32(), GetAccountId());
 
-            charEnumInfo charInfo = charEnumInfo();
-            std::string name = (*result)[1].GetString();
-            uint32 nameLen = name.length();
-            charInfo.nameLenghts =  nameLen;
-            charInfo.firstLogin = atLoginFlags & AT_LOGIN_FIRST ? true : false;
-            charInfoList[charCount] = charInfo;
-            charCount++;
-
-            guidsVect.push_back(std::make_pair(GuidLow, atLoginFlags));
-
-            sLog.outDetail("Loading char guid %u from account %u.", GuidLow, GetAccountId());
-
-            if (!Player::BuildEnumData(result, &buffer))
+            if (!Player::BuildEnumData(result, &data, &buffer))
             {
                 sLog.outError("Building enum data for SMSG_CHAR_ENUM has failed, aborting");
                 return;
             }
-            _allowedCharsToLogin.insert(GuidLow);
         }
         while (result->NextRow());
 
-        int counter = 0;
-        for (std::vector<Guids>::iterator itr = guidsVect.begin(); itr != guidsVect.end(); ++itr)
-        {
-            uint32 Guid = (*itr).first;
-            uint64 GuildGuid = (*itr).second;
-
-            uint8 Guid0 = uint8(Guid);
-            uint8 Guid1 = uint8(Guid >> 8);
-            uint8 Guid2 = uint8(Guid >> 16);
-            uint8 Guid3 = uint8(Guid >> 24);
-
-            for (int i = 0; i < 18; ++i)
-            {
-                switch (i)
-                {
-                    case 14:
-                        data.WriteBit(Guid0 ? 1 : 0);
-                        break;
-                    case 10:
-                        data.WriteBit(Guid1 ? 1 : 0);
-                        break;
-                    case 15:
-                        data.WriteBit(Guid2 ? 1 : 0);
-                        break;
-                    case 0:
-                        data.WriteBit(Guid3 ? 1 : 0);
-                        break;
-                    case 4:
-                        data.WriteBits(charInfoList[counter].nameLenghts, 7);
-                        break;
-                    case 13:
-                        data.WriteBit(charInfoList[counter].firstLogin ? 1 : 0);
-                        break;
-                    default:
-                        data.WriteBit(0);
-                        break;
-                }
-            }
-
-            counter++;
-        }
-
         data.FlushBits();
         data.append(buffer);
-    }
-    else
-    {
-        data.WriteBit(1);
-        data.FlushBits();
     }
 
     SendPacket(&data);
@@ -254,8 +178,8 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.playerBytes, characters.playerBytes2, characters.level, "
                                   //   8                9               10                     11                     12                     13                    14
                                   "characters.zone, characters.map, characters.position_x, characters.position_y, characters.position_z, guild_member.guildid, characters.playerFlags, "
-                                  //  15                    16                   17                     18                   19
-                                  "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.equipmentCache "
+                                  //  15                    16                   17                     18                   19                     20
+                                  "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.equipmentCache, characters.slot "
                                   "FROM characters LEFT JOIN character_pet ON characters.guid=character_pet.owner AND character_pet.slot='%u' "
                                   "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
                                   "WHERE characters.account = '%u' ORDER BY characters.guid"
@@ -265,8 +189,8 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
                                   "SELECT characters.guid, characters.name, characters.race, characters.class, characters.gender, characters.playerBytes, characters.playerBytes2, characters.level, "
                                   //   8                9               10                     11                     12                     13                    14
                                   "characters.zone, characters.map, characters.position_x, characters.position_y, characters.position_z, guild_member.guildid, characters.playerFlags, "
-                                  //  15                    16                   17                     18                   19                         20
-                                  "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.equipmentCache, character_declinedname.genitive "
+                                  //  15                    16                   17                     18                   19                        20                 21
+                                  "characters.at_login, character_pet.entry, character_pet.modelid, character_pet.level, characters.equipmentCache, characters.slot, character_declinedname.genitive "
                                   "FROM characters LEFT JOIN character_pet ON characters.guid = character_pet.owner AND character_pet.slot='%u' "
                                   "LEFT JOIN character_declinedname ON characters.guid = character_declinedname.guid "
                                   "LEFT JOIN guild_member ON characters.guid = guild_member.guid "
@@ -1437,4 +1361,39 @@ void WorldSession::HandleEquipmentSetUseOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_USE_EQUIPMENT_SET_RESULT, 1);
     data << uint8(0);                                       // 4 - equipment swap failed - inventory is full
     SendPacket(&data);
+}
+
+void WorldSession::HandleReorderCharactersOpcode(WorldPacket& recv_data)
+{
+    uint32 charCount = recv_data.ReadBits(10);
+
+    if (charCount > sWorld.getConfig(CONFIG_UINT32_CHARACTERS_PER_REALM))
+    {
+        DEBUG_LOG("SESSION: received CMSG_REORDER_CHARACTERS, but characters count %u is beyond server limit.", charCount);
+        recv_data.rfinish();
+        return;
+    }
+
+    std::vector<ObjectGuid> guids;
+    std::vector<uint8> slots;
+
+    for (uint32 i = 0; i < charCount; ++i)
+    {
+        ObjectGuid guid;
+        recv_data.ReadGuidMask<1, 4, 5, 3, 0, 7, 6, 2>(guid);
+        guids.push_back(guid);
+    }
+
+    for (uint32 i = 0; i < charCount; ++i)
+    {
+        recv_data.ReadGuidBytes<6, 5, 1, 4, 0, 3>(guids[i]);
+        slots.push_back(recv_data.ReadUInt8());
+        recv_data.ReadGuidBytes<2, 7>(guids[i]);
+    }
+
+    CharacterDatabase.BeginTransaction();
+    for (uint32 i = 0; i < charCount; ++i)
+        CharacterDatabase.PExecute("UPDATE `characters` SET `slot` = '%u' WHERE `guid` = '%u' AND `account` = '%u'",
+        slots[i], guids[i].GetCounter(), GetAccountId());
+    CharacterDatabase.CommitTransaction();
 }

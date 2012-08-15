@@ -1065,7 +1065,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void Update(uint32 update_diff, uint32 time) override;
 
-        static bool BuildEnumData(QueryResult* result,  ByteBuffer* p_data );
+        static bool BuildEnumData(QueryResult* result, ByteBuffer* data, ByteBuffer* buffer);
 
         void SetInWater(bool apply);
 
@@ -2589,6 +2589,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         DeclinedName* m_declinedname;
         Runes* m_runes;
         EquipmentSets m_EquipmentSets;
+        uint8 m_slot;
 
         /// class dependent melee diminishing constant for dodge/parry/missed chances
         static const float m_diminishing_k[MAX_CLASSES];
