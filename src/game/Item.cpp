@@ -208,6 +208,9 @@ bool ItemCanGoIntoBag(ItemPrototype const* pProto, ItemPrototype const* pBagProt
                 case ITEM_SUBCLASS_INSCRIPTION_CONTAINER:
                     if (!(pProto->BagFamily & BAG_FAMILY_MASK_INSCRIPTION_SUPP))
                         return false;
+                case ITEM_SUBCLASS_FISHING_CONTAINER:
+                    if (!(pProto->BagFamily & BAG_FAMILY_MASK_FISHING_SUPP))
+                        return false;
                     return true;
                 default:
                     return false;
@@ -1025,8 +1028,7 @@ bool Item::IsFitToSpellRequirements(SpellEntry const* spellInfo) const
                 return false;
             // Other checks do not apply to vellum enchants, so return final result
             int32 eqItemClass = spellInfo->GetEquippedItemClass();
-            return ((proto->SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT && eqItemClass == ITEM_CLASS_WEAPON) ||
-                    (proto->SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT && eqItemClass == ITEM_CLASS_ARMOR));
+            return proto->SubClass == ITEM_SUBCLASS_VELLUM && (eqItemClass == ITEM_CLASS_WEAPON || eqItemClass == ITEM_CLASS_ARMOR);
         }
     }
 
