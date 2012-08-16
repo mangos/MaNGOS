@@ -476,7 +476,7 @@ enum Opcodes
     CMSG_SELL_ITEM                                        = 0x4E15, // 4.3.4 15595
     SMSG_SELL_ITEM                                        = 0x6105, // 4.3.4 15595
     CMSG_BUY_ITEM                                         = 0x0736, // 4.3.4 15595
-    CMSG_BUY_ITEM_IN_SLOT                                 = 0x11A4, 
+    CMSG_BUY_ITEM_IN_SLOT                                 = 0x11A4,
     SMSG_BUY_ITEM                                         = 0x0F26, // 4.3.4 15595
     SMSG_BUY_FAILED                                       = 0x6435, // 4.3.4 15595
     CMSG_TAXICLEARALLNODES                                = 0x11A7,
