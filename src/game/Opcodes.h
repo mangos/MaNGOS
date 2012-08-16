@@ -474,11 +474,11 @@ enum Opcodes
     CMSG_LIST_INVENTORY                                   = 0x119F,
     SMSG_LIST_INVENTORY                                   = 0x11A0,
     CMSG_SELL_ITEM                                        = 0x11A1,
-    SMSG_SELL_ITEM                                        = 0x11A2,
-    CMSG_BUY_ITEM                                         = 0x11A3,
-    CMSG_BUY_ITEM_IN_SLOT                                 = 0x11A4,
-    SMSG_BUY_ITEM                                         = 0x11A5,
-    SMSG_BUY_FAILED                                       = 0x11A6,
+    SMSG_SELL_ITEM                                        = 0x11A2, 
+    CMSG_BUY_ITEM                                         = 0x0736, // 4.3.4 15595
+    CMSG_BUY_ITEM_IN_SLOT                                 = 0x11A4, 
+    SMSG_BUY_ITEM                                         = 0x0F26, // 4.3.4 15595
+    SMSG_BUY_FAILED                                       = 0x6435, // 4.3.4 15595
     CMSG_TAXICLEARALLNODES                                = 0x11A7,
     CMSG_TAXIENABLEALLNODES                               = 0x11A8,
     CMSG_TAXISHOWNODES                                    = 0x11A9,
