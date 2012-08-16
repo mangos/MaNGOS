@@ -646,7 +646,19 @@ enum ProcFlags
     PROC_FLAG_ON_TRAP_ACTIVATION            = 0x00200000,   // 21 On trap activation
 
     PROC_FLAG_TAKEN_OFFHAND_HIT             = 0x00400000,   // 22 Taken off-hand melee attacks(not used)
-    PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000    // 23 Successful off-hand melee attacks
+    PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000,   // 23 Successful off-hand melee attacks
+
+    PROC_FLAG_ON_DEATH                      = 0x01000000,   // 24 On death
+    PROC_FLAG_ON_JUMP                       = 0x02000000,   // 25 On jump
+
+    PROC_FLAG_UNK26                         = 0x04000000,   // 26 not used
+    PROC_FLAG_UNK27                         = 0x08000000,   // 27 not used
+
+    PROC_FLAG_UNK28                         = 0x10000000,   // 28 not used
+    PROC_FLAG_UNK29                         = 0x20000000,   // 29 not used
+
+    PROC_FLAG_UNK30                         = 0x40000000,   // 30 not used
+    PROC_FLAG_UNK31                         = 0x80000000,   // 31 not used
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \

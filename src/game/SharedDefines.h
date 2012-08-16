@@ -1365,6 +1365,29 @@ enum Targets
     TARGET_NONCOMBAT_PET               = 90,
     TARGET_91                          = 91,
     TARGET_IN_FRONT_OF_CASTER_30       = 104,
+    TARGET_105                         = 105,
+    TARGET_106                         = 106,
+    TARGET_107                         = 107,
+    TARGET_GO_IN_FRONT_OF_CASTER_90    = 108,
+    TARGET_109                         = 109,   // spell 89008
+    TARGET_110                         = 110,   // front enemy aoe
+    TARGET_111                         = 111,   // not used
+    TARGET_112                         = 112,   // spell 89549
+    TARGET_113                         = 113,   // not used
+    TARGET_114                         = 114,   // not used
+    TARGET_115                         = 115,   // not used
+    TARGET_116                         = 116,   // not used
+    TARGET_117                         = 117,   // test spell 83658
+    TARGET_118                         = 118,   // test spell 79579
+    TARGET_119                         = 119,   // mass ressurection 83968
+    TARGET_120                         = 120,
+    TARGET_121                         = 121,   // spell 95750
+    TARGET_122                         = 122,   // spell 100661
+    TARGET_123                         = 123,
+    TARGET_124                         = 124,
+    TARGET_125                         = 125,
+    TARGET_126                         = 126,
+    TARGET_127                         = 127,
 };
 
 enum SpellMissInfo
