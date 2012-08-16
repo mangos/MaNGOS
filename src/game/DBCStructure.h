@@ -1849,8 +1849,8 @@ struct MANGOS_DLL_SPEC SpellEntry
     uint32    AttributesEx6;                                // 7        m_attributesExF
     uint32    AttributesEx7;                                // 8        m_attributesExG (0x20 - totems, 0x4 - paladin auras, etc...)
     uint32    AttributesEx8;                                // 9        m_attributesExH
-    // uint32 unk_400_1;                                    // 10       4.0.0
-    // uint32 unk_420;                                      // 11       4.0.0
+    uint32    AttributesEx9;                                // 10       m_attributesExI
+    uint32    AttributesEx10;                               // 11       m_attributesExJ
     uint32    CastingTimeIndex;                             // 12       m_castingTimeIndex
     uint32    DurationIndex;                                // 13       m_durationIndex
     uint32    powerType;                                    // 14       m_powerType
@@ -1983,6 +1983,8 @@ struct MANGOS_DLL_SPEC SpellEntry
     inline bool HasAttribute(SpellAttributesEx6 attribute) const { return AttributesEx6 & attribute; }
     inline bool HasAttribute(SpellAttributesEx7 attribute) const { return AttributesEx7 & attribute; }
     inline bool HasAttribute(SpellAttributesEx8 attribute) const { return AttributesEx8 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx9 attribute) const { return AttributesEx9 & attribute; }
+    inline bool HasAttribute(SpellAttributesEx10 attribute) const { return AttributesEx10 & attribute; }
 
     private:
         // prevent creating custom entries (copy data from original in fact)
@@ -1997,8 +1999,8 @@ struct SpellCastTimesEntry
 {
     uint32    ID;                                           // 0        m_ID
     int32     CastTime;                                     // 1        m_base
-    //float     CastTimePerLevel;                           // 2        m_perLevel
-    //int32     MinCastTime;                                // 3        m_minimum
+    float     CastTimePerLevel;                             // 2        m_perLevel
+    int32     MinCastTime;                                  // 3        m_minimum
 };
 
 struct SpellFocusObjectEntry

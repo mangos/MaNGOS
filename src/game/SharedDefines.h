@@ -564,6 +564,78 @@ enum SpellAttributesEx8
     SPELL_ATTR_EX8_UNK31                       = 0x80000000,// 31
 };
 
+enum SpellAttributesEx9
+{
+    SPELL_ATTR_EX9_UNK0                        = 0x00000001,// 0
+    SPELL_ATTR_EX9_UNK1                        = 0x00000002,// 1
+    SPELL_ATTR_EX9_UNK2                        = 0x00000004,// 2 some sort of invisibility
+    SPELL_ATTR_EX9_UNK3                        = 0x00000008,// 3
+    SPELL_ATTR_EX9_UNK4                        = 0x00000010,// 4
+    SPELL_ATTR_EX9_UNK5                        = 0x00000020,// 5 some totem spells
+    SPELL_ATTR_EX9_UNK6                        = 0x00000040,// 6
+    SPELL_ATTR_EX9_UNK7                        = 0x00000080,// 7
+    SPELL_ATTR_EX9_UNK8                        = 0x00000100,// 8 Aimed Shot (19434) and Aimed Shot! (82928)
+    SPELL_ATTR_EX9_UNK9                        = 0x00000200,// 9
+    SPELL_ATTR_EX9_UNK10                       = 0x00000400,// 10 Ice Storm 88239
+    SPELL_ATTR_EX9_UNK11                       = 0x00000800,// 11
+    SPELL_ATTR_EX9_UNK12                       = 0x00001000,// 12 Feral Charge 49376
+    SPELL_ATTR_EX9_UNK13                       = 0x00002000,// 13 Slam 1464, used in cast time calculation
+    SPELL_ATTR_EX9_UNK14                       = 0x00004000,// 14
+    SPELL_ATTR_EX9_UNK15                       = 0x00008000,// 15 not used
+    SPELL_ATTR_EX9_UNK16                       = 0x00010000,// 16 Aimed Shot 19434, Steady Shot 56641, Cobra Shot 77767
+    SPELL_ATTR_EX9_UNK17                       = 0x00020000,// 17 not used
+    SPELL_ATTR_EX9_UNK18                       = 0x00040000,// 18
+    SPELL_ATTR_EX9_UNK19                       = 0x00080000,// 19
+    SPELL_ATTR_EX9_UNK20                       = 0x00100000,// 20
+    SPELL_ATTR_EX9_UNK21                       = 0x00200000,// 21
+    SPELL_ATTR_EX9_UNK22                       = 0x00400000,// 22
+    SPELL_ATTR_EX9_UNK23                       = 0x00800000,// 23 Asira Dismount 103720
+    SPELL_ATTR_EX9_UNK24                       = 0x01000000,// 24 not used
+    SPELL_ATTR_EX9_UNK25                       = 0x02000000,// 25 not used
+    SPELL_ATTR_EX9_UNK26                       = 0x04000000,// 26 Item - Mage T12 4P Bonus 99064
+    SPELL_ATTR_EX9_UNK27                       = 0x08000000,// 27 20707 Soulstone Resurrection, Quest Invis 9 102370
+    SPELL_ATTR_EX9_UNK28                       = 0x10000000,// 28 Decimate, Unholy Frenzy, Spirit Link: all aoe reduce health
+    SPELL_ATTR_EX9_UNK29                       = 0x20000000,// 29 passive raid-wide auras
+    SPELL_ATTR_EX9_UNK30                       = 0x40000000,// 30
+    SPELL_ATTR_EX9_UNK31                       = 0x80000000,// 31 In Chains 88791
+};
+
+enum SpellAttributesEx10
+{
+    SPELL_ATTR_EX10_UNK0                       = 0x00000001,// 0 Deep Wounds, Ignite, Blood Plague, Frost Fever, Ebon Plague, Scarlet Fever, Brittle Bones, Asira Dismount
+    SPELL_ATTR_EX10_UNK1                       = 0x00000002,// 1 Combustion, Hemorrhage
+    SPELL_ATTR_EX10_UNK2                       = 0x00000004,// 2 Throw Spear, Unholy Shot, Crack Shot!, Throw Knife, Ice Arrow
+    SPELL_ATTR_EX10_UNK3                       = 0x00000008,// 3 Spirit Bond, Fel Armor
+    SPELL_ATTR_EX10_UNK4                       = 0x00000010,// 4 Water Spout 58873
+    SPELL_ATTR_EX10_UNK5                       = 0x00000020,// 5 Immolate, Concussive Stomp
+    SPELL_ATTR_EX10_UNK6                       = 0x00000040,// 6 Teleport Player, Teleport Player to NEXUS LEGENDARY
+    SPELL_ATTR_EX10_UNK7                       = 0x00000080,// 7
+    SPELL_ATTR_EX10_UNK8                       = 0x00000100,// 8 Shadowflame, Furious Swipe
+    SPELL_ATTR_EX10_UNK9                       = 0x00000200,// 9 relocation spells
+    SPELL_ATTR_EX10_UNK10                      = 0x00000400,// 10 Omar's Seal of Approval, Spellweaving
+    SPELL_ATTR_EX10_UNK11                      = 0x00000800,// 11 Herb Gathering, Mining
+    SPELL_ATTR_EX10_UNK12                      = 0x00001000,// 12 not used
+    SPELL_ATTR_EX10_UNK13                      = 0x00002000,// 13 not used
+    SPELL_ATTR_EX10_UNK14                      = 0x00004000,// 14 not used
+    SPELL_ATTR_EX10_UNK15                      = 0x00008000,// 15 not used
+    SPELL_ATTR_EX10_UNK16                      = 0x00010000,// 16 not used
+    SPELL_ATTR_EX10_UNK17                      = 0x00020000,// 17 not used
+    SPELL_ATTR_EX10_UNK18                      = 0x00040000,// 18 not used
+    SPELL_ATTR_EX10_UNK19                      = 0x00080000,// 19 not used
+    SPELL_ATTR_EX10_UNK20                      = 0x00100000,// 20 not used
+    SPELL_ATTR_EX10_UNK21                      = 0x00200000,// 21 not used
+    SPELL_ATTR_EX10_UNK22                      = 0x00400000,// 22 not used
+    SPELL_ATTR_EX10_UNK23                      = 0x00800000,// 23 not used
+    SPELL_ATTR_EX10_UNK24                      = 0x01000000,// 24 not used
+    SPELL_ATTR_EX10_UNK25                      = 0x02000000,// 25 not used
+    SPELL_ATTR_EX10_UNK26                      = 0x04000000,// 26 not used
+    SPELL_ATTR_EX10_UNK27                      = 0x08000000,// 27 not used
+    SPELL_ATTR_EX10_UNK28                      = 0x10000000,// 28 not used
+    SPELL_ATTR_EX10_UNK29                      = 0x20000000,// 29 not used
+    SPELL_ATTR_EX10_UNK30                      = 0x40000000,// 30 not used
+    SPELL_ATTR_EX10_UNK31                      = 0x80000000,// 31 not used
+};
+
 #define MAX_TALENT_SPEC_COUNT   2
 #define MAX_GLYPH_SLOT_INDEX    6
 

@@ -128,7 +128,27 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
             castTime = int32(spellScalingEntry->castTimeMax);
     }
     else if (SpellCastTimesEntry const* spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(spellInfo->CastingTimeIndex))
-        castTime = spellCastTimeEntry->CastTime;
+    {
+        if (spell)
+        {
+            uint32 level = spell->GetCaster()->getLevel();
+            if (SpellLevelsEntry const* levelsEntry = spellInfo->GetSpellLevels())
+            {
+                if (levelsEntry->maxLevel)
+                    level = std::min(level, levelsEntry->maxLevel);
+                if (levelsEntry->baseLevel)
+                    level = std::max(level, levelsEntry->baseLevel) - levelsEntry->baseLevel;
+            }
+
+            // currently only profession spells have CastTimePerLevel data filled, always negative
+            castTime = spellCastTimeEntry->CastTime + spellCastTimeEntry->CastTimePerLevel * level;
+        }
+        else
+            castTime = spellCastTimeEntry->CastTime;
+
+        if (castTime < spellCastTimeEntry->MinCastTime)
+            castTime = spellCastTimeEntry->MinCastTime;
+    }
     else
         // not all spells have cast time index and this is all is pasiive abilities
         return 0;
