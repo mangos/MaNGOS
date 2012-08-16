@@ -471,10 +471,10 @@ enum Opcodes
     CMSG_QUEST_CONFIRM_ACCEPT                             = 0x119C,
     SMSG_QUEST_CONFIRM_ACCEPT                             = 0x119D,
     CMSG_PUSHQUESTTOPARTY                                 = 0x119E,
-    CMSG_LIST_INVENTORY                                   = 0x119F,
-    SMSG_LIST_INVENTORY                                   = 0x11A0,
-    CMSG_SELL_ITEM                                        = 0x11A1,
-    SMSG_SELL_ITEM                                        = 0x11A2, 
+    CMSG_LIST_INVENTORY                                   = 0x2806, // 4.3.4 15595
+    SMSG_LIST_INVENTORY                                   = 0x7CB0, // 4.3.4 15595
+    CMSG_SELL_ITEM                                        = 0x4E15, // 4.3.4 15595
+    SMSG_SELL_ITEM                                        = 0x6105, // 4.3.4 15595
     CMSG_BUY_ITEM                                         = 0x0736, // 4.3.4 15595
     CMSG_BUY_ITEM_IN_SLOT                                 = 0x11A4, 
     SMSG_BUY_ITEM                                         = 0x0F26, // 4.3.4 15595
@@ -554,7 +554,7 @@ enum Opcodes
     MSG_SAVE_GUILD_EMBLEM                                 = 0x11F2,
     MSG_TABARDVENDOR_ACTIVATE                             = 0x11F3,
     SMSG_PLAY_SPELL_VISUAL                                = 0x55A5, // 4.3.4 15595
-    CMSG_ZONEUPDATE                                       = 0x11F5,
+    CMSG_ZONEUPDATE                                       = 0x4F37, // 4.3.4 15595
     SMSG_PARTYKILLLOG                                     = 0x11F6,
     SMSG_COMPRESSED_UPDATE_OBJECT                         = 0x11F7,
     SMSG_EXPLORATION_EXPERIENCE                           = 0x11F9,
@@ -562,7 +562,7 @@ enum Opcodes
     CMSG_GM_NUKE                                          = 0x11FB,
     MSG_RANDOM_ROLL                                       = 0x11FC,
     SMSG_ENVIRONMENTALDAMAGELOG                           = 0x11FD,
-    CMSG_CHANGEPLAYER_DIFFICULTY                          = 0x11FE,
+    CMSG_CHANGEPLAYER_DIFFICULTY                          = 0x6107, // 4.3.4 15595
     SMSG_RWHOIS                                           = 0x11FF,
     SMSG_LFG_PLAYER_REWARD                                = 0x1200,
     SMSG_LFG_TELEPORT_DENIED                              = 0x1201,
@@ -579,7 +579,7 @@ enum Opcodes
     CMSG_UPDATE_ACCOUNT_DATA                              = 0x4736, // 4.3.4 15595
     SMSG_UPDATE_ACCOUNT_DATA                              = 0x6837, // 4.3.4 15595
     SMSG_CLEAR_FAR_SIGHT_IMMEDIATE                        = 0x120E,
-    SMSG_CHANGEPLAYER_DIFFICULTY_RESULT                   = 0x120F,
+    SMSG_CHANGEPLAYER_DIFFICULTY_RESULT                   = 0x2217, // 4.3.4 15595
     CMSG_GM_TEACH                                         = 0x1210,
     CMSG_GM_CREATE_ITEM_TARGET                            = 0x1211,
     CMSG_GMTICKET_GETTICKET                               = 0x0326, // 4.3.4 15595
@@ -621,9 +621,9 @@ enum Opcodes
     CMSG_GUILD_SET_OFFICER_NOTE                           = 0x1236,
     SMSG_LOGIN_VERIFY_WORLD                               = 0x2005, // 4.3.4 15595
     CMSG_CLEAR_EXPLORATION                                = 0x1238,
-    CMSG_SEND_MAIL                                        = 0x1239,
-    SMSG_SEND_MAIL_RESULT                                 = 0x123A,
-    CMSG_GET_MAIL_LIST                                    = 0x123B,
+    CMSG_SEND_MAIL                                        = 0x0523, // 4.3.4 15595
+    SMSG_SEND_MAIL_RESULT                                 = 0x4927, // 4.3.4 15595
+    CMSG_GET_MAIL_LIST                                    = 0x4D37, // 4.3.4 15595
     SMSG_MAIL_LIST_RESULT                                 = 0x123C,
     CMSG_BATTLEFIELD_LIST                                 = 0x123D,
     SMSG_BATTLEFIELD_LIST                                 = 0x123E,
@@ -697,7 +697,7 @@ enum Opcodes
     CMSG_RESET_FACTION_CHEAT                              = 0x1282,
     CMSG_AUTOSTORE_BANK_ITEM                              = 0x1283,
     CMSG_AUTOBANK_ITEM                                    = 0x1284,
-    MSG_QUERY_NEXT_MAIL_TIME                              = 0x1285,
+    MSG_QUERY_NEXT_MAIL_TIME                              = 0x0F04, // 4.3.4 15595 
     SMSG_RECEIVED_MAIL                                    = 0x1286,
     SMSG_RAID_GROUP_ONLY                                  = 0x1287,
     CMSG_SET_DURABILITY_CHEAT                             = 0x1288,
@@ -862,7 +862,7 @@ enum Opcodes
     SMSG_GHOSTEE_GONE                                     = 0x1327,
     CMSG_GM_UPDATE_TICKET_STATUS                          = 0x1328,
     SMSG_GM_TICKET_STATUS_UPDATE                          = 0x1329,
-    MSG_SET_DUNGEON_DIFFICULTY                            = 0x132A,
+    MSG_SET_DUNGEON_DIFFICULTY                            = 0x4925, // 4.3.4 15595
     CMSG_GMSURVEY_SUBMIT                                  = 0x132B,
     SMSG_UPDATE_INSTANCE_OWNERSHIP                        = 0x132C,
     CMSG_IGNORE_KNOCKBACK_CHEAT                           = 0x132D,
