@@ -382,8 +382,8 @@ enum Opcodes
     CMSG_ATTACKSTOP                                       = 0x4106, // 4.3.4 15595
     SMSG_ATTACKSTART                                      = 0x2D15, // 4.3.4 15595
     SMSG_ATTACKSTOP                                       = 0x0934, // 4.3.4 15595
-    SMSG_ATTACKSWING_NOTINRANGE                           = 0x6C07, // 4.3.4 15595
-    SMSG_ATTACKSWING_BADFACING                            = 0x0B36, // 4.3.4 15595
+    SMSG_ATTACKSWING_NOTINRANGE                           = 0x0B36, // 4.3.4 15595
+    SMSG_ATTACKSWING_BADFACING                            = 0x6C07, // 4.3.4 15595
     SMSG_PENDING_RAID_LOCK                                = 0x1148,
     SMSG_ATTACKSWING_DEADTARGET                           = 0x2B26, // 4.3.4 15595
     SMSG_ATTACKSWING_CANT_ATTACK                          = 0x0016, // 4.3.4 15595
