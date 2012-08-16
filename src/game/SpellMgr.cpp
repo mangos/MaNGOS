@@ -114,13 +114,24 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
                         return 0;
     }
 
-    SpellCastTimesEntry const* spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(spellInfo->CastingTimeIndex);
-
-    // not all spells have cast time index and this is all is pasiive abilities
-    if (!spellCastTimeEntry)
+    int32 castTime = 0;
+    SpellScalingEntry const* spellScalingEntry = spellInfo->GetSpellScaling();
+    if (spell && spellScalingEntry && (spell->GetCaster()->GetTypeId() == TYPEID_PLAYER || spell->GetCaster()->GetObjectGuid().IsPet()))
+    {
+        uint32 level = spell->GetCaster()->getLevel();
+        if (level == 1)
+            castTime = int32(spellScalingEntry->castTimeMin);
+        else if (level < spellScalingEntry->castScalingMaxLevel)
+            castTime = int32(spellScalingEntry->castTimeMin + float(level - 1) *
+                (spellScalingEntry->castTimeMax - spellScalingEntry->castTimeMin) / (spellScalingEntry->castScalingMaxLevel - 1));
+        else
+            castTime = int32(spellScalingEntry->castTimeMax);
+    }
+    else if (SpellCastTimesEntry const* spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(spellInfo->CastingTimeIndex))
+        castTime = spellCastTimeEntry->CastTime;
+    else
+        // not all spells have cast time index and this is all is pasiive abilities
         return 0;
-
-    int32 castTime = spellCastTimeEntry->CastTime;
 
     if (spell)
     {
