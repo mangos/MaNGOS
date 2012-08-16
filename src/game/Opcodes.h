@@ -697,7 +697,7 @@ enum Opcodes
     CMSG_RESET_FACTION_CHEAT                              = 0x1282,
     CMSG_AUTOSTORE_BANK_ITEM                              = 0x1283,
     CMSG_AUTOBANK_ITEM                                    = 0x1284,
-    MSG_QUERY_NEXT_MAIL_TIME                              = 0x0F04, // 4.3.4 15595 
+    MSG_QUERY_NEXT_MAIL_TIME                              = 0x0F04, // 4.3.4 15595
     SMSG_RECEIVED_MAIL                                    = 0x1286,
     SMSG_RAID_GROUP_ONLY                                  = 0x1287,
     CMSG_SET_DURABILITY_CHEAT                             = 0x1288,
@@ -709,7 +709,7 @@ enum Opcodes
     SMSG_AUCTION_REMOVED_NOTIFICATION                     = 0x128E,
     CMSG_GROUP_RAID_CONVERT                               = 0x128F,
     CMSG_GROUP_ASSISTANT_LEADER                           = 0x1290,
-    CMSG_BUYBACK_ITEM                                     = 0x1291,
+    CMSG_BUYBACK_ITEM                                     = 0x6C17, // 4.3.4 15595
     SMSG_SERVER_MESSAGE                                   = 0x1292,
     CMSG_SET_SAVED_INSTANCE_EXTEND                        = 0x1293,
     SMSG_LFG_OFFER_CONTINUE                               = 0x1294,
