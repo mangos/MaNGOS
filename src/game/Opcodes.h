@@ -403,9 +403,9 @@ enum Opcodes
     SMSG_BINDZONEREPLY                                    = 0x1158,
     SMSG_PLAYERBOUND                                      = 0x1159,
     SMSG_CLIENT_CONTROL_UPDATE                            = 0x115A,
-    CMSG_REPOP_REQUEST                                    = 0x115B,
-    SMSG_RESURRECT_REQUEST                                = 0x115C,
-    CMSG_RESURRECT_RESPONSE                               = 0x115D,
+    CMSG_REPOP_REQUEST                                    = 0x6235, // 4.3.4 15595
+    SMSG_RESURRECT_REQUEST                                = 0x2905, // 4.3.4 15595
+    CMSG_RESURRECT_RESPONSE                               = 0x6827, // 4.3.4 15595
     CMSG_LOOT                                             = 0x0127, // 4.3.4 15595
     CMSG_LOOT_MONEY                                       = 0x6227, // 4.3.4 15595
     CMSG_LOOT_RELEASE                                     = 0x2007, // 4.3.4 15595
@@ -523,7 +523,7 @@ enum Opcodes
     SMSG_QUERY_TIME_RESPONSE                              = 0x2124, // 4.3.4 15595
     SMSG_LOG_XPGAIN                                       = 0x11D1,
     SMSG_AURACASTLOG                                      = 0x11D2,
-    CMSG_RECLAIM_CORPSE                                   = 0x11D3,
+    CMSG_RECLAIM_CORPSE                                   = 0x4036,  // 4.3.4 15595
     CMSG_WRAP_ITEM                                        = 0x11D4,
     SMSG_LEVELUP_INFO                                     = 0x0435, // 4.3.4 15595
     MSG_MINIMAP_PING                                      = 0x11D6,
@@ -587,7 +587,7 @@ enum Opcodes
     CMSG_UNLEARN_TALENTS                                  = 0x1214,
     SMSG_INSTANCE_ENCOUNTER                               = 0x1215,
     SMSG_GAMEOBJECT_DESPAWN_ANIM                          = 0x1216,
-    MSG_CORPSE_QUERY                                      = 0x1217,
+    MSG_CORPSE_QUERY                                      = 0x4336, // 4.3.4 15595
     CMSG_GMTICKET_DELETETICKET                            = 0x6B14, // 4.3.4 15595
     SMSG_GMTICKET_DELETETICKET                            = 0x6D17, // 4.3.4 15595
     SMSG_CHAT_WRONG_FACTION                               = 0x121A,
@@ -670,7 +670,7 @@ enum Opcodes
     SMSG_SET_FLAT_SPELL_MODIFIER                          = 0x2834, // 4.3.4 15595
     SMSG_SET_PCT_SPELL_MODIFIER                           = 0x0224, // 4.3.4 15595
     CMSG_SET_AMMO                                         = 0x1269,
-    SMSG_CORPSE_RECLAIM_DELAY                             = 0x126A,
+    SMSG_CORPSE_RECLAIM_DELAY                             = 0x0D34, // 4.3.4 15595
     CMSG_SET_ACTIVE_MOVER                                 = 0x126B,
     CMSG_PET_CANCEL_AURA                                  = 0x4B25, // 4.3.4 15595
     CMSG_PLAYER_AI_CHEAT                                  = 0x126D,

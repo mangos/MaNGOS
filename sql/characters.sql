@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_0028_xxxxx_01_characters_character_phase_data` bit(1) default NULL
+  `required_0099_xxxxx_01_characters_character_phase_data` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -678,7 +678,7 @@ DROP TABLE IF EXISTS `character_phase_data`;
 CREATE TABLE `character_phase_data` (
   `guid` int(11) NOT NULL,
   `map` smallint(6) NOT NULL,
-  `phase` int(11) NOT NULL,
+  `phase` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
