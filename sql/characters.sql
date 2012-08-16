@@ -255,6 +255,7 @@ CREATE TABLE `characters` (
   `equipmentCache` longtext,
   `knownTitles` longtext,
   `actionBars` tinyint(3) UNSIGNED NOT NULL default '0',
+  `slot` tinyint(3) unsigned NOT NULL DEFAULT '255',
   `deleteInfos_Account` int(11) UNSIGNED default NULL,
   `deleteInfos_Name` varchar(12) default NULL,
   `deleteDate` bigint(20) unsigned default NULL,
