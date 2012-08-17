@@ -8038,6 +8038,15 @@ void Aura::PeriodicDummyTick()
                     target->CastSpell(target, 62593, true);
                     return;
                 }
+                case 64217:                                 // Overcharged
+                {
+                    if (GetHolder()->GetStackAmount() >= 10)
+                    {
+                        target->CastSpell(target, 64219, true);
+                        target->DealDamage(target, target->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    }
+                    return;
+                }
                 case 66118:                                 // Leeching Swarm
                 case 67630:                                 // Leeching Swarm
                 case 68646:                                 // Leeching Swarm
