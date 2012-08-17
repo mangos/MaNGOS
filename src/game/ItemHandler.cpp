@@ -585,30 +585,12 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
     uint8 customitems = vItems ? vItems->GetItemCount() : 0;
     uint8 numitems = customitems + (tItems ? tItems->GetItemCount() : 0);
 
-    uint8 count = 0;
-
-    WorldPacket data(SMSG_LIST_INVENTORY, (8 + 1 + numitems * 8 * 4));
-    
-    ObjectGuid Guid = vendorguid;
-    uint8 GuidMask[] = { 1, 0, 3, 6, 5, 2, 7, 4 };
-    uint8 GuidBytes[] = { 5, 4, 1, 0, 6, 2, 3, 7 };
-
-    data.WriteGuidMask(Guid, GuidMask, 2);
-    data.WriteBits(numitems, 21);
-    data.WriteGuidMask(Guid, GuidMask, 5, 2);
-
-    for (uint32 i = 0; i < numitems; i++)
-    {
-        data.WriteBit(true);
-        data.WriteBit(true);
-    }
-
-    data.WriteGuidMask(Guid, GuidMask, 1, 7);
-
-    data.FlushBits();
+    std::vector<bool> bitFlags;
 
     float discountMod = _player->GetReputationPriceDiscount(pCreature);
 
+    uint8 count = 0;
+    ByteBuffer buffer;
     for (uint8 vendorslot = 0; vendorslot < numitems; ++vendorslot)
     {
         VendorItem const* crItem = vendorslot < customitems ? vItems->GetItem(vendorslot) : tItems->GetItem(vendorslot - customitems);
@@ -650,28 +632,47 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
 
                 ++count;
 
+                if (count >= MAX_VENDOR_ITEMS)
+                    break;
+
+                bitFlags.push_back(crItem->ExtendedCost == 0);
+                bitFlags.push_back(true);                       // unk
+
                 // reputation discount
                 uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? uint32(floor(pProto->BuyPrice * discountMod)) : 0;
 
-                data << uint32(vendorslot + 1);             // client size expected counting from 1
-                data << uint32(pProto->MaxDurability);
+                buffer << uint32(vendorslot + 1);               // client size expected counting from 1
+                buffer << uint32(pProto->MaxDurability);
 
-                /*if (hasExtendedCost[vendorslot])
-                    data << uint32(crItem->ExtendedCost);*/
+                if (crItem->ExtendedCost)
+                    buffer << uint32(crItem->ExtendedCost);
 
-                data << uint32(itemId);
-                data << uint32(pProto->BuyCount);
-                data << uint32(price);
-                data << uint32(pProto->DisplayInfoID);
-                data << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
-                data << uint32(1);
+                buffer << uint32(itemId);
+                buffer << uint32(1);   // type == item
+                buffer << uint32(price);
+                buffer << uint32(pProto->DisplayInfoID);
+                buffer << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
+                buffer << uint32(pProto->BuyCount);
             }
         }
     }
 
-    data.WriteGuidBytes(Guid, GuidBytes, 5, 0);
-    data << uint8(0x74);
-    data.WriteGuidBytes(Guid, GuidBytes, 3, 5);
+    WorldPacket data(SMSG_LIST_INVENTORY, (8 + 3 + 1 + 1 + numitems * 8 * 4));
+
+    data.WriteGuidMask<1, 0>(vendorguid);
+    data.WriteBits(count, 21);
+    data.WriteGuidMask<3, 6, 5, 2, 7>(vendorguid);
+
+    for (uint32 i = 0; i < bitFlags.size(); ++i)
+        data.WriteBit(bitFlags[i]);
+
+    data.WriteGuidMask<4>(vendorguid);
+    data.FlushBits();
+    data.append(buffer);
+
+    data.WriteGuidBytes<5, 4, 1, 0, 6>(vendorguid);
+    data << uint8(count == 0);
+    data.WriteGuidBytes<2, 3, 7>(vendorguid);
 
     SendPacket(&data);
 }
