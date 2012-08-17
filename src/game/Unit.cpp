@@ -9257,43 +9257,70 @@ bool Unit::SelectHostileTarget()
 
 int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* effBasePoints)
 {
-    Player* unitPlayer = (GetTypeId() == TYPEID_PLAYER) ? (Player*)this : NULL;
-
-    uint8 comboPoints = unitPlayer ? unitPlayer->GetComboPoints() : 0;
-
-    int32 level = int32(getLevel());
-    uint32 maxLevel = spellProto->GetMaxLevel();
-    uint32 baseLevel = spellProto->GetBaseLevel();
-    uint32 spellLevel = spellProto->GetSpellLevel();
-    if (level > (int32)maxLevel && maxLevel > 0)
-        level = (int32)maxLevel;
-    else if (level < (int32)baseLevel)
-        level = (int32)baseLevel;
-    level-= (int32)spellLevel;
-
     SpellEffectEntry const* spellEffect = spellProto->GetSpellEffect(effect_index);
     if(!spellEffect)
         return 0;
 
-    float basePointsPerLevel = spellEffect->EffectRealPointsPerLevel;
-    int32 basePoints = effBasePoints ? *effBasePoints - 1 : spellEffect->EffectBasePoints;
-    basePoints += int32(level * basePointsPerLevel);
-    int32 randomPoints = int32(spellEffect->EffectDieSides);
-    float comboDamage = spellEffect->EffectPointsPerComboPoint;
+    Player* unitPlayer = (GetTypeId() == TYPEID_PLAYER) ? (Player*)this : NULL;
 
-    switch (randomPoints)
+    uint8 comboPoints = unitPlayer ? unitPlayer->GetComboPoints() : 0;
+
+    int32 basePoints = 0;
+    uint32 spellLevel = 0;
+    float comboDamage = 0.0f;
+
+    SpellScalingEntry const* scalingEntry = spellProto->GetSpellScaling();
+    GtSpellScalingEntry const* gtScalingEntry = NULL;
+    if (scalingEntry)
     {
-        case 0:                                             // not used
-        case 1: basePoints += 1; break;                     // range 1..1
-        default:
-        {
-            // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
-            int32 randvalue = (randomPoints >= 1)
-                              ? irand(1, randomPoints)
-                              : irand(randomPoints, 1);
+        uint32 gtSpellScalingId = getLevel() - 1;
+        if (scalingEntry->playerClass == -1)
+            gtSpellScalingId += 11 * 100;
+        else
+            gtSpellScalingId += (getClass() - 1) * 100;
 
-            basePoints += randvalue;
-            break;
+        gtScalingEntry = sGtSpellScalingStore.LookupEntry(gtSpellScalingId);
+    }
+
+    if (gtScalingEntry)
+    {
+        basePoints = int32(scalingEntry->coeff1[effect_index] * gtScalingEntry->value);
+        int32 randomPoints = int32(scalingEntry->coeff1[effect_index] * gtScalingEntry->value * scalingEntry->coeff2[effect_index]);
+        basePoints += irand(-randomPoints, randomPoints) / 2;
+        comboDamage = uint32(scalingEntry->coeff3[effect_index] * gtScalingEntry->value);
+    }
+    else
+    {
+        spellLevel = spellProto->GetSpellLevel();
+        uint32 level = getLevel();
+        uint32 maxLevel = spellProto->GetMaxLevel();
+        uint32 baseLevel = spellProto->GetBaseLevel();
+
+        if (maxLevel)
+            level = std::min(level, maxLevel);
+        level = std::max(level, baseLevel);
+        level = std::max(level, spellLevel) - spellLevel;
+
+        float basePointsPerLevel = spellEffect->EffectRealPointsPerLevel;
+        basePoints = effBasePoints ? *effBasePoints - 1 : spellEffect->EffectBasePoints;
+        basePoints += int32(level * basePointsPerLevel);
+        int32 randomPoints = int32(spellEffect->EffectDieSides);
+        comboDamage = spellEffect->EffectPointsPerComboPoint;
+
+        switch (randomPoints)
+        {
+            case 0:                                             // not used
+            case 1: basePoints += 1; break;                     // range 1..1
+            default:
+            {
+                // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
+                int32 randvalue = (randomPoints >= 1)
+                                  ? irand(1, randomPoints)
+                                  : irand(randomPoints, 1);
+
+                basePoints += randvalue;
+                break;
+            }
         }
     }
 
@@ -9322,7 +9349,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
         }
     }
 
-    if(spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellLevel &&
+    if (!gtScalingEntry && spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellLevel &&
             spellEffect->Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
             spellEffect->Effect != SPELL_EFFECT_KNOCK_BACK &&
             (spellEffect->Effect != SPELL_EFFECT_APPLY_AURA || spellEffect->EffectApplyAuraName != SPELL_AURA_MOD_DECREASE_SPEED))

@@ -136,8 +136,7 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell const* spell)
             {
                 if (levelsEntry->maxLevel)
                     level = std::min(level, levelsEntry->maxLevel);
-                if (levelsEntry->baseLevel)
-                    level = std::max(level, levelsEntry->baseLevel) - levelsEntry->baseLevel;
+                level = std::max(level, levelsEntry->baseLevel) - levelsEntry->baseLevel;
             }
 
             // currently only profession spells have CastTimePerLevel data filled, always negative
