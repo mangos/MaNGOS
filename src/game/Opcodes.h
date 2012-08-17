@@ -436,8 +436,8 @@ enum Opcodes
     SMSG_PET_NAME_INVALID                                 = 0x1179,
     SMSG_PET_SPELLS                                       = 0x4114, // 4.3.4 15595
     SMSG_PET_MODE                                         = 0x117B,
-    CMSG_GOSSIP_HELLO                                     = 0x117C,
-    CMSG_GOSSIP_SELECT_OPTION                             = 0x117D,
+    CMSG_GOSSIP_HELLO                                     = 0x4525, // 4.3.4 15595
+    CMSG_GOSSIP_SELECT_OPTION                             = 0x0216, // 4.3.4 15595
     SMSG_GOSSIP_MESSAGE                                   = 0x2035, // 4.3.4 15595
     SMSG_GOSSIP_COMPLETE                                  = 0x0806, // 4.3.4 15595
     CMSG_NPC_TEXT_QUERY                                   = 0x4E24, // 4.3.4 15595
