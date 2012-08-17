@@ -967,9 +967,53 @@ enum MangosStrings
     LANG_NPC_EVENTAI_COMBAT             = 1508,
     // Room for more Level 2              1509-1599 not used
 
-    // FREE IDS                           1600-9999
+    // Outdoor PvP
+    LANG_OPVP_EP_CAPTURE_NPT_H          = 1600,
+    LANG_OPVP_EP_CAPTURE_NPT_A          = 1601,
+    LANG_OPVP_EP_CAPTURE_CGT_H          = 1602,
+    LANG_OPVP_EP_CAPTURE_CGT_A          = 1603,
+    LANG_OPVP_EP_CAPTURE_EWT_H          = 1604,
+    LANG_OPVP_EP_CAPTURE_EWT_A          = 1605,
+    LANG_OPVP_EP_CAPTURE_PWT_H          = 1606,
+    LANG_OPVP_EP_CAPTURE_PWT_A          = 1607,
 
-    // Use for not-in-offcial-sources patches
+    LANG_OPVP_HP_CAPTURE_OVERLOOK_H     = 1608,
+    LANG_OPVP_HP_CAPTURE_OVERLOOK_A     = 1609,
+    LANG_OPVP_HP_CAPTURE_STADIUM_H      = 1610,
+    LANG_OPVP_HP_CAPTURE_STADIUM_A      = 1611,
+    LANG_OPVP_HP_CAPTURE_BROKENHILL_H   = 1612,
+    LANG_OPVP_HP_CAPTURE_BROKENHILL_A   = 1613,
+
+    LANG_OPVP_ZM_CAPTURE_EAST_BEACON_H  = 1614,
+    LANG_OPVP_ZM_CAPTURE_EAST_BEACON_A  = 1615,
+    LANG_OPVP_ZM_CAPTURE_WEST_BEACON_H  = 1616,
+    LANG_OPVP_ZM_CAPTURE_WEST_BEACON_A  = 1617,
+    LANG_OPVP_ZM_CAPTURE_BOTH_BEACONS_H = 1618,
+    LANG_OPVP_ZM_CAPTURE_BOTH_BEACONS_A = 1619,
+    LANG_OPVP_ZM_SPAWN_FIELD_SCOUT_H    = 1620,
+    LANG_OPVP_ZM_SPAWN_FIELD_SCOUT_A    = 1621,
+    LANG_OPVP_ZM_CAPTURE_GRAVEYARD_H    = 1622,
+    LANG_OPVP_ZM_CAPTURE_GRAVEYARD_A    = 1623,
+
+    LANG_OPVP_TF_CAPTURE_TOWER_H        = 1624,
+    LANG_OPVP_TF_CAPTURE_TOWER_A        = 1625,
+    LANG_OPVP_TF_LOSE_TOWER_H           = 1626,
+    LANG_OPVP_TF_LOSE_TOWER_A           = 1627,
+    LANG_OPVP_TF_CAPTURE_ALL_TOWERS_H   = 1628,
+    LANG_OPVP_TF_CAPTURE_ALL_TOWERS_A   = 1629,
+
+    LANG_OPVP_NA_PROGRESS_H             = 1630,
+    LANG_OPVP_NA_PROGRESS_A             = 1631,
+    LANG_OPVP_NA_CAPTURE_H              = 1632,
+    LANG_OPVP_NA_CAPTURE_A              = 1633,
+    LANG_OPVP_NA_DEFENSELESS            = 1634,
+
+    LANG_OPVP_SI_CAPTURE_H              = 1635,
+    LANG_OPVP_SI_CAPTURE_A              = 1636,
+
+    // FREE IDS                           1700-9999
+
+    // Use for not-in-official-sources patches
     //                                    10000-10999
 
     LANG_INVALID_REALMID                = 11001,
