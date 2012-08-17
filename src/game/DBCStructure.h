@@ -1798,12 +1798,12 @@ struct SpellScalingEntry
     uint32    castTimeMin;                                  // 1
     uint32    castTimeMax;                                  // 2
     uint32    castScalingMaxLevel;                          // 3
-    int32    playerClass;                                   // 4        (index * 100) + charLevel => gtSpellScaling.dbc
+    int32     playerClass;                                  // 4        (index * 100) + charLevel => gtSpellScaling.dbc
     float     coeff1[3];                                    // 5-7
     float     coeff2[3];                                    // 8-10
     float     coeff3[3];                                    // 11-13
-    float     unkMult;                                      // 14        some coefficient, mostly 1.0f
-    uint32    unkLevel;                                     // 15        some level
+    float     unkMult;                                      // 14       some coefficient, mostly 1.0f
+    uint32    unkLevel;                                     // 15       some level
 };
 
 // SpellShapeshift.dbc
