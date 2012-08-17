@@ -125,9 +125,7 @@ enum Opcodes
     SMSG_PET_NAME_QUERY_RESPONSE                          = 0x1054,
     CMSG_GUILD_QUERY                                      = 0x1055,
     SMSG_GUILD_QUERY_RESPONSE                             = 0x1056,
-    CMSG_ITEM_QUERY_SINGLE                                = 0x1057,
     CMSG_ITEM_QUERY_MULTIPLE                              = 0x1058,
-    SMSG_ITEM_QUERY_SINGLE_RESPONSE                       = 0x1059,
     SMSG_ITEM_QUERY_MULTIPLE_RESPONSE                     = 0x105A,
     CMSG_PAGE_TEXT_QUERY                                  = 0x105B,
     SMSG_PAGE_TEXT_QUERY_RESPONSE                         = 0x105C,
@@ -761,8 +759,6 @@ enum Opcodes
     MSG_PETITION_RENAME                                   = 0x12C2,
     SMSG_INIT_WORLD_STATES                                = 0x4C15, // 4.3.4 15595
     SMSG_UPDATE_WORLD_STATE                               = 0x12C4,
-    CMSG_ITEM_NAME_QUERY                                  = 0x12C5,
-    SMSG_ITEM_NAME_QUERY_RESPONSE                         = 0x12C6,
     SMSG_PET_ACTION_FEEDBACK                              = 0x12C7,
     CMSG_CHAR_RENAME                                      = 0x12C8,
     SMSG_CHAR_RENAME                                      = 0x12C9,
