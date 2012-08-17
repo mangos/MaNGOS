@@ -9277,7 +9277,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
         if (scalingEntry->playerClass == -1)
             gtSpellScalingId += 11 * 100;
         else
-            gtSpellScalingId += scalingEntry->playerClass * 100;
+            gtSpellScalingId += (scalingEntry->playerClass - 1) * 100;
 
         gtScalingEntry = sGtSpellScalingStore.LookupEntry(gtSpellScalingId);
     }
