@@ -132,8 +132,11 @@ void CreatureEventAIMgr::CheckUnusedAITexts()
                 switch (action.type)
                 {
                     case ACTION_T_TEXT:
+                    case ACTION_T_CHANCED_TEXT:
                     {
-                        for (int k = 0; k < 3; ++k)
+                        // ACTION_T_CHANCED_TEXT contains a chance value in first param
+                        int k = action.type == ACTION_T_TEXT ? 0 : 1;
+                        for (; k < 3; ++k)
                             if (action.text.TextId[k])
                                 idx_set.erase(action.text.TextId[k]);
                         break;
@@ -511,14 +514,22 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                 {
                     case ACTION_T_NONE:
                         break;
+                    case ACTION_T_CHANCED_TEXT:
+                        // Check first param as chance
+                        if (!action.chanced_text.chance)
+                            sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has not set chance param1. Text will not be displayed", i, j + 1);
+                        else if (action.chanced_text.chance >= 100)
+                            sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has set chance param1 >= 100. Text will always be displayed", i, j + 1);
+                        // no break here to check texts
                     case ACTION_T_TEXT:
                     {
                         bool not_set = false;
-                        for (int k = 0; k < 3; ++k)
+                        int firstTextParam = action.type == ACTION_T_TEXT ? 0 : 1;
+                        for (int k = firstTextParam; k < 3; ++k)
                         {
                             if (action.text.TextId[k])
                             {
-                                if (k > 0 && not_set)
+                                if (k > firstTextParam && not_set)
                                     sLog.outErrorDb("CreatureEventAI:  Event %u Action %u has param%d, but it follow after not set param. Required for randomized text.", i, j + 1, k + 1);
 
                                 if (!action.text.TextId[k])
