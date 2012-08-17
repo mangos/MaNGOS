@@ -2009,12 +2009,20 @@ void GameObject::TickCapturePoint()
             owner->SendUpdateWorldState(info->capturePoint.worldState1, WORLD_STATE_REMOVE);
 
         // player left capture point zone
-        m_UniqueUsers.erase((*itr));
+        m_UniqueUsers.erase(*itr);
     }
 
     // return if there are not enough players capturing the point (works because minSuperiority is always 1)
     if (rangePlayers == 0)
+    {
+        // set to inactive if all players left capture point zone
+        if (m_UniqueUsers.empty())
+            SetActiveObjectState(false);
         return;
+    }
+
+    // prevents unloading gameobject before all players left capture point zone (to prevent m_UniqueUsers not being cleared if grid is set to idle)
+    SetActiveObjectState(true);
 
     // cap speed
     int maxSuperiority = info->capturePoint.maxSuperiority;
