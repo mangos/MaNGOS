@@ -53,6 +53,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
     m_scripts[OPVP_ID_EP] = new OutdoorPvPEP();
     m_scripts[OPVP_ID_HP] = new OutdoorPvPHP();
     m_scripts[OPVP_ID_ZM] = new OutdoorPvPZM();
+    m_scripts[OPVP_ID_TF] = new OutdoorPvPTF();
 
     sLog.outString();
     sLog.outString(">> Loaded %u Outdoor PvP zones", MAX_OPVP_ID);
