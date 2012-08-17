@@ -623,8 +623,8 @@ enum Opcodes
     SMSG_SEND_MAIL_RESULT                                 = 0x4927, // 4.3.4 15595
     CMSG_GET_MAIL_LIST                                    = 0x4D37, // 4.3.4 15595
     SMSG_MAIL_LIST_RESULT                                 = 0x123C,
-    CMSG_BATTLEFIELD_LIST                                 = 0x123D,
-    SMSG_BATTLEFIELD_LIST                                 = 0x123E,
+    CMSG_BATTLEFIELD_LIST                                 = 0x3814, // 4.3.4 15595
+    SMSG_BATTLEFIELD_LIST                                 = 0x71B5, // 4.3.4 15595
     CMSG_BATTLEFIELD_JOIN                                 = 0x123F,
     SMSG_FORCE_SET_VEHICLE_REC_ID                         = 0x1240,
     CMSG_SET_VEHICLE_REC_ID_ACK                           = 0x1241,
