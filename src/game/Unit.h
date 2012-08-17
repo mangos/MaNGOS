@@ -612,7 +612,7 @@ enum NPCFlags
     UNIT_NPC_FLAG_SPELLCLICK            = 0x01000000,       // cause client to send 1015 opcode (spell click), dynamic, set at loading and don't must be set in DB
 };
 
-// used in most movement packets (send and received)
+// used in most movement packets (send and received), 30 bits in client
 enum MovementFlags
 {
     MOVEFLAG_NONE               = 0x00000000,
@@ -660,6 +660,7 @@ MovementFlags const movementOrTurningFlagsMask = MovementFlags(
             movementFlagsMask | MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT
         );
 
+// 12 bits in client
 enum MovementFlags2
 {
     MOVEFLAG2_NONE              = 0x0000,
@@ -675,10 +676,6 @@ enum MovementFlags2
     MOVEFLAG2_INTERP_MOVEMENT   = 0x0200,
     MOVEFLAG2_INTERP_TURNING    = 0x0400,
     MOVEFLAG2_INTERP_PITCHING   = 0x0800,
-    MOVEFLAG2_UNK8              = 0x1000,
-    MOVEFLAG2_UNK9              = 0x2000,
-    MOVEFLAG2_UNK10             = 0x4000,
-    MOVEFLAG2_UNK11             = 0x8000,
     MOVEFLAG2_INTERP_MASK       = MOVEFLAG2_INTERP_MOVEMENT | MOVEFLAG2_INTERP_TURNING | MOVEFLAG2_INTERP_PITCHING
 };
 

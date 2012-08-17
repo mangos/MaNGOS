@@ -3389,6 +3389,8 @@ void Spell::cast(bool skipCheck)
             // Stoneskin
             else if (m_spellInfo->Id == 20594)
                 AddTriggeredSpell(65116);                   // Stoneskin - armor 10% for 8 sec
+            else if (m_spellInfo->Id == 68992)              // Darkflight
+                AddPrecastSpell(96223);                     // Run Speed Marker
             // Chaos Bane strength buff
             else if (m_spellInfo->Id == 71904)
                 AddTriggeredSpell(73422);

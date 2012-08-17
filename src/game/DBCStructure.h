@@ -1810,9 +1810,9 @@ struct SpellScalingEntry
 struct SpellShapeshiftEntry
 {
     //uint32    Id;                                           // 0        m_ID
-    uint32    Stances;                                      // 13       m_shapeshiftMask
+    uint32    StancesNot;                                   // 13       m_shapeshiftMask
     // uint32 unk_320_2;                                    // 14       3.2.0
-    uint32    StancesNot;                                   // 15       m_shapeshiftExclude
+    uint32    Stances;                                      // 15       m_shapeshiftExclude
     // uint32 unk_320_3;                                    // 16       3.2.0
     // uint32    StanceBarOrder;                            // 155      m_stanceBarOrder not used
 };

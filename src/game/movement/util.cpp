@@ -153,7 +153,7 @@ namespace Movement
         STR(Unk11),              // 0x8000
     };
 
-    const char* g_SplineFlag_names[32] =
+    const char* g_SplineFlag_names[29] =
     {
         STR(AnimBit1),     // 0x00000001,
         STR(AnimBit2),     // 0x00000002,
@@ -174,7 +174,7 @@ namespace Movement
         STR(TransportExit),// 0x00010000,
         STR(Unknown3),     // 0x00020000,
         STR(Unknown4),     // 0x00040000,
-        STR(OrientationInversed), // 0x00080000,           // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
+        STR(OrientationInversed), // 0x00080000,    // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
         STR(SmoothGroundPath),    // 0x00100000
         STR(Walkmode),     // 0x00200000,
         STR(UncompressedPath), // 0x00400000
@@ -184,9 +184,6 @@ namespace Movement
         STR(Final_Point),  // 0x04000000,
         STR(Final_Target), // 0x08000000,
         STR(Final_Angle),  // 0x10000000,
-        STR(Unknown7),     // 0x20000000,
-        STR(Unknown8),     // 0x40000000,
-        STR(Unknown9),     // 0x80000000,
     };
 
     template<class Flags, int N>
