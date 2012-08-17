@@ -2583,9 +2583,9 @@ CREATE TABLE `item_template` (
   `GemProperties` mediumint(9) NOT NULL default '0',
   `RequiredDisenchantSkill` smallint(6) NOT NULL default '-1',
   `ArmorDamageModifier` float NOT NULL default '0',
-  `Duration` int(11) unsigned NOT NULL default '0',
+  `Duration` int(11) UNSIGNED DEFAULT '0' NOT NULL COMMENT 'Duration in seconds.',
   `ItemLimitCategory` smallint(6) NOT NULL default '0',
-  `HolidayId` int(11) unsigned NOT NULL default '0',
+  `HolidayId` int(11) UNSIGNED DEFAULT '0' NOT NULL,
   `ScriptName` varchar(64) NOT NULL default '',
   `DisenchantID` mediumint(8) unsigned NOT NULL default '0',
   `FoodType` tinyint(3) unsigned NOT NULL default '0',
@@ -2594,7 +2594,7 @@ CREATE TABLE `item_template` (
   `Unknown400_2` int(10) unsigned NOT NULL default '0',
   `minMoneyLoot` int(10) unsigned NOT NULL default '0',
   `maxMoneyLoot` int(10) unsigned NOT NULL default '0',
-  `ExtraFlags` tinyint(1) unsigned NOT NULL default '0',
+  `ExtraFlags` tinyint(1) UNSIGNED NOT NULL default '0',
   PRIMARY KEY  (`entry`),
   KEY `items_index` (`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
