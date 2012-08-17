@@ -40,6 +40,7 @@
 #include "InstanceData.h"
 #include "MapPersistentStateMgr.h"
 #include "BattleGroundMgr.h"
+#include "OutdoorPvP/OutdoorPvP.h"
 #include "Spell.h"
 #include "Util.h"
 #include "GridNotifiers.h"
@@ -754,6 +755,10 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     // Normally non-players do not teleport to other maps.
     if (InstanceData* iData = GetMap()->GetInstanceData())
         iData->OnCreatureCreate(this);
+
+    // Notify the outdoor pvp script
+    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
+        outdoorPvP->HandleCreatureCreate(this);
 
     switch (GetCreatureInfo()->rank)
     {
