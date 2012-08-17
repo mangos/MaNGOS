@@ -492,7 +492,7 @@ enum Opcodes
     CMSG_TRAINER_BUY_SPELL                                = 0x11B3,
     SMSG_TRAINER_BUY_SUCCEEDED                            = 0x11B4,
     SMSG_TRAINER_BUY_FAILED                               = 0x11B5,
-    CMSG_BINDER_ACTIVATE                                  = 0x11B6,
+    CMSG_BINDER_ACTIVATE                                  = 0x4006, // 4.3.4 15595
     SMSG_PLAYERBINDERROR                                  = 0x11B7,
     CMSG_BANKER_ACTIVATE                                  = 0x11B8,
     SMSG_SHOW_BANK                                        = 0x11B9,
@@ -796,7 +796,7 @@ enum Opcodes
     SMSG_GROUP_JOINED_BATTLEGROUND                        = 0x12E9,
     MSG_BATTLEGROUND_PLAYER_POSITIONS                     = 0x12EA,
     CMSG_PET_STOP_ATTACK                                  = 0x12EB,
-    SMSG_BINDER_CONFIRM                                   = 0x12EC,
+    SMSG_BINDER_CONFIRM                                   = 0x2835, // 4.3.4 15595
     SMSG_BATTLEGROUND_PLAYER_JOINED                       = 0x12ED,
     SMSG_BATTLEGROUND_PLAYER_LEFT                         = 0x12EE,
     CMSG_BATTLEMASTER_JOIN                                = 0x12EF,
