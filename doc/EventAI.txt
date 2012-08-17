@@ -147,6 +147,7 @@ For all ACTION_T_RANDOM, When a Particular Param is selected for the Event... Th
 41   ACTION_T_FORCE_DESPAWN                 Delay                           Despawns the creature, if delay = 0 immediate otherwise will despawn after delay time set in Param1 (in ms).
 42   ACTION_T_SET_INVINCIBILITY_HP_LEVEL    HP_Level, HP_Percent            Set min. health level for creature that can be set at damage as flat value or percent from max health
 43   ACTION_T_MOUNT_TO_ENTRY_OR_MODEL       CreatureEntry, ModelId          Set mount model from creature_template.entry (Param1) OR explicit modelId (Param2). If (Param1) AND (Param2) are both 0, unmount.
+44   ACTION_T_CHANCED_TEXT                  Chance, -TextId1, -TextId2      Displays by Chance (1..100) the specified -TextId. When -TextId2 is specified, the selection will be randomized. Text types are defined, along with other options for the text, in a table below. Param2 and Param3 needs to be negative.
 
 * = Use -1 where the param is expected to do nothing. Random constant is generated for each event, so if you have a random yell and a random sound, they will be linked up with each other (ie. param2 with param2).
 
@@ -790,6 +791,30 @@ Parameter 1: Minimum Health Level That NPC Can Reach (NPC Will Not Go Below This
 Parameter 2: Sets Format of Paramater 1 Value
 0 = Sets Paramater 1 as an exact HP value
 1 = Sets Paramater 1 as a HP Percent (0..100) of the creature's max health
+
+-----------------------------------------
+43   ACTION_T_MOUNT_TO_ENTRY_OR_MODEL:
+-----------------------------------------
+Parameter 1, Optional: Set mount model from creature_template.entry
+Parameter 2, Optional: Set mount model by explicit modelId
+
+If (Param1) AND (Param2) are both 0, unmount.
+
+------------------
+44 = ACTION_T_CHANCED_TEXT:
+------------------
+Parameter 1: Chance with which a text will be displayed (must be between 1 and 99)
+
+Parameter 2: The entry of the text that the NPC should use from eventai_texts table. Optionally a entry from other tables can be used (such as custom_texts).
+             Entry are required to be negative and exist in a *_texts-table. The type text to be displayed are defined in the texts-table itself (Say, Yell, Whisper, Emote Text, Boss Whisper, Boss Emote)
+             Other options are also to be defined in the texts-table, such as a sound to be heard with the text and the language used in output (common, dwarvish, etc).
+             In case this entry has a localized version of the text, the localized text will be displayed in client that support this locale.
+Parameter 3: Optional: TextId can be defined in addition. The same apply to this as explained above, however eventAI will randomize between the two.
+
+Also remark that the chance also depends on the chance of the event. And remark that a chance of 100 is useless!
+
+Read at bottom for documentation of creature_ai_texts-table.
+
 
 =========================================
 Target Types
