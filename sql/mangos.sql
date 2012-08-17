@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_0083_12090_01_mangos_spell_template` bit(1) default NULL
+  `required_0122_xxxxx_01_mangos_item_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2518,8 +2518,8 @@ CREATE TABLE `item_template` (
   `stat_unk1_10` int(10) NOT NULL default '0',
   `stat_unk2_10` int(10) NOT NULL default '0',
   `ScalingStatDistribution` smallint(6) NOT NULL default '0',
-  `delay` int(10) NOT NULL,
   `DamageType` tinyint(3) unsigned NOT NULL default '0',
+  `delay` int(10) NOT NULL,
   `RangedModRange` float NOT NULL default '0',
   `spellid_1` mediumint(8) unsigned NOT NULL default '0',
   `spelltrigger_1` tinyint(3) unsigned NOT NULL default '0',
