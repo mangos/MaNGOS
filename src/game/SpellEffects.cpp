@@ -1299,6 +1299,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, NULL);
                     return;
                 }
+                case 36677:                                 // Chaos Breath
+                {
+                    if (!unitTarget)
+                        return;
+
+                    uint32 possibleSpells[] = {36693, 36694, 36695, 36696, 36697, 36698, 36699, 36700} ;
+                    std::vector<uint32> spellPool(possibleSpells, possibleSpells + countof(possibleSpells));
+                    std::random_shuffle(spellPool.begin(), spellPool.end());
+
+                    for (uint8 i = 0; i < (m_caster->GetMap()->IsRegularDifficulty() ? 2 : 4); ++i)
+                        m_caster->CastSpell(m_caster, spellPool[i], true);
+
+                    return;
+                }
                 case 33923:                                 // Sonic Boom
                 case 38796:                                 // Sonic Boom (heroic)
                 {
