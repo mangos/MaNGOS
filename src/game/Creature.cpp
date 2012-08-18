@@ -438,7 +438,7 @@ uint32 Creature::ChooseDisplayId(const CreatureInfo* cinfo, const CreatureData* 
         // Where it's expected to select one of two, model must have a alternative model defined (alternative model is normally the same as defined in ModelId1).
         // Same pattern is used in the above model selection, but the result may be ModelId3 and not ModelId2 as here.
         uint32 modelid_tmp = sObjectMgr.GetCreatureModelAlternativeModel(cinfo->ModelId[1]);
-        display_id = modelid_tmp ? modelid_tmp : cinfo->ModelId[1];
+        display_id = modelid_tmp ? cinfo->ModelId[urand(0, 1)] : cinfo->ModelId[1];
     }
     else if (cinfo->ModelId[0])
     {
