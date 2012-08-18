@@ -44,21 +44,29 @@ OutdoorPvPMgr::~OutdoorPvPMgr()
         delete m_scripts[i];
 }
 
+#define LOAD_OPVP_ZONE(a)                                           \
+    if (sWorld.getConfig(CONFIG_BOOL_OUTDOORPVP_##a##_ENABLED))     \
+    {                                                               \
+        m_scripts[OPVP_ID_##a##] = new OutdoorPvP##a##();           \
+        ++counter;                                                  \
+    }
 /**
    Function which loads all outdoor pvp scripts
  */
 void OutdoorPvPMgr::InitOutdoorPvP()
 {
-    m_scripts[OPVP_ID_SI] = new OutdoorPvPSI();
-    m_scripts[OPVP_ID_EP] = new OutdoorPvPEP();
-    m_scripts[OPVP_ID_HP] = new OutdoorPvPHP();
-    m_scripts[OPVP_ID_ZM] = new OutdoorPvPZM();
-    m_scripts[OPVP_ID_TF] = new OutdoorPvPTF();
-    m_scripts[OPVP_ID_NA] = new OutdoorPvPNA();
-    m_scripts[OPVP_ID_GH] = new OutdoorPvPGH();
+    uint8 counter = 0;
+
+    LOAD_OPVP_ZONE(SI);
+    LOAD_OPVP_ZONE(EP);
+    LOAD_OPVP_ZONE(HP);
+    LOAD_OPVP_ZONE(ZM);
+    LOAD_OPVP_ZONE(TF);
+    LOAD_OPVP_ZONE(NA);
+    LOAD_OPVP_ZONE(GH);
 
     sLog.outString();
-    sLog.outString(">> Loaded %u Outdoor PvP zones", MAX_OPVP_ID);
+    sLog.outString(">> Loaded %u Outdoor PvP zones", counter);
 }
 
 OutdoorPvP* OutdoorPvPMgr::GetScript(uint32 zoneId)

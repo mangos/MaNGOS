@@ -1539,6 +1539,29 @@ Arena.StartRating = -1
 Arena.StartPersonalRating = -1
 
 ###################################################################################################################
+# OUTDOOR PVP CONFIG
+#
+#    OutdoorPvp.SIEnabled               #Enable Silithus Outdoor pvp
+#    OutdoorPvp.EPEnabled               #Enable Eastern Plaguelands Outdoor pvp
+#    OutdoorPvp.HPEnabled               #Enable Hellfire Peninsula Outdoor pvp
+#    OutdoorPvp.ZMEnabled               #Enable Zangarmarsh Outdoor pvp
+#    OutdoorPvp.TFEnabled               #Enable Terokkar Forest  Outdoor pvp
+#    OutdoorPvp.NAEnabled               #Enable Halaa (Nagrand) Outdoor pvp
+#    OutdoorPvp.GHEnabled               #Enable Venture Bay (Grizzly Hills) Outdoor pvp
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+###################################################################################################################
+
+OutdoorPvp.SIEnabled = 1
+OutdoorPvp.EPEnabled = 1
+OutdoorPvp.HPEnabled = 1
+OutdoorPvp.ZMEnabled = 1
+OutdoorPvp.TFEnabled = 1
+OutdoorPvp.NAEnabled = 1
+OutdoorPvp.GHEnabled = 1
+
+###################################################################################################################
 # NETWORK CONFIG
 #
 #    Network.Threads
