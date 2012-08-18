@@ -457,6 +457,15 @@
     <ClCompile Include="..\..\src\game\ObjectGuid.cpp" />
     <ClCompile Include="..\..\src\game\ObjectPosSelector.cpp" />
     <ClCompile Include="..\..\src\game\Opcodes.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPEP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPGH.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPHP.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPMgr.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPNA.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPSI.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPTF.cpp" />
+    <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPZM.cpp" />
     <ClCompile Include="..\..\src\game\PathFinder.cpp" />
     <ClCompile Include="..\..\src\game\pchdef.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -628,6 +637,15 @@
     <ClInclude Include="..\..\src\game\ObjectMgr.h" />
     <ClInclude Include="..\..\src\game\ObjectPosSelector.h" />
     <ClInclude Include="..\..\src\game\Opcodes.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvP.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPEP.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPGH.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPHP.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPMgr.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPNA.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPSI.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPTF.h" />
+    <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPZM.h" />
     <ClInclude Include="..\..\src\game\Path.h" />
     <ClInclude Include="..\..\src\game\PathFinder.h" />
     <ClInclude Include="..\..\src\game\pchdef.h" />
