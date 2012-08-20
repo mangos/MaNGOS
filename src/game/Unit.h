@@ -1961,6 +1961,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsSplineEnabled() const;
 
+        bool IsInWorgenForm(bool inPermanent = false) const;
+
         // Packet builders
         void BuildForceMoveRootPacket(WorldPacket* data, bool apply, uint32 value);
         void BuildMoveWaterWalkPacket(WorldPacket* data, bool apply, uint32 value);

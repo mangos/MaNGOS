@@ -8171,6 +8171,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
             if (IsNonCombatSpell(spell->m_spellInfo))
                 InterruptSpell(CurrentSpellTypes(i), false);
 
+    if (getRace() == RACE_WORGEN && !IsInWorgenForm(true))
+        CastSpell(this, 97709, true);   // cast Altered Form
+
     if (creatureNotInCombat)
     {
         // should probably be removed for the attacked (+ it's party/group) only, not global
@@ -11626,6 +11629,16 @@ bool Unit::IsSplineEnabled() const
     return movespline->Initialized();
 }
 
+bool Unit::IsInWorgenForm(bool inPermanent) const
+{
+    AuraList const& vTransformAuras = GetAurasByType(SPELL_AURA_WORGEN_TRANSFORM);
+    for (AuraList::const_iterator itr = vTransformAuras.begin(); itr != vTransformAuras.end(); ++itr)
+        if (!inPermanent || (*itr)->GetHolder()->IsPermanent())
+            return true;
+
+    return false;
+}
+
 void Unit::BuildForceMoveRootPacket(WorldPacket* data, bool apply, uint32 value)
 {
     if (apply)
@@ -11676,7 +11689,6 @@ void Unit::BuildSendPlayVisualPacket(WorldPacket* data, uint32 value, bool impac
     data->WriteGuidMask<4, 7, 5, 3, 1, 2, 0, 6>(GetObjectGuid());
     data->WriteGuidBytes<0, 4, 1, 6, 7, 2, 3, 5>(GetObjectGuid());
 }
-
 
 void Unit::BuildMoveWaterWalkPacket(WorldPacket* data, bool apply, uint32 value)
 {
