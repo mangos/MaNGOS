@@ -77,6 +77,7 @@ typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
 struct Position
 {
     Position() : x(0.0f), y(0.0f), z(0.0f), o(0.0f) {}
+    Position(float _x, float _y, float _z, float _o) : x(_x), y(_y), z(_z), o(_o) {}
     float x, y, z, o;
 };
 
