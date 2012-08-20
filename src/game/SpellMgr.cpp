@@ -738,10 +738,8 @@ bool IsExplicitNegativeTarget(uint32 targetA)
 bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
 {
     SpellEffectEntry const* spellEffect = spellproto->GetSpellEffect(effIndex);
-    if(!spellEffect)
-        return false;
 
-    switch(spellEffect->Effect)
+    switch(spellproto->GetSpellEffectIdByIndex(effIndex))
     {
         case SPELL_EFFECT_DUMMY:
             // some explicitly required dummy effect sets
@@ -962,7 +960,7 @@ bool IsPositiveEffect(SpellEntry const* spellproto, SpellEffectIndex effIndex)
     }
 
     // non-positive targets
-    if(!IsPositiveTarget(spellEffect->EffectImplicitTargetA,spellEffect->EffectImplicitTargetB))
+    if (spellEffect && !IsPositiveTarget(spellEffect->EffectImplicitTargetA,spellEffect->EffectImplicitTargetB))
         return false;
 
     // AttributesEx check
