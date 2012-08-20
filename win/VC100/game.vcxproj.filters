@@ -546,6 +546,8 @@
     </ClCompile>
     <ClCompile Include="..\..\src\game\DB2Stores.cpp">
       <Filter>Server</Filter>
+    <ClCompile Include="..\..\src\game\TransportSystem.cpp">
+      <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1044,6 +1046,8 @@
     </ClInclude>
     <ClInclude Include="..\..\src\game\DB2Structure.h">
       <Filter>Server</Filter>
+    <ClInclude Include="..\..\src\game\TransportSystem.h">
+      <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
