@@ -535,6 +535,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetWalk(bool enable);
         void SetLevitate(bool enable);
+        void SetRoot(bool enable) override;
+        void SetWaterWalk(bool enable) override;
 
         uint32 GetShieldBlockValue() const override         // dunno mob block value
         {

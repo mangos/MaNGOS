@@ -4328,19 +4328,17 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     }
 }
 
-void Player::SetMovement(PlayerMovementType pType)
+void Player::SetRoot(bool enable)
 {
-    WorldPacket data;
-    switch (pType)
-    {
-        case MOVE_ROOT:       data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4); break;
-        case MOVE_UNROOT:     data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4); break;
-        case MOVE_WATER_WALK: data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size() + 4); break;
-        case MOVE_LAND_WALK:  data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4); break;
-        default:
-            sLog.outError("Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
-            return;
-    }
+    WorldPacket data(enable ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4));
+    data << GetPackGUID();
+    data << uint32(0);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SetWaterWalk(bool enable)
+{
+    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4));
     data << GetPackGUID();
     data << uint32(0);
     GetSession()->SendPacket(&data);
@@ -4383,9 +4381,9 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
-    SetMovement(MOVE_WATER_WALK);
+    SetWaterWalk(true);
     if (!GetSession()->isLogingOut())
-        SetMovement(MOVE_UNROOT);
+        SetRoot(false);
 
     // BG - remove insignia related
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
@@ -4421,8 +4419,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
-    SetMovement(MOVE_LAND_WALK);
-    SetMovement(MOVE_UNROOT);
+    SetWaterWalk(false);
+    SetRoot(false);
 
     m_deathTimer = 0;
 
@@ -4475,7 +4473,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
 void Player::KillPlayer()
 {
-    SetMovement(MOVE_ROOT);
+    SetRoot(true);
 
     StopMirrorTimers();                                     // disable timers(bars)
 
@@ -20398,7 +20396,7 @@ void Player::SendInitialPacketsAfterAddToMap()
     }
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
-        SetMovement(MOVE_ROOT);
+        SetRoot(true);
 
     // manual send package (have code in ApplyModifier(true,true); that don't must be re-applied.
     if (HasAuraType(SPELL_AURA_MOD_ROOT))

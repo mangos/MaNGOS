@@ -4998,9 +4998,9 @@ bool ChatHandler::HandleWaterwalkCommand(char* args)
         return false;
 
     if (value)
-        player->SetMovement(MOVE_WATER_WALK);               // ON
+        player->SetWaterWalk(true);                         // ON
     else
-        player->SetMovement(MOVE_LAND_WALK);                // OFF
+        player->SetWaterWalk(false);                        // OFF
 
     PSendSysMessage(LANG_YOU_SET_WATERWALK, args, GetNameLink(player).c_str());
     if (needReportToTarget(player))
