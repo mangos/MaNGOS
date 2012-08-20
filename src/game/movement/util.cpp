@@ -153,7 +153,7 @@ namespace Movement
         STR(Unk11),              // 0x8000
     };
 
-    const char* g_SplineFlag_names[29] =
+    const char* g_SplineFlag_names[32] =
     {
         STR(AnimBit1),     // 0x00000001,
         STR(AnimBit2),     // 0x00000002,
@@ -184,6 +184,9 @@ namespace Movement
         STR(Final_Point),  // 0x04000000,
         STR(Final_Target), // 0x08000000,
         STR(Final_Angle),  // 0x10000000,
+        STR(Unknown7),     // 0x20000000,
+        STR(Unknown8),     // 0x40000000,
+        STR(Unknown9),     // 0x80000000,
     };
 
     template<class Flags, int N>
