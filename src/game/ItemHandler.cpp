@@ -303,7 +303,7 @@ void WorldSession::HandleReadItemOpcode(WorldPacket& recv_data)
             DETAIL_LOG("STORAGE: Unable to read item");
             _player->SendEquipError(msg, pItem, NULL);
         }
-        data << ObjectGuid(pItem->GetObjectGuid());
+        data << pItem->GetObjectGuid();
         SendPacket(&data);
     }
     else
@@ -894,11 +894,10 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
 void WorldSession::SendEnchantmentLog(ObjectGuid targetGuid, ObjectGuid casterGuid, uint32 itemId, uint32 spellId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4 + 1)); // last check 2.0.10
-    data << ObjectGuid(targetGuid);
-    data << ObjectGuid(casterGuid);
+    data << targetGuid.WriteAsPacked();
+    data << casterGuid.WriteAsPacked();
     data << uint32(itemId);
     data << uint32(spellId);
-    data << uint8(0);
     SendPacket(&data);
 }
 
@@ -932,7 +931,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    // cheating: non-wrapper wrapper (all empty wrappers is stackable)
+    // cheating: non-wrapper wrapper (all empty wrappers are stackable)
     if (!(gift->GetProto()->Flags & ITEM_FLAG_WRAPPER) || gift->GetMaxStackCount() == 1)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, NULL);
