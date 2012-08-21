@@ -778,6 +778,20 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
     }
 }
 
+void Unit::RemoveSpellsCausingAura(AuraType auraType, ObjectGuid casterGuid)
+{
+    for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
+    {
+        if ((*iter)->GetCasterGuid() == casterGuid)
+        {
+            RemoveAuraHolderFromStack((*iter)->GetId(), 1, casterGuid);
+            iter = m_modAuras[auraType].begin();
+        }
+        else
+            ++iter;
+    }
+}
+
 void Unit::DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb)
 {
     if (!pVictim->isAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
