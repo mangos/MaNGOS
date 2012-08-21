@@ -932,7 +932,7 @@ void Object::MarkForClientUpdate()
 }
 
 WorldObject::WorldObject()
-    : m_isActiveObject(false), m_currMap(NULL), m_mapId(0), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL)
+    : m_isActiveObject(false), m_currMap(NULL), m_mapId(0), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_transportInfo(NULL)
 {
 }
 
