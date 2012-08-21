@@ -547,7 +547,9 @@
     <ClCompile Include="..\..\src\game\OutdoorPvP\OutdoorPvPZM.cpp">
       <Filter>OutdoorPvP</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\game\TransportSystem.cpp" />
+    <ClCompile Include="..\..\src\game\TransportSystem.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\game\AccountMgr.h">
@@ -1046,6 +1048,8 @@
     <ClInclude Include="..\..\src\game\OutdoorPvP\OutdoorPvPZM.h">
       <Filter>OutdoorPvP</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\game\TransportSystem.h" />
+    <ClInclude Include="..\..\src\game\TransportSystem.h">
+      <Filter>Object</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
