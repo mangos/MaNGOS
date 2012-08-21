@@ -58,7 +58,7 @@ void TransportBase::Update(uint32 diff)
         if (fabs(m_owner->GetPositionX() - m_lastPosition.x) +
                 fabs(m_owner->GetPositionY() - m_lastPosition.y) +
                 fabs(m_owner->GetPositionZ() - m_lastPosition.z) > 1.0f ||
-                MapManager::NormalizeOrientation(m_owner->GetOrientation() - m_lastPosition.o) > 0.01f)
+                NormalizeOrientation(m_owner->GetOrientation() - m_lastPosition.o) > 0.01f)
             UpdateGlobalPositions();
 
         m_updatePositionsTimer = 500;
@@ -74,7 +74,7 @@ void TransportBase::UpdateGlobalPositions()
                  m_owner->GetPositionZ(), m_owner->GetOrientation());
 
     // Calculate new direction multipliers
-    if (MapManager::NormalizeOrientation(pos.o - m_lastPosition.o) > 0.01f)
+    if (NormalizeOrientation(pos.o - m_lastPosition.o) > 0.01f)
     {
         m_sinO = sin(pos.o);
         m_cosO = cos(pos.o);
@@ -133,7 +133,7 @@ void TransportBase::CalculateGlobalPositionOf(float lx, float ly, float lz, floa
     gy += m_owner->GetPositionY();
 
     gz = lz + m_owner->GetPositionZ();
-    go = MapManager::NormalizeOrientation(lo + m_owner->GetOrientation());
+    go = NormalizeOrientation(lo + m_owner->GetOrientation());
 }
 
 /* **************************************** TransportInfo ****************************************/
