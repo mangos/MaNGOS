@@ -404,24 +404,6 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recv_data)
     _player->m_movementInfo = mi;
 }
 
-void WorldSession::HandleDismissControlledVehicle(WorldPacket& recv_data)
-{
-    DEBUG_LOG("WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
-    recv_data.hexlike();
-
-    ObjectGuid guid;
-    MovementInfo mi;
-
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> mi;
-
-    ObjectGuid vehicleGUID = _player->GetCharmGuid();
-    if (!vehicleGUID)                                       // something wrong here...
-        return;
-
-    _player->m_movementInfo = mi;
-}
-
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 {
     // DEBUG_LOG("WORLD: Recvd CMSG_MOUNTSPECIAL_ANIM");

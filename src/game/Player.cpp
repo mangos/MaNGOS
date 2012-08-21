@@ -4330,7 +4330,7 @@ void Player::DeleteOldCharacters(uint32 keepDays)
 
 void Player::SetRoot(bool enable)
 {
-    WorldPacket data(enable ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4));
+    WorldPacket data(enable ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
     data << GetPackGUID();
     data << uint32(0);
     GetSession()->SendPacket(&data);
@@ -4338,7 +4338,7 @@ void Player::SetRoot(bool enable)
 
 void Player::SetWaterWalk(bool enable)
 {
-    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4));
+    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
     data << GetPackGUID();
     data << uint32(0);
     GetSession()->SendPacket(&data);
