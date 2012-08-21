@@ -7342,13 +7342,13 @@ void Aura::PeriodicTick()
             {
                 cleanDamage.hitOutCome = MELEE_HIT_CRIT;
                 // Resilience - reduce crit damage
-                pdamage -= target->GetSpellCritDamageReduction(pdamage);
+                pdamage -= target->GetCritDamageReduction(pdamage);
             }
 
             // only from players
             // FIXME: need use SpellDamageBonus instead?
             if (pCaster->GetTypeId() == TYPEID_PLAYER)
-                pdamage -= target->GetSpellDamageReduction(pdamage);
+                pdamage -= target->GetDamageReduction(pdamage);
 
             target->CalculateDamageAbsorbAndResist(pCaster, GetSpellSchoolMask(spellProto), DOT, pdamage, &absorb, &resist, !GetSpellProto()->HasAttribute(SPELL_ATTR_EX2_CANT_REFLECTED));
 
@@ -7434,13 +7434,13 @@ void Aura::PeriodicTick()
             {
                 cleanDamage.hitOutCome = MELEE_HIT_CRIT;
                 // Resilience - reduce crit damage
-                pdamage -= target->GetSpellCritDamageReduction(pdamage);
+                pdamage -= target->GetCritDamageReduction(pdamage);
             }
 
             // only from players
             // FIXME: need use SpellDamageBonus instead?
             if (GetCasterGuid().IsPlayer())
-                pdamage -= target->GetSpellDamageReduction(pdamage);
+                pdamage -= target->GetDamageReduction(pdamage);
 
             target->CalculateDamageAbsorbAndResist(pCaster, GetSpellSchoolMask(spellProto), DOT, pdamage, &absorb, &resist, !spellProto->HasAttribute(SPELL_ATTR_EX2_CANT_REFLECTED));
 
@@ -7636,7 +7636,7 @@ void Aura::PeriodicTick()
 
             // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
             if (power == POWER_MANA)
-                drain_amount -= target->GetSpellCritDamageReduction(drain_amount);
+                drain_amount -= target->GetCritDamageReduction(drain_amount);
 
             target->ModifyPower(power, -drain_amount);
 
@@ -7780,7 +7780,7 @@ void Aura::PeriodicTick()
 
             // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
             if (powerType == POWER_MANA)
-                pdamage -= target->GetSpellCritDamageReduction(pdamage);
+                pdamage -= target->GetCritDamageReduction(pdamage);
 
             uint32 gain = uint32(-target->ModifyPower(powerType, -pdamage));
 

@@ -2029,8 +2029,31 @@ void ObjectMgr::LoadItemPrototypes()
 
             switch (proto->ItemStat[j].ItemStatType)
             {
+                case ITEM_MOD_HEALTH:
+                case ITEM_MOD_DEFENSE_SKILL_RATING:
+                case ITEM_MOD_BLOCK_RATING:
+                case ITEM_MOD_HIT_MELEE_RATING:
+                case ITEM_MOD_HIT_RANGED_RATING:
+                case ITEM_MOD_HIT_SPELL_RATING:
+                case ITEM_MOD_CRIT_MELEE_RATING:
+                case ITEM_MOD_CRIT_SPELL_RATING:
+                case ITEM_MOD_HIT_TAKEN_MELEE_RATING:
+                case ITEM_MOD_HIT_TAKEN_RANGED_RATING:
+                case ITEM_MOD_HIT_TAKEN_SPELL_RATING:
+                case ITEM_MOD_CRIT_TAKEN_MELEE_RATING:
+                case ITEM_MOD_CRIT_TAKEN_RANGED_RATING:
+                case ITEM_MOD_CRIT_TAKEN_SPELL_RATING:
+                case ITEM_MOD_HASTE_MELEE_RATING:
+                case ITEM_MOD_HASTE_RANGED_RATING:
+                case ITEM_MOD_HASTE_SPELL_RATING:
+                case ITEM_MOD_HIT_TAKEN_RATING:
+                case ITEM_MOD_CRIT_TAKEN_RATING:
+                case ITEM_MOD_FERAL_ATTACK_POWER:
                 case ITEM_MOD_SPELL_HEALING_DONE:
                 case ITEM_MOD_SPELL_DAMAGE_DONE:
+                case ITEM_MOD_MANA_REGENERATION:
+                case ITEM_MOD_ARMOR_PENETRATION_RATING:
+                case ITEM_MOD_BLOCK_VALUE:
                     sLog.outErrorDb("Item (Entry: %u) has deprecated stat_type%d (%u)", i, j + 1, proto->ItemStat[j].ItemStatType);
                     break;
                 default:

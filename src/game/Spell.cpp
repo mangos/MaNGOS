@@ -1414,7 +1414,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
             if (m_applyMultiplierMask & (1 << effectNumber))
             {
                 // Get multiplier
-                float multiplier = spellEffect ? spellEffect->DmgMultiplier : 0.0f;
+                float multiplier = spellEffect ? spellEffect->DmgMultiplier : 1.0f;
                 // Apply multiplier mods
                 if (realCaster)
                     if (Player* modOwner = realCaster->GetSpellModOwner())
@@ -1537,7 +1537,7 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo* target)
                 if (m_applyMultiplierMask & (1 << effectNumber))
                 {
                     // Get multiplier
-                    float multiplier = spellEffect ? spellEffect->DmgMultiplier : 0.0f;
+                    float multiplier = spellEffect ? spellEffect->DmgMultiplier : 1.0f;
                     // Apply multiplier mods
                     if (real_caster)
                         if (Player* modOwner = real_caster->GetSpellModOwner())
