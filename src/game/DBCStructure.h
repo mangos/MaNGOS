@@ -807,20 +807,24 @@ struct CreatureTypeEntry
     char*   Name;                                           // 2        m_name_lang
 };*/
 
-/*struct CurrencyTypesEntry
+struct CurrencyTypesEntry
 {
-    //uint32    ID;                                         // 0        m_ID
-    //uint32    Category;                                   // 1        m_categoryID
-    //char *name;                                           // 2
-    //char *iconName;                                       // 3
-    //uint32                                                // 4
-    //uint32                                                // 5
-    //uint32                                                // 6
-    //uint32                                                // 7
-    //uint32                                                // 8
-    //uint32                                                // 9
-    //char* description;                                    // 10
-};*/
+    uint32  ID;                                             // 0
+    //uint32 Category;                                        // 1
+    //char* name;                                             // 2
+    //char* iconName;                                         // 3
+    //uint32 unk4;                                            // 4
+    //uint32 unk5;                                            // 5
+    //uint32 unk6;                                            // 6
+    uint32 TotalCount;                                      // 7
+    uint32 WeekCount;                                       // 8
+    uint32 Flags;                                           // 9
+    //char* description;                                      // 10
+
+    bool HasPrecision() const { return Flags & CURRENCY_FLAG_HAS_PRECISION; }
+    bool HasSeasonCount() const { return Flags & CURRENCY_FLAG_HAS_SEASON_COUNT; }
+    float GetPrecision() const { return HasPrecision() ? CURRENCY_PRECISION : 1.0f; }
+};
 
 struct DungeonEncounterEntry
 {

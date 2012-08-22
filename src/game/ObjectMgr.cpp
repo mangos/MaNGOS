@@ -3616,7 +3616,15 @@ void ObjectMgr::LoadQuests()
                           //   135                     136                     137                     138
                           "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
                           //   139          140
-                          "StartScript, CompleteScript"
+                          "StartScript, CompleteScript, "
+                          //   141          142            143             144                145                146                 147
+                          "ReqSpellLearned, PortraitGiver, PortraitTurnIn, PortraitGiverText, PortraitGiverName, PortraitTurnInText, PortraitTurnInName, "
+                          //   148         149             150             151             152                153                154                155
+                          "ReqCurrencyId1, ReqCurrencyId2, ReqCurrencyId3, ReqCurrencyId4, ReqCurrencyCount1, ReqCurrencyCount2, ReqCurrencyCount3, ReqCurrencyCount4, "
+                          //   156         157             158             159             160                161                162                163
+                          "RewCurrencyId1, RewCurrencyId2, RewCurrencyId3, RewCurrencyId4, RewCurrencyCount1, RewCurrencyCount2, RewCurrencyCount3, RewCurrencyCount4, "
+                          //   164   165            166          167
+                          "RewSkill, RewSkillValue, SoundAccept, SoundTurnIn "
                           " FROM quest_template");
     if (!result)
     {
@@ -4206,6 +4214,145 @@ void ObjectMgr::LoadQuests()
             {
                 int32 signedQuestId = qinfo->NextQuestId < 0 ? -int32(qinfo->GetQuestId()) : int32(qinfo->GetQuestId());
                 qNextItr->second->prevQuests.push_back(signedQuestId);
+            }
+        }
+
+        if (qinfo->RewSkill)
+        {
+            if (!sSkillLineStore.LookupEntry(qinfo->RewSkill))
+            {
+                sLog.outErrorDb("Quest %u has `RewSkill` = %u but this skill does not exist",
+                                qinfo->GetQuestId(), qinfo->RewSkill);
+                qinfo->RewSkill = 0;
+                qinfo->RewSkillValue = 0;
+            }
+        }
+
+        if (qinfo->RewSkillValue)
+        {
+            if (qinfo->RewSkillValue > sWorld.GetConfigMaxSkillValue())
+            {
+                sLog.outErrorDb("Quest %u has `RewSkillValue` = %u which is more than max possible skill value %u.",
+                                qinfo->GetQuestId(), qinfo->RewSkillValue, sWorld.GetConfigMaxSkillValue());
+            }
+        }
+        else
+        {
+            if (qinfo->RewSkill)
+            {
+                sLog.outErrorDb("Quest %u has `RewSkillValue` = %u, but `RewSkill` exists and is %u.",
+                                    qinfo->GetQuestId(), qinfo->RewSkillValue, qinfo->RewSkill);
+                qinfo->RewSkill = 0;
+            }
+        }
+
+        if (qinfo->ReqSpellLearned)
+        {
+            SpellEntry const* spellInfo = sSpellStore.LookupEntry(qinfo->ReqSpellLearned);
+
+            if (!spellInfo)
+            {
+                sLog.outErrorDb("Quest %u has `ReqSpellLearned` = %u but spell %u does not exist, quest will not have a spell requirement.",
+                                qinfo->GetQuestId(), qinfo->ReqSpellLearned, qinfo->ReqSpellLearned);
+                qinfo->ReqSpellLearned = 0;
+            }
+            else if (!SpellMgr::IsSpellValid(spellInfo))
+            {
+                sLog.outErrorDb("Quest %u has `ReqSpellLearned` = %u but spell %u is broken, quest will not have a spell requirement.",
+                                qinfo->GetQuestId(), qinfo->ReqSpellLearned, qinfo->ReqSpellLearned);
+                qinfo->ReqSpellLearned = 0;
+            }
+        }
+
+        for (int j = 0; j < QUEST_REQUIRED_CURRENCY_COUNT; ++j)
+        {
+            if (qinfo->ReqCurrencyId[j])
+            {
+                CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(qinfo->ReqCurrencyId[j]);
+                if (!currencyEntry)
+                {
+                    sLog.outErrorDb("Quest %u has `ReqCurrencyId%d` = %u but currency with entry %u does not exist, quest can not be completed.",
+                                    qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyId[j], qinfo->ReqCurrencyId[j]);
+                    qinfo->ReqCurrencyId[j] = 0;
+                    qinfo->ReqCurrencyCount[j] = 0;
+                }
+                else
+                {
+                    if (!qinfo->ReqCurrencyCount[j])
+                    {
+                        sLog.outErrorDb("Quest %u has `ReqCurrencyId%d` = %u but `ReqCurrencyCount%d` = %u.",
+                                        qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyId[j], j + 1, qinfo->ReqCurrencyCount[j]);
+                        qinfo->ReqCurrencyId[j] = 0;
+                    }
+                    else if (currencyEntry->TotalCount && uint32(qinfo->ReqCurrencyCount[j] * currencyEntry->GetPrecision()) > currencyEntry->TotalCount)
+                    {
+                        sLog.outErrorDb("Quest %u has `ReqCurrencyCount%d` = %u but currency %u has max count %u / %u (precision).",
+                                        qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyCount[j], qinfo->ReqCurrencyId[j], currencyEntry->TotalCount, uint32(currencyEntry->GetPrecision()));
+                        qinfo->ReqCurrencyCount[j] = currencyEntry->TotalCount;
+                    }
+                }
+
+            }
+            else if (qinfo->ReqCurrencyCount[j])
+            {
+                if (!qinfo->ReqCurrencyId[j])
+                {
+                    sLog.outErrorDb("Quest %u has `ReqCurrencyId%d` = 0 but `ReqCurrencyCount%d` = %u.",
+                                    qinfo->GetQuestId(), j + 1, j + 1, qinfo->ReqCurrencyCount[j]);
+                    qinfo->ReqCurrencyCount[j] = 0;
+                }
+            }
+        }
+
+        for (int j = 0; j < QUEST_REWARD_CURRENCY_COUNT; ++j)
+        {
+            if (qinfo->RewCurrencyId[j])
+            {
+                CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(qinfo->RewCurrencyId[j]);
+                if (!currencyEntry)
+                {
+                    sLog.outErrorDb("Quest %u has `RewCurrencyId%d` = %u but currency with entry %u does not exist, quest will not reward that currency.",
+                                    qinfo->GetQuestId(), j + 1, qinfo->RewCurrencyId[j], qinfo->RewCurrencyId[j]);
+                    qinfo->RewCurrencyId[j] = 0;
+                    qinfo->RewCurrencyCount[j] = 0;
+                }
+                else if (!qinfo->RewCurrencyCount[j])
+                {
+                    sLog.outErrorDb("Quest %u has `RewCurrencyId%d` = %u but `RewCurrencyCount%d` = %u.",
+                                    qinfo->GetQuestId(), j + 1, qinfo->RewCurrencyId[j], j + 1, qinfo->RewCurrencyCount[j]);
+                    qinfo->RewCurrencyId[j] = 0;
+                }
+            }
+            else if (qinfo->RewCurrencyCount[j])
+            {
+                if (!qinfo->RewCurrencyId[j])
+                {
+                    sLog.outErrorDb("Quest %u has `RewCurrencyId%d` = 0 but `RewCurrencyCount%d` = %u.",
+                                    qinfo->GetQuestId(), j + 1, j + 1, qinfo->RewCurrencyCount[j]);
+                    qinfo->RewCurrencyCount[j] = 0;
+                }
+            }
+        }
+
+        if (qinfo->SoundAcceptId)
+        {
+            SoundEntriesEntry const * soundEntry = sSoundEntriesStore.LookupEntry(qinfo->SoundAcceptId);
+            if (!soundEntry)
+            {
+                sLog.outErrorDb("Quest %u has `SoundAcceptId` = %u but sound with that entry does not exists.",
+                   qinfo->GetQuestId(), qinfo->SoundAcceptId);
+                qinfo->SoundAcceptId = 0;
+            }
+        }
+
+        if (qinfo->SoundTurnInId)
+        {
+            SoundEntriesEntry const * soundEntry = sSoundEntriesStore.LookupEntry(qinfo->SoundTurnInId);
+            if (!soundEntry)
+            {
+                sLog.outErrorDb("Quest %u has `SoundTurnInId` = %u but sound with that entry does not exists.",
+                   qinfo->GetQuestId(), qinfo->SoundTurnInId);
+                qinfo->SoundTurnInId = 0;
             }
         }
 

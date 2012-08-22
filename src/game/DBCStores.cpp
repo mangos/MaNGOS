@@ -81,7 +81,7 @@ DBCStorage <CreatureDisplayInfoExtraEntry> sCreatureDisplayInfoExtraStore(Creatu
 DBCStorage <CreatureFamilyEntry> sCreatureFamilyStore(CreatureFamilyfmt);
 DBCStorage <CreatureSpellDataEntry> sCreatureSpellDataStore(CreatureSpellDatafmt);
 DBCStorage <CreatureTypeEntry> sCreatureTypeStore(CreatureTypefmt);
-//DBCStorage <CurrencyTypesEntry> sCurrencyTypesStore(CurrencyTypesfmt);
+DBCStorage <CurrencyTypesEntry> sCurrencyTypesStore(CurrencyTypesfmt);
 
 DBCStorage <DungeonEncounterEntry> sDungeonEncounterStore(DungeonEncounterfmt);
 DBCStorage <DurabilityQualityEntry> sDurabilityQualityStore(DurabilityQualityfmt);
@@ -479,6 +479,7 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCreatureFamilyStore,      dbcPath,"CreatureFamily.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCreatureSpellDataStore,   dbcPath,"CreatureSpellData.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCreatureTypeStore,        dbcPath,"CreatureType.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sCurrencyTypesStore,       dbcPath,"CurrencyTypes.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sDungeonEncounterStore,    dbcPath,"DungeonEncounter.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sDurabilityCostsStore,     dbcPath,"DurabilityCosts.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sDurabilityQualityStore,   dbcPath,"DurabilityQuality.dbc");

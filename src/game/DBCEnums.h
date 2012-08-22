@@ -378,6 +378,14 @@ enum AbilitySkillFlags
     ABILITY_SKILL_NONTRAINABLE = 0x100
 };
 
+#define CURRENCY_PRECISION 100.0f
+
+enum CurrencyFlags
+{
+    CURRENCY_FLAG_HAS_PRECISION     = 0x08,
+    CURRENCY_FLAG_HAS_SEASON_COUNT  = 0x80, // guessed
+};
+
 enum ItemEnchantmentType
 {
     ITEM_ENCHANTMENT_TYPE_NONE             = 0,
