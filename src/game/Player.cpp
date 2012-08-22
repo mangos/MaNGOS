@@ -19499,7 +19499,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
         }
     }
 
-    uint32 totalCount = pProto->BuyCount * count;
+    uint32 totalCount = count;
 
     // check current item amount if it limited
     if (crItem->maxcount != 0)
