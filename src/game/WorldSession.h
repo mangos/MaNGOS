@@ -441,6 +441,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         // Knockback
         void HandleMoveKnockBackAck(WorldPacket& recvPacket);
+        void SendKnockBack(float angle, float horizontalSpeed, float verticalSpeed);
 
         void HandleMoveTeleportAckOpcode(WorldPacket& recvPacket);
         void HandleForceSpeedChangeAckOpcodes(WorldPacket& recv_data);

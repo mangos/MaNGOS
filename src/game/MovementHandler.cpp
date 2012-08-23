@@ -450,6 +450,21 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
     mover->SendMessageToSetExcept(&data, _player);
 }
 
+void WorldSession::SendKnockBack(float angle, float horizontalSpeed, float verticalSpeed)
+{
+    float vsin = sin(angle);
+    float vcos = cos(angle);
+
+    WorldPacket data(SMSG_MOVE_KNOCK_BACK, 9 + 4 + 4 + 4 + 4 + 4);
+    data << GetPlayer()->GetPackGUID();
+    data << uint32(0);                                  // Sequence
+    data << float(vcos);                                // x direction
+    data << float(vsin);                                // y direction
+    data << float(horizontalSpeed);                     // Horizontal speed
+    data << float(-verticalSpeed);                      // Z Movement speed (vertical)
+    SendPacket(&data);
+}
+
 void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_MOVE_HOVER_ACK");

@@ -10675,22 +10675,19 @@ void Unit::SetFFAPvP(bool state)
 void Unit::KnockBackFrom(Unit* target, float horizontalSpeed, float verticalSpeed)
 {
     float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
-    float vsin = sin(angle);
-    float vcos = cos(angle);
+    KnockBackWithAngle(angle, horizontalSpeed, verticalSpeed);
+}
 
+void Unit::KnockBackWithAngle(float angle, float horizontalSpeed, float verticalSpeed)
+{
     if (GetTypeId() == TYPEID_PLAYER)
     {
-        WorldPacket data(SMSG_MOVE_KNOCK_BACK, 9 + 4 + 4 + 4 + 4 + 4);
-        data << GetPackGUID();
-        data << uint32(0);                                  // Sequence
-        data << float(vcos);                                // x direction
-        data << float(vsin);                                // y direction
-        data << float(horizontalSpeed);                     // Horizontal speed
-        data << float(-verticalSpeed);                      // Z Movement speed (vertical)
-        ((Player*)this)->GetSession()->SendPacket(&data);
+        ((Player*)this)->GetSession()->SendKnockBack(angle, horizontalSpeed, verticalSpeed);
     }
     else
     {
+        float vsin = sin(angle);
+        float vcos = cos(angle);
         float moveTimeHalf = verticalSpeed / Movement::gravity;
         float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -verticalSpeed);
 
