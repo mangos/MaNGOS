@@ -401,14 +401,6 @@ enum RaidGroupError
     ERR_RAID_GROUP_REQUIREMENTS_UNMATCH = 4
 };
 
-enum PlayerMovementType
-{
-    MOVE_ROOT       = 1,
-    MOVE_UNROOT     = 2,
-    MOVE_WATER_WALK = 3,
-    MOVE_LAND_WALK  = 4
-};
-
 enum DrunkenState
 {
     DRUNKEN_SOBER   = 0,
@@ -1899,7 +1891,8 @@ class MANGOS_DLL_SPEC Player : public Unit
             StopMirrorTimer(FIRE_TIMER);
         }
 
-        void SetMovement(PlayerMovementType pType);
+        void SetRoot(bool enable) override;
+        void SetWaterWalk(bool enable) override;
 
         void JoinedChannel(Channel* c);
         void LeftChannel(Channel* c);
