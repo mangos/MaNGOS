@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_12120_01_mangos_spell_template` bit(1) default NULL
+  `required_12121_01_mangos_spell_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -21442,11 +21442,19 @@ CREATE TABLE `spell_template` (
 LOCK TABLES `spell_template` WRITE;
 /*!40000 ALTER TABLE `spell_template` DISABLE KEYS */;
 INSERT INTO `spell_template` VALUES
--- ID   proc_flags chnce dur  ef0 tarA0 rad  aur  misc    miscB, trigger
+-- id   proc_flags chnce dur  ef0 tarA0 rad  aur  misc    miscB, trigger
 (21387, 0x00000028,  15,  21,   6,   1,   0,  42, 0,      0,     21388, 'Melt-Weapon trigger aura related used by Ragnaros'),
 (23363, 0x00000000, 101,  21,  76,  18,   0,   0, 179804, 0,     0,     'Summon Drakonid Corpse Trigger'),
 (25192, 0x00000000, 101,  21,  76,  18,   0,   0, 180619, 0,     0,     'Summon Ossirian Crystal'),
 (26133, 0x00000000, 101,  21,  76,  18,   0,   0, 180795, 0,     0,     'Summon Sandworm Base'),
+(34810, 0x00000000, 101,  21,  28,  42,   8,   0, 20083,  64,    0,     'Summon Summoned Bloodwarder Mender behind of the caster'),
+(34817, 0x00000000, 101,  21,  28,  44,   8,   0, 20078,  64,    0,     'Summon Summoned Bloodwarder Reservist right of the caster'),
+(34818, 0x00000000, 101,  21,  28,  43,   8,   0, 20078,  64,    0,     'Summon Summoned Bloodwarder Reservist left of the caster'),
+(34819, 0x00000000, 101,  21,  28,  41,   8,   0, 20078,  64,    0,     'Summon Summoned Bloodwarder Reservist front of the caster'),
+(35153, 0x00000000, 101,  21,  28,  42,   8,   0, 20405,  64,    0,     'Summon Nether Charge behind of the caster'),
+(35904, 0x00000000, 101,  21,  28,  44,   8,   0, 20405,  64,    0,     'Summon Nether Charge right of the caster'),
+(35905, 0x00000000, 101,  21,  28,  43,   8,   0, 20405,  64,    0,     'Summon Nether Charge left of the caster'),
+(35906, 0x00000000, 101,  21,  28,  41,   8,   0, 20405,  64,    0,     'Summon Nether Charge front of the caster'),
 (44920, 0x00000000, 101,  21,   6,   1,   0,  56, 24941,  0,     0,     'Model - Shattered Sun Marksman - BE Male Tier 4'),
 (44924, 0x00000000, 101,  21,   6,   1,   0,  56, 24945,  0,     0,     'Model - Shattered Sun Marksman - BE Female Tier 4'),
 (44928, 0x00000000, 101,  21,   6,   1,   0,  56, 24949,  0,     0,     'Model - Shattered Sun Marksman - Draenei Male Tier 4'),
