@@ -1,0 +1,3 @@
+ALTER TABLE db_version CHANGE COLUMN required_0159_xxxxx_01_mangos_quest_template required_0168_xxxxx_01_mangos_playercreateinfo_spell bit;
+
+DELETE FROM `playercreateinfo_spell` WHERE Spell=69001;
