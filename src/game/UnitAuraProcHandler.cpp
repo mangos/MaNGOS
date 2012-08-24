@@ -622,7 +622,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
     SpellEffectIndex effIndex = triggeredByAura->GetEffIndex();
     SpellEffectEntry const* dummySpellEffect = dummySpell->GetSpellEffect(effIndex);
     SpellClassOptionsEntry const* dummyClassOptions = dummySpell->GetSpellClassOptions();
-    SpellClassOptionsEntry const* procClassOptions = procSpell->GetSpellClassOptions();
+    SpellClassOptionsEntry const* procClassOptions = procSpell ? procSpell->GetSpellClassOptions() : NULL;
     int32  triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
     Item* castItem = triggeredByAura->GetCastItemGuid() && GetTypeId() == TYPEID_PLAYER
@@ -2867,7 +2867,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
     // Get triggered aura spell info
     SpellEntry const* auraSpellInfo = triggeredByAura->GetSpellProto();
     SpellClassOptionsEntry const* auraClassOptions = auraSpellInfo->GetSpellClassOptions();
-    SpellClassOptionsEntry const* procClassOptions = procSpell->GetSpellClassOptions();
+    SpellClassOptionsEntry const* procClassOptions = procSpell ? procSpell->GetSpellClassOptions() : NULL;
 
     // Basepoints of trigger aura
     int32 triggerAmount = triggeredByAura->GetModifier()->m_amount;
