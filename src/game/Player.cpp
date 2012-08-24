@@ -19635,6 +19635,106 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
     return crItem->maxcount != 0;
 }
 
+bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uint32 currencyId, uint8 count)
+{
+    // cheating attempt
+    if (count < 1) count = 1;
+
+    if (!isAlive())
+        return false;
+
+    CurrencyTypesEntry const* pCurrency = sCurrencyTypesStore.LookupEntry(currencyId);
+    if (!pCurrency)
+        return false;
+
+    if (currencyId == CURRENCY_CONQUEST_ARENA_META || currencyId == CURRENCY_CONQUEST_BG_META)
+        return false;
+
+    Creature* pCreature = GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+    if (!pCreature)
+    {
+        DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
+        return false;
+    }
+
+    VendorItemData const* vItems = pCreature->GetVendorItems();
+    VendorItemData const* tItems = pCreature->GetVendorTemplateItems();
+    if ((!vItems || vItems->Empty()) && (!tItems || tItems->Empty()))
+        return false;
+
+    uint32 vCount = vItems ? vItems->GetItemCount() : 0;
+    uint32 tCount = tItems ? tItems->GetItemCount() : 0;
+
+    if (vendorslot >= vCount + tCount)
+        return false;
+
+    VendorItem const* crItem = vendorslot < vCount ? vItems->GetItem(vendorslot) : tItems->GetItem(vendorslot - vCount);
+    if (!crItem)                                            // store diff item (cheating)
+        return false;
+
+    if (crItem->item != currencyId)                         // store diff item (cheating)
+        return false;
+
+    if (crItem->maxcount != count)
+    {
+        DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: count (%u) != crItem->maxcount (%u) for currency %u and player %s.",
+            vendorGuid.GetString().c_str(), count, crItem->maxcount, currencyId, GetGuidStr().c_str());
+
+        count = crItem->maxcount;
+    }
+
+    if (uint32 extendedCostId = crItem->ExtendedCost)
+    {
+        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
+        if (!iece)
+        {
+            sLog.outError("WORLD: BuyCurrencyFromVendorSlot: Currency %u have wrong ExtendedCost field value %u for %s", currencyId, extendedCostId, vendorGuid.GetString().c_str());
+            return false;
+        }
+
+        // honor points price
+        if (GetHonorPoints() < (iece->reqhonorpoints * count))
+        {
+            SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
+            return false;
+        }
+
+        // arena points price
+        if (GetArenaPoints() < (iece->reqarenapoints * count))
+        {
+            SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
+            return false;
+        }
+
+        // item base price
+        for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
+        {
+            if (iece->reqitem[i] && !HasItemCount(iece->reqitem[i], iece->reqitemcount[i] * count))
+            {
+                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                return false;
+            }
+        }
+
+        // check for personal arena rating requirement
+        if (GetMaxPersonalArenaRatingRequirement(iece->reqarenaslot) < iece->reqpersonalarenarating)
+        {
+            // probably not the proper equip err
+            SendEquipError(EQUIP_ERR_CANT_EQUIP_RANK, NULL, NULL);
+            return false;
+        }
+    }
+
+    // TODO: check if player already has maximum currency
+
+    // TODO: modify currency
+
+    DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: Player %s buys currency %u amount %u.",
+            vendorGuid.GetString().c_str(), GetGuidStr().c_str(), currencyId, count);
+
+    return true;
+}
+
 uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot)
 {
     // returns the maximal personal arena rating that can be used to purchase items requiring this condition

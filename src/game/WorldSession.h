@@ -639,7 +639,6 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleDestroyItemOpcode(WorldPacket& recvPacket);
         void HandleAutoEquipItemOpcode(WorldPacket& recvPacket);
         void HandleSellItemOpcode(WorldPacket& recvPacket);
-        void HandleBuyItemInSlotOpcode(WorldPacket& recvPacket);
         void HandleBuyItemOpcode(WorldPacket& recvPacket);
         void HandleListInventoryOpcode(WorldPacket& recvPacket);
         void HandleAutoStoreBagItemOpcode(WorldPacket& recvPacket);

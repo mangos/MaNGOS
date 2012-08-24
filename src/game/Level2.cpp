@@ -1600,6 +1600,43 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
     return true;
 }
 
+// add currency in vendorlist
+bool ChatHandler::HandleNpcAddVendorCurrencyCommand(char* args)
+{
+    uint32 currencyId;
+    if (!ExtractUint32KeyFromLink(&args, "Hcurrency", currencyId))
+    {
+        SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 maxcount;
+    if (!ExtractUInt32(&args, maxcount))
+        return false;
+
+    uint32 extendedcost;
+    if (!ExtractUInt32(&args, extendedcost))
+        return false;
+
+    Creature* vendor = getSelectedCreature();
+
+    uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
+
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, currencyId, VENDOR_ITEM_TYPE_CURRENCY, maxcount, 0, extendedcost, m_session->GetPlayer()))
+    {
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    sObjectMgr.AddVendorItem(vendor_entry, currencyId, VENDOR_ITEM_TYPE_CURRENCY, maxcount, 0, extendedcost);
+
+    std::string name = sCurrencyTypesStore.LookupEntry(currencyId)->name[0];
+
+    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, currencyId, name.c_str(), maxcount, 0, extendedcost);
+    return true;
+}
+
 // add item in vendorlist
 bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 {
@@ -1627,17 +1664,52 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
-    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, extendedcost, m_session->GetPlayer()))
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, VENDOR_ITEM_TYPE_ITEM, maxcount, incrtime, extendedcost, m_session->GetPlayer()))
     {
         SetSentErrorMessage(true);
         return false;
     }
 
-    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime, extendedcost);
+    sObjectMgr.AddVendorItem(vendor_entry, itemId, VENDOR_ITEM_TYPE_ITEM, maxcount, incrtime, extendedcost);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    std::string name = ObjectMgr::GetItemPrototype(itemId)->Name1;
 
-    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, pProto->Name1, maxcount, incrtime, extendedcost);
+    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, name.c_str(), maxcount, incrtime, extendedcost);
+    return true;
+}
+
+// del currency from vendor list
+bool ChatHandler::HandleNpcDelVendorCurrencyCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Creature* vendor = getSelectedCreature();
+    if (!vendor || !vendor->isVendor())
+    {
+        SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 itemId;
+    if (!ExtractUint32KeyFromLink(&args, "Hcurrency", itemId))
+    {
+        SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId, VENDOR_ITEM_TYPE_CURRENCY))
+    {
+        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId, true);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::string name = sCurrencyTypesStore.LookupEntry(itemId)->name[0];
+
+    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, name.c_str());
     return true;
 }
 
@@ -1663,16 +1735,16 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
         return false;
     }
 
-    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId))
+    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId, VENDOR_ITEM_TYPE_ITEM))
     {
-        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
+        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId, false);
         SetSentErrorMessage(true);
         return false;
     }
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    std::string name = ObjectMgr::GetItemPrototype(itemId)->Name1;
 
-    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, pProto->Name1);
+    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, name.c_str());
     return true;
 }
 

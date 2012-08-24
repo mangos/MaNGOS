@@ -310,15 +310,27 @@ enum SelectFlags
 };
 
 // Vendors
+
+enum
+{
+    VENDOR_ITEM_TYPE_NONE           = 0,
+    VENDOR_ITEM_TYPE_ITEM           = 1,
+    VENDOR_ITEM_TYPE_CURRENCY       = 2,
+    VENDOR_ITEM_TYPE_MAX            = 3,
+};
+
 struct VendorItem
 {
-    VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _ExtendedCost)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost) {}
+    VendorItem(uint32 _item, uint8 _type, uint32 _maxcount, uint32 _incrtime, uint32 _ExtendedCost)
+        : item(_item), type(_type), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost) {}
 
     uint32 item;
-    uint32 maxcount;                                        // 0 for infinity item amount
+    uint8  type;
+    uint32 maxcount;                                        // 0 for infinity item amount, for type = VENDOR_ITEM_TYPE_CURRENCY, maxcount = currency count
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;                                    // index in ItemExtendedCost.dbc
+
+    bool IsCurrency() const { return type == VENDOR_ITEM_TYPE_CURRENCY; }
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -333,12 +345,12 @@ struct VendorItemData
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost)
+    void AddItem(uint32 item, uint8 type, uint32 maxcount, uint32 ptime, uint32 ExtendedCost)
     {
-        m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost));
+        m_items.push_back(new VendorItem(item, type, maxcount, ptime, ExtendedCost));
     }
-    bool RemoveItem(uint32 item_id);
-    VendorItem const* FindItemCostPair(uint32 item_id, uint32 extendedCost) const;
+    bool RemoveItem(uint32 item_id, uint8 type);
+    VendorItem const* FindItemCostPair(uint32 item_id, uint8 type, uint32 extendedCost) const;
 
     void Clear()
     {

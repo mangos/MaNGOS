@@ -8746,17 +8746,18 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         Field* fields = result->Fetch();
 
         uint32 entry        = fields[0].GetUInt32();
-        uint32 item_id      = fields[1].GetUInt32();
+        uint32 item_id      = abs(fields[1].GetInt32());
+        uint8  type         = fields[1].GetInt32() > 0 ? VENDOR_ITEM_TYPE_ITEM : VENDOR_ITEM_TYPE_CURRENCY;
         uint32 maxcount     = fields[2].GetUInt32();
         uint32 incrtime     = fields[3].GetUInt32();
         uint32 ExtendedCost = fields[4].GetUInt32();
 
-        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, maxcount, incrtime, ExtendedCost, NULL, &skip_vendors))
+        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, type, maxcount, incrtime, ExtendedCost, NULL, &skip_vendors))
             continue;
 
         VendorItemData& vList = vendorList[entry];
 
-        vList.AddItem(item_id, maxcount, incrtime, ExtendedCost);
+        vList.AddItem(item_id, type, maxcount, incrtime, ExtendedCost);
         ++count;
 
     }
@@ -9183,30 +9184,31 @@ void ObjectMgr::LoadGossipMenus()
         sLog.outErrorDb("Table `gossip_scripts` contains unused script, id %u.", *itr);
 }
 
-void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedcost)
+void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, uint8 type, uint32 maxcount, uint32 incrtime, uint32 extendedcost)
 {
     VendorItemData& vList = m_mCacheVendorItemMap[entry];
-    vList.AddItem(item, maxcount, incrtime, extendedcost);
+    vList.AddItem(item, type, maxcount, incrtime, extendedcost);
 
-    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%u','%u','%u','%u')", entry, item, maxcount, incrtime, extendedcost);
+    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,extendedcost) VALUES('%u','%i','%u','%u','%u')", entry, type == VENDOR_ITEM_TYPE_CURRENCY ? -int32(item) : item, maxcount, incrtime, extendedcost);
 }
 
-bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item)
+bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item, uint8 type)
 {
     CacheVendorItemMap::iterator  iter = m_mCacheVendorItemMap.find(entry);
     if (iter == m_mCacheVendorItemMap.end())
         return false;
 
-    if (!iter->second.RemoveItem(item))
+    if (!iter->second.RemoveItem(item, type))
         return false;
 
-    WorldDatabase.PExecuteLog("DELETE FROM npc_vendor WHERE entry='%u' AND item='%u'", entry, item);
+    WorldDatabase.PExecuteLog("DELETE FROM npc_vendor WHERE entry='%u' AND item='%i'", entry, type == VENDOR_ITEM_TYPE_CURRENCY ? -int32(item) : item);
     return true;
 }
 
-bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors) const
+bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item_id, uint8 type, uint32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* pl, std::set<uint32>* skip_vendors) const
 {
     char const* idStr = isTemplate ? "vendor template" : "vendor";
+    char const* nameStr = type == VENDOR_ITEM_TYPE_CURRENCY ? "Currency" : "Item";
     CreatureInfo const* cInfo = NULL;
 
     if (!isTemplate)
@@ -9237,14 +9239,51 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         }
     }
 
-    if (!GetItemPrototype(item_id))
+    CurrencyTypesEntry const * currencyEntry;
+    if (type == VENDOR_ITEM_TYPE_ITEM)
+    {
+        if (!GetItemPrototype(item_id))
+        {
+            if (pl)
+                ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
+            else
+                sLog.outErrorDb("Table `%s` for %s %u contains nonexistent item (%u), ignoring",
+                                tableName, idStr, vendor_entry, item_id);
+            return false;
+        }
+    }
+    else if (type == VENDOR_ITEM_TYPE_CURRENCY)
+    {
+        currencyEntry = sCurrencyTypesStore.LookupEntry(item_id);
+        if (!currencyEntry)
+        {
+            if (pl)
+                ChatHandler(pl).PSendSysMessage(LANG_CURRENCY_NOT_FOUND, item_id);
+            else
+                sLog.outErrorDb("Table `%s` for %s %u contains nonexistent currency (%u), ignoring",
+                                tableName, idStr, vendor_entry, item_id);
+            return false;
+        }
+        else
+        {
+            if (currencyEntry->ID == CURRENCY_CONQUEST_ARENA_META || currencyEntry->ID == CURRENCY_CONQUEST_BG_META)
+            {
+                if (pl)
+                    ChatHandler(pl).PSendSysMessage(LANG_VENDOR_META_CURRENCY_NOT_ALLOWED, item_id);
+                else
+                    sLog.outErrorDb("Table `%s` for %s %u contains not allowed meta currency (%u), ignoring",
+                                    tableName, idStr, vendor_entry, item_id);
+                return false;
+            }
+        }
+    }
+    else
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
+            ChatHandler(pl).PSendSysMessage(LANG_VENDOR_WRONG_ITEM_TYPE, item_id, type);
         else
-            sLog.outErrorDb("Table `%s` for %s %u contain nonexistent item (%u), ignoring",
-                            tableName, idStr, vendor_entry, item_id);
-        return false;
+            sLog.outErrorDb("Table `%s` for %s %u contains nonexistent vendor item type %u (entry %u), ignoring",
+                            tableName, idStr, vendor_entry, type, item_id);
     }
 
     if (ExtendedCost && !sItemExtendedCostStore.LookupEntry(ExtendedCost))
@@ -9252,28 +9291,43 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         if (pl)
             ChatHandler(pl).PSendSysMessage(LANG_EXTENDED_COST_NOT_EXIST, ExtendedCost);
         else
-            sLog.outErrorDb("Table `%s` contain item (Entry: %u) with wrong ExtendedCost (%u) for %s %u, ignoring",
-                            tableName, item_id, ExtendedCost, idStr, vendor_entry);
+            sLog.outErrorDb("Table `%s` contains %s (Entry: %u) with wrong ExtendedCost (%u) for %s %u, ignoring",
+                                    tableName, nameStr, item_id, ExtendedCost, idStr, vendor_entry);
         return false;
     }
 
-    if (maxcount > 0 && incrtime == 0)
+    if (type == VENDOR_ITEM_TYPE_ITEM)
     {
-        if (pl)
-            ChatHandler(pl).PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
-        else
-            sLog.outErrorDb("Table `%s` has `maxcount` (%u) for item %u of %s %u but `incrtime`=0, ignoring",
-                            tableName, maxcount, item_id, idStr, vendor_entry);
-        return false;
+        if (maxcount > 0 && incrtime == 0)
+        {
+            if (pl)
+                ChatHandler(pl).PSendSysMessage("MaxCount!=0 (%u) but IncrTime==0", maxcount);
+            else
+                sLog.outErrorDb("Table `%s` has `maxcount` (%u) for %s %u of %s %u but `incrtime`=0, ignoring",
+                                tableName, maxcount, nameStr, item_id, idStr, vendor_entry);
+            return false;
+        }
+        else if (maxcount == 0 && incrtime > 0)
+        {
+            if (pl)
+                ChatHandler(pl).PSendSysMessage("MaxCount==0 but IncrTime<>=0");
+            else
+                sLog.outErrorDb("Table `%s` has `maxcount`=0 for %s %u of %s %u but `incrtime`<>0, ignoring",
+                                tableName, nameStr, item_id, idStr, vendor_entry);
+            return false;
+        }
     }
-    else if (maxcount == 0 && incrtime > 0)
+    else if (type == VENDOR_ITEM_TYPE_CURRENCY)
     {
-        if (pl)
-            ChatHandler(pl).PSendSysMessage("MaxCount==0 but IncrTime<>=0");
-        else
-            sLog.outErrorDb("Table `%s` has `maxcount`=0 for item %u of %s %u but `incrtime`<>0, ignoring",
-                            tableName, item_id, idStr, vendor_entry);
-        return false;
+        if (maxcount < uint32(currencyEntry->GetPrecision()))
+        {
+            if (pl)
+                ChatHandler(pl).PSendSysMessage(LANG_VENDOR_WRONG_CURRENCY_MAXCOUNT, item_id, uint32(currencyEntry->GetPrecision()));
+            else
+                sLog.outErrorDb("Table `%s` contains %s (Entry: %u) with too low maxcount. Maxcount for currencies is buycount, so it can't be 0 or less than that's currency precision (%u), ignoring",
+                                        tableName, nameStr, item_id, uint32(currencyEntry->GetPrecision()));
+            return false;
+        }
     }
 
     VendorItemData const* vItems = isTemplate ? GetNpcVendorTemplateItemList(vendor_entry) : GetNpcVendorItemList(vendor_entry);
@@ -9282,30 +9336,30 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     if (!vItems && !tItems)
         return true;                                        // later checks for non-empty lists
 
-    if (vItems && vItems->FindItemCostPair(item_id, ExtendedCost))
+    if (vItems && vItems->FindItemCostPair(item_id, type, ExtendedCost))
     {
         if (pl)
-            ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, ExtendedCost);
+            ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, type == VENDOR_ITEM_TYPE_CURRENCY, ExtendedCost);
         else
-            sLog.outErrorDb("Table `%s` has duplicate items %u (with extended cost %u) for %s %u, ignoring",
-                            tableName, item_id, ExtendedCost, idStr, vendor_entry);
+            sLog.outErrorDb("Table `%s` has duplicate %s %u (with extended cost %u) for %s %u, ignoring",
+                            tableName, nameStr, item_id, ExtendedCost, idStr, vendor_entry);
         return false;
     }
 
     if (!isTemplate)
     {
-        if (tItems && tItems->FindItemCostPair(item_id, ExtendedCost))
+        if (tItems && tItems->FindItemCostPair(item_id, type, ExtendedCost))
         {
             if (pl)
-                ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, ExtendedCost);
+                ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id, type == VENDOR_ITEM_TYPE_CURRENCY, ExtendedCost);
             else
             {
                 if (!cInfo->vendorId)
-                    sLog.outErrorDb("Table `%s` has duplicate items %u (with extended cost %u) for %s %u, ignoring",
-                                    tableName, item_id, ExtendedCost, idStr, vendor_entry);
+                    sLog.outErrorDb("Table `%s` has duplicate %s %u (with extended cost %u) for %s %u, ignoring",
+                                    tableName, nameStr, item_id, ExtendedCost, idStr, vendor_entry);
                 else
-                    sLog.outErrorDb("Table `%s` has duplicate items %u (with extended cost %u) for %s %u (or possible in vendor template %u), ignoring",
-                                    tableName, item_id, ExtendedCost, idStr, vendor_entry, cInfo->vendorId);
+                    sLog.outErrorDb("Table `%s` has duplicate %s %u (with extended cost %u) for %s %u (or possible in vendor template %u), ignoring",
+                                    tableName, nameStr, item_id, ExtendedCost, idStr, vendor_entry, cInfo->vendorId);
             }
             return false;
         }
@@ -9319,7 +9373,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         if (pl)
             ChatHandler(pl).SendSysMessage(LANG_COMMAND_ADDVENDORITEMITEMS);
         else
-            sLog.outErrorDb("Table `%s` has too many items (%u >= %i) for %s %u, ignoring",
+            sLog.outErrorDb("Table `%s` has too many entries (%u >= %i) for %s %u, ignoring",
                             tableName, countItems, MAX_VENDOR_ITEMS, idStr, vendor_entry);
         return false;
     }

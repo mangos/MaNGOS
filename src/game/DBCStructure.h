@@ -811,7 +811,7 @@ struct CurrencyTypesEntry
 {
     uint32  ID;                                             // 0
     //uint32 Category;                                        // 1
-    //char* name;                                             // 2
+    DBCString name;                                         // 2
     //char* iconName;                                         // 3
     //uint32 unk4;                                            // 4
     //uint32 unk5;                                            // 5
@@ -819,7 +819,7 @@ struct CurrencyTypesEntry
     uint32 TotalCount;                                      // 7
     uint32 WeekCount;                                       // 8
     uint32 Flags;                                           // 9
-    //char* description;                                      // 10
+    //DBCString description;                                  // 10
 
     bool HasPrecision() const { return Flags & CURRENCY_FLAG_HAS_PRECISION; }
     bool HasSeasonCount() const { return Flags & CURRENCY_FLAG_HAS_SEASON_COUNT; }

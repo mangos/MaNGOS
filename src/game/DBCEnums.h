@@ -386,6 +386,17 @@ enum CurrencyFlags
     CURRENCY_FLAG_HAS_SEASON_COUNT  = 0x80, // guessed
 };
 
+enum Currencies
+{
+    CURRENCY_NONE                   = 0,
+    CURRENCY_CONQUEST_POINTS        = 390,
+    CURRENCY_HONOR_POINTS           = 392,
+    CURRENCY_JUSTICE_POINTS         = 395,
+    CURRENCY_VALOR_POINTS           = 396,
+    CURRENCY_CONQUEST_ARENA_META    = 483,
+    CURRENCY_CONQUEST_BG_META       = 484,
+};
+
 enum ItemEnchantmentType
 {
     ITEM_ENCHANTMENT_TYPE_NONE             = 0,

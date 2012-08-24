@@ -339,12 +339,14 @@ class MANGOS_DLL_SPEC ChatHandler
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);
         bool HandleNpcAddMoveCommand(char* args);
+        bool HandleNpcAddVendorCurrencyCommand(char* args);
         bool HandleNpcAddVendorItemCommand(char* args);
         bool HandleNpcAIInfoCommand(char* args);
         bool HandleNpcAllowMovementCommand(char* args);
         bool HandleNpcChangeEntryCommand(char* args);
         bool HandleNpcChangeLevelCommand(char* args);
         bool HandleNpcDeleteCommand(char* args);
+        bool HandleNpcDelVendorCurrencyCommand(char* args);
         bool HandleNpcDelVendorItemCommand(char* args);
         bool HandleNpcFactionIdCommand(char* args);
         bool HandleNpcFlagCommand(char* args);

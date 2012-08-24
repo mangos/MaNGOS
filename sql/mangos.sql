@@ -3406,8 +3406,8 @@ INSERT INTO `mangos_string` VALUES
 (206,'Item \'%i\' \'%s\' added to list with maxcount \'%i\' and incrtime \'%i\' and extendedcost \'%i\'',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (207,'Item \'%i\' not found in database.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (208,'Item \'%i\' \'%s\' deleted from vendor list',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(209,'Item \'%i\' not found in vendor list.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(210,'Item \'%i\' (with extended cost %i) already in vendor list.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(209,'Item \'%i\' (isCurrency: %u) not found in vendor list.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(210,'Item \'%i\' (isCurrency: %u, with extended cost %i) already in vendor list.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (211,'Spells of %s reset.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (212,'Spells of %s will reset at next login.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (213,'Talents of %s reset.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -3466,6 +3466,7 @@ INSERT INTO `mangos_string` VALUES
 (266,'Nothing found!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (267,'Object not found!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (268,'Creature not found!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(269,'Currency \'%i\' not found.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (270,'Creature Removed',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (271,'Creature moved.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (272,'Creature (GUID:%u) must be on the same map as player!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -3479,6 +3480,7 @@ INSERT INTO `mangos_string` VALUES
 (280,'Vendor has too many items (max 128)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (281,'You can\'t kick self, logout instead',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (282,'Player %s kicked.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(283,'Meta currency \'%i\' is not allowed in vendors.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (284,'Accepting Whisper: %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (285,'Accepting Whisper: ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (286,'Accepting Whisper: OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -4080,6 +4082,8 @@ INSERT INTO `mangos_string` VALUES
 (1506,'Current phase = %u',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1507,'Combat-Movement is %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1508,'Melee attacking is %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1509,'Can\'t add item %u to vendor with unknown item type %u',,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1510,'Currency %u has maxCount = 0, but for currencies maxCount = buyCount, so it can\'t be 0 or less than that\'s currency precision (%u).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1600,'|cffffff00Northpass Tower has been taken by the Horde!|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1601,'|cffffff00Northpass Tower has been taken by the Alliance!|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1602,'|cffffff00Crown Guard Tower has been taken by the Horde!|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -4346,8 +4350,8 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `npc_vendor`;
 CREATE TABLE `npc_vendor` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
-  `maxcount` tinyint(3) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
+  `maxcount` smallint(5) unsigned NOT NULL default '0',
   `incrtime` int(10) unsigned NOT NULL default '0',
   `ExtendedCost` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`,`item`,`ExtendedCost`)
@@ -4369,8 +4373,8 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `npc_vendor_template`;
 CREATE TABLE `npc_vendor_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
-  `maxcount` tinyint(3) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
+  `maxcount` smallint(3) unsigned NOT NULL default '0',
   `incrtime` int(10) unsigned NOT NULL default '0',
   `ExtendedCost` mediumint(8) unsigned NOT NULL default '0',
   PRIMARY KEY  (`entry`,`item`,`ExtendedCost`)

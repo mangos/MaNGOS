@@ -483,57 +483,15 @@ void WorldSession::HandleBuybackItem(WorldPacket& recv_data)
         _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
 }
 
-void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recv_data)
-{
-    DEBUG_LOG("WORLD: Received CMSG_BUY_ITEM_IN_SLOT");
-    ObjectGuid vendorGuid;
-    ObjectGuid bagGuid;
-    uint32 item, slot, count;
-    uint8 bagslot;
-
-    recv_data >> vendorGuid >> item  >> slot >> bagGuid >> bagslot >> count;
-
-    // client side expected counting from 1, and we send to client vendorslot+1 already
-    if (slot > 0)
-        --slot;
-    else
-        return;                                             // cheating
-
-    uint8 bag = NULL_BAG;                                   // init for case invalid bagGUID
-
-    // find bag slot by bag guid
-    if (bagGuid == _player->GetObjectGuid())
-        bag = INVENTORY_SLOT_BAG_0;
-    else
-    {
-        for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
-        {
-            if (Bag* pBag = (Bag*)_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            {
-                if (bagGuid == pBag->GetObjectGuid())
-                {
-                    bag = i;
-                    break;
-                }
-            }
-        }
-    }
-
-    // bag not found, cheating?
-    if (bag == NULL_BAG)
-        return;
-
-    GetPlayer()->BuyItemFromVendorSlot(vendorGuid, slot, item, count, bag, bagslot);
-}
-
 void WorldSession::HandleBuyItemOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: Received CMSG_BUY_ITEM");
-    ObjectGuid vendorGuid, otherGuid;
+    ObjectGuid vendorGuid, bagGuid;
     uint32 item, slot, count;
-    uint8 unk1, unk2;
+    uint8 type, bagSlot;
 
-    recv_data >> vendorGuid >> unk1 >> item >> slot >> count >> otherGuid >> unk2;
+    recv_data >> vendorGuid >> type >> item >> slot >> count >> bagGuid >> bagSlot;
+    DEBUG_LOG("WORLD: Received CMSG_BUY_ITEM, vendorguid: %s, type: %u, item: %u, slot: %u, count: %u, bagGuid: %s, bagSlog: %u",
+        vendorGuid.GetString().c_str(), type, item, slot, count, bagGuid.GetString().c_str(), bagSlot);
 
     // client side expected counting from 1, and we send to client vendorslot+1 already
     if (slot > 0)
@@ -541,7 +499,41 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recv_data)
     else
         return;                                             // cheating
 
-    GetPlayer()->BuyItemFromVendorSlot(vendorGuid, slot, item, count, NULL_BAG, NULL_SLOT);
+    switch(type)
+    {
+        case VENDOR_ITEM_TYPE_NONE:
+            break;
+        case VENDOR_ITEM_TYPE_ITEM:
+        {
+            uint8 bag = NULL_BAG;                           // init for case invalid bagGUID
+
+            // find bag slot by bag guid
+            if (bagGuid == _player->GetObjectGuid())
+                bag = INVENTORY_SLOT_BAG_0;
+            else
+            {
+                for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+                {
+                    if (Bag* pBag = (Bag*)_player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                    {
+                        if (bagGuid == pBag->GetObjectGuid())
+                        {
+                            bag = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            GetPlayer()->BuyItemFromVendorSlot(vendorGuid, slot, item, count, bag, bagSlot);
+            break;
+        }
+        case VENDOR_ITEM_TYPE_CURRENCY:
+        {
+            GetPlayer()->BuyCurrencyFromVendorSlot(vendorGuid, slot, item, count);
+            break;
+        }
+    }
 }
 
 void WorldSession::HandleListInventoryOpcode(WorldPacket& recv_data)
@@ -597,10 +589,15 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
 
         if (crItem)
         {
-            uint32 itemId = crItem->item;
-            ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
-            if (pProto)
+            uint32 price, displayId, buyCount, maxDurability;
+            int32 maxCount;
+
+            if (crItem->type == VENDOR_ITEM_TYPE_ITEM)
             {
+                ItemPrototype const * pProto = ObjectMgr::GetItemPrototype(crItem->item);
+                if (!pProto)
+                    continue;
+
                 if (!_player->isGameMaster())
                 {
                     // class wrong item skip only for bindable case
@@ -625,35 +622,60 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
                     if (pProto->RequiredReputationFaction && uint32(_player->GetReputationRank(pProto->RequiredReputationFaction)) >= pProto->RequiredReputationRank)
                     {
                         // checked at convert data loading as existed
-                        if (uint32 newItemId = sObjectMgr.GetItemConvert(itemId, _player->getRaceMask()))
+                        if (uint32 newItemId = sObjectMgr.GetItemConvert(crItem->item, _player->getRaceMask()))
                             pProto = ObjectMgr::GetItemPrototype(newItemId);
                     }
                 }
 
                 ++count;
-
                 if (count >= MAX_VENDOR_ITEMS)
                     break;
 
-                bitFlags.push_back(crItem->ExtendedCost == 0);
-                bitFlags.push_back(true);                       // unk
-
                 // reputation discount
-                uint32 price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? uint32(floor(pProto->BuyPrice * discountMod)) : 0;
+                maxDurability = pProto->MaxDurability;
+                price = (crItem->ExtendedCost == 0 || pProto->Flags2 & ITEM_FLAG2_EXT_COST_REQUIRES_GOLD) ? uint32(floor(pProto->BuyPrice * discountMod)) : 0;
+                displayId = pProto->DisplayInfoID;
+                maxCount = crItem->maxcount <= 0 ? -1 : int32(pCreature->GetVendorItemCurrentCount(crItem));
+                buyCount = pProto->BuyCount;
 
-                buffer << uint32(vendorslot + 1);               // client size expected counting from 1
-                buffer << uint32(pProto->MaxDurability);
-
-                if (crItem->ExtendedCost)
-                    buffer << uint32(crItem->ExtendedCost);
-
-                buffer << uint32(itemId);
-                buffer << uint32(1);   // type == item
-                buffer << uint32(price);
-                buffer << uint32(pProto->DisplayInfoID);
-                buffer << uint32(crItem->maxcount <= 0 ? 0xFFFFFFFF : pCreature->GetVendorItemCurrentCount(crItem));
-                buffer << uint32(pProto->BuyCount);
             }
+            else if (crItem->type == VENDOR_ITEM_TYPE_CURRENCY)
+            {
+                CurrencyTypesEntry const * pCurrency = sCurrencyTypesStore.LookupEntry(crItem->item);
+                if (!pCurrency)
+                    continue;
+
+                if (pCurrency->ID == CURRENCY_CONQUEST_ARENA_META || pCurrency->ID == CURRENCY_CONQUEST_BG_META)
+                    continue;
+
+                ++count;
+                if (count >= MAX_VENDOR_ITEMS)
+                    break;
+
+                maxDurability = 0;
+                price = 0;
+                displayId = 0;
+                maxCount = -1;
+                buyCount = crItem->maxcount;
+            }
+            else
+                continue;
+
+            bitFlags.push_back(crItem->ExtendedCost == 0);
+            bitFlags.push_back(true);                       // unk
+
+            buffer << uint32(vendorslot + 1);               // client size expected counting from 1
+            buffer << uint32(maxDurability);
+
+            if (crItem->ExtendedCost)
+                buffer << uint32(crItem->ExtendedCost);
+
+            buffer << uint32(crItem->item);
+            buffer << uint32(crItem->type);
+            buffer << uint32(price);
+            buffer << uint32(displayId);
+            buffer << int32(maxCount);
+            buffer << uint32(buyCount);
         }
     }
 
