@@ -588,13 +588,13 @@ enum Opcodes
     SMSG_CHAT_WRONG_FACTION                               = 0x121A,
     CMSG_GMTICKET_SYSTEMSTATUS                            = 0x121B,
     SMSG_GMTICKET_SYSTEMSTATUS                            = 0x121C,
-    CMSG_SPIRIT_HEALER_ACTIVATE                           = 0x121D,
+    CMSG_SPIRIT_HEALER_ACTIVATE                           = 0x2E26, // 4.3.4 15595
     CMSG_SET_STAT_CHEAT                                   = 0x121E,
     SMSG_QUEST_FORCE_REMOVED                              = 0x121F,
     CMSG_SKILL_BUY_STEP                                   = 0x1220,
     CMSG_SKILL_BUY_RANK                                   = 0x1221,
     CMSG_XP_CHEAT                                         = 0x1222,
-    SMSG_SPIRIT_HEALER_CONFIRM                            = 0x1223,
+    SMSG_SPIRIT_HEALER_CONFIRM                            = 0x4917, // 4.3.4 15595
     CMSG_CHARACTER_POINT_CHEAT                            = 0x1224,
     SMSG_GOSSIP_POI                                       = 0x1225,
     CMSG_CHAT_IGNORED                                     = 0x1226,
