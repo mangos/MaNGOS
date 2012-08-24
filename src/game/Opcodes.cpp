@@ -322,9 +322,9 @@ void InitializeOpcodes()
     //OPCODE(CMSG_NEXT_CINEMATIC_CAMERA,                   STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleNextCinematicCamera       );
     //OPCODE(CMSG_COMPLETE_CINEMATIC,                      STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleCompleteCinematic         );
     OPCODE(SMSG_TUTORIAL_FLAGS,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_TUTORIAL_FLAG,                           STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialFlagOpcode        );
-    //OPCODE(CMSG_TUTORIAL_CLEAR,                          STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialClearOpcode       );
-    //OPCODE(CMSG_TUTORIAL_RESET,                          STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialResetOpcode       );
+    OPCODE(CMSG_TUTORIAL_FLAG,                           STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialFlagOpcode        );
+    OPCODE(CMSG_TUTORIAL_CLEAR,                          STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialClearOpcode       );
+    OPCODE(CMSG_TUTORIAL_RESET,                          STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTutorialResetOpcode       );
     OPCODE(CMSG_STANDSTATECHANGE,                        STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleStandStateChangeOpcode    );
     OPCODE(CMSG_EMOTE,                                   STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleEmoteOpcode               );
     OPCODE(SMSG_EMOTE,                                   STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
