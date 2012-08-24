@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_0169_xxxxx_04_mangos_command` bit(1) default NULL
+  `required_0177_xxxxx_01_mangos_gameobject_template` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -2142,6 +2142,15 @@ CREATE TABLE `gameobject_template` (
   `data21` int(10) unsigned NOT NULL default '0',
   `data22` int(10) unsigned NOT NULL default '0',
   `data23` int(10) unsigned NOT NULL default '0',
+  `data24` int(10) unsigned NOT NULL DEFAULT '0',
+  `data25` int(10) unsigned NOT NULL DEFAULT '0',
+  `data26` int(10) unsigned NOT NULL DEFAULT '0',
+  `data27` int(10) unsigned NOT NULL DEFAULT '0',
+  `data28` int(10) unsigned NOT NULL DEFAULT '0',
+  `data29` int(10) unsigned NOT NULL DEFAULT '0',
+  `data30` int(10) unsigned NOT NULL DEFAULT '0',
+  `data31` int(10) unsigned NOT NULL DEFAULT '0',
+  `unk2` int(10) unsigned NOT NULL DEFAULT '0',
   `mingold` mediumint(8) unsigned NOT NULL default '0',
   `maxgold` mediumint(8) unsigned NOT NULL default '0',
   `ScriptName` varchar(64) NOT NULL default '',
