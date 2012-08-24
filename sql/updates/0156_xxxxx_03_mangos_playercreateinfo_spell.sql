@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_02_mangos_playercreateinfo required_0156_xxxxx_03_mangos_playercreateinfo_spell bit;
 
-DELETE FROM playercreateinfo_spell WHERE race BETWEEN 1 AND 22;
+DELETE FROM `playercreateinfo_spell` WHERE `race` BETWEEN 1 AND 22;
 
 INSERT INTO `playercreateinfo_spell` VALUES
 (1,1,202,'Two-Handed Swords'),

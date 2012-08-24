@@ -1,6 +1,6 @@
 ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_03_mangos_playercreateinfo_spell required_0157_xxxxx_01_mangos_player_levelstats bit;
 
-DELETE FROM player_levelstats WHERE race BETWEEN 1 AND 22;
+DELETE FROM `player_levelstats` WHERE `race` BETWEEN 1 AND 22;
 
 INSERT INTO `player_levelstats` VALUES
 (1,1,1,23,20,22,20,20),

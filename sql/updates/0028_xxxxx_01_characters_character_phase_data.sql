@@ -1,8 +1,5 @@
 ALTER TABLE character_db_version CHANGE COLUMN required_0001_xxxxx_01_characters required_0028_xxxxx_01_characters_character_phase_data bit;
 
--- ----------------------------
--- Table structure for `character_phase_data`
--- ----------------------------
 DROP TABLE IF EXISTS `character_phase_data`;
 CREATE TABLE `character_phase_data` (
   `guid` int(11) NOT NULL,
@@ -11,6 +8,3 @@ CREATE TABLE `character_phase_data` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- ----------------------------
--- Records of character_phase_data
--- ----------------------------
