@@ -249,19 +249,23 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
         return;
     }
 
+    data.Initialize(SMSG_TRAINER_SERVICE, 16);
+
+    uint32 trainState = 2;
+
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     if (!unit->IsTrainerOf(_player, true))
-        return;
+        trainState = 1;
 
     // check present spell in trainer spell list
     TrainerSpellData const* cSpells = unit->GetTrainerSpells();
     TrainerSpellData const* tSpells = unit->GetTrainerTemplateSpells();
 
     if (!cSpells && !tSpells)
-        return;
+        trainState = 1;
 
     // Try find spell in npc_trainer
     TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(spellId) : NULL;
@@ -272,45 +276,56 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
 
     // Not found anywhere, cheating?
     if (!trainer_spell)
-        return;
+        trainState = 1;
 
     // can't be learn, cheat? Or double learn with lags...
     uint32 reqLevel = 0;
     if (!_player->IsSpellFitByClassAndRace(trainer_spell->learnedSpell, &reqLevel))
-        return;
+        trainState = 1;
 
     reqLevel = trainer_spell->isProvidedReqLevel ? trainer_spell->reqLevel : std::max(reqLevel, trainer_spell->reqLevel);
     if (_player->GetTrainerSpellState(trainer_spell, reqLevel) != TRAINER_SPELL_GREEN)
-        return;
+        trainState = 1;
 
     // apply reputation discount
     uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
 
     // check money requirement
-    if (_player->GetMoney() < nSpellCost)
-        return;
+    if ((_player->GetMoney() < nSpellCost) && !trainState)
+        trainState = 0;
 
-    _player->ModifyMoney(-int32(nSpellCost));
-
-    // visual effect on trainer
-    WorldPacket data;
-    unit->BuildSendPlayVisualPacket(&data, 0xB3, false);
-    SendPacket(&data);
-
-    // visual effect on player
-    _player->BuildSendPlayVisualPacket(&data, 0x016A, true);
-    SendPacket(&data);
-
-    // learn explicitly or cast explicitly
-    if (trainer_spell->IsCastable())
-        _player->CastSpell(_player, trainer_spell->spell, true);
+    if(trainState != 2)
+    {
+        data << ObjectGuid(guid);
+        data << uint32(spellId);
+        data << trainState;
+        SendPacket(&data);            
+    }
     else
-        _player->learnSpell(spellId, false);
+    {    
+        _player->ModifyMoney(-int32(nSpellCost));
 
-    data.Initialize(SMSG_TRAINER_BUY_SUCCEEDED, 12);
-    data << ObjectGuid(guid);
-    data << uint32(spellId);                                // should be same as in packet from client
-    SendPacket(&data);
+        // visual effect on trainer
+        WorldPacket data;
+        unit->BuildSendPlayVisualPacket(&data, 0xB3, false);
+        SendPacket(&data);
+
+        // visual effect on player
+        _player->BuildSendPlayVisualPacket(&data, 0x016A, true);
+        SendPacket(&data);
+
+        // learn explicitly or cast explicitly
+        if (trainer_spell->IsCastable())
+            _player->CastSpell(_player, trainer_spell->spell, true);
+        else
+            _player->learnSpell(spellId, false);
+
+    
+        data << ObjectGuid(guid);
+        data << uint32(spellId);                                // should be same as in packet from client
+        data << uint32(2);
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)

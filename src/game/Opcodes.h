@@ -484,11 +484,11 @@ enum Opcodes
     CMSG_ACTIVATETAXI                                     = 0x11AE,
     SMSG_ACTIVATETAXIREPLY                                = 0x11AF,
     SMSG_NEW_TAXI_PATH                                    = 0x11B0,
-    CMSG_TRAINER_LIST                                     = 0x11B1,
-    SMSG_TRAINER_LIST                                     = 0x11B2,
-    CMSG_TRAINER_BUY_SPELL                                = 0x11B3,
-    SMSG_TRAINER_BUY_SUCCEEDED                            = 0x11B4,
-    SMSG_TRAINER_BUY_FAILED                               = 0x11B5,
+    CMSG_TRAINER_LIST                                     = 0x2336, // 4.3.4 15595
+    SMSG_TRAINER_LIST                                     = 0x4414, // 4.3.4 15595
+    CMSG_TRAINER_BUY_SPELL                                = 0x4415, // 4.3.4 15595
+    SMSG_TRAINER_SERVICE                                  = 0x6A05, // 4.3.4 15595
+    SMSG_TRAINER_BUY_FAILED                               = 0x0004, // 4.3.4 15595
     CMSG_BINDER_ACTIVATE                                  = 0x4006, // 4.3.4 15595
     SMSG_PLAYERBINDERROR                                  = 0x11B7,
     CMSG_BANKER_ACTIVATE                                  = 0x11B8,
