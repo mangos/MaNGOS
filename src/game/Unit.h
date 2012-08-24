@@ -1128,7 +1128,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::list<Aura*> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32> ComboPointHolderSet;
-        typedef std::map<uint8, uint32> VisibleAuraMap;
+        typedef std::map<uint8, SpellAuraHolder*> VisibleAuraMap;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
         virtual ~Unit();
@@ -1728,19 +1728,19 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
         HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
 
-        uint32 GetVisibleAura(uint8 slot) const
+        SpellAuraHolder* GetVisibleAura(uint8 slot) const
         {
             VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
             if (itr != m_visibleAuras.end())
                 return itr->second;
             return 0;
         }
-        void SetVisibleAura(uint8 slot, uint32 spellid)
+        void SetVisibleAura(uint8 slot, SpellAuraHolder* holder)
         {
-            if (spellid == 0)
+            if (!holder)
                 m_visibleAuras.erase(slot);
             else
-                m_visibleAuras[slot] = spellid;
+                m_visibleAuras[slot] = holder;
         }
         VisibleAuraMap const& GetVisibleAuras() const { return m_visibleAuras; }
         uint8 GetVisibleAurasCount() const { return m_visibleAuras.size(); }

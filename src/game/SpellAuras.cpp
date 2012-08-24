@@ -8984,7 +8984,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
     if (slot >= MAX_AURAS)                                  // slot not set
         return;
 
-    if (m_target->GetVisibleAura(slot) == 0)
+    if (!m_target->GetVisibleAura(slot))
         return;
 
     // unregister aura diminishing (and store last time)
@@ -9278,6 +9278,8 @@ void SpellAuraHolder::BuildUpdatePacket(WorldPacket& data) const
             if (auraFlags & (1 << i))
                 if (Aura const* aura = m_auras[i])
                     data << int32(aura->GetModifier()->m_amount);
+                else
+                    data << int32(0);
     }
 }
 

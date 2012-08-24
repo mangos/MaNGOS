@@ -25,6 +25,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "SpellAuras.h"
 #include "Group.h"
 #include "SocialMgr.h"
 #include "Util.h"
@@ -736,7 +737,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
         {
             if (auramask & (uint64(1) << i))
             {
-                *data << uint32(player->GetVisibleAura(i));
+                *data << uint32(player->GetVisibleAura(i)->GetId());
                 *data << uint8(1);
             }
         }
@@ -812,7 +813,7 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
             {
                 if (auramask & (uint64(1) << i))
                 {
-                    *data << uint32(pet->GetVisibleAura(i));
+                    *data << uint32(pet->GetVisibleAura(i)->GetId());
                     *data << uint8(1);
                 }
             }
@@ -893,7 +894,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     data << uint64(auramask);                               // placeholder
     for (uint8 i = 0; i < MAX_AURAS; ++i)
     {
-        if (uint32 aura = player->GetVisibleAura(i))
+        if (uint32 aura = player->GetVisibleAura(i)->GetId())
         {
             auramask |= (uint64(1) << i);
             data << uint32(aura);
@@ -919,7 +920,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
         data << uint64(petauramask);                        // placeholder
         for (uint8 i = 0; i < MAX_AURAS; ++i)
         {
-            if (uint32 petaura = pet->GetVisibleAura(i))
+            if (uint32 petaura = pet->GetVisibleAura(i)->GetId())
             {
                 petauramask |= (uint64(1) << i);
                 data << uint32(petaura);
