@@ -1,24 +1,7 @@
-ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_02_playercreateinfo required_0156_xxxxx_03_playercreateinfo_spell bit;
+ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_02_mangos_playercreateinfo required_0156_xxxxx_03_mangos_playercreateinfo_spell bit;
 
---
--- Table structure for table `playercreateinfo_spell`
---
+DELETE FROM playercreateinfo_spell WHERE race BETWEEN 1 AND 22;
 
-DROP TABLE IF EXISTS `playercreateinfo_spell`;
-CREATE TABLE `playercreateinfo_spell` (
-  `race` tinyint(3) unsigned NOT NULL default '0',
-  `class` tinyint(3) unsigned NOT NULL default '0',
-  `Spell` mediumint(8) unsigned NOT NULL default '0',
-  `Note` varchar(255) default NULL,
-  PRIMARY KEY  (`race`,`class`,`Spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `playercreateinfo_spell`
---
-
-LOCK TABLES `playercreateinfo_spell` WRITE;
-/*!40000 ALTER TABLE `playercreateinfo_spell` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_spell` VALUES
 (1,1,202,'Two-Handed Swords'),
 (1,1,196,'One-Handed Axes'),
@@ -5116,5 +5099,3 @@ INSERT INTO `playercreateinfo_spell` VALUES
 (22,6,10841,'Heavy Mageweave Bandage'),
 (22,6,18629,'Runecloth Bandage'),
 (22,6,7934,'Anti-Venom');
-/*!40000 ALTER TABLE `playercreateinfo_spell` ENABLE KEYS */;
-UNLOCK TABLES;

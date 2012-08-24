@@ -1,24 +1,7 @@
 ALTER TABLE db_version CHANGE COLUMN required_0034_xxxxx_02_mangos_player_levelstats required_0034_xxxxx_03_mangos_player_classlevelstats bit;
 
---
--- Table structure for table `player_classlevelstats`
---
+DELETE FROM player_classlevelstats WHERE race BETWEEN 1 AND 22;
 
-DROP TABLE IF EXISTS `player_classlevelstats`;
-CREATE TABLE `player_classlevelstats` (
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `basehp` smallint(5) unsigned NOT NULL,
-  `basemana` smallint(5) unsigned NOT NULL,
-  PRIMARY KEY  (`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
-
---
--- Dumping data for table `player_classlevelstats`
---
-
-LOCK TABLES `player_classlevelstats` WRITE;
-/*!40000 ALTER TABLE `player_classlevelstats` DISABLE KEYS */;
 INSERT INTO `player_classlevelstats` VALUES
 (1,1,20,0),
 (1,2,29,0),
@@ -870,5 +853,3 @@ INSERT INTO `player_classlevelstats` VALUES
 (11,83,26487,9542),
 (11,84,38865,13335),
 (11,85,39533,21751);
-/*!40000 ALTER TABLE `player_classlevelstats` ENABLE KEYS */;
-UNLOCK TABLES;

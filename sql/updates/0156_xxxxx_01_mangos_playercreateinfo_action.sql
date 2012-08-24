@@ -1,26 +1,7 @@
-ALTER TABLE db_version CHANGE COLUMN required_0155_xxxxx_02_playercreateinfo_action required_0156_xxxxx_01_playercreateinfo_action bit;
+ALTER TABLE db_version CHANGE COLUMN required_0155_xxxxx_02_mangos_playercreateinfo_action required_0156_xxxxx_01_mangos_playercreateinfo_action bit;
 
---
--- Table structure for table `playercreateinfo_action`
---
+DELETE FROM playercreateinfo_action WHERE race BETWEEN 1 AND 22;
 
-DROP TABLE IF EXISTS `playercreateinfo_action`;
-CREATE TABLE `playercreateinfo_action` (
-  `race` tinyint(3) unsigned NOT NULL default '0',
-  `class` tinyint(3) unsigned NOT NULL default '0',
-  `button` smallint(5) unsigned NOT NULL default '0',
-  `action` int(11) unsigned NOT NULL default '0',
-  `type` smallint(5) unsigned NOT NULL default '0',
-  KEY `playercreateinfo_race_class_index` (`race`,`class`),
-  PRIMARY KEY (`race`,`class`,`button`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `playercreateinfo_action`
---
-
-LOCK TABLES `playercreateinfo_action` WRITE;
-/*!40000 ALTER TABLE `playercreateinfo_action` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_action` VALUES
 (1,1,72,88163,0),
 (1,1,73,88161,0),
@@ -374,5 +355,3 @@ INSERT INTO `playercreateinfo_action` VALUES
 (22,6,9,68992,0),
 (22,6,10,68996,0),
 (22,6,11,87840,0);
-/*!40000 ALTER TABLE `playercreateinfo_action` ENABLE KEYS */;
-UNLOCK TABLES;

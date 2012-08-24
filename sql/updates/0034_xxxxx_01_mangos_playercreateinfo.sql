@@ -1,29 +1,7 @@
 ALTER TABLE db_version CHANGE COLUMN required_0028_xxxxx_03_mangos_playercreateinfo required_0034_xxxxx_01_mangos_playercreateinfo bit;
 
---
--- Table structure for table `playercreateinfo`
---
+DELETE FROM playercreateinfo WHERE race BETWEEN 1 AND 22;
 
-DROP TABLE IF EXISTS `playercreateinfo`;
-CREATE TABLE `playercreateinfo` (
-  `race` tinyint(3) unsigned NOT NULL default '0',
-  `class` tinyint(3) unsigned NOT NULL default '0',
-  `map` smallint(5) unsigned NOT NULL default '0',
-  `zone` mediumint(8) unsigned NOT NULL default '0',
-  `position_x` float NOT NULL default '0',
-  `position_y` float NOT NULL default '0',
-  `position_z` float NOT NULL default '0',
-  `orientation` float NOT NULL default '0',
-  `phaseMap` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY  (`race`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `playercreateinfo`
---
-
-LOCK TABLES `playercreateinfo` WRITE;
-/*!40000 ALTER TABLE `playercreateinfo` DISABLE KEYS */;
 INSERT INTO `playercreateinfo` VALUES
 (1,1,0,12,-8949,-132,84,0,0),
 (1,2,0,12,-8949,-132,84,0,0),
@@ -101,5 +79,3 @@ INSERT INTO `playercreateinfo` VALUES
 (22,8,654,4756,-1451.53,1403.35,35.5561,0,0),
 (22,9,654,4756,-1451.53,1403.35,35.5561,0,0),
 (22,11,654,4756,-1451.53,1403.35,35.5561,0,0);
-/*!40000 ALTER TABLE `playercreateinfo` ENABLE KEYS */;
-UNLOCK TABLES;

@@ -1,6 +1,7 @@
-ALTER TABLE db_version CHANGE COLUMN required_0155_xxxxx_01_playercreateinfo_spell required_0155_xxxxx_02_playercreateinfo_action bit;
+ALTER TABLE db_version CHANGE COLUMN required_0155_xxxxx_01_mangos_playercreateinfo_spell required_0155_xxxxx_02_mangos_playercreateinfo_action bit;
 
 DELETE FROM `playercreateinfo_action` WHERE race IN (22);
+
 INSERT INTO `playercreateinfo_action` VALUES
 (22,1,0,88161,0),
 (22,1,72,22627,1),

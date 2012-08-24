@@ -1,6 +1,7 @@
-ALTER TABLE db_version CHANGE COLUMN required_0128_12097_01_mangos_mangos_string required_0155_xxxxx_01_playercreateinfo_spell bit;
+ALTER TABLE db_version CHANGE COLUMN required_0128_12097_01_mangos_mangos_string required_0155_xxxxx_01_mangos_playercreateinfo_spell bit;
 
 DELETE FROM `playercreateinfo_spell` WHERE race IN (22);
+
 INSERT INTO `playercreateinfo_spell` VALUES
 (22,1,81,'Dodge'),
 (22,1,107,'Block'),

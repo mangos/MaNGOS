@@ -1,28 +1,7 @@
-ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_03_playercreateinfo_spell required_0157_xxxxx_01_player_levelstats bit;
+ALTER TABLE db_version CHANGE COLUMN required_0156_xxxxx_03_mangos_playercreateinfo_spell required_0157_xxxxx_01_mangos_player_levelstats bit;
 
---
--- Table structure for table `player_levelstats`
---
+DELETE FROM player_levelstats WHERE race BETWEEN 1 AND 22;
 
-DROP TABLE IF EXISTS `player_levelstats`;
-CREATE TABLE `player_levelstats` (
-  `race` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `str` tinyint(3) unsigned NOT NULL,
-  `agi` tinyint(3) unsigned NOT NULL,
-  `sta` tinyint(3) unsigned NOT NULL,
-  `inte` tinyint(3) unsigned NOT NULL,
-  `spi` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY  (`race`,`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
-
---
--- Dumping data for table `player_levelstats`
---
-
-LOCK TABLES `player_levelstats` WRITE;
-/*!40000 ALTER TABLE `player_levelstats` DISABLE KEYS */;
 INSERT INTO `player_levelstats` VALUES
 (1,1,1,23,20,22,20,20),
 (1,1,2,24,21,23,20,20),
