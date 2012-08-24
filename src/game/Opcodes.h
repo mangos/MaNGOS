@@ -885,7 +885,7 @@ enum Opcodes
     SMSG_MOVE_UNSET_CAN_FLY                               = 0x15A2, // 4.3.4 15595
     CMSG_MOVE_SET_CAN_FLY_ACK                             = 0x790C, // 4.3.4 15595
     CMSG_MOVE_SET_FLY                                     = 0x1347,
-    CMSG_SOCKET_GEMS                                      = 0x1348,
+    CMSG_SOCKET_GEMS                                      = 0x2F04, // 4.3.4 15595
     CMSG_ARENA_TEAM_CREATE                                = 0x1349,
     SMSG_ARENA_TEAM_COMMAND_RESULT                        = 0x134A,
     MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY   = 0x134B,
