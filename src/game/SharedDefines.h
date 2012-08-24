@@ -2856,7 +2856,6 @@ enum ShapeshiftForm
     FORM_BEAR               = 0x05,
     FORM_AMBIENT            = 0x06,
     FORM_GHOUL              = 0x07,
-    FORM_DIREBEAR           = 0x08,
     FORM_STEVES_GHOUL       = 0x09,
     FORM_THARONJA_SKELETON  = 0x0A,
     FORM_TEST_OF_STRENGTH   = 0x0B,

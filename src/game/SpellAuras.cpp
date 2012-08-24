@@ -3446,7 +3446,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_TRAVEL:
         case FORM_AQUA:
         case FORM_BEAR:
-        case FORM_DIREBEAR:
         case FORM_FLIGHT_EPIC:
         case FORM_FLIGHT:
         case FORM_MOONKIN:
@@ -3503,7 +3502,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
                 PowerType = POWER_ENERGY;
                 break;
             case FORM_BEAR:
-            case FORM_DIREBEAR:
             case FORM_BATTLESTANCE:
             case FORM_BERSERKERSTANCE:
             case FORM_DEFENSIVESTANCE:
@@ -3523,7 +3521,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             {
                 case FORM_CAT:
                 case FORM_BEAR:
-                case FORM_DIREBEAR:
                 {
                     // get furor proc chance
                     int32 furorChance = 0;
@@ -3605,7 +3602,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         {
                 // Nordrassil Harness - bonus
             case FORM_BEAR:
-            case FORM_DIREBEAR:
             case FORM_CAT:
                 if (Aura* dummy = target->GetDummyAura(37315))
                     target->CastSpell(target, 37316, true, NULL, dummy);
@@ -6672,12 +6668,6 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             HotWSpellId = 24899;
             MasterShaperSpellId = 48418;
             break;
-        case FORM_DIREBEAR:
-            spellId1 = 9635;
-            spellId2 = 21178;
-            HotWSpellId = 24899;
-            MasterShaperSpellId = 48418;
-            break;
         case FORM_BATTLESTANCE:
             spellId1 = 21156;
             break;
@@ -6788,7 +6778,7 @@ void Aura::HandleShapeshiftBoosts(bool apply)
                 target->CastSpell(target, 62071, true);
 
             // Survival of the Fittest (Armor part)
-            if (form == FORM_BEAR || form == FORM_DIREBEAR)
+            if (form == FORM_BEAR)
             {
                 Unit::AuraList const& modAuras = target->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
                 for (Unit::AuraList::const_iterator i = modAuras.begin(); i != modAuras.end(); ++i)
