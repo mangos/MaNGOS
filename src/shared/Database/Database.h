@@ -222,8 +222,10 @@ class MANGOS_DLL_SPEC Database
         void AllowAsyncTransactions() { m_bAllowAsyncTransactions = true; }
 
     protected:
-        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadBody(NULL), m_delayThread(NULL),
-            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
+        Database() :
+            m_nQueryConnPoolSize(1), m_pAsyncConn(NULL), m_pResultQueue(NULL),
+            m_threadBody(NULL), m_delayThread(NULL), m_bAllowAsyncTransactions(false),
+            m_iStmtIndex(-1), m_logSQL(false), m_pingIntervallms(0)
         {
             m_nQueryCounter = -1;
         }

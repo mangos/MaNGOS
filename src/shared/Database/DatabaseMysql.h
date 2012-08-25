@@ -52,7 +52,7 @@ class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
 
     protected:
         // bind parameters
-        void addParam(int nIndex, const SqlStmtFieldData& data);
+        void addParam(unsigned int nIndex, const SqlStmtFieldData& data);
 
         static enum_field_types ToMySQLType(const SqlStmtFieldData& data, my_bool& bUnsigned);
 
