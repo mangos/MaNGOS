@@ -184,10 +184,12 @@ void GlobalCooldownMgr::CancelGlobalCooldown(SpellEntry const* spellInfo)
 // Methods of class Unit
 
 Unit::Unit() :
-    i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
+    movespline(new Movement::MoveSpline()),
     m_charmInfo(NULL),
+    i_motionMaster(this),
     m_vehicleInfo(NULL),
-    movespline(new Movement::MoveSpline())
+    m_ThreatManager(this),
+    m_HostileRefManager(this)
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;

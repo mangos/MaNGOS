@@ -156,15 +156,17 @@ bool CreatureCreatePos::Relocate(Creature* cr) const
     return true;
 }
 
-Creature::Creature(CreatureSubtype subtype) :
-    Unit(), i_AI(NULL),
-    lootForPickPocketed(false), lootForBody(false), lootForSkin(false), m_groupLootTimer(0), m_groupLootId(0),
+Creature::Creature(CreatureSubtype subtype) : Unit(),
+    i_AI(NULL),
+    lootForPickPocketed(false), lootForBody(false), lootForSkin(false),
+    m_groupLootTimer(0), m_groupLootId(0),
     m_lootMoney(0), m_lootGroupRecipientId(0),
     m_corpseDecayTimer(0), m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60), m_respawnradius(5.0f),
     m_subtype(subtype), m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0),
     m_AlreadyCallAssistance(false), m_AlreadySearchedAssistance(false),
     m_regenHealth(true), m_AI_locked(false), m_isDeadByDefault(false),
-    m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_temporaryFactionFlags(TEMPFACTION_NONE),
+    m_temporaryFactionFlags(TEMPFACTION_NONE),
+    m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), 
     m_creatureInfo(NULL)
 {
     m_regenTimer = 200;
