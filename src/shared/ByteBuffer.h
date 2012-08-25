@@ -135,7 +135,10 @@ class ByteBuffer
         }
 
         // constructor
-        ByteBuffer(size_t res, bool init = false);
+        ByteBuffer(size_t res): _rpos(0), _wpos(0), _bitpos(8), _curbitval(0)
+        {
+            _storage.reserve(res);
+        }
 
         // copy constructor
         ByteBuffer(const ByteBuffer &buf) : _rpos(buf._rpos), _wpos(buf._wpos),

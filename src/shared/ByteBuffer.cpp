@@ -75,10 +75,3 @@ void BitStream::Print()
     sLog.outDebug(ss.str().c_str());
 }
 
-ByteBuffer::ByteBuffer(size_t res, bool init): _rpos(0), _wpos(0), _bitpos(8), _curbitval(0)
-{
-    if (init)
-        _storage.resize(res, 0);
-    else
-        _storage.reserve(res);
-}
