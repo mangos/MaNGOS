@@ -16,18 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "Object.h"
-#include "Player.h"
+#include "../Object.h"
+#include "../Player.h"
 #include "BattleGround.h"
 #include "BattleGroundAB.h"
-#include "Creature.h"
-#include "GameObject.h"
+#include "../Creature.h"
+#include "../GameObject.h"
 #include "BattleGroundMgr.h"
-#include "Language.h"
+#include "../Language.h"
 #include "Util.h"
 #include "WorldPacket.h"
-#include "MapManager.h"
-#include "DBCStores.h"                                      // TODO REMOVE this when graveyard handling for pvp is updated
+#include "../MapManager.h"
+#include "../DBCStores.h"                                   // TODO REMOVE this when graveyard handling for pvp is updated
 
 BattleGroundAB::BattleGroundAB()
 {

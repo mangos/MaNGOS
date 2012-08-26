@@ -25,7 +25,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
-#include "BattleGroundMgr.h"
+#include "BattleGround/BattleGroundMgr.h"
 #include "MassMailMgr.h"
 #include "SpellMgr.h"
 #include "Policies/SingletonImp.h"

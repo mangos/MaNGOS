@@ -37,7 +37,7 @@
 #include "Language.h"
 #include "MapManager.h"
 #include "BattleGround/BattleGround.h"
-#include "BattleGroundAB.h"
+#include "BattleGround/BattleGroundAB.h"
 #include "Map.h"
 #include "InstanceData.h"
 #include "DBCStructure.h"
