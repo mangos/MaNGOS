@@ -531,7 +531,7 @@ Parameter 1: CreatureID - The Creature Template ID to be Summoned. The value her
 Parameter 2: Target - The Target Type defining who the Summoned creature will attack once spawned. The value in this field needs to be a valid Target Type as specified in the reference tables below.
 Parameter 3: Duration - The duration until the summoned creature should be unsummoned AFTER Combat ends. The value in this field is in milliseconds or 0.
 
-The NPC will Summon another ccast flag 0 will work for you treature at the same spot as itself that will attack the specified target.
+The NPC will Summon another cast flag 0 will work for you treature at the same spot as itself that will attack the specified target.
 NOTE: Almost all Creature Summons have proper Summon Spells that should be used when possible. This Action is a powerful last resort option only to be used if nothing else works.
 NOTE: Using Target Type 0 will cause the Summoned creature to not attack anyone.
 NOTE: If Duration is set at 0, then the summoned creature will not despawn until it has died.
