@@ -27,11 +27,9 @@ class WorldPacket;
 enum ObjectUpdateType
 {
     UPDATETYPE_VALUES               = 0,
-    UPDATETYPE_MOVEMENT             = 1,
-    UPDATETYPE_CREATE_OBJECT        = 2,
-    UPDATETYPE_CREATE_OBJECT2       = 3,
-    UPDATETYPE_OUT_OF_RANGE_OBJECTS = 4,
-    UPDATETYPE_NEAR_OBJECTS         = 5
+    UPDATETYPE_CREATE_OBJECT        = 1,
+    UPDATETYPE_CREATE_OBJECT2       = 2,
+    UPDATETYPE_OUT_OF_RANGE_OBJECTS = 3,
 };
 
 enum ObjectUpdateFlags
@@ -40,19 +38,24 @@ enum ObjectUpdateFlags
     UPDATEFLAG_SELF                 = 0x0001,
     UPDATEFLAG_TRANSPORT            = 0x0002,
     UPDATEFLAG_HAS_ATTACKING_TARGET = 0x0004,
-    UPDATEFLAG_LOWGUID              = 0x0008,
-    UPDATEFLAG_HIGHGUID             = 0x0010,
+    UPDATEFLAG_UNK                  = 0x0008,
+    UPDATEFLAG_LOW                  = 0x0010,
     UPDATEFLAG_LIVING               = 0x0020,
     UPDATEFLAG_HAS_POSITION         = 0x0040,
     UPDATEFLAG_VEHICLE              = 0x0080,
     UPDATEFLAG_POSITION             = 0x0100,
-    UPDATEFLAG_ROTATION             = 0x0200
+    UPDATEFLAG_ROTATION             = 0x0200,
+    UPDATEFLAG_UNK1                 = 0x0400,
+    UPDATEFLAG_ANIM_KITS            = 0x0800,
+    UPDATEFLAG_TRANSPORT_ARR        = 0x1000,
+    UPDATEFLAG_ENABLE_PORTALS       = 0x2000,
+    UPDATEFLAG_UNK2                 = 0x4000,
 };
 
 class UpdateData
 {
     public:
-        UpdateData();
+        UpdateData(uint16 mapId);
 
         void AddOutOfRangeGUID(GuidSet& guids);
         void AddOutOfRangeGUID(ObjectGuid const& guid);
@@ -63,7 +66,10 @@ class UpdateData
 
         GuidSet const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
 
+        void SetMapId(uint16 mapId) { m_map = mapId; }
+
     protected:
+        uint16 m_map;
         uint32 m_blockCount;
         GuidSet m_outOfRangeGUIDs;
         ByteBuffer m_data;

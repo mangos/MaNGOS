@@ -666,8 +666,12 @@ bool ChatHandler::HandleDebugSendSetPhaseShiftCommand(char* args)
     if (!*args)
         return false;
 
-    uint32 PhaseShift = atoi(args);
-    m_session->SendSetPhaseShift(PhaseShift);
+    char* m = strtok((char*)args, " ");
+    char* p = strtok(NULL, " ");
+
+    uint16 MapId = atoi(m);
+    uint32 PhaseShift = atoi(p);
+    m_session->SendSetPhaseShift(PhaseShift, MapId);
     return true;
 }
 
@@ -1058,9 +1062,12 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     bool isDirectHeal = false;
     for (int i = 0; i < 3; ++i)
     {
+        SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
+            continue;
         // Heals (Also count Mana Shield and Absorb effects as heals)
-        if (spellEntry->Effect[i] == SPELL_EFFECT_HEAL || spellEntry->Effect[i] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-                (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && (spellEntry->EffectApplyAuraName[i] == SPELL_AURA_SCHOOL_ABSORB || spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)))
+        if (spellEffect->Effect == SPELL_EFFECT_HEAL || spellEffect->Effect == SPELL_EFFECT_HEAL_MAX_HEALTH ||
+            (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA && (spellEffect->EffectApplyAuraName == SPELL_AURA_SCHOOL_ABSORB || spellEffect->EffectApplyAuraName == SPELL_AURA_PERIODIC_HEAL)))
         {
             isDirectHeal = true;
             break;
@@ -1070,8 +1077,11 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     bool isDotHeal = false;
     for (int i = 0; i < 3; ++i)
     {
+        SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
+            continue;
         // Periodic Heals
-        if (spellEntry->Effect[i] == SPELL_EFFECT_APPLY_AURA && spellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+        if (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA && spellEffect->EffectApplyAuraName == SPELL_AURA_PERIODIC_HEAL)
         {
             isDotHeal = true;
             break;
@@ -1136,8 +1146,10 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
                                          opcode == SMSG_SET_FLAT_SPELL_MODIFIER ? "flat" : "pct", spellmodop, value, effidx);
 
     WorldPacket data(opcode, (1 + 1 + 2 + 2));
-    data << uint8(effidx);
+    data << uint32(1);
+    data << uint32(1);
     data << uint8(spellmodop);
+    data << uint8(effidx);
     data << int32(value);
     chr->GetSession()->SendPacket(&data);
 

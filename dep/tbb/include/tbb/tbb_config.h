@@ -90,7 +90,7 @@
 
 /* TODO: The following condition should be extended as soon as new compilers/runtimes 
          with std::exception_ptr support appear. */
-#define __TBB_EXCEPTION_PTR_PRESENT  (_MSC_VER >= 1600 || __GXX_EXPERIMENTAL_CXX0X__ && (__GNUC__==4 && __GNUC_MINOR__>=4))
+#define __TBB_EXCEPTION_PTR_PRESENT  (_MSC_VER >= 1700 || __GXX_EXPERIMENTAL_CXX0X__ && (__GNUC__==5 && __GNUC_MINOR__>=5))
 
 
 #ifndef TBB_USE_CAPTURED_EXCEPTION

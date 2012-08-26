@@ -128,16 +128,14 @@ static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell
     data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
     data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
     data << uint32(floor(tSpell->spellCost * fDiscountMod));
-
-    data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
-    // primary prof. learn confirmation dialog
-    data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
     data << uint8(reqLevel);
     data << uint32(tSpell->reqSkill);
     data << uint32(tSpell->reqSkillValue);
+    data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
+    // primary prof. learn confirmation dialog
+    data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
     data << uint32(!tSpell->IsCastable() && chain_node ? (chain_node->prev ? chain_node->prev : chain_node->req) : 0);
     data << uint32(!tSpell->IsCastable() && chain_node && chain_node->prev ? chain_node->req : 0);
-    data << uint32(0);
 }
 
 void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
@@ -178,6 +176,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + maxcount * 38 + strTitle.size() + 1);
     data << ObjectGuid(guid);
     data << uint32(trainer_type);
+    data << uint32(ci->trainerId);
 
     size_t count_pos = data.wpos();
     data << uint32(maxcount);
@@ -237,9 +236,9 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
-    uint32 spellId = 0;
+    uint32 spellId = 0, trainerId = 0;
 
-    recv_data >> guid >> spellId;
+    recv_data >> guid >> trainerId >> spellId;
     DEBUG_LOG("WORLD: Received CMSG_TRAINER_BUY_SPELL Trainer: %s, learn spell id is: %u", guid.GetString().c_str(), spellId);
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
@@ -249,19 +248,23 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
         return;
     }
 
+    WorldPacket sendData(SMSG_TRAINER_SERVICE, 16);
+
+    uint32 trainState = 2;
+
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     if (!unit->IsTrainerOf(_player, true))
-        return;
+        trainState = 1;
 
     // check present spell in trainer spell list
     TrainerSpellData const* cSpells = unit->GetTrainerSpells();
     TrainerSpellData const* tSpells = unit->GetTrainerTemplateSpells();
 
     if (!cSpells && !tSpells)
-        return;
+        trainState = 1;
 
     // Try find spell in npc_trainer
     TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(spellId) : NULL;
@@ -272,46 +275,55 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
 
     // Not found anywhere, cheating?
     if (!trainer_spell)
-        return;
+        trainState = 1;
 
     // can't be learn, cheat? Or double learn with lags...
     uint32 reqLevel = 0;
     if (!_player->IsSpellFitByClassAndRace(trainer_spell->learnedSpell, &reqLevel))
-        return;
+        trainState = 1;
 
     reqLevel = trainer_spell->isProvidedReqLevel ? trainer_spell->reqLevel : std::max(reqLevel, trainer_spell->reqLevel);
     if (_player->GetTrainerSpellState(trainer_spell, reqLevel) != TRAINER_SPELL_GREEN)
-        return;
+        trainState = 1;
 
     // apply reputation discount
     uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
 
     // check money requirement
-    if (_player->GetMoney() < nSpellCost)
-        return;
+    if (_player->GetMoney() < nSpellCost && trainState > 1)
+        trainState = 0;
 
-    _player->ModifyMoney(-int32(nSpellCost));
-
-    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 12);           // visual effect on trainer
-    data << ObjectGuid(guid);
-    data << uint32(0xB3);                                   // index from SpellVisualKit.dbc
-    SendPacket(&data);
-
-    data.Initialize(SMSG_PLAY_SPELL_IMPACT, 12);            // visual effect on player
-    data << _player->GetObjectGuid();
-    data << uint32(0x016A);                                 // index from SpellVisualKit.dbc
-    SendPacket(&data);
-
-    // learn explicitly or cast explicitly
-    if (trainer_spell->IsCastable())
-        _player->CastSpell(_player, trainer_spell->spell, true);
+    if (trainState != 2)
+    {
+        sendData << ObjectGuid(guid);
+        sendData << uint32(spellId);
+        sendData << uint32(trainState);
+        SendPacket(&sendData);
+    }
     else
-        _player->learnSpell(spellId, false);
+    {
+        _player->ModifyMoney(-int32(nSpellCost));
 
-    data.Initialize(SMSG_TRAINER_BUY_SUCCEEDED, 12);
-    data << ObjectGuid(guid);
-    data << uint32(spellId);                                // should be same as in packet from client
-    SendPacket(&data);
+        // visual effect on trainer
+        WorldPacket data;
+        unit->BuildSendPlayVisualPacket(&data, 0xB3, false);
+        SendPacket(&data);
+
+        // visual effect on player
+        _player->BuildSendPlayVisualPacket(&data, 0x016A, true);
+        SendPacket(&data);
+
+        // learn explicitly or cast explicitly
+        if (trainer_spell->IsCastable())
+            _player->CastSpell(_player, trainer_spell->spell, true);
+        else
+            _player->learnSpell(spellId, false);
+
+        sendData << ObjectGuid(guid);
+        sendData << uint32(spellId);                                // should be same as in packet from client
+        sendData << uint32(trainState);
+        SendPacket(&sendData);
+    }
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)
@@ -489,9 +501,10 @@ void WorldSession::SendBindPoint(Creature* npc)
     // send spell for bind 3286 bind magic
     npc->CastSpell(_player, 3286, true);                    // Bind
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
+    WorldPacket data(SMSG_TRAINER_SERVICE, 16);
     data << npc->GetObjectGuid();
     data << uint32(3286);                                   // Bind
+    data << uint32(2);
     SendPacket(&data);
 
     _player->PlayerTalkClass->CloseGossip();
@@ -755,21 +768,6 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recv_data)
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
-
-    if (GetPlayer()->m_stableSlots < MAX_PET_STABLES)
-    {
-        StableSlotPricesEntry const* SlotPrice = sStableSlotPricesStore.LookupEntry(GetPlayer()->m_stableSlots + 1);
-        if (_player->GetMoney() >= SlotPrice->Price)
-        {
-            ++GetPlayer()->m_stableSlots;
-            _player->ModifyMoney(-int32(SlotPrice->Price));
-            SendStableResult(STABLE_SUCCESS_BUY_SLOT);
-        }
-        else
-            SendStableResult(STABLE_ERR_MONEY);
-    }
-    else
-        SendStableResult(STABLE_ERR_STABLE);
 }
 
 void WorldSession::HandleStableRevivePet(WorldPacket& /* recv_data */)

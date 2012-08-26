@@ -26,7 +26,7 @@
 #include "ObjectGuid.h"
 #include <zlib/zlib.h>
 
-UpdateData::UpdateData() : m_blockCount(0)
+UpdateData::UpdateData(uint16 map) : m_blockCount(0), m_map(map)
 {
 }
 
@@ -108,12 +108,13 @@ bool UpdateData::BuildPacket(WorldPacket* packet)
 
     ByteBuffer buf(4 + (m_outOfRangeGUIDs.empty() ? 0 : 1 + 4 + 9 * m_outOfRangeGUIDs.size()) + m_data.wpos());
 
-    buf << (uint32)(!m_outOfRangeGUIDs.empty() ? m_blockCount + 1 : m_blockCount);
+    buf << uint16(m_map);
+    buf << uint32(!m_outOfRangeGUIDs.empty() ? m_blockCount + 1 : m_blockCount);
 
     if (!m_outOfRangeGUIDs.empty())
     {
-        buf << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
-        buf << (uint32) m_outOfRangeGUIDs.size();
+        buf << uint8(UPDATETYPE_OUT_OF_RANGE_OBJECTS);
+        buf << uint32(m_outOfRangeGUIDs.size());
 
         for (GuidSet::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
             buf << i->WriteAsPacked();
@@ -123,20 +124,20 @@ bool UpdateData::BuildPacket(WorldPacket* packet)
 
     size_t pSize = buf.wpos();                              // use real used data size
 
-    if (pSize > 100)                                        // compress large packets
-    {
-        uint32 destsize = compressBound(pSize);
-        packet->resize(destsize + sizeof(uint32));
+    //if (pSize > 100)                                        // compress large packets
+    //{
+    //    uint32 destsize = compressBound(pSize);
+    //    packet->resize(destsize + sizeof(uint32));
 
-        packet->put<uint32>(0, pSize);
-        Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32), &destsize, (void*)buf.contents(), pSize);
-        if (destsize == 0)
-            return false;
+    //    packet->put<uint32>(0, pSize);
+    //    Compress(const_cast<uint8*>(packet->contents()) + sizeof(uint32), &destsize, (void*)buf.contents(), pSize);
+    //    if (destsize == 0)
+    //        return false;
 
-        packet->resize(destsize + sizeof(uint32));
-        packet->SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
-    }
-    else                                                    // send small packets without compression
+    //    packet->resize(destsize + sizeof(uint32));
+    //    packet->SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
+    //}
+    //else                                                    // send small packets without compression
     {
         packet->append(buf);
         packet->SetOpcode(SMSG_UPDATE_OBJECT);
@@ -150,4 +151,5 @@ void UpdateData::Clear()
     m_data.clear();
     m_outOfRangeGUIDs.clear();
     m_blockCount = 0;
+    m_map = 0;
 }

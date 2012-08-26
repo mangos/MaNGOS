@@ -67,13 +67,13 @@ TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
     return NULL;
 }
 
-bool VendorItemData::RemoveItem(uint32 item_id)
+bool VendorItemData::RemoveItem(uint32 item_id, uint8 type)
 {
     bool found = false;
     for (VendorItemList::iterator i = m_items.begin(); i != m_items.end();)
     {
         // can have many examples
-        if ((*i)->item == item_id)
+        if ((*i)->item == item_id && (*i)->type == type)
         {
             i = m_items.erase(i);
             found = true;
@@ -85,10 +85,10 @@ bool VendorItemData::RemoveItem(uint32 item_id)
     return found;
 }
 
-VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint32 extendedCost) const
+VendorItem const* VendorItemData::FindItemCostPair(uint32 item_id, uint8 type, uint32 extendedCost) const
 {
     for (VendorItemList::const_iterator i = m_items.begin(); i != m_items.end(); ++i)
-        if ((*i)->item == item_id && (*i)->ExtendedCost == extendedCost)
+        if ((*i)->item == item_id && (*i)->ExtendedCost == extendedCost && (*i)->type == type)
             return *i;
     return NULL;
 }
@@ -1592,7 +1592,7 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo)
     if (!spellInfo)
         return false;
 
-    if (GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->Mechanic - 1)))
+    if (GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->GetMechanic() - 1)))
         return true;
 
     return Unit::IsImmuneToSpell(spellInfo);
@@ -1600,20 +1600,22 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo)
 
 bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index) const
 {
-    if (GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->EffectMechanic[index] - 1)))
+    SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(index);
+
+    if (spellEffect && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellEffect->EffectMechanic - 1)))
         return true;
 
     // Taunt immunity special flag check
     if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NOT_TAUNTABLE)
     {
         // Taunt aura apply check
-        if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
+        if (spellEffect && spellEffect->Effect == SPELL_EFFECT_APPLY_AURA)
         {
-            if (spellInfo->EffectApplyAuraName[index] == SPELL_AURA_MOD_TAUNT)
+            if (spellEffect && spellEffect->EffectApplyAuraName == SPELL_AURA_MOD_TAUNT)
                 return true;
         }
         // Spell effect taunt check
-        else if (spellInfo->Effect[index] == SPELL_EFFECT_ATTACK_ME)
+        else if (spellEffect && spellEffect->Effect == SPELL_EFFECT_ATTACK_ME)
             return true;
     }
 
@@ -1639,20 +1641,25 @@ SpellEntry const* Creature::ReachWithSpellAttack(Unit* pVictim)
         bool bcontinue = true;
         for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if ((spellInfo->Effect[j] == SPELL_EFFECT_SCHOOL_DAMAGE)       ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_INSTAKILL)            ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE) ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_HEALTH_LEECH)
-               )
+            SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(j));
+            if(!spellEffect)
+                continue;
+            if( (spellEffect->Effect == SPELL_EFFECT_SCHOOL_DAMAGE )       ||
+                (spellEffect->Effect == SPELL_EFFECT_INSTAKILL)            ||
+                (spellEffect->Effect == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE) ||
+                (spellEffect->Effect == SPELL_EFFECT_HEALTH_LEECH )
+                )
             {
                 bcontinue = false;
                 break;
             }
         }
-        if (bcontinue) continue;
-
-        if (spellInfo->manaCost > GetPower(POWER_MANA))
+        if (bcontinue)
             continue;
+
+        if(spellInfo->GetManaCost() > GetPower(POWER_MANA))
+            continue;
+
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
         float range = GetSpellMaxRange(srange);
         float minrange = GetSpellMinRange(srange);
@@ -1663,12 +1670,16 @@ SpellEntry const* Creature::ReachWithSpellAttack(Unit* pVictim)
         //    continue;
         if (dist > range || dist < minrange)
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+
+
+        if(spellInfo->GetPreventionType() == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        if(spellInfo->GetPreventionType() == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
             continue;
+
         return spellInfo;
     }
+
     return NULL;
 }
 
@@ -1691,7 +1702,8 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
         bool bcontinue = true;
         for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if ((spellInfo->Effect[j] == SPELL_EFFECT_HEAL))
+            SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(j));
+            if( spellEffect && (spellEffect->Effect == SPELL_EFFECT_HEAL) )
             {
                 bcontinue = false;
                 break;
@@ -1700,8 +1712,9 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
         if (bcontinue)
             continue;
 
-        if (spellInfo->manaCost > GetPower(POWER_MANA))
+        if(spellInfo->GetManaCost() > GetPower(POWER_MANA))
             continue;
+
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
         float range = GetSpellMaxRange(srange);
         float minrange = GetSpellMinRange(srange);
@@ -1712,12 +1725,15 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
         //    continue;
         if (dist > range || dist < minrange)
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+
+        if(spellInfo->GetPreventionType() == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
             continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        if(spellInfo->GetPreventionType() == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
             continue;
+
         return spellInfo;
     }
+
     return NULL;
 }
 
@@ -2148,8 +2164,8 @@ void Creature::AddCreatureSpellCooldown(uint32 spellid)
     if (cooldown)
         _AddCreatureSpellCooldown(spellid, time(NULL) + cooldown / IN_MILLISECONDS);
 
-    if (spellInfo->Category)
-        _AddCreatureCategoryCooldown(spellInfo->Category, time(NULL));
+    if(uint32 category = spellInfo->GetCategory())
+        _AddCreatureCategoryCooldown(category, time(NULL));
 }
 
 bool Creature::HasCategoryCooldown(uint32 spell_id) const
@@ -2158,8 +2174,8 @@ bool Creature::HasCategoryCooldown(uint32 spell_id) const
     if (!spellInfo)
         return false;
 
-    CreatureSpellCooldowns::const_iterator itr = m_CreatureCategoryCooldowns.find(spellInfo->Category);
-    return (itr != m_CreatureCategoryCooldowns.end() && time_t(itr->second + (spellInfo->CategoryRecoveryTime / IN_MILLISECONDS)) > time(NULL));
+    CreatureSpellCooldowns::const_iterator itr = m_CreatureCategoryCooldowns.find(spellInfo->GetCategory());
+    return (itr != m_CreatureCategoryCooldowns.end() && time_t(itr->second + (spellInfo->GetCategoryRecoveryTime() / IN_MILLISECONDS)) > time(NULL));
 }
 
 bool Creature::HasSpellCooldown(uint32 spell_id) const
@@ -2527,9 +2543,23 @@ void Creature::SetWalk(bool enable)
         m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+
+    if (IsInWorld())
+    {
+        WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
+        if (enable)
+        {
+            data.WriteGuidMask<7, 6, 5, 1, 3, 4, 2, 0>(GetObjectGuid());
+            data.WriteGuidBytes<4, 2, 1, 6, 5, 0, 7, 3>(GetObjectGuid());
+        }
+        else
+        {
+            data.WriteGuidMask<5, 6, 3, 7, 2, 0, 4, 1>(GetObjectGuid());
+            data.WriteGuidBytes<7, 0, 4, 6, 5, 1, 2, 3>(GetObjectGuid());
+        }
+
+        SendMessageToSet(&data, true);
+    }
 }
 
 void Creature::SetLevitate(bool enable)
@@ -2539,9 +2569,22 @@ void Creature::SetLevitate(bool enable)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    if (IsInWorld())
+    {
+        WorldPacket data(enable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
+        if (enable)
+        {
+            data.WriteGuidMask<7, 3, 4, 2, 5, 1, 0, 6>(GetObjectGuid());
+            data.WriteGuidBytes<7, 1, 3, 4, 6, 2, 5, 0>(GetObjectGuid());
+        }
+        else
+        {
+            data.WriteGuidMask<5, 4, 7, 1, 3, 6, 2, 0>(GetObjectGuid());
+            data.WriteGuidBytes<7, 3, 4, 2, 1, 6, 0, 5>(GetObjectGuid());
+        }
+
+        SendMessageToSet(&data, true);
+    }
 }
 
 void Creature::SetRoot(bool enable)
@@ -2551,9 +2594,22 @@ void Creature::SetRoot(bool enable)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_ROOT);
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_ROOT : SMSG_SPLINE_MOVE_UNROOT, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    if (IsInWorld())
+    {
+        WorldPacket data(enable ? SMSG_SPLINE_MOVE_ROOT : SMSG_SPLINE_MOVE_UNROOT, 9);
+        if (enable)
+        {
+            data.WriteGuidMask<5, 4, 6, 1, 3, 7, 2, 0>(GetObjectGuid());
+            data.WriteGuidBytes<2, 1, 7, 3, 5, 0, 6, 4>(GetObjectGuid());
+        }
+        else
+        {
+            data.WriteGuidMask<0, 1, 6, 5, 3, 2, 7, 4>(GetObjectGuid());
+            data.WriteGuidBytes<6, 3, 1, 5, 2, 0, 7, 4>(GetObjectGuid());
+        }
+
+        SendMessageToSet(&data, true);
+    }
 }
 
 void Creature::SetWaterWalk(bool enable)
@@ -2563,7 +2619,20 @@ void Creature::SetWaterWalk(bool enable)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    if (IsInWorld())
+    {
+        WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
+        if (enable)
+        {
+            data.WriteGuidMask<6, 1, 4, 2, 3, 7, 5, 0>(GetObjectGuid());
+            data.WriteGuidBytes<0, 6, 3, 7, 4, 2, 5, 1>(GetObjectGuid());
+        }
+        else
+        {
+            data.WriteGuidMask<5, 0, 4, 6, 7, 2, 3, 1>(GetObjectGuid());
+            data.WriteGuidBytes<5, 7, 3, 4, 1, 2, 0, 6>(GetObjectGuid());
+        }
+
+        SendMessageToSet(&data, true);
+    }
 }

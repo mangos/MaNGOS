@@ -83,7 +83,7 @@ namespace Movement
         else
             moveFlags &= ~MOVEFLAG_WALK_MODE;
 
-        moveFlags |= (MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD);
+        moveFlags |= MOVEFLAG_FORWARD;
 
         if (args.velocity == 0.f)
             args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));

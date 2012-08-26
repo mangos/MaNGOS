@@ -26,3 +26,4 @@ endif()
 
 add_subdirectory(recastnavigation)
 add_subdirectory(src)
+add_subdirectory(StormLib)

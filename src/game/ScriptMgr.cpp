@@ -88,14 +88,18 @@ ScriptMgr::~ScriptMgr()
 // returns priority (0 == cannot start script)
 uint8 GetSpellStartDBScriptPriority(SpellEntry const* spellinfo, SpellEffectIndex effIdx)
 {
-    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_SCRIPT_EFFECT)
+    SpellEffectEntry const* spellEffect = spellinfo->GetSpellEffect(effIdx);
+    if (!spellEffect)
+        return 0;
+
+    if (spellEffect->Effect == SPELL_EFFECT_SCRIPT_EFFECT)
         return 10;
 
-    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_DUMMY)
+    if (spellEffect->Effect == SPELL_EFFECT_DUMMY)
         return 9;
 
     // NonExisting triggered spells can also start DB-Spell-Scripts
-    if (spellinfo->Effect[effIdx] == SPELL_EFFECT_TRIGGER_SPELL && !sSpellStore.LookupEntry(spellinfo->EffectTriggerSpell[effIdx]))
+    if (spellEffect->Effect == SPELL_EFFECT_TRIGGER_SPELL && !sSpellStore.LookupEntry(spellEffect->EffectTriggerSpell))
         return 5;
 
     // Can not start script
@@ -598,7 +602,11 @@ void ScriptMgr::LoadScripts(ScriptMapMapName& scripts, const char* tablename)
                         if (SpellEntry const* spell = sSpellStore.LookupEntry(i))
                             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
                             {
-                                if (spell->Effect[j] == SPELL_EFFECT_SEND_TAXI && spell->EffectMiscValue[j] == int32(tmp.sendTaxiPath.taxiPathId))
+                                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
+                                if (!spellEffect)
+                                    continue;
+
+                                if (spellEffect->Effect == SPELL_EFFECT_SEND_TAXI && spellEffect->EffectMiscValue == tmp.sendTaxiPath.taxiPathId)
                                 {
                                     taxiSpell = i;
                                     break;
@@ -752,10 +760,14 @@ void ScriptMgr::LoadEventScripts()
         {
             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                if (spell->Effect[j] == SPELL_EFFECT_SEND_EVENT)
+                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
+                if (!spellEffect)
+                    continue;
+
+                if (spellEffect->Effect == SPELL_EFFECT_SEND_EVENT)
                 {
-                    if (spell->EffectMiscValue[j])
-                        evt_scripts.insert(spell->EffectMiscValue[j]);
+                    if (spellEffect->EffectMiscValue)
+                        evt_scripts.insert(spellEffect->EffectMiscValue);
                 }
             }
         }
@@ -1760,10 +1772,14 @@ void ScriptMgr::LoadEventIdScripts()
         {
             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
             {
-                if (spell->Effect[j] == SPELL_EFFECT_SEND_EVENT)
+                SpellEffectEntry const* spellEffect = spell->GetSpellEffect(SpellEffectIndex(j));
+                if (!spellEffect)
+                    continue;
+
+                if (spellEffect->Effect == SPELL_EFFECT_SEND_EVENT)
                 {
-                    if (spell->EffectMiscValue[j])
-                        evt_scripts.insert(spell->EffectMiscValue[j]);
+                    if (spellEffect->EffectMiscValue)
+                        evt_scripts.insert(spellEffect->EffectMiscValue);
                 }
             }
         }

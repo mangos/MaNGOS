@@ -172,7 +172,8 @@ bool AchievementCriteriaRequirement::IsValid(AchievementCriteriaEntry const* cri
                                 criteria->ID, criteria->requiredType, (requirementType == ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA ? "ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA" : "ACHIEVEMENT_CRITERIA_REQUIRE_T_AURA"), requirementType, aura.effect_idx);
                 return false;
             }
-            if (!spellEntry->EffectApplyAuraName[aura.effect_idx])
+            SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(SpellEffectIndex(aura.effect_idx));
+            if (spellEffect && !spellEffect->EffectApplyAuraName)
             {
                 sLog.outErrorDb("Table `achievement_criteria_requirement` (Entry: %u Type: %u) for requirement %s (%u) have non-aura spell effect (ID: %u Effect: %u), ignore.",
                                 criteria->ID, criteria->requiredType, (requirementType == ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA ? "ACHIEVEMENT_CRITERIA_REQUIRE_S_AURA" : "ACHIEVEMENT_CRITERIA_REQUIRE_T_AURA"), requirementType, aura.spell_id, aura.effect_idx);
@@ -2213,45 +2214,150 @@ void AchievementMgr::IncompletedAchievement(AchievementEntry const* achievement)
 void AchievementMgr::SendAllAchievementData()
 {
     // since we don't know the exact size of the packed GUIDs this is just an approximation
-    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, 4 * 2 + m_completedAchievements.size() * 4 * 2 + m_completedAchievements.size() * 7 * 4);
-    BuildAllDataPacket(&data);
+    WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, 4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
+
+    ObjectGuid guid = m_player->GetObjectGuid();
+
+    data.WriteBits(m_criteriaProgress.size(), 21);
+
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter!=m_criteriaProgress.end(); ++iter)
+    {
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
+
+        data.WriteGuidMask<4>(guid);
+        data.WriteGuidMask<3>(counter);
+        data.WriteGuidMask<5>(guid);
+        data.WriteGuidMask<0, 6>(counter);
+        data.WriteGuidMask<3, 0>(guid);
+
+        data.WriteGuidMask<4>(counter);
+        data.WriteGuidMask<2>(guid);
+        data.WriteGuidMask<7>(counter);
+        data.WriteGuidMask<7>(guid);
+        uint8 flags = 0;                                        // Seems always 0
+        data.WriteBits(flags, 2);
+        data.WriteGuidMask<6>(guid);
+
+        data.WriteGuidMask<2, 1, 5>(counter);
+        data.WriteGuidMask<1>(guid);
+    }
+
+    data.WriteBits(m_completedAchievements.size(), 23);
+
+    time_t now = time(NULL);
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
+    {
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
+
+        data.WriteGuidBytes<3>(guid);
+        data.WriteGuidBytes<5, 6>(counter);
+        data.WriteGuidBytes<4, 6>(guid);
+        data.WriteGuidBytes<2>(counter);
+
+        data << uint32(now - iter->second.date);               // Timer 2
+
+        data.WriteGuidBytes<2>(guid);
+
+        data << uint32(iter->first);
+
+        data.WriteGuidBytes<5>(guid);
+        data.WriteGuidBytes<0, 3, 1, 4>(counter);
+        data.WriteGuidBytes<0, 7>(guid);
+        data.WriteGuidBytes<7>(counter);
+
+        data << uint32(now - iter->second.date);               // Timer 1
+        data << uint32(secsToTimeBitFields(now));
+
+        data.WriteGuidBytes<1>(guid);
+    }
+
+    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
+    {
+        data << uint32(iter->first);
+        data << uint32(secsToTimeBitFields(iter->second.date));
+    }
+
     GetPlayer()->GetSession()->SendPacket(&data);
 }
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player)
 {
     // since we don't know the exact size of the packed GUIDs this is just an approximation
-    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 4 + 4 * 2 + m_completedAchievements.size() * 4 * 2 + m_completedAchievements.size() * 7 * 4);
-    data << GetPlayer()->GetPackGUID();
-    BuildAllDataPacket(&data);
-    player->GetSession()->SendPacket(&data);
-}
+    WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 4+4*2+m_completedAchievements.size()*4*2+m_completedAchievements.size()*7*4);
 
-/**
- * used by both SMSG_ALL_ACHIEVEMENT_DATA  and SMSG_RESPOND_INSPECT_ACHIEVEMENT
- */
-void AchievementMgr::BuildAllDataPacket(WorldPacket* data)
-{
-    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
+    ObjectGuid targetGuid = m_player->GetObjectGuid();
+    ObjectGuid guid = m_player->GetObjectGuid();
+
+    data.WriteGuidMask<7, 4, 1>(targetGuid);
+
+    data.WriteBits(m_completedAchievements.size(), 23);
+
+    data.WriteGuidMask<0, 3>(targetGuid);
+
+    data.WriteBits(m_criteriaProgress.size(), 21);
+
+    data.WriteGuidMask<2>(targetGuid);
+
+    for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
-        *data << uint32(iter->first);
-        *data << uint32(secsToTimeBitFields(iter->second.date));
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
+
+        data.WriteGuidMask<5, 3>(guid);
+        data.WriteGuidMask<1, 4, 2>(counter);
+        data.WriteGuidMask<6>(guid);
+        data.WriteGuidMask<0>(counter);
+        data.WriteGuidMask<4, 1, 2>(guid);
+        data.WriteGuidMask<3, 7>(counter);
+
+        uint8 flags = 0;                                    // Seems always 0
+        data.WriteBits(flags, 2);
+
+        data.WriteGuidMask<0>(guid);
+        data.WriteGuidMask<5, 6>(counter);
+        data.WriteGuidMask<7>(guid);
     }
-    *data << int32(-1);
+
+    data.WriteGuidMask<6, 5>(targetGuid);
 
     time_t now = time(NULL);
     for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
     {
-        *data << uint32(iter->first);
-        data->appendPackGUID(iter->second.counter);
-        *data << GetPlayer()->GetPackGUID();
-        *data << uint32(iter->second.timedCriteriaFailed ? 1 : 0);
-        *data << uint32(secsToTimeBitFields(now));
-        *data << uint32(now - iter->second.date);
-        *data << uint32(now - iter->second.date);
+        ObjectGuid counter = ObjectGuid(uint64(iter->second.counter));
+
+        data.WriteGuidBytes<3>(counter);
+        data.WriteGuidBytes<4>(guid);
+
+        data << uint32(now - iter->second.date);            // Timer 1
+
+        data.WriteGuidBytes<1>(counter);
+
+        data << uint32(secsToTimeBitFields(now));
+
+        data.WriteGuidBytes<3, 7>(guid);
+        data.WriteGuidBytes<5>(counter);
+        data.WriteGuidBytes<0>(guid);
+        data.WriteGuidBytes<4, 2, 6, 7>(counter);
+        data.WriteGuidBytes<6>(guid);
+
+        data << uint32(iter->first);
+        data << uint32(now - iter->second.date);            // Timer 2
+
+        data.WriteGuidBytes<1, 5>(guid);
+        data.WriteGuidBytes<0>(counter);
+        data.WriteGuidBytes<2>(guid);
     }
 
-    *data << int32(-1);
+    data.WriteGuidBytes<1, 6, 3, 0, 2>(targetGuid);
+
+    for (CompletedAchievementMap::const_iterator iter = m_completedAchievements.begin(); iter != m_completedAchievements.end(); ++iter)
+    {
+        data << uint32(iter->first);
+        data << uint32(secsToTimeBitFields(iter->second.date));
+    }
+
+    data.WriteGuidBytes<7, 4, 5>(targetGuid);
+
+    player->GetSession()->SendPacket(&data);
 }
 
 //==========================================================

@@ -145,6 +145,21 @@ float GetFloatValueFromArray(Tokens const& data, uint16 index)
     return result;
 }
 
+// modulos a radian orientation to the range of 0..2PI
+float NormalizeOrientation(float o)
+{
+    // fmod only supports positive numbers. Thus we have
+    // to emulate negative numbers
+    if (o < 0)
+    {
+        float mod = o * -1;
+        mod = fmod(mod, 2.0f * M_PI_F);
+        mod = -mod + 2.0f * M_PI_F;
+        return mod;
+    }
+    return fmod(o, 2.0f * M_PI_F);
+}
+
 void stripLineInvisibleChars(std::string& str)
 {
     static std::string invChars = " \t\7\n";

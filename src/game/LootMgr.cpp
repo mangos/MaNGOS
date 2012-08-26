@@ -749,21 +749,24 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     {
         b << uint32(0);                                     // gold
         b << uint8(0);                                      // item count
-        return b;                                           // nothing output more
+        b << uint8(0);                                      // currency count
+        return b;
     }
 
     Loot& l = lv.loot;
 
     uint8 itemsShown = 0;
+    uint8 currenciesShown = 0;
 
-    // gold
-    b << uint32(l.gold);
+    b << uint32(l.gold);                                    // gold
 
     size_t count_pos = b.wpos();                            // pos of item count byte
     b << uint8(0);                                          // item count placeholder
+    size_t currency_count_pos = b.wpos();                   // pos of currency count byte
+    b << uint8(0);                                          // currency count placeholder
 
     if (lv.permission == NONE_PERMISSION)
-        return b;                                           // nothing output more
+        return b;
 
 
     for (uint8 i = 0; i < l.items.size(); ++i)
@@ -834,8 +837,9 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         }
     }
 
-    // update number of items shown
+    // update number of items and currencies shown
     b.put<uint8>(count_pos, itemsShown);
+    b.put<uint8>(currency_count_pos, currenciesShown);
 
     return b;
 }

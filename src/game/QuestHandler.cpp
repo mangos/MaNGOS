@@ -393,13 +393,14 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
 {
     uint32 quest;
     ObjectGuid guid;
-    recv_data >> guid >> quest;
+    uint8 unk;
+    recv_data >> guid >> quest >> unk;
 
     if (!CanInteractWithQuestGiver(guid, "CMSG_QUESTGIVER_COMPLETE_QUEST"))
         return;
 
     // All ok, continue
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST - for %s to %s, quest = %u", _player->GetGuidStr().c_str(), guid.GetString().c_str(), quest);
+    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_COMPLETE_QUEST - for %s to %s, quest = %u, unk = %u", _player->GetGuidStr().c_str(), guid.GetString().c_str(), quest, unk);
 
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest))
     {
@@ -485,8 +486,9 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 {
     ObjectGuid guid;
+    uint32 quest;
     uint8 msg;
-    recvPacket >> guid >> msg;
+    recvPacket >> guid >> quest >> msg;
 
     DEBUG_LOG("WORLD: Received MSG_QUEST_PUSH_RESULT");
 
@@ -607,7 +609,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
     for (GuidSet::const_iterator itr = _player->m_clientGUIDs.begin(); itr != _player->m_clientGUIDs.end(); ++itr)
     {
-        uint8 dialogStatus = DIALOG_STATUS_NONE;
+        uint32 dialogStatus = DIALOG_STATUS_NONE;
 
         if (itr->IsAnyTypeCreature())
         {
@@ -626,7 +628,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);
 
             data << questgiver->GetObjectGuid();
-            data << uint8(dialogStatus);
+            data << uint32(dialogStatus);
             ++count;
         }
         else if (itr->IsGameObject())
@@ -645,7 +647,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
                 dialogStatus = getDialogStatus(_player, questgiver, DIALOG_STATUS_NONE);
 
             data << questgiver->GetObjectGuid();
-            data << uint8(dialogStatus);
+            data << uint32(dialogStatus);
             ++count;
         }
     }

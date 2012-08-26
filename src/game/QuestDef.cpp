@@ -138,12 +138,38 @@ Quest::Quest(Field* questRecord)
     QuestStartScript = questRecord[139].GetUInt32();
     QuestCompleteScript = questRecord[140].GetUInt32();
 
+    ReqSpellLearned = questRecord[141].GetUInt32();
+    PortraitGiver = questRecord[142].GetUInt32();
+    PortraitTurnIn = questRecord[143].GetUInt32();
+
+    PortraitGiverText = questRecord[144].GetCppString();
+    PortraitGiverName = questRecord[145].GetCppString();
+    PortraitTurnInText = questRecord[146].GetCppString();
+    PortraitTurnInName = questRecord[147].GetCppString();
+
+    for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        ReqCurrencyId[i] = questRecord[148 + i].GetUInt32();
+    for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        ReqCurrencyCount[i] = questRecord[152 + i].GetUInt32();
+
+    for (int i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+        RewCurrencyId[i] = questRecord[156 + i].GetUInt32();
+    for (int i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+        RewCurrencyCount[i] = questRecord[160 + i].GetUInt32();
+
+    RewSkill = questRecord[164].GetUInt32();
+    RewSkillValue = questRecord[165].GetUInt32();
+
+    SoundAcceptId = questRecord[166].GetUInt32();
+    SoundTurnInId = questRecord[167].GetUInt32();
+
     m_isActive = true;
 
     m_reqitemscount = 0;
     m_reqCreatureOrGOcount = 0;
     m_rewitemscount = 0;
     m_rewchoiceitemscount = 0;
+    m_reqCurrencyCount = 0;
 
     for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
     {
@@ -167,6 +193,12 @@ Quest::Quest(Field* questRecord)
     {
         if (RewChoiceItemId[i])
             ++m_rewchoiceitemscount;
+    }
+
+    for (int i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+    {
+        if (RewCurrencyId[i])
+            ++m_reqCurrencyCount;
     }
 }
 
@@ -283,12 +315,15 @@ uint32 Quest::CalculateRewardHonor(uint32 level) const
     if (GetRewHonorAddition() > 0 || GetRewHonorMultiplier() > 0.0f)
     {
         // values stored from 0.. for 1...
-        TeamContributionPoints const* tc = sTeamContributionPoints.LookupEntry(level - 1);
-        if (!tc)
+        /* not exist in 4.x
+        TeamContributionPoints const* tc = sTeamContributionPoints.LookupEntry(level-1);
+        if(!tc)
             return 0;
-        uint32 i_honor = uint32(tc->Value * GetRewHonorMultiplier() * 0.1f);
+        */
+        uint32 i_honor = uint32(/*tc->Value*/1.0f * GetRewHonorMultiplier() * 0.1f);
         honor = i_honor + GetRewHonorAddition();
     }
 
     return honor;
 }
+

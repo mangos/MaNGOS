@@ -20,9 +20,10 @@
 #define DBC_FILE_LOADER_H
 #include "Platform/Define.h"
 #include "Utilities/ByteConverter.h"
+#include "Common.h"
 #include <cassert>
 
-enum
+/*enum
 {
     FT_NA = 'x',                                            // ignore/ default, 4 byte size, in Source String means field is ignored, in Dest String means field is filled with default value
     FT_NA_BYTE = 'X',                                       // ignore/ default, 1 byte size, see above
@@ -35,7 +36,7 @@ enum
     FT_SORT = 'd',                                          // sorted by this field, field is not included
     FT_IND = 'n',                                           // the same,but parsed to data
     FT_LOGIC = 'l'                                          // Logical (boolean)
-};
+};*/
 
 class DBCFileLoader
 {
@@ -94,10 +95,12 @@ class DBCFileLoader
         uint32 GetOffset(size_t id) const { return (fieldsOffset != NULL && id < fieldCount) ? fieldsOffset[id] : 0; }
         bool IsLoaded() {return (data != NULL);}
         char* AutoProduceData(const char* fmt, uint32& count, char**& indexTable);
-        char* AutoProduceStrings(const char* fmt, char* dataTable);
-        static uint32 GetFormatRecordSize(const char* format, int32* index_pos = NULL);
-    private:
+        char* AutoProduceStringsArrayHolders(const char* fmt, char* dataTable);
+        char* AutoProduceStrings(const char* fmt, char* dataTable, LocaleConstant loc);
+        static uint32 GetFormatRecordSize(const char * format, int32 * index_pos = NULL);
+        static uint32 GetFormatStringsFields(const char * format);
 
+    private:
         uint32 recordSize;
         uint32 recordCount;
         uint32 fieldCount;

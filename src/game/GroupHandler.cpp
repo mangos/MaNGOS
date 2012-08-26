@@ -25,9 +25,12 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "SpellAuras.h"
 #include "Group.h"
 #include "SocialMgr.h"
 #include "Util.h"
+#include "DB2Structure.h"
+#include "DB2Stores.h"
 
 /* differeces from off:
     -you can uninvite yourself - is is useful
@@ -42,34 +45,61 @@
 
 void WorldSession::SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res)
 {
-    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, (4 + member.size() + 1 + 4 + 4));
+    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, 4 + member.size() + 1 + 4 + 4 + 8);
     data << uint32(operation);
     data << member;                                         // max len 48
     data << uint32(res);
     data << uint32(0);                                      // LFD cooldown related (used with ERR_PARTY_LFG_BOOT_COOLDOWN_S and ERR_PARTY_LFG_BOOT_NOT_ELIGIBLE_S)
+    data << ObjectGuid();                                   // if result == 27 (ERR_VOTE_KICK_REASON_NEEDED), then it's guid of player being kicked (member's guid)
 
     SendPacket(&data);
 }
 
 void WorldSession::SendGroupInvite(Player* player, bool alreadyInGroup /*= false*/)
 {
-    WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
-    data << uint8(alreadyInGroup ? 0 : 1);                  // invited/already in group flag
-    data << GetPlayer()->GetName();                         // max len 48
-    data << uint32(0);                                      // unk
-    data << uint8(0);                                       // count
+    WorldPacket data(SMSG_GROUP_INVITE, 21);                // guess size
+    data.WriteBit(0);
+    data.WriteGuidMask<0, 3, 2>(player->GetObjectGuid());
+    data.WriteBit(!alreadyInGroup);
+    data.WriteGuidMask<6, 5>(player->GetObjectGuid());
+    data.WriteBits(0, 9);                                   // realm name length
+    data.WriteGuidMask<4>(player->GetObjectGuid());
+    data.WriteBits(strlen(player->GetName()), 7);
+    data.WriteBits(0, 24);                                  // count
+    data.WriteBit(0);
+    data.WriteGuidMask<1, 7>(player->GetObjectGuid());
+
+    data.WriteGuidBytes<1, 4>(player->GetObjectGuid());
+    data << uint32(WorldTimer::getMSTime());
+    data << uint32(0) << uint32(0);
+    data.WriteGuidBytes<6, 0, 2, 3>(player->GetObjectGuid());
     // for(int i = 0; i < count; ++i)
     //    data << uint32(0);
-    data << uint32(0);                                      // unk
+    data.WriteGuidBytes<5>(player->GetObjectGuid());
+    data.WriteGuidBytes<7>(player->GetObjectGuid());
+    data.append(player->GetName(), strlen(player->GetName()));
+    data << uint32(0);
 
     player->GetSession()->SendPacket(&data);
 }
 
 void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
 {
-    std::string membername;
-    recv_data >> membername;
-    recv_data.read_skip<uint32>();                          // roles mask?
+    ObjectGuid guid;
+
+    recv_data.read_skip<uint32>();      // cross-realm party related
+    recv_data.read_skip<uint32>();      // roles mask?
+
+    recv_data.ReadGuidMask<2, 7>(guid);
+    uint32 realmLength = recv_data.ReadBits(9);
+    recv_data.ReadGuidMask<3>(guid);
+    uint32 nameLength = recv_data.ReadBits(10);
+    recv_data.ReadGuidMask<5, 4, 6, 0, 1>(guid);
+
+    recv_data.ReadGuidBytes<4, 7, 6>(guid);
+
+    std::string membername = recv_data.ReadString(nameLength);
+    std::string realmname = recv_data.ReadString(realmLength);
 
     // attempt add selected player
 
@@ -188,71 +218,71 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
     SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
 }
 
-void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recv_data)
+void WorldSession::HandleGroupInviteResponseOpcode(WorldPacket& recv_data)
 {
-    recv_data.read_skip<uint32>();                          // roles mask?
+    bool unk = recv_data.ReadBit();
+    bool accepted = recv_data.ReadBit();
+    if (unk)
+        recv_data.read_skip<uint32>();
 
     Group* group = GetPlayer()->GetGroupInvite();
     if (!group)
         return;
 
-    if (group->GetLeaderGuid() == GetPlayer()->GetObjectGuid())
+    if (accepted)
     {
-        sLog.outError("HandleGroupAcceptOpcode: %s tried to accept an invite to his own group",
-                      GetPlayer()->GetGuidStr().c_str());
-        return;
-    }
+        // remove in from invites in any case
+        group->RemoveInvite(GetPlayer());
 
-    // remove in from invites in any case
-    group->RemoveInvite(GetPlayer());
+        if (group->GetLeaderGuid() == GetPlayer()->GetObjectGuid())
+        {
+            sLog.outError("HandleGroupInviteResponseOpcode: %s tried to accept an invite to his own group",
+                          GetPlayer()->GetGuidStr().c_str());
+            return;
+        }
 
-    /** error handling **/
-    /********************/
+        /** error handling **/
+        /********************/
 
-    // not have place
-    if (group->IsFull())
-    {
-        SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
-        return;
-    }
+        // not have place
+        if (group->IsFull())
+        {
+            SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
+            return;
+        }
 
-    Player* leader = sObjectMgr.GetPlayer(group->GetLeaderGuid());
+        Player* leader = sObjectMgr.GetPlayer(group->GetLeaderGuid());
 
-    // forming a new group, create it
-    if (!group->IsCreated())
-    {
-        if (leader)
-            group->RemoveInvite(leader);
-        if (group->Create(group->GetLeaderGuid(), group->GetLeaderName()))
-            sObjectMgr.AddGroup(group);
-        else
+        // forming a new group, create it
+        if (!group->IsCreated())
+        {
+            if (leader)
+                group->RemoveInvite(leader);
+            if (group->Create(group->GetLeaderGuid(), group->GetLeaderName()))
+                sObjectMgr.AddGroup(group);
+            else
+                return;
+        }
+
+        // everything is fine, do it, PLAYER'S GROUP IS SET IN ADDMEMBER!!!
+        if (!group->AddMember(GetPlayer()->GetObjectGuid(), GetPlayer()->GetName()))
             return;
     }
+    else
+    {
+        // uninvite, group can be deleted
+        GetPlayer()->UninviteFromGroup();
 
-    // everything is fine, do it, PLAYER'S GROUP IS SET IN ADDMEMBER!!!
-    if (!group->AddMember(GetPlayer()->GetObjectGuid(), GetPlayer()->GetName()))
-        return;
-}
+        // remember leader if online
+        Player* leader = sObjectMgr.GetPlayer(group->GetLeaderGuid());
+        if (!leader || !leader->GetSession())
+            return;
 
-void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recv_data*/)
-{
-    Group*  group  = GetPlayer()->GetGroupInvite();
-    if (!group)
-        return;
-
-    // remember leader if online
-    Player* leader = sObjectMgr.GetPlayer(group->GetLeaderGuid());
-
-    // uninvite, group can be deleted
-    GetPlayer()->UninviteFromGroup();
-
-    if (!leader || !leader->GetSession())
-        return;
-
-    // report
-    WorldPacket data(SMSG_GROUP_DECLINE, 10);               // guess size
-    data << GetPlayer()->GetName();
-    leader->GetSession()->SendPacket(&data);
+        // report
+        WorldPacket data(SMSG_GROUP_DECLINE, 10);               // guess size
+        data << GetPlayer()->GetName();
+        leader->GetSession()->SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recv_data)
@@ -723,19 +753,39 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     if (mask & GROUP_UPDATE_FLAG_ZONE)
         *data << uint16(player->GetZoneId());
 
+    if (mask & GROUP_UPDATE_FLAG_UNK)
+        *data << uint16(0);
+
     if (mask & GROUP_UPDATE_FLAG_POSITION)
-        *data << uint16(player->GetPositionX()) << uint16(player->GetPositionY());
+        *data << uint16(player->GetPositionX()) << uint16(player->GetPositionY()) << uint16(player->GetPositionZ());
 
     if (mask & GROUP_UPDATE_FLAG_AURAS)
     {
+        *data << uint8(0);                  // if true, client clears all auras that are not in auramask and whose index is lower amount sent below
         const uint64& auramask = player->GetAuraUpdateMask();
         *data << uint64(auramask);
+        *data << uint32(MAX_AURAS);         // server sends here number of visible auras, but client checks
+                                            // if aura is in auramask, so it seems no difference if there will be MAX_AURAS
         for (uint32 i = 0; i < MAX_AURAS; ++i)
         {
             if (auramask & (uint64(1) << i))
             {
-                *data << uint32(player->GetVisibleAura(i));
-                *data << uint8(1);
+                if (SpellAuraHolder* holder = player->GetVisibleAura(i))
+                {
+                    *data << uint32(holder->GetId());
+                    *data << uint16(holder->GetAuraFlags());
+                    if (holder->GetAuraFlags() & AFLAG_EFFECT_AMOUNT_SEND)
+                        for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                            if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                                *data << int32(aura->GetModifier()->m_amount);
+                            else
+                                *data << int32(0);
+                }
+                else
+                {
+                    *data << uint32(0);
+                    *data << uint16(0);
+                }
             }
         }
     }
@@ -804,19 +854,50 @@ void WorldSession::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacke
     {
         if (pet)
         {
+            *data << uint8(0);              // if true, client clears all auras that are not in auramask and whose index is lower amount sent below
             const uint64& auramask = pet->GetAuraUpdateMask();
             *data << uint64(auramask);
+            *data << uint32(MAX_AURAS);     // server sends here number of visible auras, but client checks
+                                            // if aura is in auramask, so it seems no difference if there will be MAX_AURAS
             for (uint32 i = 0; i < MAX_AURAS; ++i)
             {
                 if (auramask & (uint64(1) << i))
                 {
-                    *data << uint32(pet->GetVisibleAura(i));
-                    *data << uint8(1);
+                    if (SpellAuraHolder* holder = pet->GetVisibleAura(i))
+                    {
+                        *data << uint32(holder->GetId());
+                        *data << uint16(holder->GetAuraFlags());
+                        if (holder->GetAuraFlags() & AFLAG_EFFECT_AMOUNT_SEND)
+                            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                                if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                                    *data << int32(aura->GetModifier()->m_amount);
+                                else
+                                    *data << int32(0);
+                    }
+                    else
+                    {
+                        *data << uint32(0);
+                        *data << uint16(0);
+                    }
                 }
             }
         }
         else
+        {
+            *data << uint8(0);
             *data << uint64(0);
+            *data << uint32(0);
+        }
+    }
+
+    if (mask & GROUP_UPDATE_FLAG_VEHICLE_SEAT)
+        *data << int32(0);
+
+    if (mask & GROUP_UPDATE_FLAG_PHASE)
+    {
+        *data << uint32(8);
+        *data << uint32(0);
+        *data << uint8(0);
     }
 }
 
@@ -845,9 +926,14 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
     data << player->GetPackGUID();
 
-    uint32 mask1 = 0x00040BFF;                              // common mask, real flags used 0x000040BFF
+    uint32 mask1 = GROUP_UPDATE_FLAG_STATUS | GROUP_UPDATE_FLAG_CUR_HP | GROUP_UPDATE_FLAG_MAX_HP |
+        GROUP_UPDATE_FLAG_POWER_TYPE | GROUP_UPDATE_FLAG_CUR_POWER | GROUP_UPDATE_FLAG_MAX_POWER |
+        GROUP_UPDATE_FLAG_LEVEL | GROUP_UPDATE_FLAG_ZONE | GROUP_UPDATE_FLAG_POSITION |
+        GROUP_UPDATE_FLAG_AURAS | GROUP_UPDATE_FLAG_PET_NAME | GROUP_UPDATE_FLAG_PET_AURAS |
+        GROUP_UPDATE_FLAG_PHASE;
+
     if (pet)
-        mask1 = 0x7FFFFFFF;                                 // for hunters and other classes with pets
+        mask1 = 0x7FEFFEFF; // full mask & ~(GROUP_UPDATE_FLAG_VEHICLE_SEAT | GROUP_UPDATE_FLAG_UNK)
 
     Powers powerType = player->getPowerType();
     data << uint32(mask1);                                  // group update mask
@@ -863,12 +949,14 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     uint16 iZoneId = 0;
     uint16 iCoordX = 0;
     uint16 iCoordY = 0;
+    uint16 iCoordZ = 0;
 
     if (player->IsInWorld())
     {
         iZoneId = player->GetZoneId();
         iCoordX = player->GetPositionX();
         iCoordY = player->GetPositionY();
+        iCoordZ = player->GetPositionZ();
     }
     else if (player->IsBeingTeleported())               // Player is in teleportation
     {
@@ -876,6 +964,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
         iZoneId = sTerrainMgr.GetZoneId(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
         iCoordX = loc.coord_x;
         iCoordY = loc.coord_y;
+        iCoordZ = loc.coord_z;
     }
     else
     {
@@ -885,17 +974,27 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     data << uint16(iZoneId);                              // GROUP_UPDATE_FLAG_ZONE
     data << uint16(iCoordX);                              // GROUP_UPDATE_FLAG_POSITION
     data << uint16(iCoordY);                              // GROUP_UPDATE_FLAG_POSITION
+    data << uint16(iCoordZ);                              // GROUP_UPDATE_FLAG_POSITION
 
+    data << uint8(1);                                     // if true, client clears all auras that are not in auramask and whose index is lower amount sent below
     uint64 auramask = 0;
     size_t maskPos = data.wpos();
-    data << uint64(auramask);                               // placeholder
+    data << uint64(auramask);                             // placeholder, server sends 0xFFFFFFFFFFFFFFFF here, but with 1 above it seems no difference
+    data << uint32(MAX_AURAS);                            // server sends here number of visible auras, but client checks
+                                                          // if aura is in auramask, so it seems no difference if there will be MAX_AURAS
     for (uint8 i = 0; i < MAX_AURAS; ++i)
     {
-        if (uint32 aura = player->GetVisibleAura(i))
+        if (SpellAuraHolder* holder = player->GetVisibleAura(i))
         {
             auramask |= (uint64(1) << i);
-            data << uint32(aura);
-            data << uint8(1);
+            data << uint32(holder->GetId());
+            data << uint16(holder->GetAuraFlags());
+            if (holder->GetAuraFlags() & AFLAG_EFFECT_AMOUNT_SEND)
+                for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                        data << int32(aura->GetModifier()->m_amount);
+                    else
+                        data << int32(0);
         }
     }
     data.put<uint64>(maskPos, auramask);                    // GROUP_UPDATE_FLAG_AURAS
@@ -912,16 +1011,25 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
         data << uint16(pet->GetPower(petpowertype));        // GROUP_UPDATE_FLAG_PET_CUR_POWER
         data << uint16(pet->GetMaxPower(petpowertype));     // GROUP_UPDATE_FLAG_PET_MAX_POWER
 
+        data << uint8(1);                                   // if true, client clears all auras that are not in auramask and whose index is lower amount sent below
         uint64 petauramask = 0;
         size_t petMaskPos = data.wpos();
-        data << uint64(petauramask);                        // placeholder
+        data << uint64(petauramask);                        // placeholder, server sends 0xFFFFFFFFFFFFFFFF here, but with 1 above it seems no difference
+        data << uint32(MAX_AURAS);                          // server sends here number of visible auras, but client checks
+                                                            // if aura is in auramask, so it seems no difference if there will be MAX_AURAS
         for (uint8 i = 0; i < MAX_AURAS; ++i)
         {
-            if (uint32 petaura = pet->GetVisibleAura(i))
+            if (SpellAuraHolder* holder = pet->GetVisibleAura(i))
             {
                 petauramask |= (uint64(1) << i);
-                data << uint32(petaura);
-                data << uint8(1);
+                data << uint32(holder->GetId());
+                data << uint16(holder->GetAuraFlags());
+                if (holder->GetAuraFlags() & AFLAG_EFFECT_AMOUNT_SEND)
+                for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                    if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                        data << int32(aura->GetModifier()->m_amount);
+                    else
+                        data << int32(0);
             }
         }
         data.put<uint64>(petMaskPos, petauramask);          // GROUP_UPDATE_FLAG_PET_AURAS
@@ -929,8 +1037,14 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recv_data)
     else
     {
         data << uint8(0);                                   // GROUP_UPDATE_FLAG_PET_NAME
+        data << uint8(1);                                   // GROUP_UPDATE_FLAG_PET_AURAS
         data << uint64(0);                                  // GROUP_UPDATE_FLAG_PET_AURAS
+        data << uint32(0);                                  // GROUP_UPDATE_FLAG_PET_AURAS
     }
+
+    data << uint32(8);                                      // GROUP_UPDATE_FLAG_PHASE
+    data << uint32(0);                                      // GROUP_UPDATE_FLAG_PHASE
+    data << uint8(0);                                       // GROUP_UPDATE_FLAG_PHASE
 
     SendPacket(&data);
 }

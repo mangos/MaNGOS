@@ -393,10 +393,11 @@ struct GameObjectInfo
         // not use for specific field access (only for output with loop by all filed), also this determinate max union size
         struct
         {
-            uint32 data[24];
+            uint32 data[32];
         } raw;
     };
 
+    uint32 unk2;
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 ScriptId;

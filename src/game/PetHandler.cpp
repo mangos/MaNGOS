@@ -186,7 +186,10 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
             for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
-                if (spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_INSTANT || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
+                SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+                if (!spellEffect)
+                    continue;
+                if (spellEffect->EffectImplicitTargetA == TARGET_ALL_ENEMY_IN_AREA || spellEffect->EffectImplicitTargetA == TARGET_ALL_ENEMY_IN_AREA_INSTANT || spellEffect->EffectImplicitTargetA == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
                     return;
             }
 
@@ -551,12 +554,7 @@ void WorldSession::HandlePetAbandon(WorldPacket& recv_data)
     if (Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid))
     {
         if (pet->IsPet())
-        {
-            if (pet->GetObjectGuid() == _player->GetPetGuid())
-                pet->ModifyPower(POWER_HAPPINESS, -50000);
-
             ((Pet*)pet)->Unsummon(PET_SAVE_AS_DELETED, _player);
-        }
         else if (pet->GetObjectGuid() == _player->GetCharmGuid())
         {
             _player->Uncharm();
@@ -635,11 +633,11 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     ObjectGuid guid;
     uint32 spellid;
     uint8  cast_count;
-    uint8  unk_flags;                                       // flags (if 0x02 - some additional data are received)
+    uint8  cast_flags;                                      // flags (if 0x02 - some additional data are received)
 
-    recvPacket >> guid >> cast_count >> spellid >> unk_flags;
+    recvPacket >> guid >> cast_count >> spellid >> cast_flags;
 
-    DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, %s, cast_count: %u, spellid %u, unk_flags %u", guid.GetString().c_str(), cast_count, spellid, unk_flags);
+    DEBUG_LOG("WORLD: CMSG_PET_CAST_SPELL, %s, cast_count: %u, spellid %u, cast_flags %u", guid.GetString().c_str(), cast_count, spellid, cast_flags);
 
     Creature* pet = _player->GetMap()->GetAnyTypeCreature(guid);
 
@@ -667,6 +665,8 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     SpellCastTargets targets;
 
     recvPacket >> targets.ReadForCaster(pet);
+
+    targets.ReadAdditionalData(recvPacket, cast_flags);
 
     pet->clearUnitState(UNIT_STAT_MOVING);
 

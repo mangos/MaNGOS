@@ -131,6 +131,8 @@ class WorldSocket : protected WorldHandler
         virtual ~WorldSocket(void);
 
         /// Called on open ,the void* is the acceptor.
+        int HandleWowConnection(WorldPacket& recvPacket);
+
         virtual int open(void*) override;
 
         /// Called on failures inside of the acceptor, don't call from your code.

@@ -257,7 +257,7 @@ enum MangosStrings
     LANG_COMMAND_TARGETOBJNOTFOUND      = 266,
     LANG_COMMAND_GOOBJNOTFOUND          = 267,
     LANG_COMMAND_GOCREATNOTFOUND        = 268,
-    //                                    269, not used
+    LANG_CURRENCY_NOT_FOUND             = 269,
     LANG_COMMAND_DELCREATMESSAGE        = 270,
     LANG_COMMAND_CREATUREMOVED          = 271,
     LANG_COMMAND_CREATUREATSAMEMAP      = 272,
@@ -271,7 +271,7 @@ enum MangosStrings
     LANG_COMMAND_ADDVENDORITEMITEMS     = 280,
     LANG_COMMAND_KICKSELF               = 281,
     LANG_COMMAND_KICKMESSAGE            = 282,
-    //                                    283, not used
+    LANG_VENDOR_META_CURRENCY_NOT_ALLOWED = 283,
     LANG_COMMAND_WHISPERACCEPTING       = 284,
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
@@ -965,6 +965,8 @@ enum MangosStrings
     LANG_NPC_EVENTAI_PHASE              = 1506,
     LANG_NPC_EVENTAI_MOVE               = 1507,
     LANG_NPC_EVENTAI_COMBAT             = 1508,
+    LANG_VENDOR_WRONG_ITEM_TYPE         = 1509,
+    LANG_VENDOR_WRONG_CURRENCY_MAXCOUNT = 1510,
     // Room for more Level 2              1509-1599 not used
 
     // Outdoor PvP
@@ -1015,6 +1017,8 @@ enum MangosStrings
 
     // Use for not-in-official-sources patches
     //                                    10000-10999
+
+    LANG_INVALID_REALMID                = 11001,
 
     // Use for custom patches             11000-11999
 

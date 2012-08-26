@@ -297,9 +297,8 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
         if ((GetPlayer()->GetPositionZ() < height + 0.1f) && !(GetPlayer()->IsInWater()))
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
-        WorldPacket data(SMSG_FORCE_MOVE_ROOT, (8 + 4));    // guess size
-        data << GetPlayer()->GetPackGUID();
-        data << (uint32)2;
+        WorldPacket data;
+        GetPlayer()->BuildForceMoveRootPacket(&data, true, 2);
         SendPacket(&data);
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
@@ -328,10 +327,8 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
     // not remove flags if can't free move - its not set in Logout request code.
     if (GetPlayer()->CanFreeMove())
     {
-        //!we can move again
-        data.Initialize(SMSG_FORCE_MOVE_UNROOT, 8);         // guess size
-        data << GetPlayer()->GetPackGUID();
-        data << uint32(0);
+        //! we can move again
+        GetPlayer()->BuildForceMoveRootPacket(&data, false, 0);
         SendPacket(&data);
 
         //! Stand Up
@@ -1040,55 +1037,28 @@ void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_MOVE_FEATHER_FALL_ACK");
 
-    // no used
-    recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
+    // not used
+    recv_data.rfinish();                                    // prevent warnings spam
+    /*
+        bitsream packet
+    */
 }
 
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
 {
-    // no used
-    recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
+    // not used
+    recv_data.rfinish();                                    // prevent warnings spam
     /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if(_player->GetGUID() != guid)
-        {
-            recv_data.rpos(recv_data.wpos());               // prevent warnings spam
-            return;
-        }
-
-        DEBUG_LOG( "WORLD: CMSG_FORCE_MOVE_UNROOT_ACK" );
-
-        recv_data.read_skip<uint32>();                      // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
+        bitsream packet
     */
 }
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
 {
-    // no used
-    recv_data.rpos(recv_data.wpos());                       // prevent warnings spam
+    // not used
+    recv_data.rfinish();                                    // prevent warnings spam
     /*
-        ObjectGuid guid;
-        recv_data >> guid;
-
-        // now can skip not our packet
-        if(_player->GetObjectGuid() != guid)
-        {
-            recv_data.rpos(recv_data.wpos());               // prevent warnings spam
-            return;
-        }
-
-        DEBUG_LOG( "WORLD: CMSG_FORCE_MOVE_ROOT_ACK" );
-
-        recv_data.read_skip<uint32>();                      // unk
-
-        MovementInfo movementInfo;
-        ReadMovementInfo(recv_data, &movementInfo);
+        bitsream packet
     */
 }
 
@@ -1174,10 +1144,10 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 
     WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
     data << player->GetObjectGuid();
-    data << uint8(player->GetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY));
+    data << uint8(player->GetHonorPoints());
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_KILLS));
-    data << uint32(player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
-    data << uint32(player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION));
+    //data << uint32(player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
+    //data << uint32(player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION));
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS));
     SendPacket(&data);
 }
@@ -1490,7 +1460,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
         if (pGroup->IsLeader(_player->GetObjectGuid()))
         {
             // the difficulty is set even if the instances can't be reset
-            //_player->SendDungeonDifficulty(true);
+            _player->SendDungeonDifficulty(true);
             pGroup->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, true, _player);
             pGroup->SetRaidDifficulty(Difficulty(mode));
         }
@@ -1527,20 +1497,14 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 {
     // fly mode on/off
     DEBUG_LOG("WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
-    // recv_data.hexlike();
 
-    ObjectGuid guid;
     MovementInfo movementInfo;
-
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // unk
     recv_data >> movementInfo;
-    recv_data >> Unused<float>();                           // unk2
 
-    if (_player->GetMover()->GetObjectGuid() != guid)
+    if (_player->GetMover()->GetObjectGuid() != movementInfo.GetGuid())
     {
         DEBUG_LOG("WorldSession::HandleMoveSetCanFlyAckOpcode: player %s, mover %s, received %s, ignored",
-                  _player->GetGuidStr().c_str(), _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
+                  _player->GetGuidStr().c_str(), _player->GetMover()->GetGuidStr().c_str(), movementInfo.GetGuid().GetString().c_str());
         return;
     }
 

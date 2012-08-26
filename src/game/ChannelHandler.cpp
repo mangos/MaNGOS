@@ -24,16 +24,17 @@ void WorldSession::HandleJoinChannelOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("Opcode %u", recvPacket.GetOpcode());
 
     uint32 channel_id;
-    uint8 unknown1, unknown2;
     std::string channelname, pass;
 
-    recvPacket >> channel_id >> unknown1 >> unknown2;
+    recvPacket >> channel_id;
+    recvPacket.read_skip<uint8>();
+    recvPacket.read_skip<uint8>();
+    recvPacket >> pass;
     recvPacket >> channelname;
 
     if (channelname.empty())
         return;
 
-    recvPacket >> pass;
     if (ChannelMgr* cMgr = channelMgr(_player->GetTeam()))
         if (Channel* chn = cMgr->GetJoinChannel(channelname, channel_id))
             chn->Join(_player->GetObjectGuid(), pass.c_str());

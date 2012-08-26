@@ -45,6 +45,8 @@
 // |color|Hareatrigger_target:id|h[name]|h|r
 // |color|Hcreature:creature_guid|h[name]|h|r
 // |color|Hcreature_entry:creature_id|h[name]|h|r
+// |color|Hcurrency:currency_id||h[name]|h|r
+// |color|Hinstancelock:player_guid:map_id:is_completed:encounter_mask|h[instance_name]|h|r
 // |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r          - client, at shift click in recipes list dialog
 // |color|Hgameevent:id|h[name]|h|r
 // |color|Hgameobject:go_guid|h[name]|h|r
@@ -438,6 +440,7 @@ ChatCommand* ChatHandler::getCommandTable()
     static ChatCommand npcCommandTable[] =
     {
         { "add",            SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddCommand,              "", NULL },
+        { "addcurrency",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddVendorCurrencyCommand,"", NULL },
         { "additem",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddVendorItemCommand,    "", NULL },
         { "addmove",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAddMoveCommand,          "", NULL },
         { "aiinfo",         SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcAIInfoCommand,           "", NULL },
@@ -445,6 +448,7 @@ ChatCommand* ChatHandler::getCommandTable()
         { "changeentry",    SEC_ADMINISTRATOR,  false, &ChatHandler::HandleNpcChangeEntryCommand,      "", NULL },
         { "changelevel",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcChangeLevelCommand,      "", NULL },
         { "delete",         SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcDeleteCommand,           "", NULL },
+        { "delcurrency",    SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcDelVendorCurrencyCommand,"", NULL },
         { "delitem",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcDelVendorItemCommand,    "", NULL },
         { "factionid",      SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcFactionIdCommand,        "", NULL },
         { "flag",           SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcFlagCommand,             "", NULL },
@@ -1447,6 +1451,8 @@ bool ChatHandler::isValidChatMessage(const char* message)
     /*
 
     valid examples:
+    |cff00aa00|Hcurrency:391|h[Рекомендательный значок Тол Барада]|h|r
+    |cffff8000|Hinstancelock:070000000177AF81:532:0:1|h[Каражан]|h|r            NYI
     |cffa335ee|Hitem:812:0:0:0:0:0:0:0:70|h[Glowing Brightwood Staff]|h|r
     |cff808080|Hquest:2278:47|h[The Platinum Discs]|h|r
     |cffffd000|Htrade:4037:1:150:1:6AAAAAAAAAAAAAAAAAAAAAAOAADAAAAAAAAAAAAAAAAIAAAAAAAAA|h[Engineering]|h|r
@@ -1506,6 +1512,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
     uint32 color = 0;
 
+    CurrencyTypesEntry const* linkedCurrency = NULL;
     ItemPrototype const* linkedItem = NULL;
     Quest const* linkedQuest = NULL;
     SpellEntry const* linkedSpell = NULL;
@@ -1517,6 +1524,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
     {
         if (validSequence == validSequenceIterator)
         {
+            linkedCurrency = NULL;
             linkedItem = NULL;
             linkedQuest = NULL;
             linkedSpell = NULL;
@@ -1606,7 +1614,26 @@ bool ChatHandler::isValidChatMessage(const char* message)
                 if (reader.eof())                           // : must be
                     return false;
 
-                if (strcmp(buffer, "item") == 0)
+                if (strcmp(buffer, "currency") == 0)
+                {
+                    if (color != CHAT_LINK_COLOR_CURRENCY)
+                        return false;
+
+                    uint32 currencyEntry = 0;
+                    // read currency entry
+                    char c = reader.peek();
+                    while (c >= '0' && c <= '9')
+                    {
+                        reader.ignore(1);
+                        currencyEntry *= 10;
+                        currencyEntry += c - '0';
+                        c = reader.peek();
+                    }
+                    linkedCurrency = sCurrencyTypesStore.LookupEntry(currencyEntry);
+                    if (!linkedCurrency)
+                        return false;
+                }
+                else if (strcmp(buffer, "item") == 0)
                 {
                     // read item entry
                     reader.getline(buffer, 256, ':');
@@ -1886,7 +1913,24 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         return false;
 
                     // verify the link name
-                    if (linkedSpell)
+                    if (linkedCurrency)
+                    {
+                        if (linkedCurrency->ID == CURRENCY_CONQUEST_ARENA_META || linkedCurrency->ID == CURRENCY_CONQUEST_BG_META)
+                            return false;
+
+                        bool foundName = false;
+                        for (uint8 i = 0; i < MAX_LOCALE; ++i)
+                        {
+                            if (*linkedCurrency->name[i] && strcmp(linkedCurrency->name[i], buffer) == 0)
+                            {
+                                foundName = true;
+                                break;
+                            }
+                        }
+                        if (!foundName)
+                            return false;
+                    }
+                    else if (linkedSpell)
                     {
                         // spells with that flag have a prefix of "$PROFESSION: "
                         if (linkedSpell->HasAttribute(SPELL_ATTR_TRADESPELL))
@@ -1965,7 +2009,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
                     else if (linkedItem)
                     {
-                        char* const* suffix = itemSuffix ? itemSuffix->nameSuffix : (itemProperty ? itemProperty->nameSuffix : NULL);
+                        DBCString suffix = itemSuffix?itemSuffix->nameSuffix:(itemProperty?itemProperty->nameSuffix:NULL);
 
                         std::string expectedName = std::string(linkedItem->Name1);
                         if (suffix)
@@ -2043,7 +2087,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 }
 
 // Note: target_guid used only in CHAT_MSG_WHISPER_INFORM mode (in this case channelName ignored)
-void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker)
+void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint8 type, uint32 language, const char* channelName, ObjectGuid targetGuid, const char* message, Unit* speaker, const char* addonPrefix /*= NULL*/)
 {
     uint32 messageLength = (message ? strlen(message) : 0) + 1;
 
@@ -2097,6 +2141,12 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
             *data << uint32(messageLength);
             *data << message;
             *data << uint8(0);
+
+            if (type == CHAT_MSG_RAID_BOSS_WHISPER || type == CHAT_MSG_RAID_BOSS_EMOTE)
+            {
+                *data << float(0.0f);                       // Added in 4.2.0, unk
+                *data << uint8(0);                          // Added in 4.2.0, unk
+            }
             return;
         }
         default:
@@ -2112,9 +2162,16 @@ void ChatHandler::FillMessageData(WorldPacket* data, WorldSession* session, uint
     {
         MANGOS_ASSERT(channelName);
         *data << channelName;
+        *data << ObjectGuid(targetGuid);
     }
+    else if (type == CHAT_MSG_ADDON)
+    {
+        MANGOS_ASSERT(addonPrefix);
+        *data << addonPrefix;
+    }
+    else
+        *data << ObjectGuid(targetGuid);
 
-    *data << ObjectGuid(targetGuid);
     *data << uint32(messageLength);
     *data << message;
     if (session != 0 && type != CHAT_MSG_WHISPER_INFORM && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)

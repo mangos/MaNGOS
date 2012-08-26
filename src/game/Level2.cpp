@@ -1600,6 +1600,43 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
     return true;
 }
 
+// add currency in vendorlist
+bool ChatHandler::HandleNpcAddVendorCurrencyCommand(char* args)
+{
+    uint32 currencyId;
+    if (!ExtractUint32KeyFromLink(&args, "Hcurrency", currencyId))
+    {
+        SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 maxcount;
+    if (!ExtractUInt32(&args, maxcount))
+        return false;
+
+    uint32 extendedcost;
+    if (!ExtractUInt32(&args, extendedcost))
+        return false;
+
+    Creature* vendor = getSelectedCreature();
+
+    uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
+
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, currencyId, VENDOR_ITEM_TYPE_CURRENCY, maxcount, 0, extendedcost, m_session->GetPlayer()))
+    {
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    sObjectMgr.AddVendorItem(vendor_entry, currencyId, VENDOR_ITEM_TYPE_CURRENCY, maxcount, 0, extendedcost);
+
+    std::string name = sCurrencyTypesStore.LookupEntry(currencyId)->name[0];
+
+    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, currencyId, name.c_str(), maxcount, 0, extendedcost);
+    return true;
+}
+
 // add item in vendorlist
 bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 {
@@ -1627,17 +1664,52 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
-    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, extendedcost, m_session->GetPlayer()))
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, VENDOR_ITEM_TYPE_ITEM, maxcount, incrtime, extendedcost, m_session->GetPlayer()))
     {
         SetSentErrorMessage(true);
         return false;
     }
 
-    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime, extendedcost);
+    sObjectMgr.AddVendorItem(vendor_entry, itemId, VENDOR_ITEM_TYPE_ITEM, maxcount, incrtime, extendedcost);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    std::string name = ObjectMgr::GetItemPrototype(itemId)->Name1;
 
-    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, pProto->Name1, maxcount, incrtime, extendedcost);
+    PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, name.c_str(), maxcount, incrtime, extendedcost);
+    return true;
+}
+
+// del currency from vendor list
+bool ChatHandler::HandleNpcDelVendorCurrencyCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Creature* vendor = getSelectedCreature();
+    if (!vendor || !vendor->isVendor())
+    {
+        SendSysMessage(LANG_COMMAND_VENDORSELECTION);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 itemId;
+    if (!ExtractUint32KeyFromLink(&args, "Hcurrency", itemId))
+    {
+        SendSysMessage(LANG_COMMAND_NEEDITEMSEND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId, VENDOR_ITEM_TYPE_CURRENCY))
+    {
+        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId, true);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::string name = sCurrencyTypesStore.LookupEntry(itemId)->name[0];
+
+    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, name.c_str());
     return true;
 }
 
@@ -1663,16 +1735,16 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
         return false;
     }
 
-    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId))
+    if (!sObjectMgr.RemoveVendorItem(vendor->GetEntry(), itemId, VENDOR_ITEM_TYPE_ITEM))
     {
-        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
+        PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId, false);
         SetSentErrorMessage(true);
         return false;
     }
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    std::string name = ObjectMgr::GetItemPrototype(itemId)->Name1;
 
-    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, pProto->Name1);
+    PSendSysMessage(LANG_ITEM_DELETED_FROM_LIST, itemId, name.c_str());
     return true;
 }
 
@@ -2579,7 +2651,7 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     AccountTypes security = SEC_PLAYER;
     std::string last_login = GetMangosString(LANG_ERROR);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT username,gmlevel,last_ip,last_login FROM account WHERE id = '%u'", accId);
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.username,aa.gmlevel,a.last_ip,a.last_login FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE a.id = '%u'", accId);
     if (result)
     {
         Field* fields = result->Fetch();
@@ -4442,7 +4514,7 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
     HandleLearnSkillRecipesHelper(target, targetSkillInfo->id);
 
     uint16 maxLevel = target->GetPureMaxSkillValue(targetSkillInfo->id);
-    target->SetSkill(targetSkillInfo->id, maxLevel, maxLevel);
+    target->SetSkill(targetSkillInfo->id, maxLevel, maxLevel, target->GetSkillStep(targetSkillInfo->id));
     PSendSysMessage(LANG_COMMAND_LEARN_ALL_RECIPES, name.c_str());
     return true;
 }
@@ -4460,7 +4532,7 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE email " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE email " _LIKE_ " " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }
@@ -4479,7 +4551,7 @@ bool ChatHandler::HandleLookupAccountIpCommand(char* args)
     LoginDatabase.escape_string(ip);
 
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }
@@ -4500,7 +4572,7 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
 
     LoginDatabase.escape_string(account);
     //                                                 0   1         2        3        4
-    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT a.id, a.username, a.last_ip, aa.gmlevel, a.expansion FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }

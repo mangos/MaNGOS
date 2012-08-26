@@ -112,45 +112,45 @@ namespace Movement
         STR(Pitch_Down),         // 0x00000080,
 
         STR(Walk),               // 0x00000100,             // Walking
-        STR(Ontransport),        // 0x00000200,
-        STR(Levitation),         // 0x00000400,
-        STR(Root),               // 0x00000800,
-        STR(Falling),            // 0x00001000,
-        STR(Fallingfar),         // 0x00002000,
-        STR(Pendingstop),        // 0x00004000,
-        STR(PendingSTRafestop),  // 0x00008000,
-        STR(Pendingforward),     // 0x00010000,
-        STR(Pendingbackward),    // 0x00020000,
-        STR(PendingSTRafeleft),  // 0x00040000,
-        STR(PendingSTRaferight), // 0x00080000,
-        STR(Pendingroot),        // 0x00100000,
-        STR(Swimming),           // 0x00200000,             // Appears With Fly Flag Also
-        STR(Ascending),          // 0x00400000,             // Swim Up Also
-        STR(Descending),         // 0x00800000,             // Swim Down Also
-        STR(Can_Fly),            // 0x01000000,             // Can Fly In 3.3?
-        STR(Flying),             // 0x02000000,             // Actual Flying Mode
-        STR(Spline_Elevation),   // 0x04000000,             // Used For Flight Paths
-        STR(Spline_Enabled),     // 0x08000000,             // Used For Flight Paths
-        STR(Waterwalking),       // 0x10000000,             // Prevent Unit From Falling Through Water
-        STR(Safe_Fall),          // 0x20000000,             // Active Rogue Safe Fall Spell (Passive)
-        STR(Hover),              // 0x40000000
-        STR(Unknown13),          // 0x80000000
-        STR(Unk1),
-        STR(Unk2),
-        STR(Unk3),
-        STR(Fullspeedturning),
-        STR(Fullspeedpitching),
-        STR(Allow_Pitching),
-        STR(Unk4),
-        STR(Unk5),
-        STR(Unk6),
-        STR(Unk7),
-        STR(Interp_Move),
-        STR(Interp_Turning),
-        STR(Interp_Pitching),
-        STR(Unk8),
-        STR(Unk9),
-        STR(Unk10),
+        STR(Levitation),         // 0x00000200,
+        STR(Root),               // 0x00000400,
+        STR(Falling),            // 0x00000800,
+        STR(Fallingfar),         // 0x00001000,
+        STR(Pendingstop),        // 0x00002000,
+        STR(PendingSTRafestop),  // 0x00004000,
+        STR(Pendingforward),     // 0x00008000,
+        STR(Pendingbackward),    // 0x00010000,
+        STR(PendingSTRafeleft),  // 0x00020000,
+        STR(PendingSTRaferight), // 0x00040000,
+        STR(Pendingroot),        // 0x00080000,
+        STR(Swimming),           // 0x00100000,             // Appears With Fly Flag Also
+        STR(Ascending),          // 0x00200000,             // Swim Up Also
+        STR(Descending),         // 0x00400000,             // Swim Down Also
+        STR(Can_Fly),            // 0x00800000,             // Can Fly In 3.3?
+        STR(Flying),             // 0x01000000,             // Actual Flying Mode
+        STR(Spline_Elevation),   // 0x02000000,             // Used For Flight Paths
+        STR(Waterwalking),       // 0x04000000,             // Prevent Unit From Falling Through Water
+        STR(Safe_Fall),          // 0x08000000,             // Active Rogue Safe Fall Spell (Passive)
+        STR(Hover),              // 0x10000000,
+        STR(Unknown11),          // 0x20000000
+        STR(None31),             // 0x40000000
+        STR(None32),             // 0x80000000
+        STR(NoStrafe),           // 0x0001
+        STR(NoJumping),          // 0x0002
+        STR(Unk3),               // 0x0004
+        STR(Fullspeedturning),   // 0x0008
+        STR(Fullspeedpitching),  // 0x0010
+        STR(Allow_Pitching),     // 0x0020
+        STR(Unk4),               // 0x0040
+        STR(Unk5),               // 0x0080
+        STR(Unk6),               // 0x0100
+        STR(Interp_Move),        // 0x0200
+        STR(Interp_Turning),     // 0x0400
+        STR(Interp_Pitching),    // 0x0800
+        STR(Unk8),               // 0x1000
+        STR(Unk9),               // 0x2000
+        STR(Unk10),              // 0x4000
+        STR(Unk11),              // 0x8000
     };
 
     const char* g_SplineFlag_names[32] =
@@ -158,35 +158,35 @@ namespace Movement
         STR(AnimBit1),     // 0x00000001,
         STR(AnimBit2),     // 0x00000002,
         STR(AnimBit3),     // 0x00000004,
-        STR(AnimBit4),     // 0x00000008,
-        STR(AnimBit5),     // 0x00000010,
-        STR(AnimBit6),     // 0x00000020,
-        STR(AnimBit7),     // 0x00000040,
-        STR(AnimBit8),     // 0x00000080,
-        STR(Done),         // 0x00000100,
-        STR(Falling),      // 0x00000200,           // Not Compartible With Trajectory Movement
-        STR(No_Spline),    // 0x00000400,
-        STR(Trajectory),   // 0x00000800,           // Not Compartible With Fall Movement
-        STR(Walkmode),     // 0x00001000,
-        STR(Flying),       // 0x00002000,           // Smooth Movement(Catmullrom Interpolation Mode), Flying Animation
-        STR(Knockback),    // 0x00004000,           // Model Orientation Fixed
-        STR(Final_Point),  // 0x00008000,
-        STR(Final_Target), // 0x00010000,
-        STR(Final_Angle),  // 0x00020000,
-        STR(Catmullrom),   // 0x00040000,           // Used Catmullrom Interpolation Mode
-        STR(Cyclic),       // 0x00080000,           // Movement By Cycled Spline
-        STR(Enter_Cycle),  // 0x00100000,           // Everytime Appears With Cyclic Flag In Monster Move Packet
-        STR(Animation),    // 0x00200000,           // Animationid (0...3), Uint32 Time, Not Compartible With Trajectory And Fall Movement
-        STR(Unknown4),     // 0x00400000,           // Disables Movement By Path
-        STR(Unknown5),     // 0x00800000,
-        STR(Unknown6),     // 0x01000000,
-        STR(Unknown7),     // 0x02000000,
-        STR(Unknown8),     // 0x04000000,
-        STR(OrientationInversed), // 0x08000000,           // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
-        STR(Unknown10),    // 0x10000000,
-        STR(Unknown11),    // 0x20000000,
-        STR(Unknown12),    // 0x40000000,
-        STR(Unknown13),    // 0x80000000,
+        STR(Unknown0),     // 0x00000008,
+        STR(FallingSlow),  // 0x00000010,
+        STR(Done),         // 0x00000020,
+        STR(Falling),      // 0x00000040,           // Not Compartible With Trajectory Movement
+        STR(No_Spline),    // 0x00000080,
+        STR(Unknown2),     // 0x00000100,
+        STR(Flying),       // 0x00000200,           // Smooth Movement(Catmullrom Interpolation Mode), Flying Animation
+        STR(Knockback),    // 0x00000400,           // Model Orientation Fixed
+        STR(Catmullrom),   // 0x00000800,           // Used Catmullrom Interpolation Mode
+        STR(Cyclic),       // 0x00001000,           // Movement By Cycled Spline
+        STR(Enter_Cycle),  // 0x00002000,           // Everytime Appears With Cyclic Flag In Monster Move Packet
+        STR(Frozen),       // 0x00004000,
+        STR(TransportEnter),// 0x00008000
+        STR(TransportExit),// 0x00010000,
+        STR(Unknown3),     // 0x00020000,
+        STR(Unknown4),     // 0x00040000,
+        STR(OrientationInversed), // 0x00080000,    // Appears With Runmode Flag, Nodes ),// 1, Handles Orientation
+        STR(SmoothGroundPath),    // 0x00100000
+        STR(Walkmode),     // 0x00200000,
+        STR(UncompressedPath), // 0x00400000
+        STR(Unknown6),     // 0x00800000
+        STR(Animation),    // 0x01000000,           // Animationid (0...3), Uint32 Time, Not Compartible With Trajectory And Fall Movement
+        STR(Trajectory),   // 0x02000000,           // Not Compartible With Fall Movement
+        STR(Final_Point),  // 0x04000000,
+        STR(Final_Target), // 0x08000000,
+        STR(Final_Angle),  // 0x10000000,
+        STR(Unknown7),     // 0x20000000,
+        STR(Unknown8),     // 0x40000000,
+        STR(Unknown9),     // 0x80000000,
     };
 
     template<class Flags, int N>

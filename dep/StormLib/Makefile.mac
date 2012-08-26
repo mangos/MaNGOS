@@ -1,0 +1,253 @@
+#####################################################################
+#
+# Makefile for compiling StormLib with g++ on Mac
+#
+# Author: Ladislav Zezula
+# Created: Mon May 10 14:13:00 CEST 2010
+# System: Mac OS X (64bit)
+#    
+#####################################################################
+
+CPP    = g++
+CC     = gcc
+CFLAGS = -Wall
+LFLAGS = -lbz2 -lz -framework Carbon
+ARCH = -arch x86_64
+DFLAGS = -D__SYS_BZLIB -D__SYS_ZLIB -D_7ZIP_ST
+AR     = ar
+ARFLAGS= rcs
+
+LIBRARY  = libStorm.dylib
+
+OBJS_CPP = src/adpcm/adpcm.obj \
+           src/huffman/huff.obj \
+           src/sparse/sparse.obj \
+           src/FileStream.obj \
+           src/SBaseCommon.o \
+           src/SBaseFileTable.o \
+           src/SCompression.obj \
+           src/SFileAddFile.obj \
+           src/SFileAttributes.obj \
+           src/SFileCompactArchive.obj \
+           src/SFileCreateArchive.obj \
+           src/SFileExtractFile.obj \
+           src/SFileFindFile.obj \
+           src/SFileListFile.obj \
+           src/SFileOpenArchive.obj \
+           src/SFileOpenFileEx.obj \
+           src/SFilePatchArchives.obj \
+           src/SFileReadFile.obj \
+           src/SFileVerify.obj
+
+
+OBJS_C   = src/jenkins/lookup3.o \
+           src/libtomcrypt/src/hashes/hash_memory.obj \
+           src/libtomcrypt/src/hashes/md5.obj \
+           src/libtomcrypt/src/hashes/sha1.obj\
+           src/libtomcrypt/src/math/ltm_desc.obj \
+           src/libtomcrypt/src/math/multi.obj \
+           src/libtomcrypt/src/math/rand_prime.obj \
+           src/libtomcrypt/src/misc/base64_decode.obj \
+           src/libtomcrypt/src/misc/crypt_argchk.obj \
+           src/libtomcrypt/src/misc/crypt_find_hash.obj \
+           src/libtomcrypt/src/misc/crypt_find_prng.obj \
+           src/libtomcrypt/src/misc/crypt_hash_descriptor.obj \
+           src/libtomcrypt/src/misc/crypt_hash_is_valid.obj \
+           src/libtomcrypt/src/misc/crypt_libc.obj \
+           src/libtomcrypt/src/misc/crypt_ltc_mp_descriptor.obj \
+           src/libtomcrypt/src/misc/crypt_prng_descriptor.obj \
+           src/libtomcrypt/src/misc/crypt_prng_is_valid.obj \
+           src/libtomcrypt/src/misc/crypt_register_hash.obj \
+           src/libtomcrypt/src/misc/crypt_register_prng.obj \
+           src/libtomcrypt/src/misc/zeromem.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_bit_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_boolean.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_choice.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_ia5_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_integer.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_object_identifier.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_octet_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_printable_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_sequence_ex.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_sequence_flexi.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_sequence_multi.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_short_integer.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_utctime.obj \
+           src/libtomcrypt/src/pk/asn1/der_decode_utf8_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_bit_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_boolean.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_ia5_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_integer.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_object_identifier.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_octet_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_printable_string.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_sequence.obj \
+           src/libtomcrypt/src/pk/asn1/der_length_short_integer.obj \
+
+           src/libtomcrypt/src/pk/asn1/der_length_utctime.obj \
+
+           src/libtomcrypt/src/pk/asn1/der_length_utf8_string.obj \
+
+           src/libtomcrypt/src/pk/asn1/der_sequence_free.obj \
+
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_map.obj \
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_mul2add.obj \
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_mulmod.obj \
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_points.obj \
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_projective_add_point.obj \
+           src/libtomcrypt/src/pk/ecc/ltc_ecc_projective_dbl_point.obj \
+           src/libtomcrypt/src/pk/pkcs1/pkcs_1_mgf1.obj \
+           src/libtomcrypt/src/pk/pkcs1/pkcs_1_oaep_decode.obj \
+           src/libtomcrypt/src/pk/pkcs1/pkcs_1_pss_decode.obj \
+           src/libtomcrypt/src/pk/pkcs1/pkcs_1_v1_5_decode.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_exptmod.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_free.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_import.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_make_key.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_verify_hash.obj \
+           src/libtomcrypt/src/pk/rsa/rsa_verify_simple.obj \
+           src/libtommath/bncore.obj \
+           src/libtommath/bn_fast_mp_invmod.obj \
+           src/libtommath/bn_fast_mp_montgomery_reduce.obj \
+           src/libtommath/bn_fast_s_mp_mul_digs.obj \
+           src/libtommath/bn_fast_s_mp_mul_high_digs.obj \
+           src/libtommath/bn_fast_s_mp_sqr.obj \
+           src/libtommath/bn_mp_2expt.obj \
+           src/libtommath/bn_mp_abs.obj \
+           src/libtommath/bn_mp_add.obj \
+           src/libtommath/bn_mp_addmod.obj \
+           src/libtommath/bn_mp_add_d.obj \
+           src/libtommath/bn_mp_and.obj \
+           src/libtommath/bn_mp_clamp.obj \
+           src/libtommath/bn_mp_clear.obj \
+           src/libtommath/bn_mp_clear_multi.obj \
+           src/libtommath/bn_mp_cmp.obj \
+           src/libtommath/bn_mp_cmp_d.obj \
+           src/libtommath/bn_mp_cmp_mag.obj \
+           src/libtommath/bn_mp_cnt_lsb.obj \
+           src/libtommath/bn_mp_copy.obj \
+           src/libtommath/bn_mp_count_bits.obj \
+           src/libtommath/bn_mp_div.obj \
+           src/libtommath/bn_mp_div_2.obj \
+           src/libtommath/bn_mp_div_2d.obj \
+           src/libtommath/bn_mp_div_3.obj \
+           src/libtommath/bn_mp_div_d.obj \
+           src/libtommath/bn_mp_dr_is_modulus.obj \
+           src/libtommath/bn_mp_dr_reduce.obj \
+           src/libtommath/bn_mp_dr_setup.obj \
+           src/libtommath/bn_mp_exch.obj \
+           src/libtommath/bn_mp_exptmod.obj \
+           src/libtommath/bn_mp_exptmod_fast.obj \
+           src/libtommath/bn_mp_expt_d.obj \
+           src/libtommath/bn_mp_exteuclid.obj \
+           src/libtommath/bn_mp_fread.obj \
+           src/libtommath/bn_mp_fwrite.obj \
+           src/libtommath/bn_mp_gcd.obj \
+           src/libtommath/bn_mp_get_int.obj \
+           src/libtommath/bn_mp_grow.obj \
+           src/libtommath/bn_mp_init.obj \
+           src/libtommath/bn_mp_init_copy.obj \
+           src/libtommath/bn_mp_init_multi.obj \
+           src/libtommath/bn_mp_init_set.obj \
+           src/libtommath/bn_mp_init_set_int.obj \
+           src/libtommath/bn_mp_init_size.obj \
+           src/libtommath/bn_mp_invmod.obj \
+           src/libtommath/bn_mp_invmod_slow.obj \
+           src/libtommath/bn_mp_is_square.obj \
+           src/libtommath/bn_mp_jacobi.obj \
+           src/libtommath/bn_mp_karatsuba_mul.obj \
+           src/libtommath/bn_mp_karatsuba_sqr.obj \
+           src/libtommath/bn_mp_lcm.obj \
+           src/libtommath/bn_mp_lshd.obj \
+           src/libtommath/bn_mp_mod.obj \
+           src/libtommath/bn_mp_mod_2d.obj \
+           src/libtommath/bn_mp_mod_d.obj \
+           src/libtommath/bn_mp_montgomery_calc_normalization.obj \
+           src/libtommath/bn_mp_montgomery_reduce.obj \
+           src/libtommath/bn_mp_montgomery_setup.obj \
+           src/libtommath/bn_mp_mul.obj \
+           src/libtommath/bn_mp_mulmod.obj \
+           src/libtommath/bn_mp_mul_2.obj \
+           src/libtommath/bn_mp_mul_2d.obj \
+           src/libtommath/bn_mp_mul_d.obj \
+           src/libtommath/bn_mp_neg.obj \
+           src/libtommath/bn_mp_n_root.obj \
+           src/libtommath/bn_mp_or.obj \
+           src/libtommath/bn_mp_prime_fermat.obj \
+           src/libtommath/bn_mp_prime_is_divisible.obj \
+           src/libtommath/bn_mp_prime_is_prime.obj \
+           src/libtommath/bn_mp_prime_miller_rabin.obj \
+           src/libtommath/bn_mp_prime_next_prime.obj \
+           src/libtommath/bn_mp_prime_rabin_miller_trials.obj \
+           src/libtommath/bn_mp_prime_random_ex.obj \
+           src/libtommath/bn_mp_radix_size.obj \
+           src/libtommath/bn_mp_radix_smap.obj \
+           src/libtommath/bn_mp_rand.obj \
+           src/libtommath/bn_mp_read_radix.obj \
+           src/libtommath/bn_mp_read_signed_bin.obj \
+           src/libtommath/bn_mp_read_unsigned_bin.obj \
+           src/libtommath/bn_mp_reduce.obj \
+           src/libtommath/bn_mp_reduce_2k.obj \
+           src/libtommath/bn_mp_reduce_2k_l.obj \
+           src/libtommath/bn_mp_reduce_2k_setup.obj \
+           src/libtommath/bn_mp_reduce_2k_setup_l.obj \
+           src/libtommath/bn_mp_reduce_is_2k.obj \
+           src/libtommath/bn_mp_reduce_is_2k_l.obj \
+           src/libtommath/bn_mp_reduce_setup.obj \
+           src/libtommath/bn_mp_rshd.obj \
+           src/libtommath/bn_mp_set.obj \
+           src/libtommath/bn_mp_set_int.obj \
+           src/libtommath/bn_mp_shrink.obj \
+           src/libtommath/bn_mp_signed_bin_size.obj \
+           src/libtommath/bn_mp_sqr.obj \
+           src/libtommath/bn_mp_sqrmod.obj \
+           src/libtommath/bn_mp_sqrt.obj \
+           src/libtommath/bn_mp_sub.obj \
+           src/libtommath/bn_mp_submod.obj \
+           src/libtommath/bn_mp_sub_d.obj \
+           src/libtommath/bn_mp_toom_mul.obj \
+           src/libtommath/bn_mp_toom_sqr.obj \
+           src/libtommath/bn_mp_toradix.obj \
+           src/libtommath/bn_mp_toradix_n.obj \
+           src/libtommath/bn_mp_to_signed_bin.obj \
+           src/libtommath/bn_mp_to_signed_bin_n.obj \
+           src/libtommath/bn_mp_to_unsigned_bin.obj \
+           src/libtommath/bn_mp_to_unsigned_bin_n.obj \
+           src/libtommath/bn_mp_unsigned_bin_size.obj \
+           src/libtommath/bn_mp_xor.obj \
+           src/libtommath/bn_mp_zero.obj \
+           src/libtommath/bn_prime_tab.obj \
+           src/libtommath/bn_reverse.obj \
+           src/libtommath/bn_s_mp_add.obj \
+           src/libtommath/bn_s_mp_exptmod.obj \
+           src/libtommath/bn_s_mp_mul_digs.obj \
+           src/libtommath/bn_s_mp_mul_high_digs.obj \
+           src/libtommath/bn_s_mp_sqr.obj \
+           src/libtommath/bn_s_mp_sub.obj \
+           src/lzma/C/LzFind.obj \
+           src/lzma/C/LzmaDec.obj \
+           src/lzma/C/LzmaEnc.obj \
+           src/pklib/explode.obj \
+           src/pklib/implode.obj
+
+all: $(LIBRARY)
+
+#clean:
+#   rm -f $(OBJS) $(LIBRARY)
+
+#install: $(LIBRARY)
+#   install $(LIBRARY) /usr/local/lib
+#   mkdir -p /usr/local/include/StormLib
+#   cp StormLib.h /usr/local/include/StormLib
+#   cp StormPort.h /usr/local/include/StormLib
+
+$(LIBRARY): $(OBJS_C) $(OBJS_CPP)
+	$(CPP) $(CFLAGS) $(DFLAGS) $(ARCH) $(LFLAGS) -shared -o $(LIBRARY) $(OBJS_C) $(OBJS_CPP)
+#	$(AR) $(ARFLAGS) $(LIBRARY) $(OBJS_C) $(OBJS_CPP)
+
+$(OBJS_C): %.obj: %.c
+	$(CC) -o $@ $(CFLAGS) $(DFLAGS) -c $<
+
+$(OBJS_CPP): %.obj: %.cpp
+	$(CC) -o $@ $(CFLAGS) $(DFLAGS) -c $<
+

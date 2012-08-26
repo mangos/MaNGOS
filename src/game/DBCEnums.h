@@ -22,7 +22,7 @@
 // Client expected level limitation, like as used in DBC item max levels for "until max player level"
 // use as default max player level, must be fit max level for used client
 // also see MAX_LEVEL and STRONG_MAX_LEVEL define
-#define DEFAULT_MAX_LEVEL 80
+#define DEFAULT_MAX_LEVEL 85
 
 // client supported max level for player/pets/etc. Avoid overflow or client stability affected.
 // also see GT_MAX_LEVEL define
@@ -68,7 +68,13 @@ enum AchievementFlags
     ACHIEVEMENT_FLAG_BAR                    = 0x00000080,   // ACHIEVEMENT_FLAG_HAS_PROGRESS_BAR Show as progress bar (value / max vale) depend from other flag (by def use last criteria value)
     ACHIEVEMENT_FLAG_REALM_FIRST_REACH      = 0x00000100,   // ACHIEVEMENT_FLAG_SERVER_FIRST
     ACHIEVEMENT_FLAG_REALM_FIRST_KILL       = 0x00000200,   //
-
+    ACHIEVEMENT_FLAG_UNK3                   = 0x00000400,   // ACHIEVEMENT_FLAG_HIDE_NAME_IN_TIE
+    ACHIEVEMENT_FLAG_REALM_FIRST_GUILD      = 0x00000800,   // first guild on realm done something
+    ACHIEVEMENT_FLAG_UNK4                   = 0x00001000,   // as guild group?
+    ACHIEVEMENT_FLAG_UNK5                   = 0x00002000,   // as guild group?
+    ACHIEVEMENT_FLAG_GUILD                  = 0x00004000,   //
+    ACHIEVEMENT_FLAG_SHOW_GUILD_MEMBERS     = 0x00008000,   //
+    ACHIEVEMENT_FLAG_SHOW_CRITERIA_MEMBERS  = 0x00010000,   //
 };
 
 enum AchievementCriteriaCondition
@@ -104,11 +110,12 @@ enum AchievementCriteriaTypes
     // you have to complete a daily quest x times in a row
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST_DAILY = 10,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_IN_ZONE = 11,
+    ACHIEVEMENT_CRITERIA_TYPE_CURRENCY_EARNED = 12,
     ACHIEVEMENT_CRITERIA_TYPE_DAMAGE_DONE = 13,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_DAILY_QUEST = 14,
-    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND = 15,
-    ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP = 16,
-    ACHIEVEMENT_CRITERIA_TYPE_DEATH = 17,
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND= 15,
+    ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP= 16,
+    ACHIEVEMENT_CRITERIA_TYPE_DEATH= 17,
     ACHIEVEMENT_CRITERIA_TYPE_DEATH_IN_DUNGEON = 18,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID = 19,
     ACHIEVEMENT_CRITERIA_TYPE_KILLED_BY_CREATURE = 20,
@@ -117,7 +124,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_DEATHS_FROM = 26,
     ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST = 27,
     ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET = 28,
-    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL = 29,
+    ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL= 29,
     ACHIEVEMENT_CRITERIA_TYPE_BG_OBJECTIVE_CAPTURE = 30,
     ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA = 31,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA = 32,
@@ -132,18 +139,18 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING = 39,
     ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL = 40,
     ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM = 41,
-    ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM = 42,
+    ACHIEVEMENT_CRITERIA_TYPE_LOOT_ITEM= 42,
     ACHIEVEMENT_CRITERIA_TYPE_EXPLORE_AREA = 43,
-    ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK = 44,
-    ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT = 45,
-    ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION = 46,
-    ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION = 47,
+    ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK= 44,
+    ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT= 45,
+    ACHIEVEMENT_CRITERIA_TYPE_GAIN_REPUTATION= 46,
+    ACHIEVEMENT_CRITERIA_TYPE_GAIN_EXALTED_REPUTATION= 47,
     // noted: rewarded as soon as the player payed, not at taking place at the seat
-    ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP = 48,
+    ACHIEVEMENT_CRITERIA_TYPE_VISIT_BARBER_SHOP= 48,
     ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM = 49,
     // TODO: itemlevel is mentioned in text but not present in dbc
     ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED_ON_LOOT = 50,
-    ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT = 51,
+    ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT= 51,
     ACHIEVEMENT_CRITERIA_TYPE_HK_CLASS = 52,
     ACHIEVEMENT_CRITERIA_TYPE_HK_RACE = 53,
     ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE = 54,
@@ -160,20 +167,20 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL = 66,
     ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY = 67,
     ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT = 68,
-    ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2 = 69,
-    ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL = 70,
+    ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2= 69,
+    ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL= 70,
     ACHIEVEMENT_CRITERIA_TYPE_FISH_IN_GAMEOBJECT = 72,
     // TODO: title id is not mentioned in dbc
     ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN = 74,
-    ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS = 75,
+    ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILLLINE_SPELLS= 75,
     ACHIEVEMENT_CRITERIA_TYPE_WIN_DUEL = 76,
     ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL = 77,
     // TODO: creature type (demon, undead etc.) is not stored in dbc
     ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE = 78,
-    ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS = 80,
-    ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION = 82,
-    ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID = 83,
-    ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS = 84,
+    ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS= 80,
+    ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION= 82,
+    ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID= 83,
+    ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS= 84,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD = 85,
     ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED = 86,
     ACHIEVEMENT_CRITERIA_TYPE_GAIN_REVERED_REPUTATION = 87,
@@ -200,7 +207,7 @@ enum AchievementCriteriaTypes
     ACHIEVEMENT_CRITERIA_TYPE_LOOT_TYPE = 109,
     // TODO: target entry is missing
     ACHIEVEMENT_CRITERIA_TYPE_CAST_SPELL2 = 110,
-    ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE = 112,
+    ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LINE= 112,
     ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL = 113,
     ACHIEVEMENT_CRITERIA_TYPE_ACCEPTED_SUMMONINGS = 114,
     ACHIEVEMENT_CRITERIA_TYPE_EARN_ACHIEVEMENT_POINTS = 115,
@@ -209,10 +216,62 @@ enum AchievementCriteriaTypes
     // 121 unused
     // 122 unused
     // 123 unused
-    // 0..123 => 124 criteria types total
+    ACHIEVEMENT_CRITERIA_TYPE_SPENT_GOLD_GUILD_REPAIRS = 124,
+    ACHIEVEMENT_CRITERIA_TYPE_REACH_GUILD_LEVEL = 125,
+    ACHIEVEMENT_CRITERIA_TYPE_CRAFT_ITEMS_GUILD = 126,
+    ACHIEVEMENT_CRITERIA_TYPE_CATCH_FROM_POOL = 127,
+    ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_BANK_SLOTS = 128,
+    ACHIEVEMENT_CRITERIA_TYPE_EARN_GUILD_ACHIEVEMENT_POINTS = 129,
+    ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_BATTLEGROUND = 130,
+    // 131 unused
+    ACHIEVEMENT_CRITERIA_TYPE_REACH_BG_RATING = 132,
+    ACHIEVEMENT_CRITERIA_TYPE_BUY_GUILD_TABARD = 133,
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUESTS_GUILD = 134,
+    ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILLS_GUILD = 135,
+    ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE_TYPE_GUILD = 136,
+    // 137 no achievements
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE = 138,
+    ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_GUILD_CHALLENGE_2 = 139,
+    // 140 no achievements
+    // 141 no achievements
+    // 142 no achievements
+    // 143 no achievements
+    // 144 no achievements
+    // 145 no achievements
+    // 146 no achievements
+    // 147 no achievements
+    // 148 no achievements
+    // 149 no achievements
+    // 150 no achievements
+    // 0..150 => 151 criteria types total
 };
 
-#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 124
+#define ACHIEVEMENT_CRITERIA_TYPE_TOTAL 151
+
+enum AchievementCriteriaMoreReqType
+{
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_ITEM_LEVEL             = 3,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_CREATURE_ID            = 4,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_SPELL                  = 8,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_SPELL_ON_TARGET        = 10,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_ITEM_QUALITY_EQUIPPED  = 14,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_ITEM_QUALITY_LOOTED    = 15,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_AREA_ID                = 17,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_AREA_ID2               = 18,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_RAID_DIFFICULTY        = 20,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_ARENA_TYPE             = 24,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_CLASS           = 26,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_RACE            = 27,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_CLASS2          = 28,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_CREATURE_TYPE          = 30,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_MAP_ID                 = 32,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_TIMED_QUEST            = 35,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_TITLE           = 38,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_LEVEL           = 39,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_PLAYER_LEVEL2          = 40,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_AREA_ID3               = 41,
+    ACHIEVEMENT_CRITERIA_MORE_REQ_TYPE_GUILD_REP              = 62,
+};
 
 enum AreaFlags
 {
@@ -253,7 +312,7 @@ enum Difficulty
 
     DUNGEON_DIFFICULTY_NORMAL    = 0,
     DUNGEON_DIFFICULTY_HEROIC    = 1,
-    // DUNGEON_DIFFICULTY_EPIC    = 2,                      // not used, but exists
+    //DUNGEON_DIFFICULTY_EPIC    = 2,                       // not used, but exists
 
     RAID_DIFFICULTY_10MAN_NORMAL = 0,
     RAID_DIFFICULTY_25MAN_NORMAL = 1,
@@ -296,7 +355,7 @@ enum FactionMasks
     FACTION_MASK_ALLIANCE = 2,                              // player or creature from alliance team
     FACTION_MASK_HORDE    = 4,                              // player or creature from horde team
     FACTION_MASK_MONSTER  = 8                               // aggressive creature from monster team
-                            // if none flags set then non-aggressive creature
+    // if none flags set then non-aggressive creature
 };
 
 enum MapTypes                                               // Lua_IsInInstance
@@ -319,6 +378,25 @@ enum AbilitySkillFlags
     ABILITY_SKILL_NONTRAINABLE = 0x100
 };
 
+#define CURRENCY_PRECISION 100.0f
+
+enum CurrencyFlags
+{
+    CURRENCY_FLAG_HAS_PRECISION     = 0x08,
+    CURRENCY_FLAG_HAS_SEASON_COUNT  = 0x80, // guessed
+};
+
+enum Currencies
+{
+    CURRENCY_NONE                   = 0,
+    CURRENCY_CONQUEST_POINTS        = 390,
+    CURRENCY_HONOR_POINTS           = 392,
+    CURRENCY_JUSTICE_POINTS         = 395,
+    CURRENCY_VALOR_POINTS           = 396,
+    CURRENCY_CONQUEST_ARENA_META    = 483,
+    CURRENCY_CONQUEST_BG_META       = 484,
+};
+
 enum ItemEnchantmentType
 {
     ITEM_ENCHANTMENT_TYPE_NONE             = 0,
@@ -334,8 +412,8 @@ enum ItemEnchantmentType
 
 enum ItemLimitCategoryMode
 {
-    ITEM_LIMIT_CATEGORY_MODE_HAVE  = 0,                     // limit applied to amount items in inventory/bank
-    ITEM_LIMIT_CATEGORY_MODE_EQUIP = 1,                     // limit applied to amount equipped items (including used gems)
+    ITEM_LIMIT_CATEGORY_MODE_HAVE  = 0,                      // limit applied to amount items in inventory/bank
+    ITEM_LIMIT_CATEGORY_MODE_EQUIP = 1,                      // limit applied to amount equipped items (including used gems)
 };
 
 // some used in code cases
@@ -355,55 +433,52 @@ enum TotemCategoryType
     TOTEM_CATEGORY_TYPE_SPANNER = 24
 };
 
-// SummonProperties.dbc, col 0          == Id               (m_id)
-// SummonProperties.dbc, col 1          == Group            (m_control)
+// SummonProperties.dbc, col 1
 enum SummonPropGroup
 {
-    SUMMON_PROP_GROUP_WILD              = 0,
-    SUMMON_PROP_GROUP_FRIENDLY          = 1,
-    SUMMON_PROP_GROUP_PETS              = 2,
-    SUMMON_PROP_GROUP_CONTROLLABLE      = 3,
-    SUMMON_PROP_GROUP_VEHICLE           = 4
+    SUMMON_PROP_GROUP_WILD           = 0,
+    SUMMON_PROP_GROUP_FRIENDLY       = 1,
+    SUMMON_PROP_GROUP_PETS           = 2,
+    SUMMON_PROP_GROUP_CONTROLLABLE   = 3,
+    SUMMON_PROP_GROUP_VEHICLE        = 4
 };
 
-// SummonProperties.dbc, col 2          == FactionId        (m_faction)
-// SummonProperties.dbc, col 3          == Title            (m_title)
+// SummonProperties.dbc, col 3
 enum UnitNameSummonTitle
 {
-    UNITNAME_SUMMON_TITLE_NONE          = 0,                // no default title, different summons, 1330 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_PET           = 1,                // 's Pet,           generic summons, 49 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_GUARDIAN      = 2,                // 's Guardian,      summon guardian, 393 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_MINION        = 3,                // 's Minion,        summon army, 5 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_TOTEM         = 4,                // 's Totem,         summon totem, 169 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_COMPANION     = 5,                // 's Companion,     critter/minipet, 195 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_RUNEBLADE     = 6,                // 's Runeblade,     summon DRW/Ghoul, 2 spells in 3.0.3"
-    UNITNAME_SUMMON_TITLE_CONSTRUCT     = 7,                // 's Construct,     summon bot/bomb, 4 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_OPPONENT      = 8,                // 's Opponent,      something todo with DK prequest line, 2 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_VEHICLE       = 9,                // 's Vehicle,       summon different vehicles, 14 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_MOUNT         = 10,               // 's Mount,         summon drake (vehicle), 3 spells
-    UNITNAME_SUMMON_TITLE_LIGHTWELL     = 11,               // 's Lightwell,     summon lightwell, 6 spells in 3.0.3
-    UNITNAME_SUMMON_TITLE_BUTLER        = 12                // 's Butler,        summon repair bot, 1 spells in 3.2.2a
+    UNITNAME_SUMMON_TITLE_NONE         = 0,                 // no default title, different summons, 1330 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_PET          = 1,                 // 's Pet,           generic summons, 49 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_GUARDIAN     = 2,                 // 's Guardian,      summon guardian, 393 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_MINION       = 3,                 // 's Minion,        summon army, 5 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_TOTEM        = 4,                 // 's Totem,         summon totem, 169 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_COMPANION    = 5,                 // 's Companion,     critter/minipet, 195 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_RUNEBLADE    = 6,                 // 's Runeblade,     summon DRW/Ghoul, 2 spells in 3.0.3"
+    UNITNAME_SUMMON_TITLE_CONSTRUCT    = 7,                 // 's Construct,     summon bot/bomb, 4 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_OPPONENT     = 8,                 // 's Opponent,      something todo with DK prequest line, 2 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_VEHICLE      = 9,                 // 's Vehicle,       summon different vehicles, 14 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_MOUNT        = 10,                // 's Mount,         summon drake (vehicle), 3 spells
+    UNITNAME_SUMMON_TITLE_LIGHTWELL    = 11,                // 's Lightwell,     summon lightwell, 6 spells in 3.0.3
+    UNITNAME_SUMMON_TITLE_BUTLER       = 12                 // 's Butler,        summon repair bot, 1 spells in 3.2.2a
 };
 
-// SummonProperties.dbc, col 4          == Slot             (m_slot)
-// SummonProperties.dbc, col 5          == Flags            (m_flags)
+// SummonProperties.dbc, col 5
 enum SummonPropFlags
 {
-    SUMMON_PROP_FLAG_NONE               = 0x0000,           // 1342 spells in 3.0.3
-    SUMMON_PROP_FLAG_UNK1               = 0x0001,           // 75 spells in 3.0.3, something unfriendly
-    SUMMON_PROP_FLAG_UNK2               = 0x0002,           // 616 spells in 3.0.3, something friendly
-    SUMMON_PROP_FLAG_UNK3               = 0x0004,           // 22 spells in 3.0.3, no idea...
-    SUMMON_PROP_FLAG_UNK4               = 0x0008,           // 49 spells in 3.0.3, some mounts
-    SUMMON_PROP_FLAG_UNK5               = 0x0010,           // 25 spells in 3.0.3, quest related?
-    SUMMON_PROP_FLAG_CANT_BE_DISMISSED  = 0x0020,           // 0 spells in 3.0.3, unused
-    SUMMON_PROP_FLAG_UNK7               = 0x0040,           // 12 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK8               = 0x0080,           // 4 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK9               = 0x0100,           // 51 spells in 3.0.3, no idea, many quest related
-    SUMMON_PROP_FLAG_UNK10              = 0x0200,           // 51 spells in 3.0.3, something defensive
-    SUMMON_PROP_FLAG_UNK11              = 0x0400,           // 3 spells, requires something near?
-    SUMMON_PROP_FLAG_UNK12              = 0x0800,           // 30 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_UNK13              = 0x1000,           // 8 spells in 3.0.3, siege vehicle
-    SUMMON_PROP_FLAG_UNK14              = 0x2000,           // 2 spells in 3.0.3, escort?
+    SUMMON_PROP_FLAG_NONE              = 0x0000,            // 1342 spells in 3.0.3
+    SUMMON_PROP_FLAG_UNK1              = 0x0001,            // 75 spells in 3.0.3, something unfriendly
+    SUMMON_PROP_FLAG_UNK2              = 0x0002,            // 616 spells in 3.0.3, something friendly
+    SUMMON_PROP_FLAG_UNK3              = 0x0004,            // 22 spells in 3.0.3, no idea...
+    SUMMON_PROP_FLAG_UNK4              = 0x0008,            // 49 spells in 3.0.3, some mounts
+    SUMMON_PROP_FLAG_UNK5              = 0x0010,            // 25 spells in 3.0.3, quest related?
+    SUMMON_PROP_FLAG_CANT_BE_DISMISSED = 0x0020,            // 0 spells in 3.0.3, unused
+    SUMMON_PROP_FLAG_UNK7              = 0x0040,            // 12 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK8              = 0x0080,            // 4 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK9              = 0x0100,            // 51 spells in 3.0.3, no idea, many quest related
+    SUMMON_PROP_FLAG_UNK10             = 0x0200,            // 51 spells in 3.0.3, something defensive
+    SUMMON_PROP_FLAG_UNK11             = 0x0400,            // 3 spells, requires something near?
+    SUMMON_PROP_FLAG_UNK12             = 0x0800,            // 30 spells in 3.0.3, no idea
+    SUMMON_PROP_FLAG_UNK13             = 0x1000,            // 8 spells in 3.0.3, siege vehicle
+    SUMMON_PROP_FLAG_UNK14             = 0x2000,            // 2 spells in 3.0.3, escort?
 };
 
 // SpellEntry::Targets

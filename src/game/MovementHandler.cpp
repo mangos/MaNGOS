@@ -202,14 +202,15 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("MSG_MOVE_TELEPORT_ACK");
+    DEBUG_LOG("CMSG_MOVE_TELEPORT_ACK");
 
     ObjectGuid guid;
-
-    recv_data >> guid.ReadAsPacked();
-
     uint32 counter, time;
     recv_data >> counter >> time;
+
+    recv_data.ReadGuidMask<5, 0, 1, 6, 3, 7, 2, 4>(guid);
+    recv_data.ReadGuidBytes<4, 2, 7, 6, 5, 1, 3, 0>(guid);
+
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
     DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
@@ -266,18 +267,15 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
     }
 
     /* extract packet */
-    ObjectGuid guid;
     MovementInfo movementInfo;
-
-    recv_data >> guid.ReadAsPacked();
     recv_data >> movementInfo;
     /*----------------*/
 
-    if (!VerifyMovementInfo(movementInfo, guid))
+    if (!VerifyMovementInfo(movementInfo, movementInfo.GetGuid()))
         return;
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
-    if (opcode == MSG_MOVE_FALL_LAND && plMover && !plMover->IsTaxiFlying())
+    if (opcode == CMSG_MOVE_FALL_LAND && plMover && !plMover->IsTaxiFlying())
         plMover->HandleFall(movementInfo);
 
     /* process position-change */
@@ -286,9 +284,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recv_data)
     if (plMover)
         plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
-    WorldPacket data(opcode, recv_data.size());
-    data << mover->GetPackGUID();             // write guid
-    movementInfo.Write(data);                               // write data
+    WorldPacket data(SMSG_PLAYER_MOVE, recv_data.size());
+    data << movementInfo;
     mover->SendMessageToSetExcept(&data, _player);
 }
 
@@ -469,26 +466,23 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_MOVE_HOVER_ACK");
 
-    ObjectGuid guid;                                        // guid - unused
+    recv_data.rfinish();
+    /*
     MovementInfo movementInfo;
-
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // unk1
     recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk2
+    */
 }
 
 void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_MOVE_WATER_WALK_ACK");
 
-    ObjectGuid guid;                                        // guid - unused
-    MovementInfo movementInfo;
+    recv_data.rfinish();
 
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // unk1
+    /*
+    MovementInfo movementInfo;
     recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk2
+    */
 }
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
@@ -513,7 +507,7 @@ bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo, ObjectGu
     if (!MaNGOS::IsValidMapCoord(movementInfo.GetPos()->x, movementInfo.GetPos()->y, movementInfo.GetPos()->z, movementInfo.GetPos()->o))
         return false;
 
-    if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    if (movementInfo.GetTransportGuid())
     {
         // transports size limited
         // (also received at zeppelin/lift leave by some reason with t_* as absolute in continent coordinates, can be safely skipped)
@@ -538,11 +532,11 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
 
     if (Player* plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL)
     {
-        if (movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+        if (movementInfo.GetTransportGuid())
         {
             if (!plMover->m_transport)
             {
-                // elevators also cause the client to send MOVEFLAG_ONTRANSPORT - just unmount if the guid can be found in the transport list
+                // elevators also cause the client to send transport guid - just unmount if the guid can be found in the transport list
                 for (MapManager::TransportSet::const_iterator iter = sMapMgr.m_Transports.begin(); iter != sMapMgr.m_Transports.end(); ++iter)
                 {
                     if ((*iter)->GetObjectGuid() == movementInfo.GetTransportGuid())

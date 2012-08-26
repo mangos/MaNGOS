@@ -1,0 +1,3586 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{a66bf1d2-c281-4638-8933-a40a40fe2606}</UniqueIdentifier>
+      <Extensions>cpp;cxx;cc;C;c</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{64d32856-a446-4163-9a21-cdc7761bdfd7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hh</Extensions>
+    </Filter>
+    <Filter Include="Inline Files">
+      <UniqueIdentifier>{3e8e43bb-56ba-4fd1-9444-adf32d03f7c5}</UniqueIdentifier>
+      <Extensions>i;inl</Extensions>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{42f5d71a-c3e0-4761-b363-cb8f2d811e77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{92603191-13a9-43e7-b4f7-76cc63b2911d}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ACE_crc32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ACE_crc_ccitt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ace_wchar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Activation_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Active_Map_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Argv_Type_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Assert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Asynch_IO_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Asynch_Pseudo_Task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_Params.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_QoS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ATM_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Atomic_Op.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_Sparc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Auto_Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Barrier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Base_Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Based_Pointer_Repository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Basic_Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Basic_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Capabilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\CDR_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\CDR_Size.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\CDR_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Cleanup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Codecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Codeset_IBM1047.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Codeset_Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Codeset_Registry_db.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Condition_Recursive_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Condition_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Configuration.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Configuration_Import_Export.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Connection_Recycling_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Containers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Copy_Disabled.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Countdown_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Date_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DEV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DEV_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DEV_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DEV_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dev_Poll_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dirent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dirent_Selector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DLL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\DLL_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dump.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dynamic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dynamic_Message_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service_Dependency.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Encoding_Converter_Factory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Event_Handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FIFO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FIFO_Send.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FIFO_Send_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FILE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FILE_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FILE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\FILE_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\File_Lock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Filecache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Flag_Manip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Framework_Component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Functor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Functor_String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Get_Opt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\gethrtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Handle_Ops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Handle_Set.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Hashable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\High_Res_Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\ICMP_Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\INET_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Init_ACE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\IO_Cntl_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\IO_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\IOStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\IPC_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Lib_Find.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Local_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Local_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Local_Tokens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Lock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg_Backend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg_Callback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg_IPC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg_NT_Event_Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Msg_UNIX_Syslog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Log_Record.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Logging_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK_CODgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK_Dgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\LSOCK_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Malloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Malloc_Allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Manual_Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Mem_Map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_SAP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MEM_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Message_Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Message_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Message_Queue_NT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Method_Request.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\MMAP_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Admin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Admin_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Control_Action.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Control_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Point_Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Monitor_Size.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Msg_WFMO_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Multihomed_INET_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Name_Proxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Name_Request_Reply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Naming_Context.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Netlink_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Notification_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Notification_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\NT_Service.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Obchunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Object_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Object_Manager_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_Errno.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_arpa_inet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_ctype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_dirent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_dlfcn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_errno.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_fcntl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_netdb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_poll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_pwd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_regex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_signal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_strings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_stropts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_mman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_msg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_select.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_sendfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_shm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_stat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_uio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_utsname.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_wait.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_unistd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_QoS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\OS_TLI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Parse_Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\PI_Malloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Ping_Socket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Pipe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\POSIX_Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\POSIX_CB_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\POSIX_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Priority_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Proactor_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Process_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Process_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Process_Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Profile_Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Reactor_Impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Reactor_Notification_Strategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Reactor_Timer_Interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Read_Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Recursive_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Recyclable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Registry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Registry_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Remote_Name_Space.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Remote_Tokens.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Rtems_init.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\RW_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\RW_Process_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\RW_Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sample_History.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sbrk_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sched_Params.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Select_Reactor_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Config.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Gestalt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Repository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Service_Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Shared_Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_MM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_Pool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_SV.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Shared_Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sig_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sig_Handler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Signal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_CODgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Sock_Connect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Bcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Mcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Netlink.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Association.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SOCK_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SPIPE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SPIPE_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SPIPE_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SPIPE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SPIPE_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Stack_Trace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\String_Base_Const.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SUN_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SV_Message.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SV_Message_Queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Complex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Simple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\SV_Shared_Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_Lexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_y.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Synch_Options.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\System_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Exit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Hook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Thread_Semaphore.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Throughput_Stats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Time_Value.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Timeprobe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TLI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TLI_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TLI_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TLI_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Token.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Token_Collection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Token_Invariants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Token_Manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Token_Request_Reply.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TP_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\Trace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TSS_Adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\TTY_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UNIX_Addr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UPIPE_Acceptor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UPIPE_Connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UPIPE_Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UTF16_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UTF32_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UTF8_Encoding_Converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\UUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\WFMO_Reactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\WIN32_Asynch_IO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\WIN32_Proactor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\XML_Svc_Conf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dep\ACE_wrappers\ace\XTI_ATM_Mcast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ACE_export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ace_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Activation_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Active_Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Active_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Arg_Shifter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ARGV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Argv_Type_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Array_Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Asynch_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Asynch_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Asynch_IO_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Asynch_Pseudo_Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_Params.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_QoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ATM_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_Sparc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Auto_Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Auto_Functor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Auto_IncDec_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Barrier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Base_Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Based_Pointer_Repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Based_Pointer_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Basic_Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Basic_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Bound_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Cache_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Cached_Connect_Strategy_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Caching_Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Caching_Utility_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Capabilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\CDR_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\CDR_Size.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\CDR_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\CE_Screen_Output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\checked_iterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Cleanup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Cleanup_Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Codecs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Codeset_IBM1047.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Codeset_Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Codeset_Symbols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Condition_Recursive_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Condition_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Condition_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-aix-5.x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-all.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-cygwin32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-doxygen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-freebsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-g++-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-ghs-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-hpux-11.00.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-icc-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-integritySCA.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-linux-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-linux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-lite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-lynxos.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-hardware.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-iphone-simulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-leopard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-panther.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-snowleopard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx-tiger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macosx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-minimal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-mvs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-netbsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-openbsd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-openvms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-pharlap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-posix-nonetworking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-posix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-neutrino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp-62x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp-pre62x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-qnx-rtp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-rtems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-suncc-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.10.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.4-g++.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.4-sunc++-4.x.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-sunos5.9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem-nsk-mips-v2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem-nsk-mips-v3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-tandem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-visualage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.6.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-vxworks6.8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-borland.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-cegcc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-dmc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-interix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-mingw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-7.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-8.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc-10.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32-msvc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\config-WinCE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Configuration_Import_Export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Connection_Recycling_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Containers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Containers_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Copy_Disabled.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\CORBA_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Countdown_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Date_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Default_Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DEV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DEV_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DEV_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DEV_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dev_Poll_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dirent_Selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DLL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\DLL_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dump_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dynamic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dynamic_Message_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service_Dependency.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Encoding_Converter_Factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Env_Value_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Event_Handler_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Send.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FIFO_Send_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FILE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FILE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FILE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\FILE_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\File_Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Filecache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Flag_Manip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Framework_Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Framework_Component_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Free_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Functor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Functor_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Functor_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Future.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Future_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Get_Opt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Global_Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Guard_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Handle_Gobbler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Handle_Ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Handle_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hash_Cache_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hash_Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hash_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hash_Map_With_Allocator_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hash_Multi_Map_Manager_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Hashable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\High_Res_Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\ICMP_Socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\If_Then_Else.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\INET_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Init_ACE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Intrusive_Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Intrusive_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Intrusive_List_Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\IO_Cntl_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\IO_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\iosfwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\IOStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\IOStream_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\IPC_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Lib_Find.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Local_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Local_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Local_Name_Space_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Local_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Lock_Adapter_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LOCK_SOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg_Backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg_Callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg_IPC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg_NT_Event_Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Msg_UNIX_Syslog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Priority.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Log_Record.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Logging_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK_CODgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK_Dgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\LSOCK_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Malloc_Allocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Malloc_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Malloc_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Managed_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Manual_Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Map_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Mem_Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_SAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MEM_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Block_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_NT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Method_Request.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Metrics_Cache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Metrics_Cache_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Min_Max.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\MMAP_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Module.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Admin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Admin_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Control_Action.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Control_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Point_Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Monitor_Size.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Msg_WFMO_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Multihomed_INET_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Name_Proxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Name_Request_Reply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Naming_Context.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Netlink_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Notification_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Notification_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\NT_Service.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Null_Barrier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Null_Condition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Null_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Null_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Numeric_Limits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obchunk.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Object_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Object_Manager_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obstack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Obstack_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_aio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_assert.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_byteswap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_complex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_cpio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_dlfcn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_fcntl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_fenv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_float.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_fmtmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_fnmatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ftw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_glob.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_grp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_iconv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\net\os_if.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_in.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\arpa\os_inet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_intrin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_inttypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_ipc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_iso646.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_kstat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_langinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_libgen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_limits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_loadavg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_local.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_mman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_monetary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_mqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ndbm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_netdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_nl_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_arpa_inet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_ctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_dlfcn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_errno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_fcntl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_netdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_poll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_pwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_stropts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_mman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_msg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_select.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_sendfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_shm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_uio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_utsname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_wait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_unistd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_pdh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_pdhmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_poll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_pstat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_pthread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_pwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_QoS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_regex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_sched.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_select.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_setjmp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_shm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_spawn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_stat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_statvfs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdarg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdbool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stddef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stdlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_typeinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_stropts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysctl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_sysinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_syslog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_tar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\netinet\os_tcp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_termios.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_tgmath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_timeb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_times.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\OS_TLI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ucontext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_uio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_ulimit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_un.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_unistd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_utime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_utmpx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_utsname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\sys\os_wait.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_wchar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_wctype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\os_include\os_wordexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pair_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Parse_Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\PI_Malloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Ping_Socket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Pipe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\POSIX_Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\POSIX_CB_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\POSIX_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\post.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\pre.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Priority_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Proactor_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Process_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Process_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Process_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Profile_Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\RB_Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reactor_Impl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reactor_Notification_Strategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reactor_Timer_Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reactor_Token_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Read_Buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Recursive_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Recyclable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcountable_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Refcounted_Auto_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Registry_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Remote_Name_Space.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Remote_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Reverse_Lock_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\RW_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\RW_Process_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\RW_Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sample_History.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sbrk_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sched_Params.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Select_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Select_Reactor_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Select_Reactor_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Gestalt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Repository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Service_Types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_MM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_SV.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Shared_Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sig_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sig_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Signal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_CODgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Sock_Connect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Bcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Mcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Netlink.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Association.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SOCK_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SPIPE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SPIPE_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SPIPE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SPIPE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SPIPE_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SStringfwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Stack_Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Static_Object_Lock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Strategies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Strategies_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Stream_Modules.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\streams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\String_Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\String_Base_Const.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SUN_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SV_Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SV_Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Complex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Simple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\SV_Shared_Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Conf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_Lexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_Param.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_Token_Table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Conf_Tokens.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\svc_export.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Svc_Handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Synch_Traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\System_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Task.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Task_Ex_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Task_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Test_and_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Exit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Hook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Thread_Semaphore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Throughput_Stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Time_Value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timeprobe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timeprobe_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Hash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Hash_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Heap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Heap_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_List.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_List_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Queue_Adapters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Queue_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Queuefwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Wheel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Timer_Wheel_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TLI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TLI_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TLI_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TLI_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token_Collection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token_Invariants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token_Manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Token_Request_Reply.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Tokenizer_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TP_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Truncate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TSS_Adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TSS_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\TTY_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Typed_SV_Message.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Typed_SV_Message_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Unbounded_Queue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Unbounded_Set.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Unbounded_Set_Ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UNIX_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UPIPE_Acceptor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UPIPE_Addr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UPIPE_Connector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UPIPE_Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UTF16_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UTF32_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UTF8_Encoding_Converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\UUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Value_Ptr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Vector_T.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\Versioned_Namespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\WFMO_Reactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\WIN32_Asynch_IO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\WIN32_Proactor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\XML_Svc_Conf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dep\ACE_wrappers\ace\XTI_ATM_Mcast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\dep\ACE_wrappers\ace\ACE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ace_wchar.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Activation_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Active_Map_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Active_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ARGV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Argv_Type_Converter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Array_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Array_Map.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Asynch_IO_Impl.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_Params.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_QoS.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\ATM_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_GCC_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Atomic_Op_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Auto_Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Auto_Functor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Auto_IncDec_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Barrier.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Base_Thread_Adapter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Based_Pointer_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Basic_Stats.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Basic_Types.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Bound_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Cache_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Caching_Strategies_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Capabilities.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\CDR_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\CDR_Size.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\CDR_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Cleanup.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Codeset_Registry.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Condition_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Condition_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Configuration.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Containers.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Containers_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Countdown_Time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Date_Time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\DEV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\DEV_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\DEV_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\DEV_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dev_Poll_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dirent.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dirent_Selector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dynamic.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dynamic_Message_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Dynamic_Service.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Env_Value_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Event_Handler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Event_Handler_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FIFO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FIFO_Recv_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FIFO_Send.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FIFO_Send_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FILE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FILE_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FILE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\FILE_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\File_Lock.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Flag_Manip.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Framework_Component.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Functor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Functor_String.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Functor_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Get_Opt.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Guard_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Handle_Gobbler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Handle_Set.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Hash_Cache_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Hash_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Hash_Map_With_Allocator_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Hash_Multi_Map_Manager_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Hashable.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\High_Res_Timer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\INET_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Intrusive_Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Intrusive_List.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Intrusive_List_Node.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\IO_Cntl_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\IO_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\IOStream_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\IPC_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Local_Tokens.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Lock.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Lock_Adapter_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Log_Msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Log_Record.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\LSOCK.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\LSOCK_CODgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\LSOCK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\LSOCK_Dgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\LSOCK_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Malloc.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Malloc_Allocator.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Malloc_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Managed_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Manual_Event.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Map_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Map_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Mem_Map.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_SAP.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MEM_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Message_Block.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Message_Block_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Message_Queue_NT.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Message_Queue_Vx.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Metrics_Cache_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\MMAP_Memory_Pool.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Module.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Monitor_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Msg_WFMO_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Multihomed_INET_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Naming_Context.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Netlink_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Notification_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Notification_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\NT_Service.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Obchunk.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Object_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Obstack_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_Errno.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_Log_Msg_Attributes.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_arpa_inet.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_ctype.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_dirent.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_dlfcn.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_errno.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_fcntl.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_math.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_netdb.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_poll.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_pwd.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_regex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_signal.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdio.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_stdlib.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_string.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_strings.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_stropts.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_mman.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_msg.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_resource.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_select.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_sendfile.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_shm.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_socket.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_stat.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_uio.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_sys_wait.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_Thread.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_time.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_unistd.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_wchar.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_NS_wctype.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\OS_TLI.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Pagefile_Memory_Pool.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Pair_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\PI_Malloc.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Ping_Socket.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Pipe.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\POSIX_Proactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Proactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Process.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Process_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Process_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Process_Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Profile_Timer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\RB_Tree.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Reactor_Notification_Strategy.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Read_Buffer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Recursive_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Recyclable.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Refcountable_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Refcounted_Auto_Ptr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Remote_Tokens.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Reverse_Lock_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\RW_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\RW_Process_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\RW_Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Sample_History.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Sched_Params.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Select_Reactor_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Select_Reactor_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Service_Config.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Service_Gestalt.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Service_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Service_Repository.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Service_Types.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_MM.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Shared_Memory_SV.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Shared_Object.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Sig_Handler.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Signal.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Singleton.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_CODgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Bcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Dgram_Mcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_IO.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Netlink.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Association.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_SEQPACK_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SOCK_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SPIPE.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SPIPE_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SPIPE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SPIPE_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SString.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Stats.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Strategies_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\String_Base.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SV_Message.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SV_Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Complex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SV_Semaphore_Simple.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\SV_Shared_Memory.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Task.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Task_Ex_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Task_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread_Adapter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread_Control.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread_Mutex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Thread_Semaphore.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Time_Value.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Timeprobe.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Timer_Queue_Adapters.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Timer_Queue_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\TLI.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\TLI_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\TLI_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Token.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Token_Collection.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Token_Manager.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Token_Request_Reply.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\TP_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\TSS_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Typed_SV_Message.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Typed_SV_Message_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Unbounded_Queue.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Unbounded_Set.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Unbounded_Set_Ex.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UNIX_Addr.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UPIPE_Acceptor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UPIPE_Connector.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UPIPE_Stream.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UTF16_Encoding_Converter.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\UUID.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\Vector_T.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\WFMO_Reactor.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="..\..\dep\ACE_wrappers\ace\XTI_ATM_Mcast.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\dep\ACE_wrappers\ace\ace.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\dep\ACE_wrappers\README">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\dep\ACE_wrappers\VERSION">
+      <Filter>Documentation</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

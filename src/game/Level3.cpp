@@ -1143,6 +1143,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
         return false;
 
     int32 gm;
+        uint32 gmRealmID = realmID;
     if (!ExtractInt32(&args, gm))
         return false;
 
@@ -1160,9 +1161,16 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
 
     /// account can't set security to same or grater level, need more power GM or console
     AccountTypes plSecurity = GetAccessLevel();
-    if (AccountTypes(gm) >= plSecurity)
+    if (AccountTypes(gm) >= plSecurity  || (gmRealmID != realmID && plSecurity < SEC_CONSOLE))
     {
         SendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    /// check if provided realmID is not current realmID, or isn't -1
+    if (gmRealmID != realmID && gmRealmID != -1)
+    {
+        SendSysMessage(LANG_INVALID_REALMID);
         SetSentErrorMessage(true);
         return false;
     }
@@ -1174,7 +1182,19 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
     }
 
     PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName.c_str(), gm);
-    LoginDatabase.PExecute("UPDATE account SET gmlevel = '%i' WHERE id = '%u'", gm, targetAccountId);
+    //LoginDatabase.PExecute("UPDATE account_access SET gmlevel = '%i' WHERE id = '%u'", gm, targetAccountId);
+
+    /// If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realmID
+    if (gmRealmID == -1)
+    {
+        LoginDatabase.PExecute("DELETE FROM account_access WHERE id = '%u'", targetAccountId);
+        LoginDatabase.PExecute("INSERT INTO account_access VALUES ('%u', '%d', -1)", targetAccountId, gm);
+    }
+    else
+    {
+        LoginDatabase.PExecute("DELETE FROM account_access WHERE id = '%u' AND RealmID = '%d'", targetAccountId, realmID);
+        LoginDatabase.PExecute("INSERT INTO account_access VALUES ('%u','%d','%d')", targetAccountId, gm, realmID);
+    }
 
     return true;
 }
@@ -1573,7 +1593,7 @@ bool ChatHandler::HandleSetSkillCommand(char* args)
     if (level <= 0 || level > maxskill || maxskill <= 0)
         return false;
 
-    target->SetSkill(skill, level, maxskill);
+    target->SetSkill(skill, level, maxskill, target->GetSkillStep(skill));
     PSendSysMessage(LANG_SET_SKILL, skill, sl->name[GetSessionDbcLocale()], tNameLink.c_str(), level, maxskill);
 
     return true;
@@ -2345,7 +2365,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
             continue;
 
         // skip server-side/triggered spells
-        if (spellInfo->spellLevel == 0)
+        if(spellInfo->GetSpellLevel()==0)
             continue;
 
         // skip wrong class/race skills
@@ -2353,7 +2373,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
             continue;
 
         // skip other spell families
-        if (spellInfo->SpellFamilyName != family)
+        if( spellInfo->GetSpellFamilyName() != family)
             continue;
 
         // skip spells with first rank learned as talent (and all talents then also)
@@ -3293,7 +3313,8 @@ void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInf
     uint32 id = spellInfo->Id;
 
     bool known = target && target->HasSpell(id);
-    bool learn = (spellInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEARN_SPELL);
+    SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(EFFECT_INDEX_0);
+    bool learn = (spellEffect && spellEffect->Effect == SPELL_EFFECT_LEARN_SPELL);
 
     uint32 talentCost = GetTalentSpellCost(id);
 
@@ -3303,7 +3324,7 @@ void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInf
 
     // unit32 used to prevent interpreting uint8 as char at output
     // find rank of learned spell for learning spell, or talent rank
-    uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? spellInfo->EffectTriggerSpell[EFFECT_INDEX_0] : id);
+    uint32 rank = talentCost ? talentCost : sSpellMgr.GetSpellRank(learn ? (spellEffect ? spellEffect->EffectTriggerSpell : 0) : id);
 
     // send spell in "id - [name, rank N] [talent] [passive] [learn] [known]" format
     std::ostringstream ss;
@@ -4001,9 +4022,14 @@ bool ChatHandler::HandleAuraCommand(char* args)
 
     for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        uint8 eff = spellInfo->Effect[i];
-        if (eff >= TOTAL_SPELL_EFFECTS)
+        SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(i));
+        if(!spellEffect)
             continue;
+
+        uint8 eff = spellEffect->Effect;
+        if (eff>=TOTAL_SPELL_EFFECTS)
+            continue;
+
         if (IsAreaAuraEffect(eff)           ||
                 eff == SPELL_EFFECT_APPLY_AURA  ||
                 eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
@@ -4949,8 +4975,8 @@ bool ChatHandler::HandleResetHonorCommand(char* args)
     target->SetHonorPoints(0);
     target->SetUInt32Value(PLAYER_FIELD_KILLS, 0);
     target->SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0);
-    target->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
-    target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
+    //target->SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, 0);
+    //target->SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, 0);
     target->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL);
 
     return true;
@@ -5954,10 +5980,8 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    WorldPacket data(12);
-    data.SetOpcode(value ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
-    data << target->GetPackGUID();
-    data << uint32(0);                                      // unknown
+    WorldPacket data;
+    target->BuildMoveSetCanFlyPacket(&data, value, 0);
     target->SendMessageToSet(&data, true);
     PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, GetNameLink(target).c_str(), args);
     return true;
@@ -6583,7 +6607,7 @@ bool ChatHandler::HandleInstanceSaveDataCommand(char* /*args*/)
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
     ///- Get the accounts with GM Level >0
-    QueryResult* result = LoginDatabase.Query("SELECT username,gmlevel FROM account WHERE gmlevel > 0");
+    QueryResult* result = LoginDatabase.Query("SELECT a.username,aa.gmlevel FROM account a LEFT JOIN account_access aa ON (a.id = aa.id) WHERE aa.gmlevel > 0");
     if (result)
     {
         SendSysMessage(LANG_GMLIST);

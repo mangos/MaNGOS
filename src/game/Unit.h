@@ -82,7 +82,14 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_UNK21                       = 0x00200000,   // 21
     AURA_INTERRUPT_FLAG_UNK22                       = 0x00400000,   // 22
     AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT            = 0x00800000,   // 23   removed by entering pvp combat
-    AURA_INTERRUPT_FLAG_DIRECT_DAMAGE               = 0x01000000    // 24   removed by any direct damage
+    AURA_INTERRUPT_FLAG_DIRECT_DAMAGE               = 0x01000000,   // 24   removed by any direct damage
+    AURA_INTERRUPT_FLAG_UNK25                       = 0x02000000,   // 25
+    AURA_INTERRUPT_FLAG_UNK26                       = 0x04000000,   // 26
+    AURA_INTERRUPT_FLAG_DAMAGE2                     = 0x08000000,   // 27   removed by damage spells + removed by damage, other than .. (diseases, Censure)
+    AURA_INTERRUPT_FLAG_ENTER_COMBAT2               = 0x10000000,   // 28
+    AURA_INTERRUPT_FLAG_UNK29                       = 0x20000000,   // 29
+    AURA_INTERRUPT_FLAG_UNK30                       = 0x40000000,   // 30
+    AURA_INTERRUPT_FLAG_UNK31                       = 0x80000000,   // 31
 };
 
 enum SpellModOp
@@ -332,9 +339,13 @@ enum UnitMods
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
-    UNIT_MOD_HAPPINESS,
+    UNIT_MOD_HAPPINESS,                                     // REQUIRED for fast indexing to work.
     UNIT_MOD_RUNE,
     UNIT_MOD_RUNIC_POWER,
+    UNIT_MOD_SOUL_SHARDS,
+    UNIT_MOD_ECLIPSE,
+    UNIT_MOD_HOLY_POWER,
+    UNIT_MOD_ALTERNATIVE,
     UNIT_MOD_ARMOR,                                         // UNIT_MOD_ARMOR..UNIT_MOD_RESISTANCE_ARCANE must be in existing order, it's accessed by index values of SpellSchools enum.
     UNIT_MOD_RESISTANCE_HOLY,
     UNIT_MOD_RESISTANCE_FIRE,
@@ -354,8 +365,10 @@ enum UnitMods
     UNIT_MOD_RESISTANCE_START = UNIT_MOD_ARMOR,
     UNIT_MOD_RESISTANCE_END = UNIT_MOD_RESISTANCE_ARCANE + 1,
     UNIT_MOD_POWER_START = UNIT_MOD_MANA,
-    UNIT_MOD_POWER_END = UNIT_MOD_RUNIC_POWER + 1
+    UNIT_MOD_POWER_END = UNIT_MOD_ALTERNATIVE + 1
 };
+
+static_assert(UNIT_MOD_POWER_END - UNIT_MOD_POWER_START == MAX_POWERS, "Power-related UnitMods are not updated.");
 
 enum BaseModGroup
 {
@@ -476,23 +489,24 @@ enum CombatRating
     CR_CRIT_MELEE               = 8,
     CR_CRIT_RANGED              = 9,
     CR_CRIT_SPELL               = 10,
-    CR_HIT_TAKEN_MELEE          = 11,
-    CR_HIT_TAKEN_RANGED         = 12,
-    CR_HIT_TAKEN_SPELL          = 13,
-    CR_CRIT_TAKEN_MELEE         = 14,
-    CR_CRIT_TAKEN_RANGED        = 15,
-    CR_CRIT_TAKEN_SPELL         = 16,
+    CR_HIT_TAKEN_MELEE          = 11,                       // obsolete
+    CR_HIT_TAKEN_RANGED         = 12,                       // obsolete
+    CR_HIT_TAKEN_SPELL          = 13,                       // obsolete
+    CR_CRIT_TAKEN_MELEE         = 14,                       // COMBAT_RATING_RESILIENCE_CRIT_TAKEN obsolete
+    CR_RESILIENCE_DAMAGE_TAKEN  = 15,                       // old CR_CRIT_TAKEN_RANGED
+    CR_CRIT_TAKEN_SPELL         = 16,                       // obsolete
     CR_HASTE_MELEE              = 17,
     CR_HASTE_RANGED             = 18,
     CR_HASTE_SPELL              = 19,
-    CR_WEAPON_SKILL_MAINHAND    = 20,
-    CR_WEAPON_SKILL_OFFHAND     = 21,
-    CR_WEAPON_SKILL_RANGED      = 22,
+    CR_WEAPON_SKILL_MAINHAND    = 20,                       // obsolete
+    CR_WEAPON_SKILL_OFFHAND     = 21,                       // obsolete
+    CR_WEAPON_SKILL_RANGED      = 22,                       // obsolete
     CR_EXPERTISE                = 23,
-    CR_ARMOR_PENETRATION        = 24
+    CR_ARMOR_PENETRATION        = 24,
+    CR_MASTERY                  = 25
 };
 
-#define MAX_COMBAT_RATING         25
+#define MAX_COMBAT_RATING         26
 
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
@@ -562,6 +576,9 @@ enum UnitFlags2
     UNIT_FLAG2_UNK9                 = 0x00000200,
     UNIT_FLAG2_DISARM_RANGED        = 0x00000400,
     UNIT_FLAG2_REGENERATE_POWER     = 0x00000800,
+    UNIT_FLAG2_WORGEN_TRANSFORM     = 0x00080000,           // transform to worgen
+    UNIT_FLAG2_WORGEN_TRANSFORM2    = 0x00100000,           // transform to worgen, but less animation?
+    UNIT_FLAG2_WORGEN_TRANSFORM3    = 0x00200000            // transform to worgen, but less animation?
 };
 
 /// Non Player Character flags
@@ -595,7 +612,7 @@ enum NPCFlags
     UNIT_NPC_FLAG_SPELLCLICK            = 0x01000000,       // cause client to send 1015 opcode (spell click), dynamic, set at loading and don't must be set in DB
 };
 
-// used in most movement packets (send and received)
+// used in most movement packets (send and received), 30 bits in client
 enum MovementFlags
 {
     MOVEFLAG_NONE               = 0x00000000,
@@ -608,28 +625,27 @@ enum MovementFlags
     MOVEFLAG_PITCH_UP           = 0x00000040,
     MOVEFLAG_PITCH_DOWN         = 0x00000080,
     MOVEFLAG_WALK_MODE          = 0x00000100,               // Walking
-    MOVEFLAG_ONTRANSPORT        = 0x00000200,
-    MOVEFLAG_LEVITATING         = 0x00000400,
-    MOVEFLAG_ROOT               = 0x00000800,
-    MOVEFLAG_FALLING            = 0x00001000,
-    MOVEFLAG_FALLINGFAR         = 0x00002000,
-    MOVEFLAG_PENDINGSTOP        = 0x00004000,
-    MOVEFLAG_PENDINGSTRAFESTOP  = 0x00008000,
-    MOVEFLAG_PENDINGFORWARD     = 0x00010000,
-    MOVEFLAG_PENDINGBACKWARD    = 0x00020000,
-    MOVEFLAG_PENDINGSTRAFELEFT  = 0x00040000,
-    MOVEFLAG_PENDINGSTRAFERIGHT = 0x00080000,
-    MOVEFLAG_PENDINGROOT        = 0x00100000,
-    MOVEFLAG_SWIMMING           = 0x00200000,               // appears with fly flag also
-    MOVEFLAG_ASCENDING          = 0x00400000,               // swim up also
-    MOVEFLAG_DESCENDING         = 0x00800000,               // swim down also
-    MOVEFLAG_CAN_FLY            = 0x01000000,               // can fly in 3.3?
-    MOVEFLAG_FLYING             = 0x02000000,               // Actual flying mode
-    MOVEFLAG_SPLINE_ELEVATION   = 0x04000000,               // used for flight paths
-    MOVEFLAG_SPLINE_ENABLED     = 0x08000000,               // used for flight paths
-    MOVEFLAG_WATERWALKING       = 0x10000000,               // prevent unit from falling through water
-    MOVEFLAG_SAFE_FALL          = 0x20000000,               // active rogue safe fall spell (passive)
-    MOVEFLAG_HOVER              = 0x40000000
+    MOVEFLAG_LEVITATING         = 0x00000200,
+    MOVEFLAG_ROOT               = 0x00000400,
+    MOVEFLAG_FALLING            = 0x00000800,
+    MOVEFLAG_FALLINGFAR         = 0x00001000,
+    MOVEFLAG_PENDINGSTOP        = 0x00002000,
+    MOVEFLAG_PENDINGSTRAFESTOP  = 0x00004000,
+    MOVEFLAG_PENDINGFORWARD     = 0x00008000,
+    MOVEFLAG_PENDINGBACKWARD    = 0x00010000,
+    MOVEFLAG_PENDINGSTRAFELEFT  = 0x00020000,
+    MOVEFLAG_PENDINGSTRAFERIGHT = 0x00040000,
+    MOVEFLAG_PENDINGROOT        = 0x00080000,
+    MOVEFLAG_SWIMMING           = 0x00100000,               // appears with fly flag also
+    MOVEFLAG_ASCENDING          = 0x00200000,               // swim up also
+    MOVEFLAG_DESCENDING         = 0x00400000,               // swim down also
+    MOVEFLAG_CAN_FLY            = 0x00800000,               // can fly in 3.3?
+    MOVEFLAG_FLYING             = 0x01000000,               // Actual flying mode
+    MOVEFLAG_SPLINE_ELEVATION   = 0x02000000,               // used for flight paths
+    MOVEFLAG_WATERWALKING       = 0x04000000,               // prevent unit from falling through water
+    MOVEFLAG_SAFE_FALL          = 0x08000000,               // active rogue safe fall spell (passive)
+    MOVEFLAG_HOVER              = 0x10000000,
+    MOVEFLAG_LOCAL_DIRTY        = 0x20000000,
 };
 
 // flags that use in movement check for example at spell casting
@@ -644,25 +660,22 @@ MovementFlags const movementOrTurningFlagsMask = MovementFlags(
             movementFlagsMask | MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT
         );
 
+// 12 bits in client
 enum MovementFlags2
 {
     MOVEFLAG2_NONE              = 0x0000,
     MOVEFLAG2_NO_STRAFE         = 0x0001,
     MOVEFLAG2_NO_JUMPING        = 0x0002,
-    MOVEFLAG2_UNK3              = 0x0004,
-    MOVEFLAG2_FULLSPEEDTURNING  = 0x0008,
-    MOVEFLAG2_FULLSPEEDPITCHING = 0x0010,
-    MOVEFLAG2_ALLOW_PITCHING    = 0x0020,
-    MOVEFLAG2_UNK4              = 0x0040,
-    MOVEFLAG2_UNK5              = 0x0080,
-    MOVEFLAG2_UNK6              = 0x0100,                   // transport related
-    MOVEFLAG2_UNK7              = 0x0200,
-    MOVEFLAG2_INTERP_MOVEMENT   = 0x0400,
-    MOVEFLAG2_INTERP_TURNING    = 0x0800,
-    MOVEFLAG2_INTERP_PITCHING   = 0x1000,
-    MOVEFLAG2_UNK8              = 0x2000,
-    MOVEFLAG2_UNK9              = 0x4000,
-    MOVEFLAG2_UNK10             = 0x8000,
+    MOVEFLAG2_FULLSPEEDTURNING  = 0x0004,
+    MOVEFLAG2_FULLSPEEDPITCHING = 0x0008,
+    MOVEFLAG2_ALLOW_PITCHING    = 0x0010,
+    MOVEFLAG2_UNK4              = 0x0020,
+    MOVEFLAG2_UNK5              = 0x0040,
+    MOVEFLAG2_UNK6              = 0x0080,                   // transport related
+    MOVEFLAG2_UNK7              = 0x0100,
+    MOVEFLAG2_INTERP_MOVEMENT   = 0x0200,
+    MOVEFLAG2_INTERP_TURNING    = 0x0400,
+    MOVEFLAG2_INTERP_PITCHING   = 0x0800,
     MOVEFLAG2_INTERP_MASK       = MOVEFLAG2_INTERP_MOVEMENT | MOVEFLAG2_INTERP_TURNING | MOVEFLAG2_INTERP_PITCHING
 };
 
@@ -670,16 +683,17 @@ class MovementInfo
 {
     public:
         MovementInfo() : moveFlags(MOVEFLAG_NONE), moveFlags2(MOVEFLAG2_NONE), time(0),
-            t_time(0), t_seat(-1), t_time2(0), s_pitch(0.0f), fallTime(0), u_unk1(0.0f) {}
+            t_time(0), t_seat(-1), t_time2(0), s_pitch(0.0f), fallTime(0), splineElevation(0.0f) {}
 
         // Read/Write methods
-        void Read(ByteBuffer& data);
-        void Write(ByteBuffer& data) const;
+        void Read(ByteBuffer& data, uint16 opcode);
+        void Write(ByteBuffer& data, uint16 opcode) const;
 
         // Movement flags manipulations
         void AddMovementFlag(MovementFlags f) { moveFlags |= f; }
         void RemoveMovementFlag(MovementFlags f) { moveFlags &= ~f; }
         bool HasMovementFlag(MovementFlags f) const { return moveFlags & f; }
+        bool HasMovementFlag2(MovementFlags2 f) const { return moveFlags2 & f; }
         MovementFlags GetMovementFlags() const { return MovementFlags(moveFlags); }
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
         MovementFlags2 GetMovementFlags2() const { return MovementFlags2(moveFlags2); }
@@ -706,10 +720,12 @@ class MovementInfo
             t_time = 0;
             t_seat = -1;
         }
+        ObjectGuid const& GetGuid() const { return guid; }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
         Position const* GetTransportPos() const { return &t_pos; }
         int8 GetTransportSeat() const { return t_seat; }
         uint32 GetTransportTime() const { return t_time; }
+        uint32 GetTransportTime2() const { return t_time2; }
         uint32 GetFallTime() const { return fallTime; }
         void ChangeOrientation(float o) { pos.o = o; }
         void ChangePosition(float x, float y, float z, float o) { pos.x = x; pos.y = y; pos.z = z; pos.o = o; }
@@ -721,9 +737,31 @@ class MovementInfo
             float   velocity, sinAngle, cosAngle, xyspeed;
         };
 
+        // used only for SMSG_PLAYER_MOVE currently
+        struct StatusInfo
+        {
+            StatusInfo() : hasFallData(false), hasFallDirection(false), hasOrientation(false), 
+                hasPitch(false), hasSpline(false), hasSplineElevation(false), 
+                hasTimeStamp(false), hasTransportTime2(false), hasTransportTime3(false) { }
+            bool hasFallData        : 1;
+            bool hasFallDirection   : 1;
+            bool hasOrientation     : 1;
+            bool hasPitch           : 1;
+            bool hasSpline          : 1;
+            bool hasSplineElevation : 1;
+            bool hasTimeStamp       : 1;
+            bool hasTransportTime2  : 1;
+            bool hasTransportTime3  : 1;
+        };
+
         JumpInfo const& GetJumpInfo() const { return jump; }
+        StatusInfo const& GetStatusInfo() const { return si; }
+        float GetSplineElevation() const { return splineElevation; }
+        float GetPitch() const { return s_pitch; }
+
     private:
         // common
+        ObjectGuid guid;
         uint32   moveFlags;                                 // see enum MovementFlags
         uint16   moveFlags2;                                // see enum MovementFlags2
         uint32   time;
@@ -741,18 +779,20 @@ class MovementInfo
         // jumping
         JumpInfo jump;
         // spline
-        float    u_unk1;
+        float    splineElevation;
+        // status info
+        StatusInfo si;
 };
 
-inline ByteBuffer& operator<< (ByteBuffer& buf, MovementInfo const& mi)
+inline WorldPacket& operator<< (WorldPacket& buf, MovementInfo const& mi)
 {
-    mi.Write(buf);
+    mi.Write(buf, buf.GetOpcode());
     return buf;
 }
 
-inline ByteBuffer& operator>> (ByteBuffer& buf, MovementInfo& mi)
+inline WorldPacket& operator>> (WorldPacket& buf, MovementInfo& mi)
 {
-    mi.Read(buf);
+    mi.Read(buf, buf.GetOpcode());
     return buf;
 }
 
@@ -1088,7 +1128,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::list<Aura*> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32> ComboPointHolderSet;
-        typedef std::map<uint8, uint32> VisibleAuraMap;
+        typedef std::map<uint8, SpellAuraHolder*> VisibleAuraMap;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
         virtual ~Unit();
@@ -1208,13 +1248,22 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         Powers getPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
         void setPowerType(Powers power);
-        uint32 GetPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   + power); }
-        uint32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER1 + power); }
-        void SetPower(Powers power, uint32 val);
-        void SetMaxPower(Powers power, uint32 val);
+        int32 GetPower(Powers power) const;
+        int32 GetPowerByIndex(uint32 index) const;
+        uint32 GetMaxPower(Powers power) const;
+        uint32 GetMaxPowerByIndex(uint32 index) const;
+        void SetPowerByIndex(uint32 power, int32 val);
+        void SetMaxPowerByIndex(uint32 power, int32 val);
+        void SetPower(Powers power, int32 val);
+        void SetMaxPower(Powers power, int32 val);
         int32 ModifyPower(Powers power, int32 val);
         void ApplyPowerMod(Powers power, uint32 val, bool apply);
         void ApplyMaxPowerMod(Powers power, uint32 val, bool apply);
+
+        static uint32 GetPowerIndexByClass(Powers power, uint32 classId);
+        static Powers GetPowerTypeByIndex(uint32 index, uint32 classId);
+        uint32 GetPowerIndex(Powers power) const { return GetPowerIndexByClass(power, getClass()); }
+        Powers getPowerType(uint32 index) const { return GetPowerTypeByIndex(index, getClass()); }
 
         uint32 GetAttackTime(WeaponAttackType att) const { return (uint32)(GetFloatValue(UNIT_FIELD_BASEATTACKTIME + att) / m_modAttackSpeedPct[att]); }
         void SetAttackTime(WeaponAttackType att, uint32 val) { SetFloatValue(UNIT_FIELD_BASEATTACKTIME + att, val * m_modAttackSpeedPct[att]); }
@@ -1293,19 +1342,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
 
         // player or player's pet resilience (-1%)
-        float GetMeleeCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_MELEE); }
-        float GetRangedCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_RANGED); }
-        float GetSpellCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_SPELL); }
-
-        // player or player's pet resilience (-1%)
-        uint32 GetMeleeCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.2f, 33.0f, damage); }
-        uint32 GetRangedCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_RANGED, 2.2f, 33.0f, damage); }
-        uint32 GetSpellCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_SPELL, 2.2f, 33.0f, damage); }
-
+        uint32 GetCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_RESILIENCE_DAMAGE_TAKEN, 2.2f, 33.0f, damage); }
         // player or player's pet resilience (-1%), cap 100%
-        uint32 GetMeleeDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
-        uint32 GetRangedDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
-        uint32 GetSpellDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.0f, 100.0f, damage); }
+        uint32 GetDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_RESILIENCE_DAMAGE_TAKEN, 2.0f, 100.0f, damage); }
 
         float  MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell);
         SpellMissInfo MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell);
@@ -1420,9 +1459,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // recommend use MonsterMove/MonsterMoveWithSpeed for most case that correctly work with movegens
         // if used additional args in ... part then floats must explicitly casted to double
         void SendHeartBeat();
-
-        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING); }
-        bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE); }
+        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING);}
+        bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);}
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
         virtual void SetRoot(bool enabled) {}
         virtual void SetWaterWalk(bool enabled) {}
@@ -1611,7 +1649,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsInFeralForm() const
         {
             ShapeshiftForm form = GetShapeshiftForm();
-            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
+            return form == FORM_CAT || form == FORM_BEAR;
         }
 
         bool IsInDisallowedMountForm() const
@@ -1690,19 +1728,19 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
         HostileRefManager& getHostileRefManager() { return m_HostileRefManager; }
 
-        uint32 GetVisibleAura(uint8 slot) const
+        SpellAuraHolder* GetVisibleAura(uint8 slot) const
         {
             VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
             if (itr != m_visibleAuras.end())
                 return itr->second;
-            return 0;
+            return NULL;
         }
-        void SetVisibleAura(uint8 slot, uint32 spellid)
+        void SetVisibleAura(uint8 slot, SpellAuraHolder* holder)
         {
-            if (spellid == 0)
+            if (!holder)
                 m_visibleAuras.erase(slot);
             else
-                m_visibleAuras[slot] = spellid;
+                m_visibleAuras[slot] = holder;
         }
         VisibleAuraMap const& GetVisibleAuras() const { return m_visibleAuras; }
         uint8 GetVisibleAurasCount() const { return m_visibleAuras.size(); }
@@ -1915,6 +1953,16 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void OnRelocated();
 
         bool IsLinkingEventTrigger() const { return m_isCreatureLinkingTrigger; }
+
+        bool IsSplineEnabled() const;
+
+        bool IsInWorgenForm(bool inPermanent = false) const;
+
+        // Packet builders
+        void BuildForceMoveRootPacket(WorldPacket* data, bool apply, uint32 value);
+        void BuildMoveWaterWalkPacket(WorldPacket* data, bool apply, uint32 value);
+        void BuildSendPlayVisualPacket(WorldPacket* data, uint32 value, bool impact);
+        void BuildMoveSetCanFlyPacket(WorldPacket* data, bool apply, uint32 value);
 
     protected:
         explicit Unit();

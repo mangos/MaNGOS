@@ -284,7 +284,7 @@ public:
 
 private:
     tbb_exception_ptr ( const std::exception_ptr& src ) : my_ptr(src) {}
-    tbb_exception_ptr ( const captured_exception& src ) : my_ptr(std::copy_exception(src)) {}
+    tbb_exception_ptr ( const captured_exception& src ) : my_ptr(make_exception_ptr(src)) {}
 }; // class tbb::internal::tbb_exception_ptr
 
 } // namespace internal

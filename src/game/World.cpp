@@ -42,6 +42,7 @@
 #include "SpellMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
+#include "DB2Stores.h"
 #include "MassMailMgr.h"
 #include "LootMgr.h"
 #include "ItemEnchantmentMgr.h"
@@ -247,12 +248,19 @@ World::AddSession_(WorldSession* s)
         return;
     }
 
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1);
-    packet << uint8(AUTH_OK);
+    WorldPacket packet(SMSG_AUTH_RESPONSE, 17);
+
+    packet.WriteBit(false);                                 // has queue
+    packet.WriteBit(true);                                  // has account info
+
+    packet << uint32(0);                                    // Unknown - 4.3.2
+    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. must be set in database manually for each account
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. Must be set in database manually for each account.
     packet << uint32(0);                                    // BillingTimeRested
-    packet << uint8(s->Expansion());                        // 0 - normal, 1 - TBC, 2 - WotLK. Must be set in database manually for each account.
+    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint8(AUTH_OK);
+
     s->SendPacket(&packet);
 
     s->SendAddonsInfo();
@@ -295,17 +303,24 @@ int32 World::GetQueuedSessionPos(WorldSession* sess)
 void World::AddQueuedSession(WorldSession* sess)
 {
     sess->SetInQueue(true);
-    m_QueuedSessions.push_back(sess);
+    m_QueuedSessions.push_back (sess);
 
     // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 4 + 1);
-    packet << uint8(AUTH_WAIT_QUEUE);
+    WorldPacket packet (SMSG_AUTH_RESPONSE, 21);
+
+    packet.WriteBit(true);                                  // has queue
+    packet.WriteBit(false);                                 // unk queue-related
+    packet.WriteBit(true);                                  // has account data
+
+    packet << uint32(0);                                    // Unknown - 4.3.2
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. must be set in database manually for each account
     packet << uint32(0);                                    // BillingTimeRemaining
-    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, 2 - WotLK, 3 - CT. Must be set in database manually for each account.
     packet << uint32(0);                                    // BillingTimeRested
-    packet << uint8(sess->Expansion());                     // 0 - normal, 1 - TBC, must be set in database manually for each account
+    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint8(AUTH_WAIT_QUEUE);
     packet << uint32(GetQueuedSessionPos(sess));            // position in queue
-    packet << uint8(0);                                     // unk 3.3.0
+
     sess->SendPacket(&packet);
 }
 
@@ -959,6 +974,7 @@ void World::SetInitialWorldSettings()
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
     LoadDBCStores(m_dataPath);
+    LoadDB2Stores(m_dataPath);
     DetectDBCLang();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());    // Get once for all the locale index of DBC language (console/broadcasts)
 
@@ -1104,6 +1120,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading Quest POI");
     sObjectMgr.LoadQuestPOI();
+
+    sLog.outString("Loading Quest Phase Maps...");
+    sObjectMgr.LoadQuestPhaseMaps();
 
     sLog.outString("Loading Quests Relations...");
     sLog.outString();

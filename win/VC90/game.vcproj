@@ -831,11 +831,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\MailHandler.cpp"
+				RelativePath="..\..\src\game\Mail.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\game\Mail.h"
+				RelativePath="..\..\src\game\MailHandler.cpp"
 				>
 			</File>
 			<File
@@ -882,7 +882,7 @@
 				RelativePath="..\..\src\game\MoveMap.h"
 				>
 			</File>
-            <File
+			<File
 				RelativePath="..\..\src\game\MoveMapSharedDefines.h"
 				>
 			</File>
@@ -1515,6 +1515,22 @@
 			Name="Server"
 			>
 			<File
+				RelativePath="..\..\src\game\DB2fmt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\DB2Stores.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\DB2Stores.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\DB2Structure.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\game\DBCEnums.h"
 				>
 			</File>
@@ -1528,6 +1544,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\game\DBCStores.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\game\DBCStructure.cpp"
 				>
 			</File>
 			<File
@@ -1754,6 +1774,10 @@
 		<Filter
 			Name="Movement"
 			>
+			<File
+				RelativePath="..\..\src\game\MovementStructures.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\game\Movement\MoveSpline.cpp"
 				>
