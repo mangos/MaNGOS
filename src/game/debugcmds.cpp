@@ -26,7 +26,7 @@
 #include "Unit.h"
 #include "GossipDef.h"
 #include "Language.h"
-#include "BattleGroundMgr.h"
+#include "BattleGround/BattleGroundMgr.h"
 #include <fstream>
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"

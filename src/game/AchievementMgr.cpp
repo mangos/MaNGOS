@@ -36,7 +36,7 @@
 #include "CellImpl.h"
 #include "Language.h"
 #include "MapManager.h"
-#include "BattleGround.h"
+#include "BattleGround/BattleGround.h"
 #include "BattleGroundAB.h"
 #include "Map.h"
 #include "InstanceData.h"

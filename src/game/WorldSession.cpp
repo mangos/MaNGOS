@@ -33,7 +33,7 @@
 #include "Guild.h"
 #include "GuildMgr.h"
 #include "World.h"
-#include "BattleGroundMgr.h"
+#include "BattleGround/BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
 #include "Auth/AuthCrypt.h"

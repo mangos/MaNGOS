@@ -37,7 +37,7 @@
 #include <zlib/zlib.h>
 #include "ObjectAccessor.h"
 #include "Object.h"
-#include "BattleGround.h"
+#include "BattleGround/BattleGround.h"
 #include "OutdoorPvP/OutdoorPvP.h"
 #include "Pet.h"
 #include "SocialMgr.h"
