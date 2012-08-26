@@ -2759,11 +2759,12 @@ enum ChatMsg
 enum ChatLinkColors
 {
     CHAT_LINK_COLOR_CURRENCY    = 0xff00aa00,   // green
+    CHAT_LINK_COLOR_INSTANCELOCK= 0xffff8000,   // orange
     CHAT_LINK_COLOR_TRADE       = 0xffffd000,   // orange
     CHAT_LINK_COLOR_TALENT      = 0xff4e96f7,   // blue
     CHAT_LINK_COLOR_SPELL       = 0xff71d5ff,   // bright blue
     CHAT_LINK_COLOR_ENCHANT     = 0xffffd000,   // orange
-    CHAT_LINK_COLOR_ACHIEVEMENT = 0xffffff00,
+    CHAT_LINK_COLOR_ACHIEVEMENT = 0xffffff00,   // yellow
     CHAT_LINK_COLOR_GLYPH       = 0xff66bbff
 };
 

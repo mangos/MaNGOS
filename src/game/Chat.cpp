@@ -46,6 +46,7 @@
 // |color|Hcreature:creature_guid|h[name]|h|r
 // |color|Hcreature_entry:creature_id|h[name]|h|r
 // |color|Hcurrency:currency_id||h[name]|h|r
+// |color|Hinstancelock:player_guid:map_id:is_completed:encounter_mask|h[instance_name]|h|r
 // |color|Henchant:recipe_spell_id|h[prof_name: recipe_name]|h|r          - client, at shift click in recipes list dialog
 // |color|Hgameevent:id|h[name]|h|r
 // |color|Hgameobject:go_guid|h[name]|h|r
@@ -1451,6 +1452,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
 
     valid examples:
     |cff00aa00|Hcurrency:391|h[Рекомендательный значок Тол Барада]|h|r
+    |cffff8000|Hinstancelock:070000000177AF81:532:0:1|h[Каражан]|h|r            NYI
     |cffa335ee|Hitem:812:0:0:0:0:0:0:0:70|h[Glowing Brightwood Staff]|h|r
     |cff808080|Hquest:2278:47|h[The Platinum Discs]|h|r
     |cffffd000|Htrade:4037:1:150:1:6AAAAAAAAAAAAAAAAAAAAAAOAADAAAAAAAAAAAAAAAAIAAAAAAAAA|h[Engineering]|h|r
