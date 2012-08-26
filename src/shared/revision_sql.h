@@ -1,6 +1,6 @@
 #ifndef __REVISION_SQL_H__
 #define __REVISION_SQL_H__
- #define REVISION_DB_CHARACTERS "required_11785_02_characters_instance"
- #define REVISION_DB_MANGOS "required_12097_01_mangos_mangos_string"
- #define REVISION_DB_REALMD "required_10008_01_realmd_realmd_db_version"
+ #define REVISION_DB_CHARACTERS "required_12112_02_characters_character"
+ #define REVISION_DB_MANGOS "required_12112_14_mangos_command"
+ #define REVISION_DB_REALMD "required_12112_01_realmd_account_access"
 #endif // __REVISION_SQL_H__

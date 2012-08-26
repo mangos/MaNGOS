@@ -1,0 +1,3 @@
+ALTER TABLE db_version CHANGE COLUMN required_12112_07_mangos_quest_phase_maps required_12112_08_mangos_player_classlevelstats bit;
+
+DROP TABLE IF EXISTS `player_classlevelstats`;
