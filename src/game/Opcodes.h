@@ -1199,10 +1199,10 @@ enum Opcodes
     SMSG_HEALTH_UPDATE                                    = 0x1480,
     SMSG_POWER_UPDATE                                     = 0x4A07, // 4.3.4 15595
     CMSG_GAMEOBJ_REPORT_USE                               = 0x4827, // 4.3.4 15595
-    SMSG_HIGHEST_THREAT_UPDATE                            = 0x1483,
-    SMSG_THREAT_UPDATE                                    = 0x1484,
-    SMSG_THREAT_REMOVE                                    = 0x1485,
-    SMSG_THREAT_CLEAR                                     = 0x1486,
+    SMSG_HIGHEST_THREAT_UPDATE                            = 0x4104, // 4.3.4 15595
+    SMSG_THREAT_UPDATE                                    = 0x4735, // 4.3.4 15595
+    SMSG_THREAT_REMOVE                                    = 0x2E05, // 4.3.4 15595
+    SMSG_THREAT_CLEAR                                     = 0x6437, // 4.3.4 15595
     SMSG_CONVERT_RUNE                                     = 0x1487,
     SMSG_RESYNC_RUNES                                     = 0x1488,
     SMSG_ADD_RUNE_POWER                                   = 0x1489,
