@@ -1040,6 +1040,7 @@ void Group::SendUpdate()
         {
             data << uint8(0);
             data << uint32(0);
+            data << uint8(0);
         }
         data << GetObjectGuid();                            // group guid
         data << uint32(0);                                  // 3.3, this value increments every time SMSG_GROUP_LIST is sent
@@ -1057,7 +1058,7 @@ void Group::SendUpdate()
             data << uint8(onlineState);                     // online-state
             data << uint8(citr2->group);                    // groupid
             data << uint8(GetFlags(*citr2));                // group flags
-            data << uint8(0);                               // 3.3, role?
+            data << uint8(0);                               // roles mask
         }
 
         data << m_leaderGuid;                               // leader guid

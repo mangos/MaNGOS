@@ -1733,7 +1733,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             VisibleAuraMap::const_iterator itr = m_visibleAuras.find(slot);
             if (itr != m_visibleAuras.end())
                 return itr->second;
-            return 0;
+            return NULL;
         }
         void SetVisibleAura(uint8 slot, SpellAuraHolder* holder)
         {
