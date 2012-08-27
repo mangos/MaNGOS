@@ -367,6 +367,7 @@ class Spell
         void EffectSpecCount(SpellEffectEntry const* effect);
         void EffectActivateSpec(SpellEffectEntry const* effect);
         void EffectCancelAura(SpellEffectEntry const* effect);
+        void EffectKnockBackFromPosition(SpellEffectEntry const* effect);
 
         Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL);
         ~Spell();

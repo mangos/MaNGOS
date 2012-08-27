@@ -1623,6 +1623,8 @@ void ScriptAction::HandleScriptStep()
                 pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             else if (m_script->goLockState.lockState & 0x08)
                 pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+
+            break;
         }
         case SCRIPT_COMMAND_STAND_STATE:                    // 28
         {
