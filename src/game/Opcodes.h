@@ -1080,7 +1080,7 @@ enum Opcodes
     SMSG_RAID_READY_CHECK_ERROR                           = 0x1409,
     CMSG_OPT_OUT_OF_LOOT                                  = 0x140A,
     MSG_QUERY_GUILD_BANK_TEXT                             = 0x140B,
-    CMSG_SET_GUILD_BANK_TEXT                              = 0x140C,
+    CMSG_SET_GUILD_BANK_TEXT                              = 0x3023, // 4.3.4 15595
     CMSG_SET_GRANTABLE_LEVELS                             = 0x140D,
     CMSG_GRANT_LEVEL                                      = 0x140E,
     CMSG_REFER_A_FRIEND                                   = 0x140F,
