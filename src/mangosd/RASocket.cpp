@@ -157,7 +157,7 @@ int RASocket::handle_input(ACE_HANDLE)
 
     if (readBytes <= 0)
     {
-        DEBUG_LOG("read %u bytes in RASocket::handle_input", readBytes);
+        DEBUG_LOG("read " SIZEFMTD " bytes in RASocket::handle_input", readBytes);
         return -1;
     }
 

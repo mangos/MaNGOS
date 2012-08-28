@@ -7169,7 +7169,7 @@ bool ChatHandler::HandleMmapTestArea(char* args)
 
     if (!creatureList.empty())
     {
-        PSendSysMessage("Found %i Creatures.", creatureList.size());
+        PSendSysMessage("Found " SIZEFMTD " Creatures.", creatureList.size());
 
         uint32 paths = 0;
         uint32 uStartTime = WorldTimer::getMSTime();
