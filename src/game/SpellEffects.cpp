@@ -7964,7 +7964,6 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                         }
                         // These are not restored
                         case POWER_FOCUS:
-                        case POWER_HAPPINESS:
                         case POWER_RUNE:
                         case POWER_HEALTH:
                             break;
@@ -9945,7 +9944,7 @@ void Spell::EffectCancelAura(SpellEffectEntry const* effect)
     unitTarget->RemoveAurasDueToSpell(spellId);
 }
 
-void Spell::EffectKnockBackFromPosition(SpellEffectIndex eff_idx)
+void Spell::EffectKnockBackFromPosition(SpellEffectEntry const* effect)
 {
     if (!unitTarget)
         return;
@@ -9957,7 +9956,7 @@ void Spell::EffectKnockBackFromPosition(SpellEffectIndex eff_idx)
         m_caster->GetPosition(x, y, z);
 
     float angle = unitTarget->GetAngle(x,y) + M_PI_F;
-    float horizontalSpeed = m_spellInfo->EffectMiscValue[eff_idx] * 0.1f;
+    float horizontalSpeed = effect->EffectMiscValue * 0.1f;
     float verticalSpeed = damage * 0.1f;
     unitTarget->KnockBackWithAngle(angle, horizontalSpeed, verticalSpeed);
 }
