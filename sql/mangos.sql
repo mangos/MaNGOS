@@ -4093,7 +4093,7 @@ INSERT INTO `mangos_string` VALUES
 (1506,'Current phase = %u',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1507,'Combat-Movement is %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1508,'Melee attacking is %s',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(1509,'Can\'t add item %u to vendor with unknown item type %u',,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1509,'Can\'t add item %u to vendor with unknown item type %u',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1510,'Currency %u has maxCount = 0, but for currencies maxCount = buyCount, so it can\'t be 0 or less than that\'s currency precision (%u).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1600,'|cffffff00Northpass Tower has been taken by the Horde!|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1601,'|cffffff00Northpass Tower has been taken by the Alliance!|r',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
