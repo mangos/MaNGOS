@@ -566,8 +566,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
 
         if (movementInfo.GetPos()->z < -500.0f)
         {
-            if (plMover->InBattleGround()
-                    && plMover->GetBattleGround()
+            if (plMover->GetBattleGround()
                     && plMover->GetBattleGround()->HandlePlayerUnderMap(_player))
             {
                 // do nothing, the handle already did if returned true

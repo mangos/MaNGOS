@@ -752,15 +752,15 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     if (!cPos.Relocate(this))
         return false;
 
+    // Notify the outdoor pvp script
+    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
+        outdoorPvP->HandleCreatureCreate(this);
+
     // Notify the map's instance data.
     // Only works if you create the object in it, not if it is moves to that map.
     // Normally non-players do not teleport to other maps.
     if (InstanceData* iData = GetMap()->GetInstanceData())
         iData->OnCreatureCreate(this);
-
-    // Notify the outdoor pvp script
-    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
-        outdoorPvP->HandleCreatureCreate(this);
 
     switch (GetCreatureInfo()->rank)
     {

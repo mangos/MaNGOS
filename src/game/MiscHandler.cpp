@@ -735,14 +735,12 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         return;
     }
 
-    if (pl->InBattleGround())
+    if (BattleGround* bg = pl->GetBattleGround())
     {
-        if (BattleGround* bg = pl->GetBattleGround())
-            bg->HandleAreaTrigger(pl, Trigger_ID);
+        bg->HandleAreaTrigger(pl, Trigger_ID);
         return;
     }
-
-    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(pl->GetCachedZoneId()))
+    else if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(pl->GetCachedZoneId()))
     {
         if (outdoorPvP->HandleAreaTrigger(pl, Trigger_ID))
             return;
