@@ -2662,7 +2662,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %lu realm completed achievements.", (unsigned long)m_allCompletedAchievements.size());
+    sLog.outString(">> Loaded " SIZEFMTD " realm completed achievements.", m_allCompletedAchievements.size());
 }
 
 void AchievementGlobalMgr::LoadRewards()
@@ -2889,5 +2889,5 @@ void AchievementGlobalMgr::LoadRewardLocales()
     delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %lu achievement reward locale strings", (unsigned long)m_achievementRewardLocales.size());
+    sLog.outString(">> Loaded " SIZEFMTD " achievement reward locale strings", m_achievementRewardLocales.size());
 }

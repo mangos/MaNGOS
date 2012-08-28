@@ -73,7 +73,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = %i", bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, cast_flags, (uint32)recvPacket.size());
+    DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, cast_count: %u, spellid: %u, Item: %u, glyphIndex: %u, unk_flags: %u, data length = " SIZEFMTD, bagIndex, slot, cast_count, spellid, pItem->GetEntry(), glyphIndex, cast_flags, recvPacket.size());
 
     ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
@@ -195,7 +195,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 {
-    DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = %i", (uint32)recvPacket.size());
+    DETAIL_LOG("WORLD: CMSG_OPEN_ITEM packet, data length = " SIZEFMTD, recvPacket.size());
 
     uint8 bagIndex, slot;
 
@@ -352,8 +352,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, cast_count: %u, cast_flags %u, data length = %i",
-              spellId, cast_count, cast_flags, (uint32)recvPacket.size());
+    DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, cast_count: %u, cast_flags %u, data length = " SIZEFMTD,
+              spellId, cast_count, unk_flags, recvPacket.size());
 
     SpellEntry const* spellInfo = sSpellStore.LookupEntry(spellId);
 
