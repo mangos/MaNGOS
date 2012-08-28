@@ -1,4 +1,4 @@
-ALTER TABLE db_version CHANGE COLUMN required_12012_01_mangos_spell_template required_12112_01_mangos_item_template bit;
+ALTER TABLE db_version CHANGE COLUMN required_12097_01_mangos_mangos_string required_12112_01_mangos_item_template bit;
 
 ALTER TABLE `item_template` ADD COLUMN `Unknown` float NOT NULL AFTER `Flags2`;
 ALTER TABLE `item_template` ADD COLUMN `Unknown1` float NOT NULL AFTER `Unknown`;
