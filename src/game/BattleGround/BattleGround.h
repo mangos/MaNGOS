@@ -290,7 +290,7 @@ class BattleGround
         virtual void StartingEventOpenDoors() {}
 
         /* achievement req. */
-        virtual bool IsAllNodesConrolledByTeam(Team /*team*/) const { return false; }
+        virtual bool IsAllNodesControlledByTeam(Team /*team*/) const { return false; }
         bool IsTeamScoreInRange(Team team, uint32 minScore, uint32 maxScore) const;
 
         /* Battleground */

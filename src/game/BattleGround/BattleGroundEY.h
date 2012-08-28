@@ -283,7 +283,7 @@ class BattleGroundEY : public BattleGround
         virtual void EventPlayerDroppedFlag(Player* source) override;
 
         /* achievement req. */
-        bool IsAllNodesControlledByTeam(Team team) const;
+        bool IsAllNodesControlledByTeam(Team team) const override;
 
     private:
         void EventPlayerCapturedFlag(Player* source, BG_EY_Nodes node);     // NOTE: virtual BattleGround::EventPlayerCapturedFlag has different parameters list
