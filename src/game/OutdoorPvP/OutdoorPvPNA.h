@@ -171,7 +171,7 @@ class OutdoorPvPNA : public OutdoorPvP
         void HandleGameObjectCreate(GameObject* go) override;
         void HandleCreatureDeath(Creature* creature) override;
 
-        void HandlePlayerKillInsideArea(Player* player, Unit* victim) override;
+        void HandlePlayerKillInsideArea(Player* player) override;
         bool HandleGameObjectUse(Player* player, GameObject* go) override;
         void Update(uint32 diff) override;
 

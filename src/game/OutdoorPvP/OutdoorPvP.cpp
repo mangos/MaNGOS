@@ -78,7 +78,7 @@ void OutdoorPvP::SendUpdateWorldState(uint32 field, uint32 value)
    @param   player who killed another player
    @param   victim who was killed
  */
-void OutdoorPvP::HandlePlayerKill(Player* killer, Unit* victim)
+void OutdoorPvP::HandlePlayerKill(Player* killer, Player* victim)
 {
     if (Group* group = killer->GetGroup())
     {
@@ -96,14 +96,14 @@ void OutdoorPvP::HandlePlayerKill(Player* killer, Unit* victim)
             // creature kills must be notified, even if not inside objective / not outdoor pvp active
             // player kills only count if active and inside objective
             if (groupMember->CanUseOutdoorCapturePoint())
-                HandlePlayerKillInsideArea(groupMember, victim);
+                HandlePlayerKillInsideArea(groupMember);
         }
     }
     else
     {
         // creature kills must be notified, even if not inside objective / not outdoor pvp active
         if (killer && killer->CanUseOutdoorCapturePoint())
-            HandlePlayerKillInsideArea(killer, victim);
+            HandlePlayerKillInsideArea(killer);
     }
 }
 

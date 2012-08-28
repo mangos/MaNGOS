@@ -1114,26 +1114,29 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             he->DuelComplete(DUEL_INTERUPTED);
         }
 
-        // handle player kill in outdoor pvp
-        if (player_tap && pVictim->GetTypeId() == TYPEID_PLAYER && pVictim != this)
+        // handle player/npc kill in battleground or outdoor pvp script
+        if (player_tap)
         {
-            if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(player_tap->GetCachedZoneId()))
-                outdoorPvP->HandlePlayerKill(player_tap, pVictim);
-        }
-
-        // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
-        if (pVictim->GetTypeId() == TYPEID_PLAYER && ((Player*)pVictim)->InBattleGround())
-        {
-            Player* killed = ((Player*)pVictim);
-            if (BattleGround* bg = killed->GetBattleGround())
-                if (player_tap)
-                    bg->HandleKillPlayer(killed, player_tap);
-        }
-        else if (pVictim->GetTypeId() == TYPEID_UNIT)
-        {
-            if (player_tap)
+            if (pVictim->GetTypeId() == TYPEID_PLAYER)
+            {
+                Player* killed = (Player*)pVictim;
+                if (killed->InBattleGround())
+                {
+                    if (BattleGround* bg = killed->GetBattleGround())
+                        bg->HandleKillPlayer(killed, player_tap);
+                }
+                else if (pVictim != this)
+                {
+                    // selfkills are not handled in outdoor pvp scripts
+                    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(player_tap->GetCachedZoneId()))
+                        outdoorPvP->HandlePlayerKill(player_tap, killed);
+                }
+            }
+            else if (pVictim->GetTypeId() == TYPEID_UNIT)
+            {
                 if (BattleGround* bg = player_tap->GetBattleGround())
                     bg->HandleKillUnit((Creature*)pVictim, player_tap);
+            }
         }
     }
     else                                                    // if (health <= damage)

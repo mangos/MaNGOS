@@ -142,7 +142,7 @@ void OutdoorPvPHP::HandleObjectiveComplete(uint32 eventId, std::list<Player*> pl
 }
 
 // Cast player spell on opponent kill
-void OutdoorPvPHP::HandlePlayerKillInsideArea(Player* player, Unit* /*victim*/)
+void OutdoorPvPHP::HandlePlayerKillInsideArea(Player* player)
 {
     for (uint8 i = 0; i < MAX_HP_TOWERS; ++i)
     {

@@ -95,7 +95,7 @@ void OutdoorPvPNA::HandleObjectiveComplete(uint32 eventId, std::list<Player*> pl
 }
 
 // Cast player spell on opponent kill
-void OutdoorPvPNA::HandlePlayerKillInsideArea(Player* player, Unit* /*victim*/)
+void OutdoorPvPNA::HandlePlayerKillInsideArea(Player* player)
 {
     if (GameObject* capturePoint = player->GetMap()->GetGameObject(m_capturePoint))
     {
