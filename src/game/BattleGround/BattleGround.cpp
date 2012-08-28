@@ -73,7 +73,7 @@ namespace MaNGOS
                 data << ObjectGuid(targetGuid);
                 data << uint32(strlen(text) + 1);
                 data << text;
-                data << uint8(i_source ? i_source->GetChatTag() : CHAT_TAG_NONE);
+                data << uint8(i_source ? i_source->GetChatTag() : uint8(CHAT_TAG_NONE));
             }
 
             ChatMsg i_msgtype;
@@ -152,7 +152,7 @@ namespace MaNGOS
                 data << ObjectGuid(targetGuid);
                 data << uint32(strlen(str) + 1);
                 data << str;
-                data << uint8(i_source ? i_source->GetChatTag() : CHAT_TAG_NONE);
+                data << uint8(i_source ? i_source->GetChatTag() : uint8(CHAT_TAG_NONE));
             }
         private:
 

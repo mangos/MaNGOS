@@ -434,6 +434,8 @@ void GameObject::Update(uint32 update_diff, uint32 p_time)
                     m_UniqueUsers.clear();
                     SetLootState(GO_READY);
                     return; // SetLootState and return because go is treated as "burning flag" due to GetGoAnimProgress() being 100 and would be removed on the client
+                default:
+                    break;
             }
 
             if (!HasStaticDBSpawnData())                    // Remove wild summoned after use

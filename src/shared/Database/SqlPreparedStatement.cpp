@@ -152,6 +152,7 @@ void SqlPlainPreparedStatement::DataToString(const SqlStmtFieldData& data, std::
             m_pConn.DB().escape_string(tmp);
             fmt << "'" << tmp << "'";
         }
+        case FIELD_NONE:                                                    break;
         break;
     }
 }

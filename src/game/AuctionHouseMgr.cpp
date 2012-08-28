@@ -557,6 +557,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
                 {
                     case ALLIANCE: houseid = player->GetAuctionAccessMode() == 0 ? 1 : 6; break;
                     case HORDE:    houseid = player->GetAuctionAccessMode() == 0 ? 6 : 1; break;
+                    default: break;
                 }
             }
         }

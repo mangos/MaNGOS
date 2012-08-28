@@ -6712,6 +6712,16 @@ void Aura::HandleShapeshiftBoosts(bool apply)
         case FORM_STEALTH:
         case FORM_CREATURECAT:
         case FORM_CREATUREBEAR:
+        case FORM_STEVES_GHOUL:
+        case FORM_THARONJA_SKELETON:
+        case FORM_TEST_OF_STRENGTH:
+        case FORM_BLB_PLAYER:
+        case FORM_SHADOW_DANCE:
+        case FORM_TEST:
+        case FORM_ZOMBIE:
+        case FORM_UNDEAD:
+        case FORM_FRENZY:
+        case FORM_NONE:
             break;
     }
 
@@ -8649,7 +8659,7 @@ void Aura::HandlePhase(bool apply, bool Real)
             target->RemoveAurasDueToSpell(phases.front()->GetId(), GetHolder());
     }
 
-    target->SetPhaseMask(apply ? GetMiscValue() : PHASEMASK_NORMAL, true);
+    target->SetPhaseMask(apply ? GetMiscValue() : uint32(PHASEMASK_NORMAL), true);
     // no-phase is also phase state so same code for apply and remove
     if (GetEffIndex() == EFFECT_INDEX_0 && target->GetTypeId() == TYPEID_PLAYER)
     {
