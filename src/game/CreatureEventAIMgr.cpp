@@ -376,6 +376,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         case SPAWNED_EVENT_ZONE:
                             if (!GetAreaEntryByAreaID(temp.spawned.conditionValue1))
                                 sLog.outErrorDb("CreatureEventAI:  Creature %u are using spawned event(%u) with param1 = %u 'area specific' but area (param2: %u) does not exist. Event will never repeat.", temp.creature_id, i, temp.spawned.condition, temp.spawned.conditionValue1);
+                            break;
                         default:
                             sLog.outErrorDb("CreatureEventAI:  Creature %u are using invalid spawned event %u mode (%u) in param1", temp.creature_id, i, temp.spawned.condition);
                             break;
