@@ -21,7 +21,7 @@
 
 #include "Common.h"
 #include "OutdoorPvP.h"
-#include "../Language.h"
+#include "Language.h"
 
 enum
 {

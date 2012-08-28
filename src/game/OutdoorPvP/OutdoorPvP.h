@@ -20,8 +20,8 @@
 #define OUTDOOR_PVP_H
 
 #include "Common.h"
-#include "../ObjectGuid.h"
-#include "../SharedDefines.h"
+#include "ObjectGuid.h"
+#include "SharedDefines.h"
 #include "OutdoorPvPMgr.h"
 
 class WorldPacket;

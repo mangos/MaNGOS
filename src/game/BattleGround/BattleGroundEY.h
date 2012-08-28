@@ -19,7 +19,7 @@
 #ifndef __BATTLEGROUNDEY_H
 #define __BATTLEGROUNDEY_H
 
-#include "../Language.h"
+#include "Language.h"
 
 class BattleGround;
 

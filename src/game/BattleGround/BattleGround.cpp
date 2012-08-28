@@ -16,24 +16,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../Object.h"
-#include "../Player.h"
+#include "Object.h"
+#include "Player.h"
 #include "BattleGround.h"
 #include "BattleGroundMgr.h"
-#include "../Creature.h"
-#include "../MapManager.h"
-#include "../Language.h"
-#include "../SpellAuras.h"
-#include "../ArenaTeam.h"
-#include "../World.h"
-#include "../Group.h"
-#include "../ObjectGuid.h"
-#include "../ObjectMgr.h"
-#include "../Mail.h"
+#include "Creature.h"
+#include "MapManager.h"
+#include "Language.h"
+#include "SpellAuras.h"
+#include "ArenaTeam.h"
+#include "World.h"
+#include "Group.h"
+#include "ObjectGuid.h"
+#include "ObjectMgr.h"
+#include "Mail.h"
 #include "WorldPacket.h"
 #include "Util.h"
-#include "../Formulas.h"
-#include "../GridNotifiersImpl.h"
+#include "Formulas.h"
+#include "GridNotifiersImpl.h"
 
 namespace MaNGOS
 {

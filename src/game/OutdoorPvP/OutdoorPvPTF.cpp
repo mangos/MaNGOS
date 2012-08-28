@@ -18,12 +18,12 @@
 
 #include "OutdoorPvPTF.h"
 #include "WorldPacket.h"
-#include "../World.h"
-#include "../ObjectMgr.h"
-#include "../Object.h"
-#include "../Creature.h"
-#include "../GameObject.h"
-#include "../Player.h"
+#include "World.h"
+#include "ObjectMgr.h"
+#include "Object.h"
+#include "Creature.h"
+#include "GameObject.h"
+#include "Player.h"
 
 OutdoorPvPTF::OutdoorPvPTF() : OutdoorPvP(),
     m_zoneWorldState(WORLD_STATE_TF_TOWERS_CONTROLLED),

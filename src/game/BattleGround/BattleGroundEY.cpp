@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "../Object.h"
-#include "../Player.h"
+#include "Object.h"
+#include "Player.h"
 #include "BattleGround.h"
 #include "BattleGroundEY.h"
-#include "../Creature.h"
-#include "../ObjectMgr.h"
+#include "Creature.h"
+#include "ObjectMgr.h"
 #include "BattleGroundMgr.h"
-#include "../Language.h"
+#include "Language.h"
 #include "WorldPacket.h"
 #include "Util.h"
-#include "../MapManager.h"
+#include "MapManager.h"
 
 BattleGroundEY::BattleGroundEY()
 {
