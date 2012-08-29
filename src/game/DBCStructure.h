@@ -1339,6 +1339,12 @@ struct MovieEntry
     //uint32      unk2;                                     // 3 4.0.0
 };
 
+struct NumTalentsAtLevelEntry
+{
+    //uint32 Level;                                         // 0 index
+    float Talents;                                          // 1 talent count
+};
+
 #define MAX_OVERRIDE_SPELLS     10
 
 struct OverrideSpellDataEntry
@@ -2144,6 +2150,14 @@ struct TalentTabEntry
     //char* description;                                    // 7
     //uint32 rolesMask;                                     // 8 4.0.0
     //uint32 spellIds[2];                                   // 9-10 passive mastery bonus spells?
+};
+
+struct TalentTreePrimarySpellsEntry
+{
+    //uint32 Id;                                            // 0 index
+    uint32 TalentTree;                                      // 1 entry from TalentTab.dbc
+    uint32 SpellId;                                         // 2 spell id to learn
+    //uint32 Flags;                                         // 3 some kind of flags
 };
 
 struct TaxiNodesEntry
