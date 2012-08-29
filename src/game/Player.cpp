@@ -552,7 +552,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
     m_spellPenetrationItemMod = 0;
 
     // Honor System
-    m_lastHonorUpdateTime = time(NULL);
     m_honorPoints = 0;
     m_arenaPoints = 0;
 
@@ -4041,13 +4040,6 @@ void Player::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
 
             m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
         }
-        for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-        {
-            if (m_items[i] == NULL)
-                continue;
-
-            m_items[i]->BuildCreateUpdateBlockForPlayer(data, target);
-        }
     }
 
     SetPhaseAndMap(target);
@@ -4086,13 +4078,6 @@ void Player::DestroyForPlayer(Player* target, bool anim) const
     if (target == this)
     {
         for (int i = INVENTORY_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
-        {
-            if (m_items[i] == NULL)
-                continue;
-
-            m_items[i]->DestroyForPlayer(target);
-        }
-        for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
             if (m_items[i] == NULL)
                 continue;
@@ -4703,9 +4688,6 @@ void Player::DurabilityLossAll(double percent, bool inventory)
             if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 DurabilityLoss(pItem, percent);
 
-        // keys not have durability
-        // for(int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
-
         for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
             if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
@@ -4746,9 +4728,6 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
         for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
             if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 DurabilityPointsLoss(pItem, points);
-
-        // keys not have durability
-        // for(int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
 
         for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
             if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -6535,41 +6514,6 @@ void Player::RewardReputation(Quest const* pQuest)
     // TODO: implement reputation spillover
 }
 
-void Player::UpdateArenaFields(void)
-{
-    /* arena calcs go here */
-}
-
-void Player::UpdateHonorFields()
-{
-    /// called when rewarding honor and at each save
-    time_t now = time(NULL);
-    time_t today = (time(NULL) / DAY) * DAY;
-
-    if (m_lastHonorUpdateTime < today)
-    {
-        time_t yesterday = today - DAY;
-
-        uint16 kills_today = PAIR32_LOPART(GetUInt32Value(PLAYER_FIELD_KILLS));
-
-        // update yesterday's contribution
-        if (m_lastHonorUpdateTime >= yesterday)
-        {
-            //SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
-
-            // this is the first update today, reset today's contribution
-            SetUInt32Value(PLAYER_FIELD_KILLS, MAKE_PAIR32(0,kills_today));
-        }
-        else
-        {
-            // no honor/kills yesterday or today, reset
-            SetUInt32Value(PLAYER_FIELD_KILLS, 0);
-        }
-    }
-
-    m_lastHonorUpdateTime = now;
-}
-
 /// Calculate the amount of honor gained based on the victim
 /// and the size of the group for which the honor is divided
 /// An exact honor value can also be given (overriding the calcs)
@@ -6593,9 +6537,6 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, float honor)
 
     ObjectGuid victim_guid;
     uint32 victim_rank = 0;
-
-    // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
-    UpdateHonorFields();
 
     if (honor <= 0)
     {
@@ -9216,16 +9157,6 @@ InventoryResult Player::CanUnequipItems(uint32 item, uint32 count) const
                 return EQUIP_ERR_OK;
         }
     }
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-    {
-        pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && pItem->GetEntry() == item)
-        {
-            tempcount += pItem->GetCount();
-            if (tempcount >= count)
-                return EQUIP_ERR_OK;
-        }
-    }
     Bag* pBag;
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
@@ -9256,12 +9187,6 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
     {
         Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (pItem && pItem != skipItem &&  pItem->GetEntry() == item)
-            count += pItem->GetCount();
-    }
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-    {
-        Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && pItem != skipItem && pItem->GetEntry() == item)
             count += pItem->GetCount();
     }
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -9318,11 +9243,6 @@ uint32 Player::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipIte
             if (pItem->GetProto()->ItemLimitCategory == limitCategory && pItem != skipItem)
                 count += pItem->GetCount();
 
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetProto()->ItemLimitCategory == limitCategory && pItem != skipItem)
-                count += pItem->GetCount();
-
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             count += pBag->GetItemCountWithLimitCategory(limitCategory, skipItem);
@@ -9346,11 +9266,6 @@ Item* Player::GetItemByEntry(uint32 item) const
             if (pItem->GetEntry() == item)
                 return pItem;
 
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetEntry() == item)
-                return pItem;
-
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (Item* itemPtr = pBag->GetItemByEntry(item))
@@ -9366,11 +9281,6 @@ Item* Player::GetItemByLimitedCategory(uint32 limitedCategory) const
             if (pItem->GetProto()->ItemLimitCategory == limitedCategory)
                 return pItem;
 
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetProto()->ItemLimitCategory == limitedCategory)
-                return pItem;
-
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (Item* itemPtr = pBag->GetItemByLimitedCategory(limitedCategory))
@@ -9382,11 +9292,6 @@ Item* Player::GetItemByLimitedCategory(uint32 limitedCategory) const
 Item* Player::GetItemByGuid(ObjectGuid guid) const
 {
     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->GetObjectGuid() == guid)
-                return pItem;
-
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (pItem->GetObjectGuid() == guid)
                 return pItem;
@@ -9422,7 +9327,7 @@ Item* Player::GetItemByPos(uint16 pos) const
 
 Item* Player::GetItemByPos(uint8 bag, uint8 slot) const
 {
-    if (bag == INVENTORY_SLOT_BAG_0 && (slot < BANK_SLOT_BAG_END || (slot >= KEYRING_SLOT_START && slot < CURRENCYTOKEN_SLOT_END)))
+    if (bag == INVENTORY_SLOT_BAG_0 && slot < BANK_SLOT_BAG_END)
         return m_items[slot];
     else if ((bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END)
              || (bag >= BANK_SLOT_BAG_START && bag < BANK_SLOT_BAG_END))
@@ -9502,8 +9407,6 @@ bool Player::IsInventoryPos(uint8 bag, uint8 slot)
         return true;
     if (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END)
         return true;
-    if (bag == INVENTORY_SLOT_BAG_0 && (slot >= KEYRING_SLOT_START && slot < CURRENCYTOKEN_SLOT_END))
-        return true;
     return false;
 }
 
@@ -9562,10 +9465,6 @@ bool Player::IsValidPos(uint8 bag, uint8 slot, bool explicit_pos) const
         if (slot >= INVENTORY_SLOT_ITEM_START && slot < INVENTORY_SLOT_ITEM_END)
             return true;
 
-        // keyring slots
-        if (slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_END)
-            return true;
-
         // bank main slots
         if (slot >= BANK_SLOT_ITEM_START && slot < BANK_SLOT_ITEM_END)
             return true;
@@ -9614,16 +9513,6 @@ bool Player::HasItemCount(uint32 item, uint32 count, bool inBankAlso) const
 {
     uint32 tempcount = 0;
     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
-    {
-        Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && pItem->GetEntry() == item && !pItem->IsInTrade())
-        {
-            tempcount += pItem->GetCount();
-            if (tempcount >= count)
-                return true;
-        }
-    }
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
     {
         Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
         if (pItem && pItem->GetEntry() == item && !pItem->IsInTrade())
@@ -9814,12 +9703,6 @@ bool Player::HasItemTotemCategory(uint32 TotemCategory) const
         if (pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory, TotemCategory))
             return true;
     }
-    for (uint8 i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-    {
-        pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pItem && IsTotemCategoryCompatiableWith(pItem->GetProto()->TotemCategory, TotemCategory))
-            return true;
-    }
     for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -9850,14 +9733,6 @@ InventoryResult Player::_CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, Item
     {
         if (bag == INVENTORY_SLOT_BAG_0)
         {
-            // keyring case
-            if (slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_START + GetMaxKeyringSize() && !(pProto->BagFamily & BAG_FAMILY_MASK_KEYS))
-                return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
-
-            // currencytoken case
-            if (slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END && !(pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS))
-                return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
-
             // prevent cheating
             if ((slot >= BUYBACK_SLOT_START && slot < BUYBACK_SLOT_END) || slot >= PLAYER_SLOT_END)
                 return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
@@ -10096,24 +9971,6 @@ InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& de
         {
             if (bag == INVENTORY_SLOT_BAG_0)               // inventory
             {
-                res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START, CURRENCYTOKEN_SLOT_END, dest, pProto, count, true, pItem, bag, slot);
-                if (res != EQUIP_ERR_OK)
-                {
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return res;
-                }
-
-                if (count == 0)
-                {
-                    if (no_similar_count == 0)
-                        return EQUIP_ERR_OK;
-
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-                }
-
                 res = _CanStoreItem_InInventorySlots(INVENTORY_SLOT_ITEM_START, INVENTORY_SLOT_ITEM_END, dest, pProto, count, true, pItem, bag, slot);
                 if (res != EQUIP_ERR_OK)
                 {
@@ -10161,67 +10018,6 @@ InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& de
         // search free slot in bag for place to
         if (bag == INVENTORY_SLOT_BAG_0)                    // inventory
         {
-            // search free slot - keyring case
-            if (pProto->BagFamily & BAG_FAMILY_MASK_KEYS)
-            {
-                uint32 keyringSize = GetMaxKeyringSize();
-                res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START, KEYRING_SLOT_START + keyringSize, dest, pProto, count, false, pItem, bag, slot);
-                if (res != EQUIP_ERR_OK)
-                {
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return res;
-                }
-
-                if (count == 0)
-                {
-                    if (no_similar_count == 0)
-                        return EQUIP_ERR_OK;
-
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-                }
-
-                res = _CanStoreItem_InInventorySlots(CURRENCYTOKEN_SLOT_START, CURRENCYTOKEN_SLOT_END, dest, pProto, count, false, pItem, bag, slot);
-                if (res != EQUIP_ERR_OK)
-                {
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return res;
-                }
-
-                if (count == 0)
-                {
-                    if (no_similar_count == 0)
-                        return EQUIP_ERR_OK;
-
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-                }
-            }
-            else if (pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
-            {
-                res = _CanStoreItem_InInventorySlots(CURRENCYTOKEN_SLOT_START, CURRENCYTOKEN_SLOT_END, dest, pProto, count, false, pItem, bag, slot);
-                if (res != EQUIP_ERR_OK)
-                {
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return res;
-                }
-
-                if (count == 0)
-                {
-                    if (no_similar_count == 0)
-                        return EQUIP_ERR_OK;
-
-                    if (no_space_count)
-                        *no_space_count = count + no_similar_count;
-                    return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-                }
-            }
-
             res = _CanStoreItem_InInventorySlots(INVENTORY_SLOT_ITEM_START, INVENTORY_SLOT_ITEM_END, dest, pProto, count, false, pItem, bag, slot);
             if (res != EQUIP_ERR_OK)
             {
@@ -10270,24 +10066,6 @@ InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& de
     // search stack for merge to
     if (pProto->Stackable != 1)
     {
-        res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START, CURRENCYTOKEN_SLOT_END, dest, pProto, count, true, pItem, bag, slot);
-        if (res != EQUIP_ERR_OK)
-        {
-            if (no_space_count)
-                *no_space_count = count + no_similar_count;
-            return res;
-        }
-
-        if (count == 0)
-        {
-            if (no_similar_count == 0)
-                return EQUIP_ERR_OK;
-
-            if (no_space_count)
-                *no_space_count = count + no_similar_count;
-            return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-        }
-
         res = _CanStoreItem_InInventorySlots(INVENTORY_SLOT_ITEM_START, INVENTORY_SLOT_ITEM_END, dest, pProto, count, true, pItem, bag, slot);
         if (res != EQUIP_ERR_OK)
         {
@@ -10347,48 +10125,6 @@ InventoryResult Player::_CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& de
     // search free slot - special bag case
     if (pProto->BagFamily)
     {
-        if (pProto->BagFamily & BAG_FAMILY_MASK_KEYS)
-        {
-            uint32 keyringSize = GetMaxKeyringSize();
-            res = _CanStoreItem_InInventorySlots(KEYRING_SLOT_START, KEYRING_SLOT_START + keyringSize, dest, pProto, count, false, pItem, bag, slot);
-            if (res != EQUIP_ERR_OK)
-            {
-                if (no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return res;
-            }
-
-            if (count == 0)
-            {
-                if (no_similar_count == 0)
-                    return EQUIP_ERR_OK;
-
-                if (no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-            }
-        }
-        else if (pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
-        {
-            res = _CanStoreItem_InInventorySlots(CURRENCYTOKEN_SLOT_START, CURRENCYTOKEN_SLOT_END, dest, pProto, count, false, pItem, bag, slot);
-            if (res != EQUIP_ERR_OK)
-            {
-                if (no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return res;
-            }
-
-            if (count == 0)
-            {
-                if (no_similar_count == 0)
-                    return EQUIP_ERR_OK;
-
-                if (no_space_count)
-                    *no_space_count = count + no_similar_count;
-                return EQUIP_ERR_CANT_CARRY_MORE_OF_THIS;
-            }
-        }
-
         for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
             res = _CanStoreItem_InBag(i, dest, pProto, count, false, false, pItem, bag, slot);
@@ -10461,13 +10197,9 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
     // fill space table
     int inv_slot_items[INVENTORY_SLOT_ITEM_END - INVENTORY_SLOT_ITEM_START];
     int inv_bags[INVENTORY_SLOT_BAG_END - INVENTORY_SLOT_BAG_START][MAX_BAG_SIZE];
-    int inv_keys[KEYRING_SLOT_END - KEYRING_SLOT_START];
-    int inv_tokens[CURRENCYTOKEN_SLOT_END - CURRENCYTOKEN_SLOT_START];
 
     memset(inv_slot_items, 0, sizeof(int) * (INVENTORY_SLOT_ITEM_END - INVENTORY_SLOT_ITEM_START));
     memset(inv_bags, 0, sizeof(int) * (INVENTORY_SLOT_BAG_END - INVENTORY_SLOT_BAG_START)*MAX_BAG_SIZE);
-    memset(inv_keys, 0, sizeof(int) * (KEYRING_SLOT_END - KEYRING_SLOT_START));
-    memset(inv_tokens, 0, sizeof(int) * (CURRENCYTOKEN_SLOT_END - CURRENCYTOKEN_SLOT_START));
 
     for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
@@ -10476,26 +10208,6 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
         if (pItem2 && !pItem2->IsInTrade())
         {
             inv_slot_items[i - INVENTORY_SLOT_ITEM_START] = pItem2->GetCount();
-        }
-    }
-
-    for (int i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
-    {
-        pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-
-        if (pItem2 && !pItem2->IsInTrade())
-        {
-            inv_keys[i - KEYRING_SLOT_START] = pItem2->GetCount();
-        }
-    }
-
-    for (int i = CURRENCYTOKEN_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-    {
-        pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-
-        if (pItem2 && !pItem2->IsInTrade())
-        {
-            inv_tokens[i - CURRENCYTOKEN_SLOT_START] = pItem2->GetCount();
         }
     }
 
@@ -10550,30 +10262,6 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
         {
             bool b_found = false;
 
-            for (int t = KEYRING_SLOT_START; t < KEYRING_SLOT_END; ++t)
-            {
-                pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, t);
-                if (pItem2 && pItem2->CanBeMergedPartlyWith(pProto) == EQUIP_ERR_OK && inv_keys[t - KEYRING_SLOT_START] + pItem->GetCount() <= pProto->GetMaxStackSize())
-                {
-                    inv_keys[t - KEYRING_SLOT_START] += pItem->GetCount();
-                    b_found = true;
-                    break;
-                }
-            }
-            if (b_found) continue;
-
-            for (int t = CURRENCYTOKEN_SLOT_START; t < CURRENCYTOKEN_SLOT_END; ++t)
-            {
-                pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, t);
-                if (pItem2 && pItem2->CanBeMergedPartlyWith(pProto) == EQUIP_ERR_OK && inv_tokens[t - CURRENCYTOKEN_SLOT_START] + pItem->GetCount() <= pProto->GetMaxStackSize())
-                {
-                    inv_tokens[t - CURRENCYTOKEN_SLOT_START] += pItem->GetCount();
-                    b_found = true;
-                    break;
-                }
-            }
-            if (b_found) continue;
-
             for (int t = INVENTORY_SLOT_ITEM_START; t < INVENTORY_SLOT_ITEM_END; ++t)
             {
                 pItem2 = GetItemByPos(INVENTORY_SLOT_BAG_0, t);
@@ -10610,36 +10298,6 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
         if (pProto->BagFamily)
         {
             bool b_found = false;
-            if (pProto->BagFamily & BAG_FAMILY_MASK_KEYS)
-            {
-                uint32 keyringSize = GetMaxKeyringSize();
-                for (uint32 t = KEYRING_SLOT_START; t < KEYRING_SLOT_START + keyringSize; ++t)
-                {
-                    if (inv_keys[t - KEYRING_SLOT_START] == 0)
-                    {
-                        inv_keys[t - KEYRING_SLOT_START] = 1;
-                        b_found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (b_found) continue;
-
-            if (pProto->BagFamily & BAG_FAMILY_MASK_CURRENCY_TOKENS)
-            {
-                for (uint32 t = CURRENCYTOKEN_SLOT_START; t < CURRENCYTOKEN_SLOT_END; ++t)
-                {
-                    if (inv_tokens[t - CURRENCYTOKEN_SLOT_START] == 0)
-                    {
-                        inv_tokens[t - CURRENCYTOKEN_SLOT_START] = 1;
-                        b_found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (b_found) continue;
 
             for (int t = INVENTORY_SLOT_BAG_START; !b_found && t < INVENTORY_SLOT_BAG_END; ++t)
             {
@@ -11347,10 +11005,6 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
             pItem->SetSlot(slot);
             pItem->SetContainer(NULL);
 
-            // need update known currency
-            if (slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END)
-                UpdateKnownCurrencies(pItem->GetEntry(), true);
-
             if (IsInWorld() && update)
             {
                 pItem->AddToWorld();
@@ -11652,9 +11306,6 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                     }
                 }
             }
-            // need update known currency
-            else if (slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END)
-                UpdateKnownCurrencies(pItem->GetEntry(), false);
 
             m_items[slot] = NULL;
             SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid());
@@ -11794,9 +11445,6 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
                 // equipment visual show
                 SetVisibleItemSlot(slot, NULL);
             }
-            // need update known currency
-            else if (slot >= CURRENCYTOKEN_SLOT_START && slot < CURRENCYTOKEN_SLOT_END)
-                UpdateKnownCurrencies(pItem->GetEntry(), false);
 
             m_items[slot] = NULL;
         }
@@ -11831,34 +11479,6 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
                 if (pItem->GetCount() + remcount <= count)
                 {
                     // all items in inventory can unequipped
-                    remcount += pItem->GetCount();
-                    DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
-
-                    if (remcount >= count)
-                        return;
-                }
-                else
-                {
-                    ItemRemovedQuestCheck(pItem->GetEntry(), count - remcount);
-                    pItem->SetCount(pItem->GetCount() - count + remcount);
-                    if (IsInWorld() && update)
-                        pItem->SendCreateUpdateToPlayer(this);
-                    pItem->SetState(ITEM_CHANGED, this);
-                    return;
-                }
-            }
-        }
-    }
-
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
-    {
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-        {
-            if (pItem->GetEntry() == item && !pItem->IsInTrade())
-            {
-                if (pItem->GetCount() + remcount <= count)
-                {
-                    // all keys can be unequipped
                     remcount += pItem->GetCount();
                     DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
 
@@ -12010,11 +11630,6 @@ void Player::DestroyZoneLimitedItem(bool update, uint32 new_zone)
 
     // in inventory
     for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
-        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            if (pItem->IsLimitedToAnotherMapOrZone(GetMapId(), new_zone))
-                DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
-
-    for (int i = KEYRING_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (pItem->IsLimitedToAnotherMapOrZone(GetMapId(), new_zone))
                 DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
@@ -15634,9 +15249,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
     // 25                 26       27       28       29       30         31           32            33        34    35      36                 37         38
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, dungeon_difficulty,"
-    // 39           40                41                42                    43          44          45              46           47               48              49
-    //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk,"
-    // 50      51      52      53      54      55      56         57          58             59              60           61          62
+    // 39          40          41              42           43              44
+    //"totalKills, todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk,"
+    // 45      46      47      48      49      50      51         52          53             54              55           56          57
     //"health, power1, power2, power3, power4, power5, specCount, activeSpec, exploredZones, equipmentCache, knownTitles, actionBars, slot FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
@@ -15687,8 +15302,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(UNIT_FIELD_LEVEL, fields[6].GetUInt8());
     SetUInt32Value(PLAYER_XP, fields[7].GetUInt32());
 
-    _LoadIntoDataField(fields[58].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
-    _LoadIntoDataField(fields[60].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE*2);
+    _LoadIntoDataField(fields[53].GetString(), PLAYER_EXPLORED_ZONES_1, PLAYER_EXPLORED_ZONES_SIZE);
+    _LoadIntoDataField(fields[55].GetString(), PLAYER__FIELD_KNOWN_TITLES, KNOWN_TITLES_SIZE*2);
 
     InitDisplayIds();                                       // model, scale and model data
 
@@ -15706,19 +15321,17 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetUInt32Value(PLAYER_BYTES, fields[9].GetUInt32());
     SetUInt32Value(PLAYER_BYTES_2, fields[10].GetUInt32());
 
-    m_drunk = fields[49].GetUInt16();
+    m_drunk = fields[44].GetUInt16();
 
     SetUInt16Value(PLAYER_BYTES_3, 0, (m_drunk & 0xFFFE) | gender);
 
     SetUInt32Value(PLAYER_FLAGS, fields[11].GetUInt32());
-    SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[48].GetInt32());
-
-    //SetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES, fields[47].GetUInt64());
+    SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[43].GetInt32());
 
     // Action bars state
-    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[61].GetUInt8());
+    SetByteValue(PLAYER_FIELD_BYTES, 2, fields[56].GetUInt8());
 
-    m_slot = fields[62].GetUInt8();
+    m_slot = fields[57].GetUInt8();
 
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -15761,8 +15374,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     _LoadArenaTeamInfo(holder->GetResult(PLAYER_LOGIN_QUERY_LOADARENAINFO));
 
-    SetArenaPoints(fields[39].GetUInt32());
-
     // check arena teams integrity
     for (uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
     {
@@ -15779,13 +15390,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             SetArenaTeamInfoField(arena_slot, ArenaTeamInfoType(j), 0);
     }
 
-    SetHonorPoints(fields[40].GetUInt32());
-
-    //SetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, fields[41].GetUInt32());
-    //SetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION, fields[42].GetUInt32());
-    SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, fields[43].GetUInt32());
-    SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[44].GetUInt16());
-    SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[45].GetUInt16());
+    SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, fields[39].GetUInt32());
+    SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[40].GetUInt16());
+    SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[41].GetUInt16());
 
     _LoadBoundInstances(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES));
 
@@ -15982,11 +15589,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     m_atLoginFlags = fields[33].GetUInt32();
 
-    // Honor system
-    // Update Honor kills data
-    m_lastHonorUpdateTime = logoutTime;
-    UpdateHonorFields();
-
     m_deathExpireTime = (time_t)fields[36].GetUInt64();
     if (m_deathExpireTime > now + MAX_DEATH_COUNT * DEATH_EXPIRE_STEP)
         m_deathExpireTime = now + MAX_DEATH_COUNT * DEATH_EXPIRE_STEP - 1;
@@ -16053,8 +15655,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     _LoadMailedItems(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS));
     UpdateNextMailTimeAndUnreads();
 
-    m_specsCount = fields[56].GetUInt8();
-    m_activeSpec = fields[57].GetUInt8();
+    m_specsCount = fields[51].GetUInt8();
+    m_activeSpec = fields[52].GetUInt8();
 
     _LoadGlyphs(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGLYPHS));
 
@@ -16094,7 +15696,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     // check PLAYER_CHOSEN_TITLE compatibility with PLAYER__FIELD_KNOWN_TITLES
     // note: PLAYER__FIELD_KNOWN_TITLES updated at quest status loaded
-    uint32 curTitle = fields[46].GetUInt32();
+    uint32 curTitle = fields[42].GetUInt32();
     if (curTitle && !HasTitle(curTitle))
         curTitle = 0;
 
@@ -16162,13 +15764,13 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     UpdateAllStats();
 
     // restore remembered power/health values (but not more max values)
-    uint32 savedhealth = fields[50].GetUInt32();
+    uint32 savedhealth = fields[45].GetUInt32();
     SetHealth(savedhealth > GetMaxHealth() ? GetMaxHealth() : savedhealth);
 
     static_assert(MAX_STORED_POWERS == 5, "Query not updated.");
     for (uint32 i = 0; i < MAX_STORED_POWERS; ++i)
     {
-        uint32 savedpower = fields[51 + i].GetUInt32();
+        uint32 savedpower = fields[46 + i].GetUInt32();
         SetPowerByIndex(i, std::min(savedpower, GetMaxPowerByIndex(i)));
     }
 
@@ -17471,9 +17073,6 @@ void Player::SaveToDB()
         return;
     }
 
-    // first save/honor gain after midnight will also update the player's honor fields
-    UpdateHonorFields();
-
     DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s at save: ", m_name.c_str());
     outDebugStatsValues();
 
@@ -17490,16 +17089,16 @@ void Player::SaveToDB()
         "taximask, online, cinematic, "
         "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, "
         "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
-        "death_expire_time, taxi_path, arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, "
-        "todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, health, power1, power2, power3, "
+        "death_expire_time, taxi_path, totalKills, "
+        "todayKills, yesterdayKills, chosenTitle, watchedFaction, drunk, health, power1, power2, power3, "
         "power4, power5, specCount, activeSpec, exploredZones, equipmentCache, knownTitles, actionBars, slot) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, ?, "
         "?, ?, ?, "
         "?, ?, ?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, ?, ?, ?, ?, "
-        "?, ?, ?, ?, ?, ?, ?, "
-        "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+        "?, ?, ?, "
+        "?, ?, ?, ?, ?, ?, ?, ?, ?, "
         "?, ?, ?, ?, ?, ?, ?, ?, ?) ");
 
     uberInsert.addUInt32(GetGUIDLow());
@@ -17575,10 +17174,6 @@ void Player::SaveToDB()
     ss << m_taxi.SaveTaxiDestinationsToString();       // string
     uberInsert.addString(ss);
 
-    uberInsert.addUInt32(GetArenaPoints());
-
-    uberInsert.addUInt32(GetHonorPoints());
-
     uberInsert.addUInt32(0);                                // FIXME 4x GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION)
 
     uberInsert.addUInt32(0);                                // FIXME 4x GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION)
@@ -17591,7 +17186,6 @@ void Player::SaveToDB()
 
     uberInsert.addUInt32(GetUInt32Value(PLAYER_CHOSEN_TITLE));
 
-    uberInsert.addUInt64(0);                                // FIXME 4x GetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES)
 
     // FIXME: at this moment send to DB as unsigned, including unit32(-1)
     uberInsert.addUInt32(GetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX));
@@ -22620,17 +22214,6 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
     // learn! (other talent ranks will unlearned at learning)
     pet->learnSpell(spellid);
     DETAIL_LOG("PetTalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
-}
-
-void Player::UpdateKnownCurrencies(uint32 itemId, bool apply)
-{
-    //if(CurrencyTypesEntry const* ctEntry = sCurrencyTypesStore.LookupEntry(itemId))
-    //{
-    //    if(apply)
-    //        SetFlag64(PLAYER_FIELD_KNOWN_CURRENCIES, (UI64LIT(1) << (ctEntry->BitIndex - 1)));
-    //    else
-    //        RemoveFlag64(PLAYER_FIELD_KNOWN_CURRENCIES, (UI64LIT(1) << (ctEntry->BitIndex - 1)));
-    //}
 }
 
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode)

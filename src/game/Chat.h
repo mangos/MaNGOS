@@ -268,7 +268,6 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleHonorAddCommand(char* args);
         bool HandleHonorAddKillCommand(char* args);
-        bool HandleHonorUpdateCommand(char* args);
 
         bool HandleInstanceListBindsCommand(char* args);
         bool HandleInstanceUnbindCommand(char* args);

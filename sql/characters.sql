@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_12112_02_characters_character` bit(1) default NULL
+  `required_12138_01_characters_characters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -232,15 +232,10 @@ CREATE TABLE `characters` (
   `zone` int(11) unsigned NOT NULL default '0',
   `death_expire_time` bigint(20) unsigned NOT NULL default '0',
   `taxi_path` text,
-  `arenaPoints` int(10) UNSIGNED NOT NULL default '0',
-  `totalHonorPoints` int(10) UNSIGNED NOT NULL default '0',
-  `todayHonorPoints` int(10) UNSIGNED NOT NULL default '0',
-  `yesterdayHonorPoints` int(10) UNSIGNED NOT NULL default '0',
   `totalKills` int(10) UNSIGNED NOT NULL default '0',
   `todayKills` smallint(5) UNSIGNED NOT NULL default '0',
   `yesterdayKills` smallint(5) UNSIGNED NOT NULL default '0',
   `chosenTitle` int(10) UNSIGNED NOT NULL default '0',
-  `knownCurrencies` bigint(20) UNSIGNED NOT NULL default '0',
   `watchedFaction` int(10) UNSIGNED NOT NULL default '0',
   `drunk` smallint(5) UNSIGNED NOT NULL default '0',
   `health` int(10) UNSIGNED NOT NULL default '0',
