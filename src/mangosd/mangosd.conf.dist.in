@@ -537,21 +537,17 @@ LogColors = ""
 #        If you want to start with one silver, use for example 100 (100 copper = 1 silver)
 #        Default: 0
 #
-#    MaxHonorPoints
-#        Max honor points that player can have.
-#        Default: 75000
-#
 #    StartHonorPoints
 #        Amount of honor that new players will start with
 #        Default: 0
 #
-#    MaxArenaPoints
-#        Max arena points that player can have.
-#        Default: 5000
-#
-#    StartArenaPoints
-#        Amount of arena points that new players will start with
+#    StartConquestPoints
+#        Amount of conquest points that new players will start with
 #        Default: 0
+#
+#    ConquestPointsDefaultWeekCap
+#        Amount of conquest points that player can earn per week
+#        Default: 135000 (with precision)
 #
 #    InstantLogout
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
@@ -783,10 +779,9 @@ MaxPlayerLevel = 85
 StartPlayerLevel = 1
 StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
-MaxHonorPoints = 75000
 StartHonorPoints = 0
-MaxArenaPoints = 5000
-StartArenaPoints = 0
+StartConquestPoints = 0
+ConquestPointsDefaultWeekCap = 135000
 InstantLogout = 1
 DisableWaterBreath = 4
 AllFlightPaths = 0

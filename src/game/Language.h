@@ -287,7 +287,7 @@ enum MangosStrings
     LANG_COMMAND_TICKETDEL              = 296,
     LANG_COMMAND_SPAWNDIST              = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
-    LANG_COMMAND_MODIFY_HONOR           = 299,
+    LANG_COMMAND_MODIFY_CURRENCY        = 299,
 
     LANG_YOUR_CHAT_DISABLED             = 300,
     LANG_YOU_DISABLE_CHAT               = 301,
@@ -296,7 +296,7 @@ enum MangosStrings
     LANG_YOU_ENABLE_CHAT                = 304,
 
     LANG_COMMAND_MODIFY_REP             = 305,
-    LANG_COMMAND_MODIFY_ARENA           = 306,
+    LANG_CURRENCY_AMOUNT                = 306,
     LANG_COMMAND_FACTION_NOTFOUND       = 307,
     LANG_COMMAND_FACTION_UNKNOWN        = 308,
     LANG_COMMAND_FACTION_INVPARAM       = 309,
@@ -452,7 +452,7 @@ enum MangosStrings
     LANG_COMMAND_GRAVEYARDALRLINKED     = 450,
     LANG_COMMAND_GRAVEYARDLINKED        = 451,
     LANG_COMMAND_GRAVEYARDWRONGZONE     = 452,
-    //                                  = 453,
+    LANG_COMMAND_NOCURRENCYFOUND        = 453,
     LANG_COMMAND_GRAVEYARDERROR         = 454,
     LANG_COMMAND_GRAVEYARD_NOTEAM       = 455,
     LANG_COMMAND_GRAVEYARD_ANY          = 456,

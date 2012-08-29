@@ -1398,3 +1398,21 @@ void WorldSession::HandleReorderCharactersOpcode(WorldPacket& recv_data)
         slots[i], guids[i].GetCounter(), GetAccountId());
     CharacterDatabase.CommitTransaction();
 }
+
+void WorldSession::HandleSetCurrencyFlagsOpcode(WorldPacket& recv_data)
+{
+    uint32 currencyId, flags;
+    recv_data >> flags >> currencyId;
+
+    DEBUG_LOG("CMSG_SET_CURRENCY_FLAGS: currency: %u, flags: %u", currencyId, flags);
+
+    if (flags & ~PLAYERCURRENCY_MASK_USED_BY_CLIENT)
+    {
+        DEBUG_LOG("CMSG_SET_CURRENCY_FLAGS: received unknown currency flags 0x%X from player %s account %u for currency %u",
+            flags & ~PLAYERCURRENCY_MASK_USED_BY_CLIENT, GetPlayer()->GetGuidStr().c_str(), GetAccountId(), currencyId);
+    }
+
+    flags &= PLAYERCURRENCY_MASK_USED_BY_CLIENT;
+    GetPlayer()->SetCurrencyFlags(currencyId, uint8(flags));
+}
+

@@ -298,6 +298,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupAchievementCommand(char* args);
         bool HandleLookupAreaCommand(char* args);
         bool HandleLookupCreatureCommand(char* args);
+        bool HandleLookupCurrencyCommand(char* args);
         bool HandleLookupEventCommand(char* args);
         bool HandleLookupFactionCommand(char* args);
         bool HandleLookupItemCommand(char* args);
@@ -329,9 +330,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyMountCommand(char* args);
         bool HandleModifyFactionCommand(char* args);
         bool HandleModifyTalentCommand(char* args);
-        bool HandleModifyHonorCommand(char* args);
         bool HandleModifyRepCommand(char* args);
-        bool HandleModifyArenaCommand(char* args);
+        bool HandleModifyCurrencyCommand(char* args);
         bool HandleModifyPhaseCommand(char* args);
         bool HandleModifyGenderCommand(char* args);
 
@@ -660,6 +660,7 @@ class MANGOS_DLL_SPEC ChatHandler
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = NULL);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = NULL);
         bool ShowPlayerListHelper(QueryResult* result, uint32* limit = NULL, bool title = true, bool error = true);
+        void ShowCurrencyListHelper(Player* target, CurrencyTypesEntry const* currency, LocaleConstant loc);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         void ShowPoolListHelper(uint16 pool_id);
         void ShowTicket(GMTicket const* ticket);

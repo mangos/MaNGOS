@@ -859,6 +859,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleReadyForAccountDataTimesOpcode(WorldPacket& recv_data);
         void HandleQueryQuestsCompletedOpcode(WorldPacket& recv_data);
         void HandleQuestPOIQueryOpcode(WorldPacket& recv_data);
+        void HandleSetCurrencyFlagsOpcode(WorldPacket& recv_data);
     private:
         // private trade methods
         void moveItems(Item* myItems[], Item* hisItems[]);

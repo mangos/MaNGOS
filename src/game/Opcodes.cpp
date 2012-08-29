@@ -1373,4 +1373,9 @@ void InitializeOpcodes()
     //OPCODE(SMSG_COMPRESSED_UNKNOWN_1310,                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_PLAYER_MOVE,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(CMSG_REORDER_CHARACTERS,                      STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleReorderCharactersOpcode   );
+    OPCODE(SMSG_SET_CURRENCY_WEEK_LIMIT,                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(SMSG_SET_CURRENCY,                            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(SMSG_SEND_CURRENCIES,                         STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_SET_CURRENCY_FLAGS,                      STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleSetCurrencyFlagsOpcode    );
+    OPCODE(SMSG_WEEKLY_RESET_CURRENCY,                   STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 };

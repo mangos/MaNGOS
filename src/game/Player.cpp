@@ -551,10 +551,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
     m_armorPenetrationPct = 0.0f;
     m_spellPenetrationItemMod = 0;
 
-    // Honor System
-    m_honorPoints = 0;
-    m_arenaPoints = 0;
-
     // Player summoning
     m_summon_expire = 0;
     m_summon_mapid = 0;
@@ -724,8 +720,8 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     InitRunes();
 
     SetUInt32Value(PLAYER_FIELD_COINAGE, sWorld.getConfig(CONFIG_UINT32_START_PLAYER_MONEY));
-    SetHonorPoints(sWorld.getConfig(CONFIG_UINT32_START_HONOR_POINTS));
-    SetArenaPoints(sWorld.getConfig(CONFIG_UINT32_START_ARENA_POINTS));
+    SetCurrencyCount(CURRENCY_HONOR_POINTS,sWorld.getConfig(CONFIG_UINT32_START_HONOR_POINTS));
+    SetCurrencyCount(CURRENCY_CONQUEST_POINTS, sWorld.getConfig(CONFIG_UINT32_START_CONQUEST_POINTS));
 
     // Played time
     m_Last_tick = time(NULL);
@@ -4378,6 +4374,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             CharacterDatabase.PExecute("DELETE FROM character_equipmentsets WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM guild_eventlog WHERE PlayerGuid1 = '%u' OR PlayerGuid2 = '%u'", lowguid, lowguid);
             CharacterDatabase.PExecute("DELETE FROM guild_bank_eventlog WHERE PlayerGuid = '%u'", lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_currencies WHERE guid = '%u'", lowguid);
             CharacterDatabase.CommitTransaction();
             break;
         }
@@ -6635,50 +6632,9 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, float honor)
     GetSession()->SendPacket(&data);
 
     // add honor points
-    ModifyHonorPoints(int32(honor));
+    ModifyCurrencyCount(CURRENCY_HONOR_POINTS, int32(honor));
 
-    // FIXME 4x ApplyModUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION, uint32(honor), true);
     return true;
-}
-
-void Player::SetHonorPoints(uint32 value)
-{
-    if (value > sWorld.getConfig(CONFIG_UINT32_MAX_HONOR_POINTS))
-        value = sWorld.getConfig(CONFIG_UINT32_MAX_HONOR_POINTS);
-
-    // FIXME 4x SetUInt32Value(PLAYER_FIELD_HONOR_CURRENCY, value);
-    // must be recalculated to new honor points items and removed
-    m_honorPoints = value;
-}
-
-void Player::SetArenaPoints(uint32 value)
-{
-    if (value > sWorld.getConfig(CONFIG_UINT32_MAX_ARENA_POINTS))
-        value = sWorld.getConfig(CONFIG_UINT32_MAX_ARENA_POINTS);
-
-    // FIXME 4x SetUInt32Value(PLAYER_FIELD_ARENA_CURRENCY, value);
-    // must be recalculated to new honor points items and removed
-    m_arenaPoints = value;
-}
-
-void Player::ModifyHonorPoints(int32 value)
-{
-    int32 newValue = (int32)GetHonorPoints() + value;
-
-    if (newValue < 0)
-        newValue = 0;
-
-    SetHonorPoints(newValue);
-}
-
-void Player::ModifyArenaPoints(int32 value)
-{
-    int32 newValue = (int32)GetArenaPoints() + value;
-
-    if (newValue < 0)
-        newValue = 0;
-
-    SetArenaPoints(newValue);
 }
 
 uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
@@ -15667,6 +15623,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         m_deathState = DEAD;
 
+    _LoadCurrencies(holder->GetResult(PLAYER_LOGIN_QUERY_LOADCURRENCIES));
     _LoadSpells(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSPELLS));
 
     // after spell load, learn rewarded spell if need also
@@ -17237,6 +17194,7 @@ void Player::SaveToDB()
     _SaveSkills();
     m_achievementMgr.SaveToDB();
     m_reputationMgr.SaveToDB();
+    _SaveCurrencies();
     _SaveEquipmentSets();
     GetSession()->SaveTutorialsData();                      // changed only while character in game
     _SaveGlyphs();
@@ -19008,10 +18966,10 @@ void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
 {
     ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
 
-    if (extendedCost->reqhonorpoints)
-        ModifyHonorPoints(-int32(extendedCost->reqhonorpoints * count));
-    if (extendedCost->reqarenapoints)
-        ModifyArenaPoints(-int32(extendedCost->reqarenapoints * count));
+    //if (extendedCost->reqhonorpoints)
+    //    ModifyHonorPoints(-int32(extendedCost->reqhonorpoints * count));
+    //if (extendedCost->reqarenapoints)
+    //    ModifyArenaPoints(-int32(extendedCost->reqarenapoints * count));
 
     for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
     {
@@ -19113,18 +19071,18 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
         }
 
         // honor points price
-        if (GetHonorPoints() < (iece->reqhonorpoints * count))
-        {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
-            return false;
-        }
+        //if (GetHonorPoints() < (iece->reqhonorpoints * count))
+        //{
+        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
+        //    return false;
+        //}
 
         // arena points price
-        if (GetArenaPoints() < (iece->reqarenapoints * count))
-        {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
-            return false;
-        }
+        //if (GetArenaPoints() < (iece->reqarenapoints * count))
+        //{
+        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
+        //    return false;
+        //}
 
         // item base price
         for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
@@ -19282,18 +19240,18 @@ bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot,
         }
 
         // honor points price
-        if (GetHonorPoints() < (iece->reqhonorpoints * count))
-        {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
-            return false;
-        }
+        //if (GetHonorPoints() < (iece->reqhonorpoints * count))
+        //{
+        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
+        //    return false;
+        //}
 
         // arena points price
-        if (GetArenaPoints() < (iece->reqarenapoints * count))
-        {
-            SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
-            return false;
-        }
+        //if (GetArenaPoints() < (iece->reqarenapoints * count))
+        //{
+        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
+        //    return false;
+        //}
 
         // item base price
         for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
@@ -19313,13 +19271,39 @@ bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot,
             return false;
         }
     }
+    else
+    {
+        SendBuyError(BUY_ERR_ITEM_SOLD_OUT, 0, 0, 0);
+        return false;
+    }
 
-    // TODO: check if player already has maximum currency
+    if (uint32 totalCap = GetCurrencyTotalCap(pCurrency))
+    {
+        if (GetCurrencyCount(currencyId) >= totalCap)
+        {
 
-    // TODO: modify currency
+            SendBuyError(BUY_ERR_CANT_CARRY_MORE, 0, 0, 0);
+            return false;
+        }
+    }
 
-    DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: Player %s buys currency %u amount %u.",
-            vendorGuid.GetString().c_str(), GetGuidStr().c_str(), currencyId, count);
+    if (uint32 weekCap = GetCurrencyWeekCap(pCurrency))
+    {
+        if (GetCurrencyWeekCount(currencyId) >= weekCap)
+        {
+            SendBuyError(BUY_ERR_CANT_CARRY_MORE, 0, 0, 0);
+            return false;
+        }
+    }
+
+    if (crItem->ExtendedCost)
+        TakeExtendedCost(crItem->ExtendedCost, count);
+
+    ModifyCurrencyCount(currencyId, crItem->maxcount, true, false);
+
+
+    DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: Player %s buys currency %u amount %u count %u.",
+            vendorGuid.GetString().c_str(), GetGuidStr().c_str(), currencyId, crItem->maxcount, count);
 
     return true;
 }
@@ -20128,6 +20112,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // set fly flag if in fly form or taxi flight to prevent visually drop at ground in showup moment
     if (IsFreeFlying() || IsTaxiFlying())
         m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING);
+
+    SendCurrencies();
 
     SetMover(this);
 }
@@ -23137,3 +23123,276 @@ void Player::_fillGearScoreData(Item* item, GearScoreVec* gearScore, uint32& two
             break;
     }
 }
+
+void Player::SendCurrencies() const
+{
+    WorldPacket data(SMSG_SEND_CURRENCIES, m_currencies.size() * 4);
+    data.WriteBits(m_currencies.size(), 23);
+
+    for (PlayerCurrenciesMap::const_iterator itr = m_currencies.begin(); itr != m_currencies.end(); ++itr)
+    {
+        uint32 weekCap = GetCurrencyWeekCap(itr->second.currencyEntry);
+        data.WriteBit(weekCap && itr->second.weekCount);
+        data.WriteBits(itr->second.flags, 4);
+        data.WriteBit(weekCap);
+        data.WriteBit(itr->second.currencyEntry->HasSeasonCount());
+    }
+
+    for (PlayerCurrenciesMap::const_iterator itr = m_currencies.begin(); itr != m_currencies.end(); ++itr)
+    {
+        data << uint32(floor(itr->second.totalCount / itr->second.currencyEntry->GetPrecision()));
+
+        uint32 weekCap = GetCurrencyWeekCap(itr->second.currencyEntry);
+        if (weekCap)
+            data << uint32(floor(weekCap / itr->second.currencyEntry->GetPrecision()));
+        if (itr->second.currencyEntry->HasSeasonCount())
+            data << uint32(floor(itr->second.seasonCount / itr->second.currencyEntry->GetPrecision()));
+        data << uint32(itr->first);
+        if (weekCap && itr->second.weekCount)
+            data << uint32(floor(itr->second.weekCount / itr->second.currencyEntry->GetPrecision()));
+    }
+
+    GetSession()->SendPacket(&data);
+}
+
+uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const * currency) const
+{
+    uint32 cap = currency->WeekCap;
+    switch (currency->ID)
+    {
+        case CURRENCY_CONQUEST_POINTS:
+            cap = sWorld.getConfig(CONFIG_UINT32_CONQUEST_POINTS_DEFAULT_WEEK_CAP);
+            break;
+    }
+
+    return cap;
+}
+
+void Player::SendCurrencyWeekCap(uint32 id) const
+{
+    if (!IsInWorld() || GetSession()->PlayerLoading())
+        return;
+
+    CurrencyTypesEntry const * currency = sCurrencyTypesStore.LookupEntry(id);
+    if (!currency)
+        return;
+
+    uint32 cap = GetCurrencyTotalCap(currency);
+    if (!cap)
+        return;
+
+    WorldPacket packet(SMSG_SET_CURRENCY_WEEK_LIMIT, 8);
+    packet << uint32(floor(cap / currency->GetPrecision()));
+    packet << uint32(currency->ID);
+    GetSession()->SendPacket(&packet);
+}
+
+uint32 Player::GetCurrencyTotalCap(CurrencyTypesEntry const* currency) const
+{
+    uint32 cap = currency->TotalCap;
+
+    return cap;
+}
+
+uint32 Player::GetCurrencyCount(uint32 id) const
+{
+    PlayerCurrenciesMap::const_iterator itr = m_currencies.find(id);
+    return itr != m_currencies.end() ? itr->second.totalCount : 0;
+}
+
+uint32 Player::GetCurrencySeasonCount(uint32 id) const
+{
+    PlayerCurrenciesMap::const_iterator itr = m_currencies.find(id);
+    return itr != m_currencies.end() ? itr->second.seasonCount : 0;
+}
+
+uint32 Player::GetCurrencyWeekCount(uint32 id) const
+{
+    PlayerCurrenciesMap::const_iterator itr = m_currencies.find(id);
+    return itr != m_currencies.end() ? itr->second.weekCount : 0;
+}
+
+void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool modifySeason)
+{
+    if (!count)
+        return;
+
+    CurrencyTypesEntry const * currency = NULL;
+
+    int32 oldTotalCount = 0;
+    int32 oldWeekCount = 0;
+    PlayerCurrenciesMap::iterator itr = m_currencies.find(id);
+
+    if (itr == m_currencies.end())
+    {
+        currency = sCurrencyTypesStore.LookupEntry(id);
+        MANGOS_ASSERT(currency);
+
+        PlayerCurrency cur;
+        cur.state = PLAYERCURRENCY_NEW;
+        cur.totalCount = 0;
+        cur.weekCount = 0;
+        cur.seasonCount = 0;
+        cur.flags = 0;
+        cur.currencyEntry = currency;
+        m_currencies[id] = cur;
+        itr = m_currencies.find(id);
+    }
+    else
+    {
+        oldTotalCount = itr->second.totalCount;
+        oldWeekCount = itr->second.weekCount;
+        currency = itr->second.currencyEntry;
+    }
+
+    int32 newTotalCount = oldTotalCount + count;
+    if (newTotalCount < 0)
+        newTotalCount = 0;
+
+    int32 newWeekCount = oldWeekCount + (modifyWeek && count > 0 ? count : 0);
+    if (newWeekCount < 0)
+        newWeekCount = 0;
+
+    int32 totalCap = GetCurrencyTotalCap(currency);
+    if (totalCap && int32(totalCap) < newTotalCount)
+    {
+        int32 delta = newTotalCount - totalCap;
+        newTotalCount = totalCap;
+        newWeekCount -= delta;
+    }
+
+    int32 weekCap = GetCurrencyWeekCap(currency);
+    if (modifyWeek && weekCap && newWeekCount > weekCap)
+    {
+        int32 delta = newWeekCount - weekCap;
+        newWeekCount = weekCap;
+        newTotalCount -= delta;
+    }
+
+    if (newTotalCount != oldTotalCount)
+    {
+        if (itr->second.state != PLAYERCURRENCY_NEW)
+            itr->second.state = PLAYERCURRENCY_CHANGED;
+
+        itr->second.totalCount = newTotalCount;
+        itr->second.weekCount = newWeekCount;
+
+        int32 diff = newTotalCount - oldTotalCount;
+        if (diff > 0 && modifySeason)
+            itr->second.seasonCount += diff;
+
+        // probably excessive checks
+        if (IsInWorld() && !GetSession()->PlayerLoading())
+        {
+            if (diff > 0)
+                UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CURRENCY_EARNED, id, newTotalCount);
+
+            WorldPacket packet(SMSG_SET_CURRENCY, 13);
+            bool bit0 = modifyWeek && weekCap && diff > 0;
+            bool bit1 = currency->HasSeasonCount();
+            bool bit2 = currency->ID == CURRENCY_CONQUEST_ARENA_META || currency->ID == CURRENCY_CONQUEST_BG_META; // hides message in client when set
+            packet.WriteBit(bit0);
+            packet.WriteBit(bit1);
+            packet.WriteBit(bit2);
+
+            if (bit1)
+                packet << uint32(floor(itr->second.seasonCount / currency->GetPrecision()));
+            packet << uint32(floor(newTotalCount / currency->GetPrecision()));
+            packet << uint32(id);
+            if (bit0)
+                packet << uint32(floor(newWeekCount / currency->GetPrecision()));
+            GetSession()->SendPacket(&packet);
+        }
+
+        if (itr->first == CURRENCY_CONQUEST_ARENA_META || itr->first == CURRENCY_CONQUEST_BG_META)
+            ModifyCurrencyCount(CURRENCY_CONQUEST_POINTS, diff, modifyWeek);
+    }
+}
+
+void Player::SetCurrencyCount(uint32 id, uint32 count)
+{
+    ModifyCurrencyCount(id, int32(count) - GetCurrencyCount(id));
+}
+
+void Player::_LoadCurrencies(QueryResult* result)
+{
+    //         0   1           2          4            5
+    // "SELECT id, totalCount, weekCount, seasonCount, flags FROM character_currencies WHERE guid = '%u'"
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 currency_id = fields[0].GetUInt16();
+            uint32 totalCount  = fields[1].GetUInt32();
+            uint32 weekCount   = fields[2].GetUInt32();
+            uint32 seasonCount = fields[3].GetUInt32();
+            uint8 flags        = fields[4].GetUInt8();
+
+            CurrencyTypesEntry const * entry = sCurrencyTypesStore.LookupEntry(currency_id);
+            if (!entry)
+            {
+                sLog.outError("Player::_LoadCurrencies: %s has not existing currency id %u, removing.", GetGuidStr().c_str(), currency_id);
+                CharacterDatabase.PExecute("DELETE FROM character_currencies WHERE id = '%u'", currency_id);
+                continue;
+            }
+
+            uint32 weekCap = GetCurrencyWeekCap(entry);
+            uint32 totalCap = GetCurrencyTotalCap(entry);
+
+            PlayerCurrency cur;
+
+            cur.state = PLAYERCURRENCY_UNCHANGED;
+
+            if (totalCap && totalCount > totalCap)
+                cur.totalCount = totalCap;
+            else
+                cur.totalCount = totalCount;
+
+            if (weekCap && weekCount > weekCap)
+                cur.weekCount = weekCap;
+            else
+                cur.weekCount = weekCount;
+
+            cur.seasonCount = seasonCount;
+
+            cur.flags = flags & PLAYERCURRENCY_MASK_USED_BY_CLIENT;
+            cur.currencyEntry = entry;
+
+            m_currencies[currency_id] = cur;
+        }
+        while (result->NextRow());
+    }
+}
+
+void Player::_SaveCurrencies()
+{
+    for (PlayerCurrenciesMap::iterator itr = m_currencies.begin(); itr != m_currencies.end();)
+    {
+        if (itr->second.state == PLAYERCURRENCY_CHANGED)
+            CharacterDatabase.PExecute("UPDATE `character_currencies` SET `totalCount` = '%u', `weekCount` = '%u', `seasonCount` = '%u', `flags` = '%u' WHERE `guid` = '%u' AND `id` = '%u'", itr->second.totalCount, itr->second.weekCount, itr->second.seasonCount, itr->second.flags, GetGUIDLow(), itr->first);
+        else if (itr->second.state == PLAYERCURRENCY_NEW)
+            CharacterDatabase.PExecute("INSERT INTO `character_currencies` (`guid`, `id`, `totalCount`, `weekCount`, `seasonCount`, `flags`) VALUES ('%u', '%u', '%u', '%u', '%u', '%u')", GetGUIDLow(), itr->first, itr->second.totalCount, itr->second.weekCount, itr->second.seasonCount, itr->second.flags);
+
+        if (itr->second.state == PLAYERCURRENCY_REMOVED)
+            m_currencies.erase(itr++);
+        else
+        {
+            itr->second.state = PLAYERCURRENCY_UNCHANGED;
+            ++itr;
+        }
+    }
+}
+
+void Player::SetCurrencyFlags(uint32 currencyId, uint8 flags)
+{
+    PlayerCurrenciesMap::iterator itr = m_currencies.find(currencyId);
+    if (itr == m_currencies.end())
+        return;
+
+    itr->second.flags = flags;
+    itr->second.state = PLAYERCURRENCY_CHANGED;
+}
+

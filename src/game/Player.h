@@ -87,6 +87,37 @@ enum BuyBankSlotResult
     ERR_BANKSLOT_OK                 = 3
 };
 
+enum PlayerCurrencyFlag
+{
+    PLAYERCURRENCY_FLAG_NONE                = 0x0,
+    PLAYERCURRENCY_FLAG_UNK1                = 0x1,  // unused?
+    PLAYERCURRENCY_FLAG_UNK2                = 0x2,  // unused?
+    PLAYERCURRENCY_FLAG_SHOW_IN_BACKPACK    = 0x4,
+    PLAYERCURRENCY_FLAG_UNUSED              = 0x8,
+
+    PLAYERCURRENCY_MASK_USED_BY_CLIENT =
+        PLAYERCURRENCY_FLAG_SHOW_IN_BACKPACK |
+        PLAYERCURRENCY_FLAG_UNUSED,
+};
+
+enum PlayerCurrencyState
+{
+    PLAYERCURRENCY_UNCHANGED        = 0,
+    PLAYERCURRENCY_CHANGED          = 1,
+    PLAYERCURRENCY_NEW              = 2,
+    PLAYERCURRENCY_REMOVED          = 3
+};
+
+struct PlayerCurrency
+{
+    PlayerCurrencyState state;
+    uint32 totalCount;
+    uint32 weekCount;
+    uint32 seasonCount;
+    uint8 flags;
+    CurrencyTypesEntry const * currencyEntry;
+};
+
 enum PlayerSpellState
 {
     PLAYERSPELL_UNCHANGED = 0,
@@ -110,6 +141,7 @@ struct PlayerTalent
     PlayerSpellState state;
 };
 
+typedef UNORDERED_MAP<uint32, PlayerCurrency> PlayerCurrenciesMap;
 typedef UNORDERED_MAP<uint32, PlayerSpell> PlayerSpellMap;
 typedef UNORDERED_MAP<uint32, PlayerTalent> PlayerTalentMap;
 
@@ -827,6 +859,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADTALENTS,
     PLAYER_LOGIN_QUERY_LOADWEEKLYQUESTSTATUS,
     PLAYER_LOGIN_QUERY_LOADMONTHLYQUESTSTATUS,
+    PLAYER_LOGIN_QUERY_LOADCURRENCIES,
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -1939,15 +1972,23 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ModifySkillBonus(uint32 skillid, int32 val, bool talent);
 
         /*********************************************************/
+        /***                CURRENCY SYSTEM                    ***/
+        /*********************************************************/
+        uint32 GetCurrencyCount(uint32 id) const;
+        uint32 GetCurrencySeasonCount(uint32 id) const;
+        uint32 GetCurrencyWeekCount(uint32 id) const;
+        void SendCurrencies() const;
+        void ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek = true, bool modifySeason = true);
+        bool HasCurrencyCount(uint32 id, uint32 count) const { return GetCurrencyCount(id) >= count; }
+        bool HasCurrencySeasonCount(uint32 id, uint32 count) const { return GetCurrencySeasonCount(id) >= count; }
+        void SetCurrencyCount(uint32 id, uint32 count);
+        void SendCurrencyWeekCap(uint32 id) const;
+        void SetCurrencyFlags(uint32 currencyId, uint8 flags);
+
+        /*********************************************************/
         /***                  PVP SYSTEM                       ***/
         /*********************************************************/
         bool RewardHonor(Unit *pVictim, uint32 groupsize, float honor = -1);
-        uint32 GetHonorPoints() { return m_honorPoints; }
-        uint32 GetArenaPoints() { return m_arenaPoints; }
-        void SetHonorPoints(uint32 honor);
-        void SetArenaPoints(uint32 arena);
-        void ModifyHonorPoints( int32 value );
-        void ModifyArenaPoints( int32 value );
 
         uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot);
 
@@ -2428,11 +2469,13 @@ class MANGOS_DLL_SPEC Player : public Unit
         int32 getMaxTimer(MirrorTimerType timer);
 
         /*********************************************************/
-        /***                  HONOR SYSTEM                     ***/
+        /***                CURRENCY SYSTEM                    ***/
         /*********************************************************/
-        time_t m_lastHonorUpdateTime;
-        uint32 m_honorPoints;
-        uint32 m_arenaPoints;
+        PlayerCurrenciesMap m_currencies;
+        uint32 GetCurrencyWeekCap(CurrencyTypesEntry const * currency) const;
+        uint32 GetCurrencyTotalCap(CurrencyTypesEntry const * currency) const;
+        void _LoadCurrencies(QueryResult* result);
+        void _SaveCurrencies();
 
         void outDebugStatsValues() const;
         ObjectGuid m_lootGuid;

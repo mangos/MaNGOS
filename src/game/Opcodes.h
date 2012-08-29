@@ -1391,6 +1391,11 @@ enum Opcodes
     SMSG_SPLINE_MOVE_SET_TURN_RATE                        = 0x78B5, // 4.3.4 15595
     SMSG_SPLINE_MOVE_SET_WALK_SPEED                       = 0x34A5, // 4.3.4 15595
     CMSG_REORDER_CHARACTERS                               = 0x0593, // 4.3.4 15595
+    SMSG_SET_CURRENCY_WEEK_LIMIT                          = 0x70A7, // 4.3.4 15595
+    SMSG_SET_CURRENCY                                     = 0x59B0, // 4.3.4 15595
+    SMSG_SEND_CURRENCIES                                  = 0x15A5, // 4.3.4 15595
+    CMSG_SET_CURRENCY_FLAGS                               = 0x7306, // 4.3.4 15595
+    SMSG_WEEKLY_RESET_CURRENCY                            = 0x3CA1, // 4.3.4 15595
 };
 
 #define MAX_OPCODE_TABLE_SIZE 0xFFFF
