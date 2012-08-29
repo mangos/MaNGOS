@@ -13118,32 +13118,33 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
     if (!menuId)
         return textId;
 
-    GossipMenusMapBounds pMenuBounds = sObjectMgr.GetGossipMenusMapBounds(menuId);
+    uint32 scriptId = 0;
+    uint32 lastConditionId = 0;
 
+    GossipMenusMapBounds pMenuBounds = sObjectMgr.GetGossipMenusMapBounds(menuId);
     for (GossipMenusMap::const_iterator itr = pMenuBounds.first; itr != pMenuBounds.second; ++itr)
     {
-        if (itr->second.conditionId && sObjectMgr.IsPlayerMeetToNEWCondition(this, itr->second.conditionId))
+        // Take the text that has the highest conditionId of all fitting
+        // TODO: Simplify logic to (!itr->second.conditionId && !lastConditionId) || <lineBelow>)
+        if (itr->second.conditionId > lastConditionId && sObjectMgr.IsPlayerMeetToNEWCondition(this, itr->second.conditionId))
         {
+            lastConditionId = itr->second.conditionId;
             textId = itr->second.text_id;
-
-            // Start related script
-            if (itr->second.script_id)
-                GetMap()->ScriptsStart(sGossipScripts, itr->second.script_id, this, pSource);
-            break;
+            scriptId = itr->second.script_id;
         }
-        else if (!itr->second.conditionId)
+        else if (!itr->second.conditionId && !lastConditionId)
         {
             if (sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_1) && sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_2))
             {
                 textId = itr->second.text_id;
-
-                // Start related script
-                if (itr->second.script_id)
-                    GetMap()->ScriptsStart(sGossipScripts, itr->second.script_id, this, pSource);
-                break;
+                scriptId = itr->second.script_id;
             }
         }
     }
+
+    // Start related script
+    if (scriptId)
+        GetMap()->ScriptsStart(sGossipScripts, scriptId, this, pSource);
 
     return textId;
 }
