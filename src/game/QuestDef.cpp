@@ -195,9 +195,9 @@ Quest::Quest(Field* questRecord)
             ++m_rewchoiceitemscount;
     }
 
-    for (int i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+    for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
     {
-        if (RewCurrencyId[i])
+        if (ReqCurrencyId[i])
             ++m_reqCurrencyCount;
     }
 }

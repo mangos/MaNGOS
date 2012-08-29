@@ -4283,11 +4283,11 @@ void ObjectMgr::LoadQuests()
                                         qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyId[j], j + 1, qinfo->ReqCurrencyCount[j]);
                         qinfo->ReqCurrencyId[j] = 0;
                     }
-                    else if (currencyEntry->TotalCount && uint32(qinfo->ReqCurrencyCount[j] * currencyEntry->GetPrecision()) > currencyEntry->TotalCount)
+                    else if (currencyEntry->TotalCap && qinfo->ReqCurrencyCount[j] > currencyEntry->TotalCap)
                     {
-                        sLog.outErrorDb("Quest %u has `ReqCurrencyCount%d` = %u but currency %u has max count %u / %u (precision).",
-                                        qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyCount[j], qinfo->ReqCurrencyId[j], currencyEntry->TotalCount, uint32(currencyEntry->GetPrecision()));
-                        qinfo->ReqCurrencyCount[j] = currencyEntry->TotalCount;
+                        sLog.outErrorDb("Quest %u has `ReqCurrencyCount%d` = %u but currency %u has max count %u.",
+                                        qinfo->GetQuestId(), j + 1, qinfo->ReqCurrencyCount[j], qinfo->ReqCurrencyId[j], currencyEntry->TotalCap);
+                        qinfo->ReqCurrencyCount[j] = currencyEntry->TotalCap;
                     }
                 }
 

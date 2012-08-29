@@ -19675,12 +19675,11 @@ bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot,
     if (crItem->item != currencyId)                         // store diff item (cheating)
         return false;
 
-    if (crItem->maxcount != count)
+    if (!crItem->maxcount)
     {
-        DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: count (%u) != crItem->maxcount (%u) for currency %u and player %s.",
-            vendorGuid.GetString().c_str(), count, crItem->maxcount, currencyId, GetGuidStr().c_str());
-
-        count = crItem->maxcount;
+        DEBUG_LOG("WORLD: BuyCurrencyFromVendorSlot - %s: crItem->maxcount (%u) == 0 for currency %u and player %s.",
+            vendorGuid.GetString().c_str(), crItem->maxcount, currencyId, GetGuidStr().c_str());
+        return false;
     }
 
     if (uint32 extendedCostId = crItem->ExtendedCost)

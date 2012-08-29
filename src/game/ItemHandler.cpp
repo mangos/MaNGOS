@@ -530,7 +530,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recv_data)
         }
         case VENDOR_ITEM_TYPE_CURRENCY:
         {
-            GetPlayer()->BuyCurrencyFromVendorSlot(vendorGuid, slot, item, count);
+            GetPlayer()->BuyCurrencyFromVendorSlot(vendorGuid, slot, item, 1);
             break;
         }
     }
