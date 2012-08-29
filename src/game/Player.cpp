@@ -17174,10 +17174,6 @@ void Player::SaveToDB()
     ss << m_taxi.SaveTaxiDestinationsToString();       // string
     uberInsert.addString(ss);
 
-    uberInsert.addUInt32(0);                                // FIXME 4x GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION)
-
-    uberInsert.addUInt32(0);                                // FIXME 4x GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION)
-
     uberInsert.addUInt32(GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS));
 
     uberInsert.addUInt16(GetUInt16Value(PLAYER_FIELD_KILLS, 0));
