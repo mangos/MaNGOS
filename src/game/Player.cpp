@@ -18966,15 +18966,26 @@ void Player::TakeExtendedCost(uint32 extendedCostId, uint32 count)
 {
     ItemExtendedCostEntry const* extendedCost = sItemExtendedCostStore.LookupEntry(extendedCostId);
 
-    //if (extendedCost->reqhonorpoints)
-    //    ModifyHonorPoints(-int32(extendedCost->reqhonorpoints * count));
-    //if (extendedCost->reqarenapoints)
-    //    ModifyArenaPoints(-int32(extendedCost->reqarenapoints * count));
-
     for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
     {
         if (extendedCost->reqitem[i])
             DestroyItemCount(extendedCost->reqitem[i], extendedCost->reqitemcount[i] * count, true);
+    }
+
+    for (int i = 0; i < MAX_EXTENDED_COST_CURRENCIES; ++i)
+    {
+        if (extendedCost->reqcur[i] == CURRENCY_NONE)
+            continue;
+
+        if (extendedCost->IsSeasonCurrencyRequirement(i))
+            continue;
+
+        CurrencyTypesEntry const * entry = sCurrencyTypesStore.LookupEntry(extendedCost->reqcur[i]);
+        if (!entry)
+            continue;
+
+        int32 cost = int32(extendedCost->reqcurrcount[i] * count);
+        ModifyCurrencyCount(entry->ID, -cost);
     }
 }
 
@@ -19063,26 +19074,12 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
 
     if (uint32 extendedCostId = crItem->ExtendedCost)
     {
-         ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
+        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(extendedCostId);
         if (!iece)
         {
             sLog.outError("Item %u have wrong ExtendedCost field value %u", pProto->ItemId, extendedCostId);
             return false;
         }
-
-        // honor points price
-        //if (GetHonorPoints() < (iece->reqhonorpoints * count))
-        //{
-        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
-        //    return false;
-        //}
-
-        // arena points price
-        //if (GetArenaPoints() < (iece->reqarenapoints * count))
-        //{
-        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
-        //    return false;
-        //}
 
         // item base price
         for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
@@ -19090,6 +19087,29 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot, uin
             if (iece->reqitem[i] && !HasItemCount(iece->reqitem[i], iece->reqitemcount[i] * count))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                return false;
+            }
+        }
+
+        // currency price
+        for (uint8 i = 0; i < MAX_EXTENDED_COST_CURRENCIES; ++i)
+        {
+            if (iece->reqcur[i] == CURRENCY_NONE)
+                continue;
+
+            CurrencyTypesEntry const * costCurrency = sCurrencyTypesStore.LookupEntry(iece->reqcur[i]);
+            if (!costCurrency)
+            {
+                sLog.outError("Item %u has ExtendedCost %u with unexistent currency id %u", pProto->ItemId, extendedCostId, iece->reqcur[i]);
+                continue;
+            }
+
+            int32 cost = int32(iece->reqcurrcount[i] * count);
+
+            bool hasCount = iece->IsSeasonCurrencyRequirement(i) ? HasCurrencySeasonCount(iece->reqcur[i], cost) : HasCurrencyCount(iece->reqcur[i], cost);
+            if (!hasCount)
+            {
+                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL);
                 return false;
             }
         }
@@ -19239,26 +19259,34 @@ bool Player::BuyCurrencyFromVendorSlot(ObjectGuid vendorGuid, uint32 vendorslot,
             return false;
         }
 
-        // honor points price
-        //if (GetHonorPoints() < (iece->reqhonorpoints * count))
-        //{
-        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_HONOR_POINTS, NULL, NULL);
-        //    return false;
-        //}
-
-        // arena points price
-        //if (GetArenaPoints() < (iece->reqarenapoints * count))
-        //{
-        //    SendEquipError(EQUIP_ERR_NOT_ENOUGH_ARENA_POINTS, NULL, NULL);
-        //    return false;
-        //}
-
         // item base price
         for (uint8 i = 0; i < MAX_EXTENDED_COST_ITEMS; ++i)
         {
             if (iece->reqitem[i] && !HasItemCount(iece->reqitem[i], iece->reqitemcount[i] * count))
             {
                 SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL, NULL);
+                return false;
+            }
+        }
+
+        // currency price
+        for (uint8 i = 0; i < MAX_EXTENDED_COST_CURRENCIES; ++i)
+        {
+            if (iece->reqcur[i] == CURRENCY_NONE)
+                continue;
+
+            CurrencyTypesEntry const * costCurrency = sCurrencyTypesStore.LookupEntry(iece->reqcur[i]);
+            if (!costCurrency)
+            {
+                sLog.outError("Currency %u has ExtendedCost %u with unexistent currency id %u", currencyId, extendedCostId, iece->reqcur[i]);
+                continue;
+            }
+
+            int32 cost = int32(iece->reqcurrcount[i] * count);
+            bool hasCount = iece->IsSeasonCurrencyRequirement(i) ? HasCurrencySeasonCount(iece->reqcur[i], cost) : HasCurrencyCount(iece->reqcur[i], cost);
+            if (!hasCount)
+            {
+                SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL);
                 return false;
             }
         }

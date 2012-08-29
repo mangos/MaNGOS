@@ -21,6 +21,6 @@
 
 const char Itemfmt[]="niiiiiii";
 const char ItemCurrencyCostfmt[]="di";
-const char ItemExtendedCostEntryfmt[]="niiiiiiiiiiiiiixiiiiiiiiiixxxxx";
+const char ItemExtendedCostEntryfmt[]="nxxiiiiiiiiiiiixiiiiiiiiiixxixx";
 
 #endif

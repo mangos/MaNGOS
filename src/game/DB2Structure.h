@@ -50,19 +50,41 @@ struct ItemCurrencyCostEntry
 #define MAX_EXTENDED_COST_ITEMS         5
 #define MAX_EXTENDED_COST_CURRENCIES    5
 
+enum ItemExtendedCostFlags
+{
+    ITEM_EXTENDED_COST_FLAG_UNK                 = 0x01, // guild related
+    ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_0   = 0x02, // currency requirements under these indexes require season count
+    ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_1   = 0x04,
+    ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_2   = 0x08,
+    ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_3   = 0x10,
+    ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_4   = 0x20,
+};
+
 struct ItemExtendedCostEntry
 {
     uint32      Id;                                         // 0
-    uint32      reqhonorpoints;                             // 1        m_honorPoints
-    uint32      reqarenapoints;                             // 2        m_arenaPoints
+    //                                                      // 1        unk, old reqhonorpoints
+    //                                                      // 2        unk, old reqarenapoints
     uint32      reqarenaslot;                               // 3        m_arenaBracket
     uint32      reqitem[MAX_EXTENDED_COST_ITEMS];           // 5-8      m_itemID
     uint32      reqitemcount[MAX_EXTENDED_COST_ITEMS];      // 9-13     m_itemCount
     uint32      reqpersonalarenarating;                     // 14       m_requiredArenaRating
     //uint32                                                // 15       m_itemPurchaseGroup
-    uint32    reqcur[MAX_EXTENDED_COST_CURRENCIES];         // 16-20
-    uint32    reqcurrcount[MAX_EXTENDED_COST_CURRENCIES];   // 21-25
-    //uint32    something[5];                               // 26-30
+    uint32      reqcur[MAX_EXTENDED_COST_CURRENCIES];       // 16-20
+    uint32      reqcurrcount[MAX_EXTENDED_COST_CURRENCIES]; // 21-25
+                                                            // 26       reputation-related
+                                                            // 27       reputation-related
+    uint32      flags;                                      // 28
+    //                                                      // 29
+    //                                                      // 30
+
+    bool IsSeasonCurrencyRequirement(uint32 i) const
+    {
+        MANGOS_ASSERT(i < MAX_EXTENDED_COST_CURRENCIES);
+
+        // start from ITEM_EXTENDED_COST_FLAG_SEASON_IN_INDEX_0
+        return flags & 1 << (i + 1);
+    }
 };
 
 #endif
