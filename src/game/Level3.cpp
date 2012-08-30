@@ -7130,12 +7130,6 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleFlushArenaPointsCommand(char* /*args*/)
-{
-    sBattleGroundMgr.DistributeArenaPoints();
-    return true;
-}
-
 bool ChatHandler::HandleModifyGenderCommand(char* args)
 {
     if (!*args)

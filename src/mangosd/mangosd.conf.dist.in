@@ -537,18 +537,6 @@ LogColors = ""
 #        If you want to start with one silver, use for example 100 (100 copper = 1 silver)
 #        Default: 0
 #
-#    StartHonorPoints
-#        Amount of honor that new players will start with
-#        Default: 0
-#
-#    StartConquestPoints
-#        Amount of conquest points that new players will start with
-#        Default: 0
-#
-#    ConquestPointsDefaultWeekCap
-#        Amount of conquest points that player can earn per week
-#        Default: 135000 (with precision)
-#
 #    InstantLogout
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
@@ -779,9 +767,6 @@ MaxPlayerLevel = 85
 StartPlayerLevel = 1
 StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
-StartHonorPoints = 0
-StartConquestPoints = 0
-ConquestPointsDefaultWeekCap = 135000
 InstantLogout = 1
 DisableWaterBreath = 4
 AllFlightPaths = 0
@@ -1484,15 +1469,6 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 #        Default: 600000 (10 minutes, recommended)
 #                 0 (disable)
 #
-#    Arena.AutoDistributePoints
-#        Set if arena points should be distributed automatically, or by GM command
-#        Default: 0 (disable) (recommended): use gm command or sql query to distribute the points
-#                 1 (enable)  arena points are distributed automatically
-#
-#    Arena.AutoDistributeInterval
-#        How often should the distribution take place
-#        If automatic distribution is enabled in days
-#        Default: 7 (weekly)
 #
 #    Arena.QueueAnnouncer.Join
 #        Enable arena queue announcer posting to chat at join
@@ -1524,8 +1500,6 @@ BattleGround.PremadeGroupWaitForMatch = 1800000
 
 Arena.MaxRatingDifference = 150
 Arena.RatingDiscardTimer = 600000
-Arena.AutoDistributePoints = 0
-Arena.AutoDistributeInterval = 7
 Arena.QueueAnnouncer.Join = 0
 Arena.QueueAnnouncer.Exit = 0
 Arena.ArenaSeason.ID = 1
@@ -1677,3 +1651,44 @@ SOAP.Port = 7878
 CharDelete.Method = 0
 CharDelete.MinLevel = 0
 CharDelete.KeepDays = 30
+
+###################################################################################################################
+# CURRENCIES
+#
+#    Currency.StartHonorPoints
+#        Amount of honor that new players will start with
+#        Default: 0 (with precision)
+#
+#    Currency.StartConquestPoints
+#        Amount of conquest points that new players will start with
+#        Default: 0 (with precision)
+#
+#    Currency.ResetInterval
+#        How often should currency week count reset (days)
+#        Default: 7 (weekly)
+#
+#    Currency.ResetWeekDay
+#        Week day when currency week count is reset (0..6) 0 == Sunday
+#        Default: 3 (Wednesday)
+#
+#    Currency.ResetHour
+#        Hour of a day when currency week count is reset (0..23)
+#        Default: 6
+#
+#    Currency.ConquestPointsDefaultWeekCap
+#        Amount of conquest points that player can earn per week
+#        Default: 135000 (with precision)
+#
+#    Currency.ConquestPointsArenaReward
+#        Amount of conquest points rewarded by winning arenas
+#        Default: 12000 (with precision)
+#
+###################################################################################################################
+
+Currency.StartHonorPoints = 0
+Currency.StartConquestPoints = 0
+Currency.ResetInterval = 7
+Currency.ResetWeekDay = 3
+Currency.ResetHour = 6
+Currency.ConquestPointsDefaultWeekCap = 135000
+Currency.ConquestPointsArenaReward = 12000

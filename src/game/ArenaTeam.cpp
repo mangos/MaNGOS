@@ -552,33 +552,6 @@ bool ArenaTeam::HaveMember(ObjectGuid guid) const
     return false;
 }
 
-uint32 ArenaTeam::GetPoints(uint32 MemberRating)
-{
-    // returns how many points would be awarded with this team type with this rating
-    float points;
-
-    uint32 rating = MemberRating + 150 < m_stats.rating ? MemberRating : m_stats.rating;
-
-    if (rating <= 1500)
-    {
-        // As of Season 6 and later, all teams below 1500 rating will earn points as if they were a 1500 rated team
-        if (sWorld.getConfig(CONFIG_UINT32_ARENA_SEASON_ID) >= 6)
-            rating = 1500;
-
-        points = (float)rating * 0.22f + 14.0f;
-    }
-    else
-        points = 1511.26f / (1.0f + 1639.28f * exp(-0.00412f * (float)rating));
-
-    // type penalties for <5v5 teams
-    if (m_Type == ARENA_TYPE_2v2)
-        points *= 0.76f;
-    else if (m_Type == ARENA_TYPE_3v3)
-        points *= 0.88f;
-
-    return (uint32) points;
-}
-
 float ArenaTeam::GetChanceAgainst(uint32 own_rating, uint32 enemy_rating)
 {
     // returns the chance to win against a team with the given rating, used in the rating adjustment calculation
@@ -712,35 +685,6 @@ void ArenaTeam::MemberWon(Player* plr, uint32 againstRating)
             plr->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_GAMES_SEASON, itr->games_season);
             return;
         }
-    }
-}
-
-void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& PlayerPoints)
-{
-    // called after a match has ended and the stats are already modified
-    // helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
-    // 10 played games per week is a minimum
-    if (m_stats.games_week < 10)
-        return;
-    // to get points, a player has to participate in at least 30% of the matches
-    uint32 min_plays = (uint32) ceil(m_stats.games_week * 0.3);
-    for (MemberList::const_iterator itr = m_members.begin(); itr !=  m_members.end(); ++itr)
-    {
-        // the player participated in enough games, update his points
-        uint32 points_to_add = 0;
-        if (itr->games_week >= min_plays)
-            points_to_add = GetPoints(itr->personal_rating);
-        // OBSOLETE : CharacterDatabase.PExecute("UPDATE arena_team_member SET points_to_add = '%u' WHERE arenateamid = '%u' AND guid = '%u'", points_to_add, m_TeamId, itr->guid);
-
-        std::map<uint32, uint32>::iterator plr_itr = PlayerPoints.find(itr->guid.GetCounter());
-        if (plr_itr != PlayerPoints.end())
-        {
-            // check if there is already more points
-            if (plr_itr->second < points_to_add)
-                PlayerPoints[itr->guid.GetCounter()] = points_to_add;
-        }
-        else
-            PlayerPoints[itr->guid.GetCounter()] = points_to_add;
     }
 }
 

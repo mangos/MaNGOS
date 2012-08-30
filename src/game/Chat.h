@@ -592,7 +592,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleRespawnCommand(char* args);
         bool HandleComeToMeCommand(char* args);
         bool HandleCombatStopCommand(char* args);
-        bool HandleFlushArenaPointsCommand(char* args);
         bool HandleRepairitemsCommand(char* args);
         bool HandleStableCommand(char* args);
         bool HandleWaterwalkCommand(char* args);

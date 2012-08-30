@@ -36,7 +36,6 @@ typedef UNORDERED_MAP<uint32, BattleGroundTypeId> BattleMastersMap;
 typedef UNORDERED_MAP<uint32, BattleGroundEventIdx> CreatureBattleEventIndexesMap;
 typedef UNORDERED_MAP<uint32, BattleGroundEventIdx> GameObjectBattleEventIndexesMap;
 
-#define BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY 86400     // seconds in a day
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 
 struct GroupQueueInfo;                                      // type predefinition
@@ -235,8 +234,6 @@ class BattleGroundMgr
         uint32 GetRatingDiscardTimer()  const;
         uint32 GetPrematureFinishTime() const;
 
-        void InitAutomaticArenaPointDistribution();
-        void DistributeArenaPoints();
         void ToggleArenaTesting();
         void ToggleTesting();
 
@@ -289,8 +286,6 @@ class BattleGroundMgr
         typedef std::set<uint32> ClientBattleGroundIdSet;
         ClientBattleGroundIdSet m_ClientBattleGroundIds[MAX_BATTLEGROUND_TYPE_ID][MAX_BATTLEGROUND_BRACKETS]; // the instanceids just visible for the client
         uint32 m_NextRatingDiscardUpdate;
-        time_t m_NextAutoDistributionTime;
-        uint32 m_AutoDistributionTimeChecker;
         bool   m_ArenaTesting;
         bool   m_Testing;
 };

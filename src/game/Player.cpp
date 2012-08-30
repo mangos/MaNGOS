@@ -720,8 +720,8 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     InitRunes();
 
     SetUInt32Value(PLAYER_FIELD_COINAGE, sWorld.getConfig(CONFIG_UINT32_START_PLAYER_MONEY));
-    SetCurrencyCount(CURRENCY_HONOR_POINTS,sWorld.getConfig(CONFIG_UINT32_START_HONOR_POINTS));
-    SetCurrencyCount(CURRENCY_CONQUEST_POINTS, sWorld.getConfig(CONFIG_UINT32_START_CONQUEST_POINTS));
+    SetCurrencyCount(CURRENCY_HONOR_POINTS,sWorld.getConfig(CONFIG_UINT32_CURRENCY_START_HONOR_POINTS));
+    SetCurrencyCount(CURRENCY_CONQUEST_POINTS, sWorld.getConfig(CONFIG_UINT32_CURRENCY_START_CONQUEST_POINTS));
 
     // Played time
     m_Last_tick = time(NULL);
@@ -23190,7 +23190,7 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const * currency) const
     switch (currency->ID)
     {
         case CURRENCY_CONQUEST_POINTS:
-            cap = sWorld.getConfig(CONFIG_UINT32_CONQUEST_POINTS_DEFAULT_WEEK_CAP);
+            cap = sWorld.getConfig(CONFIG_UINT32_CURRENCY_CONQUEST_POINTS_DEFAULT_WEEK_CAP);
             break;
     }
 
@@ -23425,3 +23425,14 @@ void Player::SetCurrencyFlags(uint32 currencyId, uint8 flags)
     itr->second.state = PLAYERCURRENCY_CHANGED;
 }
 
+void Player::ResetCurrencyWeekCounts()
+{
+    for (PlayerCurrenciesMap::iterator itr = m_currencies.begin(); itr != m_currencies.end(); ++itr)
+    {
+        itr->second.weekCount = 0;
+        itr->second.state = PLAYERCURRENCY_CHANGED;
+    }
+
+    WorldPacket data(SMSG_WEEKLY_RESET_CURRENCY, 0);
+    SendDirectMessage(&data);
+}

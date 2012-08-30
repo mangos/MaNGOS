@@ -1125,7 +1125,7 @@ void BGQueueRemoveEvent::Abort(uint64 /*e_time*/)
 /***            BATTLEGROUND MANAGER                   ***/
 /*********************************************************/
 
-BattleGroundMgr::BattleGroundMgr() : m_AutoDistributionTimeChecker(0), m_ArenaTesting(false)
+BattleGroundMgr::BattleGroundMgr() : m_ArenaTesting(false)
 {
     for (uint8 i = BATTLEGROUND_TYPE_NONE; i < MAX_BATTLEGROUND_TYPE_ID; ++i)
         m_BattleGrounds[i].clear();
@@ -1197,21 +1197,6 @@ void BattleGroundMgr::Update(uint32 diff)
         }
         else
             m_NextRatingDiscardUpdate -= diff;
-    }
-    if (sWorld.getConfig(CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS))
-    {
-        if (m_AutoDistributionTimeChecker < diff)
-        {
-            if (sWorld.GetGameTime() > m_NextAutoDistributionTime)
-            {
-                DistributeArenaPoints();
-                m_NextAutoDistributionTime = time_t(m_NextAutoDistributionTime + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_UINT32_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
-                CharacterDatabase.PExecute("UPDATE saved_variables SET NextArenaPointDistributionTime = '" UI64FMTD "'", uint64(m_NextAutoDistributionTime));
-            }
-            m_AutoDistributionTimeChecker = 600000; // check 10 minutes
-        }
-        else
-            m_AutoDistributionTimeChecker -= diff;
     }
 }
 
@@ -1716,76 +1701,6 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
     sLog.outString();
     sLog.outString(">> Loaded %u battlegrounds", count);
-}
-
-void BattleGroundMgr::InitAutomaticArenaPointDistribution()
-{
-    if (sWorld.getConfig(CONFIG_BOOL_ARENA_AUTO_DISTRIBUTE_POINTS))
-    {
-        DEBUG_LOG("Initializing Automatic Arena Point Distribution");
-        QueryResult* result = CharacterDatabase.Query("SELECT NextArenaPointDistributionTime FROM saved_variables");
-        if (!result)
-        {
-            DEBUG_LOG("Battleground: Next arena point distribution time not found in SavedVariables, reseting it now.");
-            m_NextAutoDistributionTime = time_t(sWorld.GetGameTime() + BATTLEGROUND_ARENA_POINT_DISTRIBUTION_DAY * sWorld.getConfig(CONFIG_UINT32_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
-            CharacterDatabase.PExecute("INSERT INTO saved_variables (NextArenaPointDistributionTime) VALUES ('" UI64FMTD "')", uint64(m_NextAutoDistributionTime));
-        }
-        else
-        {
-            m_NextAutoDistributionTime = time_t((*result)[0].GetUInt64());
-            delete result;
-        }
-        DEBUG_LOG("Automatic Arena Point Distribution initialized.");
-    }
-}
-
-void BattleGroundMgr::DistributeArenaPoints()
-{
-    // used to distribute arena points based on last week's stats
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_START);
-
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_START);
-
-    // temporary structure for storing maximum points to add values for all players
-    std::map<uint32, uint32> PlayerPoints;
-
-    // at first update all points for all team members
-    for (ObjectMgr::ArenaTeamMap::iterator team_itr = sObjectMgr.GetArenaTeamMapBegin(); team_itr != sObjectMgr.GetArenaTeamMapEnd(); ++team_itr)
-    {
-        if (ArenaTeam* at = team_itr->second)
-        {
-            at->UpdateArenaPointsHelper(PlayerPoints);
-        }
-    }
-
-    // cycle that gives points to all players
-    for (std::map<uint32, uint32>::iterator plr_itr = PlayerPoints.begin(); plr_itr != PlayerPoints.end(); ++plr_itr)
-    {
-        // update to database
-        CharacterDatabase.PExecute("UPDATE characters SET arenaPoints = arenaPoints + '%u' WHERE guid = '%u'", plr_itr->second, plr_itr->first);
-        // add points if player is online
-        //if (Player* pl = sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, plr_itr->first)))
-        //    pl->ModifyArenaPoints(plr_itr->second);
-    }
-
-    PlayerPoints.clear();
-
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_END);
-
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_START);
-    for (ObjectMgr::ArenaTeamMap::iterator titr = sObjectMgr.GetArenaTeamMapBegin(); titr != sObjectMgr.GetArenaTeamMapEnd(); ++titr)
-    {
-        if (ArenaTeam* at = titr->second)
-        {
-            at->FinishWeek();                              // set played this week etc values to 0 in memory, too
-            at->SaveToDB();                                // save changes
-            at->NotifyStatsChanged();                      // notify the players of the changes
-        }
-    }
-
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
-
-    sWorld.SendWorldText(LANG_DIST_ARENA_POINTS_END);
 }
 
 void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* plr, BattleGroundTypeId bgTypeId, uint8 fromWhere)

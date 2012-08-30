@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_12141_01_characters_character_currencies` bit(1) default NULL
+  `required_12150_01_characters_saved_variables` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -1725,7 +1725,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `saved_variables`;
 CREATE TABLE `saved_variables` (
-    `NextArenaPointDistributionTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0',
+    `NextCurrenciesResetTime` bigint(40) UNSIGNED NOT NULL DEFAULT '0',
     `NextDailyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
     `NextWeeklyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
     `NextMonthlyQuestResetTime` bigint(40) unsigned NOT NULL default '0',
