@@ -458,7 +458,13 @@ class BattleGround
         virtual void HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/) {}
         // must be implemented in BG subclass if need AND call base class generic code
         virtual void HandleKillPlayer(Player* player, Player* killer);
-        virtual void HandleKillUnit(Creature* /*unit*/, Player* /*killer*/) { return; };
+        virtual void HandleKillUnit(Creature* /*unit*/, Player* /*killer*/) {}
+
+        // Process Capture event
+        virtual bool HandleEvent(uint32 /*eventId*/, GameObject* /*go*/) { return false; }
+
+        // Called when a gameobject is created
+        virtual void HandleGameObjectCreate(GameObject* /*go*/) {}
 
         /* Battleground events */
         virtual void EventPlayerDroppedFlag(Player* /*player*/) {}

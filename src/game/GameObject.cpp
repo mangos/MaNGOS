@@ -166,9 +166,15 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     if (goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT && goinfo->capturePoint.radius)
         SetCapturePointSlider(sOutdoorPvPMgr.GetCapturePointSliderValue(goinfo->id));
 
-    // Notify the outdoor pvp script
-    if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
-        outdoorPvP->HandleGameObjectCreate(this);
+    // Notify the battleground script
+    if (map->IsBattleGroundOrArena())
+        ((BattleGroundMap*)map)->GetBG()->HandleGameObjectCreate(this);
+    else
+    {
+        // Notify the outdoor pvp script
+        if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
+            outdoorPvP->HandleGameObjectCreate(this);
+    }
 
     // Notify the map's instance data.
     // Only works if you create the object in it, not if it is moves to that map.
@@ -2158,8 +2164,14 @@ void GameObject::TickCapturePoint()
 
     if (eventId)
     {
-        // Notify the outdoor pvp script
-        if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript((*capturingPlayers.begin())->GetCachedZoneId()))
+        // Notify the battleground or outdoor pvp script
+        if (BattleGround* bg = (*capturingPlayers.begin())->GetBattleGround())
+        {
+            // Allow only certain events to be handled by other script engines
+            if (bg->HandleEvent(eventId, this))
+                return;
+        }
+        else if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript((*capturingPlayers.begin())->GetCachedZoneId()))
         {
             // Allow only certain events to be handled by other script engines
             if (outdoorPvP->HandleEvent(eventId, this))
