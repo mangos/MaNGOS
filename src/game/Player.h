@@ -1983,6 +1983,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool HasCurrencySeasonCount(uint32 id, uint32 count) const { return GetCurrencySeasonCount(id) >= count; }
         void SetCurrencyCount(uint32 id, uint32 count);
         void SendCurrencyWeekCap(uint32 id) const;
+        void SendCurrencyWeekCap(CurrencyTypesEntry const * currency) const;
         void SetCurrencyFlags(uint32 currencyId, uint8 flags);
         void ResetCurrencyWeekCounts();
 

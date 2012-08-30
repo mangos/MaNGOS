@@ -23199,14 +23199,15 @@ uint32 Player::GetCurrencyWeekCap(CurrencyTypesEntry const * currency) const
 
 void Player::SendCurrencyWeekCap(uint32 id) const
 {
-    if (!IsInWorld() || GetSession()->PlayerLoading())
+    SendCurrencyWeekCap(sCurrencyTypesStore.LookupEntry(id));
+}
+
+void Player::SendCurrencyWeekCap(CurrencyTypesEntry const * currency) const
+{
+    if (!currency || !IsInWorld() || GetSession()->PlayerLoading())
         return;
 
-    CurrencyTypesEntry const * currency = sCurrencyTypesStore.LookupEntry(id);
-    if (!currency)
-        return;
-
-    uint32 cap = GetCurrencyTotalCap(currency);
+    uint32 cap = GetCurrencyWeekCap(currency);
     if (!cap)
         return;
 
@@ -23252,6 +23253,7 @@ void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool m
     int32 oldWeekCount = 0;
     PlayerCurrenciesMap::iterator itr = m_currencies.find(id);
 
+    bool initWeek = false;
     if (itr == m_currencies.end())
     {
         currency = sCurrencyTypesStore.LookupEntry(id);
@@ -23265,6 +23267,7 @@ void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool m
         cur.flags = 0;
         cur.currencyEntry = currency;
         m_currencies[id] = cur;
+        initWeek = true;
         itr = m_currencies.find(id);
     }
     else
@@ -23297,6 +23300,7 @@ void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool m
         newWeekCount = weekCap;
         newTotalCount -= delta;
     }
+    initWeek &= weekCap != currency->WeekCap;
 
     if (newTotalCount != oldTotalCount)
     {
@@ -23331,6 +23335,10 @@ void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool m
             if (bit0)
                 packet << uint32(floor(newWeekCount / currency->GetPrecision()));
             GetSession()->SendPacket(&packet);
+
+            // init currency week limit for new currencies
+            if (initWeek)
+                SendCurrencyWeekCap(currency);
         }
 
         if (itr->first == CURRENCY_CONQUEST_ARENA_META || itr->first == CURRENCY_CONQUEST_BG_META)
