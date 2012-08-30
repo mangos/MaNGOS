@@ -26,6 +26,7 @@
 #include "WorldSession.h"
 #include "Object.h"
 #include "Chat.h"
+#include "BattleGroundEY.h"
 #include "BattleGroundMgr.h"
 #include "BattleGroundWS.h"
 #include "BattleGround.h"
@@ -227,55 +228,68 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_d
     {
         case BATTLEGROUND_WS:
         {
-            uint32 count1 = 0;                          // always constant zero?
-            uint32 count2 = 0;                          // count of next fields
+            uint32 flagCarrierCount = 0;
 
-            Player* ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
-            if (ali_plr)
-                ++count2;
+            Player* flagCarrierAlliance = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagCarrierGuid());
+            if (flagCarrierAlliance)
+                ++flagCarrierCount;
 
-            Player* horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
-            if (horde_plr)
-                ++count2;
+            Player* flagCarrierHorde = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagCarrierGuid());
+            if (flagCarrierHorde)
+                ++flagCarrierCount;
 
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 4 + 16 * count1 + 16 * count2));
-            data << count1;                             // alliance flag holders count - obsolete, now always 0
-            /*for(uint8 i = 0; i < count1; ++i)
+            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4 + 16 * flagCarrierCount);
+            data << uint32(0);
+            data << uint32(flagCarrierCount);
+
+            if (flagCarrierAlliance)
             {
-                data << ObjectGuid(0);                  // guid
-                data << (float)0;                       // x
-                data << (float)0;                       // y
-            }*/
-            data << count2;                             // horde flag holders count - obsolete, now count of next fields
-            if (ali_plr)
-            {
-                data << ObjectGuid(ali_plr->GetObjectGuid());
-                data << float(ali_plr->GetPositionX());
-                data << float(ali_plr->GetPositionY());
+                data << flagCarrierAlliance->GetObjectGuid();
+                data << float(flagCarrierAlliance->GetPositionX());
+                data << float(flagCarrierAlliance->GetPositionY());
             }
-            if (horde_plr)
+            if (flagCarrierHorde)
             {
-                data << ObjectGuid(horde_plr->GetObjectGuid());
-                data << float(horde_plr->GetPositionX());
-                data << float(horde_plr->GetPositionY());
+                data << flagCarrierHorde->GetObjectGuid();
+                data << float(flagCarrierHorde->GetPositionX());
+                data << float(flagCarrierHorde->GetPositionY());
             }
 
             SendPacket(&data);
-        }
-        break;
-        case BATTLEGROUND_EY:
-            // TODO : fix me!
             break;
+        }
+        case BATTLEGROUND_EY:
+        {
+            uint32 flagCarrierCount = 0;
+
+            Player* flagCarrier = sObjectMgr.GetPlayer(((BattleGroundEY*)bg)->GetFlagCarrierGuid());
+            if (flagCarrier)
+                flagCarrierCount = 1;
+
+            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4 + 16 * flagCarrierCount);
+            data << uint32(0);
+            data << uint32(flagCarrierCount);
+
+            if (flagCarrier)
+            {
+                data << flagCarrier->GetObjectGuid();
+                data << float(flagCarrier->GetPositionX());
+                data << float(flagCarrier->GetPositionY());
+            }
+
+            SendPacket(&data);
+            break;
+        }
         case BATTLEGROUND_AB:
         case BATTLEGROUND_AV:
         {
             // for other BG types - send default
-            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, (4 + 4));
+            WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4);
             data << uint32(0);
             data << uint32(0);
             SendPacket(&data);
+            break;
         }
-        break;
         default:
             // maybe it is sent also in arena - do nothing
             break;
