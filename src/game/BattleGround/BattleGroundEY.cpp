@@ -348,7 +348,7 @@ void BattleGroundEY::Reset()
     m_towersAlliance = 0;
     m_towersHorde = 0;
 
-    m_honorTicks = BattleGroundMgr::IsBGWeekend(GetTypeID()) ? EY_WEEKEND_HONOR_TICKS : EY_NORMAL_HONOR_TICKS;
+    m_honorTicks = BattleGroundMgr::IsBGWeekend(GetTypeID()) ? EY_WEEKEND_HONOR_INTERVAL : EY_NORMAL_HONOR_INTERVAL;
     m_honorScoreTicks[BG_TEAM_ALLIANCE] = 0;
     m_honorScoreTicks[BG_TEAM_HORDE] = 0;
 
