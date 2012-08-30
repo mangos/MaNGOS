@@ -8474,40 +8474,27 @@ static WorldStatePair AB_world_states[] =
 
 static WorldStatePair EY_world_states[] =
 {
-    { 0xac1, 0x0 },                                         // 2753  7 Horde Bases
-    { 0xac0, 0x0 },                                         // 2752  8 Alliance Bases
-    { 0xab6, 0x0 },                                         // 2742  9 Mage Tower - Horde conflict
-    { 0xab5, 0x0 },                                         // 2741 10 Mage Tower - Alliance conflict
-    { 0xab4, 0x0 },                                         // 2740 11 Fel Reaver - Horde conflict
-    { 0xab3, 0x0 },                                         // 2739 12 Fel Reaver - Alliance conflict
-    { 0xab2, 0x0 },                                         // 2738 13 Draenei - Alliance conflict
-    { 0xab1, 0x0 },                                         // 2737 14 Draenei - Horde conflict
-    { 0xab0, 0x0 },                                         // 2736 15 unk // 0 at start
-    { 0xaaf, 0x0 },                                         // 2735 16 unk // 0 at start
-    { 0xaad, 0x0 },                                         // 2733 17 Draenei - Horde control
-    { 0xaac, 0x0 },                                         // 2732 18 Draenei - Alliance control
-    { 0xaab, 0x1 },                                         // 2731 19 Draenei uncontrolled (1 - yes, 0 - no)
-    { 0xaaa, 0x0 },                                         // 2730 20 Mage Tower - Alliance control
-    { 0xaa9, 0x0 },                                         // 2729 21 Mage Tower - Horde control
-    { 0xaa8, 0x1 },                                         // 2728 22 Mage Tower uncontrolled (1 - yes, 0 - no)
-    { 0xaa7, 0x0 },                                         // 2727 23 Fel Reaver - Horde control
-    { 0xaa6, 0x0 },                                         // 2726 24 Fel Reaver - Alliance control
-    { 0xaa5, 0x1 },                                         // 2725 25 Fel Reaver uncontrolled (1 - yes, 0 - no)
-    { 0xaa4, 0x0 },                                         // 2724 26 Boold Elf - Horde control
-    { 0xaa3, 0x0 },                                         // 2723 27 Boold Elf - Alliance control
-    { 0xaa2, 0x1 },                                         // 2722 28 Boold Elf uncontrolled (1 - yes, 0 - no)
-    { 0xac5, 0x1 },                                         // 2757 29 Flag (1 - show, 0 - hide) - doesn't work exactly this way!
-    { 0xad2, 0x1 },                                         // 2770 30 Horde top-stats (1 - show, 0 - hide) // 02 -> horde picked up the flag
-    { 0xad1, 0x1 },                                         // 2769 31 Alliance top-stats (1 - show, 0 - hide) // 02 -> alliance picked up the flag
-    { 0xabe, 0x0 },                                         // 2750 32 Horde resources
-    { 0xabd, 0x0 },                                         // 2749 33 Alliance resources
-    { 0xa05, 0x8e },                                        // 2565 34 unk, constant?
-    { 0xaa0, 0x0 },                                         // 2720 35 Capturing progress-bar (100 -> empty (only grey), 0 -> blue|red (no grey), default 0)
-    { 0xa9f, 0x0 },                                         // 2719 36 Capturing progress-bar (0 - left, 100 - right)
-    { 0xa9e, 0x0 },                                         // 2718 37 Capturing progress-bar (1 - show, 0 - hide)
-    { 0xc0d, 0x17b },                                       // 3085 38 unk
-    // and some more ... unknown
-    { 0x0,   0x0 }
+    { 2753, 0 },                                            // WORLD_STATE_EY_TOWER_COUNT_HORDE
+    { 2752, 0 },                                            // WORLD_STATE_EY_TOWER_COUNT_ALLIANCE
+    { 2733, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_DRAENEI_RUINS_HORDE
+    { 2732, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_DRAENEI_RUINS_ALLIANCE
+    { 2731, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_DRAENEI_RUINS_NEUTRAL
+    { 2730, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_MAGE_TOWER_ALLIANCE
+    { 2729, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_MAGE_TOWER_HORDE
+    { 2728, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_MAGE_TOWER_NEUTRAL
+    { 2727, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_FEL_REAVER_HORDE
+    { 2726, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_FEL_REAVER_ALLIANCE
+    { 2725, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_FEL_REAVER_NEUTRAL
+    { 2724, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_BLOOD_ELF_HORDE
+    { 2723, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_BLOOD_ELF_ALLIANCE
+    { 2722, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_BLOOD_ELF_NEUTRAL
+    { 2757, WORLD_STATE_REMOVE },                           // WORLD_STATE_EY_NETHERSTORM_FLAG_READY
+    { 2770, 1 },                                            // WORLD_STATE_EY_NETHERSTORM_FLAG_STATE_HORDE
+    { 2769, 1 },                                            // WORLD_STATE_EY_NETHERSTORM_FLAG_STATE_ALLIANCE
+    { 2750, 0 },                                            // WORLD_STATE_EY_RESOURCES_HORDE
+    { 2749, 0 },                                            // WORLD_STATE_EY_RESOURCES_ALLIANCE
+    { 2565, 0x8e },                                         // global unk -- TODO: move to global world state
+    { 3085, 0x17b }                                         // global unk -- TODO: move to global world state
 };
 
 static WorldStatePair SI_world_states[] =                   // Silithus
