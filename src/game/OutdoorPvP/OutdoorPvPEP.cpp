@@ -109,6 +109,8 @@ void OutdoorPvPEP::HandleCreatureCreate(Creature* creature)
 
 void OutdoorPvPEP::HandleGameObjectCreate(GameObject* go)
 {
+    OutdoorPvP::HandleGameObjectCreate(go);
+
     switch (go->GetEntry())
     {
         case GO_TOWER_BANNER_NORTHPASS:

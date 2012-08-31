@@ -19,7 +19,6 @@
 #include "OutdoorPvPMgr.h"
 #include "Policies/SingletonImp.h"
 #include "OutdoorPvP.h"
-#include "GameObject.h"
 #include "World.h"
 #include "Log.h"
 #include "OutdoorPvPEP.h"
@@ -170,14 +169,14 @@ void OutdoorPvPMgr::Update(uint32 diff)
    Function that gets the capture point slider value
 
    @param   capture point entry
+   @param   default value being returned if no saved value for the capture point was found
  */
-int8 OutdoorPvPMgr::GetCapturePointSliderValue(uint32 entry)
+float OutdoorPvPMgr::GetCapturePointSliderValue(uint32 entry, float defaultValue)
 {
-    std::map<uint32, int8>::iterator itr = m_capturePointSlider.find(entry);
-
+    CapturePointSliderMap::const_iterator itr = m_capturePointSlider.find(entry);
     if (itr != m_capturePointSlider.end())
         return itr->second;
 
     // return default value if we can't find any
-    return CAPTURE_SLIDER_NEUTRAL;
+    return defaultValue;
 }

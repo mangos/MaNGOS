@@ -611,10 +611,7 @@ enum CapturePointSlider
 {
     CAPTURE_SLIDER_ALLIANCE         = 100,                  // full alliance
     CAPTURE_SLIDER_HORDE            = 0,                    // full horde
-    CAPTURE_SLIDER_NEUTRAL          = 50,                   // middle
-
-    CAPTURE_SLIDER_ALLIANCE_LOCKED  = -1,                   // used to store additional information
-    CAPTURE_SLIDER_HORDE_LOCKED     = -2
+    CAPTURE_SLIDER_MIDDLE           = 50                    // middle
 };
 
 class Unit;
@@ -771,7 +768,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         GameObject* LookupFishingHoleAround(float range);
 
-        void SetCapturePointSlider(int8 value);
+        void SetCapturePointSlider(float value);
+        float GetCapturePointSlider() const { return m_captureSlider; }
 
         GridReference<GameObject>& GetGridRef() { return m_gridRef; }
 
@@ -785,7 +783,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         // For traps/goober this: spell casting cooldown, for doors/buttons: reset time.
 
         uint32      m_captureTimer;                         // (msecs) timer used for capture points
-        float       m_captureSlider;
+        float       m_captureSlider;                        // capture point slider value in range of [0..100]
         CapturePointState m_captureState;
 
         GuidSet m_SkillupSet;                               // players that already have skill-up at GO use

@@ -80,6 +80,8 @@ void OutdoorPvPHP::HandlePlayerLeaveZone(Player* player, bool isMainZone)
 
 void OutdoorPvPHP::HandleGameObjectCreate(GameObject* go)
 {
+    OutdoorPvP::HandleGameObjectCreate(go);
+
     switch (go->GetEntry())
     {
         case GO_TOWER_BANNER_OVERLOOK:

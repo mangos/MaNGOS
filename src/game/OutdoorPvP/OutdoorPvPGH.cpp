@@ -63,6 +63,8 @@ void OutdoorPvPGH::HandleCreatureDeath(Creature* creature)
 
 void OutdoorPvPGH::HandleGameObjectCreate(GameObject* go)
 {
+    OutdoorPvP::HandleGameObjectCreate(go);
+
     if (go->GetEntry() == GO_VENTURE_BAY_LIGHTHOUSE)
     {
         m_capturePoint = go->GetObjectGuid();
@@ -137,8 +139,9 @@ void OutdoorPvPGH::LockLighthouse(const WorldObject* objRef)
 {
     if (GameObject* go = objRef->GetMap()->GetGameObject(m_capturePoint))
         go->SetLootState(GO_JUST_DEACTIVATED);
-
-    sOutdoorPvPMgr.SetCapturePointSlider(m_capturePoint, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE_LOCKED : CAPTURE_SLIDER_HORDE_LOCKED);
+    else
+        // if grid is unloaded, changing the saved slider value is enough
+        sOutdoorPvPMgr.SetCapturePointSlider(GO_VENTURE_BAY_LIGHTHOUSE, m_zoneOwner == ALLIANCE ? -CAPTURE_SLIDER_ALLIANCE : -CAPTURE_SLIDER_HORDE);
 }
 
 // Handle Lighthouse unlock when the commander is killed
@@ -146,8 +149,7 @@ void OutdoorPvPGH::UnlockLighthouse(const WorldObject* objRef)
 {
     if (GameObject* go = objRef->GetMap()->GetGameObject(m_capturePoint))
         go->SetCapturePointSlider(m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
-        // no banner visual update needed because it already has the correct one
     else
-        // if grid is unloaded, resetting the slider value is enough
-        sOutdoorPvPMgr.SetCapturePointSlider(m_capturePoint, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
+        // if grid is unloaded, resetting the saved slider value is enough
+        sOutdoorPvPMgr.SetCapturePointSlider(GO_VENTURE_BAY_LIGHTHOUSE, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
 }

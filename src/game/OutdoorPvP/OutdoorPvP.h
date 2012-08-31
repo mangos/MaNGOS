@@ -64,9 +64,12 @@ class OutdoorPvP
         // handle capture objective complete
         virtual void HandleObjectiveComplete(uint32 /*eventId*/, std::list<Player*> /*players*/, Team /*team*/) {}
 
-        // Called when a creature or gameobject is created
+        // Called when a creature is created
         virtual void HandleCreatureCreate(Creature* /*creature*/) {}
-        virtual void HandleGameObjectCreate(GameObject* /*go*/) {}
+
+        // Called when a gameobject is created or removed
+        virtual void HandleGameObjectCreate(GameObject* /*go*/);
+        virtual void HandleGameObjectRemove(GameObject* /*go*/);
 
         // Called on creature death
         virtual void HandleCreatureDeath(Creature* /*creature*/) {}

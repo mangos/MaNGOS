@@ -83,16 +83,13 @@ void GameObject::AddToWorld()
 
 void GameObject::RemoveFromWorld()
 {
-    // store the slider value for non instance, non locked capture points
-    if (!GetMap()->IsBattleGroundOrArena())
-    {
-        if (GetGOInfo()->type == GAMEOBJECT_TYPE_CAPTURE_POINT && m_lootState == GO_ACTIVATED)
-            sOutdoorPvPMgr.SetCapturePointSlider(GetEntry(), m_captureSlider);
-    }
-
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
+        // Notify the outdoor pvp script
+        if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
+            outdoorPvP->HandleGameObjectRemove(this);
+
         // Remove GO from owner
         if (ObjectGuid owner_guid = GetOwnerGuid())
         {
@@ -165,19 +162,11 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
     SetGoArtKit(0);                                         // unknown what this is
     SetGoAnimProgress(animprogress);
 
-    // Notify the battleground script
+    // Notify the battleground or outdoor pvp script
     if (map->IsBattleGroundOrArena())
         ((BattleGroundMap*)map)->GetBG()->HandleGameObjectCreate(this);
-    else
-    {
-        // set initial data and activate non instance capture points
-        if (goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT)
-            SetCapturePointSlider(sOutdoorPvPMgr.GetCapturePointSliderValue(goinfo->id));
-
-        // Notify the outdoor pvp script
-        if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
-            outdoorPvP->HandleGameObjectCreate(this);
-    }
+    else if (OutdoorPvP* outdoorPvP = sOutdoorPvPMgr.GetScript(GetZoneId()))
+        outdoorPvP->HandleGameObjectCreate(this);
 
     // Notify the map's instance data.
     // Only works if you create the object in it, not if it is moves to that map.
@@ -1960,32 +1949,27 @@ bool GameObject::HasStaticDBSpawnData() const
     return sObjectMgr.GetGOData(GetGUIDLow()) != NULL;
 }
 
-void GameObject::SetCapturePointSlider(int8 value)
+void GameObject::SetCapturePointSlider(float value)
 {
     GameObjectInfo const* info = GetGOInfo();
 
-    switch (value)
+    // only activate non-locked capture point
+    if (value >= 0)
     {
-        case CAPTURE_SLIDER_ALLIANCE_LOCKED:
-            m_captureSlider = CAPTURE_SLIDER_ALLIANCE;
-            break;
-        case CAPTURE_SLIDER_HORDE_LOCKED:
-            m_captureSlider = CAPTURE_SLIDER_HORDE;
-            break;
-        default:
-            m_captureSlider = value;
-            SetLootState(GO_ACTIVATED);
-            break;
+        m_captureSlider = value;
+        SetLootState(GO_ACTIVATED);
     }
+    else
+        m_captureSlider = -value;
 
     // set the state of the capture point based on the slider value
-    if (m_captureSlider == CAPTURE_SLIDER_ALLIANCE)
+    if ((int)m_captureSlider == CAPTURE_SLIDER_ALLIANCE)
         m_captureState = CAPTURE_STATE_WIN_ALLIANCE;
-    else if (m_captureSlider == CAPTURE_SLIDER_HORDE)
+    else if ((int)m_captureSlider == CAPTURE_SLIDER_HORDE)
         m_captureState = CAPTURE_STATE_WIN_HORDE;
-    else if (m_captureSlider > CAPTURE_SLIDER_NEUTRAL + info->capturePoint.neutralPercent * 0.5f)
+    else if (m_captureSlider > CAPTURE_SLIDER_MIDDLE + info->capturePoint.neutralPercent * 0.5f)
         m_captureState = CAPTURE_STATE_PROGRESS_ALLIANCE;
-    else if (m_captureSlider < CAPTURE_SLIDER_NEUTRAL - info->capturePoint.neutralPercent * 0.5f)
+    else if (m_captureSlider < CAPTURE_SLIDER_MIDDLE - info->capturePoint.neutralPercent * 0.5f)
         m_captureState = CAPTURE_STATE_PROGRESS_HORDE;
     else
         m_captureState = CAPTURE_STATE_NEUTRAL;
@@ -2006,7 +1990,7 @@ void GameObject::TickCapturePoint()
 
     GuidSet tempUsers(m_UniqueUsers);
     uint32 neutralPercent = info->capturePoint.neutralPercent;
-    uint32 oldValue = m_captureSlider;
+    int oldValue = m_captureSlider;
     int rangePlayers = 0;
 
     for (std::list<Player*>::iterator itr = capturingPlayers.begin(); itr != capturingPlayers.end(); ++itr)
@@ -2085,7 +2069,7 @@ void GameObject::TickCapturePoint()
     }
 
     // return if slider did not move a whole percent
-    if ((uint32)m_captureSlider == oldValue)
+    if ((int)m_captureSlider == oldValue)
         return;
 
     // on retail this is also sent to newly added players even though they already received a slider value
@@ -2097,13 +2081,13 @@ void GameObject::TickCapturePoint()
 
     /* WIN EVENTS */
     // alliance wins tower with max points
-    if (m_captureState != CAPTURE_STATE_WIN_ALLIANCE && (uint32)m_captureSlider == CAPTURE_SLIDER_ALLIANCE)
+    if (m_captureState != CAPTURE_STATE_WIN_ALLIANCE && (int)m_captureSlider == CAPTURE_SLIDER_ALLIANCE)
     {
         eventId = info->capturePoint.winEventID1;
         m_captureState = CAPTURE_STATE_WIN_ALLIANCE;
     }
     // horde wins tower with max points
-    else if (m_captureState != CAPTURE_STATE_WIN_HORDE && (uint32)m_captureSlider == CAPTURE_SLIDER_HORDE)
+    else if (m_captureState != CAPTURE_STATE_WIN_HORDE && (int)m_captureSlider == CAPTURE_SLIDER_HORDE)
     {
         eventId = info->capturePoint.winEventID2;
         m_captureState = CAPTURE_STATE_WIN_HORDE;
@@ -2111,7 +2095,7 @@ void GameObject::TickCapturePoint()
 
     /* PROGRESS EVENTS */
     // alliance takes the tower from neutral, contested or horde (if there is no neutral area) to alliance
-    else if (m_captureState != CAPTURE_STATE_PROGRESS_ALLIANCE && m_captureSlider > CAPTURE_SLIDER_NEUTRAL + neutralPercent * 0.5f && progressFaction == ALLIANCE)
+    else if (m_captureState != CAPTURE_STATE_PROGRESS_ALLIANCE && m_captureSlider > CAPTURE_SLIDER_MIDDLE + neutralPercent * 0.5f && progressFaction == ALLIANCE)
     {
         eventId = info->capturePoint.progressEventID1;
 
@@ -2124,7 +2108,7 @@ void GameObject::TickCapturePoint()
         m_captureState = CAPTURE_STATE_PROGRESS_ALLIANCE;
     }
     // horde takes the tower from neutral, contested or alliance (if there is no neutral area) to horde
-    else if (m_captureState != CAPTURE_STATE_PROGRESS_HORDE && m_captureSlider < CAPTURE_SLIDER_NEUTRAL - neutralPercent * 0.5f && progressFaction == HORDE)
+    else if (m_captureState != CAPTURE_STATE_PROGRESS_HORDE && m_captureSlider < CAPTURE_SLIDER_MIDDLE - neutralPercent * 0.5f && progressFaction == HORDE)
     {
         eventId = info->capturePoint.progressEventID2;
 
@@ -2139,13 +2123,13 @@ void GameObject::TickCapturePoint()
 
     /* NEUTRAL EVENTS */
     // alliance takes the tower from horde to neutral
-    else if (m_captureState != CAPTURE_STATE_NEUTRAL && m_captureSlider >= CAPTURE_SLIDER_NEUTRAL - neutralPercent * 0.5f && m_captureSlider <= CAPTURE_SLIDER_NEUTRAL + neutralPercent * 0.5f && progressFaction == ALLIANCE)
+    else if (m_captureState != CAPTURE_STATE_NEUTRAL && m_captureSlider >= CAPTURE_SLIDER_MIDDLE - neutralPercent * 0.5f && m_captureSlider <= CAPTURE_SLIDER_MIDDLE + neutralPercent * 0.5f && progressFaction == ALLIANCE)
     {
         eventId = info->capturePoint.neutralEventID1;
         m_captureState = CAPTURE_STATE_NEUTRAL;
     }
     // horde takes the tower from alliance to neutral
-    else if (m_captureState != CAPTURE_STATE_NEUTRAL && m_captureSlider >= CAPTURE_SLIDER_NEUTRAL - neutralPercent * 0.5f && m_captureSlider <= CAPTURE_SLIDER_NEUTRAL + neutralPercent * 0.5f && progressFaction == HORDE)
+    else if (m_captureState != CAPTURE_STATE_NEUTRAL && m_captureSlider >= CAPTURE_SLIDER_MIDDLE - neutralPercent * 0.5f && m_captureSlider <= CAPTURE_SLIDER_MIDDLE + neutralPercent * 0.5f && progressFaction == HORDE)
     {
         eventId = info->capturePoint.neutralEventID2;
         m_captureState = CAPTURE_STATE_NEUTRAL;

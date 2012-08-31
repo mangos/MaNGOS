@@ -117,6 +117,8 @@ void OutdoorPvPZM::HandleCreatureCreate(Creature* creature)
 
 void OutdoorPvPZM::HandleGameObjectCreate(GameObject* go)
 {
+    OutdoorPvP::HandleGameObjectCreate(go);
+
     switch (go->GetEntry())
     {
         case GO_ZANGA_BANNER_EAST:

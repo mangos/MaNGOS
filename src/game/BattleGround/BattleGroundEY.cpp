@@ -190,19 +190,19 @@ void BattleGroundEY::HandleGameObjectCreate(GameObject* go)
     {
         case GO_CAPTURE_POINT_BLOOD_ELF_TOWER:
             m_towers[NODE_BLOOD_ELF_TOWER] = go->GetObjectGuid();
-            go->SetCapturePointSlider(CAPTURE_SLIDER_NEUTRAL);
+            go->SetCapturePointSlider(CAPTURE_SLIDER_MIDDLE);
             break;
         case GO_CAPTURE_POINT_FEL_REAVER_RUINS:
             m_towers[NODE_FEL_REAVER_RUINS] = go->GetObjectGuid();
-            go->SetCapturePointSlider(CAPTURE_SLIDER_NEUTRAL);
+            go->SetCapturePointSlider(CAPTURE_SLIDER_MIDDLE);
             break;
         case GO_CAPTURE_POINT_MAGE_TOWER:
             m_towers[NODE_MAGE_TOWER] = go->GetObjectGuid();
-            go->SetCapturePointSlider(CAPTURE_SLIDER_NEUTRAL);
+            go->SetCapturePointSlider(CAPTURE_SLIDER_MIDDLE);
             break;
         case GO_CAPTURE_POINT_DRAENEI_RUINS:
             m_towers[NODE_DRAENEI_RUINS] = go->GetObjectGuid();
-            go->SetCapturePointSlider(CAPTURE_SLIDER_NEUTRAL);
+            go->SetCapturePointSlider(CAPTURE_SLIDER_MIDDLE);
             break;
     }
 }

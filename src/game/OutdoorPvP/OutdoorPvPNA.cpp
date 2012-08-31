@@ -189,6 +189,8 @@ void OutdoorPvPNA::HandleCreatureDeath(Creature* creature)
 
 void OutdoorPvPNA::HandleGameObjectCreate(GameObject* go)
 {
+    OutdoorPvP::HandleGameObjectCreate(go);
+
     switch (go->GetEntry())
     {
         case GO_HALAA_BANNER:
@@ -523,7 +525,7 @@ void OutdoorPvPNA::Update(uint32 diff)
 // Handle soldiers respawn on timer - this will summon a replacement for the dead soldier
 void OutdoorPvPNA::RespawnSoldier()
 {
-    for (GuidZoneMap::iterator itr = m_zonePlayers.begin(); itr != m_zonePlayers.end(); ++itr)
+    for (GuidZoneMap::const_iterator itr = m_zonePlayers.begin(); itr != m_zonePlayers.end(); ++itr)
     {
         // Find player who is in main zone (Nagrand) to get correct map reference
         if (!itr->second)
@@ -544,8 +546,9 @@ void OutdoorPvPNA::LockHalaa(const WorldObject* objRef)
 {
     if (GameObject* go = objRef->GetMap()->GetGameObject(m_capturePoint))
         go->SetLootState(GO_JUST_DEACTIVATED);
-
-    sOutdoorPvPMgr.SetCapturePointSlider(m_capturePoint, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE_LOCKED : CAPTURE_SLIDER_HORDE_LOCKED);
+    else
+        // if grid is unloaded, changing the saved slider value is enough
+        sOutdoorPvPMgr.SetCapturePointSlider(GO_HALAA_BANNER, m_zoneOwner == ALLIANCE ? -CAPTURE_SLIDER_ALLIANCE : -CAPTURE_SLIDER_HORDE);
 }
 
 // Unlock Halaa when all the soldiers are killed
@@ -553,8 +556,7 @@ void OutdoorPvPNA::UnlockHalaa(const WorldObject* objRef)
 {
     if (GameObject* go = objRef->GetMap()->GetGameObject(m_capturePoint))
         go->SetCapturePointSlider(m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
-        // no banner visual update needed because it already has the correct one
     else
-        // if grid is unloaded, resetting the slider value is enough
-        sOutdoorPvPMgr.SetCapturePointSlider(m_capturePoint, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
+        // if grid is unloaded, resetting the saved slider value is enough
+        sOutdoorPvPMgr.SetCapturePointSlider(GO_HALAA_BANNER, m_zoneOwner == ALLIANCE ? CAPTURE_SLIDER_ALLIANCE : CAPTURE_SLIDER_HORDE);
 }
