@@ -638,7 +638,8 @@ enum SpellAttributesEx10
 };
 
 #define MAX_TALENT_SPEC_COUNT   2
-#define MAX_GLYPH_SLOT_INDEX    6
+#define MAX_GLYPH_SLOT_INDEX    9
+#define REQ_PRIMARY_TREE_TALENTS 31
 
 enum SheathTypes
 {

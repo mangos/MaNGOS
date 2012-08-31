@@ -21,7 +21,7 @@
 
 DROP TABLE IF EXISTS `character_db_version`;
 CREATE TABLE `character_db_version` (
-  `required_12150_01_characters_saved_variables` bit(1) default NULL
+  `required_12161_01_characters_characters` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 
 --
@@ -221,6 +221,7 @@ CREATE TABLE `characters` (
   `rest_bonus` float NOT NULL default '0',
   `resettalents_cost` int(11) unsigned NOT NULL default '0',
   `resettalents_time` bigint(20) unsigned NOT NULL default '0',
+  `primary_trees` varchar(10) NOT NULL DEFAULT '0 0 ',
   `trans_x` float NOT NULL default '0',
   `trans_y` float NOT NULL default '0',
   `trans_z` float NOT NULL default '0',

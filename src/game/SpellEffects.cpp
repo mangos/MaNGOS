@@ -8794,6 +8794,27 @@ void Spell::EffectApplyGlyph(SpellEffectEntry const* effect)
 
     Player* player = (Player*)m_caster;
 
+        // glyph sockets level requirement
+    uint8 minLevel = 0;
+    switch (m_glyphIndex)
+    {
+        case 0:
+        case 1:
+        case 6: minLevel = 25; break;
+        case 2:
+        case 3:
+        case 7: minLevel = 50; break;
+        case 4:
+        case 5:
+        case 8: minLevel = 75; break;
+    }
+
+    if (minLevel && m_caster->getLevel() < minLevel)
+    {
+        SendCastResult(SPELL_FAILED_GLYPH_SOCKET_LOCKED);
+        return;
+    }
+
     // apply new one
     if(uint32 glyph = effect->EffectMiscValue)
     {

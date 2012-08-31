@@ -2128,8 +2128,9 @@ struct SummonPropertiesEntry
     uint32  Flags;                                          // 5        m_flags (enum SummonPropFlags)
 };
 
-#define MAX_TALENT_RANK 3
+#define MAX_TALENT_RANK 5
 #define MAX_PET_TALENT_RANK 3                               // use in calculations, expected <= MAX_TALENT_RANK
+#define MAX_TALENT_TABS 3
 
 struct TalentEntry
 {
@@ -2138,11 +2139,13 @@ struct TalentEntry
     uint32    Row;                                          // 2        m_tierID
     uint32    Col;                                          // 3        m_columnIndex
     uint32    RankID[MAX_TALENT_RANK];                      // 4-6      m_spellRank
-    uint32    DependsOn[MAX_TALENT_RANK];                   // 9-11     m_prereqTalent (Talent.dbc)                                                            // 
-    uint8     DependsOnRank[MAX_TALENT_RANK];               // 11-13    part of prev field                                                          // 
-    uint8     needAddInSpellBook;                           // 14       m_flags also need disable higest ranks on reset talent tree
-    uint32    unk1;                                         // 15       m_requiredSpellID
-    //uint64  allowForPet;                                  // 16       m_categoryMask its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
+    uint32    DependsOn;                                    // 9        m_prereqTalent (Talent.dbc)
+                                                            // 10-11 part of prev field
+    uint32    DependsOnRank;                                // 12       m_prereqRank
+                                                            // 13-14 part of prev field
+    //uint32  needAddInSpellBook;                           // 15       m_flags also need disable higest ranks on reset talent tree
+    //uint32  unk1;                                         // 16       m_requiredSpellID
+    //uint64  allowForPet;                                  // 17       m_categoryMask its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
 };
 
 struct TalentTabEntry
@@ -2155,8 +2158,8 @@ struct TalentTabEntry
     uint32  tabpage;                                        // 5        m_orderIndex
     //char* internalname;                                   // 6        m_backgroundFile
     //char* description;                                    // 7
-    //uint32 rolesMask;                                     // 8 4.0.0
-    //uint32 spellIds[2];                                   // 9-10 passive mastery bonus spells?
+    //uint32 rolesMask;                                     // 8        4.0.0
+    uint32 masterySpells[2];                                // 9-10     passive mastery bonus spells
 };
 
 struct TalentTreePrimarySpellsEntry
