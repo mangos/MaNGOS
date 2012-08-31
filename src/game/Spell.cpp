@@ -6926,25 +6926,6 @@ SpellCastResult Spell::CheckItems()
 
             if (totems != 0)
                 return SPELL_FAILED_TOTEMS;
-
-            // Check items for TotemCategory  (items presence in inventory)
-            uint32 TotemCategory = MAX_SPELL_TOTEM_CATEGORIES;
-            for(int i= 0; i < MAX_SPELL_TOTEM_CATEGORIES; ++i)
-            {
-                if (spellTotems->TotemCategory[i] != 0)
-                {
-                    if (p_caster->HasItemTotemCategory(spellTotems->TotemCategory[i]))
-                    {
-                        TotemCategory -= 1;
-                        continue;
-                    }
-                }
-                else
-                    TotemCategory -= 1;
-            }
-
-            if (TotemCategory != 0)
-                return SPELL_FAILED_TOTEM_CATEGORY;
         }
     }
 
