@@ -554,6 +554,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
     m_armorPenetrationPct = 0.0f;
     m_spellPenetrationItemMod = 0;
 
+    m_lastHonorKillsUpdateTime = time(NULL);
+
     // Player summoning
     m_summon_expire = 0;
     m_summon_mapid = 0;
@@ -6531,6 +6533,35 @@ void Player::RewardReputation(Quest const* pQuest)
     // TODO: implement reputation spillover
 }
 
+void Player::UpdateHonorKills()
+{
+    /// called when rewarding honor and at each save
+    time_t now = time(NULL);
+    time_t today = (time(NULL) / DAY) * DAY;
+
+    if (m_lastHonorKillsUpdateTime < today)
+    {
+        time_t yesterday = today - DAY;
+
+        uint16 kills_today = GetUInt16Value(PLAYER_FIELD_KILLS, 0);
+
+        // update yesterday's contribution
+        if (m_lastHonorKillsUpdateTime >= yesterday)
+        {
+            // this is the first update today, reset today's contribution
+            SetUInt16Value(PLAYER_FIELD_KILLS, 0, 0);
+            SetUInt16Value(PLAYER_FIELD_KILLS, 1, kills_today);
+        }
+        else
+        {
+            // no honor/kills yesterday or today, reset
+            SetUInt32Value(PLAYER_FIELD_KILLS, 0);
+        }
+    }
+
+    m_lastHonorKillsUpdateTime = now;
+}
+
 /// Calculate the amount of honor gained based on the victim
 /// and the size of the group for which the honor is divided
 /// An exact honor value can also be given (overriding the calcs)
@@ -6554,6 +6585,9 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, float honor)
 
     ObjectGuid victim_guid;
     uint32 victim_rank = 0;
+
+    // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
+    UpdateHonorKills();
 
     if (honor <= 0)
     {
@@ -15333,8 +15367,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     }
 
     SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, fields[40].GetUInt32());
-    SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[41].GetUInt16());
-    SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[42].GetUInt16());
+    SetUInt16Value(PLAYER_FIELD_KILLS, 0, fields[41].GetUInt16()); // today
+    SetUInt16Value(PLAYER_FIELD_KILLS, 1, fields[42].GetUInt16()); // yesterday
 
     _LoadBoundInstances(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES));
 
@@ -15530,6 +15564,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     }
 
     m_atLoginFlags = fields[34].GetUInt32();
+
+    // Update Honor kills data
+    m_lastHonorKillsUpdateTime = logoutTime;
+    UpdateHonorKills();
 
     m_deathExpireTime = (time_t)fields[37].GetUInt64();
     if (m_deathExpireTime > now + MAX_DEATH_COUNT * DEATH_EXPIRE_STEP)
@@ -17027,6 +17065,9 @@ void Player::SaveToDB()
         ScheduleDelayedOperation(DELAYED_SAVE_PLAYER);
         return;
     }
+
+    // first save/honor gain after midnight will also update the player's honor fields
+    UpdateHonorKills();
 
     DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s at save: ", m_name.c_str());
     outDebugStatsValues();
@@ -23506,6 +23547,6 @@ void Player::ResetCurrencyWeekCounts()
         itr->second.state = PLAYERCURRENCY_CHANGED;
     }
 
-    WorldPacket data(SMSG_WEEKLY_RESET_CURRENCY, 0);
+    WorldPacket data(SMSG_WEEKLY_RESET_CURRENCIES, 0);
     SendDirectMessage(&data);
 }

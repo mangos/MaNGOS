@@ -1991,6 +1991,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         /*********************************************************/
         /***                  PVP SYSTEM                       ***/
         /*********************************************************/
+        void UpdateHonorKills();
         bool RewardHonor(Unit *pVictim, uint32 groupsize, float honor = -1);
 
         uint32 GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot);
@@ -2484,6 +2485,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 m_speakCount;
         Difficulty m_dungeonDifficulty;
         Difficulty m_raidDifficulty;
+        time_t m_lastHonorKillsUpdateTime;
 
         uint32 m_atLoginFlags;
 

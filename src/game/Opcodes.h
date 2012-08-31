@@ -771,7 +771,8 @@ enum Opcodes
     CMSG_BATTLEFIELD_STATUS                               = 0x12D4,
     SMSG_BATTLEFIELD_STATUS                               = 0x12D5,
     CMSG_BATTLEFIELD_PORT                                 = 0x12D6,
-    MSG_INSPECT_HONOR_STATS                               = 0x12D7,
+    CMSG_INSPECT_HONOR_STATS                              = 0x791E, // 4.3.4 15595
+    SMSG_INSPECT_HONOR_STATS                              = 0x79A5, // 4.3.4 15595
     CMSG_BATTLEMASTER_HELLO                               = 0x12D8,
     CMSG_MOVE_START_SWIM_CHEAT                            = 0x12D9,
     CMSG_MOVE_STOP_SWIM_CHEAT                             = 0x12DA,
@@ -932,7 +933,7 @@ enum Opcodes
     CMSG_SET_TITLE                                        = 0x2117, // 4.3.4 15595
     CMSG_CANCEL_MOUNT_AURA                                = 0x0635, // 4.3.4 15595
     SMSG_ARENA_ERROR                                      = 0x1377,
-    MSG_INSPECT_ARENA_TEAMS                               = 0x1378,
+    MSG_INSPECT_ARENA_TEAMS                               = 0x2704, // 4.3.4 15595
     SMSG_DEATH_RELEASE_LOC                                = 0x1379,
     CMSG_CANCEL_TEMP_ENCHANTMENT                          = 0x137A,
     SMSG_FORCED_DEATH_UPDATE                              = 0x137B,
@@ -1395,7 +1396,13 @@ enum Opcodes
     SMSG_SET_CURRENCY                                     = 0x59B0, // 4.3.4 15595
     SMSG_SEND_CURRENCIES                                  = 0x15A5, // 4.3.4 15595
     CMSG_SET_CURRENCY_FLAGS                               = 0x7306, // 4.3.4 15595
-    SMSG_WEEKLY_RESET_CURRENCY                            = 0x3CA1, // 4.3.4 15595
+    SMSG_WEEKLY_RESET_CURRENCIES                          = 0x3CA1, // 4.3.4 15595
+    CMSG_INSPECT_RATED_BG_STATS                           = 0x3010, // 4.3.4 15595
+    CMSG_REQUEST_RATED_BG_INFO                            = 0x2423, // 4.3.4 15595
+    CMSG_REQUEST_RATED_BG_STATS                           = 0x05B3, // 4.3.4 15595
+    CMSG_REQUEST_PVP_REWARDS                              = 0x780C, // 4.3.4 15595
+    CMSG_REQUEST_PVP_OPTIONS_ENABLED                      = 0x24A1, // 4.3.4 15595
+    SMSG_PVP_OPTIONS_ENABLED                              = 0x50A1, // 4.3.4 15595
 };
 
 #define MAX_OPCODE_TABLE_SIZE 0xFFFF

@@ -4147,6 +4147,24 @@ bool ChatHandler::HandleHonorAddKillCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleHonorKillsUpdateCommand(char* /*args*/)
+{
+    Player* target = getSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(target))
+        return false;
+
+    target->UpdateHonorKills();
+    return true;
+}
+
 bool ChatHandler::HandleLookupEventCommand(char* args)
 {
     if (!*args)

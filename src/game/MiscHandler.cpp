@@ -1138,23 +1138,25 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
-    recv_data >> guid;
+    recv_data.ReadGuidMask<1, 5, 7, 3, 2, 4, 0, 6>(guid);
+    recv_data.ReadGuidBytes<4, 7, 0, 5, 1, 6, 2, 3>(guid);
 
     Player* player = sObjectMgr.GetPlayer(guid);
-
     if (!player)
     {
         sLog.outError("InspectHonorStats: WTF, player not found...");
         return;
     }
 
-    WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
-    data << player->GetObjectGuid();
-    data << uint8(player->GetCurrencyCount(CURRENCY_HONOR_POINTS));
-    data << uint32(player->GetUInt32Value(PLAYER_FIELD_KILLS));
-    //data << uint32(player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
-    //data << uint32(player->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION));
+    WorldPacket data(SMSG_INSPECT_HONOR_STATS, 18);
+    data.WriteGuidMask<4, 3, 6, 2, 5, 0, 7, 1>(player->GetObjectGuid());
+    data << uint8(0);                                                   // rank
+    data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 1));      // yesterday kills
+    data << uint16(player->GetUInt16Value(PLAYER_FIELD_KILLS, 0));      // today kills
+    data.WriteGuidBytes<2, 0, 6, 3, 4, 1, 5>(player->GetObjectGuid());
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS));
+    data.WriteGuidBytes<7>(player->GetObjectGuid());
+
     SendPacket(&data);
 }
 
