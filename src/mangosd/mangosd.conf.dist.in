@@ -427,7 +427,9 @@ LogColors = ""
 #
 #    Expansion
 #        Allow server use content from expansion
-#        Default: 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
+#        Default: 3 - check expansion 3 maps existence, and if client support expansion 3 and account have
+#                     expansion 3 setting then allow visit expansion 3 maps, allow create new race and class character)
+#                 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
 #                     expansion 2 setting then allow visit expansion 2 maps, allow create new class character)
 #                 1 - check expansion 1 maps existence, and if client support expansion 1 and account have
 #                     expansion 1 setting then allow visit expansion 1 maps, allow create new races character)
