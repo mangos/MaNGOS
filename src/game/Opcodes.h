@@ -595,7 +595,7 @@ enum Opcodes
     CMSG_XP_CHEAT                                         = 0x1222,
     SMSG_SPIRIT_HEALER_CONFIRM                            = 0x4917, // 4.3.4 15595
     CMSG_CHARACTER_POINT_CHEAT                            = 0x1224,
-    SMSG_GOSSIP_POI                                       = 0x1225,
+    SMSG_GOSSIP_POI                                       = 0x4316,  // 4.3.4 15595
     CMSG_CHAT_IGNORED                                     = 0x1226,
     CMSG_GM_VISION                                        = 0x1227,
     CMSG_SERVER_COMMAND                                   = 0x1228,
