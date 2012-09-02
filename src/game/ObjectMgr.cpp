@@ -4780,7 +4780,7 @@ void ObjectMgr::LoadInstanceTemplate()
             if (!parentEntry)
             {
                 sLog.outErrorDb("ObjectMgr::LoadInstanceTemplate: bad parent map id %u for instance template %d template!",
-                                parentEntry->MapID, temp->map);
+                                temp->parent, temp->map);
                 const_cast<InstanceTemplate*>(temp)->parent = 0;
                 continue;
             }
