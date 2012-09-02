@@ -760,14 +760,14 @@ enum Opcodes
     SMSG_CHAR_RENAME                                      = 0x2024, // 4.3.4 15595
     CMSG_MOVE_SPLINE_DONE                                 = 0x12CA,
     CMSG_MOVE_FALL_RESET                                  = 0x310A, // 4.3.4 15595
-    SMSG_INSTANCE_SAVE_CREATED                            = 0x12CC,
-    SMSG_RAID_INSTANCE_INFO                               = 0x12CD,
-    CMSG_REQUEST_RAID_INFO                                = 0x12CE,
+    SMSG_INSTANCE_SAVE_CREATED                            = 0x0124, // 4.3.4 15595
+    SMSG_RAID_INSTANCE_INFO                               = 0x6626, // 4.3.4 15595
+    CMSG_REQUEST_RAID_INFO                                = 0x2F26, // 4.3.4 15595
     CMSG_MOVE_TIME_SKIPPED                                = 0x12CF,
     CMSG_MOVE_FEATHER_FALL_ACK                            = 0x12D0,
     CMSG_MOVE_WATER_WALK_ACK                              = 0x3B00, // 4.3.4 15595
     CMSG_MOVE_NOT_ACTIVE_MOVER                            = 0x12D2,
-    SMSG_PLAY_SOUND                                       = 0x12D3,
+    SMSG_PLAY_SOUND                                       = 0x2134, // 4.3.4 15595
     CMSG_BATTLEFIELD_STATUS                               = 0x12D4,
     SMSG_BATTLEFIELD_STATUS                               = 0x12D5,
     CMSG_BATTLEFIELD_PORT                                 = 0x12D6,
@@ -808,7 +808,7 @@ enum Opcodes
     SMSG_MINIGAME_STATE                                   = 0x12F8,
     CMSG_MINIGAME_MOVE                                    = 0x12F9,
     SMSG_MINIGAME_MOVE_FAILED                             = 0x12FA,
-    SMSG_RAID_INSTANCE_MESSAGE                            = 0x12FB,
+    SMSG_RAID_INSTANCE_MESSAGE                            = 0x6E15, // 4.3.4 15595
     SMSG_COMPRESSED_MOVES                                 = 0x12FC,
     CMSG_GUILD_INFO_TEXT                                  = 0x12FD,
     SMSG_CHAT_RESTRICTED                                  = 0x12FE,
