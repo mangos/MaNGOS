@@ -27,6 +27,7 @@ struct AchievementEntry;
 struct AchievementCriteriaEntry;
 struct AreaTrigger;
 struct AreaTriggerEntry;
+struct CurrencyTypesEntry;
 struct FactionEntry;
 struct FactionState;
 struct GameTele;
