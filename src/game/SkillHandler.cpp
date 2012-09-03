@@ -18,6 +18,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "DBCStores.h"
 #include "Opcodes.h"
 #include "Log.h"
 #include "Player.h"
