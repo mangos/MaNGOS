@@ -350,7 +350,7 @@ void TradeData::SetSpell(uint32 spell_id, Item* castItem /*= NULL*/)
     Update(false);                                          // send spell info to caster self
 }
 
-void TradeData::SetMoney(uint32 money)
+void TradeData::SetMoney(uint64 money)
 {
     if (m_money == money)
         return;

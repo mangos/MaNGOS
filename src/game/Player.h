@@ -1002,7 +1002,7 @@ class TradeData
         Item*  GetSpellCastItem() const;
         bool HasSpellCastItem() const { return !m_spellCastItem.IsEmpty(); }
 
-        uint32 GetMoney() const { return m_money; }
+        uint64 GetMoney() const { return m_money; }
 
         bool IsAccepted() const { return m_accepted; }
         bool IsInAcceptProcess() const { return m_acceptProccess; }
@@ -1010,7 +1010,7 @@ class TradeData
 
         void SetItem(TradeSlots slot, Item* item);
         void SetSpell(uint32 spell_id, Item* castItem = NULL);
-        void SetMoney(uint32 money);
+        void SetMoney(uint64 money);
 
         void SetAccepted(bool state, bool crosssend = false);
 
@@ -1029,7 +1029,7 @@ class TradeData
         bool       m_accepted;                              // m_player press accept for trade list
         bool       m_acceptProccess;                        // one from player/trader press accept and this processed
 
-        uint32     m_money;                                 // m_player place money to trade
+        uint64     m_money;                                 // m_player place money to trade
 
         uint32     m_spell;                                 // m_player apply spell to non-traded slot item
         ObjectGuid m_spellCastItem;                         // applied spell casted by item use
@@ -1515,7 +1515,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void setRegenTimer(uint32 time) {m_regenTimer = time;}
         void setWeaponChangeTimer(uint32 time) {m_weaponChangeTimer = time;}
 
-        uint32 GetMoney() const { return GetUInt32Value(PLAYER_FIELD_COINAGE); }
+        uint64 GetMoney() const { return GetUInt64Value(PLAYER_FIELD_COINAGE); }
         void ModifyMoney(int32 d)
         {
             if (d < 0)
