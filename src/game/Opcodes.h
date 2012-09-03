@@ -754,7 +754,7 @@ enum Opcodes
     UMSG_DELETE_GUILD_CHARTER                             = 0x12C1,
     MSG_PETITION_RENAME                                   = 0x12C2,
     SMSG_INIT_WORLD_STATES                                = 0x4C15, // 4.3.4 15595
-    SMSG_UPDATE_WORLD_STATE                               = 0x12C4,
+    SMSG_UPDATE_WORLD_STATE                               = 0x4816, // 4.3.4 15595
     SMSG_PET_ACTION_FEEDBACK                              = 0x12C7,
     CMSG_CHAR_RENAME                                      = 0x2327, // 4.3.4 15595
     SMSG_CHAR_RENAME                                      = 0x2024, // 4.3.4 15595

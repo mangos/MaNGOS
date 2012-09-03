@@ -1935,6 +1935,7 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/)
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(soundId);
+    data << ObjectGuid();
 
     Map::PlayerList const& pList = GetPlayers();
     for (PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
