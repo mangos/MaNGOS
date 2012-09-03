@@ -112,7 +112,7 @@ class MANGOS_DLL_SPEC ObjectGuid
     public:                                                 // accessors
         uint64   GetRawValue() const { return m_guid; }
         HighGuid GetHigh() const { return HighGuid((m_guid >> 52) & 0x00000FFF); }
-        uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 32) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 32) & UI64LIT(0xFFFF)) : 0; }
         uint32   GetCounter()  const
         {
             return HasEntry()
