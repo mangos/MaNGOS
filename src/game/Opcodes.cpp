@@ -783,7 +783,7 @@ void InitializeOpcodes()
     OPCODE(CMSG_MOVE_WATER_WALK_ACK,                     STATUS_LOGGEDIN, PROCESS_THREADSAFE,   &WorldSession::HandleMoveWaterWalkAck          );
     //OPCODE(CMSG_MOVE_NOT_ACTIVE_MOVER,                   STATUS_LOGGEDIN, PROCESS_THREADSAFE,   &WorldSession::HandleMoveNotActiveMoverOpcode  );
     OPCODE(SMSG_PLAY_SOUND,                              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_BATTLEFIELD_STATUS,                      STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBattlefieldStatusOpcode   );
+    OPCODE(CMSG_BATTLEFIELD_STATUS,                      STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBattlefieldStatusOpcode   );
     //OPCODE(SMSG_BATTLEFIELD_STATUS,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_BATTLEFIELD_PORT,                        STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBattleFieldPortOpcode     );
     OPCODE(CMSG_INSPECT_HONOR_STATS,                     STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleInspectHonorStatsOpcode   );
@@ -811,7 +811,7 @@ void InitializeOpcodes()
     OPCODE(SMSG_BINDER_CONFIRM,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_BATTLEGROUND_PLAYER_JOINED,              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_BATTLEGROUND_PLAYER_LEFT,                STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_BATTLEMASTER_JOIN,                       STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBattlemasterJoinOpcode    );
+    OPCODE(CMSG_BATTLEMASTER_JOIN,                       STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBattlemasterJoinOpcode    );
     OPCODE(SMSG_ADDON_INFO,                              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_PET_UNLEARN,                             STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePetUnlearnOpcode          );
     //OPCODE(SMSG_PET_UNLEARN_CONFIRM,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
@@ -1381,8 +1381,10 @@ void InitializeOpcodes()
     OPCODE(SMSG_WEEKLY_RESET_CURRENCIES,                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_INSPECT_RATED_BG_STATS,                  STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_REQUEST_RATED_BG_INFO,                   STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL                     );
-    //OPCODE(CMSG_REQUEST_RATED_BG_STATS,                  STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL                     );
-    //OPCODE(CMSG_REQUEST_PVP_REWARDS,                     STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL                     );
-    OPCODE(CMSG_REQUEST_PVP_OPTIONS_ENABLED,             STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleRequestPvPOptionsEnabled    );
+    OPCODE(CMSG_REQUEST_RATED_BG_STATS,                  STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleRequestRatedBGStatsOpcode );
+    OPCODE(SMSG_RATED_BG_STATS,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_REQUEST_PVP_REWARDS,                     STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleRequestPvPRewardsOpcode   );
+    OPCODE(SMSG_PVP_REWARDS,                             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_REQUEST_PVP_OPTIONS_ENABLED,             STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleRequestPvPOptionsEnabledOpcode );
     OPCODE(SMSG_PVP_OPTIONS_ENABLED,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
 };

@@ -1704,61 +1704,54 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
     sLog.outString(">> Loaded %u battlegrounds", count);
 }
 
-void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* plr, BattleGroundTypeId bgTypeId, uint8 fromWhere)
+void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* plr, BattleGroundTypeId bgTypeId)
 {
     if (!plr)
         return;
 
+    BattleGround* bgTemplate = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
+
     data->Initialize(SMSG_BATTLEFIELD_LIST);
-    *data << guid;                                          // battlemaster guid
-    *data << uint8(fromWhere);                              // from where you joined
-    *data << uint32(bgTypeId);                              // battleground id
-    *data << uint8(0);                                      // unk
-    *data << uint8(0);                                      // unk
+    *data << uint32(0);                     // 4.3.4 winConquest weekend
+    *data << uint32(0);                     // 4.3.4 winConquest random
+    *data << uint32(0);                     // 4.3.4 lossHonor weekend
+    *data << uint32(bgTypeId);              // battleground id
+    *data << uint32(0);                     // 4.3.4 lossHonor random
+    *data << uint32(0);                     // 4.3.4 winHonor random
+    *data << uint32(0);                     // 4.3.4 winHonor weekend
+    *data << uint8(0);                      // max level
+    *data << uint8(0);                      // min level
+    data->WriteGuidMask<0, 1, 7>(guid);
+    data->WriteBit(false);                  // has holiday bg currency bonus ??
+    data->WriteBit(false);                  // has random bg currency bonus ??
 
-    // Rewards
-    *data << uint8(0);                                      // 3.3.3 hasWin
-    *data << uint32(0);                                     // 3.3.3 winHonor
-    *data << uint32(0);                                     // 3.3.3 winArena
-    *data << uint32(0);                                     // 3.3.3 lossHonor
-
-    uint8 isRandom = 0;
-    *data << uint8(isRandom);                               // 3.3.3 isRandom
-    if (isRandom)
+    uint32 count = 0;
+    ByteBuffer buf;
+    if (bgTemplate)
     {
-        // Rewards (random)
-        *data << uint8(0);                                  // 3.3.3 hasWin_Random
-        *data << uint32(0);                                 // 3.3.3 winHonor_Random
-        *data << uint32(0);                                 // 3.3.3 winArena_Random
-        *data << uint32(0);                                 // 3.3.3 lossHonor_Random
-    }
-
-    if (bgTypeId == BATTLEGROUND_AA)                        // arena
-    {
-        *data << uint32(0);                                 // arena - no instances showed
-    }
-    else                                                    // battleground
-    {
-        size_t count_pos = data->wpos();
-        uint32 count = 0;
-        *data << uint32(0);                                 // number of bg instances
-
-        if (BattleGround* bgTemplate = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId))
+        // expected bracket entry
+        if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgTemplate->GetMapId(), plr->getLevel()))
         {
-            // expected bracket entry
-            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bgTemplate->GetMapId(), plr->getLevel()))
+            BattleGroundBracketId bracketId = bracketEntry->GetBracketId();
+            ClientBattleGroundIdSet const& ids = m_ClientBattleGroundIds[bgTypeId][bracketId];
+            for (ClientBattleGroundIdSet::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
             {
-                BattleGroundBracketId bracketId = bracketEntry->GetBracketId();
-                ClientBattleGroundIdSet const& ids = m_ClientBattleGroundIds[bgTypeId][bracketId];
-                for (ClientBattleGroundIdSet::const_iterator itr = ids.begin(); itr != ids.end(); ++itr)
-                {
-                    *data << uint32(*itr);
-                    ++count;
-                }
-                data->put<uint32>(count_pos , count);
+                buf << uint32(*itr);
+                ++count;
             }
         }
     }
+
+    data->WriteBits(count, 24);
+    data->WriteGuidMask<6, 4, 2, 3>(guid);
+    data->WriteBit(true);                   // unk
+    data->WriteGuidMask<5>(guid);
+    data->WriteBit(true);                   // signals EVENT_PVPQUEUE_ANYWHERE_SHOW if set
+
+    data->WriteGuidBytes<6, 1, 7, 5>(guid);
+    if (count)
+        data->append(buf);
+    data->WriteGuidBytes<0, 2, 4, 3>(guid);
 }
 
 void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGroundTypeId bgTypeId)
@@ -1816,6 +1809,10 @@ BattleGroundQueueTypeId BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId bgType
             return BATTLEGROUND_QUEUE_IC;
         case BATTLEGROUND_RB:
             return BATTLEGROUND_QUEUE_NONE;
+        case BATTLEGROUND_TP:
+            return BATTLEGROUND_QUEUE_TP;
+        case BATTLEGROUND_BG:
+            return BATTLEGROUND_QUEUE_BG;
         case BATTLEGROUND_AA:
         case BATTLEGROUND_NA:
         case BATTLEGROUND_RL:
@@ -1854,6 +1851,10 @@ BattleGroundTypeId BattleGroundMgr::BGTemplateId(BattleGroundQueueTypeId bgQueue
             return BATTLEGROUND_SA;
         case BATTLEGROUND_QUEUE_IC:
             return BATTLEGROUND_IC;
+        case BATTLEGROUND_QUEUE_TP:
+            return BATTLEGROUND_TP;
+        case BATTLEGROUND_QUEUE_BG:
+            return BATTLEGROUND_BG;
         case BATTLEGROUND_QUEUE_2v2:
         case BATTLEGROUND_QUEUE_3v3:
         case BATTLEGROUND_QUEUE_5v5:
@@ -1984,10 +1985,13 @@ HolidayIds BattleGroundMgr::BGTypeToWeekendHolidayId(BattleGroundTypeId bgTypeId
     switch (bgTypeId)
     {
         case BATTLEGROUND_AV: return HOLIDAY_CALL_TO_ARMS_AV;
-        case BATTLEGROUND_EY: return HOLIDAY_CALL_TO_ARMS_EY;
         case BATTLEGROUND_WS: return HOLIDAY_CALL_TO_ARMS_WS;
-        case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
         case BATTLEGROUND_AB: return HOLIDAY_CALL_TO_ARMS_AB;
+        case BATTLEGROUND_EY: return HOLIDAY_CALL_TO_ARMS_EY;
+        case BATTLEGROUND_SA: return HOLIDAY_CALL_TO_ARMS_SA;
+        case BATTLEGROUND_IC: return HOLIDAY_CALL_TO_ARMS_IC;
+        case BATTLEGROUND_TP: return HOLIDAY_CALL_TO_ARMS_TP;
+        case BATTLEGROUND_BG: return HOLIDAY_CALL_TO_ARMS_BG;
         default: return HOLIDAY_NONE;
     }
 }
@@ -1997,10 +2001,13 @@ BattleGroundTypeId BattleGroundMgr::WeekendHolidayIdToBGType(HolidayIds holiday)
     switch (holiday)
     {
         case HOLIDAY_CALL_TO_ARMS_AV: return BATTLEGROUND_AV;
-        case HOLIDAY_CALL_TO_ARMS_EY: return BATTLEGROUND_EY;
         case HOLIDAY_CALL_TO_ARMS_WS: return BATTLEGROUND_WS;
-        case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
         case HOLIDAY_CALL_TO_ARMS_AB: return BATTLEGROUND_AB;
+        case HOLIDAY_CALL_TO_ARMS_EY: return BATTLEGROUND_EY;
+        case HOLIDAY_CALL_TO_ARMS_SA: return BATTLEGROUND_SA;
+        case HOLIDAY_CALL_TO_ARMS_IC: return BATTLEGROUND_IC;
+        case HOLIDAY_CALL_TO_ARMS_TP: return BATTLEGROUND_TP;
+        case HOLIDAY_CALL_TO_ARMS_BG: return BATTLEGROUND_BG;
         default: return BATTLEGROUND_TYPE_NONE;
     }
 }

@@ -23551,3 +23551,29 @@ void Player::ResetCurrencyWeekCounts()
     WorldPacket data(SMSG_WEEKLY_RESET_CURRENCIES, 0);
     SendDirectMessage(&data);
 }
+
+void Player::SendPvPRewards()
+{
+    // Placeholder
+
+    WorldPacket data(SMSG_PVP_REWARDS, 6 * 4);
+    data << uint32(1650);   // rbg conquest cap
+    data << uint32(0);      // total conquest earned
+    data << uint32(1350);   // arena conquest cap
+    data << uint32(0);      // rbg conquest earned
+    data << uint32(0);      // arena conquest earned
+    data << uint32(1650);   // total conquest cap
+
+    SendDirectMessage(&data);
+}
+
+void Player::SendRatedBGStats()
+{
+    // Placeholder
+
+    WorldPacket data(SMSG_RATED_BG_STATS, 6 * 4);
+    for (int i = 0; i < 18; ++i)
+        data << uint32(i + 1);
+
+    SendDirectMessage(&data);
+}

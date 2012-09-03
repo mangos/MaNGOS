@@ -2372,7 +2372,13 @@ enum HolidayIds
     HOLIDAY_PILGRIMS_BOUNTY          = 404,
     HOLIDAY_WOTLK_LAUNCH             = 406,
     HOLIDAY_DAY_OF_DEAD              = 409,
-    HOLIDAY_CALL_TO_ARMS_ISLE_OF_C   = 420
+    HOLIDAY_CALL_TO_ARMS_IC          = 420,
+    HOLIDAY_CALL_TO_ARMS_BG          = 435,
+    HOLIDAY_CALL_TO_ARMS_TP          = 436,
+    HOLIDAY_CALL_TO_ARMS_RBG_15v15   = 442,
+    HOLIDAY_CALL_TO_ARMS_RBG_25v25   = 443,
+    HOLIDAY_WOW_7TH_ANNIVERSARY      = 467,
+    HOLIDAY_WOW_8TH_ANNIVERSARY      = 484,
 };
 
 // values based at QuestSort.dbc
@@ -3049,11 +3055,17 @@ enum BattleGroundTypeId
     BATTLEGROUND_RV            = 11,
     BATTLEGROUND_IC            = 30,
     BATTLEGROUND_RB            = 32,                        // random battleground
+    BATTLEGROUND_RBG_10v10     = 100,                       // rated battleground 10v10
+    BATTLEGROUND_RBG_15v15     = 101,                       // rated battleground 15v15
+    BATTLEGROUND_RBG_5v5       = 102,                       // rated battleground 5v5
     BATTLEGROUND_TP            = 108,                       // 4.0.0
-    BATTLEGROUND_BG            = 118                        // 4.0.0
+    BATTLEGROUND_BG            = 120,                       // 4.3.4
+    //BATTLEGROUND_UNK1          = 441,                     // icecrown citadel
+    //BATTLEGROUND_UNK2          = 443,                     // ruby sanctum
+    //BATTLEGROUND_UNK3          = 656,                     // rated eye of the storm
 };
 
-#define MAX_BATTLEGROUND_TYPE_ID 119
+#define MAX_BATTLEGROUND_TYPE_ID 121
 
 enum ArenaType
 {

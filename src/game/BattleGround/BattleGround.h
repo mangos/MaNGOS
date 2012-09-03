@@ -166,11 +166,14 @@ enum BattleGroundQueueTypeId
     BATTLEGROUND_QUEUE_EY       = 4,
     BATTLEGROUND_QUEUE_SA       = 5,
     BATTLEGROUND_QUEUE_IC       = 6,
-    BATTLEGROUND_QUEUE_2v2      = 7,
-    BATTLEGROUND_QUEUE_3v3      = 8,
-    BATTLEGROUND_QUEUE_5v5      = 9
+    BATTLEGROUND_QUEUE_TP       = 7,
+    BATTLEGROUND_QUEUE_BG       = 8,
+    BATTLEGROUND_QUEUE_2v2      = 9,
+    BATTLEGROUND_QUEUE_3v3      = 10,
+    BATTLEGROUND_QUEUE_5v5      = 11,
 };
-#define MAX_BATTLEGROUND_QUEUE_TYPES 10
+
+#define MAX_BATTLEGROUND_QUEUE_TYPES 12
 
 enum ScoreType
 {
@@ -295,6 +298,7 @@ class BattleGround
 
         /* Battleground */
         // Get methods:
+        ObjectGuid GetObjectGuid() { return ObjectGuid(HIGHGUID_BATTLEGROUND, uint32(0), uint32(m_TypeID)); }
         char const* GetName() const         { return m_Name; }
         BattleGroundTypeId GetTypeID() const { return m_TypeID; }
         BattleGroundBracketId GetBracketId() const { return m_BracketId; }

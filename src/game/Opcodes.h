@@ -768,9 +768,9 @@ enum Opcodes
     CMSG_MOVE_WATER_WALK_ACK                              = 0x3B00, // 4.3.4 15595
     CMSG_MOVE_NOT_ACTIVE_MOVER                            = 0x12D2,
     SMSG_PLAY_SOUND                                       = 0x2134, // 4.3.4 15595
-    CMSG_BATTLEFIELD_STATUS                               = 0x12D4,
-    SMSG_BATTLEFIELD_STATUS                               = 0x12D5,
-    CMSG_BATTLEFIELD_PORT                                 = 0x12D6,
+    CMSG_BATTLEFIELD_STATUS                               = 0x2500, // 4.3.4 15595
+    SMSG_BATTLEFIELD_STATUS                               = 0x7DA1, // 4.3.4 15595
+    CMSG_BATTLEFIELD_PORT                                 = 0x711A, // 4.3.4 15595
     CMSG_INSPECT_HONOR_STATS                              = 0x791E, // 4.3.4 15595
     SMSG_INSPECT_HONOR_STATS                              = 0x79A5, // 4.3.4 15595
     CMSG_BATTLEMASTER_HELLO                               = 0x12D8,
@@ -790,13 +790,13 @@ enum Opcodes
     CMSG_GM_UNTEACH                                       = 0x12E6,
     SMSG_WARDEN_DATA                                      = 0x12E7,
     CMSG_WARDEN_DATA                                      = 0x12E8,
-    SMSG_GROUP_JOINED_BATTLEGROUND                        = 0x12E9,
+    SMSG_GROUP_JOINED_BATTLEGROUND                        = 0x71A7, // 4.3.4 15595
     MSG_BATTLEGROUND_PLAYER_POSITIONS                     = 0x12EA,
     CMSG_PET_STOP_ATTACK                                  = 0x12EB,
     SMSG_BINDER_CONFIRM                                   = 0x2835, // 4.3.4 15595
     SMSG_BATTLEGROUND_PLAYER_JOINED                       = 0x12ED,
     SMSG_BATTLEGROUND_PLAYER_LEFT                         = 0x12EE,
-    CMSG_BATTLEMASTER_JOIN                                = 0x12EF,
+    CMSG_BATTLEMASTER_JOIN                                = 0x7902, // 4.3.4 15595
     SMSG_ADDON_INFO                                       = 0x2C14, // 4.3.4 15595
     CMSG_PET_UNLEARN                                      = 0x12F1,
     SMSG_PET_UNLEARN_CONFIRM                              = 0x12F2,
@@ -902,7 +902,7 @@ enum Opcodes
     CMSG_ARENA_TEAM_DISBAND                               = 0x1356,
     CMSG_ARENA_TEAM_LEADER                                = 0x1357,
     SMSG_ARENA_TEAM_EVENT                                 = 0x1358,
-    CMSG_BATTLEMASTER_JOIN_ARENA                          = 0x1359,
+    CMSG_BATTLEMASTER_JOIN_ARENA                          = 0x701C, // 4.3.4 15595
     CMSG_MOVE_START_ASCEND                                = 0x390A,
     CMSG_MOVE_STOP_ASCEND                                 = 0x7B00, // 4.3.4 15595
     SMSG_ARENA_TEAM_STATS                                 = 0x135C,
@@ -1400,7 +1400,9 @@ enum Opcodes
     CMSG_INSPECT_RATED_BG_STATS                           = 0x3010, // 4.3.4 15595
     CMSG_REQUEST_RATED_BG_INFO                            = 0x2423, // 4.3.4 15595
     CMSG_REQUEST_RATED_BG_STATS                           = 0x05B3, // 4.3.4 15595
+    SMSG_RATED_BG_STATS                                   = 0x34A1, // 4.3.4 15595
     CMSG_REQUEST_PVP_REWARDS                              = 0x780C, // 4.3.4 15595
+    SMSG_PVP_REWARDS                                      = 0x5DA4, // 4.3.4 15595
     CMSG_REQUEST_PVP_OPTIONS_ENABLED                      = 0x24A1, // 4.3.4 15595
     SMSG_PVP_OPTIONS_ENABLED                              = 0x50A1, // 4.3.4 15595
 };
