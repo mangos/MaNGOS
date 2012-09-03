@@ -260,7 +260,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(money_per_player);
-                data << uint8(playersNear.size() > 1 ? 0 : 1);// 0 is "you share of loot..."
+                data << uint8(playersNear.size() > 1 ? 0 : 1);  // 0 is "you share of loot..."
+                data << uint32(0);                              // guild share
 
                 (*i)->GetSession()->SendPacket(&data);
             }
@@ -273,6 +274,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(pLoot->gold);
             data << uint8(1);                               // 1 is "you loot..."
+            data << uint32(0);                              // guild share
             player->GetSession()->SendPacket(&data);
         }
 

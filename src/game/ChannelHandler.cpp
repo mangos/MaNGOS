@@ -27,10 +27,13 @@ void WorldSession::HandleJoinChannelOpcode(WorldPacket& recvPacket)
     std::string channelname, pass;
 
     recvPacket >> channel_id;
-    recvPacket.read_skip<uint8>();
-    recvPacket.read_skip<uint8>();
-    recvPacket >> pass;
-    recvPacket >> channelname;
+    recvPacket.ReadBit();       // has voice
+    recvPacket.ReadBit();       // zone update
+
+    uint8 channelLength = recvPacket.ReadBits(8);
+    uint8 passwordLength = recvPacket.ReadBits(8);
+    channelname = recvPacket.ReadString(channelLength);
+    pass = recvPacket.ReadString(passwordLength);
 
     if (channelname.empty())
         return;

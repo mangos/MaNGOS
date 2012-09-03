@@ -1206,8 +1206,9 @@ void WorldSession::HandleSetGuildBankTabText(WorldPacket& recv_data)
 
     uint8 TabId;
     std::string Text;
+
     recv_data >> TabId;
-    recv_data >> Text;
+    Text = recv_data.ReadString(recv_data.ReadBits(14));
 
     uint32 GuildId = GetPlayer()->GetGuildId();
     if (!GuildId)
