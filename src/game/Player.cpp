@@ -3362,7 +3362,7 @@ bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) cons
 
     // Check CasterAuraStates
     SpellAuraRestrictionsEntry const* auraRestrictions = spellInfo->GetSpellAuraRestrictions();
-    return need_cast && (auraRestrictions && (!auraRestrictions->CasterAuraState || HasAuraState(AuraState(auraRestrictions->CasterAuraState))));
+    return need_cast && (!auraRestrictions || !auraRestrictions->CasterAuraState || HasAuraState(AuraState(auraRestrictions->CasterAuraState)));
 }
 
 void Player::learnSpell(uint32 spell_id, bool dependent)
