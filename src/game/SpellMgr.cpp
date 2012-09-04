@@ -4631,7 +4631,7 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry cons
             break;
     }
 
-    return 10000;
+    return 8000;
 }
 
 bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group)
