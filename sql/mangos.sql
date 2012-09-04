@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_12179_01_mangos_player_levelstats` bit(1) default NULL
+  `required_12180_01_mangos_spell_learn_spell` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -23299,7 +23299,17 @@ INSERT INTO `spell_learn_spell` VALUES
 (53428,53341,1),
 (53428,53343,1),
 (56815,56816,0),
-(58984,21009,1);
+(58984,21009,1),
+(86467,86473,1),
+(87491,86470,1),
+(87492,86471,1),
+(87493,86472,1),
+(87494,86474,1),
+(87495,86475,1),
+(87496,86476,1),
+(87497,86477,1),
+(87498,86478,1),
+(87500,86479,1);
 /*!40000 ALTER TABLE `spell_learn_spell` ENABLE KEYS */;
 UNLOCK TABLES;
 

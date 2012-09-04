@@ -205,8 +205,9 @@ DBCStorage <TalentEntry> sTalentStore(TalentEntryfmt);
 TalentSpellPosMap sTalentSpellPosMap;
 DBCStorage <TalentTabEntry> sTalentTabStore(TalentTabEntryfmt);
 DBCStorage <TalentTreePrimarySpellsEntry> sTalentTreePrimarySpellsStore(TalentTreePrimarySpellsfmt);
-typedef std::map<uint32, std::vector<uint32> > TalentTreePrimarySpellsMap;
-TalentTreePrimarySpellsMap sTalentTreePrimarySpellsMap;
+typedef std::map<uint32, std::vector<uint32> > TalentTreeSpellsMap;
+TalentTreeSpellsMap sTalentTreeMasterySpellsMap;
+TalentTreeSpellsMap sTalentTreePrimarySpellsMap;
 
 // store absolute bit position for first rank for talent inspect
 static uint32 sTalentTabPages[MAX_CLASSES][3];
@@ -676,6 +677,11 @@ void LoadDBCStores(const std::string& dataPath)
             if(!talentTabInfo)
                 continue;
 
+            for (uint32 i = 0; i < MAX_MASTERY_SPELLS; ++i)
+                if (uint32 spellid = talentTabInfo->masterySpells[i])
+                    if (sSpellStore.LookupEntry(spellid))
+                        sTalentTreeMasterySpellsMap[talentTabId].push_back(spellid);
+
             // prevent memory corruption; otherwise cls will become 12 below
             if ((talentTabInfo->ClassMask & CLASSMASK_ALL_PLAYABLE)==0)
                 continue;
@@ -690,7 +696,8 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files, sTalentTreePrimarySpellsStore, dbcPath, "TalentTreePrimarySpells.dbc");
     for (uint32 i = 0; i < sTalentTreePrimarySpellsStore.GetNumRows(); ++i)
         if (TalentTreePrimarySpellsEntry const* talentSpell = sTalentTreePrimarySpellsStore.LookupEntry(i))
-            sTalentTreePrimarySpellsMap[talentSpell->TalentTree].push_back(talentSpell->SpellId);
+            if (sSpellStore.LookupEntry(talentSpell->SpellId))
+                sTalentTreePrimarySpellsMap[talentSpell->TalentTree].push_back(talentSpell->SpellId);
     sTalentTreePrimarySpellsStore.Clear();
 
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sTaxiNodesStore,           dbcPath,"TaxiNodes.dbc");
@@ -1062,9 +1069,18 @@ uint32 const* GetTalentTabPages(uint32 cls)
     return sTalentTabPages[cls];
 }
 
+std::vector<uint32> const* GetTalentTreeMasterySpells(uint32 talentTree)
+{
+    TalentTreeSpellsMap::const_iterator itr = sTalentTreeMasterySpellsMap.find(talentTree);
+    if (itr == sTalentTreeMasterySpellsMap.end())
+        return NULL;
+
+    return &itr->second;
+}
+
 std::vector<uint32> const* GetTalentTreePrimarySpells(uint32 talentTree)
 {
-    TalentTreePrimarySpellsMap::const_iterator itr = sTalentTreePrimarySpellsMap.find(talentTree);
+    TalentTreeSpellsMap::const_iterator itr = sTalentTreePrimarySpellsMap.find(talentTree);
     if (itr == sTalentTreePrimarySpellsMap.end())
         return NULL;
 

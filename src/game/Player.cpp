@@ -3851,13 +3851,22 @@ bool Player::resetTalents(bool no_cost, bool all_specs)
     // Remove spec specific spells
     for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
     {
-        std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]);
-        if (specSpells)
+        if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(GetTalentTabPages(getClass())[i]))
+            for (size_t i = 0; i < specSpells->size(); ++i)
+                removeSpell(specSpells->at(i), true);
+
+        if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]))
             for (size_t i = 0; i < specSpells->size(); ++i)
                 removeSpell(specSpells->at(i), true);
     }
 
-    m_talentsPrimaryTree[m_activeSpec] = 0;
+    for (uint8 spec = 0; spec < MAX_TALENT_SPEC_COUNT; ++spec)
+    {
+        if (!all_specs && spec != m_activeSpec)
+            continue;
+
+        m_talentsPrimaryTree[spec] = 0;
+    }
 
     // for not current spec just mark removed all saved to DB case and drop not saved
     if (all_specs)
@@ -15767,7 +15776,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
             break;
 
         uint32 talentTree = atol(talentTrees[i].c_str());
-        if (sTalentTabStore.LookupEntry(talentTree))
+        if (!talentTree || sTalentTabStore.LookupEntry(talentTree))
             m_talentsPrimaryTree[i] = talentTree;
         else if (i == m_activeSpec)
             SetAtLoginFlag(AT_LOGIN_RESET_TALENTS); // invalid tree, reset talents
@@ -22173,8 +22182,12 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
     if (!m_talentsPrimaryTree[m_activeSpec])
     {
         m_talentsPrimaryTree[m_activeSpec] = talentInfo->TalentTab;
-        std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(talentInfo->TalentTab);
-        if (specSpells)
+        if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(talentInfo->TalentTab))
+            if (HasAuraType(SPELL_AURA_MASTERY))
+                for (size_t i = 0; i < specSpells->size(); ++i)
+                    learnSpell(specSpells->at(i), false);
+
+        if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(talentInfo->TalentTab))
             for (size_t i = 0; i < specSpells->size(); ++i)
                 learnSpell(specSpells->at(i), false);
     }
@@ -22747,8 +22760,11 @@ void Player::ActivateSpec(uint8 specNum)
     // Remove spec specific spells
     for (uint32 i = 0; i < MAX_TALENT_TABS; ++i)
     {
-        std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]);
-        if (specSpells)
+        if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(GetTalentTabPages(getClass())[i]))
+            for (size_t i = 0; i < specSpells->size(); ++i)
+                removeSpell(specSpells->at(i), true);
+
+        if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(GetTalentTabPages(getClass())[i]))
             for (size_t i = 0; i < specSpells->size(); ++i)
                 removeSpell(specSpells->at(i), true);
     }
@@ -22855,8 +22871,12 @@ void Player::ActivateSpec(uint8 specNum)
 
     ResummonPetTemporaryUnSummonedIfAny();
 
-    std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(m_talentsPrimaryTree[m_activeSpec]);
-    if (specSpells)
+    if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(m_talentsPrimaryTree[m_activeSpec]))
+        if (HasAuraType(SPELL_AURA_MASTERY))
+            for (size_t i = 0; i < specSpells->size(); ++i)
+                learnSpell(specSpells->at(i), false);
+
+    if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(m_talentsPrimaryTree[m_activeSpec]))
         for (size_t i = 0; i < specSpells->size(); ++i)
             learnSpell(specSpells->at(i), false);
 
@@ -22870,7 +22890,7 @@ void Player::ActivateSpec(uint8 specNum)
 
     SetPower(pw, 0);
 
-    if (!sTalentTabStore.LookupEntry(m_talentsPrimaryTree[m_activeSpec]))
+    if (m_talentsPrimaryTree[m_activeSpec] && !sTalentTabStore.LookupEntry(m_talentsPrimaryTree[m_activeSpec]))
         resetTalents(true);
 }
 
