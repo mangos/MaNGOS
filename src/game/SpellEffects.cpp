@@ -7091,6 +7091,14 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                     m_caster->CastSpell(unitTarget, 30768, true);
                     break;
                 }
+                case 30835:                                 // Infernal Relay
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 30836, true, NULL, NULL, m_caster->GetObjectGuid());
+                    break;
+                }
                 case 30918:                                 // Improved Sprint
                 {
                     if (!unitTarget)

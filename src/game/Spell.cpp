@@ -1706,6 +1706,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 23138:                                 // Gate of Shazzrah
                 case 28560:                                 // Summon Blizzard
                 case 30769:                                 // Pick Red Riding Hood
+                case 30835:                                 // Infernal Relay
                 case 31347:                                 // Doom TODO: exclude top threat target from target selection
                 case 33711:                                 // Murmur's Touch
                 case 38794:                                 // Murmur's Touch (h)
