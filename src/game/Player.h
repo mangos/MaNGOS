@@ -1847,6 +1847,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateArmorPenetration();
         void ApplyManaRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
+        void UpdateMasteryAuras();
 
         ObjectGuid const& GetLootGuid() const { return m_lootGuid; }
         void SetLootGuid(ObjectGuid const& guid) { m_lootGuid = guid; }

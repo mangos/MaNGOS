@@ -781,6 +781,70 @@ void Player::UpdateManaRegen()
     SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, power_regen_mp5 + power_regen);
 }
 
+void Player::UpdateMasteryAuras()
+{
+    if (!HasAuraType(SPELL_AURA_MASTERY))
+    {
+        SetFloatValue(PLAYER_MASTERY, 0.0f);
+        return;
+    }
+
+    float masteryValue = GetTotalAuraModifier(SPELL_AURA_MASTERY) + GetRatingBonusValue(CR_MASTERY);
+    SetFloatValue(PLAYER_MASTERY, masteryValue);
+
+    std::vector<uint32> const* masterySpells = GetTalentTreeMasterySpells(m_talentsPrimaryTree[m_activeSpec]);
+    if (!masterySpells)
+        return;
+
+    for (int i = 0; i < masterySpells->size(); ++i)
+    {
+        SpellAuraHolder* holder = GetSpellAuraHolder(masterySpells->at(i));
+        if (!holder)
+            continue;
+
+        SpellEntry const* spellEntry = holder->GetSpellProto();
+
+        // Find mastery scaling coef
+        int32 masteryBonus = 0;
+        for (uint32 j = 0; j < MAX_EFFECT_INDEX; ++j)
+        {
+            SpellEffectEntry const * effectEntry = spellEntry->GetSpellEffect(SpellEffectIndex(j));
+            if (!effectEntry)
+                continue;
+
+            // mastery scaling coef is stored in dummy aura, except 77215 (Potent Afflictions, zero effect)
+            // and 76808 (Executioner, not stored at all)
+            uint32 bp = effectEntry->CalculateSimpleValue();
+            if (holder->GetId() == 76808)
+                bp = 250;
+
+            if (!bp)
+                continue;
+
+            masteryBonus = bp;
+            break;
+        }
+
+        if (!masteryBonus)
+            continue;
+
+        // update aura modifiers
+        for (uint32 j = 0; j < MAX_EFFECT_INDEX; ++j)
+        {
+            Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(j));
+            if (!aura)
+                continue;
+
+            if (aura->GetSpellProto()->CalculateSimpleValue(SpellEffectIndex(j)))
+                continue;
+
+            aura->ApplyModifier(false, false);
+            aura->GetModifier()->m_amount = int32(masteryValue * masteryBonus / 100.0f);
+            aura->ApplyModifier(true, false);
+        }
+    }
+}
+
 void Player::_ApplyAllStatBonuses()
 {
     SetCanModifyStats(false);

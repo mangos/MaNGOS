@@ -5382,6 +5382,9 @@ void Player::UpdateRating(CombatRating cr)
             if (affectStats)
                 UpdateArmorPenetration();
             break;
+        case CR_MASTERY:
+            UpdateMasteryAuras();
+            break;
         // deprecated
         case CR_HIT_TAKEN_MELEE:
         case CR_HIT_TAKEN_RANGED:
