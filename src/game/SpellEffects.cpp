@@ -1272,6 +1272,30 @@ void Spell::EffectDummy(SpellEffectEntry const* effect)
 
                     return;
                 }
+                case 29969:                                 // Summon Blizzard
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 29952, true, NULL, NULL, m_caster->GetObjectGuid());
+                    return;
+                }
+                case 29979:                                 // Massive Magnetic Pull
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 30010, true);
+                    return;
+                }
+                case 30004:                                 // Flame Wreath
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    m_caster->CastSpell(unitTarget, 29946, true);
+                    return;
+                }
                 case 30458:                                 // Nigh Invulnerability
                 {
                     if (!m_CastItem)
