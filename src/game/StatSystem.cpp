@@ -796,7 +796,7 @@ void Player::UpdateMasteryAuras()
     if (!masterySpells)
         return;
 
-    for (int i = 0; i < masterySpells->size(); ++i)
+    for (uint32 i = 0; i < masterySpells->size(); ++i)
     {
         SpellAuraHolder* holder = GetSpellAuraHolder(masterySpells->at(i));
         if (!holder)

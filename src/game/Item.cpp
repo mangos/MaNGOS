@@ -998,6 +998,12 @@ bool Item::IsBoundByEnchant() const
         if (!enchant_id)
             continue;
 
+        if (enchant_slot == TRANSMOGRIFY_ENCHANTMENT_SLOT)
+            return true;
+
+        if (enchant_slot > PRISMATIC_ENCHANTMENT_SLOT && enchant_slot < PROP_ENCHANTMENT_SLOT_0)
+            continue;
+
         SpellItemEnchantmentEntry const* enchantEntry = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
         if (!enchantEntry)
             continue;
