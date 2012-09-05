@@ -236,11 +236,11 @@ Where "A  ->  B" means that the command is executed from A with B as target.
 
 23 SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL   resultingSource = Creature
                                             * datalong=creature entry/modelid (depend on data_flags) OR 0 to demorph
-                                            * data_flags= 0x01 to use datalong value as modelid explicit
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: use datalong value as modelid explicit
 
 24 SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL   resultingSource = Creature
                                             * datalong=creature entry/modelid (depend on data_flags) OR 0 to dismount
-                                            * data_flags= 0x01 to use datalong value as modelid explicit
+                                            * data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL: use datalong value as modelid explicit
 
 25 SCRIPT_COMMAND_SET_RUN                   resultingSource = Creature
                                             * datalong= bool 0=off, 1=on
