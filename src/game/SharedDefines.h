@@ -2611,10 +2611,19 @@ enum SkillType
     SKILL_GENERAL_SHAMAN           = 801,
     SKILL_GENERAL_WARLOCK          = 802,
     SKILL_GENERAL_WARRIOR          = 803,
-    SKILL_GENERAL_PRIEST           = 804
+    SKILL_GENERAL_PRIEST           = 804,
+    SKILL_PET_WATER_ELEMENTAL      = 805,
+    SKILL_PET_FOX                  = 808,
+    SKILL_ALL_GLYPHS               = 810,
+    SKILL_PET_DOG                  = 811,
+    SKILL_PET_MONKEY               = 815,
+    SKILL_PET_SHALE_SPIDER         = 817,
+    SKILL_PET_BEETLE               = 818,
+    SKILL_ALL_GUILD_PERKS          = 821,
+    SKILL_PET_HYDRA                = 824,
 };
 
-#define MAX_SKILL_TYPE               805
+#define MAX_SKILL_TYPE               825
 
 inline SkillType SkillByLockType(LockType locktype)
 {
