@@ -3976,8 +3976,6 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
     int32 points = GetModifier()->m_amount;
 
     ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
-    if (prot == SKILL_DEFENSE)
-        ((Player*)GetTarget())->UpdateDefenseBonusesMod();
 }
 
 void Aura::HandleChannelDeathItem(bool apply, bool Real)

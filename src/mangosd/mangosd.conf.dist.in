@@ -1276,10 +1276,8 @@ Visibility.AIRelocationNotifyDelay = 1000
 #        Default: 1
 #
 #    SkillGain.Crafting
-#    SkillGain.Defense
 #    SkillGain.Gathering
-#    SkillGain.Weapon
-#         crafting/defense/gathering/weapon skills gain at skill grow (1,2,...)
+#         For Crafting and Gathering gain skill grows (1,2,...)
 #         Default: 1
 #
 #    SkillChance.Orange
@@ -1389,9 +1387,7 @@ Rate.Reputation.LowLevel.Kill    = 1
 Rate.Reputation.LowLevel.Quest   = 1
 Rate.InstanceResetTime = 1
 SkillGain.Crafting = 1
-SkillGain.Defense = 1
 SkillGain.Gathering = 1
-SkillGain.Weapon = 1
 SkillChance.Orange = 100
 SkillChance.Yellow = 75
 SkillChance.Green  = 25

@@ -30,7 +30,7 @@ enum ItemModType
     ITEM_MOD_INTELLECT                = 5,
     ITEM_MOD_SPIRIT                   = 6,
     ITEM_MOD_STAMINA                  = 7,
-    ITEM_MOD_DEFENSE_SKILL_RATING     = 12,                 // deprecated
+    //ITEM_MOD_DEFENSE_SKILL_RATING     = 12,               // deprecated
     ITEM_MOD_DODGE_RATING             = 13,
     ITEM_MOD_PARRY_RATING             = 14,
     ITEM_MOD_BLOCK_RATING             = 15,                 // deprecated

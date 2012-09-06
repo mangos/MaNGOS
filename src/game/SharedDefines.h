@@ -2463,7 +2463,7 @@ enum SkillType
     SKILL_2H_SWORDS                = 55,
     SKILL_HOLY                     = 56,
     SKILL_SHADOW                   = 78,
-    SKILL_DEFENSE                  = 95,
+    //SKILL_DEFENSE                  = 95,
     SKILL_LANG_COMMON              = 98,
     SKILL_RACIAL_DWARVEN           = 101,
     SKILL_LANG_ORCISH              = 109,

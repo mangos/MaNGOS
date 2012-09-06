@@ -1795,7 +1795,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLevel, uint32 Multiplicator = 1);
         bool UpdateFishingSkill();
 
-        uint32 GetBaseDefenseSkillValue() const { return GetBaseSkillValue(SKILL_DEFENSE); }
         uint32 GetBaseWeaponSkillValue(WeaponAttackType attType) const;
 
         uint32 GetSpellByProto(ItemPrototype* proto);
@@ -1922,10 +1921,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void CleanupChannels();
         void UpdateLocalChannels(uint32 newZone);
         void LeaveLFGChannel();
-
-        void UpdateDefense();
-        void UpdateWeaponSkill(WeaponAttackType attType);
-        void UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence);
 
         void SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step = 0);
         uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus

@@ -1875,56 +1875,15 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
         }
         case MELEE_HIT_GLANCING:
         {
-            damageInfo->HitInfo |= HITINFO_GLANCING;
-            damageInfo->TargetState = VICTIMSTATE_NORMAL;
-            damageInfo->procEx |= PROC_EX_NORMAL_HIT;
-            float reducePercent = 1.0f;                     // damage factor
-            // calculate base values and mods
-            float baseLowEnd = 1.3f;
-            float baseHighEnd = 1.2f;
-            switch (getClass())                             // lowering base values for casters
-            {
-                case CLASS_SHAMAN:
-                case CLASS_PRIEST:
-                case CLASS_MAGE:
-                case CLASS_WARLOCK:
-                case CLASS_DRUID:
-                    baseLowEnd  -= 0.7f;
-                    baseHighEnd -= 0.3f;
-                    break;
-            }
-
-            float maxLowEnd = 0.6f;
-            switch (getClass())                             // upper for melee classes
-            {
-                case CLASS_WARRIOR:
-                case CLASS_ROGUE:
-                    maxLowEnd = 0.91f;                      // If the attacker is a melee class then instead the lower value of 0.91
-            }
-
-            // calculate values
-            int32 diff = damageInfo->target->GetDefenseSkillValue() - GetWeaponSkillValue(damageInfo->attackType);
-            float lowEnd  = baseLowEnd - (0.05f * diff);
-            float highEnd = baseHighEnd - (0.03f * diff);
-
-            // apply max/min bounds
-            if (lowEnd < 0.01f)                             // the low end must not go bellow 0.01f
-                lowEnd = 0.01f;
-            else if (lowEnd > maxLowEnd)                    // the smaller value of this and 0.6 is kept as the low end
-                lowEnd = maxLowEnd;
-
-            if (highEnd < 0.2f)                             // high end limits
-                highEnd = 0.2f;
-            if (highEnd > 0.99f)
-                highEnd = 0.99f;
-
-            if (lowEnd > highEnd)                           // prevent negative range size
-                lowEnd = highEnd;
-
-            reducePercent = lowEnd + rand_norm_f() * (highEnd - lowEnd);
-
-            damageInfo->cleanDamage += damageInfo->damage - uint32(reducePercent *  damageInfo->damage);
-            damageInfo->damage   = uint32(reducePercent *  damageInfo->damage);
+            damageInfo->HitInfo     |= HITINFO_GLANCING;
+            damageInfo->TargetState  = VICTIMSTATE_NORMAL;
+            damageInfo->procEx      |= PROC_EX_NORMAL_HIT;
+            int32 leveldif = int32(pVictim->getLevel()) - int32(getLevel());
+            if (leveldif > 3)
+                leveldif = 3;
+            float reducePercent = 1 - leveldif * 0.1f;
+            damageInfo->cleanDamage += damageInfo->damage - uint32(reducePercent * damageInfo->damage);
+            damageInfo->damage = uint32(reducePercent * damageInfo->damage);
             break;
         }
         case MELEE_HIT_CRUSHING:
@@ -2045,11 +2004,6 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         // there is a newbie protection, at level 10 just 7% base chance; assuming linear function
         if (pVictim->getLevel() < 30)
             Probability = 0.65f * pVictim->getLevel() + 0.5f;
-
-        uint32 VictimDefense = pVictim->GetDefenseSkillValue();
-        uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
-
-        Probability *= AttackerMeleeSkill / (float)VictimDefense;
 
         if (Probability > 40.0f)
             Probability = 40.0f;
@@ -2931,7 +2885,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* pVictim, WeaponAttackT
     int32 victimMaxSkillValueForLevel = pVictim->GetMaxSkillValueForLevel(this);
 
     int32 attackerWeaponSkill = GetWeaponSkillValue(attType, pVictim);
-    int32 victimDefenseSkill = pVictim->GetDefenseSkillValue(this);
+    int32 victimDefenseSkill = pVictim->GetUnitMeleeSkill(this); // level * 5
 
     // bonus from skills is 0.04%
     int32    skillBonus  = 4 * (attackerWeaponSkill - victimMaxSkillValueForLevel);
@@ -3261,14 +3215,9 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell)
     if (spell->GetDmgClass() == SPELL_DAMAGE_CLASS_RANGED)
         attType = RANGED_ATTACK;
 
-    // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->GetEquippedItemClass() == ITEM_CLASS_WEAPON) ? int32(GetWeaponSkillValue(attType,pVictim)) : GetMaxSkillValueForLevel();
-    int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetMaxSkillValueForLevel(this));
-    int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
-
     uint32 roll = urand(0, 10000);
 
-    uint32 missChance = uint32(MeleeSpellMissChance(pVictim, attType, fullSkillDiff, spell) * 100.0f);
+	uint32 missChance = uint32(MeleeSpellMissChance(pVictim, attType,0,spell) * 100.0f);
     // Roll miss
     uint32 tmp = spell->HasAttribute(SPELL_ATTR_EX3_CANT_MISS) ? 0 : missChance;
     if (roll < tmp)
@@ -3356,7 +3305,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell)
     if (canDodge)
     {
         // Roll dodge
-        int32 dodgeChance = int32(pVictim->GetUnitDodgeChance() * 100.0f) - skillDiff * 4;
+        int32 dodgeChance = int32(pVictim->GetUnitDodgeChance() * 100.0f);
         // Reduce enemy dodge chance by SPELL_AURA_MOD_COMBAT_RESULT_CHANCE
         dodgeChance += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_COMBAT_RESULT_CHANCE, VICTIMSTATE_DODGE) * 100;
         // Reduce dodge chance by attacker expertise rating
@@ -3375,7 +3324,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell)
     if (canParry)
     {
         // Roll parry
-        int32 parryChance = int32(pVictim->GetUnitParryChance() * 100.0f)  - skillDiff * 4;
+        int32 parryChance = int32(pVictim->GetUnitParryChance() * 100.0f);
         // Reduce parry chance by attacker expertise rating
         if (GetTypeId() == TYPEID_PLAYER)
             parryChance -= int32(((Player*)this)->GetExpertiseDodgeOrParryReduction(attType) * 100.0f);
@@ -3493,19 +3442,6 @@ SpellMissInfo Unit::SpellHitResult(Unit* pVictim, SpellEntry const* spell, bool 
     if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
         return SPELL_MISS_EVADE;
 
-    // Check for immune
-    if (pVictim->IsImmuneToSpell(spell))
-        return SPELL_MISS_IMMUNE;
-
-    // All positive spells can`t miss
-    // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (IsPositiveSpell(spell->Id))
-        return SPELL_MISS_NONE;
-
-    // Check for immune
-    if (pVictim->IsImmunedToDamage(GetSpellSchoolMask(spell)))
-        return SPELL_MISS_IMMUNE;
-
     // Try victim reflect spell
     if (CanReflect)
     {
@@ -3537,74 +3473,25 @@ SpellMissInfo Unit::SpellHitResult(Unit* pVictim, SpellEntry const* spell, bool 
 
 float Unit::MeleeMissChanceCalc(const Unit* pVictim, WeaponAttackType attType) const
 {
-    if (!pVictim)
-        return 0.0f;
-
-    // Base misschance 5%
-    float missChance = 5.0f;
-
-    // DualWield - white damage has additional 19% miss penalty
-    if (haveOffhandWeapon() && attType != RANGED_ATTACK)
-    {
-        bool isNormal = false;
-        for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
+	if (!pVictim)
+	return 0.0f; 	
+	// Base misschance 5% 	
+	float missChance = 5.0f;
+	// DualWield - white damage has additional 19% miss penalty
+	if (haveOffhandWeapon() && attType != RANGED_ATTACK)
+	{
+		bool isNormal = false;
+	  	for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
+	{
+         if (m_currentSpells[i] && (GetSpellSchoolMask(m_currentSpells[i]->m_spellInfo) & SPELL_SCHOOL_MASK_NORMAL))
         {
-            if (m_currentSpells[i] && (GetSpellSchoolMask(m_currentSpells[i]->m_spellInfo) & SPELL_SCHOOL_MASK_NORMAL))
-            {
-                isNormal = true;
-                break;
-            }
-        }
-        if (!isNormal && !m_currentSpells[CURRENT_MELEE_SPELL])
-            missChance += 19.0f;
-    }
-
-    int32 skillDiff = int32(GetWeaponSkillValue(attType, pVictim)) - int32(pVictim->GetDefenseSkillValue(this));
-
-    // PvP - PvE melee chances
-    // TODO: implement diminishing returns for defense from player's defense rating
-    // pure skill diff is not sufficient since 3.x anymore, but exact formulas hard to research
-    if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        missChance -= skillDiff * 0.04f;
-    else if (skillDiff < -10)
-        missChance -= (skillDiff + 10) * 0.4f - 1.0f;
-    else
-        missChance -=  skillDiff * 0.1f;
-
-    // Hit chance bonus from attacker based on ratings and auras
-    if (attType == RANGED_ATTACK)
-        missChance -= m_modRangedHitChance;
-    else
-        missChance -= m_modMeleeHitChance;
-
-    // Modify miss chance by victim auras
-    if (attType == RANGED_ATTACK)
-        missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE);
-    else
-        missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
-
-    // Limit miss chance from 0 to 60%
-    if (missChance < 0.0f)
-        return 0.0f;
-    if (missChance > 60.0f)
-        return 60.0f;
-
-    return missChance;
+				isNormal = true;
+			 break;
+		}
+	}
+	if (!isNormal && !m_currentSpells[CURRENT_MELEE_SPELL])
+	missChance += 19.0f;
 }
-
-uint32 Unit::GetDefenseSkillValue(Unit const* target) const
-{
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        // in PvP use full skill instead current skill value
-        uint32 value = (target && target->GetTypeId() == TYPEID_PLAYER)
-                       ? ((Player*)this)->GetMaxSkillValue(SKILL_DEFENSE)
-                       : ((Player*)this)->GetSkillValue(SKILL_DEFENSE);
-        value += uint32(((Player*)this)->GetRatingBonusValue(CR_DEFENSE_SKILL));
-        return value;
-    }
-    else
-        return GetUnitMeleeSkill(target);
 }
 
 float Unit::GetUnitDodgeChance() const
@@ -3724,10 +3611,6 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* pVict
         crit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE);
 
     crit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
-
-
-    // Apply crit chance from defence skill
-    crit += (int32(GetMaxSkillValueForLevel(pVictim)) - int32(pVictim->GetDefenseSkillValue(this))) * 0.04f;
 
     if (crit < 0.0f)
         crit = 0.0f;
@@ -10373,19 +10256,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
     // For melee/ranged based attack need update skills and set some Aura states
     if (!(procExtra & PROC_EX_CAST_END) && procFlag & MELEE_BASED_TRIGGER_MASK)
     {
-        // Update skills here for players
-        if (GetTypeId() == TYPEID_PLAYER)
-        {
-            // On melee based hit/miss/resist need update skill (for victim and attacker)
-            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST))
-            {
-                if (pTarget->GetTypeId() != TYPEID_PLAYER && pTarget->GetCreatureType() != CREATURE_TYPE_CRITTER)
-                    ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
-            }
-            // Update defence if player is victim and parry/dodge/block
-            if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
-                ((Player*)this)->UpdateDefense();
-        }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
         {

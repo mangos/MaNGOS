@@ -1358,7 +1358,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         virtual uint32 GetShieldBlockValue() const = 0;
         uint32 GetUnitMeleeSkill(Unit const* target = NULL) const { return (target ? GetLevelForTarget(target) : getLevel()) * 5; }
-        uint32 GetDefenseSkillValue(Unit const* target = NULL) const;
         uint32 GetWeaponSkillValue(WeaponAttackType attType, Unit const* target = NULL) const;
         float GetWeaponProcChance() const;
         float GetPPMProcChance(uint32 WeaponSpeed, float PPM) const;

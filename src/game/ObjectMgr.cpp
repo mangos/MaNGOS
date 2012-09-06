@@ -2029,7 +2029,6 @@ void ObjectMgr::LoadItemPrototypes()
             switch (proto->ItemStat[j].ItemStatType)
             {
                 case ITEM_MOD_HEALTH:
-                case ITEM_MOD_DEFENSE_SKILL_RATING:
                 case ITEM_MOD_BLOCK_RATING:
                 case ITEM_MOD_HIT_MELEE_RATING:
                 case ITEM_MOD_HIT_RANGED_RATING:

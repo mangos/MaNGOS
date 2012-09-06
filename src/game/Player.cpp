@@ -5037,17 +5037,6 @@ void Player::LeaveLFGChannel()
     }
 }
 
-void Player::UpdateDefense()
-{
-    uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
-
-    if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
-    {
-        // update dependent from defense skill part
-        UpdateDefenseBonusesMod();
-    }
-}
-
 void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END || modType >= MOD_END)
@@ -5328,10 +5317,6 @@ void Player::UpdateRating(CombatRating cr)
 
     switch (cr)
     {
-        case CR_WEAPON_SKILL:                               // Implemented in Unit::RollMeleeOutcomeAgainst
-        case CR_DEFENSE_SKILL:
-            UpdateDefenseBonusesMod();
-            break;
         case CR_DODGE:
             UpdateDodgePercentage();
             break;
@@ -5391,9 +5376,6 @@ void Player::UpdateRating(CombatRating cr)
         case CR_HIT_TAKEN_SPELL:
         case CR_CRIT_TAKEN_SPELL:
         case CR_CRIT_TAKEN_MELEE:
-        case CR_WEAPON_SKILL_MAINHAND:
-        case CR_WEAPON_SKILL_OFFHAND:
-        case CR_WEAPON_SKILL_RANGED:
             break;
     }
 }
@@ -5599,69 +5581,6 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
-{
-    // no skill gain in pvp
-    Unit* pVictim = getVictim();
-    if (pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
-        return;
-
-    if (IsInFeralForm())
-        return;                                             // always maximized SKILL_FERAL_COMBAT in fact
-
-    if (GetShapeshiftForm() == FORM_TREE)
-        return;                                             // use weapon but not skill up
-
-    uint32 weaponSkillGain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
-
-    Item* pWeapon = GetWeaponForAttack(attType, true, true);
-    if (pWeapon && pWeapon->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-        UpdateSkill(pWeapon->GetSkill(), weaponSkillGain);
-    else if (!pWeapon && attType == BASE_ATTACK)
-        UpdateSkill(SKILL_UNARMED, weaponSkillGain);
-
-    UpdateAllCritPercentages();
-}
-
-void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
-{
-    uint32 plevel = getLevel();                             // if defense than pVictim == attacker
-    uint32 greylevel = MaNGOS::XP::GetGrayLevel(plevel);
-    uint32 moblevel = pVictim->GetLevelForTarget(this);
-    if (moblevel < greylevel)
-        return;
-
-    if (moblevel > plevel + 5)
-        moblevel = plevel + 5;
-
-    uint32 lvldif = moblevel - greylevel;
-    if (lvldif < 3)
-        lvldif = 3;
-
-    int32 skilldif = 5 * plevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
-
-    // Max skill reached for level.
-    // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skilldif <= 0)
-        return;
-
-    float chance = float(3 * lvldif * skilldif) / plevel;
-    if (!defence)
-        chance *= 0.1f * GetStat(STAT_INTELLECT);
-
-    chance = chance < 1.0f ? 1.0f : chance;                 // minimum chance to increase skill is 1%
-
-    if (roll_chance_f(chance))
-    {
-        if (defence)
-            UpdateDefense();
-        else
-            UpdateWeaponSkill(attType);
-    }
-    else
-        return;
-}
-
 void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
 {
     SkillStatusMap::const_iterator itr = mSkillStatus.find(skillid);
@@ -5748,9 +5667,6 @@ void Player::UpdateSkillsToMaxSkillsForLevel()
                 itr->second.uState = SKILL_CHANGED;
             GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, pskill);
         }
-
-        if (pskill == SKILL_DEFENSE)
-            UpdateDefenseBonusesMod();
     }
 }
 
@@ -7195,7 +7111,6 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
                 break;
             // deprecated item mods
             case ITEM_MOD_HEALTH:
-            case ITEM_MOD_DEFENSE_SKILL_RATING:
             case ITEM_MOD_BLOCK_RATING:
             case ITEM_MOD_HIT_MELEE_RATING:
             case ITEM_MOD_HIT_RANGED_RATING:
@@ -12628,7 +12543,6 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             DEBUG_LOG("+ %u MASTERY_RATING", enchant_amount);
                             break;
                         // deprecated
-                        case ITEM_MOD_DEFENSE_SKILL_RATING:
                         case ITEM_MOD_BLOCK_RATING:
                         case ITEM_MOD_HIT_MELEE_RATING:
                         case ITEM_MOD_HIT_RANGED_RATING:
@@ -21910,8 +21824,6 @@ void Player::_LoadSkills(QueryResult* result)
             SetSkill(SKILL_FIRST_AID, base_skill, base_skill);
         if (GetPureSkillValue(SKILL_AXES) < base_skill)
             SetSkill(SKILL_AXES, base_skill, base_skill);
-        if (GetPureSkillValue(SKILL_DEFENSE) < base_skill)
-            SetSkill(SKILL_DEFENSE, base_skill, base_skill);
         if (GetPureSkillValue(SKILL_POLEARMS) < base_skill)
             SetSkill(SKILL_POLEARMS, base_skill, base_skill);
         if (GetPureSkillValue(SKILL_SWORDS) < base_skill)
