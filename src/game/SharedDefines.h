@@ -3242,9 +3242,8 @@ enum MaxLevel
     MAX_LEVEL_CLASSIC                   = 60,
     MAX_LEVEL_TBC                       = 70,
     MAX_LEVEL_WOTLK                     = 80,
-    MAX_LEVEL_CATA                      = 85,
 };
 
-static const MaxLevel maxLevelForExpansion[MAX_EXPANSION + 1] = { MAX_LEVEL_CLASSIC, MAX_LEVEL_TBC, MAX_LEVEL_WOTLK, MAX_LEVEL_CATA };
+static const MaxLevel maxLevelForExpansion[MAX_EXPANSION + 1] = { MAX_LEVEL_CLASSIC, MAX_LEVEL_TBC, MAX_LEVEL_WOTLK };
 
 #endif
