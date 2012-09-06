@@ -7581,6 +7581,7 @@ SpellCastResult Spell::CanOpenLock(SpellEffectIndex effIndex, uint32 lockId, Ski
                     reqSkillValue = lockInfo->Skill[j];
 
                     // castitem check: rogue using skeleton keys. the skill values should not be added in this case.
+                    // MAX_SKILL_TYPE - skill value scales with caster level
                     if (skillId == MAX_SKILL_TYPE)
                         skillValue = m_CastItem || m_caster->GetTypeId() != TYPEID_PLAYER ? 0 : m_caster->getLevel() * 5;
                     else

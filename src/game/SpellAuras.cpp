@@ -371,7 +371,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleNULL,                                      //315 SPELL_AURA_UNDERWATER_WALKING 4 spells in 4.3.4 underwater walking
     &Aura::HandleUnused,                                    //316 0 spells in 4.3.4
     &Aura::HandleNULL,                                      //317 SPELL_AURA_MOD_INCREASE_SPELL_POWER_PCT 13 spells in 4.3.4
-    &Aura::HandleNULL,                                      //318 SPELL_AURA_MASTERY 12 spells in 4.3
+    &Aura::HandleAuraMastery,                               //318 SPELL_AURA_MASTERY 12 spells in 4.3
     &Aura::HandleNULL,                                      //319 SPELL_AURA_MOD_MELEE_ATTACK_SPEED 47 spells in 4.3.4
     &Aura::HandleNULL,                                      //320 SPELL_AURA_MOD_RANGED_ATTACK_SPEED 5 spells in 4.3.4
     &Aura::HandleNULL,                                      //321 1 spells in 4.3 Hex
@@ -8742,6 +8742,18 @@ void Aura::HandleAuraStopNaturalManaRegen(bool apply, bool Real)
         return;
 
     GetTarget()->ApplyModFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER, !apply && !GetTarget()->IsUnderLastManaUseEffect());
+}
+
+void Aura::HandleAuraMastery(bool apply, bool Real)
+{
+    if (!Real)
+        return;
+
+    Unit* target = GetTarget();
+    if (target->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    ((Player*)target)->UpdateMasteryAuras();
 }
 
 bool Aura::IsLastAuraOnHolder()

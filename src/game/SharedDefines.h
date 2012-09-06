@@ -2620,7 +2620,7 @@ inline SkillType SkillByLockType(LockType locktype)
 {
     switch (locktype)
     {
-        case LOCKTYPE_PICKLOCK:    return SkillType(MAX_SKILL_TYPE);
+        case LOCKTYPE_PICKLOCK:    return SkillType(MAX_SKILL_TYPE);    // no skill for such lock, 'skill' value scales with level
         case LOCKTYPE_HERBALISM:   return SKILL_HERBALISM;
         case LOCKTYPE_MINING:      return SKILL_MINING;
         case LOCKTYPE_FISHING:     return SKILL_FISHING;
