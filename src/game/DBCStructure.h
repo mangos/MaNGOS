@@ -2411,15 +2411,6 @@ typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
 
 // Structures not used for casting to loaded DBC data and not required then packing
-struct MapDifficulty
-{
-    MapDifficulty() : resetTime(0), maxPlayers(0) {}
-    MapDifficulty(uint32 _resetTime, uint32 _maxPlayers) : resetTime(_resetTime), maxPlayers(_maxPlayers) {}
-
-    uint32 resetTime;                                       // in secs, 0 if no fixed reset time
-    uint32 maxPlayers;                                      // some heroic dungeons have 0 when expect same value as in normal dificulty case
-};
-
 struct TalentSpellPos
 {
     TalentSpellPos() : talent_id(0), rank(0) {}

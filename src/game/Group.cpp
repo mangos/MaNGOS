@@ -1780,7 +1780,7 @@ InstanceGroupBind* Group::GetBoundInstance(uint32 mapid, Player* player)
     Difficulty difficulty = player->GetDifficulty(mapEntry->IsRaid());
 
     // some instances only have one difficulty
-    MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
+    MapDifficultyEntry const* mapDiff = GetMapDifficultyData(mapid, difficulty);
     if (!mapDiff)
         difficulty = DUNGEON_DIFFICULTY_NORMAL;
 
@@ -1794,7 +1794,7 @@ InstanceGroupBind* Group::GetBoundInstance(uint32 mapid, Player* player)
 InstanceGroupBind* Group::GetBoundInstance(Map* aMap, Difficulty difficulty)
 {
     // some instances only have one difficulty
-    MapDifficulty const* mapDiff = GetMapDifficultyData(aMap->GetId(), difficulty);
+    MapDifficultyEntry const* mapDiff = GetMapDifficultyData(aMap->GetId(), difficulty);
     if (!mapDiff)
         return NULL;
 

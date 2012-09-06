@@ -182,7 +182,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         }
 
         // The player has a heroic mode and tries to enter into instance which has no a heroic mode
-        MapDifficulty const* mapDiff = GetMapDifficultyData(entry->MapID, player->GetDifficulty(entry->map_type == MAP_RAID));
+        MapDifficultyEntry const* mapDiff = GetMapDifficultyData(entry->MapID, player->GetDifficulty(entry->map_type == MAP_RAID));
         if (!mapDiff)
         {
             bool isRegularTargetMap = player->GetDifficulty(entry->IsRaid()) == REGULAR_DIFFICULTY;

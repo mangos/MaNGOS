@@ -3206,6 +3206,23 @@ enum ActivateTaxiReply
     ERR_TAXINOTSTANDING             = 12
 };
 
+enum AreaLockStatus
+{
+    AREA_LOCKSTATUS_OK                          = 0,
+    AREA_LOCKSTATUS_UNKNOWN_ERROR               = 1,
+    AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION      = 2,
+    AREA_LOCKSTATUS_TOO_LOW_LEVEL               = 3,
+    AREA_LOCKSTATUS_TOO_HIGH_LEVEL              = 4,
+    AREA_LOCKSTATUS_RAID_LOCKED                 = 5,
+    AREA_LOCKSTATUS_QUEST_NOT_COMPLETED         = 6,
+    AREA_LOCKSTATUS_MISSING_ITEM                = 7,
+    AREA_LOCKSTATUS_MISSING_DIFFICULTY          = 8,
+    AREA_LOCKSTATUS_ZONE_IN_COMBAT              = 9,
+    AREA_LOCKSTATUS_INSTANCE_IS_FULL            = 10,
+    AREA_LOCKSTATUS_NOT_ALLOWED                 = 11,
+    AREA_LOCKSTATUS_HAS_BIND                    = 12,
+};
+
 // we need to stick to 1 version or half of the stuff will work for someone
 // others will not and opposite
 // will only support WoW, WoW:TBC, WoW:WotLK and WoW:Cataclysm 4.3.4 client build 15595...
@@ -3218,5 +3235,15 @@ enum ActivateTaxiReply
 // because if client receive unsupported expansion level it think
 // that it not have expansion installed and reject
 #define MAX_EXPANSION 3
+
+// Maxlevel for expansion
+enum MaxLevel
+{
+    MAX_LEVEL_CLASSIC                   = 60,
+    MAX_LEVEL_TBC                       = 70,
+    MAX_LEVEL_WOTLK                     = 80,
+};
+
+static const MaxLevel maxLevelForExpansion[MAX_EXPANSION + 1] = { MAX_LEVEL_CLASSIC, MAX_LEVEL_TBC, MAX_LEVEL_WOTLK };
 
 #endif

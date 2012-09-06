@@ -34,7 +34,7 @@
 
 struct InstanceTemplate;
 struct MapEntry;
-struct MapDifficulty;
+struct MapDifficultyEntry;
 struct GameObjectData;
 struct CreatureData;
 
@@ -304,8 +304,8 @@ class DungeonResetScheduler
             return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
         }
 
-        static uint32 GetMaxResetTimeFor(MapDifficulty const* mapDiff);
-        static time_t CalculateNextResetTime(MapDifficulty const* mapDiff, time_t prevResetTime);
+        static uint32 GetMaxResetTimeFor(MapDifficultyEntry const* mapDiff);
+        static time_t CalculateNextResetTime(MapDifficultyEntry const* mapDiff, time_t prevResetTime);
     public:                                                 // modifiers
         void SetResetTimeFor(uint32 mapid, Difficulty d, time_t t)
         {
