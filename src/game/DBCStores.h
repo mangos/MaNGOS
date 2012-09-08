@@ -91,6 +91,7 @@ inline Difficulty GetPrevDifficulty(Difficulty diff, bool isRaid)
 uint32 const* /*[3]*/ GetTalentTabPages(uint32 cls);
 std::vector<uint32> const* GetTalentTreeMasterySpells(uint32 talentTree);
 std::vector<uint32> const* GetTalentTreePrimarySpells(uint32 talentTree);
+uint32 GetTalentTreeRolesMask(uint32 talentTree);
 
 bool IsPointInAreaTriggerZone(AreaTriggerEntry const* atEntry, uint32 mapid, float x, float y, float z, float delta = 0.0f);
 

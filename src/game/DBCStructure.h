@@ -2137,8 +2137,6 @@ struct TalentEntry
     //uint64  allowForPet;                                  // 17       m_categoryMask its a 64 bit mask for pet 1<<m_categoryEnumID in CreatureFamily.dbc
 };
 
-#define MAX_MASTERY_SPELLS 2
-
 struct TalentTabEntry
 {
     uint32  TalentTabID;                                    // 0        m_ID
@@ -2149,7 +2147,7 @@ struct TalentTabEntry
     uint32  tabpage;                                        // 5        m_orderIndex
     //char* internalname;                                   // 6        m_backgroundFile
     //char* description;                                    // 7
-    //uint32 rolesMask;                                     // 8        4.0.0
+    uint32 rolesMask;                                       // 8        4.0.0
     uint32 masterySpells[MAX_MASTERY_SPELLS];               // 9-10     passive mastery bonus spells
 };
 

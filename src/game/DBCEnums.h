@@ -422,6 +422,15 @@ enum ItemLimitCategory
     ITEM_LIMIT_CATEGORY_MANA_GEM   = 4,
 };
 
+enum TalentTreeRole
+{
+    TALENT_ROLE_TANK    = 0x2,
+    TALENT_ROLE_HEALER  = 0x4,
+    TALENT_ROLE_DPS     = 0x8,
+};
+
+#define MAX_MASTERY_SPELLS 2
+
 enum TotemCategoryType
 {
     TOTEM_CATEGORY_TYPE_KNIFE   = 1,
