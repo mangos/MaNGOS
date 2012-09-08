@@ -288,7 +288,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraTrackResources(bool Apply, bool Real);
         void HandleAuraModParryPercent(bool Apply, bool Real);
         void HandleAuraModDodgePercent(bool Apply, bool Real);
-        void HandleAuraModBlockPercent(bool Apply, bool Real);
+        void HandleAuraModBlockChancePercent(bool Apply, bool Real);
         void HandleAuraModCritPercent(bool Apply, bool Real);
         void HandlePeriodicLeech(bool Apply, bool Real);
         void HandleModHitChance(bool Apply, bool Real);
@@ -321,9 +321,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleModPercentStat(bool Apply, bool Real);
         void HandleModResistancePercent(bool Apply, bool Real);
         void HandleAuraModBaseResistancePCT(bool Apply, bool Real);
-        void HandleModShieldBlockPCT(bool Apply, bool Real);
         void HandleAuraTrackStealthed(bool Apply, bool Real);
-        void HandleModShieldBlock(bool Apply, bool Real);
         void HandleForceReaction(bool Apply, bool Real);
         void HandleAuraModRangedHaste(bool Apply, bool Real);
         void HandleRangedAmmoHaste(bool Apply, bool Real);
@@ -345,7 +343,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleSpiritOfRedemption(bool apply, bool Real);
         void HandleModManaRegen(bool apply, bool Real);
         void HandleComprehendLanguage(bool apply, bool Real);
-        void HandleShieldBlockValue(bool apply, bool Real);
+        void HandleModShieldBlockDamage(bool apply, bool Real);
         void HandleModSpellCritChanceShool(bool apply, bool Real);
         void HandleAuraRetainComboPoints(bool apply, bool Real);
         void HandleModSpellDamagePercentFromStat(bool apply, bool Real);
@@ -375,6 +373,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraAddMechanicAbilities(bool apply, bool Real);
         void HandleAuraStopNaturalManaRegen(bool apply, bool Real);
         void HandleAuraMastery(bool apply, bool Real);
+        void HandleAuraModBlockCritChance(bool apply, bool Real);
 
         virtual ~Aura();
 

@@ -16,12 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "DBCStores.h"
 #include "Unit.h"
 #include "Player.h"
 #include "Pet.h"
 #include "Creature.h"
 #include "SharedDefines.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 
 /*#######################################
 ########                         ########
@@ -49,7 +51,6 @@ bool Player::UpdateStats(Stats stat)
     switch (stat)
     {
         case STAT_STRENGTH:
-            UpdateShieldBlockValue();
             break;
         case STAT_AGILITY:
             UpdateArmor();
@@ -131,8 +132,10 @@ bool Player::UpdateAllStats()
     UpdateAllRatings();
     UpdateAllCritPercentages();
     UpdateAllSpellCritChances();
-    UpdateDefenseBonusesMod();
-    UpdateShieldBlockValue();
+    UpdateBlockPercentage();
+    UpdateParryPercentage();
+    UpdateShieldBlockDamageValue();
+    UpdateDodgePercentage();
     UpdateArmorPenetration();
     UpdateSpellDamageAndHealingBonus();
     UpdateManaRegen();
@@ -393,9 +396,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     }
 }
 
-void Player::UpdateShieldBlockValue()
+void Player::UpdateShieldBlockDamageValue()
 {
-    SetUInt32Value(PLAYER_SHIELD_BLOCK, GetShieldBlockValue());
+    SetUInt32Value(PLAYER_SHIELD_BLOCK, GetShieldBlockDamageValue());
 }
 
 void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage)
@@ -479,13 +482,6 @@ void Player::UpdateDamagePhysical(WeaponAttackType attType)
     }
 }
 
-void Player::UpdateDefenseBonusesMod()
-{
-    UpdateBlockPercentage();
-    UpdateParryPercentage();
-    UpdateDodgePercentage();
-}
-
 void Player::UpdateBlockPercentage()
 {
     // No block
@@ -494,11 +490,9 @@ void Player::UpdateBlockPercentage()
     {
         // Base value
         value = 5.0f;
-        // Modify value from defense skill
-        value += (int32(GetDefenseSkillValue()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
-        // Increase from SPELL_AURA_MOD_BLOCK_PERCENT aura
-        value += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
-        // Increase from rating
+        // Increase from SPELL_AURA_MOD_BLOCK_CHANCE_PERCENT aura
+        value += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_CHANCE_PERCENT);
+        // Increase from rating (exists only on auras)
         value += GetRatingBonusValue(CR_BLOCK);
         value = value < 0.0f ? 0.0f : value;
     }
@@ -533,7 +527,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
 
     float value = GetTotalPercentageModValue(modGroup) + GetRatingBonusValue(cr);
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
-    value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+    value += (int32(GetMaxSkillValueForLevel()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
 }
@@ -570,17 +564,17 @@ void Player::UpdateParryPercentage()
 {
     const float parry_cap[MAX_CLASSES] =
     {
-        47.003525f,  // Warrior
-        47.003525f,  // Paladin
-        145.560408f,  // Hunter
-        145.560408f,  // Rogue
-        0.0f,       // Priest
-        47.003525f,  // DK
-        145.560408f,  // Shaman
-        0.0f,       // Mage
-        0.0f,       // Warlock
-        0.0f,       // ??
-        0.0f        // Druid
+        65.631440f,     // Warrior
+        65.631440f,     // Paladin
+        145.560408f,    // Hunter
+        145.560408f,    // Rogue
+        0.0f,           // Priest
+        65.631440f,     // DK
+        145.560408f,    // Shaman
+        0.0f,           // Mage
+        0.0f,           // Warlock
+        0.0f,           // ??
+        0.0f            // Druid
     };
 
     // No parry
@@ -592,9 +586,6 @@ void Player::UpdateParryPercentage()
         float nondiminishing  = 5.0f;
         // Parry from rating
         float diminishing = GetRatingBonusValue(CR_PARRY);
-        // Modify value from defense skill (only bonus from defense rating diminishes)
-        nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;
-        diminishing += (int32(GetRatingBonusValue(CR_DEFENSE_SKILL))) * 0.04f;
         // Parry from SPELL_AURA_MOD_PARRY_PERCENT aura
         nondiminishing += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
         // apply diminishing formula to diminishing parry chance
@@ -609,25 +600,22 @@ void Player::UpdateDodgePercentage()
 {
     const float dodge_cap[MAX_CLASSES] =
     {
-        88.129021f,  // Warrior
-        88.129021f,  // Paladin
-        145.560408f,  // Hunter
-        145.560408f,  // Rogue
-        150.375940f,  // Priest
-        88.129021f,  // DK
-        145.560408f,  // Shaman
-        150.375940f,  // Mage
-        150.375940f,  // Warlock
-        0.0f,       // ??
-        116.890707f   // Druid
+        65.631440f,     // Warrior
+        65.631440f,     // Paladin
+        145.560408f,    // Hunter
+        145.560408f,    // Rogue
+        150.375940f,    // Priest
+        65.631440f,     // DK
+        145.560408f,    // Shaman
+        150.375940f,    // Mage
+        150.375940f,    // Warlock
+        0.0f,           // ??
+        116.890707f     // Druid
     };
 
     float diminishing = 0.0f, nondiminishing = 0.0f;
     // Dodge from agility
     GetDodgeFromAgility(diminishing, nondiminishing);
-    // Modify value from defense skill (only bonus from defense rating diminishes)
-    nondiminishing += (GetSkillValue(SKILL_DEFENSE) - GetMaxSkillValueForLevel()) * 0.04f;
-    diminishing += (int32(GetRatingBonusValue(CR_DEFENSE_SKILL))) * 0.04f;
     // Dodge from SPELL_AURA_MOD_DODGE_PERCENT aura
     nondiminishing += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
     // Dodge from rating
@@ -804,28 +792,9 @@ void Player::UpdateMasteryAuras()
 
         SpellEntry const* spellEntry = holder->GetSpellProto();
 
-        // Find mastery scaling coef
-        int32 masteryBonus = 0;
-        for (uint32 j = 0; j < MAX_EFFECT_INDEX; ++j)
-        {
-            SpellEffectEntry const * effectEntry = spellEntry->GetSpellEffect(SpellEffectIndex(j));
-            if (!effectEntry)
-                continue;
-
-            // mastery scaling coef is stored in dummy aura, except 77215 (Potent Afflictions, zero effect)
-            // and 76808 (Executioner, not stored at all)
-            uint32 bp = effectEntry->CalculateSimpleValue();
-            if (holder->GetId() == 76808)
-                bp = 250;
-
-            if (!bp)
-                continue;
-
-            masteryBonus = bp;
-            break;
-        }
-
-        if (!masteryBonus)
+        // calculate mastery scaling coef
+        int32 masteryCoef = GetMasteryCoefficient(spellEntry);
+        if (!masteryCoef)
             continue;
 
         // update aura modifiers
@@ -835,11 +804,11 @@ void Player::UpdateMasteryAuras()
             if (!aura)
                 continue;
 
-            if (aura->GetSpellProto()->CalculateSimpleValue(SpellEffectIndex(j)))
+            if (spellEntry->CalculateSimpleValue(SpellEffectIndex(j)))
                 continue;
 
             aura->ApplyModifier(false, false);
-            aura->GetModifier()->m_amount = int32(masteryValue * masteryBonus / 100.0f);
+            aura->GetModifier()->m_amount = int32(masteryValue * masteryCoef / 100.0f);
             aura->ApplyModifier(true, false);
         }
     }

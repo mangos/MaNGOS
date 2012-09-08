@@ -1797,11 +1797,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         bool UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLevel, uint32 Multiplicator = 1);
         bool UpdateFishingSkill();
 
-        uint32 GetBaseDefenseSkillValue() const { return GetBaseSkillValue(SKILL_DEFENSE); }
-        uint32 GetBaseWeaponSkillValue(WeaponAttackType attType) const;
-
-        uint32 GetSpellByProto(ItemPrototype* proto);
-
         float GetHealthBonusFromStamina();
         float GetManaBonusFromIntellect();
 
@@ -1813,7 +1808,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateMaxPower(Powers power) override;
         void ApplyFeralAPBonus(int32 amount, bool apply);
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
-        void UpdateShieldBlockValue();
+        void UpdateShieldBlockDamageValue();
         void UpdateDamagePhysical(WeaponAttackType attType) override;
         void ApplySpellPowerBonus(int32 amount, bool apply);
         void UpdateSpellDamageAndHealingBonus();
@@ -1823,7 +1818,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage);
 
-        void UpdateDefenseBonusesMod();
         float GetMeleeCritFromAgility();
         void GetDodgeFromAgility(float& diminishing, float& nondiminishing);
         float GetSpellCritFromIntellect();
@@ -1925,10 +1919,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateLocalChannels(uint32 newZone);
         void LeaveLFGChannel();
 
-        void UpdateDefense();
-        void UpdateWeaponSkill(WeaponAttackType attType);
-        void UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence);
-
         void SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step = 0);
         uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
         uint16 GetPureMaxSkillValue(uint32 skill) const;    // max
@@ -2012,7 +2002,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateCorpseReclaimDelay();
         void SendCorpseReclaimDelay(bool load = false);
 
-        uint32 GetShieldBlockValue() const override;        // overwrite Unit version (virtual)
+        uint32 GetShieldBlockDamageValue() const override;        // overwrite Unit version (virtual)
         bool CanParry() const { return m_canParry; }
         void SetCanParry(bool value);
         bool CanBlock() const { return m_canBlock; }

@@ -550,9 +550,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetRoot(bool enable) override;
         void SetWaterWalk(bool enable) override;
 
-        uint32 GetShieldBlockValue() const override         // dunno mob block value
+        uint32 GetShieldBlockDamageValue() const override         // dunno mob block value
         {
-            return (getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
+            return uint32(BASE_BLOCK_DAMAGE_PERCENT);
         }
 
         SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }

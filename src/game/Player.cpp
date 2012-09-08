@@ -2754,7 +2754,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     SetFloatValue(PLAYER_PARRY_PERCENTAGE, 0.0f);
     SetFloatValue(PLAYER_BLOCK_PERCENTAGE, 0.0f);
-    SetUInt32Value(PLAYER_SHIELD_BLOCK, 0);
+    SetUInt32Value(PLAYER_SHIELD_BLOCK, uint32(BASE_BLOCK_DAMAGE_PERCENT));
 
     // Dodge percentage
     SetFloatValue(PLAYER_DODGE_PERCENTAGE, 0.0f);
@@ -5037,17 +5037,6 @@ void Player::LeaveLFGChannel()
     }
 }
 
-void Player::UpdateDefense()
-{
-    uint32 defense_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE);
-
-    if (UpdateSkill(SKILL_DEFENSE, defense_skill_gain))
-    {
-        // update dependent from defense skill part
-        UpdateDefenseBonusesMod();
-    }
-}
-
 void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END || modType >= MOD_END)
@@ -5080,7 +5069,7 @@ void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, floa
         case CRIT_PERCENTAGE:              UpdateCritPercentage(BASE_ATTACK);                          break;
         case RANGED_CRIT_PERCENTAGE:       UpdateCritPercentage(RANGED_ATTACK);                        break;
         case OFFHAND_CRIT_PERCENTAGE:      UpdateCritPercentage(OFF_ATTACK);                           break;
-        case SHIELD_BLOCK_VALUE:           UpdateShieldBlockValue();                                   break;
+        case SHIELD_BLOCK_DAMAGE_VALUE:    UpdateShieldBlockDamageValue();                             break;
         default: break;
     }
 }
@@ -5113,9 +5102,10 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
     return m_auraBaseMod[modGroup][FLAT_MOD] * m_auraBaseMod[modGroup][PCT_MOD];
 }
 
-uint32 Player::GetShieldBlockValue() const
+uint32 Player::GetShieldBlockDamageValue() const
 {
-    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
+    float value = m_canBlock ? BASE_BLOCK_DAMAGE_PERCENT : 0;
+    value = (value + m_auraBaseMod[SHIELD_BLOCK_DAMAGE_VALUE][FLAT_MOD]) * m_auraBaseMod[SHIELD_BLOCK_DAMAGE_VALUE][PCT_MOD];
 
     value = (value < 0) ? 0 : value;
 
@@ -5140,6 +5130,14 @@ float Player::GetMeleeCritFromAgility()
 
 void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
 {
+    // 4.2.0: these classes no longer receive dodge from agility and have 5% base
+    if (getClass() == CLASS_WARRIOR || getClass() == CLASS_PALADIN || getClass() == CLASS_DEATH_KNIGHT)
+    {
+        diminishing = 0.0f;
+        nondiminishing = 5.0f;
+        return;
+    }
+
     // Table for base dodge values
     const float dodge_base[MAX_CLASSES] =
     {
@@ -5328,9 +5326,8 @@ void Player::UpdateRating(CombatRating cr)
 
     switch (cr)
     {
-        case CR_WEAPON_SKILL:                               // Implemented in Unit::RollMeleeOutcomeAgainst
+        case CR_WEAPON_SKILL:
         case CR_DEFENSE_SKILL:
-            UpdateDefenseBonusesMod();
             break;
         case CR_DODGE:
             UpdateDodgePercentage();
@@ -5599,69 +5596,6 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(WeaponAttackType attType)
-{
-    // no skill gain in pvp
-    Unit* pVictim = getVictim();
-    if (pVictim && pVictim->IsCharmerOrOwnerPlayerOrPlayerItself())
-        return;
-
-    if (IsInFeralForm())
-        return;                                             // always maximized SKILL_FERAL_COMBAT in fact
-
-    if (GetShapeshiftForm() == FORM_TREE)
-        return;                                             // use weapon but not skill up
-
-    uint32 weaponSkillGain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON);
-
-    Item* pWeapon = GetWeaponForAttack(attType, true, true);
-    if (pWeapon && pWeapon->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-        UpdateSkill(pWeapon->GetSkill(), weaponSkillGain);
-    else if (!pWeapon && attType == BASE_ATTACK)
-        UpdateSkill(SKILL_UNARMED, weaponSkillGain);
-
-    UpdateAllCritPercentages();
-}
-
-void Player::UpdateCombatSkills(Unit* pVictim, WeaponAttackType attType, bool defence)
-{
-    uint32 plevel = getLevel();                             // if defense than pVictim == attacker
-    uint32 greylevel = MaNGOS::XP::GetGrayLevel(plevel);
-    uint32 moblevel = pVictim->GetLevelForTarget(this);
-    if (moblevel < greylevel)
-        return;
-
-    if (moblevel > plevel + 5)
-        moblevel = plevel + 5;
-
-    uint32 lvldif = moblevel - greylevel;
-    if (lvldif < 3)
-        lvldif = 3;
-
-    int32 skilldif = 5 * plevel - (defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType));
-
-    // Max skill reached for level.
-    // Can in some cases be less than 0: having max skill and then .level -1 as example.
-    if (skilldif <= 0)
-        return;
-
-    float chance = float(3 * lvldif * skilldif) / plevel;
-    if (!defence)
-        chance *= 0.1f * GetStat(STAT_INTELLECT);
-
-    chance = chance < 1.0f ? 1.0f : chance;                 // minimum chance to increase skill is 1%
-
-    if (roll_chance_f(chance))
-    {
-        if (defence)
-            UpdateDefense();
-        else
-            UpdateWeaponSkill(attType);
-    }
-    else
-        return;
-}
-
 void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
 {
     SkillStatusMap::const_iterator itr = mSkillStatus.find(skillid);
@@ -5678,10 +5612,7 @@ void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
 
 void Player::UpdateSkillsForLevel()
 {
-    uint16 maxconfskill = sWorld.GetConfigMaxSkillValue();
     uint32 maxSkill = GetMaxSkillValueForLevel();
-
-    bool alwaysMaxSkill = sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL);
 
     for (SkillStatusMap::iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end(); ++itr)
     {
@@ -5706,22 +5637,11 @@ void Player::UpdateSkillsForLevel()
         /// update only level dependent max skill values
         if (max != 1)
         {
-            /// maximize skill always
-            if (alwaysMaxSkill)
-            {
-                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, maxSkill);
-                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxSkill);
-                if (itr->second.uState != SKILL_NEW)
-                    itr->second.uState = SKILL_CHANGED;
-                GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, pskill);
-            }
-            else if (max != maxconfskill)                   /// update max skill value if current max skill not maximized
-            {
-                SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, val);
-                SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxSkill);
-                if (itr->second.uState != SKILL_NEW)
-                    itr->second.uState = SKILL_CHANGED;
-            }
+            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, maxSkill);
+            SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxSkill);
+            if (itr->second.uState != SKILL_NEW)
+                itr->second.uState = SKILL_CHANGED;
+            GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, pskill);
         }
     }
 }
@@ -5748,9 +5668,6 @@ void Player::UpdateSkillsToMaxSkillsForLevel()
                 itr->second.uState = SKILL_CHANGED;
             GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, pskill);
         }
-
-        if (pskill == SKILL_DEFENSE)
-            UpdateDefenseBonusesMod();
     }
 }
 
@@ -15627,6 +15544,22 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid());
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
+    m_specsCount = fields[52].GetUInt8();
+    m_activeSpec = fields[53].GetUInt8();
+
+    Tokens talentTrees = StrSplit(fields[26].GetString(), " ");
+    for (uint8 i = 0; i < MAX_TALENT_SPEC_COUNT; ++i)
+    {
+        if (i >= talentTrees.size())
+            break;
+
+        uint32 talentTree = atol(talentTrees[i].c_str());
+        if (!talentTree || sTalentTabStore.LookupEntry(talentTree))
+            m_talentsPrimaryTree[i] = talentTree;
+        else if (i == m_activeSpec)
+            SetAtLoginFlag(AT_LOGIN_RESET_TALENTS); // invalid tree, reset talents
+    }
+
     // reset stats before loading any modifiers
     InitStatsForLevel();
     InitGlyphsForLevel();
@@ -15658,9 +15591,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     _LoadMails(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILS));
     _LoadMailedItems(holder->GetResult(PLAYER_LOGIN_QUERY_LOADMAILEDITEMS));
     UpdateNextMailTimeAndUnreads();
-
-    m_specsCount = fields[52].GetUInt8();
-    m_activeSpec = fields[53].GetUInt8();
 
     _LoadGlyphs(holder->GetResult(PLAYER_LOGIN_QUERY_LOADGLYPHS));
 
@@ -15781,20 +15711,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
 
     DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s after load item and aura is: ", m_name.c_str());
     outDebugStatsValues();
-
-    // must be after loading spells and talents
-    Tokens talentTrees = StrSplit(fields[26].GetString(), " ");
-    for (uint8 i = 0; i < MAX_TALENT_SPEC_COUNT; ++i)
-    {
-        if (i >= talentTrees.size())
-            break;
-
-        uint32 talentTree = atol(talentTrees[i].c_str());
-        if (!talentTree || sTalentTabStore.LookupEntry(talentTree))
-            m_talentsPrimaryTree[i] = talentTree;
-        else if (i == m_activeSpec)
-            SetAtLoginFlag(AT_LOGIN_RESET_TALENTS); // invalid tree, reset talents
-    }
 
     // all fields read
     delete result;
@@ -21069,19 +20985,6 @@ bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
     return pRewardSource->IsWithinDistInMap(corpse, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE));
 }
 
-uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
-{
-    Item* item = GetWeaponForAttack(attType, true, true);
-
-    // unarmed only with base attack
-    if (attType != BASE_ATTACK && !item)
-        return 0;
-
-    // weapon skill or (unarmed for base attack)
-    uint32  skill = item ? item->GetSkill() : uint32(SKILL_UNARMED);
-    return GetBaseSkillValue(skill);
-}
-
 void Player::ResurectUsingRequestData()
 {
     /// Teleport before resurrecting by player, otherwise the player might get attacked from creatures near his corpse
@@ -21394,6 +21297,7 @@ void Player::SetCanBlock(bool value)
 
     m_canBlock = value;
     UpdateBlockPercentage();
+    UpdateShieldBlockDamageValue();
 }
 
 bool ItemPosCount::isContainedIn(ItemPosCountVec const& vec) const

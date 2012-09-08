@@ -104,7 +104,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleNULL,                                      // 48 SPELL_AURA_48 4 spells in 4.3.4 Napalm (area damage spell with additional delayed damage effect)
     &Aura::HandleAuraModDodgePercent,                       // 49 SPELL_AURA_MOD_DODGE_PERCENT
     &Aura::HandleNoImmediateEffect,                         // 50 SPELL_AURA_MOD_CRITICAL_HEALING_AMOUNT implemented in Unit::SpellCriticalHealingBonus
-    &Aura::HandleAuraModBlockPercent,                       // 51 SPELL_AURA_MOD_BLOCK_PERCENT
+    &Aura::HandleAuraModBlockChancePercent,                 // 51 SPELL_AURA_MOD_BLOCK_CHANCE_PERCENT
     &Aura::HandleAuraModCritPercent,                        // 52 SPELL_AURA_MOD_CRIT_PERCENT
     &Aura::HandlePeriodicLeech,                             // 53 SPELL_AURA_PERIODIC_LEECH
     &Aura::HandleModHitChance,                              // 54 SPELL_AURA_MOD_HIT_CHANCE
@@ -203,7 +203,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleModMechanicImmunityMask,                   //147 SPELL_AURA_MECHANIC_IMMUNITY_MASK     implemented in Unit::IsImmuneToSpell and Unit::IsImmuneToSpellEffect (check part)
     &Aura::HandleAuraRetainComboPoints,                     //148 SPELL_AURA_RETAIN_COMBO_POINTS
     &Aura::HandleNoImmediateEffect,                         //149 SPELL_AURA_REDUCE_PUSHBACK            implemented in Spell::Delayed and Spell::DelayedChannel
-    &Aura::HandleShieldBlockValue,                          //150 SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT
+    &Aura::HandleModShieldBlockDamage,                      //150 SPELL_AURA_MOD_SHIELD_BLOCKDAMAGE
     &Aura::HandleAuraTrackStealthed,                        //151 SPELL_AURA_TRACK_STEALTHED
     &Aura::HandleNoImmediateEffect,                         //152 SPELL_AURA_MOD_DETECTED_RANGE         implemented in Creature::GetAttackDistance
     &Aura::HandleNoImmediateEffect,                         //153 SPELL_AURA_SPLIT_DAMAGE_FLAT          implemented in Unit::CalculateAbsorbAndResist
@@ -211,7 +211,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleNoImmediateEffect,                         //155 SPELL_AURA_MOD_WATER_BREATHING        implemented in Player::getMaxTimer
     &Aura::HandleNoImmediateEffect,                         //156 SPELL_AURA_MOD_REPUTATION_GAIN        implemented in Player::CalculateReputationGain
     &Aura::HandleUnused,                                    //157 SPELL_AURA_PET_DAMAGE_MULTI (single test like spell 20782, also single for 214 aura)
-    &Aura::HandleShieldBlockValue,                          //158 SPELL_AURA_MOD_SHIELD_BLOCKVALUE
+    &Aura::HandleNULL,                                      //158 SPELL_AURA_MOD_SHIELD_BLOCKVALUE
     &Aura::HandleNoImmediateEffect,                         //159 SPELL_AURA_NO_PVP_CREDIT              implemented in Player::RewardHonor
     &Aura::HandleNoImmediateEffect,                         //160 SPELL_AURA_MOD_AOE_AVOIDANCE          implemented in Unit::MagicSpellHitResult
     &Aura::HandleNoImmediateEffect,                         //161 SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT implemented in Player::RegenerateAll and Player::RegenerateHealth
@@ -306,7 +306,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleAuraModIncreaseHealth,                     //250 SPELL_AURA_MOD_INCREASE_HEALTH_2
     &Aura::HandleNULL,                                      //251 SPELL_AURA_MOD_ENEMY_DODGE
     &Aura::HandleModCombatSpeedPct,                         //252 SPELL_AURA_SLOW_ALL
-    &Aura::HandleNoImmediateEffect,                         //253 SPELL_AURA_MOD_BLOCK_CRIT_CHANCE             implemented in Unit::CalculateMeleeDamage
+    &Aura::HandleAuraModBlockCritChance,                    //253 SPELL_AURA_MOD_BLOCK_CRIT_CHANCE              obsolete in 4.x, but spells exist
     &Aura::HandleAuraModDisarm,                             //254 SPELL_AURA_MOD_DISARM_OFFHAND     also disarm shield
     &Aura::HandleNoImmediateEffect,                         //255 SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT    implemented in Unit::SpellDamageBonusTaken
     &Aura::HandleNoReagentUseAura,                          //256 SPELL_AURA_NO_REAGENT_USE Use SpellClassMask for spell select
@@ -3975,9 +3975,12 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
     uint32 prot = m_spellEffect->EffectMiscValue;
     int32 points = GetModifier()->m_amount;
 
-    ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
+    // defense skill is removed in 4.x.x, spell tooltips updated,
+    // but auras still exist
     if (prot == SKILL_DEFENSE)
-        ((Player*)GetTarget())->UpdateDefenseBonusesMod();
+        return;
+
+    ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
 }
 
 void Aura::HandleChannelDeathItem(bool apply, bool Real)
@@ -6199,7 +6202,7 @@ void Aura::HandleAuraModDodgePercent(bool /*apply*/, bool /*Real*/)
     // sLog.outError("BONUS DODGE CHANCE: + %f", float(m_modifier.m_amount));
 }
 
-void Aura::HandleAuraModBlockPercent(bool /*apply*/, bool /*Real*/)
+void Aura::HandleAuraModBlockChancePercent(bool /*apply*/, bool /*Real*/)
 {
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -7012,14 +7015,10 @@ void Aura::HandleModTargetResistance(bool apply, bool Real)
         target->ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, m_modifier.m_amount, apply);
 }
 
-void Aura::HandleShieldBlockValue(bool apply, bool /*Real*/)
+void Aura::HandleModShieldBlockDamage(bool apply, bool /*Real*/)
 {
-    BaseModType modType = FLAT_MOD;
-    if (m_modifier.m_auraname == SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT)
-        modType = PCT_MOD;
-
     if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
-        ((Player*)GetTarget())->HandleBaseModValue(SHIELD_BLOCK_VALUE, modType, float(m_modifier.m_amount), apply);
+        ((Player*)GetTarget())->HandleBaseModValue(SHIELD_BLOCK_DAMAGE_VALUE, FLAT_MOD, float(m_modifier.m_amount), apply);
 }
 
 void Aura::HandleAuraRetainComboPoints(bool apply, bool Real)
@@ -8746,14 +8745,17 @@ void Aura::HandleAuraStopNaturalManaRegen(bool apply, bool Real)
 
 void Aura::HandleAuraMastery(bool apply, bool Real)
 {
-    if (!Real)
-        return;
-
     Unit* target = GetTarget();
     if (target->GetTypeId() != TYPEID_PLAYER)
         return;
 
     ((Player*)target)->UpdateMasteryAuras();
+}
+
+void Aura::HandleAuraModBlockCritChance(bool apply, bool Real)
+{
+    if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
+        ((Player*)GetTarget())->ApplyModUInt32Value(PLAYER_SHIELD_BLOCK_CRIT_PERCENTAGE, m_modifier.m_amount, apply);
 }
 
 bool Aura::IsLastAuraOnHolder()

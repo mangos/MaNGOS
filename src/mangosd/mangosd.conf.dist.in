@@ -548,11 +548,6 @@ LogColors = ""
 #        Default: 0 (false)
 #                 1 (true)
 #
-#    AlwaysMaxSkillForLevel
-#        Players will automatically gain max level dependent (weapon/defense) skill when logging in, leveling up etc.
-#        Default: 0 (false)
-#                 1 (true)
-#
 #    ActivateWeather
 #        Activate weather system
 #        Default: 1 (true)
@@ -772,7 +767,6 @@ StartPlayerMoney = 0
 InstantLogout = 1
 DisableWaterBreath = 4
 AllFlightPaths = 0
-AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
 CastUnstuck = 1
 MaxSpellCastsInChain = 10
@@ -1276,10 +1270,8 @@ Visibility.AIRelocationNotifyDelay = 1000
 #        Default: 1
 #
 #    SkillGain.Crafting
-#    SkillGain.Defense
 #    SkillGain.Gathering
-#    SkillGain.Weapon
-#         crafting/defense/gathering/weapon skills gain at skill grow (1,2,...)
+#         Crafting and gathering skill gains at skill grow (1,2,...)
 #         Default: 1
 #
 #    SkillChance.Orange
@@ -1389,9 +1381,7 @@ Rate.Reputation.LowLevel.Kill    = 1
 Rate.Reputation.LowLevel.Quest   = 1
 Rate.InstanceResetTime = 1
 SkillGain.Crafting = 1
-SkillGain.Defense = 1
 SkillGain.Gathering = 1
-SkillGain.Weapon = 1
 SkillChance.Orange = 100
 SkillChance.Yellow = 75
 SkillChance.Green  = 25

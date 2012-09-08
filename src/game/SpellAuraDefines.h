@@ -86,7 +86,7 @@ enum AuraType
     SPELL_AURA_48 = 48,                                     // One periodic spell
     SPELL_AURA_MOD_DODGE_PERCENT = 49,
     SPELL_AURA_MOD_CRITICAL_HEALING_AMOUNT = 50,
-    SPELL_AURA_MOD_BLOCK_PERCENT = 51,
+    SPELL_AURA_MOD_BLOCK_CHANCE_PERCENT = 51,
     SPELL_AURA_MOD_CRIT_PERCENT = 52,
     SPELL_AURA_PERIODIC_LEECH = 53,
     SPELL_AURA_MOD_HIT_CHANCE = 54,
@@ -185,7 +185,7 @@ enum AuraType
     SPELL_AURA_MECHANIC_IMMUNITY_MASK = 147,
     SPELL_AURA_RETAIN_COMBO_POINTS = 148,
     SPELL_AURA_REDUCE_PUSHBACK  = 149,                      //    Reduce Pushback
-    SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT = 150,
+    SPELL_AURA_MOD_SHIELD_BLOCKDAMAGE = 150,
     SPELL_AURA_TRACK_STEALTHED  = 151,                      //    Track Stealthed
     SPELL_AURA_MOD_DETECTED_RANGE = 152,                    //    Mod Detected Range
     SPELL_AURA_SPLIT_DAMAGE_FLAT = 153,                     //    Split Damage Flat

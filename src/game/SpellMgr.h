@@ -607,6 +607,8 @@ int32 GetDiminishingReturnsLimitDuration(DiminishingGroup group, SpellEntry cons
 
 SpellEntry const* GetSpellEntryByDifficulty(uint32 id, Difficulty difficulty, bool isRaid);
 
+int32 GetMasteryCoefficient(SpellEntry const * spellProto);
+
 // Spell proc event related declarations (accessed using SpellMgr functions)
 enum ProcFlags
 {

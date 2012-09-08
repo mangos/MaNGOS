@@ -1854,7 +1854,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
             damageInfo->TargetState = VICTIMSTATE_NORMAL;
             damageInfo->HitInfo    |= HITINFO_BLOCK;
             damageInfo->procEx     |= PROC_EX_BLOCK;
-            damageInfo->blocked_amount = damageInfo->target->GetShieldBlockValue();
+            damageInfo->blocked_amount = damageInfo->target->GetShieldBlockDamageValue() * damageInfo->damage / 100.0f;
 
             // Target has a chance to double the blocked amount if it has SPELL_AURA_MOD_BLOCK_CRIT_CHANCE
             if (roll_chance_i(pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_CRIT_CHANCE)))
@@ -1903,7 +1903,7 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
             }
 
             // calculate values
-            int32 diff = damageInfo->target->GetDefenseSkillValue() - GetWeaponSkillValue(damageInfo->attackType);
+            int32 diff = damageInfo->target->GetMaxSkillValueForLevel() - GetMaxSkillValueForLevel();
             float lowEnd  = baseLowEnd - (0.05f * diff);
             float highEnd = baseHighEnd - (0.03f * diff);
 
@@ -2046,8 +2046,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         if (pVictim->getLevel() < 30)
             Probability = 0.65f * pVictim->getLevel() + 0.5f;
 
-        uint32 VictimDefense = pVictim->GetDefenseSkillValue();
-        uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
+        uint32 VictimDefense = pVictim->GetMaxSkillValueForLevel(this);
+        uint32 AttackerMeleeSkill = GetMaxSkillValueForLevel();
 
         Probability *= AttackerMeleeSkill / (float)VictimDefense;
 
@@ -2758,7 +2758,7 @@ void Unit::CalculateAbsorbResistBlock(Unit* pCaster, SpellNonMeleeDamage* damage
 
     if (blocked)
     {
-        damageInfo->blocked = GetShieldBlockValue();
+        damageInfo->blocked = uint32(damageInfo->damage * GetShieldBlockDamageValue() / 100.0f);
         if (damageInfo->damage < damageInfo->blocked)
             damageInfo->blocked = damageInfo->damage;
         damageInfo->damage -= damageInfo->blocked;
@@ -2930,11 +2930,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* pVictim, WeaponAttackT
     int32 attackerMaxSkillValueForLevel = GetMaxSkillValueForLevel(pVictim);
     int32 victimMaxSkillValueForLevel = pVictim->GetMaxSkillValueForLevel(this);
 
-    int32 attackerWeaponSkill = GetWeaponSkillValue(attType, pVictim);
-    int32 victimDefenseSkill = pVictim->GetDefenseSkillValue(this);
-
     // bonus from skills is 0.04%
-    int32    skillBonus  = 4 * (attackerWeaponSkill - victimMaxSkillValueForLevel);
+    int32    skillBonus  = 4 * (attackerMaxSkillValueForLevel - victimMaxSkillValueForLevel);
     int32    sum = 0, tmp = 0;
     int32    roll = urand(0, 10000);
 
@@ -3019,11 +3016,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* pVictim, WeaponAttackT
             getLevel() < pVictim->GetLevelForTarget(this))
     {
         // cap possible value (with bonuses > max skill)
-        int32 skill = attackerWeaponSkill;
-        int32 maxskill = attackerMaxSkillValueForLevel;
-        skill = (skill > maxskill) ? maxskill : skill;
+        int32 skill = attackerMaxSkillValueForLevel;
 
-        tmp = (10 + (victimDefenseSkill - skill)) * 100;
+        tmp = (10 + (victimMaxSkillValueForLevel - skill)) * 100;
         tmp = tmp > 4000 ? 4000 : tmp;
         if (roll < (sum += tmp))
         {
@@ -3066,10 +3061,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* pVictim, WeaponAttackT
              GetTypeId() == TYPEID_PLAYER && GetCharmerOrOwnerGuid()))
     {
         // when their weapon skill is 15 or more above victim's defense skill
-        tmp = victimDefenseSkill;
-        int32 tmpmax = victimMaxSkillValueForLevel;
-        // having defense above your maximum (from items, talents etc.) has no effect
-        tmp = tmp > tmpmax ? tmpmax : tmp;
+        tmp = victimMaxSkillValueForLevel;
         // tmp = mob's level * 5 - player's current defense skill
         tmp = attackerMaxSkillValueForLevel - tmp;
         if (tmp >= 15)
@@ -3204,7 +3196,11 @@ bool Unit::IsSpellBlocked(Unit* pCaster, SpellEntry const* spellEntry, WeaponAtt
     }
 
     float blockChance = GetUnitBlockChance();
-    blockChance += (int32(pCaster->GetWeaponSkillValue(attackType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+    // For each point of difference between the attacker's level and the defender's level,
+    // the block chance is modified by 0.5% if the target is a mob and 0.2% if the target is a player.
+    blockChance += (getLevel() - pCaster->GetLevelForTarget(this)) * (pCaster->GetTypeId() == TYPEID_PLAYER ? 0.2f : 0.5f);
+    if (blockChance < 0.0f)
+        blockChance = 0.0f;
 
     return roll_chance_f(blockChance);
 }
@@ -3262,13 +3258,12 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell)
         attType = RANGED_ATTACK;
 
     // bonus from skills is 0.04% per skill Diff
-    int32 attackerWeaponSkill = (spell->GetEquippedItemClass() == ITEM_CLASS_WEAPON) ? int32(GetWeaponSkillValue(attType,pVictim)) : GetMaxSkillValueForLevel();
+    int32 attackerWeaponSkill = GetMaxSkillValueForLevel();
     int32 skillDiff = attackerWeaponSkill - int32(pVictim->GetMaxSkillValueForLevel(this));
-    int32 fullSkillDiff = attackerWeaponSkill - int32(pVictim->GetDefenseSkillValue(this));
 
     uint32 roll = urand(0, 10000);
 
-    uint32 missChance = uint32(MeleeSpellMissChance(pVictim, attType, fullSkillDiff, spell) * 100.0f);
+    uint32 missChance = uint32(MeleeSpellMissChance(pVictim, attType, skillDiff, spell) * 100.0f);
     // Roll miss
     uint32 tmp = spell->HasAttribute(SPELL_ATTR_EX3_CANT_MISS) ? 0 : missChance;
     if (roll < tmp)
@@ -3559,7 +3554,7 @@ float Unit::MeleeMissChanceCalc(const Unit* pVictim, WeaponAttackType attType) c
             missChance += 19.0f;
     }
 
-    int32 skillDiff = int32(GetWeaponSkillValue(attType, pVictim)) - int32(pVictim->GetDefenseSkillValue(this));
+    int32 skillDiff = int32(GetMaxSkillValueForLevel(pVictim)) - int32(pVictim->GetMaxSkillValueForLevel(this));
 
     // PvP - PvE melee chances
     // TODO: implement diminishing returns for defense from player's defense rating
@@ -3590,21 +3585,6 @@ float Unit::MeleeMissChanceCalc(const Unit* pVictim, WeaponAttackType attType) c
         return 60.0f;
 
     return missChance;
-}
-
-uint32 Unit::GetDefenseSkillValue(Unit const* target) const
-{
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        // in PvP use full skill instead current skill value
-        uint32 value = (target && target->GetTypeId() == TYPEID_PLAYER)
-                       ? ((Player*)this)->GetMaxSkillValue(SKILL_DEFENSE)
-                       : ((Player*)this)->GetSkillValue(SKILL_DEFENSE);
-        value += uint32(((Player*)this)->GetRatingBonusValue(CR_DEFENSE_SKILL));
-        return value;
-    }
-    else
-        return GetUnitMeleeSkill(target);
 }
 
 float Unit::GetUnitDodgeChance() const
@@ -3682,7 +3662,7 @@ float Unit::GetUnitBlockChance() const
         else
         {
             float block = 5.0f;
-            block += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
+            block += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_CHANCE_PERCENT);
             return block > 0.0f ? block : 0.0f;
         }
     }
@@ -3725,42 +3705,9 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* pVict
 
     crit += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_SPELL_AND_WEAPON_CRIT_CHANCE);
 
-
-    // Apply crit chance from defence skill
-    crit += (int32(GetMaxSkillValueForLevel(pVictim)) - int32(pVictim->GetDefenseSkillValue(this))) * 0.04f;
-
     if (crit < 0.0f)
         crit = 0.0f;
     return crit;
-}
-
-uint32 Unit::GetWeaponSkillValue(WeaponAttackType attType, Unit const* target) const
-{
-    uint32 value = 0;
-    if (GetTypeId() == TYPEID_PLAYER)
-    {
-        Item* item = ((Player*)this)->GetWeaponForAttack(attType, true, true);
-
-        // feral or unarmed skill only for base attack
-        if (attType != BASE_ATTACK && !item)
-            return 0;
-
-        if (IsInFeralForm())
-            return GetMaxSkillValueForLevel();              // always maximized SKILL_FERAL_COMBAT in fact
-
-        // weapon skill or (unarmed for base attack)
-        uint32 skill = item ? item->GetSkill() : uint32(SKILL_UNARMED);
-
-        // in PvP use full skill instead current skill value
-        value = (target && target->GetTypeId() == TYPEID_PLAYER)
-                ? ((Player*)this)->GetMaxSkillValue(skill)
-                : ((Player*)this)->GetSkillValue(skill);
-        // Modify value from ratings
-        value += uint32(((Player*)this)->GetRatingBonusValue(CR_WEAPON_SKILL));
-    }
-    else
-        value = GetUnitMeleeSkill(target);
-    return value;
 }
 
 void Unit::_UpdateSpells(uint32 time)
@@ -9257,6 +9204,13 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
 
     Player* unitPlayer = (GetTypeId() == TYPEID_PLAYER) ? (Player*)this : NULL;
 
+    // calculate basepoints dependent on mastery
+    if (unitPlayer && spellProto->HasAttribute(SPELL_ATTR_EX8_MASTERY) && !spellProto->CalculateSimpleValue(effect_index))
+    {
+        if (int32 masteryCoef = GetMasteryCoefficient(spellProto))
+            return int32(GetFloatValue(PLAYER_MASTERY) * masteryCoef / 100.0f);
+    }
+
     uint8 comboPoints = unitPlayer ? unitPlayer->GetComboPoints() : 0;
 
     int32 basePoints = 0;
@@ -10373,19 +10327,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
     // For melee/ranged based attack need update skills and set some Aura states
     if (!(procExtra & PROC_EX_CAST_END) && procFlag & MELEE_BASED_TRIGGER_MASK)
     {
-        // Update skills here for players
-        if (GetTypeId() == TYPEID_PLAYER)
-        {
-            // On melee based hit/miss/resist need update skill (for victim and attacker)
-            if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_MISS | PROC_EX_RESIST))
-            {
-                if (pTarget->GetTypeId() != TYPEID_PLAYER && pTarget->GetCreatureType() != CREATURE_TYPE_CRITTER)
-                    ((Player*)this)->UpdateCombatSkills(pTarget, attType, isVictim);
-            }
-            // Update defence if player is victim and parry/dodge/block
-            if (isVictim && procExtra & (PROC_EX_DODGE | PROC_EX_PARRY | PROC_EX_BLOCK))
-                ((Player*)this)->UpdateDefense();
-        }
         // If exist crit/parry/dodge/block need update aura state (for victim and attacker)
         if (procExtra & (PROC_EX_CRITICAL_HIT | PROC_EX_PARRY | PROC_EX_DODGE | PROC_EX_BLOCK))
         {

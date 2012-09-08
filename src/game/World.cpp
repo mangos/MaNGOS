@@ -681,9 +681,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_SKILL_MILLING,     "SkillChance.Milling",     false);
 
     setConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING,  "SkillGain.Crafting",  1);
-    setConfig(CONFIG_UINT32_SKILL_GAIN_DEFENSE,   "SkillGain.Defense",   1);
     setConfig(CONFIG_UINT32_SKILL_GAIN_GATHERING, "SkillGain.Gathering", 1);
-    setConfig(CONFIG_UINT32_SKILL_GAIN_WEAPON,       "SkillGain.Weapon",    1);
 
     setConfig(CONFIG_BOOL_SKILL_FAIL_LOOT_FISHING,         "SkillFail.Loot.Fishing", true);
     setConfig(CONFIG_BOOL_SKILL_FAIL_GAIN_FISHING,         "SkillFail.Gain.Fishing", true);
@@ -698,8 +696,6 @@ void World::LoadConfigSettings(bool reload)
 
     setConfig(CONFIG_BOOL_SAVE_RESPAWN_TIME_IMMEDIATELY, "SaveRespawnTimeImmediately", true);
     setConfig(CONFIG_BOOL_WEATHER, "ActivateWeather", true);
-
-    setConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL, "AlwaysMaxSkillForLevel", false);
 
     if (configNoReload(reload, CONFIG_UINT32_EXPANSION, "Expansion", MAX_EXPANSION))
         setConfigMinMax(CONFIG_UINT32_EXPANSION, "Expansion", MAX_EXPANSION, 0, MAX_EXPANSION);
