@@ -194,12 +194,16 @@ void Player::UpdateArmor()
 
 float Player::GetHealthBonusFromStamina()
 {
+    GtOCTHpPerStaminaEntry const* hpBase = sGtOCTHpPerStaminaStore.LookupEntry((getClass() - 1) * GT_MAX_LEVEL + getLevel() - 1);
+
     float stamina = GetStat(STAT_STAMINA);
 
     float baseStam = stamina < 20 ? stamina : 20;
     float moreStam = stamina - baseStam;
+    if (moreStam < 0.0f)
+        moreStam = 0.0f;
 
-    return baseStam + (moreStam * 10.0f);
+    return baseStam + moreStam * hpBase->ratio;
 }
 
 float Player::GetManaBonusFromIntellect()
@@ -739,6 +743,11 @@ void Player::ApplyManaRegenBonus(int32 amount, bool apply)
 {
     m_baseManaRegen += apply ? amount : -amount;
     UpdateManaRegen();
+}
+
+void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
+{
+    m_baseHealthRegen += apply ? amount : -amount;
 }
 
 void Player::UpdateManaRegen()

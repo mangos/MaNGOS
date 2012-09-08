@@ -1821,7 +1821,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         float GetMeleeCritFromAgility();
         void GetDodgeFromAgility(float& diminishing, float& nondiminishing);
         float GetSpellCritFromIntellect();
-        float OCTRegenHPPerSpirit();
         float OCTRegenMPPerSpirit();
         float GetRatingMultiplier(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
@@ -1842,6 +1841,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateExpertise(WeaponAttackType attType);
         void UpdateArmorPenetration();
         void ApplyManaRegenBonus(int32 amount, bool apply);
+        void ApplyHealthRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
         void UpdateMasteryAuras();
 
@@ -2534,6 +2534,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint16 m_baseSpellPower;
         uint16 m_baseFeralAP;
         uint16 m_baseManaRegen;
+        uint32 m_baseHealthRegen;
         float m_armorPenetrationPct;
         int32 m_spellPenetrationItemMod;
 

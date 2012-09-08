@@ -550,6 +550,7 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
 
     m_baseSpellPower = 0;
     m_baseFeralAP = 0;
+    m_baseHealthRegen = 0;
     m_baseManaRegen = 0;
     m_armorPenetrationPct = 0.0f;
     m_spellPenetrationItemMod = 0;
@@ -2059,7 +2060,7 @@ void Player::RegenerateAll(uint32 diff)
 {
     // Not in combat or they have regeneration
     if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT) ||
-            HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed())
+            HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) || IsPolymorphed() || m_baseHealthRegen)
     {
         RegenerateHealth(diff);
         if (!isInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
@@ -2204,22 +2205,31 @@ void Player::RegenerateHealth(uint32 diff)
     // normal regen case (maybe partly in combat case)
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
-        addvalue = OCTRegenHPPerSpirit() * HealthIncreaseRate;
+        addvalue = HealthIncreaseRate;
         if (!isInCombat())
         {
+            if (getLevel() < 15)
+                addvalue = 0.20f * GetMaxHealth() * addvalue / getLevel();
+            else
+                addvalue = 0.015f * GetMaxHealth() * addvalue;
+
             AuraList const& mModHealthRegenPct = GetAurasByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
             for (AuraList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
                 addvalue *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+
+            addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * 2.0f / 5.0f;
         }
         else if (HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
             addvalue *= GetTotalAuraModifier(SPELL_AURA_MOD_REGEN_DURING_COMBAT) / 100.0f;
 
         if (!IsStandState())
-            addvalue *= 1.5;
+            addvalue *= 1.33f;
     }
 
     // always regeneration bonus (including combat)
     addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT);
+
+    addvalue += m_baseHealthRegen / 2.5f;
 
     if (addvalue < 0)
         addvalue = 0;
@@ -5237,27 +5247,6 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
     return 0.0f;
 }
 
-float Player::OCTRegenHPPerSpirit()
-{
-    //uint32 level = getLevel();
-    //uint32 pclass = getClass();
-
-    //if (level>GT_MAX_LEVEL) level = GT_MAX_LEVEL;
-
-    //GtOCTRegenHPEntry     const *baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    //GtRegenHPPerSptEntry  const *moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    //if (baseRatio==NULL || moreRatio==NULL)
-        return 0.0f;
-
-    // Formula from PaperDollFrame script
-    //float spirit = GetStat(STAT_SPIRIT);
-    //float baseSpirit = spirit;
-    //if (baseSpirit>50) baseSpirit = 50;
-    //float moreSpirit = spirit - baseSpirit;
-    //float regen = baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio;
-    //return regen;
-}
-
 float Player::OCTRegenMPPerSpirit()
 {
     uint32 level = getLevel();
@@ -7102,6 +7091,9 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
                 break;
             case ITEM_MOD_SPELL_POWER:
                 ApplySpellPowerBonus(int32(val), apply);
+                break;
+            case ITEM_MOD_HEALTH_REGEN:
+                ApplyHealthRegenBonus(int32(val), apply);
                 break;
             case ITEM_MOD_SPELL_PENETRATION:
                 ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -int32(val), apply);
@@ -12534,6 +12526,10 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         case ITEM_MOD_SPELL_POWER:
                             ApplySpellPowerBonus(enchant_amount, apply);
                             DEBUG_LOG("+ %u SPELL_POWER", enchant_amount);
+                            break;
+                        case ITEM_MOD_HEALTH_REGEN:
+                            ApplyHealthRegenBonus(enchant_amount, apply);
+                            DEBUG_LOG("+ %u HEALTH_REGENERATION", enchant_amount);
                             break;
                         case ITEM_MOD_SPELL_PENETRATION:
                             ApplyModInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, -int32(enchant_amount), apply);
