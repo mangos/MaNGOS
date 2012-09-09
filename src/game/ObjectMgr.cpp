@@ -5714,18 +5714,36 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
     if (!mapEntry || mapEntry->ghost_entrance_map < 0)
         return NULL;
 
+    // Try to find one that teleports to the map we want to enter
+    std::list<AreaTrigger const*> ghostTrigger;
     AreaTrigger const* compareTrigger = NULL;
     for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); ++itr)
     {
         if (itr->second.target_mapId == uint32(mapEntry->ghost_entrance_map))
         {
-            if (!compareTrigger || itr->second.IsLessOrEqualThan(compareTrigger))
+            ghostTrigger.push_back(&itr->second);
+            // First run, only consider AreaTrigger that teleport in the proper map
+            if ((!compareTrigger || itr->second.IsLessOrEqualThan(compareTrigger)) && sAreaTriggerStore.LookupEntry(itr->first)->mapid == map_id)
             {
                 if (itr->second.IsMinimal())
                     return &itr->second;
 
                 compareTrigger = &itr->second;
             }
+        }
+    }
+    if (compareTrigger)
+        return compareTrigger;
+
+    // Second attempt: take one fitting
+    for (std::list<AreaTrigger const*>::const_iterator itr = ghostTrigger.begin(); itr != ghostTrigger.end(); ++itr)
+    {
+        if (!compareTrigger || (*itr)->IsLessOrEqualThan(compareTrigger))
+        {
+            if ((*itr)->IsMinimal())
+                return *itr;
+
+            compareTrigger = *itr;
         }
     }
     return compareTrigger;

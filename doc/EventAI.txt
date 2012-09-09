@@ -108,9 +108,9 @@ For all ACTION_T_RANDOM Actions, When a Particular Param is selected for the Eve
 3    ACTION_T_MORPH_TO_ENTRY_OR_MODEL       CreatureEntry, ModelId          Sets either model from creature_template.entry (Param1) OR explicit modelId (Param2) for the NPC. If (Param1) AND (Param2) are both 0, NPC will demorph and revert to the default model (as specified in creature_template).
 4    ACTION_T_SOUND                         SoundId                         NPC Plays a specified Sound ID.
 5    ACTION_T_EMOTE                         EmoteId                         NPC Does a specified Emote ID.
-6    UNUSED                    				UNUSED                          UNUSED
-7    UNUSED                   				UNUSED                          UNUSED
-8    UNUSED              					UNUSED                          UNUSED
+6    UNUSED                                 UNUSED                          UNUSED
+7    UNUSED                                 UNUSED                          UNUSED
+8    UNUSED                                 UNUSED                          UNUSED
 9    ACTION_T_RANDOM_SOUND                  SoundId1, SoundId2, SoundId3    NPC Plays a Random Sound ID (Random Selects Param1, Param2 or Param3) *
 10   ACTION_T_RANDOM_EMOTE                  EmoteId1, EmoteId2, EmoteId3    NPC Emotes a Random Emote ID (Random Selects Param1, Param2 or Param3) *
 11   ACTION_T_CAST                          SpellId, Target, CastFlags      Casts spell (Param1) on a target (Param2) using cast flags (Param3) --> Specified Below
