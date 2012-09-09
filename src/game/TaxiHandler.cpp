@@ -96,7 +96,7 @@ void WorldSession::SendTaxiMenu(Creature* unit)
     // find current node
     uint32 curloc = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), GetPlayer()->GetTeam());
 
-    if (curloc == 0)
+    if (!curloc)
         return;
 
     DEBUG_LOG("WORLD: CMSG_TAXINODE_STATUS_QUERY %u ", curloc);
