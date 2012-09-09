@@ -4784,10 +4784,6 @@ void Spell::TakePower()
     }
 
     m_caster->ModifyPower(powerType, -(int32)m_powerCost);
-
-    // Set the five second timer
-    if (powerType == POWER_MANA && m_powerCost > 0)
-        m_caster->SetLastManaUse();
 }
 
 SpellCastResult Spell::CheckOrTakeRunePower(bool take)

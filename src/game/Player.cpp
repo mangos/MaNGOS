@@ -1326,8 +1326,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (isAlive())
     {
-        // if no longer casting, set regen power as soon as it is up.
-        if (!IsUnderLastManaUseEffect() && !HasAuraType(SPELL_AURA_STOP_NATURAL_MANA_REGEN))
+        if (!HasAuraType(SPELL_AURA_STOP_NATURAL_MANA_REGEN))
             SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER);
 
         if (!m_regenTimer)
@@ -2102,9 +2101,9 @@ void Player::Regenerate(Powers power, uint32 diff)
         {
             if (HasAuraType(SPELL_AURA_STOP_NATURAL_MANA_REGEN))
                 break;
-            bool recentCast = IsUnderLastManaUseEffect();
             float ManaIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_MANA);
-            if (recentCast)
+
+            if (isInCombat())
             {
                 // Mangos Updates Mana in intervals of 2s, which is correct
                 addvalue = GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 2.00f;
@@ -3914,6 +3913,9 @@ bool Player::resetTalents(bool no_cost, bool all_specs)
         m_resetTalentsTime = time(NULL);
     }
 
+    // Update talent tree role-dependent mana regen
+    UpdateManaRegen();
+
     // FIXME: remove pet before or after unlearn spells? for now after unlearn to allow removing of talent related, pet affecting auras
     RemovePet(PET_SAVE_REAGENTS);
     /* when prev line will dropped use next line
@@ -5246,6 +5248,11 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
 
 float Player::OCTRegenMPPerSpirit()
 {
+    // Only healers have regen bonus from spirit. Others regenerate by combat regen.
+    uint32 rolesMask = GetTalentTreeRolesMask(m_talentsPrimaryTree[m_activeSpec]);
+    if ((rolesMask & TALENT_ROLE_HEALER) == 0)
+        return 0.0f;
+
     uint32 level = getLevel();
     uint32 pclass = getClass();
 
@@ -22151,6 +22158,9 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
         if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(talentInfo->TalentTab))
             for (size_t i = 0; i < specSpells->size(); ++i)
                 learnSpell(specSpells->at(i), false);
+
+        // Update talent tree role-dependent mana regen
+        UpdateManaRegen();
     }
 
     return true;
@@ -22853,6 +22863,9 @@ void Player::ActivateSpec(uint8 specNum)
 
     if (m_talentsPrimaryTree[m_activeSpec] && !sTalentTabStore.LookupEntry(m_talentsPrimaryTree[m_activeSpec]))
         resetTalents(true);
+
+    // Update talent tree role-dependent mana regen
+    UpdateManaRegen();
 }
 
 void Player::UpdateSpecCount(uint8 count)

@@ -535,7 +535,6 @@ Unit::Unit() :
     m_baseSpellCritChance = 5;
 
     m_CombatTimer = 0;
-    m_lastManaUseTimer = 0;
 
     // m_victimThreat = 0.0f;
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
@@ -594,14 +593,6 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
     _UpdateSpells(update_diff);
 
     CleanupDeletedAuras();
-
-    if (m_lastManaUseTimer)
-    {
-        if (update_diff >= m_lastManaUseTimer)
-            m_lastManaUseTimer = 0;
-        else
-            m_lastManaUseTimer -= update_diff;
-    }
 
     if (CanHaveThreatList())
         getThreatManager().UpdateForClient(update_diff);
