@@ -262,7 +262,7 @@ uint32 PlayerTaxi::GetCurrentTaxiPath() const
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
 {
     for (int i = 0; i < TaxiMaskSize; ++i)
-        ss << taxi.m_taximask[i] << " ";
+        ss << uint32(taxi.m_taximask[i]) << ' ';
     return ss;
 }
 
