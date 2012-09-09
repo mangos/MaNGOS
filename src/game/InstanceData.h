@@ -51,7 +51,6 @@ class MANGOS_DLL_SPEC InstanceData
         // Called every map update
         virtual void Update(uint32 /*diff*/) {}
 
-        // Used by the map's CanEnter function.
         // This is to prevent players from entering during boss encounters.
         virtual bool IsEncounterInProgress() const { return false; };
 

@@ -171,7 +171,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         bool CheckGridIntegrity(Creature* c, bool moved) const;
 
         uint32 GetInstanceId() const { return i_InstanceId; }
-        virtual bool CanEnter(Player* /*player*/) { return true; }
+        virtual bool CanEnter(Player* player);
         const char* GetMapName() const;
 
         // have meaning only for instanced map (that have set real difficulty), NOT USE its for BaseMap
@@ -384,7 +384,6 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
         bool Reset(InstanceResetMethod method);
         void PermBindAllPlayers(Player* player);
         void UnloadAll(bool pForce) override;
-        bool CanEnter(Player* player) override;
         void SendResetWarnings(uint32 timeLeft) const;
         void SetResetSchedule(bool on);
 

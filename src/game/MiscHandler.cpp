@@ -799,60 +799,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         player->SpawnCorpseBones();
     }
 
-    // check trigger requirements
-    uint32 miscRequirement = 0;
-    AreaLockStatus lockStatus = player->GetAreaTriggerLockStatus(at, player->GetDifficulty(targetMapEntry->IsRaid()), miscRequirement);
-    switch (lockStatus)
-    {
-        case AREA_LOCKSTATUS_OK:
-            player->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT);
-            break;
-        case AREA_LOCKSTATUS_TOO_LOW_LEVEL:
-            SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), miscRequirement);
-            break;
-        case AREA_LOCKSTATUS_ZONE_IN_COMBAT:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_ZONE_IN_COMBAT);
-            break;
-        case AREA_LOCKSTATUS_INSTANCE_IS_FULL:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_MAX_PLAYERS);
-            break;
-        case AREA_LOCKSTATUS_QUEST_NOT_COMPLETED:
-            if (at->target_mapId == 269)                    // Exception for Black Morass
-            {
-                SendAreaTriggerMessage(GetMangosString(LANG_TELEREQ_QUEST_BLACK_MORASS));
-                break;
-            }
-            else if (targetMapEntry->IsContinent())         // do not report anything for quest areatrigge
-            {
-                DEBUG_LOG("HandleAreaTriggerOpcode: LockAreaStatus %u, do not teleport, no message sent (trigger %u)", lockStatus, Trigger_ID);
-                break;
-            }
-            // No break here!
-        case AREA_LOCKSTATUS_MISSING_ITEM:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, player->GetDifficulty(targetMapEntry->IsRaid()));
-            break;
-        case AREA_LOCKSTATUS_MISSING_DIFFICULTY:
-        {
-            Difficulty difficulty = player->GetDifficulty(targetMapEntry->IsRaid());
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_DIFFICULTY, difficulty > RAID_DIFFICULTY_10MAN_HEROIC ? RAID_DIFFICULTY_10MAN_HEROIC : difficulty);
-            break;
-        }
-        case AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_INSUF_EXPAN_LVL, miscRequirement);
-            break;
-        case AREA_LOCKSTATUS_NOT_ALLOWED:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_MAP_NOT_ALLOWED);
-            break;
-        case AREA_LOCKSTATUS_RAID_LOCKED:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_NEED_GROUP);
-            break;
-        case AREA_LOCKSTATUS_UNKNOWN_ERROR:
-            player->SendTransferAborted(at->target_mapId, TRANSFER_ABORT_ERROR);
-            break;
-        default:
-            sLog.outError("HandleAreaTriggerOpcode: unhandled LockAreaStatus %u, when %s attempts to use area-trigger %u", lockStatus, player->GetGuidStr().c_str(), Trigger_ID);
-            break;
-    }
+    // teleport player (trigger requirement will be checked on TeleportTo)
+    player->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT, at);
 }
 
 void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)

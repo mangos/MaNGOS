@@ -805,6 +805,23 @@ void WorldSession::LoadTutorialsData()
     m_tutorialState = TUTORIALDATA_UNCHANGED;
 }
 
+// Send chat information about aborted transfer (mostly used by Player::SendTransferAbortedByLockstatus())
+void WorldSession::SendTransferAborted(uint32 mapid, uint8 reason, uint8 arg)
+{
+    WorldPacket data(SMSG_TRANSFER_ABORTED, 4 + 2);
+    data << uint32(mapid);
+    data << uint8(reason);                                  // transfer abort reason
+    switch (reason)
+    {
+        case TRANSFER_ABORT_INSUF_EXPAN_LVL:
+        case TRANSFER_ABORT_DIFFICULTY:
+        case TRANSFER_ABORT_UNIQUE_MESSAGE:
+            data << uint8(arg);
+            break;
+    }
+    SendPacket(&data);
+}
+
 void WorldSession::SendTutorialsData()
 {
     WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * 8);
