@@ -1707,6 +1707,25 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!InBattleGround() && mEntry->IsBattleGroundOrArena())
         return false;
 
+    // Check requirements for teleport
+    if (GetMapId() != mapid || m_transport || at)           // NOT(sameCheckAsBelow) OR at
+    {
+        uint32 miscRequirement = 0;
+        AreaLockStatus lockStatus = GetAreaTriggerLockStatus(at ? at : sObjectMgr.GetMapEntranceTrigger(mapid), GetDifficulty(mEntry->IsRaid()), miscRequirement);
+        if (lockStatus != AREA_LOCKSTATUS_OK)
+        {
+            // Teleport not requested by area-trigger
+            // TODO - Assume a player with expansion 0 travels from BootyBay to Ratched, and he is attempted to be teleported to outlands
+            //        then he will repop near BootyBay instead of normally continuing his journey
+            // This code is probably added to catch passengers on ships to northrend who shouldn't go there
+            if (lockStatus == AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION && !at && GetTransport())
+                RepopAtGraveyard();                         // Teleport to near graveyard if on transport, looks blizz like :)
+
+            SendTransferAbortedByLockStatus(mEntry, lockStatus, miscRequirement);
+            return false;
+        }
+    }
+
     if (Group* grp = GetGroup())                            // TODO: Verify that this is correct place
         grp->SetPlayerMap(GetObjectGuid(), mapid);
 
@@ -1731,18 +1750,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
     if ((GetMapId() == mapid) && (!m_transport))            // TODO the !m_transport might have unexpected effects when teleporting from transport to other place on same map
     {
-        // If we are teleported by an areatrigger, check the requirements
-        if (at)
-        {
-            uint32 miscRequirement = 0;
-            AreaLockStatus lockStatus = GetAreaTriggerLockStatus(at, GetDifficulty(mEntry->IsRaid()), miscRequirement);
-            if (lockStatus != AREA_LOCKSTATUS_OK)
-            {
-                SendTransferAbortedByLockStatus(mEntry, lockStatus, miscRequirement);
-                return false;
-            }
-        }
-
         // lets reset far teleport flag if it wasn't reset during chained teleports
         SetSemaphoreTeleportFar(false);
         // setup delayed teleport flag
@@ -1789,15 +1796,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // far teleport to another map
         Map* oldmap = IsInWorld() ? GetMap() : NULL;
         // check if we can enter before stopping combat / removing pet / totems / interrupting spells
-
-        // Check enter rights before map getting to avoid creating instance copy for player
-        uint32 miscRequirement = 0;
-        AreaLockStatus lockStatus = GetAreaTriggerLockStatus(at ? at : sObjectMgr.GetMapEntranceTrigger(mapid), GetDifficulty(mEntry->IsRaid()), miscRequirement);
-        if (lockStatus != AREA_LOCKSTATUS_OK)
-        {
-            SendTransferAbortedByLockStatus(mEntry, lockStatus, miscRequirement);
-            return false;
-        }
 
         // If the map is not created, assume it is possible to enter it.
         // It will be created in the WorldPortAck.
@@ -15278,7 +15276,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     SetLocationMapId(fields[15].GetUInt32());
 
     uint32 difficulty = fields[39].GetUInt32();
-    if (difficulty >= MAX_DUNGEON_DIFFICULTY)
+    if (difficulty >= MAX_DUNGEON_DIFFICULTY || getLevel() < LEVELREQUIREMENT_HEROIC)
         difficulty = DUNGEON_DIFFICULTY_NORMAL;
     SetDungeonDifficulty(Difficulty(difficulty));           // may be changed in _LoadGroup
 
@@ -20219,8 +20217,6 @@ void Player::SendTransferAbortedByLockStatus(MapEntry const* mapEntry, AreaLockS
                 break;
             }
         case AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION:
-            if (GetTransport())
-                RepopAtGraveyard();
             GetSession()->SendTransferAborted(mapEntry->MapID, TRANSFER_ABORT_INSUF_EXPAN_LVL, miscRequirement);
             break;
         case AREA_LOCKSTATUS_NOT_ALLOWED:
