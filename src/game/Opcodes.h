@@ -758,7 +758,7 @@ enum Opcodes
     SMSG_PET_ACTION_FEEDBACK                              = 0x12C7,
     CMSG_CHAR_RENAME                                      = 0x2327, // 4.3.4 15595
     SMSG_CHAR_RENAME                                      = 0x2024, // 4.3.4 15595
-    CMSG_MOVE_SPLINE_DONE                                 = 0x12CA,
+    CMSG_MOVE_SPLINE_DONE                                 = 0x790E, // 4.3.4 15595
     CMSG_MOVE_FALL_RESET                                  = 0x310A, // 4.3.4 15595
     SMSG_INSTANCE_SAVE_CREATED                            = 0x0124, // 4.3.4 15595
     SMSG_RAID_INSTANCE_INFO                               = 0x6626, // 4.3.4 15595

@@ -2181,6 +2181,79 @@ MovementStatusElements MovementCastSpellSequence[] =
     MSEEnd,
 };
 
+MovementStatusElements MovementSplineDoneSequence[] =
+{
+    MSEMovementCounter,
+    MSEPositionY,
+    MSEPositionX,
+    MSEPositionZ,
+    MSEGuidBit6,
+    MSEHasOrientation,
+    MSEHasFallData,
+    MSEHasTimestamp,
+    MSEGuidBit2,
+    MSEHasSplineElevation,
+    MSEGuidBit4,
+    MSEHasTransportData,
+    MSEGuidBit3,
+    MSEHasMovementFlags,
+    MSEGuidBit0,
+    MSEHasUnknownBit,
+    MSEGuidBit1,
+    MSEGuidBit5,
+    MSEHasPitch,
+    MSEHasSpline,
+    MSEHasMovementFlags2,
+    MSEGuidBit7,
+    MSETransportGuidBit1,
+    MSETransportGuidBit7,
+    MSETransportGuidBit5,
+    MSETransportGuidBit3,
+    MSETransportGuidBit4,
+    MSETransportGuidBit6,
+    MSEHasTransportTime2,
+    MSETransportGuidBit2,
+    MSEHasTransportTime3,
+    MSETransportGuidBit0,
+    MSEHasFallDirection,
+    MSEFlags2,
+    MSEFlags,
+    MSEGuidByte7,
+    MSEGuidByte4,
+    MSEGuidByte5,
+    MSEGuidByte6,
+    MSEGuidByte0,
+    MSEGuidByte1,
+    MSEGuidByte2,
+    MSEGuidByte3,
+    MSEFallVerticalSpeed,
+    MSEFallSinAngle,
+    MSEFallCosAngle,
+    MSEFallHorizontalSpeed,
+    MSEFallTime,
+    MSEPitch,
+    MSEPositionO,
+    MSETransportGuidByte1,
+    MSETransportTime3,
+    MSETransportGuidByte7,
+    MSETransportTime,
+    MSETransportPositionY,
+    MSETransportPositionX,
+    MSETransportPositionZ,
+    MSETransportSeat,
+    MSETransportPositionO,
+    MSETransportGuidByte0,
+    MSETransportTime2,
+    MSETransportGuidByte2,
+    MSETransportGuidByte3,
+    MSETransportGuidByte5,
+    MSETransportGuidByte6,
+    MSETransportGuidByte4,
+    MSETimestamp,
+    MSESplineElevation,
+    MSEEnd,
+};
+
 MovementStatusElements* GetMovementStatusElementsSequence(uint16 opcode)
 {
     switch(opcode)
@@ -2207,6 +2280,8 @@ MovementStatusElements* GetMovementStatusElementsSequence(uint16 opcode)
             return MovementSetRunModeSequence;
         case CMSG_MOVE_SET_WALK_MODE:
             return MovementSetWalkModeSequence;
+        case CMSG_MOVE_SPLINE_DONE:
+            return MovementSplineDoneSequence;
         case CMSG_MOVE_START_BACKWARD:
             return MovementStartBackwardSequence;
         case CMSG_MOVE_START_FORWARD:

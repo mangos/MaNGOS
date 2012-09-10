@@ -195,13 +195,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_MOVE_SPLINE_DONE");
 
-    ObjectGuid guid;                                        // used only for proper packet read
     MovementInfo movementInfo;                              // used only for proper packet read
-
-    recv_data >> guid.ReadAsPacked();
     recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk
-
 
     // in taxi flight packet received in 2 case:
     // 1) end taxi path in far (multi-node) flight
