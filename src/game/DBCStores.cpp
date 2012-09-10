@@ -771,8 +771,8 @@ void LoadDBCStores(const std::string& dataPath)
             }
 
             // valid taxi network node
-            uint8  field   = (uint8)((i - 1) / 32);
-            uint32 submask = 1<<((i-1)%32);
+            uint8  field   = (uint8)((i - 1) / 8);
+            uint32 submask = 1 << ((i-1) % 8);
             sTaxiNodesMask[field] |= submask;
 
             if (node->MountCreatureID[0] && node->MountCreatureID[0] != 32981)
@@ -787,9 +787,8 @@ void LoadDBCStores(const std::string& dataPath)
                 sOldContinentsNodesMask[field] |= submask;
 
             // fix DK node at Ebon Hold
-            if (i == 315) {
+            if (i == 315)
                 ((TaxiNodesEntry*)node)->MountCreatureID[1] = 32981;
-            }
         }
     }
 

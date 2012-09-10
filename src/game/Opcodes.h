@@ -476,13 +476,13 @@ enum Opcodes
     CMSG_TAXICLEARALLNODES                                = 0x11A7,
     CMSG_TAXIENABLEALLNODES                               = 0x11A8,
     CMSG_TAXISHOWNODES                                    = 0x11A9,
-    SMSG_SHOWTAXINODES                                    = 0x11AA,
-    CMSG_TAXINODE_STATUS_QUERY                            = 0x11AB,
-    SMSG_TAXINODE_STATUS                                  = 0x11AC,
-    CMSG_TAXIQUERYAVAILABLENODES                          = 0x11AD,
-    CMSG_ACTIVATETAXI                                     = 0x11AE,
-    SMSG_ACTIVATETAXIREPLY                                = 0x11AF,
-    SMSG_NEW_TAXI_PATH                                    = 0x11B0,
+    SMSG_SHOWTAXINODES                                    = 0x2A36, // 4.3.4 15595
+    CMSG_TAXINODE_STATUS_QUERY                            = 0x2F25, // 4.3.4 15595
+    SMSG_TAXINODE_STATUS                                  = 0x2936, // 4.3.4 15595
+    CMSG_TAXIQUERYAVAILABLENODES                          = 0x6C06, // 4.3.4 15595
+    CMSG_ACTIVATETAXI                                     = 0x6E06, // 4.3.4 15595
+    SMSG_ACTIVATETAXIREPLY                                = 0x6A37, // 4.3.4 15595
+    SMSG_NEW_TAXI_PATH                                    = 0x4B35, // 4.3.4 15595
     CMSG_TRAINER_LIST                                     = 0x2336, // 4.3.4 15595
     SMSG_TRAINER_LIST                                     = 0x4414, // 4.3.4 15595
     CMSG_TRAINER_BUY_SPELL                                = 0x4415, // 4.3.4 15595
@@ -832,7 +832,7 @@ enum Opcodes
     CMSG_GM_NUKE_ACCOUNT                                  = 0x1310,
     MSG_GM_DESTROY_CORPSE                                 = 0x1311,
     CMSG_GM_DESTROY_ONLINE_CORPSE                         = 0x1312,
-    CMSG_ACTIVATETAXIEXPRESS                              = 0x1313,
+    CMSG_ACTIVATETAXIEXPRESS                              = 0x0515, // 4.3.4 15595
     SMSG_SET_FACTION_ATWAR                                = 0x1314,
     SMSG_GAMETIMEBIAS_SET                                 = 0x1315,
     CMSG_DEBUG_ACTIONS_START                              = 0x1316,
@@ -951,7 +951,7 @@ enum Opcodes
     SMSG_SPLINE_SET_FLIGHT_BACK_SPEED                     = 0x1387,
     CMSG_MAELSTROM_INVALIDATE_CACHE                       = 0x1388,
     SMSG_FLIGHT_SPLINE_SYNC                               = 0x1389,
-    CMSG_SET_TAXI_BENCHMARK_MODE                          = 0x138A,
+    CMSG_SET_TAXI_BENCHMARK_MODE                          = 0x4314, // 4.3.4 15595
     SMSG_JOINED_BATTLEGROUND_QUEUE                        = 0x138B,
     SMSG_REALM_SPLIT                                      = 0x2714, // 4.3.4 15595
     CMSG_REALM_SPLIT                                      = 0x2906, // 4.3.4 15595
@@ -1217,7 +1217,7 @@ enum Opcodes
     SMSG_AUCTION_LIST_PENDING_SALES                       = 0x1491,
     SMSG_MODIFY_COOLDOWN                                  = 0x6016, // 4.3.4 15595
     SMSG_PET_UPDATE_COMBO_POINTS                          = 0x1493,
-    CMSG_ENABLETAXI                                       = 0x1494,
+    CMSG_ENABLETAXI                                       = 0x0C16, // 4.3.4 15595
     SMSG_PRE_RESURRECT                                    = 0x1495,
     SMSG_AURA_UPDATE_ALL                                  = 0x6916, // 4.3.4 15595
     SMSG_AURA_UPDATE                                      = 0x4707, // 4.3.4 15595

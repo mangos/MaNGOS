@@ -5244,8 +5244,8 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, Te
         if (!node || node->map_id != mapid || !node->MountCreatureID[team == ALLIANCE ? 1 : 0])
             continue;
 
-        uint8  field   = (uint8)((i - 1) / 32);
-        uint32 submask = 1 << ((i - 1) % 32);
+        uint8 field   = (uint8)((i - 1) / 8);
+        uint8 submask = 1 << ((i - 1) % 8);
 
         // skip not taxi network nodes
         if ((sTaxiNodesMask[field] & submask) == 0)
