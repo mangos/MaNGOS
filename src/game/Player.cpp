@@ -1697,28 +1697,36 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         return false;
     }
 
+    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);  // Validity checked in IsValidMapCoord
+
     // preparing unsummon pet if lost (we must get pet before teleportation or will not find it later)
     Pet* pet = GetPet();
-
-    MapEntry const* mEntry = sMapStore.LookupEntry(mapid);
 
     // don't let enter battlegrounds without assigned battleground id (for example through areatrigger)...
     // don't let gm level > 1 either
     if (!InBattleGround() && mEntry->IsBattleGroundOrArena())
         return false;
 
+    // Get MapEntrance trigger if teleport to other -nonBG- map
+    bool assignedAreaTrigger = false;
+    if (GetMapId() != mapid && !mEntry->IsBattleGroundOrArena() && !at)
+    {
+        at = sObjectMgr.GetMapEntranceTrigger(mapid);
+        assignedAreaTrigger = true;
+    }
+
     // Check requirements for teleport
-    if (GetMapId() != mapid || m_transport || at)           // NOT(sameCheckAsBelow) OR at
+    if (at)
     {
         uint32 miscRequirement = 0;
-        AreaLockStatus lockStatus = GetAreaTriggerLockStatus(at ? at : sObjectMgr.GetMapEntranceTrigger(mapid), GetDifficulty(mEntry->IsRaid()), miscRequirement);
+        AreaLockStatus lockStatus = GetAreaTriggerLockStatus(at, GetDifficulty(mEntry->IsRaid()), miscRequirement);
         if (lockStatus != AREA_LOCKSTATUS_OK)
         {
             // Teleport not requested by area-trigger
             // TODO - Assume a player with expansion 0 travels from BootyBay to Ratched, and he is attempted to be teleported to outlands
             //        then he will repop near BootyBay instead of normally continuing his journey
             // This code is probably added to catch passengers on ships to northrend who shouldn't go there
-            if (lockStatus == AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION && !at && GetTransport())
+            if (lockStatus == AREA_LOCKSTATUS_INSUFFICIENT_EXPANSION && !assignedAreaTrigger && GetTransport())
                 RepopAtGraveyard();                         // Teleport to near graveyard if on transport, looks blizz like :)
 
             SendTransferAbortedByLockStatus(mEntry, lockStatus, miscRequirement);
