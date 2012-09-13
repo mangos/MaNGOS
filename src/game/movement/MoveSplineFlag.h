@@ -49,8 +49,8 @@ namespace Movement
                 Cyclic              = 0x00001000,           // Movement by cycled spline
                 Enter_Cycle         = 0x00002000,           // Everytimes appears with cyclic flag in monster move packet, erases first spline vertex after first cycle done
                 Frozen              = 0x00004000,           // Will never arrive
-                TransportEnter      = 0x00008000,
-                TransportExit       = 0x00010000,
+                BoardVehicle        = 0x00008000,
+                ExitVehicle         = 0x00010000,
                 Unknown3            = 0x00020000,           // NOT VERIFIED
                 Unknown4            = 0x00040000,           // NOT VERIFIED
                 OrientationInversed = 0x00080000,
@@ -102,15 +102,15 @@ namespace Movement
             void operator &= (uint32 f) { raw() &= f;}
             void operator |= (uint32 f) { raw() |= f;}
 
-            void EnableAnimation(uint8 anim) { raw() = (raw() & ~(Mask_Animations | Falling | Trajectory | FallingSlow)) | Animation | (anim & Mask_Animations);}
-            void EnableParabolic()           { raw() = (raw() & ~(Mask_Animations | Falling | Animation | FallingSlow)) | Trajectory;}
-            void EnableFalling()             { raw() = (raw() & ~(Mask_Animations | Trajectory | Animation))| Falling;}
-            void EnableCatmullRom()          { raw() = (raw() & ~SmoothGroundPath) | Catmullrom | UncompressedPath; }
-            void EnableFacingPoint()         { raw() = (raw() & ~Mask_Final_Facing) | Final_Point;}
-            void EnableFacingAngle()         { raw() = (raw() & ~Mask_Final_Facing) | Final_Angle;}
-            void EnableFacingTarget()        { raw() = (raw() & ~Mask_Final_Facing) | Final_Target;}
-            void EnableTransportEnter()      { raw() = (raw() & ~TransportExit) | TransportEnter; }
-            void EnableTransportExit()       { raw() = (raw() & ~TransportEnter) | TransportExit; }
+            void EnableAnimation(uint8 anim) { raw() = (raw() & ~(Mask_Animations                           | Falling | Trajectory | FallingSlow)) | Animation | (anim & Mask_Animations);}
+            void EnableParabolic()           { raw() = (raw() & ~(Mask_Animations                           | Falling | Animation | FallingSlow)) | Trajectory;}
+            void EnableFalling()             { raw() = (raw() & ~(Mask_Animations                           | Trajectory | Animation))| Falling;}
+            void EnableCatmullRom()          { raw() = (raw() & ~SmoothGroundPath)                          | Catmullrom | UncompressedPath; }
+            void EnableFacingPoint()         { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Point;}
+            void EnableFacingAngle()         { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Angle;}
+            void EnableFacingTarget()        { raw() = (raw() & ~Mask_Final_Facing)                         | Final_Target;}
+            void EnableBoardVehicle()        { raw() = (raw() & ~(Catmullrom | ExitVehicle))                | BoardVehicle; }
+            void EnableExitVehicle()         { raw() = (raw() & ~BoardVehicle)                              | ExitVehicle; }
 
             uint8 animId             : 3;
             bool unknown0            : 1;
@@ -125,8 +125,8 @@ namespace Movement
             bool cyclic              : 1;
             bool enter_cycle         : 1;
             bool frozen              : 1;
-            bool transportEnter      : 1;
-            bool transportExit       : 1;
+            bool boardVehicle        : 1;
+            bool exitVehicle         : 1;
             bool unknown3            : 1;
             bool unknown4            : 1;
             bool orientationInversed : 1;
