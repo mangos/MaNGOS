@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_12195_02_mangos_mangos_string"` bit(1) default NULL
+  `required_12216_12_mangos_spell_loot_template"` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -1020,11 +1020,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `creature_loot_template`;
 CREATE TABLE `creature_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'entry 0 used for player insignia loot',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -1429,11 +1429,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `disenchant_loot_template`;
 CREATE TABLE `disenchant_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'Recommended id selection: item_level*100 + item_quality',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -1684,11 +1684,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `fishing_loot_template`;
 CREATE TABLE `fishing_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0' COMMENT 'entry 0 used for junk loot at fishing fail (if allowed by config option)',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -2022,11 +2022,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `gameobject_loot_template`;
 CREATE TABLE `gameobject_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -2411,11 +2411,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `item_loot_template`;
 CREATE TABLE `item_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -3309,11 +3309,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `mail_loot_template`;
 CREATE TABLE `mail_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -4227,11 +4227,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `milling_loot_template`;
 CREATE TABLE `milling_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -4824,11 +4824,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `pickpocketing_loot_template`;
 CREATE TABLE `pickpocketing_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -20409,11 +20409,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `prospecting_loot_template`;
 CREATE TABLE `prospecting_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -20761,11 +20761,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `reference_loot_template`;
 CREATE TABLE `reference_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -20965,11 +20965,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `skinning_loot_template`;
 CREATE TABLE `skinning_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',
@@ -23411,11 +23411,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `spell_loot_template`;
 CREATE TABLE `spell_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL default '0',
-  `item` mediumint(8) unsigned NOT NULL default '0',
+  `item` mediumint(8) NOT NULL default '0',
   `ChanceOrQuestChance` float NOT NULL default '100',
   `groupid` tinyint(3) unsigned NOT NULL default '0',
   `mincountOrRef` mediumint(9) NOT NULL default '1',
-  `maxcount` tinyint(3) unsigned NOT NULL default '1',
+  `maxcount` smallint(5) unsigned NOT NULL default '1',
   `lootcondition` tinyint(3) unsigned NOT NULL default '0',
   `condition_value1` mediumint(8) unsigned NOT NULL default '0',
   `condition_value2` mediumint(8) unsigned NOT NULL default '0',

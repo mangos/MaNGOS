@@ -380,6 +380,11 @@ enum AbilitySkillFlags
 
 #define CURRENCY_PRECISION 100.0f
 
+enum CurrencyCategory
+{
+    CURRENCY_CATEGORY_ARCHAEOLOGY   = 82,
+};
+
 enum CurrencyFlags
 {
     CURRENCY_FLAG_HAS_PRECISION     = 0x08,

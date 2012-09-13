@@ -1215,7 +1215,12 @@ Visibility.AIRelocationNotifyDelay = 1000
 #    Rate.Drop.Item.Artifact
 #    Rate.Drop.Item.Referenced
 #    Rate.Drop.Money
-#         Drop rates (items by quality and money)
+#    Rate.Drop.Currency
+#         Drop rates (items by quality, money and currency drop chance)
+#         Default: 1
+#
+#    Rate.Drop.Currency.Amount
+#         Drop rate for currency amount
 #         Default: 1
 #
 #    Rate.XP.Kill
@@ -1361,8 +1366,10 @@ Rate.Drop.Item.Legendary = 1
 Rate.Drop.Item.Artifact = 1
 Rate.Drop.Item.Referenced = 1
 Rate.Drop.Money = 1
-Rate.XP.Kill    = 1
-Rate.XP.Quest   = 1
+Rate.Drop.Currency = 1
+Rate.Drop.Currency.Amount = 1
+Rate.XP.Kill = 1
+Rate.XP.Quest = 1
 Rate.XP.Explore = 1
 Rate.Rest.InGame = 1
 Rate.Rest.Offline.InTavernOrCity = 1

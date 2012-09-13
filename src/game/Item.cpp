@@ -648,7 +648,8 @@ bool Item::LoadFromDB(uint32 guidLow, Field* fields, ObjectGuid ownerGuid)
 
 void Item::LoadLootFromDB(Field* fields)
 {
-    uint32 item_id     = fields[1].GetUInt32();
+    uint32 item_id     = abs(fields[1].GetInt32());
+    uint8  type        = fields[1].GetInt32() > 0 ? LOOT_ITEM_TYPE_ITEM : LOOT_ITEM_TYPE_CURRENCY;
     uint32 item_amount = fields[2].GetUInt32();
     uint32 item_suffix = fields[3].GetUInt32();
     int32  item_propid = fields[4].GetInt32();
@@ -662,16 +663,32 @@ void Item::LoadLootFromDB(Field* fields)
     }
 
     // normal item case
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
-
-    if (!proto)
+    if (type == LOOT_ITEM_TYPE_ITEM)
     {
-        CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u' AND itemid = '%u'", GetGUIDLow(), item_id);
-        sLog.outError("Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
-        return;
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
+        if (!proto)
+        {
+            CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u' AND itemid = '%u'", GetGUIDLow(), item_id);
+            sLog.outError("Item::LoadLootFromDB: %s has an unknown item (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
+            return;
+        }
+
+        loot.items.push_back(LootItem(item_id, type, item_amount, item_suffix, item_propid));
+    }
+    // currency case
+    else //if (type == LOOT_ITEM_TYPE_CURRENCY)
+    {
+        CurrencyTypesEntry const* currencyEntry = sCurrencyTypesStore.LookupEntry(item_id);
+        if (!currencyEntry)
+        {
+            CharacterDatabase.PExecute("DELETE FROM item_loot WHERE guid = '%u' AND itemid = '%i'", GetGUIDLow(), -int32(item_id));
+            sLog.outError("Item::LoadLootFromDB: %s has an unknown currency (id: #%u) in item_loot, deleted.", GetOwnerGuid().GetString().c_str(), item_id);
+            return;
+        }
+
+        loot.items.push_back(LootItem(item_id, type, item_amount));
     }
 
-    loot.items.push_back(LootItem(item_id, item_amount, item_suffix, item_propid));
     ++loot.unlootedCount;
 
     SetLootState(ITEM_LOOT_UNCHANGED);

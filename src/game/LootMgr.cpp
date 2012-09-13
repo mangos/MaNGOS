@@ -113,16 +113,17 @@ void LootStore::LoadLootTable()
             bar.step();
 
             uint32 entry               = fields[0].GetUInt32();
-            uint32 item                = fields[1].GetUInt32();
+            uint32 item                = abs(fields[1].GetInt32());
+            uint8 type                 = fields[1].GetInt32() > 0 ? LOOT_ITEM_TYPE_ITEM : LOOT_ITEM_TYPE_CURRENCY;
             float  chanceOrQuestChance = fields[2].GetFloat();
             uint8  group               = fields[3].GetUInt8();
             int32  mincountOrRef       = fields[4].GetInt32();
             uint32 maxcount            = fields[5].GetUInt32();
             uint16 conditionId         = fields[6].GetUInt16();
 
-            if (maxcount > std::numeric_limits<uint8>::max())
+            if (type == LOOT_ITEM_TYPE_ITEM && maxcount > std::numeric_limits<uint8>::max())
             {
-                sLog.outErrorDb("Table '%s' entry %d item %d: maxcount value (%u) to large. must be less %u - skipped", GetName(), entry, item, maxcount, std::numeric_limits<uint8>::max());
+                sLog.outErrorDb("Table '%s' entry %d item %d: maxcount value (%u) too large. must be less than %u - skipped", GetName(), entry, item, maxcount, std::numeric_limits<uint8>::max());
                 continue;                                   // error already printed to log/console.
             }
 
@@ -142,7 +143,7 @@ void LootStore::LoadLootTable()
                 }
             }
 
-            LootStoreItem storeitem = LootStoreItem(item, chanceOrQuestChance, group, conditionId, mincountOrRef, maxcount);
+            LootStoreItem storeitem = LootStoreItem(item, type, chanceOrQuestChance, group, conditionId, mincountOrRef, maxcount);
 
             if (!storeitem.IsValid(*this, entry))           // Validity checks
                 continue;
@@ -253,11 +254,18 @@ bool LootStoreItem::Roll(bool rate) const
     if (mincountOrRef < 0)                                  // reference case
         return roll_chance_f(chance * (rate ? sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
+    if (type == LOOT_ITEM_TYPE_ITEM)
+    {
+        ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
 
-    float qualityModifier = pProto && rate ? sWorld.getConfig(qualityToRate[pProto->Quality]) : 1.0f;
+        float qualityModifier = pProto && rate ? sWorld.getConfig(qualityToRate[pProto->Quality]) : 1.0f;
 
-    return roll_chance_f(chance * qualityModifier);
+        return roll_chance_f(chance * qualityModifier);
+    }
+    else if (type == LOOT_ITEM_TYPE_CURRENCY)
+        return roll_chance_f(chance * (rate ? sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_CURRENCY) : 1.0f));
+
+    return false;
 }
 
 // Checks correctness of values
@@ -269,6 +277,12 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
         return false;
     }
 
+    if (group && type == LOOT_ITEM_TYPE_CURRENCY)
+    {
+        sLog.outErrorDb("Table '%s' entry %d currency %d: group is set, but currencies must not have group - skipped", store.GetName(), entry, itemid, group, 1 << 7);
+        return false;
+    }
+
     if (mincountOrRef == 0)
     {
         sLog.outErrorDb("Table '%s' entry %d item %d: wrong mincountOrRef (%d) - skipped", store.GetName(), entry, itemid, mincountOrRef);
@@ -277,10 +291,27 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 
     if (mincountOrRef > 0)                                  // item (quest or non-quest) entry, maybe grouped
     {
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
-        if (!proto)
+        if (type == LOOT_ITEM_TYPE_ITEM)
         {
-            sLog.outErrorDb("Table '%s' entry %d item %d: item entry not listed in `item_template` - skipped", store.GetName(), entry, itemid);
+            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+            if (!proto)
+            {
+                sLog.outErrorDb("Table '%s' entry %d item %d: item entry not listed in `item_template` - skipped", store.GetName(), entry, itemid);
+                return false;
+            }
+        }
+        else if (type == LOOT_ITEM_TYPE_CURRENCY)
+        {
+            CurrencyTypesEntry const* currency = sCurrencyTypesStore.LookupEntry(itemid);
+            if (!currency)
+            {
+                sLog.outErrorDb("Table '%s' entry %d: currency entry %u not exists - skipped", store.GetName(), entry, itemid);
+                return false;
+            }
+        }
+        else
+        {
+            sLog.outErrorDb("Table '%s' entry %d: has unknown item %u with type %u - skipped", store.GetName(), entry, itemid, type);
             return false;
         }
 
@@ -301,7 +332,6 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
             sLog.outErrorDb("Table '%s' entry %d item %d: max count (%u) less that min count (%i) - skipped", store.GetName(), entry, itemid, uint32(maxcount), mincountOrRef);
             return false;
         }
-
     }
     else                                                    // mincountOrRef < 0
     {
@@ -327,32 +357,39 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
 LootItem::LootItem(LootStoreItem const& li)
 {
     itemid      = li.itemid;
+    type        = li.type;
     conditionId = li.conditionId;
-
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
-    freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
-
-    needs_quest = li.needs_quest;
-
+    currency = type == LOOT_ITEM_TYPE_CURRENCY;
     count       = urand(li.mincountOrRef, li.maxcount);     // constructor called for mincountOrRef > 0 only
-    randomSuffix = GenerateEnchSuffixFactor(itemid);
-    randomPropertyId = Item::GenerateItemRandomPropertyId(itemid);
+
     is_looted = 0;
     is_blocked = 0;
     is_underthreshold = 0;
     is_counted = 0;
+
+    if (currency)
+    {
+        freeforall = false;
+        needs_quest = false;
+        randomSuffix = 0;
+        randomPropertyId = 0;
+        count = uint32(count * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_CURRENCY_AMOUNT));
+    }
+    else
+    {
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+        freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
+        needs_quest = li.needs_quest;
+        randomSuffix = GenerateEnchSuffixFactor(itemid);
+        randomPropertyId = Item::GenerateItemRandomPropertyId(itemid);
+    }
 }
 
-LootItem::LootItem(uint32 itemid_, uint32 count_, uint32 randomSuffix_, int32 randomPropertyId_)
+LootItem::LootItem(uint32 itemid_, uint8 type_, uint32 count_, uint32 randomSuffix_, int32 randomPropertyId_)
 {
     itemid      = itemid_;
+    type        = type_;
     conditionId = 0;
-
-    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
-    freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
-
-    needs_quest = false;
-
     count       = count_;
     randomSuffix = randomSuffix_;
     randomPropertyId = randomPropertyId_;
@@ -360,6 +397,16 @@ LootItem::LootItem(uint32 itemid_, uint32 count_, uint32 randomSuffix_, int32 ra
     is_blocked = 0;
     is_underthreshold = 0;
     is_counted = 0;
+    currency = type == LOOT_ITEM_TYPE_CURRENCY;
+    needs_quest = false;
+
+    if (currency)
+        freeforall = false;
+    else
+    {
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemid);
+        freeforall  = proto && (proto->Flags & ITEM_FLAG_PARTY_LOOT);
+    }
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
@@ -369,28 +416,46 @@ bool LootItem::AllowedForPlayer(Player const* player) const
     if (conditionId && !sObjectMgr.IsPlayerMeetToNEWCondition(player, conditionId))
         return false;
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
-    if (!pProto)
-        return false;
-
-    // not show loot for not own team
-    if ((pProto->Flags2 & ITEM_FLAG2_HORDE_ONLY) && player->GetTeam() != HORDE)
-        return false;
-
-    if ((pProto->Flags2 & ITEM_FLAG2_ALLIANCE_ONLY) && player->GetTeam() != ALLIANCE)
-        return false;
-
-    if (needs_quest)
+    if (type == LOOT_ITEM_TYPE_ITEM)
     {
-        // Checking quests for quest-only drop (check only quests requirements in this case)
-        if (!player->HasQuestForItem(itemid))
+        ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
+        if (!pProto)
             return false;
+
+        // not show loot for not own team
+        if ((pProto->Flags2 & ITEM_FLAG2_HORDE_ONLY) && player->GetTeam() != HORDE)
+            return false;
+
+        if ((pProto->Flags2 & ITEM_FLAG2_ALLIANCE_ONLY) && player->GetTeam() != ALLIANCE)
+            return false;
+
+        if (needs_quest)
+        {
+            // Checking quests for quest-only drop (check only quests requirements in this case)
+            if (!player->HasQuestForItem(itemid))
+                return false;
+        }
+        else
+        {
+            // Not quest only drop (check quest starting items for already accepted non-repeatable quests)
+            if (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid))
+                return false;
+        }
     }
-    else
+    else if (type == LOOT_ITEM_TYPE_CURRENCY)
     {
-        // Not quest only drop (check quest starting items for already accepted non-repeatable quests)
-        if (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE && !player->HasQuestForItem(itemid))
+        CurrencyTypesEntry const * currency = sCurrencyTypesStore.LookupEntry(itemid);
+        if (!itemid)
             return false;
+
+        if (!player->isGameMaster())
+        {
+            if (currency->ID == CURRENCY_CONQUEST_ARENA_META || currency->ID == CURRENCY_CONQUEST_BG_META)
+                return false;
+
+            if (currency->Category == CURRENCY_CATEGORY_ARCHAEOLOGY && !player->HasSkill(SKILL_ARCHAEOLOGY))
+                return false;
+        }
     }
 
     return true;
@@ -398,8 +463,8 @@ bool LootItem::AllowedForPlayer(Player const* player) const
 
 LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, bool condition_ok /*= false*/) const
 {
-    // ignore looted, FFA (each player get own copy) and not allowed items
-    if (is_looted || freeforall || (conditionId && !condition_ok) || !AllowedForPlayer(viewer))
+    // ignore currencies, looted items, FFA (each player get own copy) and not allowed items
+    if (currency || is_looted || freeforall || (conditionId && !condition_ok) || !AllowedForPlayer(viewer))
         return MAX_LOOT_SLOT_TYPE;
 
     switch (permission)
@@ -434,9 +499,10 @@ void Loot::AddItem(LootStoreItem const& item)
         items.push_back(LootItem(item));
 
         // non-conditional one-player only items are counted here,
+        // currencies are counter in FillCurrencyLoot,
         // free for all items are counted in FillFFALoot(),
-        // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-        if (!item.conditionId)
+        // non-ffa conditionals are counted in FillNonQuestNonFFANonCurrencyConditionalLoot()
+        if (!item.conditionId && item.type == LOOT_ITEM_TYPE_ITEM)
         {
             ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
             if (!proto || !(proto->Flags & ITEM_FLAG_PARTY_LOOT))
@@ -485,7 +551,11 @@ void Loot::FillNotNormalLootFor(Player* pl)
 {
     uint32 plguid = pl->GetGUIDLow();
 
-    QuestItemMap::const_iterator qmapitr = m_playerQuestItems.find(plguid);
+    QuestItemMap::const_iterator qmapitr = m_playerCurrencies.find(plguid);
+    if (qmapitr == m_playerCurrencies.end())
+        FillCurrencyLoot(pl);
+
+    qmapitr = m_playerQuestItems.find(plguid);
     if (qmapitr == m_playerQuestItems.end())
         FillQuestLoot(pl);
 
@@ -493,9 +563,32 @@ void Loot::FillNotNormalLootFor(Player* pl)
     if (qmapitr == m_playerFFAItems.end())
         FillFFALoot(pl);
 
-    qmapitr = m_playerNonQuestNonFFAConditionalItems.find(plguid);
-    if (qmapitr == m_playerNonQuestNonFFAConditionalItems.end())
-        FillNonQuestNonFFAConditionalLoot(pl);
+    qmapitr = m_playerNonQuestNonFFANonCurrencyConditionalItems.find(plguid);
+    if (qmapitr == m_playerNonQuestNonFFANonCurrencyConditionalItems.end())
+        FillNonQuestNonFFANonCurrencyConditionalLoot(pl);
+}
+
+QuestItemList* Loot::FillCurrencyLoot(Player* player)
+{
+    QuestItemList* ql = new QuestItemList();
+
+    for (uint8 i = 0; i < items.size(); ++i)
+    {
+        LootItem& item = items[i];
+        if (!item.is_looted && item.currency && item.AllowedForPlayer(player))
+        {
+            ql->push_back(QuestItem(i));
+            ++unlootedCount;
+        }
+    }
+    if (ql->empty())
+    {
+        delete ql;
+        return NULL;
+    }
+
+    m_playerCurrencies[player->GetGUIDLow()] = ql;
+    return ql;
 }
 
 QuestItemList* Loot::FillFFALoot(Player* player)
@@ -556,14 +649,14 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     return ql;
 }
 
-QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
+QuestItemList* Loot::FillNonQuestNonFFANonCurrencyConditionalLoot(Player* player)
 {
     QuestItemList* ql = new QuestItemList();
 
     for (uint8 i = 0; i < items.size(); ++i)
     {
         LootItem& item = items[i];
-        if (!item.is_looted && !item.freeforall && item.conditionId && item.AllowedForPlayer(player))
+        if (!item.is_looted && !item.freeforall && !item.currency && item.conditionId && item.AllowedForPlayer(player))
         {
             ql->push_back(QuestItem(i));
             if (!item.is_counted)
@@ -579,7 +672,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
         return NULL;
     }
 
-    m_playerNonQuestNonFFAConditionalItems[player->GetGUIDLow()] = ql;
+    m_playerNonQuestNonFFANonCurrencyConditionalItems[player->GetGUIDLow()] = ql;
     return ql;
 }
 
@@ -663,7 +756,7 @@ void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
     }
 }
 
-LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem** qitem, QuestItem** ffaitem, QuestItem** conditem)
+LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem** qitem, QuestItem** ffaitem, QuestItem** conditem, QuestItem** currency)
 {
     LootItem* item = NULL;
     bool is_looted = true;
@@ -684,7 +777,25 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem** qite
     {
         item = &items[lootSlot];
         is_looted = item->is_looted;
-        if (item->freeforall)
+        if (item->currency)
+        {
+            QuestItemMap::const_iterator itr = m_playerCurrencies.find(player->GetGUIDLow());
+            if (itr != m_playerCurrencies.end())
+            {
+                for (QuestItemList::const_iterator iter = itr->second->begin(); iter != itr->second->end(); ++iter)
+                {
+                    if (iter->index == lootSlot)
+                    {
+                        QuestItem* currency2 = (QuestItem*) & (*iter);
+                        if (currency)
+                            *currency = currency2;
+                        is_looted = currency2->is_looted;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (item->freeforall)
         {
             QuestItemMap::const_iterator itr = m_playerFFAItems.find(player->GetGUIDLow());
             if (itr != m_playerFFAItems.end())
@@ -702,8 +813,8 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem** qite
         }
         else if (item->conditionId)
         {
-            QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.find(player->GetGUIDLow());
-            if (itr != m_playerNonQuestNonFFAConditionalItems.end())
+            QuestItemMap::const_iterator itr = m_playerNonQuestNonFFANonCurrencyConditionalItems.find(player->GetGUIDLow());
+            if (itr != m_playerNonQuestNonFFANonCurrencyConditionalItems.end())
             {
                 for (QuestItemList::const_iterator iter = itr->second->begin(); iter != itr->second->end(); ++iter)
                 {
@@ -734,11 +845,19 @@ uint32 Loot::GetMaxSlotInLootFor(Player* player) const
 
 ByteBuffer& operator<<(ByteBuffer& b, LootItem const& li)
 {
-    b << uint32(li.itemid);
-    b << uint32(li.count);                                  // nr of items of this type
-    b << uint32(ObjectMgr::GetItemPrototype(li.itemid)->DisplayInfoID);
-    b << uint32(li.randomSuffix);
-    b << uint32(li.randomPropertyId);
+    if (li.type == LOOT_ITEM_TYPE_ITEM)
+    {
+        b << uint32(li.itemid);
+        b << uint32(li.count);                                  // nr of items of this type
+        b << uint32(ObjectMgr::GetItemPrototype(li.itemid)->DisplayInfoID);
+        b << uint32(li.randomSuffix);
+        b << uint32(li.randomPropertyId);
+    }
+    else if (li.type == LOOT_ITEM_TYPE_CURRENCY)
+    {
+        b << uint32(li.itemid);
+        b << uint32(li.count);
+    }
     // b << uint8(0);                                       // slot type - will send after this function call
     return b;
 }
@@ -765,10 +884,6 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     size_t currency_count_pos = b.wpos();                   // pos of currency count byte
     b << uint8(0);                                          // currency count placeholder
 
-    if (lv.permission == NONE_PERMISSION)
-        return b;
-
-
     for (uint8 i = 0; i < l.items.size(); ++i)
     {
         LootSlotType slot_type = l.items[i].GetSlotTypeForSharedLoot(lv.permission, lv.viewer);
@@ -780,7 +895,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         ++itemsShown;
     }
 
-    QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFAConditionalItems();
+    QuestItemMap const& lootPlayerNonQuestNonFFAConditionalItems = l.GetPlayerNonQuestNonFFANonCurrencyConditionalItems();
     QuestItemMap::const_iterator nn_itr = lootPlayerNonQuestNonFFAConditionalItems.find(lv.viewer->GetGUIDLow());
     if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
     {
@@ -833,6 +948,22 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 b << uint8(fi->index) << item;
                 b << uint8(slot_type);                      // allow loot
                 ++itemsShown;
+            }
+        }
+    }
+
+    QuestItemMap const& lootPlayerCurrencies = l.GetPlayerCurrencies();
+    QuestItemMap::const_iterator currency_itr = lootPlayerCurrencies.find(lv.viewer->GetGUIDLow());
+    if (currency_itr != lootPlayerCurrencies.end())
+    {
+        QuestItemList* currency_list = currency_itr->second;
+        for (QuestItemList::const_iterator ci = currency_list->begin() ; ci != currency_list->end(); ++ci)
+        {
+            LootItem& item = l.items[ci->index];
+            if (!ci->is_looted && !item.is_looted)
+            {
+                b << uint8(ci->index) << item;
+                ++currenciesShown;
             }
         }
     }
@@ -1009,7 +1140,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, bool rate, uint8 
         if (!i->Roll(rate))
             continue;                                       // Bad luck for the entry
 
-        if (i->mincountOrRef < 0)                           // References processing
+        if (i->mincountOrRef < 0 && i->type == LOOT_ITEM_TYPE_ITEM)    // References processing
         {
             LootTemplate const* Referenced = LootTemplates_Reference.GetLootFor(-i->mincountOrRef);
 

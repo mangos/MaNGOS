@@ -34,7 +34,7 @@
 
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 {
-    DEBUG_LOG("WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
+    DEBUG_LOG("WORLD: %s", LookupOpcodeName(recv_data.GetOpcode()));
     Player*  player =   GetPlayer();
     ObjectGuid lguid = player->GetLootGuid();
     Loot*    loot;
@@ -109,8 +109,9 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
     QuestItem* qitem = NULL;
     QuestItem* ffaitem = NULL;
     QuestItem* conditem = NULL;
+    QuestItem* currency = NULL;
 
-    LootItem* item = loot->LootItemInSlot(lootSlot, player, &qitem, &ffaitem, &conditem);
+    LootItem* item = loot->LootItemInSlot(lootSlot, player, &qitem, &ffaitem, &conditem, &currency);
 
     if (!item)
     {
@@ -127,6 +128,17 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recv_data)
 
     if (pItem)
         pItem->SetLootState(ITEM_LOOT_CHANGED);
+
+    if (currency)
+    {
+        if (CurrencyTypesEntry const * currencyEntry = sCurrencyTypesStore.LookupEntry(item->itemid))
+            player->ModifyCurrencyCount(item->itemid, int32(item->count * currencyEntry->GetPrecision()));
+
+        player->SendNotifyLootItemRemoved(lootSlot, true);
+        currency->is_looted = true;
+        --loot->unlootedCount;
+        return;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);
@@ -261,8 +273,6 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(money_per_player);
                 data << uint8(playersNear.size() > 1 ? 0 : 1);  // 0 is "you share of loot..."
-                data << uint32(0);                              // guild share
-
                 (*i)->GetSession()->SendPacket(&data);
             }
         }
@@ -274,7 +284,6 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
             WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(pLoot->gold);
             data << uint8(1);                               // 1 is "you loot..."
-            data << uint32(0);                              // guild share
             player->GetSession()->SendPacket(&data);
         }
 
@@ -555,11 +564,16 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 
     if (slotid > pLoot->items.size())
     {
-        DEBUG_LOG("AutoLootItem: Player %s might be using a hack! (slot %d, size " SIZEFMTD ")", GetPlayer()->GetName(), slotid, pLoot->items.size());
+        DEBUG_LOG("WorldSession::HandleLootMasterGiveOpcode: Player %s might be using a hack! (slot %d, size " SIZEFMTD ")", GetPlayer()->GetName(), slotid, pLoot->items.size());
         return;
     }
 
     LootItem& item = pLoot->items[slotid];
+    if (item.currency)
+    {
+        sLog.outError("WorldSession::HandleLootMasterGiveOpcode: player %s tried to give currency via master loot! Hack alert! Slot %u, currency id %u", GetPlayer()->GetName(), slotid, item.itemid);
+        return;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);

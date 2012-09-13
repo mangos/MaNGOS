@@ -369,8 +369,8 @@ class MANGOS_DLL_SPEC Group
         /*********************************************************/
 
         void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r);
-        void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll& r);
-        void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll& r);
+        void SendLootRoll(ObjectGuid const& targetGuid, uint32 rollNumber, uint8 rollType, const Roll& r);
+        void SendLootRollWon(ObjectGuid const& targetGuid, uint32 rollNumber, RollVote rollType, const Roll& r);
         void SendLootAllPassed(const Roll& r);
         void GroupLoot(WorldObject* pSource, Loot* loot);
         void NeedBeforeGreed(WorldObject* pSource, Loot* loot);
