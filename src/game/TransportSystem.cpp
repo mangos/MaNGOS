@@ -24,7 +24,7 @@
  * This file contains the code needed for MaNGOS to provide abstract support for transported entities
  * Currently implemented
  * - Calculating between local and global coords
- *
+ * - Abstract storage of passengers (added by BoardPassenger, UnboardPassenger)
  */
 
 #include "TransportSystem.h"
@@ -134,6 +134,34 @@ void TransportBase::CalculateGlobalPositionOf(float lx, float ly, float lz, floa
 
     gz = lz + m_owner->GetPositionZ();
     go = NormalizeOrientation(lo + m_owner->GetOrientation());
+}
+
+void TransportBase::BoardPassenger(WorldObject* passenger, float lx, float ly, float lz, float lo, uint8 seat)
+{
+    TransportInfo* transportInfo = new TransportInfo(passenger, this, lx, ly, lz, lo, seat);
+
+    // Insert our new passenger
+    m_passengers.insert(PassengerMap::value_type(passenger, transportInfo));
+
+    // The passenger needs fast access to transportInfo
+    passenger->SetTransportInfo(transportInfo);
+}
+
+void TransportBase::UnBoardPassenger(WorldObject* passenger)
+{
+    PassengerMap::const_iterator itr = m_passengers.find(passenger);
+
+    if (itr == m_passengers.end())
+        return;
+
+    // Set passengers transportInfo to NULL
+    passenger->SetTransportInfo(NULL);
+
+    // Delete transportInfo
+    delete itr->second;
+
+    // Unboard finally
+    m_passengers.erase(itr);
 }
 
 /* **************************************** TransportInfo ****************************************/
