@@ -589,7 +589,7 @@ enum VehicleSeatFlags
     SEAT_FLAG_UNK18                 = 0x00100000,
     SEAT_FLAG_UNK19                 = 0x00200000,
     SEAT_FLAG_UNK20                 = 0x00400000,           // "RecHasVehicleEnterAnim"
-    SEAT_FLAG_UNK21                 = 0x00800000,
+    SEAT_FLAG_UNK21                 = 0x00800000,           // Lua_IsUsingVehicleControls
     SEAT_FLAG_UNK22                 = 0x01000000,           // "EnableVehicleZoom"
     SEAT_FLAG_USABLE                = 0x02000000,           // Lua_CanExitVehicle
     SEAT_FLAG_CAN_SWITCH            = 0x04000000,           // Lua_CanSwitchVehicleSeats

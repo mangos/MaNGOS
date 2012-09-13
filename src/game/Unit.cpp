@@ -623,6 +623,10 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
         setAttackTimer(OFF_ATTACK, (update_diff >= base_att ? 0 : base_att - update_diff));
     }
 
+    // Update passenger positions if we are the first vehicle
+    if (IsVehicle() && !IsBoarded())
+        m_vehicleInfo->Update(update_diff);
+
     // update abilities available only for fraction of time
     UpdateReactives(update_diff);
 
@@ -11482,7 +11486,7 @@ void Unit::SetVehicleId(uint32 entry)
         VehicleEntry const* ventry = sVehicleStore.LookupEntry(entry);
         MANGOS_ASSERT(ventry != NULL);
 
-        m_vehicleInfo = new VehicleInfo(ventry);
+        m_vehicleInfo = new VehicleInfo(this, ventry);
         m_updateFlag |= UPDATEFLAG_VEHICLE;
     }
     else

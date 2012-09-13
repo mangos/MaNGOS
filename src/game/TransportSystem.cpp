@@ -103,9 +103,9 @@ void TransportBase::UpdateGlobalPositionOf(WorldObject* passenger, float lx, flo
         else
             m_owner->GetMap()->CreatureRelocation((Creature*)passenger, gx, gy, gz, go);
 
-        //// If passenger is vehicle
-        //if (((Unit*)passenger)->IsVehicle())
-        //    ((Unit*)passenger)->GetVehicleInfo()->UpdateGlobalPositions();
+        // If passenger is vehicle
+        if (((Unit*)passenger)->IsVehicle())
+            ((Unit*)passenger)->GetVehicleInfo()->UpdateGlobalPositions();
     }
     // ToDo: Add gameobject relocation
     // ToDo: Add passenger relocation for MO transports
