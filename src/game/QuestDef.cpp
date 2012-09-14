@@ -142,10 +142,10 @@ Quest::Quest(Field* questRecord)
     PortraitGiver = questRecord[142].GetUInt32();
     PortraitTurnIn = questRecord[143].GetUInt32();
 
-    PortraitGiverText = questRecord[144].GetCppString();
-    PortraitGiverName = questRecord[145].GetCppString();
-    PortraitTurnInText = questRecord[146].GetCppString();
-    PortraitTurnInName = questRecord[147].GetCppString();
+    PortraitGiverName = questRecord[144].GetCppString();
+    PortraitGiverText = questRecord[145].GetCppString();
+    PortraitTurnInName = questRecord[146].GetCppString();
+    PortraitTurnInText = questRecord[147].GetCppString();
 
     for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
         ReqCurrencyId[i] = questRecord[148 + i].GetUInt32();

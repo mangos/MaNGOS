@@ -190,6 +190,10 @@ struct QuestLocale
     std::vector<std::string> EndText;
     std::vector<std::string> CompletedText;
     std::vector< std::vector<std::string> > ObjectiveText;
+    std::vector<std::string> PortraitGiverName;
+    std::vector<std::string> PortraitGiverText;
+    std::vector<std::string> PortraitTurnInName;
+    std::vector<std::string> PortraitTurnInText;
 };
 
 // This Quest class provides a convenient way to access a few pretotaled (cached) quest details,
@@ -247,10 +251,10 @@ class Quest
         std::string GetRequestItemsText() const { return RequestItemsText; }
         std::string GetEndText() const { return EndText; }
         std::string GetCompletedText() const { return CompletedText; }
-        std::string GetPortraitGiverText() const { return PortraitGiverText; }
         std::string GetPortraitGiverName() const { return PortraitGiverName; }
-        std::string GetPortraitTurnInText() const { return PortraitTurnInText; }
+        std::string GetPortraitGiverText() const { return PortraitGiverText; }
         std::string GetPortraitTurnInName() const { return PortraitTurnInName; }
+        std::string GetPortraitTurnInText() const { return PortraitTurnInText; }
         int32  GetRewOrReqMoney() const;
         uint32 GetRewHonorAddition() const { return RewHonorAddition; }
         float GetRewHonorMultiplier() const { return RewHonorMultiplier; }
@@ -377,10 +381,10 @@ class Quest
         std::string RequestItemsText;
         std::string EndText;
         std::string CompletedText;
-        std::string PortraitGiverText;
         std::string PortraitGiverName;
-        std::string PortraitTurnInText;
+        std::string PortraitGiverText;
         std::string PortraitTurnInName;
+        std::string PortraitTurnInText;
         uint32 RewHonorAddition;
         float RewHonorMultiplier;
         int32  RewOrReqMoney;
