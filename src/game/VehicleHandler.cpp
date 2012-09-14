@@ -36,12 +36,31 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvPacket)
 
     recvPacket >> vehicleGuid.ReadAsPacked();
     recvPacket >> movementInfo;
+
+    TransportInfo* transportInfo = _player->GetTransportInfo();
+    if (!transportInfo || !transportInfo->IsOnVehicle())
+        return;
+
+    Unit* vehicle = (Unit*)transportInfo->GetTransport();
+
+    // Something went wrong
+    if (vehicleGuid != vehicle->GetObjectGuid())
+        return;
+
+    // Remove Vehicle Control Aura
+    vehicle->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE, _player->GetObjectGuid());
 }
 
 void WorldSession::HandleRequestVehicleExit(WorldPacket& recvPacket)
 {
     DEBUG_LOG("WORLD: Received CMSG_REQUEST_VEHICLE_EXIT");
     recvPacket.hexlike();
+
+    TransportInfo* transportInfo = _player->GetTransportInfo();
+    if (!transportInfo || !transportInfo->IsOnVehicle())
+        return;
+
+    ((Unit*)transportInfo->GetTransport())->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE, _player->GetObjectGuid());
 }
 
 void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket& recvPacket)

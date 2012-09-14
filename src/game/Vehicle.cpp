@@ -24,7 +24,7 @@
  * This file contains the code needed for CMaNGOS to support vehicles
  * Currently implemented
  * - TODO Board
- * - TODO Unboard
+ * - Unboard to unboard a passenger from the vehicle
  * - TODO Switch
  * - CanBoard to check if a passenger can board a vehicle
  * - Internal helper to set the controlling and spells for a vehicle's seat
@@ -89,7 +89,7 @@ void VehicleInfo::Board(Unit* passenger, uint8 seat)
 {
     MANGOS_ASSERT(passenger);
 
-    DEBUG_LOG("VehicleInfo::Board: Try to board passenger %s to seat %u", passenger->GetObjectGuid().GetString().c_str(), seat);
+    DEBUG_LOG("VehicleInfo::Board: Try to board passenger %s to seat %u", passenger->GetGuidStr().c_str(), seat);
 }
 
 /**
@@ -114,7 +114,42 @@ void VehicleInfo::UnBoard(Unit* passenger, bool changeVehicle)
 {
     MANGOS_ASSERT(passenger);
 
-    DEBUG_LOG("VehicleInfo::Unboard: passenger: %s", passenger->GetObjectGuid().GetString().c_str());
+    DEBUG_LOG("VehicleInfo::Unboard: passenger: %s", passenger->GetGuidStr().c_str());
+
+    PassengerMap::const_iterator itr = m_passengers.find(passenger);
+    MANGOS_ASSERT(itr != m_passengers.end());
+
+    VehicleSeatEntry const* seatEntry = GetSeatEntry(itr->second->GetTransportSeat());
+    MANGOS_ASSERT(seatEntry);
+
+    UnBoardPassenger(passenger);                            // Use TransportBase to remove the passenger from storage list
+
+    if (!changeVehicle)                                     // Send expected unboarding packages
+    {
+        // Update movementInfo
+        passenger->m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
+        passenger->m_movementInfo.ClearTransportData();
+
+        if (passenger->GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* pPlayer = (Player*)passenger;
+            pPlayer->ResummonPetTemporaryUnSummonedIfAny();
+
+            // SMSG_PET_DISMISS_SOUND (?)
+        }
+
+        if (passenger->IsRooted())
+            passenger->SetRoot(false);
+
+        Movement::MoveSplineInit init(*passenger);
+        // ToDo: Set proper unboard coordinates
+        init.MoveTo(m_owner->GetPositionX(), m_owner->GetPositionY(), m_owner->GetPositionZ());
+        init.SetExitVehicle();
+        init.Launch();
+    }
+
+    // Remove passenger modifications
+    RemoveSeatMods(passenger, seatEntry->m_flags);
 }
 
 /**
