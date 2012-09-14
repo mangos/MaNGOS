@@ -23,7 +23,7 @@
  * @file Vehicle.cpp
  * This file contains the code needed for CMaNGOS to support vehicles
  * Currently implemented
- * - TODO Board
+ * - Board to board a passenger onto a vehicle (includes checks)
  * - Unboard to unboard a passenger from the vehicle
  * - SwitchSeat to switch to another seat of the same vehicle
  * - CanBoard to check if a passenger can board a vehicle
@@ -90,6 +90,64 @@ void VehicleInfo::Board(Unit* passenger, uint8 seat)
     MANGOS_ASSERT(passenger);
 
     DEBUG_LOG("VehicleInfo::Board: Try to board passenger %s to seat %u", passenger->GetGuidStr().c_str(), seat);
+
+    // This check is also called in Spell::CheckCast()
+    if (!CanBoard(passenger))
+        return;
+
+    // Use the planned seat only if the seat is valid, possible to choose and empty
+    if (!IsSeatAvailableFor(passenger, seat))
+        if (!GetUsableSeatFor(passenger, seat))
+            return;
+
+    VehicleSeatEntry const* seatEntry = GetSeatEntry(seat);
+    MANGOS_ASSERT(seatEntry);
+
+    // ToDo: Unboard passenger from a MOTransport when they are properly implemented
+    /*if (TransportInfo* transportInfo = passenger->GetTransportInfo())
+    {
+        WorldObject* transporter = transportInfo->GetTransport();
+
+        // Must be a MO transporter
+        MANGOS_ASSERT(transporter->GetObjectGuid().IsMOTransport());
+
+        ((Transport*)transporter)->UnBoardPassenger(passenger);
+    }*/
+
+    DEBUG_LOG("VehicleInfo::Board: Board passenger: %s to seat %u", passenger->GetGuidStr().c_str(), seat);
+
+    // Calculate passengers local position
+    float lx, ly, lz, lo;
+    CalculateBoardingPositionOf(passenger->GetPositionX(), passenger->GetPositionY(), passenger->GetPositionZ(), passenger->GetOrientation(), lx, ly, lz, lo);
+
+    BoardPassenger(passenger, lx, ly, lz, lo, seat);        // Use TransportBase to store the passenger
+
+    // Set data for createobject packets
+    passenger->m_movementInfo.AddMovementFlag(MOVEFLAG_ONTRANSPORT);
+    passenger->m_movementInfo.SetTransportData(m_owner->GetObjectGuid(), lx, ly, lz, lo, 0, seat);
+
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
+    {
+        Player* pPlayer = (Player*)passenger;
+        pPlayer->RemovePet(PET_SAVE_AS_CURRENT);
+
+        WorldPacket data(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA);
+        pPlayer->GetSession()->SendPacket(&data);
+
+        // SMSG_BREAK_TARGET (?)
+    }
+
+    if (!passenger->IsRooted())
+        passenger->SetRoot(true);
+
+    Movement::MoveSplineInit init(*passenger);
+    init.MoveTo(0.0f, 0.0f, 0.0f);                          // ToDo: Set correct local coords
+    init.SetFacing(0.0f);                                   // local orientation ? ToDo: Set proper orientation!
+    init.SetBoardVehicle();
+    init.Launch();
+
+    // Apply passenger modifications
+    ApplySeatMods(passenger, seatEntry->m_flags);
 }
 
 /**
