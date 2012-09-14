@@ -1196,7 +1196,7 @@ void InitializeOpcodes()
     OPCODE(SMSG_CRITERIA_UPDATE,                         STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(CMSG_QUERY_INSPECT_ACHIEVEMENTS,              STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleQueryInspectAchievementsOpcode);
     OPCODE(SMSG_RESPOND_INSPECT_ACHIEVEMENTS,            STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_DISMISS_CONTROLLED_VEHICLE,              STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleDismissControlledVehicle  );
+    //OPCODE(CMSG_DISMISS_CONTROLLED_VEHICLE,              STATUS_LOGGEDIN, PROCESS_THREADSAFE, &WorldSession::HandleDismissControlledVehicle  );
     //OPCODE(CMSG_COMPLETE_ACHIEVEMENT_CHEAT,              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     OPCODE(SMSG_QUESTUPDATE_ADD_PVP_KILL,                STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_SET_CRITERIA_CHEAT,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
@@ -1205,10 +1205,10 @@ void InitializeOpcodes()
     //OPCODE(CMSG_CHAR_CUSTOMIZE,                          STATUS_AUTHED,   PROCESS_THREADUNSAFE, &WorldSession::HandleCharCustomizeOpcode       );
     //OPCODE(SMSG_CHAR_CUSTOMIZE,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_PET_RENAMEABLE,                          STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_REQUEST_VEHICLE_EXIT,                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    //OPCODE(CMSG_REQUEST_VEHICLE_EXIT,                    STATUS_LOGGEDIN, PROCESS_THREADSAFE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_REQUEST_VEHICLE_PREV_SEAT,               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_REQUEST_VEHICLE_NEXT_SEAT,               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    //OPCODE(CMSG_REQUEST_VEHICLE_SWITCH_SEAT,             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    //OPCODE(CMSG_REQUEST_VEHICLE_SWITCH_SEAT,             STATUS_LOGGEDIN, PROCESS_THREADSAFE,      &WorldSession::Handle_NULL                     );
     OPCODE(CMSG_PET_LEARN_TALENT,                        STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePetLearnTalent            );
     //OPCODE(CMSG_PET_UNLEARN_TALENTS,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     OPCODE(SMSG_SET_PHASE_SHIFT,                         STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
@@ -1242,7 +1242,7 @@ void InitializeOpcodes()
     OPCODE(SMSG_SERVER_FIRST_ACHIEVEMENT,                STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_PET_LEARNED_SPELL,                       STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_PET_REMOVED_SPELL,                       STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE,      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    //OPCODE(CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE,      STATUS_LOGGEDIN, PROCESS_THREADSAFE,       &WorldSession::Handle_NULL                     );
     //OPCODE(CMSG_HEARTH_AND_RESURRECT,                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleHearthandResurrect        );
     //OPCODE(SMSG_ON_CANCEL_EXPECTED_RIDE_VEHICLE_AURA,    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_CRITERIA_DELETED,                        STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );

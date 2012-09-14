@@ -26,20 +26,48 @@
 #include "Vehicle.h"
 #include "ObjectMgr.h"
 
-void WorldSession::HandleDismissControlledVehicle(WorldPacket& recv_data)
+void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvPacket)
 {
-    DEBUG_LOG("WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
-    recv_data.hexlike();
+    DEBUG_LOG("WORLD: Received CMSG_DISMISS_CONTROLLED_VEHICLE");
+    recvPacket.hexlike();
 
-    ObjectGuid guid;
-    MovementInfo mi;
+    ObjectGuid vehicleGuid;
+    MovementInfo movementInfo;                              // Not used at the moment
 
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> mi;
+    recvPacket >> vehicleGuid.ReadAsPacked();
+    recvPacket >> movementInfo;
+}
 
-    ObjectGuid vehicleGUID = _player->GetCharmGuid();
-    if (!vehicleGUID)                                       // something wrong here...
-        return;
+void WorldSession::HandleRequestVehicleExit(WorldPacket& recvPacket)
+{
+    DEBUG_LOG("WORLD: Received CMSG_REQUEST_VEHICLE_EXIT");
+    recvPacket.hexlike();
+}
 
-    _player->m_movementInfo = mi;
+void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket& recvPacket)
+{
+    DEBUG_LOG("WORLD: Received CMSG_REQUEST_VEHICLE_SWITCH_SEAT");
+    recvPacket.hexlike();
+
+    ObjectGuid vehicleGuid;
+    uint8 seat;
+
+    recvPacket >> vehicleGuid.ReadAsPacked();
+    recvPacket >> seat;
+}
+
+void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvPacket)
+{
+    DEBUG_LOG("WORLD: Received CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE");
+    recvPacket.hexlike();
+
+    ObjectGuid srcVehicleGuid;
+    MovementInfo movementInfo;
+    ObjectGuid destVehicleGuid;
+    uint8 seat;
+
+    recvPacket >> srcVehicleGuid.ReadAsPacked();
+    recvPacket >> movementInfo;                             // Not used at the moment
+    recvPacket >> destVehicleGuid.ReadAsPacked();
+    recvPacket >> seat;
 }
