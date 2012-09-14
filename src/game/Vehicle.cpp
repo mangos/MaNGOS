@@ -25,7 +25,7 @@
  * Currently implemented
  * - TODO Board
  * - Unboard to unboard a passenger from the vehicle
- * - TODO Switch
+ * - SwitchSeat to switch to another seat of the same vehicle
  * - CanBoard to check if a passenger can board a vehicle
  * - Internal helper to set the controlling and spells for a vehicle's seat
  * - Internal helper to control the available seats of a vehicle
@@ -93,7 +93,7 @@ void VehicleInfo::Board(Unit* passenger, uint8 seat)
 }
 
 /**
- * This function will switch the seat of a passenger
+ * This function will switch the seat of a passenger on the same vehicle
  *
  * @param passenger MUST be provided. This Unit will change its seat on the vehicle
  * @param seat      Seat to which the passenger will be switched
@@ -101,6 +101,50 @@ void VehicleInfo::Board(Unit* passenger, uint8 seat)
 void VehicleInfo::SwitchSeat(Unit* passenger, uint8 seat)
 {
     MANGOS_ASSERT(passenger);
+
+    DEBUG_LOG("VehicleInfo::SwitchSeat: passenger: %s try to switch to seat %u", passenger->GetGuidStr().c_str(), seat);
+
+    // Switching seats is not possible
+    if (m_vehicleEntry->m_flags & VEHICLE_FLAG_DISABLE_SWITCH)
+        return;
+
+    PassengerMap::const_iterator itr = m_passengers.find(passenger);
+    MANGOS_ASSERT(itr != m_passengers.end());
+
+    // We are already boarded to this seat
+    if (itr->second->GetTransportSeat() == seat)
+        return;
+
+    // Check if it's a valid seat
+    if (!IsSeatAvailableFor(passenger, seat))
+        return;
+
+    VehicleSeatEntry const* seatEntry = GetSeatEntry(itr->second->GetTransportSeat());
+    MANGOS_ASSERT(seatEntry);
+
+    // Switching seats is only allowed if this flag is set
+    if (~seatEntry->m_flags & SEAT_FLAG_CAN_SWITCH)
+        return;
+
+    // Remove passenger modifications of the old seat
+    RemoveSeatMods(passenger, seatEntry->m_flags);
+
+    // Set to new seat
+    itr->second->SetTransportSeat(seat);
+
+    Movement::MoveSplineInit init(*passenger);
+    init.MoveTo(0.0f, 0.0f, 0.0f);                          // ToDo: Set correct local coords
+    //if (oldorientation != neworientation) (?)
+    //init.SetFacing(0.0f);                                 // local orientation ? ToDo: Set proper orientation!
+    // It seems that Seat switching is sent without SplineFlag BoardVehicle
+    init.Launch();
+
+    // Get seatEntry of new seat
+    seatEntry = GetSeatEntry(seat);
+    MANGOS_ASSERT(seatEntry);
+
+    // Apply passenger modifications of the new seat
+    ApplySeatMods(passenger, seatEntry->m_flags);
 }
 
 /**

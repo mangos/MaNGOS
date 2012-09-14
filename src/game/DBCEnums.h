@@ -562,6 +562,7 @@ enum VehicleFlags
     VEHICLE_FLAG_CUSTOM_PITCH       = 0x00000040,           // If set use pitchMin and pitchMax from DBC, otherwise pitchMin = -pi/2, pitchMax = pi/2
     VEHICLE_FLAG_ADJUST_AIM_ANGLE   = 0x00000400,           // Lua_IsVehicleAimAngleAdjustable
     VEHICLE_FLAG_ADJUST_AIM_POWER   = 0x00000800,           // Lua_IsVehicleAimPowerAdjustable
+    VEHICLE_FLAG_DISABLE_SWITCH     = 0x00400000,           // Can't change seats, VEHICLE_ID = 335 chopper
 };
 
 enum VehicleSeatFlags

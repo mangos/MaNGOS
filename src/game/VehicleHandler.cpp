@@ -73,6 +73,18 @@ void WorldSession::HandleRequestVehicleSwitchSeat(WorldPacket& recvPacket)
 
     recvPacket >> vehicleGuid.ReadAsPacked();
     recvPacket >> seat;
+
+    TransportInfo* transportInfo = _player->GetTransportInfo();
+    if (!transportInfo || !transportInfo->IsOnVehicle())
+        return;
+
+    Unit* vehicle = (Unit*)transportInfo->GetTransport();
+
+    // Something went wrong
+    if (vehicleGuid != vehicle->GetObjectGuid())
+        return;
+
+    vehicle->GetVehicleInfo()->SwitchSeat(_player, seat);
 }
 
 void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvPacket)
@@ -89,4 +101,33 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvPacket)
     recvPacket >> movementInfo;                             // Not used at the moment
     recvPacket >> destVehicleGuid.ReadAsPacked();
     recvPacket >> seat;
+
+    TransportInfo* transportInfo = _player->GetTransportInfo();
+    if (!transportInfo || !transportInfo->IsOnVehicle())
+        return;
+
+    Unit* srcVehicle = (Unit*)transportInfo->GetTransport();
+
+    // Something went wrong
+    if (srcVehicleGuid != srcVehicle->GetObjectGuid())
+        return;
+
+    if (srcVehicleGuid != destVehicleGuid)
+    {
+        Unit* destVehicle = _player->GetMap()->GetUnit(destVehicleGuid);
+
+        if (!destVehicle || !destVehicle->IsVehicle())
+            return;
+
+        // Change vehicle is not possible
+        if (destVehicle->GetVehicleInfo()->GetVehicleEntry()->m_flags & VEHICLE_FLAG_DISABLE_SWITCH)
+            return;
+
+        SpellClickInfoMapBounds clickPair = sObjectMgr.GetSpellClickInfoMapBounds(destVehicle->GetEntry());
+        for (SpellClickInfoMap::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
+            if (itr->second.IsFitToRequirements(_player))
+                _player->CastSpell(destVehicle, itr->second.spellId, true);
+    }
+    else
+        srcVehicle->GetVehicleInfo()->SwitchSeat(_player, seat);
 }
