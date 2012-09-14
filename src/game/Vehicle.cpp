@@ -268,6 +268,10 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
     if (passenger == m_owner)
         return false;
 
+    // Passenger is already on this vehicle (in this case switching seats is required)
+    if (passenger->IsBoarded() && passenger->GetTransportInfo()->GetTransport() == m_owner)
+        return false;
+
     // Prevent circular boarding m_owner must not be boarded on passenger
     WorldObject* lastVehicle = m_owner;
     while (lastVehicle->IsBoarded() && lastVehicle->GetTransportInfo()->IsOnVehicle())

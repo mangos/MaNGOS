@@ -11584,7 +11584,9 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
         m_movesplineTimer.Reset(POSITION_UPDATE_DELAY);
         Movement::Location loc = movespline->ComputePosition();
 
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (IsBoarded())
+            GetTransportInfo()->SetLocalPosition(loc.x, loc.y, loc.z, loc.orientation);
+        else if (GetTypeId() == TYPEID_PLAYER)
             ((Player*)this)->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
         else
             GetMap()->CreatureRelocation((Creature*)this, loc.x, loc.y, loc.z, loc.orientation);
