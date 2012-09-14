@@ -184,15 +184,12 @@ inline bool IsPeriodicRegenerateEffect(SpellEntry const* spellInfo, SpellEffectI
 
 bool IsCastEndProcModifierAura(SpellEntry const* spellInfo, SpellEffectIndex effecIdx, SpellEntry const* procSpell);
 
-inline bool IsSpellHaveAura(SpellEntry const* spellInfo, AuraType aura)
+inline bool IsSpellHaveAura(SpellEntry const* spellInfo, AuraType aura, uint32 effectMask = (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2))
 {
-    for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
-    {
-        if(SpellEffectEntry const* effectEntry = spellInfo->GetSpellEffect(SpellEffectIndex(i)))
-            if(AuraType(effectEntry->EffectApplyAuraName)==aura)
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        if (effectMask & (1 << i))
+            if (AuraType(spellInfo->EffectApplyAuraName[i]) == aura)
                 return true;
-    }
-
     return false;
 }
 
