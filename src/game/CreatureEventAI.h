@@ -33,7 +33,7 @@ class WorldObject;
 
 enum EventAI_Type
 {
-    EVENT_T_TIMER                   = 0,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
+    EVENT_T_TIMER_IN_COMBAT         = 0,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_TIMER_OOC               = 1,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_HP                      = 2,                    // HPMax%, HPMin%, RepeatMin, RepeatMax
     EVENT_T_MANA                    = 3,                    // ManaMax%,ManaMin% RepeatMin, RepeatMax
@@ -62,6 +62,7 @@ enum EventAI_Type
     EVENT_T_SUMMONED_JUST_DESPAWN   = 26,                   // CreatureId, RepeatMin, RepeatMax
     EVENT_T_MISSING_AURA            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
+    EVENT_T_TIMER_GENERIC                   = 29,                   // InitialMin, InitialMax, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -419,8 +420,9 @@ struct CreatureEventAI_Event
 
     union
     {
-        // EVENT_T_TIMER                                    = 0
+        // EVENT_T_TIMER_IN_COMBAT                          = 0
         // EVENT_T_TIMER_OOC                                = 1
+        // EVENT_T_TIMER_GENERIC                                    = 29
         struct
         {
             uint32 initialMin;

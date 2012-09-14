@@ -64,7 +64,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 
 #    Internal Name                 Event Param Usage (Param1, Param2, Param3, Param4)      Description
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-0    EVENT_T_TIMER                 InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY IN COMBAT.
+0    EVENT_T_TIMER_IN_COMBAT       InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY IN COMBAT.
 1    EVENT_T_TIMER_OOC             InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4),  EXPIRES ONLY OUT OF COMBAT BUT NOT DURING EVADE.
 2    EVENT_T_HP                    HPMax%, HPMin%, RepeatMin, RepeatMax                    Expires when the NPC's HP% is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4) If Event Conditions Are Still Met.
 3    EVENT_T_MANA                  ManaMax%, ManaMin%, RepeatMin, RepeatMax                Expires when the NPC's Mana% is between (Param1) and (Param2). Will repeat between every (Param3) and (Param4) If Event Conditions Are Still Met.
@@ -91,6 +91,7 @@ Some events such as EVENT_T_AGGRO, EVENT_T_DEATH, EVENT_T_SPAWNED, and EVENT_T_E
 26   EVENT_T_SUMMONED_JUST_DESPAWN CreatureId, RepeatMin, RepeatMax                        Expires before creature with entry = (Param1) is despawn (Param1 = 0 means all spawns). Will repeat every (Param2) and (Param3).
 27   EVENT_T_MISSING_AURA          SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a creature not has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
 28   EVENT_T_TARGET_MISSING_AURA   SpellID, AmmountInStack, RepeatMin, RepeatMax           Expires when a target unit not has spell (Param1) auras applied in a stack greater or equal to value provided in (Param2). Will repeat every (Param3) and (Param4).
+29   EVENT_T_TIMER_GENERIC         InitialMin, InitialMax, RepeatMin, RepeatMax            Expires at first between (Param1) and (Param2) and then will repeat between every (Param3) and (Param4).
 
 =========================================
 Action Types
@@ -162,7 +163,7 @@ BOTH - This event can trigger both in and out of combat.
 Events that do not have lables on them are events that are directly involved with the in and out of combat state.
 
 ------------------
-0 = EVENT_T_TIMER:
+0 = EVENT_T_TIMER_IN_COMBAT:
 ------------------
 Parameter 1: InitialMin - Minumum Time used to calculate Random Initial Expire
 Parameter 2: InitialMax - Maximum Time used to calculate Random Initial Expire
@@ -180,7 +181,7 @@ Parameter 2: InitialMax - Maximum Time used to calculate Random Initial Event Ex
 Parameter 3: RepeatMin - Minimum Time used to calculate Random Repeat Event Expire
 Parameter 4: RepeatMax - Maximum Time used to calculate Random Repeat Event Expire
 
-OUT OF COMBAT ONLY - Expires first between (Param1) and (Param2) and then between every (Param3) and (Param4) from then on.
+OUT OF COMBAT ONLY (Not while evading) - Expires first between (Param1) and (Param2) and then between every (Param3) and (Param4) from then on.
 This is commonly used for events that occur and repeat outside of combat like random NPC Say or Random Emotes.
 
 ---------------
@@ -428,6 +429,23 @@ Parameter 2: Amount -  This is the amount or less of SpellID's auras at creature
 Parameter 3: RepeatMin - Minimum Time used to calculate Random Repeat Expire
 Parameter 4: RepeatMax - Maximum Time used to calculate Random Repeat Expire
 
+---------------------------------
+28 = EVENT_T_TARGET_MISSING_AURA:
+---------------------------------
+Parameter 1: SpellId - This is the SpellID That the Aura Check will look for to be missing
+Parameter 2: Amount -  This is the amount or less of SpellID's auras at creature required for event expire.
+Parameter 3: RepeatMin - Minimum Time used to calculate Random Repeat Expire
+Parameter 4: RepeatMax - Maximum Time used to calculate Random Repeat Expire
+
+---------------------------
+29 = EVENT_T_TIMER_GENERIC:
+---------------------------
+Parameter 1: InitialMin - Minumum Time used to calculate Random Initial Expire
+Parameter 2: InitialMax - Maximum Time used to calculate Random Initial Expire
+Parameter 3: RepeatMin - Minimum Time used to calculate Random Repeat Expire
+Parameter 4: RepeatMax - Maximum Time used to calculate Random Repeat Expire
+
+IN COMBAT and OUT OF COMBAT - Expires first between (Param1) and (Param2) and then between every (Param3) and (Param4) from then on.
 
 
 =========================================
