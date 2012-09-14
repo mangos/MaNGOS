@@ -287,6 +287,38 @@ void VehicleInfo::ApplySeatMods(Unit* passenger, uint32 seatFlags)
 /// Remove control and such modifiers to a passenger if they were added
 void VehicleInfo::RemoveSeatMods(Unit* passenger, uint32 seatFlags)
 {
+    Unit* pVehicle = (Unit*)m_owner;
+
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
+    {
+        Player* pPlayer = (Player*)passenger;
+
+        if (seatFlags & SEAT_FLAG_CAN_CONTROL)
+        {
+            pPlayer->SetCharm(NULL);
+            pVehicle->SetCharmerGuid(ObjectGuid());
+
+            pPlayer->SetClientControl(pVehicle, 0);
+            pPlayer->SetMover(NULL);
+
+            pVehicle->clearUnitState(UNIT_STAT_CONTROLLED);
+            pVehicle->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+            // must be called after movement control unapplying
+            pPlayer->GetCamera().ResetView();
+        }
+
+        if (seatFlags & (SEAT_FLAG_USABLE | SEAT_FLAG_CAN_CAST))
+            pPlayer->RemovePetActionBar();
+    }
+    else if (passenger->GetTypeId() == TYPEID_UNIT)
+    {
+        if (seatFlags & SEAT_FLAG_CAN_CONTROL)
+        {
+            passenger->SetCharm(NULL);
+            pVehicle->SetCharmerGuid(ObjectGuid());
+        }
+    }
 }
 
 /*! @} */
