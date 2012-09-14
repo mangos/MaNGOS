@@ -152,7 +152,7 @@ void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, floa
     NormalizeRotatedPosition(gx - m_owner->GetPositionX(), gy - m_owner->GetPositionY(), lx, ly);
 
     lz = gz - m_owner->GetPositionZ();
-    lo = MapManager::NormalizeOrientation(go - m_owner->GetOrientation());
+    lo = NormalizeOrientation(go - m_owner->GetOrientation());
 }
 
 /* ************************************************************************************************
