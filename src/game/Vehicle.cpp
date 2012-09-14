@@ -27,6 +27,7 @@
  * - TODO Unboard
  * - TODO Switch
  * - CanBoard to check if a passenger can board a vehicle
+ * - Internal helper to set the controlling and spells for a vehicle's seat
  * - Internal helper to control the available seats of a vehicle
  */
 
@@ -231,6 +232,56 @@ bool VehicleInfo:: IsUsableSeatForPlayer(uint32 seatFlags) const
 /// Add control and such modifiers to a passenger if required
 void VehicleInfo::ApplySeatMods(Unit* passenger, uint32 seatFlags)
 {
+    Unit* pVehicle = (Unit*)m_owner;                        // Vehicles are alawys Unit
+
+    if (passenger->GetTypeId() == TYPEID_PLAYER)
+    {
+        Player* pPlayer = (Player*)passenger;
+
+        if (seatFlags & SEAT_FLAG_CAN_CONTROL)
+        {
+            pPlayer->GetCamera().SetView(pVehicle);
+
+            pPlayer->SetCharm(pVehicle);
+            pVehicle->SetCharmerGuid(pPlayer->GetObjectGuid());
+
+            pVehicle->addUnitState(UNIT_STAT_CONTROLLED);
+            pVehicle->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
+            pPlayer->SetClientControl(pVehicle, 1);
+            pPlayer->SetMover(pVehicle);
+
+            // Unconfirmed - default speed handling
+            if (pVehicle->GetTypeId() == TYPEID_UNIT)
+            {
+                if (!pPlayer->IsWalking() && pVehicle->IsWalking())
+                {
+                    ((Creature*)pVehicle)->SetWalk(false);
+                }
+                else if (pPlayer->IsWalking() && !pVehicle->IsWalking())
+                {
+                    ((Creature*)pVehicle)->SetWalk(true);
+                }
+            }
+        }
+
+        if (seatFlags & (SEAT_FLAG_USABLE | SEAT_FLAG_CAN_CAST))
+        {
+            CharmInfo* charmInfo = pVehicle->InitCharmInfo(pVehicle);
+            // ToDo: Send vehicle actionbar spells
+            charmInfo->InitEmptyActionBar();
+
+            pPlayer->PossessSpellInitialize();
+        }
+    }
+    else if (passenger->GetTypeId() == TYPEID_UNIT)
+    {
+        if (seatFlags & SEAT_FLAG_CAN_CONTROL)
+        {
+            passenger->SetCharm(pVehicle);
+            pVehicle->SetCharmerGuid(passenger->GetObjectGuid());
+        }
+    }
 }
 
 /// Remove control and such modifiers to a passenger if they were added
