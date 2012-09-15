@@ -4419,7 +4419,7 @@ void ObjectMgr::LoadQuestLocales()
                           "Title_loc5,Details_loc5,Objectives_loc5,OfferRewardText_loc5,RequestItemsText_loc5,EndText_loc5,CompletedText_loc5,ObjectiveText1_loc5,ObjectiveText2_loc5,ObjectiveText3_loc5,ObjectiveText4_loc5,PortraitGiverName_loc5,PortraitGiverText_loc5,PortraitTurnInName_loc5,PortraitTurnInText_loc5,"
                           "Title_loc6,Details_loc6,Objectives_loc6,OfferRewardText_loc6,RequestItemsText_loc6,EndText_loc6,CompletedText_loc6,ObjectiveText1_loc6,ObjectiveText2_loc6,ObjectiveText3_loc6,ObjectiveText4_loc6,PortraitGiverName_loc6,PortraitGiverText_loc6,PortraitTurnInName_loc6,PortraitTurnInText_loc6,"
                           "Title_loc7,Details_loc7,Objectives_loc7,OfferRewardText_loc7,RequestItemsText_loc7,EndText_loc7,CompletedText_loc7,ObjectiveText1_loc7,ObjectiveText2_loc7,ObjectiveText3_loc7,ObjectiveText4_loc7,PortraitGiverName_loc7,PortraitGiverText_loc7,PortraitTurnInName_loc7,PortraitTurnInText_loc7,"
-                          "Title_loc8,Details_loc8,Objectives_loc8,OfferRewardText_loc8,RequestItemsText_loc8,EndText_loc8,CompletedText_loc8,ObjectiveText1_loc8,ObjectiveText2_loc8,ObjectiveText3_loc8,ObjectiveText4_loc8,PortraitGiverName_loc8,PortraitGiverText_loc8,PortraitTurnInName_loc8,PortraitTurnInText_loc8,"
+                          "Title_loc8,Details_loc8,Objectives_loc8,OfferRewardText_loc8,RequestItemsText_loc8,EndText_loc8,CompletedText_loc8,ObjectiveText1_loc8,ObjectiveText2_loc8,ObjectiveText3_loc8,ObjectiveText4_loc8,PortraitGiverName_loc8,PortraitGiverText_loc8,PortraitTurnInName_loc8,PortraitTurnInText_loc8"
                           " FROM locales_quest"
                                              );
 
