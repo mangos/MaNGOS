@@ -1129,7 +1129,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::list<Aura*> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32 /*playerGuidLow*/> ComboPointHolderSet;
-        typedef std::map<uint8 /*slot*/, uint32 /*spellId*/> VisibleAuraMap;
+        typedef std::map<uint8 /*slot*/, SpellAuraHolder* /*spellId*/> VisibleAuraMap;
         typedef std::map<SpellEntry const*, ObjectGuid /*targetGuid*/> TrackedAuraTargetMap;
 
         virtual ~Unit();
