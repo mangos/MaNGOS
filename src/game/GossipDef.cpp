@@ -411,7 +411,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid = %s", npcGUID.GetString().c_str());
 }
 
-void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID)
+void PlayerMenu::SendQuestGiverStatus(uint32 questStatus, ObjectGuid npcGUID)
 {
     WorldPacket data(SMSG_QUESTGIVER_STATUS, 12);
     data << npcGUID;
