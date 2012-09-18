@@ -5581,6 +5581,15 @@ bool ChatHandler::HandleQuestCompleteCommand(char* args)
     if (ReqOrRewMoney < 0)
         player->ModifyMoney(-ReqOrRewMoney);
 
+    for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+    {
+        if (pQuest->ReqCurrencyId[i])
+            player->ModifyCurrencyCount(pQuest->ReqCurrencyId[i], int32(pQuest->ReqCurrencyCount[i] * GetCurrencyPrecision(pQuest->ReqCurrencyId[i])));
+    }
+
+    if (uint32 spell = pQuest->GetReqSpellLearned())
+        player->learnSpell(spell, false);
+
     player->CompleteQuest(entry);
     return true;
 }

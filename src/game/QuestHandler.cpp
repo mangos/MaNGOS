@@ -413,7 +413,7 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recv_data)
         }
         else
         {
-            if (pQuest->GetReqItemsCount())                 // some items required
+            if (pQuest->GetReqItemsCount() || pQuest->GetReqCurrencyCount())    // some items or currency required
                 _player->PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, _player->CanRewardQuest(pQuest, false), false);
             else                                            // no items required
                 _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);

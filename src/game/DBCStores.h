@@ -100,6 +100,8 @@ PvPDifficultyEntry const* GetBattlegroundBracketById(uint32 mapid, BattleGroundB
 
 MANGOS_DLL_SPEC uint32 GetCreatureModelRace(uint32 model_id);
 
+float GetCurrencyPrecision(uint32 currencyId);
+
 extern DBCStorage <AchievementEntry>             sAchievementStore;
 extern DBCStorage <AchievementCriteriaEntry>     sAchievementCriteriaStore;
 extern DBCStorage <AreaTableEntry>               sAreaStore;// recommend access using functions

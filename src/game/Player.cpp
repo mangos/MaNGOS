@@ -3409,6 +3409,9 @@ void Player::learnSpell(uint32 spell_id, bool dependent)
                 learnSpell(i->second, false);
         }
     }
+
+    if (IsInWorld())
+        SpellAddedQuestCheck(spell_id);
 }
 
 void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bool sendUpdate)
@@ -3630,6 +3633,9 @@ void Player::removeSpell(uint32 spell_id, bool disabled, bool learn_low_rank, bo
         data << uint32(spell_id);
         GetSession()->SendPacket(&data);
     }
+
+    if (IsInWorld())
+        SpellRemovedQuestCheck(spell_id);
 }
 
 void Player::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
@@ -5436,23 +5442,19 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
     uint16 value = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
     uint16 max = GetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset);
 
-    if ((!max) || (!value) || (value >= max))
+    if (!max || !value || value >= max)
         return false;
 
-    if (value * 512 < max * urand(0, 512))
-    {
-        uint32 new_value = value + step;
-        if (new_value > max)
-            new_value = max;
+    uint32 new_value = value + step;
+    if (new_value > max)
+        new_value = max;
 
-        SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, new_value);
-        if (itr->second.uState != SKILL_NEW)
-            itr->second.uState = SKILL_CHANGED;
-        GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skill_id);
-        return true;
-    }
+    SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, new_value);
+    if (itr->second.uState != SKILL_NEW)
+        itr->second.uState = SKILL_CHANGED;
+    GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, skill_id);
 
-    return false;
+    return true;
 }
 
 inline int SkillGainChance(uint32 SkillValue, uint32 GrayLevel, uint32 GreenLevel, uint32 YellowLevel)
@@ -13382,7 +13384,7 @@ bool Player::CanCompleteQuest(uint32 quest_id) const
     if (qInfo->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))
     {
         // a few checks, not all "satisfy" is needed
-        if (SatisfyQuestPreviousQuest(qInfo, false) && SatisfyQuestLevel(qInfo, false) &&
+        if (SatisfyQuestPreviousQuest(qInfo, false) && SatisfyQuestLevel(qInfo, false) && SatisfyQuestSpell(qInfo, false) &&
                 SatisfyQuestSkill(qInfo, false) && SatisfyQuestRace(qInfo, false) && SatisfyQuestClass(qInfo, false))
             return true;
 
@@ -13404,6 +13406,12 @@ bool Player::CanCompleteQuest(uint32 quest_id) const
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
             if (qInfo->ReqItemCount[i] != 0 && q_status.m_itemcount[i] < qInfo->ReqItemCount[i])
+                return false;
+        }
+
+        for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        {
+            if (qInfo->ReqCurrencyId[i] && !HasCurrencyCount(qInfo->ReqCurrencyId[i], int32(qInfo->ReqCurrencyCount[i] * GetCurrencyPrecision(qInfo->ReqCurrencyId[i]))))
                 return false;
         }
     }
@@ -13436,7 +13444,9 @@ bool Player::CanCompleteQuest(uint32 quest_id) const
     if (repFacId && GetReputationMgr().GetReputation(repFacId) < qInfo->GetRepObjectiveValue())
         return false;
 
-    // FIXME: check req currencies
+    if (uint32 spell = qInfo->GetReqSpellLearned())
+        if (!HasSpell(spell))
+            return false;
 
     return true;
 }
@@ -13450,9 +13460,17 @@ bool Player::CanCompleteRepeatableQuest(Quest const* pQuest) const
         return false;
 
     if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER))
+    {
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
             if (pQuest->ReqItemId[i] && pQuest->ReqItemCount[i] && !HasItemCount(pQuest->ReqItemId[i], pQuest->ReqItemCount[i]))
                 return false;
+
+        for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        {
+            if (pQuest->ReqCurrencyId[i] && !HasCurrencyCount(pQuest->ReqCurrencyId[i], int32(pQuest->ReqCurrencyCount[i] * GetCurrencyPrecision(pQuest->ReqCurrencyId[i]))))
+                return false;
+        }
+    }
 
     if (!CanRewardQuest(pQuest, false))
         return false;
@@ -13474,9 +13492,9 @@ bool Player::CanRewardQuest(Quest const* pQuest, bool msg) const
     if (GetQuestRewardStatus(pQuest->GetQuestId()))
         return false;
 
-    // prevent receive reward with quest items in bank
     if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER))
     {
+        // prevent receive reward with quest items in bank
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
             if (pQuest->ReqItemCount[i] != 0 &&
@@ -13488,13 +13506,28 @@ bool Player::CanRewardQuest(Quest const* pQuest, bool msg) const
                 return false;
             }
         }
+
+        // prevent receive reward with low currency
+        for (int i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+        {
+            if (pQuest->ReqCurrencyId[i] &&
+                    !HasCurrencyCount(pQuest->ReqCurrencyId[i], int32(pQuest->ReqCurrencyCount[i] * GetCurrencyPrecision(pQuest->ReqCurrencyId[i]))))
+            {
+                if (msg)
+                    SendEquipError(EQUIP_ERR_VENDOR_MISSING_TURNINS, NULL);
+
+                return false;
+            }
+        }
     }
 
     // prevent receive reward with low money and GetRewOrReqMoney() < 0
     if (pQuest->GetRewOrReqMoney() < 0 && GetMoney() < uint32(-pQuest->GetRewOrReqMoney()))
         return false;
 
-    // FIXME: check currencies max count ?
+    if (uint32 spell = pQuest->GetReqSpellLearned())
+        if (!HasSpell(spell))
+            return false;
 
     return true;
 }
@@ -13711,7 +13744,12 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
         }
     }
 
-    // FIXME: take currency
+    // take currency
+    for (uint32 i = 0; i < QUEST_REQUIRED_CURRENCY_COUNT; ++i)
+    {
+        if (pQuest->ReqCurrencyId[i])
+            ModifyCurrencyCount(pQuest->ReqCurrencyId[i], -int32(pQuest->ReqCurrencyCount[i] * GetCurrencyPrecision(pQuest->ReqCurrencyId[i])));
+    }
 
     RemoveTimedQuest(quest_id);
 
@@ -13787,7 +13825,16 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, Object* questGiver,
     if (pQuest->GetRewOrReqMoney() < 0)
         ModifyMoney(pQuest->GetRewOrReqMoney());
 
-    // FIXME: reward currency
+    // reward currency
+    for (uint32 i = 0; i < QUEST_REWARD_CURRENCY_COUNT; ++i)
+    {
+        if (pQuest->RewCurrencyId[i])
+            ModifyCurrencyCount(pQuest->RewCurrencyId[i], int32(pQuest->RewCurrencyCount[i] * GetCurrencyPrecision(pQuest->RewCurrencyId[i])));
+    }
+
+    // reward skill
+    if (uint32 skill = pQuest->GetRewSkill())
+        UpdateSkill(skill, pQuest->GetRewSkillValue());
 
     // title reward
     if (pQuest->GetCharTitleId())
@@ -13926,6 +13973,26 @@ bool Player::SatisfyQuestSkill(Quest const* qInfo, bool msg) const
     {
         if (msg)
             SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool Player::SatisfyQuestSpell(Quest const* qInfo, bool msg) const
+{
+    uint32 spell = qInfo->GetReqSpellLearned();
+
+    // skip 0 case ReqSpellLearned
+    if (spell == 0)
+        return true;
+
+    // check spell
+    if (!HasSpell(spell))
+    {
+        if (msg)
+            SendCanTakeQuestResponse(INVALIDREASON_QUEST_FAILED_SPELL);
 
         return false;
     }
@@ -14489,6 +14556,58 @@ void Player::GroupEventHappens(uint32 questId, WorldObject const* pEventObject)
         AreaExploredOrEventHappens(questId);
 }
 
+void Player::CurrencyAddedQuestCheck(uint32 entry)
+{
+    for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == 0)
+            continue;
+
+        QuestStatusData& q_status = mQuestStatus[questid];
+
+        if (q_status.m_status != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
+        if (!qInfo || !qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER))
+            continue;
+
+        for (int j = 0; j < QUEST_REQUIRED_CURRENCY_COUNT; ++j)
+        {
+            uint32 reqcurrency = qInfo->ReqCurrencyId[j];
+            if (reqcurrency == entry)
+            {
+                if (CanCompleteQuest(questid))
+                    CompleteQuest(questid);
+            }
+        }
+    }
+}
+
+void Player::CurrencyRemovedQuestCheck(uint32 entry)
+{
+    for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+        Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
+        if (!qInfo || !qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER))
+            continue;
+
+        for (int j = 0; j < QUEST_REQUIRED_CURRENCY_COUNT; ++j)
+        {
+            uint32 reqcurrency = qInfo->ReqCurrencyId[j];
+            if (reqcurrency == entry)
+            {
+                if (!HasCurrencyCount(entry, int32(qInfo->ReqCurrencyCount[j] * GetCurrencyPrecision(entry))))
+                    IncompleteQuest(questid);
+            }
+        }
+    }
+}
+
 void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
 {
     for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -14568,6 +14687,58 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
         }
     }
     UpdateForQuestWorldObjects();
+}
+
+void Player::SpellAddedQuestCheck(uint32 entry)
+{
+    for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (questid == 0)
+            continue;
+
+        QuestStatusData& q_status = mQuestStatus[questid];
+
+        if (q_status.m_status != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
+        if (!qInfo)
+            continue;
+
+        uint32 reqspelllearned = qInfo->GetReqSpellLearned();
+        if (!reqspelllearned)
+            continue;
+
+        if (reqspelllearned == entry)
+        {
+            if (CanCompleteQuest(questid))
+                CompleteQuest(questid);
+        }
+    }
+}
+
+void Player::SpellRemovedQuestCheck(uint32 entry)
+{
+    for (int i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    {
+        uint32 questid = GetQuestSlotQuestId(i);
+        if (!questid)
+            continue;
+        Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
+        if (!qInfo)
+            continue;
+
+        uint32 reqspelllearned = qInfo->GetReqSpellLearned();
+        if (!reqspelllearned)
+            continue;
+
+        if (reqspelllearned == entry)
+        {
+            if (!HasSpell(entry))
+                IncompleteQuest(questid);
+        }
+    }
 }
 
 void Player::KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid)
@@ -23451,6 +23622,11 @@ void Player::ModifyCurrencyCount(uint32 id, int32 count, bool modifyWeek, bool m
             // init currency week limit for new currencies
             if (initWeek)
                 SendCurrencyWeekCap(currency);
+
+            if (diff > 0)
+                CurrencyAddedQuestCheck(id);
+            else
+                CurrencyRemovedQuestCheck(id);
         }
 
         if (itr->first == CURRENCY_CONQUEST_ARENA_META || itr->first == CURRENCY_CONQUEST_BG_META)

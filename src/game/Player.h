@@ -1380,6 +1380,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void FailQuest(uint32 quest_id);
         bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
+        bool SatisfyQuestSpell(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
         bool SatisfyQuestLog(bool msg) const;
         bool SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const;
@@ -1442,8 +1443,12 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetReqKillOrCastCurrentCount(uint32 quest_id, int32 entry);
         void AreaExploredOrEventHappens(uint32 questId);
         void GroupEventHappens(uint32 questId, WorldObject const* pEventObject);
+        void CurrencyAddedQuestCheck(uint32 entry);
+        void CurrencyRemovedQuestCheck(uint32 entry);
         void ItemAddedQuestCheck(uint32 entry, uint32 count);
         void ItemRemovedQuestCheck(uint32 entry, uint32 count);
+        void SpellAddedQuestCheck(uint32 entry);
+        void SpellRemovedQuestCheck(uint32 entry);
         void KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid);
         void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid());
         void CastedCreatureOrGO(uint32 entry, ObjectGuid guid, uint32 spell_id, bool original_caster = true);

@@ -56,7 +56,8 @@ enum QuestFailedReasons
     INVALIDREASON_QUEST_FAILED_NOT_ENOUGH_MONEY       = 23, // You don't have enough money for that quest.
     INVALIDREASON_QUEST_FAILED_TOO_MANY_DAILY_QUESTS  = 26, // You have already completed 25 daily quests today.
     INVALIDREASON_QUEST_FAILED_CAIS                   = 27, // You cannot complete quests once you have reached tired time.
-    INVALIDREASON_DAILY_QUEST_DONE_TODAY              = 29  // You have completed that daily quest today.
+    INVALIDREASON_DAILY_QUEST_DONE_TODAY              = 29, // You have completed that daily quest today.
+    INVALIDREASON_QUEST_FAILED_SPELL                  = 31, // You haven't learned the required spell.
 };
 
 enum QuestShareMessages
