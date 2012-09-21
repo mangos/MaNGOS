@@ -6229,25 +6229,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 // It is possible to change between vehicles that are boarded on each other
                 if (m_caster->IsBoarded() && m_caster->GetTransportInfo()->IsOnVehicle())
                 {
-                    bool boardedOnEachOther = false;
-                    WorldObject* lastTransport = pTarget;
                     // Check if trying to board a vehicle that is boarded on current transport
-                    while (!boardedOnEachOther && lastTransport->IsBoarded() && lastTransport->GetTransportInfo()->IsOnVehicle())
-                    {
-                        if (lastTransport->GetTransportInfo()->GetTransportGuid() == m_caster->GetTransportInfo()->GetTransportGuid())
-                            boardedOnEachOther = true;
-                        else
-                            lastTransport = lastTransport->GetTransportInfo()->GetTransport();
-                    }
+                    bool boardedOnEachOther = m_caster->GetTransportInfo()->HasOnBoard(pTarget);
                     // Check if trying to board a vehicle that has the current transport on board
-                    lastTransport = m_caster;
-                    while (!boardedOnEachOther && lastTransport->IsBoarded() && lastTransport->GetTransportInfo()->IsOnVehicle())
-                    {
-                        if (lastTransport->GetTransportInfo()->GetTransportGuid() == pTarget->GetTransportInfo()->GetTransportGuid())
-                            boardedOnEachOther = true;
-                        else
-                            lastTransport = lastTransport->GetTransportInfo()->GetTransport();
-                    }
+                    if (!boardedOnEachOther && pTarget->IsBoarded())
+                        boardedOnEachOther = pTarget->GetTransportInfo()->HasOnBoard(m_caster);
 
                     if (!boardedOnEachOther)
                         return SPELL_FAILED_NOT_ON_TRANSPORT;
@@ -6255,6 +6241,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 if (!pTarget->GetVehicleInfo()->CanBoard(m_caster))
                     return SPELL_FAILED_BAD_TARGETS;
+
+                break;
             }
             case SPELL_AURA_MIRROR_IMAGE:
             {

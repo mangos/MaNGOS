@@ -272,15 +272,9 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
     if (passenger->IsBoarded() && passenger->GetTransportInfo()->GetTransport() == m_owner)
         return false;
 
-    // Prevent circular boarding m_owner must not be boarded on passenger
-    WorldObject* lastVehicle = m_owner;
-    while (lastVehicle->IsBoarded() && lastVehicle->GetTransportInfo()->IsOnVehicle())
-    {
-        lastVehicle = lastVehicle->GetTransportInfo()->GetTransport();
-        if (lastVehicle == passenger)
-            return false;
-    }
-
+    // Prevent circular boarding: passenger must not have m_owner on board
+    if (passenger->IsBoarded() && passenger->GetTransportInfo()->HasOnBoard(m_owner))
+        return false;
 
     // Check if we have at least one empty seat
     if (!GetEmptySeats())

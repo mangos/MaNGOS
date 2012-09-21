@@ -67,6 +67,9 @@ class TransportBase
 
         void CalculateGlobalPositionOf(float lx, float ly, float lz, float lo, float& gx, float& gy, float& gz, float& go) const;
 
+        // Helper function to check if a unit is boarded onto this transporter (or a transporter boarded onto this)*
+        bool HasOnBoard(WorldObject const* passenger) const;
+
     protected:
         // Helper functions to add/ remove a passenger from the list
         void BoardPassenger(WorldObject* passenger, float lx, float ly, float lz, float lo, uint8 seat);
@@ -102,6 +105,9 @@ class TransportInfo
 
         // Required for chain-updating (passenger on transporter on transporter)
         bool IsOnVehicle() const { return m_transport->GetOwner()->GetTypeId() == TYPEID_PLAYER || m_transport->GetOwner()->GetTypeId() == TYPEID_UNIT; }
+
+        // Helper function if a passenger is already boarded somewhere onto the boarded transports
+        bool HasOnBoard(WorldObject const* passenger) const { return m_transport->HasOnBoard(passenger); }
 
         // Get local position and seat
         uint8 GetTransportSeat() const { return m_seat; }

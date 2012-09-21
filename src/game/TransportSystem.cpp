@@ -136,6 +136,25 @@ void TransportBase::CalculateGlobalPositionOf(float lx, float ly, float lz, floa
     go = NormalizeOrientation(lo + m_owner->GetOrientation());
 }
 
+//  Helper function to check if a unit is boarded onto this transporter (or a transporter boarded onto this) recursively
+bool TransportBase::HasOnBoard(WorldObject const* passenger) const
+{
+    MANGOS_ASSERT(passenger);
+
+    // For efficiency we go down from the (possible) passenger until we reached our owner, or until we reached no passenger
+    // Note, this will not catch, if self and passenger are boarded onto the same transporter (as it should not)
+    while (passenger->IsBoarded())
+    {
+        // pasenger is boarded onto this
+        if (passenger->GetTransportInfo()->GetTransport() == m_owner)
+            return true;
+        else
+            passenger = passenger->GetTransportInfo()->GetTransport();
+    }
+
+    return false;
+}
+
 void TransportBase::BoardPassenger(WorldObject* passenger, float lx, float ly, float lz, float lo, uint8 seat)
 {
     TransportInfo* transportInfo = new TransportInfo(passenger, this, lx, ly, lz, lo, seat);
