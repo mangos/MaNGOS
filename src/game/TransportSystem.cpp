@@ -149,7 +149,7 @@ void TransportBase::BoardPassenger(WorldObject* passenger, float lx, float ly, f
 
 void TransportBase::UnBoardPassenger(WorldObject* passenger)
 {
-    PassengerMap::const_iterator itr = m_passengers.find(passenger);
+    PassengerMap::iterator itr = m_passengers.find(passenger);
 
     if (itr == m_passengers.end())
         return;
