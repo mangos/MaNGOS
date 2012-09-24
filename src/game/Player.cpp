@@ -23752,9 +23752,9 @@ void Player::SendRatedBGStats()
 {
     // Placeholder
 
-    WorldPacket data(SMSG_RATED_BG_STATS, 6 * 4);
+    WorldPacket data(SMSG_RATED_BG_STATS, 18 * 4);
     for (int i = 0; i < 18; ++i)
-        data << uint32(i + 1);
+        data << uint32(0);
 
     SendDirectMessage(&data);
 }

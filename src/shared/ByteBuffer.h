@@ -150,6 +150,8 @@ class ByteBuffer
         {
             _storage.clear();
             _rpos = _wpos = 0;
+            _curbitval = 0;
+            _bitpos = 8;
         }
 
         template <typename T> ByteBuffer& append(T value)

@@ -1749,6 +1749,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
     data->WriteBit(true);                   // signals EVENT_PVPQUEUE_ANYWHERE_SHOW if set
 
     data->WriteGuidBytes<6, 1, 7, 5>(guid);
+    data->FlushBits();
     if (count)
         data->append(buf);
     data->WriteGuidBytes<0, 2, 4, 3>(guid);
@@ -1788,7 +1789,7 @@ bool BattleGroundMgr::IsArenaType(BattleGroundTypeId bgTypeId)
             return true;
         default:
             return false;
-    };
+    }
 }
 
 BattleGroundQueueTypeId BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId bgTypeId, ArenaType arenaType)
