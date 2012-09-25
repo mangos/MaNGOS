@@ -3119,7 +3119,7 @@ uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized)
 float Unit::CalculateLevelPenalty(SpellEntry const* spellProto) const
 {
     uint32 spellLevel = spellProto->GetSpellLevel();
-    if(spellLevel <= 0)
+    if (spellLevel <= 0 || spellLevel > spellProto->GetMaxLevel())
         return 1.0f;
 
     float LvlPenalty = 0.0f;
@@ -9264,6 +9264,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
         return 0;
 
     Player* unitPlayer = (GetTypeId() == TYPEID_PLAYER) ? (Player*)this : NULL;
+    uint32 level = getLevel();
 
     // calculate basepoints dependent on mastery
     if (unitPlayer && spellProto->HasAttribute(SPELL_ATTR_EX8_MASTERY) && !spellProto->CalculateSimpleValue(effect_index))
@@ -9282,26 +9283,34 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
     GtSpellScalingEntry const* gtScalingEntry = NULL;
     if (scalingEntry)
     {
-        uint32 gtSpellScalingId = getLevel() - 1;
+        if (target && IsAuraApplyEffect(spellProto, effect_index) && IsPositiveEffect(spellProto, effect_index))
+            level = target->getLevel();
+
+        uint32 gtSpellScalingId = level - 1;
         if (scalingEntry->playerClass == -1)
-            gtSpellScalingId += 11 * 100;
+            gtSpellScalingId += (MAX_CLASSES - 1) * GT_MAX_LEVEL;
         else
-            gtSpellScalingId += (scalingEntry->playerClass - 1) * 100;
+            gtSpellScalingId += (scalingEntry->playerClass - 1) * GT_MAX_LEVEL;
 
         gtScalingEntry = sGtSpellScalingStore.LookupEntry(gtSpellScalingId);
     }
 
     if (gtScalingEntry)
     {
-        basePoints = int32(scalingEntry->coeff1[effect_index] * gtScalingEntry->value);
-        int32 randomPoints = int32(scalingEntry->coeff1[effect_index] * gtScalingEntry->value * scalingEntry->coeff2[effect_index]);
+        float scale = gtScalingEntry->value;
+        if (scalingEntry->castTimeMax > 0 && scalingEntry->castScalingMaxLevel > level)
+            scale *= float(scalingEntry->castTimeMin + float(level - 1) * (scalingEntry->castTimeMax - scalingEntry->castTimeMin) / (scalingEntry->castScalingMaxLevel - 1)) / float(scalingEntry->castTimeMax);
+        if (scalingEntry->coefLevelBase > level)
+            scale *= (1.0f - scalingEntry->coefBase) * (level - 1) / (scalingEntry->coefLevelBase - 1) + scalingEntry->coefBase;
+
+        basePoints = int32(scalingEntry->coeff1[effect_index] * scale);
+        int32 randomPoints = int32(scalingEntry->coeff1[effect_index] * scale * scalingEntry->coeff2[effect_index]);
         basePoints += irand(-randomPoints, randomPoints) / 2;
-        comboDamage = uint32(scalingEntry->coeff3[effect_index] * gtScalingEntry->value);
+        comboDamage = uint32(scalingEntry->coeff3[effect_index] * scale);
     }
     else
     {
         spellLevel = spellProto->GetSpellLevel();
-        uint32 level = getLevel();
         uint32 maxLevel = spellProto->GetMaxLevel();
         uint32 baseLevel = spellProto->GetBaseLevel();
 
@@ -9362,7 +9371,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
             spellEffect->Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
             spellEffect->Effect != SPELL_EFFECT_KNOCK_BACK &&
             (spellEffect->Effect != SPELL_EFFECT_APPLY_AURA || spellEffect->EffectApplyAuraName != SPELL_AURA_MOD_DECREASE_SPEED))
-        value = int32(value*0.25f*exp(getLevel()*(70-spellLevel)/1000.0f));
+        value = int32(value * 0.25f * exp(level * (70 - spellLevel) / 1000.0f));
 
     return value;
 }

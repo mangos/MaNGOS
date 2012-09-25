@@ -1800,7 +1800,7 @@ struct SpellReagentsEntry
 // SpellScaling.dbc
 struct SpellScalingEntry
 {
-    //uint32    Id;                                           // 0        m_ID
+    //uint32    Id;                                         // 0        m_ID
     uint32    castTimeMin;                                  // 1
     uint32    castTimeMax;                                  // 2
     uint32    castScalingMaxLevel;                          // 3
@@ -1808,8 +1808,8 @@ struct SpellScalingEntry
     float     coeff1[3];                                    // 5-7
     float     coeff2[3];                                    // 8-10
     float     coeff3[3];                                    // 11-13
-    float     unkMult;                                      // 14       some coefficient, mostly 1.0f
-    uint32    unkLevel;                                     // 15       some level
+    float     coefBase;                                     // 14       some coefficient, mostly 1.0f
+    uint32    coefLevelBase;                                // 15       some level
 };
 
 // SpellShapeshift.dbc
