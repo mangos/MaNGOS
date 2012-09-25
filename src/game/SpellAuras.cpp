@@ -1330,7 +1330,7 @@ void Aura::TriggerSpell()
                         else
                             newAngle -= M_PI_F/40;
 
-                        newAngle =  NormalizeOrientation;
+                        newAngle = NormalizeOrientation(newAngle);
 
                         target->SetFacingTo(newAngle);
 
@@ -1588,7 +1588,7 @@ void Aura::TriggerSpell()
                         else
                             newAngle -= 2*M_PI_F/100;
 
-                        newAngle = MapManager::NormalizeOrientation(newAngle);
+                        newAngle = NormalizeOrientation(newAngle);
 
                         target->SetFacingTo(newAngle);
 
@@ -8205,7 +8205,7 @@ void Aura::PeriodicDummyTick()
                     else
                         newAngle -= 0.09f;
 
-                    newAngle =  NormalizeOrientation;
+                    newAngle = NormalizeOrientation(newAngle);
 
                     target->SetFacingTo(newAngle);
 
