@@ -317,6 +317,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupTeleCommand(char* args);
         bool HandleLookupTitleCommand(char* args);
 
+        bool HandleModifyHolyPowerCommand(char* args);
         bool HandleModifyHPCommand(char* args);
         bool HandleModifyManaCommand(char* args);
         bool HandleModifyRageCommand(char* args);

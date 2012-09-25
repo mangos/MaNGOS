@@ -642,6 +642,49 @@ bool ChatHandler::HandleRecallCommand(char* args)
     return HandleGoHelper(target, target->m_recallMap, target->m_recallX, target->m_recallY, &target->m_recallZ, &target->m_recallO);
 }
 
+bool ChatHandler::HandleModifyHolyPowerCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    int32 power = atoi(args);
+
+    if (power < 0)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* chr = getSelectedPlayer();
+    if (!chr)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(chr))
+        return false;
+
+    int32 maxPower = int32(chr->GetMaxPower(POWER_HOLY_POWER));
+    if (power > maxPower)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage(LANG_YOU_CHANGE_HOLY_POWER, GetNameLink(chr).c_str(), power, maxPower);
+    if (needReportToTarget(chr))
+        ChatHandler(chr).PSendSysMessage(LANG_YOURS_HOLY_POWER_CHANGED, GetNameLink().c_str(), power, maxPower);
+
+    chr->SetPower(POWER_HOLY_POWER, power);
+
+    return true;
+}
+
 // Edit Player HP
 bool ChatHandler::HandleModifyHPCommand(char* args)
 {

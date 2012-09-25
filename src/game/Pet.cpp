@@ -37,6 +37,7 @@ Pet::Pet(PetType type) :
 {
     m_name = "Pet";
     m_regenTimer = 4000;
+    m_holyPowerRegenTimer = REGEN_TIME_HOLY_POWER;
 
     // pets always have a charminfo, even if they are not actually charmed
     CharmInfo* charmInfo = InitCharmInfo(this);

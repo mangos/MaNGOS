@@ -1113,8 +1113,9 @@ enum IgnoreUnitState
 #define MAX_CREATURE_ATTACK_RADIUS 45.0f                    // max distance for creature aggro (use with CONFIG_FLOAT_RATE_CREATURE_AGGRO)
 
 // Regeneration defines
-#define REGEN_TIME_FULL     2000                            // For this time difference is computed regen value
-#define REGEN_TIME_PRECISE  500                             // Used in Spell::CheckPower for precise regeneration in spell cast time
+#define REGEN_TIME_FULL         2000                        // This determines how often regen value is computed
+#define REGEN_TIME_PRECISE      500                         // Used in Spell::CheckPower for precise regeneration in spell cast time
+#define REGEN_TIME_HOLY_POWER   10000                       // This determines how often holy power regen is processed
 
 struct SpellProcEventEntry;                                 // used only privately
 
@@ -1260,6 +1261,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         int32 ModifyPower(Powers power, int32 val);
         void ApplyPowerMod(Powers power, uint32 val, bool apply);
         void ApplyMaxPowerMod(Powers power, uint32 val, bool apply);
+        void ResetHolyPowerRegenTimer() { m_holyPowerRegenTimer = REGEN_TIME_HOLY_POWER; }
 
         static uint32 GetPowerIndexByClass(Powers power, uint32 classId);
         static Powers GetPowerTypeByIndex(uint32 index, uint32 classId);
@@ -1613,6 +1615,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
         uint32 GetCreatePowers(Powers power) const;
+        uint32 GetCreateMaxPowers(Powers power) const;
         float GetPosStat(Stats stat) const { return GetFloatValue(UNIT_FIELD_POSSTAT0 + stat); }
         float GetNegStat(Stats stat) const { return GetFloatValue(UNIT_FIELD_NEGSTAT0 + stat); }
         float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
@@ -2002,6 +2005,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 m_reactiveTimer[MAX_REACTIVE];
         uint32 m_regenTimer;
+        uint32 m_holyPowerRegenTimer;
 
         VehicleInfo* m_vehicleInfo;
         void DisableSpline();

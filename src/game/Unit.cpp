@@ -9918,14 +9918,15 @@ void Unit::SetPowerByIndex(uint32 powerIndex, int32 val)
     MANGOS_ASSERT(powerIndex < MAX_STORED_POWERS);
     SetInt32Value(UNIT_FIELD_POWER1 + powerIndex, val);
 
+    Powers power = getPowerType(powerIndex);
+    MANGOS_ASSERT(power != INVALID_POWER);
+
     if (IsInWorld())
     {
-        Powers power = getPowerType(powerIndex);
-        MANGOS_ASSERT(power != INVALID_POWER);
-
         WorldPacket data(SMSG_POWER_UPDATE);
         data << GetPackGUID();
         data << uint32(1); // iteration count
+        // for (int i = 0; i < count; ++i)
         data << uint8(power);
         data << uint32(val);
         SendMessageToSet(&data, true);
@@ -9947,6 +9948,10 @@ void Unit::SetPowerByIndex(uint32 powerIndex, int32 val)
                 ((Player*)owner)->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
         }
     }
+
+    // modifying holy power resets it's fade timer
+    if (power == POWER_HOLY_POWER)
+        ResetHolyPowerRegenTimer();
 }
 
 void Unit::SetMaxPower(Powers power, int32 val)
@@ -10053,11 +10058,26 @@ uint32 Unit::GetCreatePowers(Powers power) const
                 return 100;
             return (GetTypeId() == TYPEID_PLAYER || !((Creature const*)this)->IsPet() || ((Pet const*)this)->getPetType() != HUNTER_PET ? 0 : 100);
         case POWER_ENERGY:      return 100;
-        case POWER_RUNE:        return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 8 : 0);
-        case POWER_RUNIC_POWER: return (GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 1000 : 0);
-        case POWER_SOUL_SHARDS: return 0;                   // TODO: fix me
+        case POWER_RUNE:        return GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 8 : 0;
+        case POWER_RUNIC_POWER: return GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_DEATH_KNIGHT ? 1000 : 0;
+        case POWER_SOUL_SHARDS: return 0;
         case POWER_ECLIPSE:     return 0;                   // TODO: fix me
         case POWER_HOLY_POWER:  return 0;
+    }
+
+    return 0;
+}
+
+uint32 Unit::GetCreateMaxPowers(Powers power) const
+{
+    switch (power)
+    {
+        case POWER_HOLY_POWER:
+            return GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_PALADIN ? 3 : 0;
+        case POWER_SOUL_SHARDS:
+            return GetTypeId() == TYPEID_PLAYER && ((Player const*)this)->getClass() == CLASS_WARLOCK ? 3 : 0;
+        default:
+            return GetCreatePowers(power);
     }
 
     return 0;

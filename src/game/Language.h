@@ -167,7 +167,7 @@ enum MangosStrings
     LANG_COMMAND_TELE_NOTFOUND          = 164,
     LANG_COMMAND_TELE_PARAMETER         = 165,
     LANG_COMMAND_TELE_NOLOCATION        = 166,
-    //                                    167               // not used
+    LANG_YOURS_HOLY_POWER_CHANGED       = 167,
     LANG_COMMAND_TELE_LOCATION          = 168,
 
     LANG_MAIL_SENT                      = 169,
@@ -177,7 +177,8 @@ enum MangosStrings
     LANG_YOU_CHANGE_RUNIC_POWER         = 173,
     LANG_YOURS_RUNIC_POWER_CHANGED      = 174,
     LANG_LIQUID_STATUS                  = 175,
-    // Room for more level 1              176-199 not used
+    LANG_YOU_CHANGE_HOLY_POWER          = 176,
+    // Room for more level 1              177-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,

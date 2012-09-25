@@ -413,6 +413,7 @@ ChatCommand* ChatHandler::getCommandTable()
     static ChatCommand modifyCommandTable[] =
     {
         { "currency",       SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyCurrencyCommand,      "", NULL },
+        { "holypower",      SEC_MODERATOR,      false, &ChatHandler::HandleModifyHolyPowerCommand,     "", NULL },
         { "hp",             SEC_MODERATOR,      false, &ChatHandler::HandleModifyHPCommand,            "", NULL },
         { "mana",           SEC_MODERATOR,      false, &ChatHandler::HandleModifyManaCommand,          "", NULL },
         { "rage",           SEC_MODERATOR,      false, &ChatHandler::HandleModifyRageCommand,          "", NULL },
