@@ -5672,21 +5672,19 @@ void Player::UpdateSkillsForLevel()
 
         if (GetSkillRangeType(pSkill, false) != SKILL_RANGE_LEVEL)
             continue;
+        // only weapons skills curently have SKILL_RANGE_LEVEL
 
         uint16 field = itr->second.pos / 2;
         uint8 offset = itr->second.pos & 1; // itr->second.pos % 2
 
-        uint16 val = GetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset);
         uint16 max = GetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset);
 
         /// update only level dependent max skill values
         if (max != 1)
         {
-            SetUInt16Value(PLAYER_SKILL_RANK_0 + field, offset, maxSkill);
             SetUInt16Value(PLAYER_SKILL_MAX_RANK_0 + field, offset, maxSkill);
             if (itr->second.uState != SKILL_NEW)
                 itr->second.uState = SKILL_CHANGED;
-            GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_REACH_SKILL_LEVEL, pskill);
         }
     }
 }
