@@ -644,19 +644,6 @@ struct ItemPrototype
     uint32 GetMaxStackSize() const { return Stackable > 0 ? uint32(Stackable) : uint32(0x7FFFFFFF - 1); }
     float getDPS() const;
 
-    int32 getFeralBonus(int32 extraDPS = 0) const
-    {
-        // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1 << SubClass) & 0x02A5F3)
-        {
-            int32 bonus = int32((extraDPS + getDPS()) * 14.0f) - 767;
-            if (bonus < 0)
-                return 0;
-            return bonus;
-        }
-        return 0;
-    }
-
     uint32 GetArmor() const;
     float GetMinDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 0.7f + 0.5f); }
     float GetMaxDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 1.3f + 0.5f); }

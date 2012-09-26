@@ -413,7 +413,7 @@ void LoadDBCStores(const std::string& dataPath)
         exit(1);
     }
 
-    const uint32 DBCFilesCount = 112;
+    const uint32 DBCFilesCount = 124;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -441,6 +441,7 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAchievementCriteriaStore, dbcPath,"Achievement_Criteria.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaTriggerStore,         dbcPath,"AreaTrigger.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAreaGroupStore,           dbcPath,"AreaGroup.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sArmorLocationStore,       dbcPath,"ArmorLocation.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sAuctionHouseStore,        dbcPath,"AuctionHouse.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBankBagSlotPricesStore,   dbcPath,"BankBagSlotPrices.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sBattlemasterListStore,    dbcPath,"BattlemasterList.dbc");
@@ -526,8 +527,19 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtOCTBaseHPByClassStore,  dbcPath,"gtOCTBaseHPByClass.dbc"); // 15595
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sGtOCTBaseMPByClassStore,  dbcPath,"gtOCTBaseMPByClass.dbc"); // 15595
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sHolidaysStore,            dbcPath,"Holidays.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemArmorQualityStore,    dbcPath,"ItemArmorQuality.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemArmorShieldStore,     dbcPath,"ItemArmorShield.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemArmorTotalStore,      dbcPath,"ItemArmorTotal.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemBagFamilyStore,       dbcPath,"ItemBagFamily.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemClassStore,           dbcPath,"ItemClass.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageAmmoStore,      dbcPath,"ItemDamageAmmo.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageOneHandStore,   dbcPath,"ItemDamageOneHand.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageOneHandCasterStore,dbcPath,"ItemDamageOneHandCaster.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageRangedStore,    dbcPath,"ItemDamageRanged.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageThrownStore,    dbcPath,"ItemDamageThrown.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageTwoHandStore,   dbcPath,"ItemDamageTwoHand.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageTwoHandCasterStore,dbcPath,"ItemDamageTwoHandCaster.dbc");
+    LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDamageWandStore,      dbcPath,"ItemDamageWand.dbc");
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDisplayInfoStore,     dbcPath,"ItemDisplayInfo.dbc");     -- not used currently
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemLimitCategoryStore,   dbcPath,"ItemLimitCategory.dbc");
     LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemRandomPropertiesStore,dbcPath,"ItemRandomProperties.dbc");

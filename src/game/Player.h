@@ -1810,7 +1810,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         void UpdateArmor() override;
         void UpdateMaxHealth() override;
         void UpdateMaxPower(Powers power) override;
-        void ApplyFeralAPBonus(int32 amount, bool apply);
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateShieldBlockDamageValue();
         void UpdateDamagePhysical(WeaponAttackType attType) override;
@@ -1824,6 +1823,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         float GetMeleeCritFromAgility();
         void GetDodgeFromAgility(float& diminishing, float& nondiminishing);
+        void GetParryFromStrength(float& diminishing, float& nondiminishing);
         float GetSpellCritFromIntellect();
         float OCTRegenMPPerSpirit();
         float GetRatingMultiplier(CombatRating cr) const;
@@ -2537,7 +2537,6 @@ class MANGOS_DLL_SPEC Player : public Unit
         float m_auraBaseMod[BASEMOD_END][MOD_END];
         int16 m_baseRatingValue[MAX_COMBAT_RATING];
         uint16 m_baseSpellPower;
-        uint16 m_baseFeralAP;
         uint16 m_baseManaRegen;
         uint32 m_baseHealthRegen;
         float m_armorPenetrationPct;

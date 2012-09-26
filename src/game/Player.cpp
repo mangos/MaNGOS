@@ -551,7 +551,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
         m_baseRatingValue[i] = 0;
 
     m_baseSpellPower = 0;
-    m_baseFeralAP = 0;
     m_baseHealthRegen = 0;
     m_baseManaRegen = 0;
     m_armorPenetrationPct = 0.0f;
@@ -5187,8 +5186,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
     // 4.2.0: these classes no longer receive dodge from agility and have 5% base
     if (getClass() == CLASS_WARRIOR || getClass() == CLASS_PALADIN || getClass() == CLASS_DEATH_KNIGHT)
     {
-        diminishing = 0.0f;
-        nondiminishing = 5.0f;
+        nondiminishing += 5.0f;
         return;
     }
 
@@ -5237,8 +5235,21 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
     float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + STAT_AGILITY][BASE_PCT];
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
-    diminishing = 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1];
-    nondiminishing = 100.0f * (dodge_base[pclass - 1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1]);
+    diminishing += 100.0f * bonus_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1];
+    nondiminishing += 100.0f * (dodge_base[pclass - 1] + base_agility * dodgeRatio->ratio * crit_to_dodge[pclass - 1]);
+}
+
+void Player::GetParryFromStrength(float& diminishing, float& nondiminishing)
+{
+    // other classes than these do not receive parry bonus from strength
+    if (getClass() != CLASS_WARRIOR && getClass() != CLASS_PALADIN && getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    float base_strength = GetCreateStat(STAT_STRENGTH) * m_auraModifiersGroup[UNIT_MOD_STAT_START + STAT_STRENGTH][BASE_PCT];
+    float bonus_strength = GetStat(STAT_STRENGTH) - base_strength;
+    // calculate diminishing (green in char screen) and non-diminishing (white) contribution
+    diminishing += bonus_strength * GetRatingMultiplier(CR_PARRY) * 0.27f;
+    nondiminishing += base_strength * GetRatingMultiplier(CR_PARRY) * 0.27f;
 }
 
 float Player::GetSpellCritFromIntellect()
@@ -7249,20 +7260,6 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
     {
         damage = apply ? maxDamage : BASE_MAXDAMAGE;
         SetBaseWeaponDamage(attType, MAXDAMAGE, damage);
-    }
-
-    // Apply feral bonus from ScalingStatValue if set
-    if (ssv)
-    {
-        if (int32 feral_bonus = ssv->getFeralBonus(proto->StatScalingFactor))
-            ApplyFeralAPBonus(feral_bonus, apply);
-    }
-    // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
-    if (getClass() == CLASS_DRUID)
-    {
-        int32 feral_bonus = proto->getFeralBonus(extraDPS);
-        if (feral_bonus > 0)
-            ApplyFeralAPBonus(feral_bonus, apply);
     }
 
     if (!CanUseEquippedWeapon(attType))

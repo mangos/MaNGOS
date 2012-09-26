@@ -685,9 +685,9 @@ struct ChrClassesEntry
     //uint32 flags2;                                        // 8        m_flags (0x08 HasRelicSlot)
     uint32  CinematicSequence;                              // 9        m_cinematicSequenceID
     uint32  expansion;                                      // 10       m_required_expansion
-    //uint32                                                // 11
-    //uint32                                                // 12
-    //uint32                                                // 13
+    uint32  apPerStr;                                       // 11       attack power per strength
+    uint32  apPerAgi;                                       // 12       attack power per agility
+    uint32  rapPerAgi;                                      // 13       ranged attack power per agility
 };
 
 struct ChrRacesEntry
@@ -1494,13 +1494,6 @@ struct ScalingStatValuesEntry
     {
         if (mask & 0x00008000)
             return spellBonus;
-        return 0;
-    }
-
-    uint32 getFeralBonus(uint32 mask) const                 // removed in 3.2.x?
-    {
-        if (mask & 0x00010000)                              // not used?
-            return 0;
         return 0;
     }
 };
