@@ -833,7 +833,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
         delete result;
 
         // post check
-        for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+        for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
         {
             if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             {

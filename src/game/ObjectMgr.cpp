@@ -440,7 +440,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
     sLog.outString(">> Loaded " SIZEFMTD " points_of_interest locale strings", mPointOfInterestLocaleMap.size());
 }
 
-struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader>
+struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader, SQLStorage>
 {
     template<class D>
     void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
@@ -454,14 +454,14 @@ void ObjectMgr::LoadCreatureTemplates()
     SQLCreatureLoader loader;
     loader.Load(sCreatureStorage);
 
-    sLog.outString(">> Loaded %u creature definitions", sCreatureStorage.RecordCount);
+    sLog.outString(">> Loaded %u creature definitions", sCreatureStorage.GetRecordCount());
     sLog.outString();
 
     std::set<uint32> difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures
     std::set<uint32> hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1  values
 
     // check data correctness
-    for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
     {
         CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i);
         if (!cInfo)
@@ -776,11 +776,11 @@ void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entry
 {
     creatureaddons.Load();
 
-    sLog.outString(">> Loaded %u %s", creatureaddons.RecordCount, comment);
+    sLog.outString(">> Loaded %u %s", creatureaddons.GetRecordCount(), comment);
     sLog.outString();
 
     // check data correctness and convert 'auras'
-    for (uint32 i = 1; i < creatureaddons.MaxEntry; ++i)
+    for (uint32 i = 1; i < creatureaddons.GetMaxEntry(); ++i)
     {
         CreatureDataAddon const* addon = creatureaddons.LookupEntry<CreatureDataAddon>(i);
         if (!addon)
@@ -813,7 +813,7 @@ void ObjectMgr::LoadCreatureAddons()
     LoadCreatureAddons(sCreatureInfoAddonStorage, "Entry", "creature template addons");
 
     // check entry ids
-    for (uint32 i = 1; i < sCreatureInfoAddonStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureInfoAddonStorage.GetMaxEntry(); ++i)
         if (CreatureDataAddon const* addon = sCreatureInfoAddonStorage.LookupEntry<CreatureDataAddon>(i))
             if (!sCreatureStorage.LookupEntry<CreatureInfo>(addon->guidOrEntry))
                 sLog.outErrorDb("Creature (Entry: %u) does not exist but has a record in `%s`", addon->guidOrEntry, sCreatureInfoAddonStorage.GetTableName());
@@ -821,7 +821,7 @@ void ObjectMgr::LoadCreatureAddons()
     LoadCreatureAddons(sCreatureDataAddonStorage, "GUID", "creature addons");
 
     // check entry ids
-    for (uint32 i = 1; i < sCreatureDataAddonStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureDataAddonStorage.GetMaxEntry(); ++i)
         if (CreatureDataAddon const* addon = sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(i))
             if (mCreatureDataMap.find(addon->guidOrEntry) == mCreatureDataMap.end())
                 sLog.outErrorDb("Creature (GUID: %u) does not exist but has a record in `creature_addon`", addon->guidOrEntry);
@@ -831,7 +831,7 @@ void ObjectMgr::LoadEquipmentTemplates()
 {
     sEquipmentStorage.Load();
 
-    for (uint32 i = 0; i < sEquipmentStorage.MaxEntry; ++i)
+    for (uint32 i = 0; i < sEquipmentStorage.GetMaxEntry(); ++i)
     {
         EquipmentInfo const* eqInfo = sEquipmentStorage.LookupEntry<EquipmentInfo>(i);
 
@@ -869,7 +869,7 @@ void ObjectMgr::LoadEquipmentTemplates()
         }
     }
 
-    sLog.outString(">> Loaded %u equipment template", sEquipmentStorage.RecordCount);
+    sLog.outString(">> Loaded %u equipment template", sEquipmentStorage.GetRecordCount());
     sLog.outString();
 }
 
@@ -934,7 +934,7 @@ void ObjectMgr::LoadCreatureModelInfo()
     sCreatureModelStorage.Load();
 
     // post processing
-    for (uint32 i = 1; i < sCreatureModelStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)
     {
         CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(i);
         if (!minfo)
@@ -1036,7 +1036,7 @@ void ObjectMgr::LoadCreatureModelInfo()
 
     }
 
-    sLog.outString(">> Loaded %u creature model based info", sCreatureModelStorage.RecordCount);
+    sLog.outString(">> Loaded %u creature model based info", sCreatureModelStorage.GetRecordCount());
     sLog.outString();
 }
 
@@ -1188,7 +1188,7 @@ void ObjectMgr::LoadCreatures()
 
     // build single time for check creature data
     std::set<uint32> difficultyCreatures[MAX_DIFFICULTY - 1];
-    for (uint32 i = 0; i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1; ++diff)
                 if (cInfo->DifficultyEntry[diff])
@@ -1551,10 +1551,10 @@ void ObjectMgr::LoadGameObjectAddon()
 {
     sGameObjectDataAddonStorage.Load();
 
-    sLog.outString(">> Loaded %u gameobject addons", sGameObjectDataAddonStorage.RecordCount);
+    sLog.outString(">> Loaded %u gameobject addons", sGameObjectDataAddonStorage.GetRecordCount());
     sLog.outString();
 
-    for (uint32 i = 1; i < sGameObjectDataAddonStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sGameObjectDataAddonStorage.GetMaxEntry(); ++i)
     {
         GameObjectDataAddon const* addon = sGameObjectDataAddonStorage.LookupEntry<GameObjectDataAddon>(i);
         if (!addon)
@@ -1774,7 +1774,7 @@ void ObjectMgr::LoadItemLocales()
     sLog.outString(">> Loaded " SIZEFMTD " Item locale strings", mItemLocaleMap.size());
 }
 
-struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader>
+struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
 {
     template<class D>
     void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
@@ -1787,11 +1787,11 @@ void ObjectMgr::LoadItemPrototypes()
 {
     SQLItemLoader loader;
     loader.Load(sItemStorage);
-    sLog.outString(">> Loaded %u item prototypes", sItemStorage.RecordCount);
+    sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
 
     // check data correctness
-    for (uint32 i = 1; i < sItemStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
     {
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(i);
         ItemEntry const *dbcitem = sItemStore.LookupEntry(i);
@@ -4613,13 +4613,11 @@ void ObjectMgr::LoadQuestLocales()
 
 void ObjectMgr::LoadPageTexts()
 {
-    sPageTextStore.Free();                                  // for reload case
-
     sPageTextStore.Load();
-    sLog.outString(">> Loaded %u page texts", sPageTextStore.RecordCount);
+    sLog.outString(">> Loaded %u page texts", sPageTextStore.GetRecordCount());
     sLog.outString();
 
-    for (uint32 i = 1; i < sPageTextStore.MaxEntry; ++i)
+    for (uint32 i = 1; i < sPageTextStore.GetMaxEntry(); ++i)
     {
         // check data correctness
         PageText const* page = sPageTextStore.LookupEntry<PageText>(i);
@@ -4788,7 +4786,7 @@ void ObjectMgr::LoadInstanceEncounters()
     sLog.outString(">> Loaded " SIZEFMTD " Instance Encounters", m_DungeonEncounters.size());
 }
 
-struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader>
+struct SQLInstanceLoader : public SQLStorageLoaderBase<SQLInstanceLoader, SQLStorage>
 {
     template<class D>
     void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
@@ -4802,7 +4800,7 @@ void ObjectMgr::LoadInstanceTemplate()
     SQLInstanceLoader loader;
     loader.Load(sInstanceTemplate);
 
-    for (uint32 i = 0; i < sInstanceTemplate.MaxEntry; ++i)
+    for (uint32 i = 0; i < sInstanceTemplate.GetMaxEntry(); ++i)
     {
         InstanceTemplate const* temp = GetInstanceTemplate(i);
         if (!temp)
@@ -4845,11 +4843,11 @@ void ObjectMgr::LoadInstanceTemplate()
         }
     }
 
-    sLog.outString(">> Loaded %u Instance Template definitions", sInstanceTemplate.RecordCount);
+    sLog.outString(">> Loaded %u Instance Template definitions", sInstanceTemplate.GetRecordCount());
     sLog.outString();
 }
 
-struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader>
+struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader, SQLStorage>
 {
     template<class D>
     void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
@@ -4863,7 +4861,7 @@ void ObjectMgr::LoadWorldTemplate()
     SQLWorldLoader loader;
     loader.Load(sWorldTemplate, false);
 
-    for (uint32 i = 0; i < sWorldTemplate.MaxEntry; ++i)
+    for (uint32 i = 0; i < sWorldTemplate.GetMaxEntry(); ++i)
     {
         WorldTemplate const* temp = GetWorldTemplate(i);
         if (!temp)
@@ -4885,7 +4883,7 @@ void ObjectMgr::LoadWorldTemplate()
         }
     }
 
-    sLog.outString(">> Loaded %u World Template definitions", sWorldTemplate.RecordCount);
+    sLog.outString(">> Loaded %u World Template definitions", sWorldTemplate.GetRecordCount());
     sLog.outString();
 }
 
@@ -4894,7 +4892,7 @@ void ObjectMgr::LoadConditions()
     SQLWorldLoader loader;
     loader.Load(sConditionStorage, false);
 
-    for (uint32 i = 0; i < sConditionStorage.MaxEntry; ++i)
+    for (uint32 i = 0; i < sConditionStorage.GetMaxEntry(); ++i)
     {
         const PlayerCondition* condition = sConditionStorage.LookupEntry<PlayerCondition>(i);
         if (!condition)
@@ -4908,7 +4906,7 @@ void ObjectMgr::LoadConditions()
         }
     }
 
-    sLog.outString(">> Loaded %u Condition definitions", sConditionStorage.RecordCount);
+    sLog.outString(">> Loaded %u Condition definitions", sConditionStorage.GetRecordCount());
     sLog.outString();
 }
 
@@ -6070,7 +6068,7 @@ void ObjectMgr::LoadGameObjectLocales()
     sLog.outString(">> Loaded " SIZEFMTD " gameobject locale strings", mGameObjectLocaleMap.size());
 }
 
-struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader>
+struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader, SQLStorage>
 {
     template<class D>
     void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
@@ -6161,7 +6159,7 @@ void ObjectMgr::LoadGameobjectInfo()
     loader.Load(sGOStorage);
 
     // some checks
-    for (uint32 id = 1; id < sGOStorage.MaxEntry; ++id)
+    for (uint32 id = 1; id < sGOStorage.GetMaxEntry(); ++id)
     {
         GameObjectInfo const* goInfo = sGOStorage.LookupEntry<GameObjectInfo>(id);
         if (!goInfo)
@@ -6328,7 +6326,7 @@ void ObjectMgr::LoadGameobjectInfo()
         }
     }
 
-    sLog.outString(">> Loaded %u game object templates", sGOStorage.RecordCount);
+    sLog.outString(">> Loaded %u game object templates", sGOStorage.GetRecordCount());
     sLog.outString();
 }
 
@@ -7045,7 +7043,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 
 static char* SERVER_SIDE_SPELL      = "MaNGOS server-side spell";
 
-struct SQLSpellLoader : public SQLStorageLoaderBase<SQLSpellLoader>
+struct SQLSpellLoader : public SQLStorageLoaderBase<SQLSpellLoader, SQLStorage>
 {
     template<class S, class D>
     void default_fill(uint32 field_pos, S src, D &dst)
@@ -7075,10 +7073,10 @@ void ObjectMgr::LoadSpellTemplate()
     SQLSpellLoader loader;
     loader.Load(sSpellTemplate);
 
-    sLog.outString(">> Loaded %u spell definitions", sSpellTemplate.RecordCount);
+    sLog.outString(">> Loaded %u spell definitions", sSpellTemplate.GetRecordCount());
     sLog.outString();
 
-    for (uint32 i = 1; i < sSpellTemplate.MaxEntry; ++i)
+    for (uint32 i = 1; i < sSpellTemplate.GetMaxEntry(); ++i)
     {
         // check data correctness
         SpellEntry const* spellEntry = sSpellTemplate.LookupEntry<SpellEntry>(i);
@@ -7523,7 +7521,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 {
     mGameObjectForQuestSet.clear();                         // need for reload case
 
-    if (!sGOStorage.MaxEntry)
+    if (!sGOStorage.GetMaxEntry())
     {
         BarGoLink bar(1);
         bar.step();
@@ -7532,11 +7530,11 @@ void ObjectMgr::LoadGameObjectForQuests()
         return;
     }
 
-    BarGoLink bar(sGOStorage.MaxEntry - 1);
+    BarGoLink bar(sGOStorage.GetMaxEntry() - 1);
     uint32 count = 0;
 
     // collect GO entries for GO that must activated
-    for (uint32 go_entry = 1; go_entry < sGOStorage.MaxEntry; ++go_entry)
+    for (uint32 go_entry = 1; go_entry < sGOStorage.GetMaxEntry(); ++go_entry)
     {
         bar.step();
         GameObjectInfo const* goInfo = GetGameObjectInfo(go_entry);
@@ -8828,7 +8826,7 @@ void ObjectMgr::LoadTrainerTemplates()
     for (CacheTrainerSpellMap::const_iterator tItr = m_mCacheTrainerTemplateSpellMap.begin(); tItr != m_mCacheTrainerTemplateSpellMap.end(); ++tItr)
         trainer_ids.insert(tItr->first);
 
-    for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
     {
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
         {
@@ -8911,7 +8909,7 @@ void ObjectMgr::LoadVendorTemplates()
     for (CacheVendorItemMap::const_iterator vItr = m_mCacheVendorTemplateItemMap.begin(); vItr != m_mCacheVendorTemplateItemMap.end(); ++vItr)
         vendor_ids.insert(vItr->first);
 
-    for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
     {
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
         {
@@ -9081,13 +9079,13 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
     sLog.outString(">> Loaded %u gossip_menu entries", count);
 
     // post loading tests
-    for (uint32 i = 1; i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             if (cInfo->GossipMenuId)
                 if (m_mGossipMenusMap.find(cInfo->GossipMenuId) == m_mGossipMenusMap.end())
                     sLog.outErrorDb("Creature (Entry: %u) has gossip_menu_id = %u for nonexistent menu", cInfo->Entry, cInfo->GossipMenuId);
 
-    for (uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sGOStorage.GetMaxEntry(); ++i)
         if (GameObjectInfo const* gInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
             if (uint32 menuid = gInfo->GetGossipMenuId())
                 if (m_mGossipMenusMap.find(menuid) == m_mGossipMenusMap.end())
@@ -9125,7 +9123,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             if (itr->first)
                 menu_ids.insert(itr->first);
 
-        for (uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+        for (uint32 i = 1; i < sGOStorage.GetMaxEntry(); ++i)
             if (GameObjectInfo const* gInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
                 if (uint32 menuid = gInfo->GetGossipMenuId())
                     menu_ids.erase(menuid);
@@ -9139,7 +9137,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
     // prepare menuid -> CreatureInfo map for fast access
     typedef  std::multimap<uint32, const CreatureInfo*> Menu2CInfoMap;
     Menu2CInfoMap menu2CInfoMap;
-    for (uint32 i = 1;  i < sCreatureStorage.MaxEntry; ++i)
+    for (uint32 i = 1;  i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             if (cInfo->GossipMenuId)
             {

@@ -956,8 +956,8 @@ bool AuctionBotSeller::Initialize()
 
     uint32 itemsAdded = 0;
 
-    BarGoLink bar(sItemStorage.MaxEntry);
-    for (uint32 itemID = 0; itemID < sItemStorage.MaxEntry; ++itemID)
+    BarGoLink bar(sItemStorage.GetMaxEntry());
+    for (uint32 itemID = 0; itemID < sItemStorage.GetMaxEntry(); ++itemID)
     {
         ItemPrototype const* prototype = sObjectMgr.GetItemPrototype(itemID);
 

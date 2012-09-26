@@ -731,7 +731,7 @@ void ScriptMgr::LoadEventScripts()
     std::set<uint32> evt_scripts;
 
     // Load all possible script entries from gameobjects
-    for (uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sGOStorage.GetMaxEntry(); ++i)
     {
         if (GameObjectInfo const* goInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
         {
@@ -1745,7 +1745,7 @@ void ScriptMgr::LoadEventIdScripts()
     std::set<uint32> evt_scripts;
 
     // Load all possible event entries from gameobjects
-    for (uint32 i = 1; i < sGOStorage.MaxEntry; ++i)
+    for (uint32 i = 1; i < sGOStorage.GetMaxEntry(); ++i)
     {
         if (GameObjectInfo const* goInfo = sGOStorage.LookupEntry<GameObjectInfo>(i))
         {

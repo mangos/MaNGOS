@@ -21,79 +21,100 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "DBCFileLoader.h"
 
-class SQLStorage
+class SQLStorageBase
 {
-        template<class T>
-        friend struct SQLStorageLoaderBase;
+    template<class DerivedLoader, class StorageClass> friend class SQLStorageLoaderBase;
 
     public:
-        SQLStorage(const char* fmt, const char* _entry_field, const char* sqlname)
-        {
-            src_format = fmt;
-            dst_format = fmt;
-            init(_entry_field, sqlname);
-        }
+        char const* GetTableName() const { return m_tableName; }
+        char const* EntryFieldName() const { return m_entry_field; }
 
-        SQLStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
-        {
-            src_format = src_fmt;
-            dst_format = dst_fmt;
-            init(_entry_field, sqlname);
-        }
+        FieldFormat GetDstFormat(uint32 idx) const { return (FieldFormat)m_dst_format[idx]; };
+        const char* GetDstFormat() const { return m_dst_format; };
+        FieldFormat GetSrcFormat(uint32 idx) const { return (FieldFormat)m_src_format[idx]; };
+        const char* GetSrcFormat() const { return m_src_format; };
 
-        ~SQLStorage()
-        {
-            Free();
-        }
+        uint32 GetMaxEntry() const { return m_maxEntry; };
+        uint32 GetRecordCount() const { return m_recordCount; };
+
+    protected:
+        SQLStorageBase();
+        virtual ~SQLStorageBase() { Free(); }
+
+        void Initialize(const char* tableName, const char* entry_field, const char* src_format, const char* dst_format);
+
+        uint32 GetDstFieldCount() const { return m_dstFieldCount; }
+        uint32 GetSrcFieldCount() const { return m_srcFieldCount; }
+        uint32 GetRecordSize() const { return m_recordSize; }
+
+        virtual void prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize);
+        virtual void JustCreatedRecord(uint32 recordId, char* record) = 0;
+        virtual void Free();
+
+    private:
+        char* createRecord(uint32 recordId);
+
+        // Information about the table
+        const char* m_tableName;
+        const char* m_entry_field;
+        const char* m_src_format;
+        const char* m_dst_format;
+
+        // Information about the records
+        uint32 m_dstFieldCount;
+        uint32 m_srcFieldCount;
+        uint32 m_recordCount;
+        uint32 m_maxEntry;
+        uint32 m_recordSize;
+
+        // Data Storage
+        char* m_data;
+};
+
+class SQLStorage : public SQLStorageBase
+{
+    template<class DerivedLoader, class StorageClass> friend class SQLStorageLoaderBase;
+
+    public:
+        SQLStorage(const char* fmt, const char* _entry_field, const char* sqlname);
+
+        SQLStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname);
+
+        ~SQLStorage() { Free(); }
 
         template<class T>
         T const* LookupEntry(uint32 id) const
         {
-            if (id >= MaxEntry)
+            if (id >= GetMaxEntry())
                 return NULL;
-            return reinterpret_cast<T const*>(pIndex[id]);
+            return reinterpret_cast<T const*>(m_Index[id]);
         }
 
-        uint32 RecordCount;
-        uint32 MaxEntry;
-        uint32 iNumFields;
-        uint32 oNumFields;
-
-        char const* GetTableName() const { return table; }
-
         void Load();
-        void Free();
 
         void EraseEntry(uint32 id);
 
-    private:
-        void init(const char* _entry_field, const char* sqlname)
+    protected:
+        void prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize) override;
+        void JustCreatedRecord(uint32 recordId, char* record) override
         {
-            entry_field = _entry_field;
-            table = sqlname;
-            data = NULL;
-            pIndex = NULL;
-            iNumFields = strlen(src_format);
-            oNumFields = strlen(dst_format);
-            MaxEntry = 0;
+            m_Index[recordId] = record;
         }
 
-        char** pIndex;
+        void Free() override;
 
-        char* data;
-        const char* src_format;
-        const char* dst_format;
-        const char* table;
-        const char* entry_field;
-        // bool HasString;
+    private:
+        // Lookup access
+        char** m_Index;
 };
 
-template <class T>
-struct SQLStorageLoaderBase
+template <class DerivedLoader, class StorageClass>
+class SQLStorageLoaderBase
 {
     public:
-        void Load(SQLStorage& storage, bool error_at_empty = true);
+        void Load(StorageClass& storage, bool error_at_empty = true);
 
         template<class S, class D>
         void convert(uint32 field_pos, S src, D& dst);
@@ -113,14 +134,14 @@ struct SQLStorageLoaderBase
 
     private:
         template<class V>
-        void storeValue(V value, SQLStorage& store, char* p, uint32 x, uint32& offset);
-        void storeValue(char const* value, SQLStorage& store, char* p, uint32 x, uint32& offset);
+        void storeValue(V value, StorageClass& store, char* record, uint32 field_pos, uint32& offset);
+        void storeValue(char const* value, StorageClass& store, char* record, uint32 field_pos, uint32& offset);
 
         // trap, no body
-        void storeValue(char* value, SQLStorage& store, char* p, uint32 x, uint32& offset);
+        void storeValue(char* value, StorageClass& store, char* record, uint32 field_pos, uint32& offset);
 };
 
-struct SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader>
+class SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader, SQLStorage>
 {
 };
 
