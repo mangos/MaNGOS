@@ -1592,7 +1592,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
 {
     BattlemasterListEntry const* bgEntry = sBattlemasterListStore.LookupEntry(bgOrTemplate->GetTypeID());
     if (!bgEntry)
-        return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;            // shouldn't happen
+        return ERR_BATTLEGROUND_JOIN_FAILED;                // shouldn't happen
 
     // check for min / max count
     uint32 memberscount = GetMembersCount();
@@ -1644,7 +1644,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattleGroundQueue(BattleGround const* 
         if (!member->HasFreeBattleGroundQueueId())
             return ERR_BATTLEGROUND_TOO_MANY_QUEUES;        // not blizz-like
     }
-    return GroupJoinBattlegroundResult(bgOrTemplate->GetTypeID());
+    return ERR_BATTLEGROUND_NONE;
 }
 
 void Group::SetDungeonDifficulty(Difficulty difficulty)

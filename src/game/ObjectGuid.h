@@ -146,6 +146,7 @@ class MANGOS_DLL_SPEC ObjectGuid
         bool IsMOTransport()       const { return GetHigh() == HIGHGUID_MO_TRANSPORT;         }
         bool IsInstance()          const { return GetHigh() == HIGHGUID_INSTANCE;             }
         bool IsGroup()             const { return GetHigh() == HIGHGUID_GROUP;                }
+        bool IsBattleGround()      const { return GetHigh() == HIGHGUID_BATTLEGROUND;         }
 
         static TypeID GetTypeId(HighGuid high)
         {
@@ -220,6 +221,7 @@ class MANGOS_DLL_SPEC ObjectGuid
                 case HIGHGUID_UNIT:
                 case HIGHGUID_PET:
                 case HIGHGUID_VEHICLE:
+                case HIGHGUID_BATTLEGROUND:
                 default:
                     return true;
             }
