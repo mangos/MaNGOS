@@ -56,17 +56,18 @@ enum ArenaTeamCommandErrors
     ERR_ARENA_TEAM_TARGET_TOO_HIGH_S        = 0x16,
     ERR_ARENA_TEAM_TOO_MANY_MEMBERS_S       = 0x17,
     ERR_ARENA_TEAM_NOT_FOUND                = 0x1B,
-    ERR_ARENA_TEAMS_LOCKED                  = 0x1E
+    ERR_ARENA_TEAMS_LOCKED                  = 0x1E,
+    ERR_ARENA_TEAM_TOO_MANY_CREATE          = 0x21,
 };
 
 enum ArenaTeamEvents
 {
-    ERR_ARENA_TEAM_JOIN_SS                  = 3,            // player name + arena team name
-    ERR_ARENA_TEAM_LEAVE_SS                 = 4,            // player name + arena team name
-    ERR_ARENA_TEAM_REMOVE_SSS               = 5,            // player name + arena team name + captain name
-    ERR_ARENA_TEAM_LEADER_IS_SS             = 6,            // player name + arena team name
-    ERR_ARENA_TEAM_LEADER_CHANGED_SSS       = 7,            // old captain + new captain + arena team name
-    ERR_ARENA_TEAM_DISBANDED_S              = 8             // captain name + arena team name
+    ERR_ARENA_TEAM_JOIN_SS                  = 4,            // player name + arena team name
+    ERR_ARENA_TEAM_LEAVE_SS                 = 5,            // player name + arena team name
+    ERR_ARENA_TEAM_REMOVE_SSS               = 6,            // player name + arena team name + captain name
+    ERR_ARENA_TEAM_LEADER_IS_SS             = 7,            // player name + arena team name
+    ERR_ARENA_TEAM_LEADER_CHANGED_SSS       = 8,            // old captain + new captain + arena team name
+    ERR_ARENA_TEAM_DISBANDED_S              = 9,            // captain name + arena team name
 };
 
 /*
@@ -128,6 +129,7 @@ class ArenaTeam
         ArenaType GetType() const         { return m_Type; }
         uint8  GetSlot() const            { return GetSlotByType(GetType()); }
         static uint8 GetSlotByType(ArenaType type);
+        static ArenaType GetTypeBySlot(uint8 slot);
         ObjectGuid GetCaptainGuid() const { return m_CaptainGuid; }
         std::string GetName() const       { return m_Name; }
         const ArenaTeamStats& GetStats() const { return m_stats; }

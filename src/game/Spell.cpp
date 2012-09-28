@@ -4661,7 +4661,7 @@ void Spell::SendChannelStart(uint32 duration)
     //    data << uint32(0);
     //}
     data << uint8(0);       // unk2
-    //if (unk1)
+    //if (unk2)
     //{
     //    data << ObjectGuid().WriteAsPacked();
     //    data << uint32(0);

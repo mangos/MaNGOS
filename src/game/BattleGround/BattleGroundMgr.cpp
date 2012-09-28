@@ -1221,9 +1221,9 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
 
             data->WriteGuidMask<0, 4, 7, 1, 6, 3, 5, 2>(playerGuid);
             data->WriteGuidBytes<5, 6, 7, 2>(playerGuid);
-            *data << uint32(QueueSlot); // not queue slot
+            *data << uint32(QueueSlot);                 // not queue slot
             data->WriteGuidBytes<3, 1>(playerGuid);
-            *data << uint32(QueueSlot); // Queue slot
+            *data << uint32(QueueSlot);                 // Queue slot
             *data << uint32(bg->GetStartTime());
             data->WriteGuidBytes<0, 4>(playerGuid);
             break;
@@ -1259,13 +1259,13 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             //if (...)
             //    *data << uint8(playerCount);          // player count (XvX) > 0 && rated: Rated XvX, !rated: Skirmish XvX. if ==0 >= Bg type
             //else
-                *data << uint8(0);
+                *data << uint8(arenatype);
             data->WriteGuidBytes<6>(bgGuid);
             data->WriteGuidBytes<7>(playerGuid);
             data->WriteGuidBytes<3>(bgGuid);
             data->WriteGuidBytes<6>(playerGuid);
             data->WriteGuidBytes<0>(bgGuid);
-            *data << uint32(0);                // Time
+            *data << uint32(0);                         // Time
             *data << uint32(QueueSlot);                 // queueslot
             *data << uint8(0);                          // maxlevel? seen 85 only in sniffs
             *data << uint32(Time2);                     // unk 10 Time since started time2
@@ -1283,14 +1283,14 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             //*data << uint8(bg->GetPlayersCountByTeam(bg->GetPlayerTeam(playerGuid)));
             *data << uint8(0);                          // unk 0
             *data << uint32(QueueSlot);                 // Queue slot
-            *data << uint32(0);                // Time
+            *data << uint32(0);                         // Time
             *data << uint8(0);                          // Max Level
-            *data << uint32(QueueSlot);           // not queueslot
+            *data << uint32(QueueSlot);                 // not queueslot
             *data << uint32(bg->GetMapId());            // Map Id
             //if (...)
             //    *data << uint8(playerCount);          // player count (XvX) > 0 && rated: Rated XvX, !rated: Skirmish XvX. if ==0 >= Bg type
             //else
-                *data << uint8(0);
+                *data << uint8(arenatype);
 
             data->WriteGuidMask<5, 2, 1>(playerGuid);
             data->WriteGuidMask<2>(bgGuid);
@@ -1339,7 +1339,7 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             data->WriteGuidBytes<6>(playerGuid);
 
             *data << uint32(0);                         // Time
-            *data << uint8(arenatype);                  // Teamsize
+            *data << uint8(0);                          // unk
 
             data->WriteGuidBytes<4, 1>(playerGuid);
 
@@ -1347,7 +1347,8 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket* data, BattleGro
             //if (...)
             //    *data << uint8(playerCount);          // player count (XvX) > 0 && rated: Rated XvX, !rated: Skirmish XvX. if ==0 >= Bg type
             //else
-                *data << uint8(0);
+                *data << uint8(arenatype);
+
             *data << uint32(QueueSlot);                 // not queue slot
             *data << uint32(bg->GetMapId());            // Map Id
             *data << uint8(0);                          // Max Level? seen 85
@@ -1428,7 +1429,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg)
     if (bg->isArena())
     {
         // it seems this must be according to BG_WINNER_A/H and _NOT_ BG_TEAM_A/H
-        for (int8 i = 1; i >= 0; --i)
+        for (int8 i = 0; i < BG_TEAMS_COUNT; ++i)
         {
             if (ArenaTeam* at = sObjectMgr.GetArenaTeamById(bg->m_ArenaTeamIds[i]))
                 data->WriteBits(at->GetName().length(), 8);
@@ -1516,7 +1517,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg)
                 data->WriteBits(0, 24);                     // count of next fields
                 break;
              default:
-                DEBUG_LOG("Unhandled SMSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID());
+                sLog.outError("Unhandled SMSG_PVP_LOG_DATA for BG id %u", bg->GetTypeID());
                 data->WriteBits(0, 24);                     // count of next fields
                 break;
         }
@@ -1528,19 +1529,18 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg)
         buffer.WriteGuidBytes<7, 2>(memberGuid);
     }
 
-    data->WriteBit(bg->GetStatus() == STATUS_WAIT_LEAVE);    // If Ended
+    data->WriteBit(bg->GetStatus() == STATUS_WAIT_LEAVE);   // If Ended
 
     if (bg->isRated())                                      // arena
     {
-        // it seems this must be according to BG_WINNER_A/H and _NOT_ BG_TEAM_A/H
-        for (int8 i = 1; i >= 0; --i)
+        for (int8 i = 0; i < BG_TEAMS_COUNT; ++i)
         {
             uint32 pointsLost = bg->m_ArenaTeamRatingChanges[i] < 0 ? abs(bg->m_ArenaTeamRatingChanges[i]) : 0;
             uint32 pointsGained = bg->m_ArenaTeamRatingChanges[i] > 0 ? bg->m_ArenaTeamRatingChanges[i] : 0;
 
+            *data << uint32(0);                             // Matchmaking Value
             *data << uint32(pointsLost);                    // Rating Lost
             *data << uint32(pointsGained);                  // Rating gained
-            *data << uint32(0);                             // Matchmaking Value
             DEBUG_LOG("rating change: %d", bg->m_ArenaTeamRatingChanges[i]);
         }
     }
@@ -1550,7 +1550,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround* bg)
 
     if (bg->isArena())
     {
-        for (int8 i = 1; i >= 0; --i)
+        for (int8 i = 0; i < BG_TEAMS_COUNT; ++i)
         {
             if (ArenaTeam* at = sObjectMgr.GetArenaTeamById(bg->m_ArenaTeamIds[i]))
                 data->append(at->GetName().data(), at->GetName().length());

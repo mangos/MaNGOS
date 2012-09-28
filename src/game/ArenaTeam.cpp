@@ -543,6 +543,20 @@ uint8 ArenaTeam::GetSlotByType(ArenaType type)
     return 0xFF;
 }
 
+ArenaType ArenaTeam::GetTypeBySlot(uint8 slot)
+{
+    switch (slot)
+    {
+        case 0: return ARENA_TYPE_2v2;
+        case 1: return ARENA_TYPE_3v3;
+        case 2: return ARENA_TYPE_5v5;
+        default:
+            break;
+    }
+    sLog.outError("FATAL: Unknown arena team slot %u for some arena team", slot);
+    return ArenaType(0xFF);
+}
+
 bool ArenaTeam::HaveMember(ObjectGuid guid) const
 {
     for (MemberList::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)

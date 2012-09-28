@@ -797,6 +797,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleInspectArenaTeamsOpcode(WorldPacket& recv_data);
         void HandleArenaTeamQueryOpcode(WorldPacket& recv_data);
         void HandleArenaTeamRosterOpcode(WorldPacket& recv_data);
+        void HandleArenaTeamCreateOpcode(WorldPacket& recv_data);
         void HandleArenaTeamInviteOpcode(WorldPacket& recv_data);
         void HandleArenaTeamAcceptOpcode(WorldPacket& recv_data);
         void HandleArenaTeamDeclineOpcode(WorldPacket& recv_data);
