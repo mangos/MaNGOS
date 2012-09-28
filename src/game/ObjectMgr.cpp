@@ -663,15 +663,6 @@ void ObjectMgr::LoadCreatureTemplates()
                 sLog.outErrorDb("Creature (Entry: %u) has non-existing PetSpellDataId (%u)", cInfo->Entry, cInfo->PetSpellDataId);
         }
 
-        for (int j = 0; j < CREATURE_MAX_SPELLS; ++j)
-        {
-            if (cInfo->spells[j] && !sSpellStore.LookupEntry(cInfo->spells[j]))
-            {
-                sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->Entry, j + 1, cInfo->spells[j]);
-                const_cast<CreatureInfo*>(cInfo)->spells[j] = 0;
-            }
-        }
-
         if (cInfo->MovementType >= MAX_DB_MOTION_TYPE)
         {
             sLog.outErrorDb("Creature (Entry: %u) has wrong movement generator type (%u), ignore and set to IDLE.", cInfo->Entry, cInfo->MovementType);
@@ -9542,6 +9533,31 @@ bool LoadMangosStrings(DatabaseType& db, char const* table, int32 start_value, i
     }
 
     return sObjectMgr.LoadMangosStrings(db, table, start_value, end_value);
+}
+
+void ObjectMgr::LoadCreatureTemplateSpells()
+{
+    sCreatureTemplateSpellsStorage.Load();
+
+    sLog.outString(">> Loaded %u creature_template_spells definitions", sCreatureTemplateSpellsStorage.GetRecordCount());
+    sLog.outString();
+
+    for (SQLStorageBase::SQLSIterator<CreatureTemplateSpells> itr = sCreatureTemplateSpellsStorage.getDataBegin<CreatureTemplateSpells>(); itr < sCreatureTemplateSpellsStorage.getDataEnd<CreatureTemplateSpells>(); ++itr)
+    {
+        if (!sCreatureStorage.LookupEntry<CreatureInfo>(itr->entry))
+        {
+            sLog.outErrorDb("LoadCreatureTemplateSpells: Spells found for creature entry %u, but creature does not exist, skipping", itr->entry);
+            sCreatureTemplateSpellsStorage.EraseEntry(itr->entry);
+        }
+        for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+        {
+            if (itr->spells[i] && !sSpellStore.LookupEntry(itr->spells[i]))
+            {
+                sLog.outErrorDb("LoadCreatureTemplateSpells: Spells found for creature entry %u, assigned spell %s does not exist, set to 0", itr->entry, itr->spells[i]);
+                const_cast<CreatureTemplateSpells*>(*itr)->spells[i] = 0;
+            }
+        }
+    }
 }
 
 CreatureInfo const* GetCreatureTemplateStore(uint32 entry)

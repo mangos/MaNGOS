@@ -3628,7 +3628,7 @@ bool SpellMgr::LoadPetDefaultSpells_helper(CreatureInfo const* cInfo, PetDefault
 
 void SpellMgr::LoadPetDefaultSpells()
 {
-    MANGOS_ASSERT(MAX_CREATURE_SPELL_DATA_SLOT == CREATURE_MAX_SPELLS);
+    MANGOS_ASSERT(MAX_CREATURE_SPELL_DATA_SLOT <= CREATURE_MAX_SPELLS);
 
     mPetDefaultSpellsMap.clear();
 
@@ -3691,8 +3691,9 @@ void SpellMgr::LoadPetDefaultSpells()
                     continue;
 
                 PetDefaultSpellsEntry petDefSpells;
-                for (int j = 0; j < MAX_CREATURE_SPELL_DATA_SLOT; ++j)
-                    petDefSpells.spellid[j] = cInfo->spells[j];
+                if (CreatureTemplateSpells const* templateSpells = sCreatureTemplateSpellsStorage.LookupEntry<CreatureTemplateSpells>(cInfo->Entry))
+                    for (int j = 0; j < MAX_CREATURE_SPELL_DATA_SLOT; ++j)
+                        petDefSpells.spellid[j] = templateSpells->spells[j];
 
                 if (LoadPetDefaultSpells_helper(cInfo, petDefSpells))
                 {

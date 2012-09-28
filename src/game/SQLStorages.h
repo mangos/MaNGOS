@@ -36,6 +36,7 @@ extern SQLStorage sConditionStorage;
 
 extern SQLHashStorage sSpellTemplate;
 extern SQLHashStorage sGameObjectDataAddonStorage;
+extern SQLHashStorage sCreatureTemplateSpellsStorage;
 
 extern SQLMultiStorage sVehicleAccessoryStorage;
 
