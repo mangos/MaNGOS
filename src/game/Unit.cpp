@@ -9273,6 +9273,14 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
             return int32(GetFloatValue(PLAYER_MASTERY) * masteryCoef / 100.0f);
     }
 
+    // calculate basepoints for armor specialization spells
+    if (unitPlayer && spellProto->HasAttribute(SPELL_ATTR_EX8_ARMOR_SPECIALIZATION))
+    {
+        // check spells not valid for current talent tree or insufficient equipped items
+        if (!unitPlayer->FitArmorSpecializationRules(spellProto))
+            return 0;
+    }
+
     uint8 comboPoints = unitPlayer ? unitPlayer->GetComboPoints() : 0;
 
     int32 basePoints = 0;

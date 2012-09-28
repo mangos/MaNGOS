@@ -3962,6 +3962,8 @@ bool Player::resetTalents(bool no_cost, bool all_specs)
     // Update talent tree role-dependent mana regen
     UpdateManaRegen();
 
+    UpdateArmorSpecializations();
+
     // FIXME: remove pet before or after unlearn spells? for now after unlearn to allow removing of talent related, pet affecting auras
     RemovePet(PET_SAVE_REAGENTS);
     /* when prev line will dropped use next line
@@ -8923,16 +8925,15 @@ void Player::SetSheath(SheathState sheathed)
     Unit::SetSheath(sheathed);                              // this must visualize Sheath changing for other players...
 }
 
-uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const
+bool Player::GetSlotsForInventoryType(uint8 invType, uint8* slots, uint32 subClass) const
 {
     uint8 pClass = getClass();
 
-    uint8 slots[4];
     slots[0] = NULL_SLOT;
     slots[1] = NULL_SLOT;
     slots[2] = NULL_SLOT;
     slots[3] = NULL_SLOT;
-    switch (proto->InventoryType)
+    switch (invType)
     {
         case INVTYPE_HEAD:
             slots[0] = EQUIPMENT_SLOT_HEAD;
@@ -8983,11 +8984,11 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
             slots[0] = EQUIPMENT_SLOT_MAINHAND;
 
             // suggest offhand slot only if know dual wielding
-            // (this will be replace mainhand weapon at auto equip instead unwonted "you don't known dual wielding" ...
+            // (this will be replace mainhand weapon at auto equip instead unwanted "you don't known dual wielding" ...
             if (CanDualWield())
                 slots[1] = EQUIPMENT_SLOT_OFFHAND;
             break;
-        };
+        }
         case INVTYPE_SHIELD:
             slots[0] = EQUIPMENT_SLOT_OFFHAND;
             break;
@@ -9025,7 +9026,7 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
             break;
         case INVTYPE_RELIC:
         {
-            switch (proto->SubClass)
+            switch (subClass)
             {
                 case ITEM_SUBCLASS_ARMOR_LIBRAM:
                     if (pClass == CLASS_PALADIN)
@@ -9050,9 +9051,18 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
             }
             break;
         }
-        default :
-            return NULL_SLOT;
+        default:
+            return false;
     }
+
+    return true;
+}
+
+uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const
+{
+    uint8 slots[4];
+    if (!GetSlotsForInventoryType(proto->InventoryType, slots, proto->SubClass))
+        return NULL_SLOT;
 
     if (slot != NULL_SLOT)
     {
@@ -11092,6 +11102,8 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             UpdateExpertise(OFF_ATTACK);
             UpdateArmorPenetration();
         }
+
+        UpdateArmorSpecializations();
     }
     else
     {
@@ -11151,6 +11163,8 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
 
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, slot + 1);
+
+        UpdateArmorSpecializations();
     }
 }
 
@@ -11259,6 +11273,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
                 if ((slot == EQUIPMENT_SLOT_MAINHAND || slot == EQUIPMENT_SLOT_OFFHAND) && CanTitanGrip() && !HasTwoHandWeaponInOneHand())
                     RemoveAurasDueToSpell(49152);
             }
+
+            UpdateArmorSpecializations();
         }
         else
         {
@@ -22370,6 +22386,7 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
 
         // Update talent tree role-dependent mana regen
         UpdateManaRegen();
+        UpdateArmorSpecializations();
     }
 
     return true;
@@ -23075,6 +23092,8 @@ void Player::ActivateSpec(uint8 specNum)
 
     // Update talent tree role-dependent mana regen
     UpdateManaRegen();
+
+    UpdateArmorSpecializations();
 }
 
 void Player::UpdateSpecCount(uint8 count)
@@ -23388,7 +23407,7 @@ void Player::_fillGearScoreData(Item* item, GearScoreVec* gearScore, uint32& two
             break;
         case INVTYPE_WEAPON:
         case INVTYPE_WEAPONMAINHAND:
-            (*gearScore)[SLOT_MAIN_HAND] = std::max((*gearScore)[SLOT_MAIN_HAND], level);
+            (*gearScore)[EQUIPMENT_SLOT_MAINHAND] = std::max((*gearScore)[EQUIPMENT_SLOT_MAINHAND], level);
             break;
         case INVTYPE_SHIELD:
         case INVTYPE_WEAPONOFFHAND:
@@ -23899,4 +23918,160 @@ AreaLockStatus Player::GetAreaTriggerLockStatus(AreaTrigger const* at, Difficult
     }
 
     return AREA_LOCKSTATUS_OK;
+}
+
+const uint32 armorSpecToClass[MAX_CLASSES] =
+{
+    0,
+    86526,  // CLASS_WARRIOR
+    86525,  // CLASS_PALADIN
+    86528,  // CLASS_HUNTER
+    86531,  // CLASS_ROGUE
+    0,      // CLASS_PRIEST
+    86524,  // CLASS_DEATH_KNIGHT
+    86529,  // CLASS_SHAMAN
+    0,      // CLASS_MAGE
+    0,      // CLASS_WARLOCK
+    0,      // CLASS_UNK2
+    86530,  // CLASS_DRUID
 };
+
+#define MAX_ARMOR_SPECIALIZATION_SPELLS 18
+struct armorSpecToTabInfo
+{
+    uint32 spellId;
+    uint8 Class;
+    uint16 tab;
+};
+
+const armorSpecToTabInfo armorSpecToTab[MAX_ARMOR_SPECIALIZATION_SPELLS] =
+{
+    { 86537, CLASS_DEATH_KNIGHT, 398 }, // blood
+    { 86113, CLASS_DEATH_KNIGHT, 399 }, // frost
+    { 86536, CLASS_DEATH_KNIGHT, 400 }, // unholy
+    { 86093, CLASS_DRUID, 752 },        // balance
+    { 86096, CLASS_DRUID, 750 },        // feral
+    { 86097, CLASS_DRUID, 750 },        // feral
+    { 86104, CLASS_DRUID, 748 },        // resto
+    { 86538, CLASS_HUNTER, 0 },         //
+    { 86103, CLASS_PALADIN, 831 },      // holy
+    { 86102, CLASS_PALADIN, 839 },      // prot
+    { 86539, CLASS_PALADIN, 855 },      // retro
+    { 86092, CLASS_ROGUE, 0 },          //
+    { 86100, CLASS_SHAMAN, 261 },       // elem
+    { 86099, CLASS_SHAMAN, 263 },       // ench
+    { 86108, CLASS_SHAMAN, 262 },       // restor
+    { 86101, CLASS_WARRIOR, 746 },      // arms
+    { 86110, CLASS_WARRIOR, 815 },      // fury
+    { 86535, CLASS_WARRIOR, 845 },      // prot
+};
+
+void Player::UpdateArmorSpecializations()
+{
+    uint32 specPassive = armorSpecToClass[getClass()];
+    // return class has no armor specialization
+    if (!specPassive)
+        return;
+
+    for (int i = 0; i < MAX_ARMOR_SPECIALIZATION_SPELLS; ++i)
+    {
+        if (armorSpecToTab[i].Class != getClass())
+            continue;
+
+        SpellEntry const * spellProto = sSpellStore.LookupEntry(armorSpecToTab[i].spellId);
+        if (!spellProto || !spellProto->HasAttribute(SPELL_ATTR_EX8_ARMOR_SPECIALIZATION))
+        {
+            sLog.outError("Player::UpdateArmorSpecializations: unexistent or wrong spell %u for class %u",
+                armorSpecToTab[i].spellId, armorSpecToTab[i].Class);
+            continue;
+        }
+
+        // remove if base passive is unlearned
+        if (!HasSpell(specPassive))
+        {
+            RemoveAurasDueToSpell(spellProto->Id);
+            continue;
+        }
+
+        SpellAuraHolder* holder = GetSpellAuraHolder(spellProto->Id);
+        if (!holder)
+        {
+            // cast absent spells that may be missing due to shapeshift form dependency
+            CastSpell(this, spellProto->Id, true);
+            continue;
+        }
+
+        Aura* aura = holder->GetAuraByEffectIndex(EFFECT_INDEX_0);
+        if (!aura)
+            continue;
+
+        // recalculate modifier depending on current tree
+        aura->ApplyModifier(false, false);
+        aura->GetModifier()->m_amount = CalculateSpellDamage(this, spellProto, EFFECT_INDEX_0);
+        aura->ApplyModifier(true, false);
+    }
+}
+
+bool Player::FitArmorSpecializationRules(SpellEntry const * spellProto) const
+{
+    if (!spellProto || !spellProto->HasAttribute(SPELL_ATTR_EX8_ARMOR_SPECIALIZATION))
+        return true;
+
+    int i = 0;
+    for (; i < MAX_ARMOR_SPECIALIZATION_SPELLS; ++i)
+    {
+        if (spellProto->Id == armorSpecToTab[i].spellId)
+        {
+            if (!armorSpecToTab[i].tab && m_talentsPrimaryTree[m_activeSpec] == 0 ||
+                armorSpecToTab[i].tab && armorSpecToTab[i].tab != m_talentsPrimaryTree[m_activeSpec])
+                return false;
+
+            break;
+        }
+    }
+
+    if (i == MAX_ARMOR_SPECIALIZATION_SPELLS)
+        return false;
+
+    if (!HasSpell(armorSpecToClass[getClass()]))
+        return false;
+
+    if (SpellEquippedItemsEntry const * itemsEntry = spellProto->GetSpellEquippedItems())
+    {
+        // there spells check items with inventory types which are in EquippedItemInventoryTypeMask
+        uint32 inventoryTypeMask = itemsEntry->EquippedItemInventoryTypeMask;
+        // get slots that should be check for item presence and SpellEquippedItemsEntry match
+        uint32 slotMask = 0;
+        uint8 slots[4];
+        for (int i = 0; i < MAX_INVTYPE; ++i)
+        {
+            if (inventoryTypeMask & (1 << i))
+            {
+                if (!GetSlotsForInventoryType(i, slots))
+                    continue;
+                for (int j = 0; j < 4; ++j)
+                    if (slots[j] != NULL_SLOT)
+                        slotMask |= 1 << slots[j];
+            }
+        }
+
+        for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        {
+            if (slotMask & (1 << i))
+            {
+                Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                // item must be present for specialization to work
+                if (!item)
+                    return false;
+
+                if (item->GetProto()->Class != itemsEntry->EquippedItemClass)
+                    return false;
+
+                if (((1 << item->GetProto()->SubClass) & itemsEntry->EquippedItemSubClassMask) == 0)
+                    return false;
+            }
+        }
+    }
+
+    return true;
+}

@@ -3641,6 +3641,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
     if (target->GetTypeId() == TYPEID_PLAYER)
         ((Player*)target)->InitDataForForm();
+
+    // update form-dependent armor specializations
+    if (target->GetTypeId() == TYPEID_PLAYER && ((Player*)target)->getClass() == CLASS_DRUID)
+        ((Player*)target)->UpdateArmorSpecializations();
 }
 
 void Aura::HandleAuraTransform(bool apply, bool Real)
@@ -5936,13 +5940,11 @@ void Aura::HandleModHealingDone(bool /*apply*/, bool /*Real*/)
 
 void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
 {
-    if (m_modifier.m_miscvalue < -1 || m_modifier.m_miscvalue > 4)
-    {
-        sLog.outError("WARNING: Misc Value for SPELL_AURA_MOD_PERCENT_STAT not valid");
+    if (!m_modifier.m_amount)
         return;
-    }
 
     Unit* target = GetTarget();
+    uint32 miscValueB = GetSpellEffect()->EffectMiscValueB;
 
     // save current and max HP before applying aura
     uint32 curHPValue = target->GetHealth();
@@ -5950,7 +5952,7 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
 
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
     {
-        if (m_modifier.m_miscvalue == i || m_modifier.m_miscvalue == -1)
+        if ((miscValueB & (1 << i)) || miscValueB == 0)
         {
             target->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_PCT, float(m_modifier.m_amount), apply);
             if (target->GetTypeId() == TYPEID_PLAYER || ((Creature*)target)->IsPet())
@@ -5959,10 +5961,9 @@ void Aura::HandleModTotalPercentStat(bool apply, bool /*Real*/)
     }
 
     // recalculate current HP/MP after applying aura modifications (only for spells with 0x10 flag)
-    if (m_modifier.m_miscvalue == STAT_STAMINA && maxHPValue > 0 && GetSpellProto()->HasAttribute(SPELL_ATTR_UNK4))
+    if ((miscValueB & (1 << STAT_STAMINA)) && maxHPValue > 0 && GetSpellProto()->HasAttribute(SPELL_ATTR_UNK4))
     {
-        // newHP = (curHP / maxHP) * newMaxHP = (newMaxHP * curHP) / maxHP -> which is better because no int -> double -> int conversion is needed
-        uint32 newHPValue = (target->GetMaxHealth() * curHPValue) / maxHPValue;
+        uint32 newHPValue = uint32(float(target->GetMaxHealth()) / maxHPValue * curHPValue);
         target->SetHealth(newHPValue);
     }
 }

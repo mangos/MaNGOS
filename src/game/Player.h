@@ -1182,6 +1182,7 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         void SetVirtualItemSlot(uint8 i, Item* item);
         void SetSheath(SheathState sheathed) override;      // overwrite Unit version
+        bool GetSlotsForInventoryType(uint8 invType, uint8* slots, uint32 subClass = 0) const;
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = NULL) const;
         uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = NULL) const;
@@ -1849,6 +1850,8 @@ class MANGOS_DLL_SPEC Player : public Unit
         void ApplyHealthRegenBonus(int32 amount, bool apply);
         void UpdateManaRegen();
         void UpdateMasteryAuras();
+        void UpdateArmorSpecializations();
+        bool FitArmorSpecializationRules(SpellEntry const * spellProto) const;
 
         ObjectGuid const& GetLootGuid() const { return m_lootGuid; }
         void SetLootGuid(ObjectGuid const& guid) { m_lootGuid = guid; }
