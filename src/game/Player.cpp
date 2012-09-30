@@ -22376,9 +22376,8 @@ bool Player::LearnTalent(uint32 talentId, uint32 talentRank)
     {
         m_talentsPrimaryTree[m_activeSpec] = talentInfo->TalentTab;
         if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(talentInfo->TalentTab))
-            if (HasAuraType(SPELL_AURA_MASTERY))
-                for (size_t i = 0; i < specSpells->size(); ++i)
-                    learnSpell(specSpells->at(i), false);
+            for (size_t i = 0; i < specSpells->size(); ++i)
+                learnSpell(specSpells->at(i), false);
 
         if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(talentInfo->TalentTab))
             for (size_t i = 0; i < specSpells->size(); ++i)
@@ -23069,9 +23068,8 @@ void Player::ActivateSpec(uint8 specNum)
     ResummonPetTemporaryUnSummonedIfAny();
 
     if (std::vector<uint32> const* specSpells = GetTalentTreeMasterySpells(m_talentsPrimaryTree[m_activeSpec]))
-        if (HasAuraType(SPELL_AURA_MASTERY))
-            for (size_t i = 0; i < specSpells->size(); ++i)
-                learnSpell(specSpells->at(i), false);
+        for (size_t i = 0; i < specSpells->size(); ++i)
+            learnSpell(specSpells->at(i), false);
 
     if (std::vector<uint32> const* specSpells = GetTalentTreePrimarySpells(m_talentsPrimaryTree[m_activeSpec]))
         for (size_t i = 0; i < specSpells->size(); ++i)
