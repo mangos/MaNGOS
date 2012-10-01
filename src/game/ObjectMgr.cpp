@@ -7043,7 +7043,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 
 static char* SERVER_SIDE_SPELL      = "MaNGOS server-side spell";
 
-struct SQLSpellLoader : public SQLStorageLoaderBase<SQLSpellLoader, SQLStorage>
+struct SQLSpellLoader : public SQLStorageLoaderBase<SQLSpellLoader, SQLHashStorage>
 {
     template<class S, class D>
     void default_fill(uint32 field_pos, S src, D &dst)

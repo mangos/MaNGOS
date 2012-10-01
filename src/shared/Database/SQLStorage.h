@@ -110,6 +110,43 @@ class SQLStorage : public SQLStorageBase
         char** m_Index;
 };
 
+class SQLHashStorage : public SQLStorageBase
+{
+    template<class DerivedLoader, class StorageClass> friend class SQLStorageLoaderBase;
+
+    public:
+        SQLHashStorage(const char* fmt, const char * _entry_field, const char * sqlname);
+        SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname);
+
+        ~SQLHashStorage() { Free(); }
+
+        template<class T>
+        T const* LookupEntry(uint32 id) const
+        {
+            RecordMap::const_iterator find = m_indexMap.find(id);
+            if (find != m_indexMap.end())
+                return reinterpret_cast<T const*>(find->second);
+            return NULL;
+        }
+
+        void Load();
+
+        void EraseEntry(uint32 id);
+
+    protected:
+        void prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize) override;
+        void JustCreatedRecord(uint32 recordId, char* record) override
+        {
+            m_indexMap[recordId] = record;
+        }
+
+        void Free() override;
+
+    private:
+        typedef UNORDERED_MAP<uint32/*recordId*/, char* /*record*/> RecordMap;
+        RecordMap m_indexMap;
+};
+
 template <class DerivedLoader, class StorageClass>
 class SQLStorageLoaderBase
 {
@@ -142,6 +179,10 @@ class SQLStorageLoaderBase
 };
 
 class SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader, SQLStorage>
+{
+};
+
+class SQLHashStorageLoader : public SQLStorageLoaderBase<SQLHashStorageLoader, SQLHashStorage>
 {
 };
 

@@ -160,3 +160,42 @@ void SQLStorage::prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 re
 
     SQLStorageBase::prepareToLoad(maxRecordId, recordCount, recordSize);
 }
+
+// -----------------------------------  SQLHashStorage  ---------------------------------------- //
+void SQLHashStorage::Load()
+{
+    SQLHashStorageLoader loader;
+    loader.Load(*this);
+}
+
+void SQLHashStorage::Free()
+{
+    SQLStorageBase::Free();
+    m_indexMap.clear();
+}
+
+void SQLHashStorage::prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize)
+{
+    // Clear (possible) old data and old index array
+    Free();
+
+    SQLStorageBase::prepareToLoad(maxRecordId, recordCount, recordSize);
+}
+
+void SQLHashStorage::EraseEntry(uint32 id)
+{
+    // do not erase from m_records
+    RecordMap::iterator find = m_indexMap.find(id);
+    if (find != m_indexMap.end())
+        find->second = NULL;
+}
+
+SQLHashStorage::SQLHashStorage(const char* fmt, const char * _entry_field, const char * sqlname)
+{
+    Initialize(sqlname, _entry_field, fmt, fmt);
+}
+
+SQLHashStorage::SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname)
+{
+    Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
+}
