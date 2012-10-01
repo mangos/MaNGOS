@@ -79,6 +79,11 @@ VehicleInfo::VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry) : Transp
     }
 }
 
+VehicleInfo::~VehicleInfo()
+{
+    ((Unit*)m_owner)->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
+}
+
 /**
  * This function will board a passenger onto a vehicle
  *

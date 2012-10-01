@@ -1270,8 +1270,8 @@ void InitializeOpcodes()
     //OPCODE(CMSG_QUERY_VEHICLE_STATUS,                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
     //OPCODE(SMSG_BATTLEGROUND_INFO_THROTTLED,             STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(SMSG_SET_VEHICLE_REC_ID,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_RIDE_VEHICLE_INTERACT,                   STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
-    //OPCODE(CMSG_CONTROLLER_EJECT_PASSENGER,              STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );
+    //OPCODE(CMSG_RIDE_VEHICLE_INTERACT,                   STATUS_LOGGEDIN, PROCESS_THREADSAFE,   &WorldSession::HandleRideVehicleInteract       );
+    //OPCODE(CMSG_CONTROLLER_EJECT_PASSENGER,              STATUS_LOGGEDIN, PROCESS_THREADSAFE,   &WorldSession::HandleEjectPassenger            );
     OPCODE(SMSG_PET_GUIDS,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(SMSG_CLIENTCACHE_VERSION,                     STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     //OPCODE(CMSG_CHANGE_GDF_ARENA_RATING,                 STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_NULL                     );

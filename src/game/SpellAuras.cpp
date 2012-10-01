@@ -3348,10 +3348,27 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
             display_id = minfo->modelid;
 
         target->Mount(display_id, GetId());
+
+        if (ci->vehicleId)
+        {
+            target->SetVehicleId(ci->vehicleId);
+
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
+        }
     }
     else
     {
         target->Unmount(true);
+
+        CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
+        if (ci && target->IsVehicle() && ci->vehicleId == target->GetVehicleInfo()->GetVehicleEntry()->m_ID)
+        {
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
+
+            target->SetVehicleId(0);
+        }
     }
 }
 

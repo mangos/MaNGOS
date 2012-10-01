@@ -781,7 +781,7 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType, ObjectGuid casterGuid)
     {
         if ((*iter)->GetCasterGuid() == casterGuid)
         {
-            RemoveAuraHolderFromStack((*iter)->GetId(), 1, casterGuid);
+            RemoveSpellAuraHolder((*iter)->GetHolder());
             iter = m_modAuras[auraType].begin();
         }
         else

@@ -55,6 +55,7 @@ class VehicleInfo : public TransportBase
 {
     public:
         explicit VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry);
+        ~VehicleInfo();
 
         VehicleEntry const* GetVehicleEntry() const { return m_vehicleEntry; }
 
