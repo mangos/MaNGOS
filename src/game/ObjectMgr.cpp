@@ -152,8 +152,6 @@ ObjectMgr::ObjectMgr() :
     m_FirstTemporaryCreatureGuid(1),
     m_FirstTemporaryGameObjectGuid(1)
 {
-    // Only zero condition left, others will be added while loading DB tables
-    mConditions.resize(1);
 }
 
 ObjectMgr::~ObjectMgr()
@@ -4890,7 +4888,7 @@ void ObjectMgr::LoadWorldTemplate()
 void ObjectMgr::LoadConditions()
 {
     SQLWorldLoader loader;
-    loader.Load(sConditionStorage, false);
+    loader.Load(sConditionStorage);
 
     for (uint32 i = 0; i < sConditionStorage.GetMaxEntry(); ++i)
     {
@@ -7790,30 +7788,8 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     sLog.outString(">> Loaded %u areas for fishing base skill level", count);
 }
 
-// Searches for the same condition already in Conditions store
-// Returns Id if found, else adds it to Conditions and returns Id
-uint16 ObjectMgr::GetConditionId(ConditionType condition, uint32 value1, uint32 value2)
-{
-    PlayerCondition lc = PlayerCondition(0, condition, value1, value2);
-    for (uint16 i = 0; i < mConditions.size(); ++i)
-    {
-        if (lc == mConditions[i])
-            return i;
-    }
-
-    mConditions.push_back(lc);
-
-    if (mConditions.size() > 0xFFFF)
-    {
-        sLog.outError("Conditions store overflow! Current and later loaded conditions will ignored!");
-        return 0;
-    }
-
-    return mConditions.size() - 1;
-}
-
 // Check if a player meets condition conditionId
-bool ObjectMgr::IsPlayerMeetToNEWCondition(Player const* pPlayer, uint16 conditionId) const
+bool ObjectMgr::IsPlayerMeetToCondition(Player const* pPlayer, uint16 conditionId) const
 {
     if (!pPlayer)
         return false;                                       // player not present, return false
@@ -8984,8 +8960,8 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
     m_mGossipMenusMap.clear();
     //                                                0      1        2
     QueryResult* result = WorldDatabase.Query("SELECT entry, text_id, script_id, "
-                          //   3       4             5             6       7             8            9
-                          "cond_1, cond_1_val_1, cond_1_val_2, cond_2, cond_2_val_1, cond_2_val_2, condition_id FROM gossip_menu");
+                          //   3
+                          "condition_id FROM gossip_menu");
 
     if (!result)
     {
@@ -9014,14 +8990,7 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
         gMenu.text_id           = fields[1].GetUInt32();
         gMenu.script_id         = fields[2].GetUInt32();
 
-        ConditionType cond_1    = (ConditionType)fields[3].GetUInt32();
-        uint32 cond_1_val_1     = fields[4].GetUInt32();
-        uint32 cond_1_val_2     = fields[5].GetUInt32();
-        ConditionType cond_2    = (ConditionType)fields[6].GetUInt32();
-        uint32 cond_2_val_1     = fields[7].GetUInt32();
-        uint32 cond_2_val_2     = fields[8].GetUInt32();
-
-        gMenu.conditionId       = fields[9].GetUInt16();
+        gMenu.conditionId       = fields[3].GetUInt16();
 
         if (!GetGossipText(gMenu.text_id))
         {
@@ -9041,21 +9010,6 @@ void ObjectMgr::LoadGossipMenu(std::set<uint32>& gossipScriptSet)
             // Remove used script id
             gossipScriptSet.erase(gMenu.script_id);
         }
-
-        if (!PlayerCondition::IsValid(0, cond_1, cond_1_val_1, cond_1_val_2))
-        {
-            sLog.outErrorDb("Table gossip_menu entry %u, invalid condition 1 for id %u", gMenu.entry, gMenu.text_id);
-            continue;
-        }
-
-        if (!PlayerCondition::IsValid(0, cond_2, cond_2_val_1, cond_2_val_2))
-        {
-            sLog.outErrorDb("Table gossip_menu entry %u, invalid condition 2 for id %u", gMenu.entry, gMenu.text_id);
-            continue;
-        }
-
-        gMenu.cond_1 = GetConditionId(cond_1, cond_1_val_1, cond_1_val_2);
-        gMenu.cond_2 = GetConditionId(cond_2, cond_2_val_1, cond_2_val_2);
 
         if (gMenu.conditionId)
         {
@@ -9099,9 +9053,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
     QueryResult* result = WorldDatabase.Query(
                               "SELECT menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, "
                               "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, "
-                              "cond_1, cond_1_val_1, cond_1_val_2, "
-                              "cond_2, cond_2_val_1, cond_2_val_2, "
-                              "cond_3, cond_3_val_1, cond_3_val_2, condition_id "
+                              "condition_id "
                               "FROM gossip_menu_option");
 
     if (!result)
@@ -9169,16 +9121,7 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
         gMenuItem.box_money             = fields[10].GetUInt32();
         gMenuItem.box_text              = fields[11].GetCppString();
 
-        ConditionType cond_1            = (ConditionType)fields[12].GetUInt32();
-        uint32 cond_1_val_1             = fields[13].GetUInt32();
-        uint32 cond_1_val_2             = fields[14].GetUInt32();
-        ConditionType cond_2            = (ConditionType)fields[15].GetUInt32();
-        uint32 cond_2_val_1             = fields[16].GetUInt32();
-        uint32 cond_2_val_2             = fields[17].GetUInt32();
-        ConditionType cond_3            = (ConditionType)fields[18].GetUInt32();
-        uint32 cond_3_val_1             = fields[19].GetUInt32();
-        uint32 cond_3_val_2             = fields[20].GetUInt32();
-        gMenuItem.conditionId           = fields[21].GetUInt16();
+        gMenuItem.conditionId           = fields[12].GetUInt16();
 
         if (gMenuItem.menu_id)                              // == 0 id is special and not have menu_id data
         {
@@ -9187,22 +9130,6 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
                 sLog.outErrorDb("Gossip menu option (MenuId: %u) for nonexistent menu", gMenuItem.menu_id);
                 continue;
             }
-        }
-
-        if (!PlayerCondition::IsValid(0, cond_1, cond_1_val_1, cond_1_val_2))
-        {
-            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 1 for id %u", gMenuItem.menu_id, gMenuItem.id);
-            continue;
-        }
-        if (!PlayerCondition::IsValid(0, cond_2, cond_2_val_1, cond_2_val_2))
-        {
-            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 2 for id %u", gMenuItem.menu_id, gMenuItem.id);
-            continue;
-        }
-        if (!PlayerCondition::IsValid(0, cond_3, cond_3_val_1, cond_3_val_2))
-        {
-            sLog.outErrorDb("Table gossip_menu_option menu %u, invalid condition 3 for id %u", gMenuItem.menu_id, gMenuItem.id);
-            continue;
         }
 
         if (gMenuItem.action_menu_id > 0)
@@ -9263,10 +9190,6 @@ void ObjectMgr::LoadGossipMenuItems(std::set<uint32>& gossipScriptSet)
             // Remove used script id
             gossipScriptSet.erase(gMenuItem.action_script_id);
         }
-
-        gMenuItem.cond_1 = GetConditionId(cond_1, cond_1_val_1, cond_1_val_2);
-        gMenuItem.cond_2 = GetConditionId(cond_2, cond_2_val_1, cond_2_val_2);
-        gMenuItem.cond_3 = GetConditionId(cond_3, cond_3_val_1, cond_3_val_2);
 
         if (gMenuItem.conditionId)
         {

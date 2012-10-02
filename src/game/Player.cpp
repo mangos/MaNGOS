@@ -12788,34 +12788,11 @@ void Player::PrepareGossipMenu(WorldObject* pSource, uint32 menuId)
 
         if (!isGameMaster())                                // Let GM always see menu items regardless of conditions
         {
-            if (itr->second.conditionId && !sObjectMgr.IsPlayerMeetToNEWCondition(this, itr->second.conditionId))
+            if (itr->second.conditionId && !sObjectMgr.IsPlayerMeetToCondition(this, itr->second.conditionId))
             {
                 if (itr->second.option_id == GOSSIP_OPTION_QUESTGIVER)
                     canSeeQuests = false;
                 continue;
-            }
-            else if (!itr->second.conditionId)
-            {
-                if (itr->second.cond_1 && !sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_1))
-                {
-                    if (itr->second.option_id == GOSSIP_OPTION_QUESTGIVER)
-                        canSeeQuests = false;
-                    continue;
-                }
-
-                if (itr->second.cond_2 && !sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_2))
-                {
-                    if (itr->second.option_id == GOSSIP_OPTION_QUESTGIVER)
-                        canSeeQuests = false;
-                    continue;
-                }
-
-                if (itr->second.cond_3 && !sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_3))
-                {
-                    if (itr->second.option_id == GOSSIP_OPTION_QUESTGIVER)
-                        canSeeQuests = false;
-                    continue;
-                }
             }
         }
 
@@ -13173,20 +13150,13 @@ uint32 Player::GetGossipTextId(uint32 menuId, WorldObject* pSource)
     for (GossipMenusMap::const_iterator itr = pMenuBounds.first; itr != pMenuBounds.second; ++itr)
     {
         // Take the text that has the highest conditionId of all fitting
-        // TODO: Simplify logic to (!itr->second.conditionId && !lastConditionId) || <lineBelow>)
-        if (itr->second.conditionId > lastConditionId && sObjectMgr.IsPlayerMeetToNEWCondition(this, itr->second.conditionId))
+        // No condition and no text with condition found OR higher and fitting condition found
+        if ((!itr->second.conditionId && !lastConditionId) ||
+                (itr->second.conditionId > lastConditionId && sObjectMgr.IsPlayerMeetToCondition(this, itr->second.conditionId)))
         {
             lastConditionId = itr->second.conditionId;
             textId = itr->second.text_id;
             scriptId = itr->second.script_id;
-        }
-        else if (!itr->second.conditionId && !lastConditionId)
-        {
-            if (sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_1) && sObjectMgr.IsPlayerMeetToCondition(this, itr->second.cond_2))
-            {
-                textId = itr->second.text_id;
-                scriptId = itr->second.script_id;
-            }
         }
     }
 
