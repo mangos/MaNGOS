@@ -674,7 +674,7 @@ LogColors = ""
 #
 #    MinPetitionSigns
 #        Min signatures count to creating guild (0..9).
-#        Default: 9
+#        Default: 4
 #
 #    MaxGroupXPDistance
 #        Max distance to creature for group memeber to get XP at creature death.
@@ -793,7 +793,7 @@ MaxPrimaryTradeSkill = 2
 TradeSkill.GMIgnore.MaxPrimarySkillsCount = 4
 TradeSkill.GMIgnore.Level = 4
 TradeSkill.GMIgnore.Skill = 4
-MinPetitionSigns = 9
+MinPetitionSigns = 4
 MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
 MassMailer.SendPerTick = 10

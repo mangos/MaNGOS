@@ -173,7 +173,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 
     // remove all player signs from another petitions
     // this will be prevent attempt joining player to many guilds and corrupt guild data integrity
-    Player::RemovePetitionsAndSigns(plGuid, 9);
+    Player::RemovePetitionsAndSigns(plGuid);
 
     uint32 lowguid = plGuid.GetCounter();
 

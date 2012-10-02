@@ -1770,7 +1770,9 @@ class MANGOS_DLL_SPEC Player : public Unit
         uint32 GetRank() { return GetUInt32Value(PLAYER_GUILDRANK); }
         static uint32 GetRankFromDB(ObjectGuid guid);
         int GetGuildIdInvited() { return m_GuildIdInvited; }
-        static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
+        static void RemovePetitionsAndSigns(ObjectGuid guid);
+        void SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result);
+        void SendPetitionTurnInResult(uint32 result);
 
         // Arena Team
         void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot, ArenaType type)

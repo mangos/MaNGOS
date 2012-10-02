@@ -141,10 +141,6 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
         }
     }
 
-    // remove all player signs from another petitions
-    // this will be prevent attempt joining player to many arenateams and corrupt arena team data integrity
-    Player::RemovePetitionsAndSigns(playerGuid, GetType());
-
     ArenaTeamMember newmember;
     newmember.name              = plName;
     newmember.guid              = playerGuid;

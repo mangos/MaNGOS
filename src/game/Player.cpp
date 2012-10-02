@@ -4297,7 +4297,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
     }
 
     // remove signs from petitions (also remove petitions if owner);
-    RemovePetitionsAndSigns(playerguid, 10);
+    RemovePetitionsAndSigns(playerguid);
 
     switch (charDelete_method)
     {
@@ -18684,15 +18684,12 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
     GetSession()->SendPacket(&data);
 }
 
-void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
+void Player::RemovePetitionsAndSigns(ObjectGuid guid)
 {
     uint32 lowguid = guid.GetCounter();
 
     QueryResult* result = NULL;
-    if (type == 10)
-        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u'", lowguid);
-    else
-        result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", lowguid, type);
+    result = CharacterDatabase.PQuery("SELECT ownerguid,petitionguid FROM petition_sign WHERE playerguid = '%u'", lowguid);
     if (result)
     {
         do                                                  // this part effectively does nothing, since the deletion / modification only takes place _after_ the PetitionQuery. Though I don't know if the result remains intact if I execute the delete query beforehand.
@@ -18712,23 +18709,12 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
 
         delete result;
 
-        if (type == 10)
-            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u'", lowguid);
-        else
-            CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u' AND type = '%u'", lowguid, type);
+        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE playerguid = '%u'", lowguid);
     }
 
     CharacterDatabase.BeginTransaction();
-    if (type == 10)
-    {
-        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u'", lowguid);
-        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u'", lowguid);
-    }
-    else
-    {
-        CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u' AND type = '%u'", lowguid, type);
-        CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u' AND type = '%u'", lowguid, type);
-    }
+    CharacterDatabase.PExecute("DELETE FROM petition WHERE ownerguid = '%u'", lowguid);
+    CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE ownerguid = '%u'", lowguid);
     CharacterDatabase.CommitTransaction();
 }
 
@@ -24072,4 +24058,20 @@ bool Player::FitArmorSpecializationRules(SpellEntry const * spellProto) const
     }
 
     return true;
+}
+
+void Player::SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result)
+{
+    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, 8 + 8 + 4);
+    data << petitionGuid;
+    data << player->GetObjectGuid();
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendPetitionTurnInResult(uint32 result)
+{
+    WorldPacket data(SMSG_TURN_IN_PETITION_RESULTS, 4);
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
 }
