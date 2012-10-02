@@ -39,6 +39,31 @@ class SQLStorageBase
         uint32 GetMaxEntry() const { return m_maxEntry; };
         uint32 GetRecordCount() const { return m_recordCount; };
 
+        template<typename T>
+        class SQLSIterator
+        {
+            friend class SQLStorageBase;
+
+            public:
+                T const* getValue() const { return reinterpret_cast<T const*>(pointer); }
+
+                void operator ++() { pointer += recordSize; }
+                T const* operator *() const { return getValue(); }
+                T const* operator ->() const { return getValue(); }
+                bool operator <(SQLSIterator& r) const { return pointer < r.pointer; }
+                void operator =(SQLSIterator& r) { pointer = r.pointer; recordSize = r.recordSize; }
+
+            private:
+                SQLSIterator(char* ptr, uint32 _recordSize) : pointer(ptr), recordSize(_recordSize) {}
+                char* pointer;
+                uint32 recordSize;
+        };
+
+        template<typename T>
+        SQLSIterator<T> getDataBegin() const { return SQLSIterator<T>(m_data, m_recordSize); }
+        template<typename T>
+        SQLSIterator<T> getDataEnd() const { return SQLSIterator<T>(m_data + m_recordCount * m_recordSize, m_recordSize); }
+
     protected:
         SQLStorageBase();
         virtual ~SQLStorageBase() { Free(); }
