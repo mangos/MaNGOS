@@ -124,14 +124,8 @@ CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
 
     m_InvinceabilityHpLevel = 0;
 
-    // Handle Spawned Events
-    if (!m_bEmptyList)
-    {
-        for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
-            if (SpawnedEventConditionsCheck((*i).Event))
-                ProcessEvent(*i);
-    }
-    Reset();
+    // Handle Spawned Events, also calls Reset()
+    JustRespawned();
 }
 
 bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker)
@@ -873,25 +867,25 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
     }
 }
 
-void CreatureEventAI::JustRespawned()
+void CreatureEventAI::JustRespawned()                       // NOTE that this is called from the AI's constructor as well
 {
     Reset();
 
     if (m_bEmptyList)
         return;
 
-    // Reset generic timer
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
     {
+        // Reset generic timer
         if (i->Event.event_type == EVENT_T_TIMER_GENERIC)
+        {
             if (i->UpdateRepeatTimer(m_creature, i->Event.timer.initialMin, i->Event.timer.initialMax))
                 i->Enabled = true;
-    }
-
-    // Handle Spawned Events
-    for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
-        if (SpawnedEventConditionsCheck((*i).Event))
+        }
+        // Handle Spawned Events
+        else if (SpawnedEventConditionsCheck((*i).Event))
             ProcessEvent(*i);
+    }
 }
 
 void CreatureEventAI::Reset()
