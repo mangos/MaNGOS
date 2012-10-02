@@ -199,3 +199,39 @@ SQLHashStorage::SQLHashStorage(const char* src_fmt, const char* dst_fmt, const c
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
 }
+
+// -----------------------------------  SQLMultiStorage  --------------------------------------- //
+void SQLMultiStorage::Load()
+{
+    SQLMultiStorageLoader loader;
+    loader.Load(*this);
+}
+
+void SQLMultiStorage::Free()
+{
+    SQLStorageBase::Free();
+    m_indexMultiMap.clear();
+}
+
+void SQLMultiStorage::prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize)
+{
+    // Clear (possible) old data and old index array
+    Free();
+
+    SQLStorageBase::prepareToLoad(maxRecordId, recordCount, recordSize);
+}
+
+void SQLMultiStorage::EraseEntry(uint32 id)
+{
+    m_indexMultiMap.erase(id);
+}
+
+SQLMultiStorage::SQLMultiStorage(const char* fmt, const char * _entry_field, const char * sqlname)
+{
+    Initialize(sqlname, _entry_field, fmt, fmt);
+}
+
+SQLMultiStorage::SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname)
+{
+    Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
+}

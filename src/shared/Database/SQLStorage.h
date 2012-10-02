@@ -172,6 +172,73 @@ class SQLHashStorage : public SQLStorageBase
         RecordMap m_indexMap;
 };
 
+class SQLMultiStorage : public SQLStorageBase
+{
+    template<class DerivedLoader, class StorageClass> friend class SQLStorageLoaderBase;
+    template<typename T> friend class SQLMultiSIterator;
+    template<typename T> friend class SQLMSIteratorBounds;
+
+    private:
+        typedef std::multimap<uint32/*recordId*/, char* /*record*/> RecordMultiMap;
+
+    public:
+        SQLMultiStorage(const char* fmt, const char * _entry_field, const char * sqlname);
+        SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname);
+
+        ~SQLMultiStorage() { Free(); }
+
+        template<typename T>
+        class SQLMultiSIterator
+        {
+            friend class SQLMultiStorage;
+
+            public:
+                T const* getValue() const { return reinterpret_cast<T const*>(citerator->second); }
+                uint32 getKey() const { return citerator->first; }
+
+                void operator ++() { ++citerator; }
+                T const* operator *() const { return getValue(); }
+                T const* operator ->() const { return getValue(); }
+                bool operator !=(const SQLMultiSIterator& r) const { return citerator != r.citerator; }
+
+            private:
+                SQLMultiSIterator(RecordMultiMap::const_iterator _itr) : citerator(_itr) {}
+                RecordMultiMap::const_iterator citerator;
+        };
+
+        template<typename T>
+        class SQLMSIteratorBounds
+        {
+            friend class SQLMultiStorage;
+
+            public:
+                const SQLMultiSIterator<T> first;
+                const SQLMultiSIterator<T> second;
+
+            private:
+                SQLMSIteratorBounds(std::pair<RecordMultiMap::const_iterator, RecordMultiMap::const_iterator> pair) : first(pair.first), second(pair.second) {}
+        };
+
+        template<typename T>
+        SQLMSIteratorBounds<T> getBounds(uint32 key) const { return SQLMSIteratorBounds<T>(m_indexMultiMap.equal_range(key)); }
+
+        void Load();
+
+        void EraseEntry(uint32 id);
+
+    protected:
+        void prepareToLoad(uint32 maxRecordId, uint32 recordCount, uint32 recordSize) override;
+        void JustCreatedRecord(uint32 recordId, char* record) override
+        {
+            m_indexMultiMap.insert(RecordMultiMap::value_type(recordId, record));
+        }
+
+        void Free() override;
+
+    private:
+        RecordMultiMap m_indexMultiMap;
+};
+
 template <class DerivedLoader, class StorageClass>
 class SQLStorageLoaderBase
 {
@@ -208,6 +275,10 @@ class SQLStorageLoader : public SQLStorageLoaderBase<SQLStorageLoader, SQLStorag
 };
 
 class SQLHashStorageLoader : public SQLStorageLoaderBase<SQLHashStorageLoader, SQLHashStorage>
+{
+};
+
+class SQLMultiStorageLoader : public SQLStorageLoaderBase<SQLMultiStorageLoader, SQLMultiStorage>
 {
 };
 
