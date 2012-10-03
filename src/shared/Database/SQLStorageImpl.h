@@ -260,15 +260,16 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
         // dependend on dest-size
         // iterate two indexes: x over dest, y over source
         //                      y++ If and only If x != FT_NA*
-        for (uint32 x = 0, y = 0; x < store.GetDstFieldCount(); ++x)
+        //                      x++ If and only If a value is stored
+        for (uint32 x = 0, y = 0; x < store.GetDstFieldCount();)
         {
             switch (store.GetDstFormat(x))
             {
                     // For default fill continue and do not increase y
-                case FT_NA:         storeValue((uint32)0, store, record, x, offset);         continue;
-                case FT_NA_BYTE:    storeValue((char)0, store, record, x, offset);           continue;
-                case FT_NA_FLOAT:   storeValue((float)0.0f, store, record, x, offset);       continue;
-                case FT_NA_POINTER: storeValue((char const*)NULL, store, record, x, offset); continue;
+                case FT_NA:         storeValue((uint32)0, store, record, x, offset);         ++x; continue;
+                case FT_NA_BYTE:    storeValue((char)0, store, record, x, offset);           ++x; continue;
+                case FT_NA_FLOAT:   storeValue((float)0.0f, store, record, x, offset);       ++x; continue;
+                case FT_NA_POINTER: storeValue((char const*)NULL, store, record, x, offset); ++x; continue;
             }
 
             // It is required that the input has at least as many columns set as the output requires
@@ -277,19 +278,15 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
 
             switch (store.GetSrcFormat(y))
             {
-                case FT_LOGIC:
-                    storeValue((bool)(fields[y].GetUInt32() > 0), store, record, x, offset); break;
-                case FT_BYTE:
-                    storeValue((char)fields[y].GetUInt8(), store, record, x, offset); break;
-                case FT_INT:
-                    storeValue((uint32)fields[y].GetUInt32(), store, record, x, offset); break;
-                case FT_FLOAT:
-                    storeValue((float)fields[y].GetFloat(), store, record, x, offset); break;
-                case FT_STRING:
-                    storeValue((char const*)fields[y].GetString(), store, record, x, offset); break;
+                case FT_LOGIC:  storeValue((bool)(fields[y].GetUInt32() > 0), store, record, x, offset);  ++x; break;
+                case FT_BYTE:   storeValue((char)fields[y].GetUInt8(), store, record, x, offset);         ++x; break;
+                case FT_INT:    storeValue((uint32)fields[y].GetUInt32(), store, record, x, offset);      ++x; break;
+                case FT_FLOAT:  storeValue((float)fields[y].GetFloat(), store, record, x, offset);        ++x; break;
+                case FT_STRING: storeValue((char const*)fields[y].GetString(), store, record, x, offset); ++x; break;
                 case FT_NA:
                 case FT_NA_BYTE:
                 case FT_NA_FLOAT:
+                    // Do Not increase x
                     break;
                 case FT_IND:
                 case FT_SORT:
