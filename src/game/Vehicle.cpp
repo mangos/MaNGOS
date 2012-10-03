@@ -38,11 +38,43 @@
 #include "Unit.h"
 #include "Creature.h"
 #include "ObjectMgr.h"
+#include "SQLStorages.h"
 #include "Vehicle.h"
 #include "Util.h"
 #include "movement/MoveSplineInit.h"
 #include "movement/MoveSpline.h"
 #include "MapManager.h"
+
+void ObjectMgr::LoadVehicleAccessory()
+{
+    sVehicleAccessoryStorage.Load();
+
+    sLog.outString(">> Loaded %u vehicle accessories", sVehicleAccessoryStorage.GetRecordCount());
+    sLog.outString();
+
+    // Check content
+    for (SQLMultiStorage::SQLSIterator<VehicleAccessory> itr = sVehicleAccessoryStorage.getDataBegin<VehicleAccessory>(); itr < sVehicleAccessoryStorage.getDataEnd<VehicleAccessory>(); ++itr)
+    {
+        if (!sCreatureStorage.LookupEntry<CreatureInfo>(itr->vehicleEntry))
+        {
+            sLog.outErrorDb("Table `vehicle_accessory` has entry (vehicle entry: %u, seat %u, passenger %u) where vehicle_entry is invalid, skip vehicle.", itr->vehicleEntry, itr->seatId, itr->passengerEntry);
+            sVehicleAccessoryStorage.EraseEntry(itr->vehicleEntry);
+            continue;
+        }
+        if (!sCreatureStorage.LookupEntry<CreatureInfo>(itr->passengerEntry))
+        {
+            sLog.outErrorDb("Table `vehicle_accessory` has entry (vehicle entry: %u, seat %u, passenger %u) where accessory_entry is invalid, skip vehicle.", itr->vehicleEntry, itr->seatId, itr->passengerEntry);
+            sVehicleAccessoryStorage.EraseEntry(itr->vehicleEntry);
+            continue;
+        }
+        if (itr->seatId >= MAX_VEHICLE_SEAT)
+        {
+            sLog.outErrorDb("Table `vehicle_accessory` has entry (vehicle entry: %u, seat %u, passenger %u) where seat is invalid (must be between 0 and %u), skip vehicle.", itr->vehicleEntry, itr->seatId, itr->passengerEntry, MAX_VEHICLE_SEAT - 1);
+            sVehicleAccessoryStorage.EraseEntry(itr->vehicleEntry);
+            continue;
+        }
+    }
+}
 
 /**
  * Constructor of VehicleInfo

@@ -24,7 +24,7 @@ CREATE TABLE `db_version` (
   `version` varchar(120) default NULL,
   `creature_ai_version` varchar(120) default NULL,
   `cache_id` int(10) default '0',
-  `required_12257_01_mangos_spell_learn_spell"` bit(1) default NULL
+  `required_12274_01_mangos_vehicle_accessory"` bit(1) default NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Used DB version notes';
 
 --
@@ -25207,6 +25207,26 @@ CREATE TABLE `transports` (
 LOCK TABLES `transports` WRITE;
 /*!40000 ALTER TABLE `transports` DISABLE KEYS */;
 /*!40000 ALTER TABLE `transports` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `vehicle_accessory`
+--
+DROP TABLE IF EXISTS vehicle_accessory;
+CREATE TABLE `vehicle_accessory` (
+  `vehicle_entry` int(10) UNSIGNED NOT NULL COMMENT 'entry of the npc who has some accessory as vehicle',
+  `seat` mediumint(8) UNSIGNED NOT NULL COMMENT 'onto which seat shall the passenger be boarded',
+  `accessory_entry` int(10) UNSIGNED NOT NULL COMMENT 'entry of the passenger that is to be boarded',
+  `comment` varchar(255) NOT NULL,
+  PRIMARY KEY  (`vehicle_entry`, `seat`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Vehicle Accessory (passengers that are auto-boarded onto a vehicle)';
+
+--
+-- Dumping data for table `vehicle_accessory`
+--
+LOCK TABLES `vehicle_accessory` WRITE;
+/*!40000 ALTER TABLE `vehicle_accessory` DISABLE KEYS */;
+/*!40000 ALTER TABLE `vehicle_accessory` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
