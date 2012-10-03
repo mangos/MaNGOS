@@ -653,6 +653,12 @@ class ByteBuffer
             return out;
         }
 
+        ByteBuffer& WriteStringData(const std::string& str)
+        {
+            FlushBits();
+            return append((uint8 const*)str.c_str(), str.size());
+        }
+
         bool ReadBoolean()
         {
             uint8 b = 0;
