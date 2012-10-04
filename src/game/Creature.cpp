@@ -946,31 +946,27 @@ void Creature::PrepareBodyLootState()
 {
     loot.clear();
 
-    // only dead
-    if (!isAlive())
+    // if have normal loot then prepare it access
+    if (!lootForBody)
     {
-        // if have normal loot then prepare it access
-        if (!lootForBody)
+        // have normal loot
+        if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
+                // ... or can have skinning after
+                (GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW)))
         {
-            // have normal loot
-            if (GetCreatureInfo()->maxgold > 0 || GetCreatureInfo()->lootid ||
-                    // ... or can have skinning after
-                    (GetCreatureInfo()->SkinLootId && sWorld.getConfig(CONFIG_BOOL_CORPSE_EMPTY_LOOT_SHOW)))
-            {
-                SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                return;
-            }
-        }
-
-        lootForBody = true;                                 // pass this loot mode
-
-        // if not have normal loot allow skinning if need
-        if (!lootForSkin && GetCreatureInfo()->SkinLootId)
-        {
-            RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+            SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             return;
         }
+    }
+
+    lootForBody = true;                                     // pass this loot mode
+
+    // if not have normal loot allow skinning if need
+    if (!lootForSkin && GetCreatureInfo()->SkinLootId)
+    {
+        RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
+        return;
     }
 
     RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);

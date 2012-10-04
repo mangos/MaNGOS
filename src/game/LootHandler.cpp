@@ -497,13 +497,11 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 if (group->GetLooterGuid() == player->GetObjectGuid())
                     group->UpdateLooterGuid(pCreature);
 
-            if (loot->isLooted())
+            if (loot->isLooted() && !pCreature->isAlive())
             {
                 // for example skinning after normal loot
                 pCreature->PrepareBodyLootState();
-
-                if (!pCreature->isAlive())
-                    pCreature->AllLootRemovedFromCorpse();
+                pCreature->AllLootRemovedFromCorpse();
             }
             break;
         }
