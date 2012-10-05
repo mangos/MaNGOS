@@ -61,7 +61,10 @@ typedef std::map<uint8 /*seatPosition*/, VehicleSeatEntry const*> VehicleSeatMap
 class VehicleInfo : public TransportBase
 {
     public:
-        explicit VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry);
+        explicit VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry, uint32 overwriteNpcEntry);
+        void Initialize();                                  ///< Initializes the accessories
+        bool IsInitialized() const { return m_isInitialized; }
+
         ~VehicleInfo();
 
         VehicleEntry const* GetVehicleEntry() const { return m_vehicleEntry; }
@@ -72,9 +75,11 @@ class VehicleInfo : public TransportBase
 
         bool CanBoard(Unit* passenger) const;               // Used to check if a Unit can board a vehicle
 
+        void RemoveAccessoriesFromMap();                    ///< Unsummones accessory in case of far-teleport or death
+
     private:
         // Internal use to calculate the boarding position
-        void CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo);
+        void CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo) const;
 
         // Seat information
         VehicleSeatEntry const* GetSeatEntry(uint8 seat) const;
@@ -96,6 +101,10 @@ class VehicleInfo : public TransportBase
         VehicleSeatMap m_vehicleSeats;                      ///< Stores the available seats of the vehicle (filled in constructor)
         uint8 m_creatureSeats;                              ///< Mask that stores which seats are avaiable for creatures
         uint8 m_playerSeats;                                ///< Mask that stores which seats are avaiable for players
+
+        uint32 m_overwriteNpcEntry;                         // Internal use to store the entry with which the vehicle-accessories are fetched
+        bool m_isInitialized;                               // Internal use to store if the accessory is initialized
+        GuidSet m_accessoryGuids;                           ///< Stores the summoned accessories of this vehicle
 };
 
 #endif

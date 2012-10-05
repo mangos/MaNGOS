@@ -3351,7 +3351,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
 
         if (ci->vehicleId)
         {
-            target->SetVehicleId(ci->vehicleId);
+            target->SetVehicleId(ci->vehicleId, ci->Entry);
 
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
@@ -3367,7 +3367,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PLAYER_VEHICLE);
 
-            target->SetVehicleId(0);
+            target->SetVehicleId(0, 0);
         }
     }
 }
@@ -8538,7 +8538,7 @@ void Aura::HandleAuraControlVehicle(bool apply, bool Real)
 
     if (apply)
     {
-        target->GetVehicleInfo()->Board(caster, GetSpellProto()->CalculateSimpleValue(m_effIndex) - 1);
+        target->GetVehicleInfo()->Board(caster, GetBasePoints() - 1);
     }
     else
         target->GetVehicleInfo()->UnBoard(caster, m_removeMode == AURA_REMOVE_BY_TRACKING);

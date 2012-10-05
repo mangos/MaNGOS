@@ -44,6 +44,7 @@
 #include "movement/MoveSplineInit.h"
 #include "movement/MoveSpline.h"
 #include "MapManager.h"
+#include "TemporarySummon.h"
 
 void ObjectMgr::LoadVehicleAccessory()
 {
@@ -81,14 +82,17 @@ void ObjectMgr::LoadVehicleAccessory()
  *
  * @param owner         MUST be provided owner of the vehicle (type Unit)
  * @param vehicleEntry  MUST be provided dbc-entry of the vehicle
+ * @param overwriteNpcEntry Use to overwrite the GetEntry() result for selecting associated passengers
  *
  * This function will initialise the VehicleInfo of the vehicle owner
  * Also the seat-map is created here
  */
-VehicleInfo::VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry) : TransportBase(owner),
+VehicleInfo::VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry, uint32 overwriteNpcEntry) : TransportBase(owner),
     m_vehicleEntry(vehicleEntry),
     m_creatureSeats(0),
-    m_playerSeats(0)
+    m_playerSeats(0),
+    m_overwriteNpcEntry(overwriteNpcEntry),
+    m_isInitialized(false)
 {
     MANGOS_ASSERT(vehicleEntry);
 
@@ -114,6 +118,27 @@ VehicleInfo::VehicleInfo(Unit* owner, VehicleEntry const* vehicleEntry) : Transp
 VehicleInfo::~VehicleInfo()
 {
     ((Unit*)m_owner)->RemoveSpellsCausingAura(SPELL_AURA_CONTROL_VEHICLE);
+
+    RemoveAccessoriesFromMap();                             // Remove accessories (for example required with player vehicles)
+}
+
+void VehicleInfo::Initialize()
+{
+    if (!m_overwriteNpcEntry)
+        m_overwriteNpcEntry = m_owner->GetEntry();
+
+    // Loading passengers (rough version only!)
+    SQLMultiStorage::SQLMSIteratorBounds<VehicleAccessory> bounds = sVehicleAccessoryStorage.getBounds<VehicleAccessory>(m_overwriteNpcEntry);
+    for (SQLMultiStorage::SQLMultiSIterator<VehicleAccessory> itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        if (Creature* summoned = m_owner->SummonCreature(itr->passengerEntry, m_owner->GetPositionX(), m_owner->GetPositionY(), m_owner->GetPositionZ(), m_owner->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 0))
+        {
+            m_accessoryGuids.insert(summoned->GetObjectGuid());
+            int32 basepoint0 = itr->seatId + 1;
+            summoned->CastCustomSpell((Unit*)m_owner, 46598, &basepoint0, NULL, NULL, true);
+        }
+    }
+    m_isInitialized = true;
 }
 
 /**
@@ -285,6 +310,14 @@ void VehicleInfo::UnBoard(Unit* passenger, bool changeVehicle)
         init.MoveTo(m_owner->GetPositionX(), m_owner->GetPositionY(), m_owner->GetPositionZ());
         init.SetExitVehicle();
         init.Launch();
+
+        // Despawn if passenger was accessory
+        if (passenger->GetTypeId() == TYPEID_UNIT && m_accessoryGuids.find(passenger->GetObjectGuid()) != m_accessoryGuids.end())
+        {
+            // TODO Same TODO as in VehicleInfo::RemoveAccessoriesFromMap
+            ((Creature*)passenger)->ForcedDespawn(5000);
+            m_accessoryGuids.erase(passenger->GetObjectGuid());
+        }
     }
 
     // Remove passenger modifications
@@ -330,12 +363,27 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
 }
 
 // Helper function to undo the turning of the vehicle to calculate a relative position of the passenger when boarding
-void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo)
+void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo) const
 {
     NormalizeRotatedPosition(gx - m_owner->GetPositionX(), gy - m_owner->GetPositionY(), lx, ly);
 
     lz = gz - m_owner->GetPositionZ();
     lo = NormalizeOrientation(go - m_owner->GetOrientation());
+}
+
+void VehicleInfo::RemoveAccessoriesFromMap()
+{
+    // Remove all accessories
+    for (GuidSet::const_iterator itr = m_accessoryGuids.begin(); itr != m_accessoryGuids.end(); ++itr)
+    {
+        if (Creature* pAccessory = m_owner->GetMap()->GetCreature(*itr))
+        {
+            // TODO - unclear how long to despawn, also maybe some flag etc depending
+            pAccessory->ForcedDespawn(5000);
+        }
+    }
+    m_accessoryGuids.clear();
+    m_isInitialized = false;
 }
 
 /* ************************************************************************************************

@@ -65,6 +65,7 @@
 #include "DBCStores.h"
 #include "DB2Stores.h"
 #include "SQLStorages.h"
+#include "Vehicle.h"
 
 #include <cmath>
 
@@ -1842,6 +1843,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // remove pet on map change
             if (pet)
                 UnsummonPetTemporaryIfAny();
+
+            // remove vehicle accessories on map change
+            if (IsVehicle())
+                GetVehicleInfo()->RemoveAccessoriesFromMap();
 
             // remove all dyn objects
             RemoveAllDynObjects();
