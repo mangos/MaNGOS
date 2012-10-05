@@ -511,7 +511,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool CanWalk() const { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
         bool CanSwim() const { return GetCreatureInfo()->InhabitType & INHABIT_WATER; }
-        bool CanFly()  const { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
+        bool CanFly()  const { return (GetCreatureInfo()->InhabitType & INHABIT_AIR) || (GetByteValue(UNIT_FIELD_BYTES_1, 3) & UNIT_BYTE1_FLAG_UNK_2); }
 
         bool IsTrainerOf(Player* player, bool msg) const;
         bool CanInteractWithBattleMaster(Player* player, bool msg) const;
