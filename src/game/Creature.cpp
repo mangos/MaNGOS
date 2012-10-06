@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "ObjectGuid.h"
+#include "SQLStorages.h"
 #include "SpellMgr.h"
 #include "QuestDef.h"
 #include "GossipDef.h"

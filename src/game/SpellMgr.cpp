@@ -3361,6 +3361,8 @@ void SpellMgr::LoadSpellScriptTarget()
                 spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_INSTANT ||
                 spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_CUSTOM ||
                 spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_CUSTOM ||
+                spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_GO_AROUND_SOURCE ||
+                spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_GO_AROUND_SOURCE ||
                 spellEffect->EffectImplicitTargetA == TARGET_AREAEFFECT_GO_AROUND_DEST ||
                 spellEffect->EffectImplicitTargetB == TARGET_AREAEFFECT_GO_AROUND_DEST)
             {
