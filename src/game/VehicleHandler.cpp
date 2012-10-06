@@ -26,9 +26,6 @@
 #include "Vehicle.h"
 #include "ObjectMgr.h"
 
-/* This spell is used for boarding a player vehicle */
-#define SPELL_RIDE_VEHICLE_HARDCODED 46598
-
 void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvPacket)
 {
     DEBUG_LOG("WORLD: Received CMSG_DISMISS_CONTROLLED_VEHICLE");

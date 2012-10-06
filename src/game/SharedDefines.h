@@ -3255,4 +3255,7 @@ enum MaxLevel
 
 static const MaxLevel maxLevelForExpansion[MAX_EXPANSION + 1] = { MAX_LEVEL_CLASSIC, MAX_LEVEL_TBC, MAX_LEVEL_WOTLK };
 
+// This spell is used for general boarding serverside
+#define SPELL_RIDE_VEHICLE_HARDCODED    46598
+
 #endif

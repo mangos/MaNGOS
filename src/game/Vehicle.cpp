@@ -135,7 +135,7 @@ void VehicleInfo::Initialize()
         {
             m_accessoryGuids.insert(summoned->GetObjectGuid());
             int32 basepoint0 = itr->seatId + 1;
-            summoned->CastCustomSpell((Unit*)m_owner, 46598, &basepoint0, NULL, NULL, true);
+            summoned->CastCustomSpell((Unit*)m_owner, SPELL_RIDE_VEHICLE_HARDCODED, &basepoint0, NULL, NULL, true);
         }
     }
     m_isInitialized = true;
@@ -342,8 +342,8 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
     if (passenger->IsBoarded() && passenger->GetTransportInfo()->GetTransport() == m_owner)
         return false;
 
-    // Prevent circular boarding: passenger must not have m_owner on board
-    if (passenger->IsBoarded() && passenger->GetTransportInfo()->HasOnBoard(m_owner))
+    // Prevent circular boarding: passenger (could only be vehicle) must not have m_owner on board
+    if (passenger->IsVehicle() && passenger->GetVehicleInfo()->HasOnBoard(m_owner))
         return false;
 
     // Check if we have at least one empty seat
