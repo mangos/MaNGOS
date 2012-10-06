@@ -1587,7 +1587,7 @@ void ScriptAction::HandleScriptStep()
                 break;
 
             Creature* pAttacker = static_cast<Creature*>(pSource);
-            Unit* unitTarget = static_cast<Unit*>(target);
+            Unit* unitTarget = static_cast<Unit*>(pTarget);
 
             if (pAttacker->IsFriendlyTo(unitTarget))
             {
