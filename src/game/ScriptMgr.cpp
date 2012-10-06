@@ -1374,7 +1374,7 @@ void ScriptAction::HandleScriptStep()
             pDoor->UseDoorOrButton(time_to_reset);
 
             if (pTarget && pTarget->isType(TYPEMASK_GAMEOBJECT) && ((GameObject*)pTarget)->GetGoType() == GAMEOBJECT_TYPE_BUTTON)
-                ((GameObject*)target)->UseDoorOrButton(time_to_reset);
+                ((GameObject*)pTarget)->UseDoorOrButton(time_to_reset);
 
             break;
         }
@@ -1408,7 +1408,7 @@ void ScriptAction::HandleScriptStep()
 
             break;
         }
-        case SCRIPT_COMMAND_PLAY_SOUND:                     // 16 // TODO
+        case SCRIPT_COMMAND_PLAY_SOUND:                     // 16
         {
             if (!pSource)
             {
@@ -1417,30 +1417,19 @@ void ScriptAction::HandleScriptStep()
             }
 
             // bitmask: 0/1=anyone/target, 0/2=with distance dependent
-            Player* pTarget = NULL;
-
+            Player* pSoundTarget = NULL;
             if (m_script->playSound.flags & 1)
             {
-                if (!target)
-                {
-                    sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u in targeted mode call for NULL target.", m_table, m_script->id, m_script->command);
+                pSoundTarget = GetPlayerTargetOrSourceAndLog(pSource, pTarget);
+                if (!pSoundTarget)
                     break;
-                }
-
-                if (target->GetTypeId() != TYPEID_PLAYER)
-                {
-                    sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u in targeted mode call for non-player (TypeId: %u), skipping.", m_table, m_script->id, m_script->command, target->GetTypeId());
-                    break;
-                }
-
-                pTarget = (Player*)target;
             }
 
             // bitmask: 0/1=anyone/target, 0/2=with distance dependent
             if (m_script->playSound.flags & 2)
-                pSource->PlayDistanceSound(m_script->playSound.soundId, pTarget);
+                pSource->PlayDistanceSound(m_script->playSound.soundId, pSoundTarget);
             else
-                pSource->PlayDirectSound(m_script->playSound.soundId, pTarget);
+                pSource->PlayDirectSound(m_script->playSound.soundId, pSoundTarget);
 
             break;
         }
