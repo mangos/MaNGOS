@@ -97,19 +97,19 @@ void OutdoorPvPZM::HandleCreatureCreate(Creature* creature)
     switch (creature->GetEntry())
     {
         case NPC_PVP_BEAM_RED:
-            if (creature->GetPositionY() < 7000.0f)                 // East Beam
+            if (creature->GetPositionY() < 7000.0f)         // East Beam
                 m_beamTowerRed[0] = creature->GetObjectGuid();
-            else if (creature->GetPositionY() < 7300.0f)            // Center Beam
+            else if (creature->GetPositionY() < 7300.0f)    // Center Beam
                 m_beamGraveyardRed = creature->GetObjectGuid();
-            else                                                    // West Beam
+            else                                            // West Beam
                 m_beamTowerRed[1] = creature->GetObjectGuid();
             break;
         case NPC_PVP_BEAM_BLUE:
-            if (creature->GetPositionY() < 7000.0f)                 // East Beam
+            if (creature->GetPositionY() < 7000.0f)         // East Beam
                 m_beamTowerBlue[0] = creature->GetObjectGuid();
-            else if (creature->GetPositionY() < 7300.0f)            // Center Beam
+            else if (creature->GetPositionY() < 7300.0f)    // Center Beam
                 m_beamGraveyardBlue = creature->GetObjectGuid();
-            else                                                    // West Beam
+            else                                            // West Beam
                 m_beamTowerBlue[1] = creature->GetObjectGuid();
             break;
     }

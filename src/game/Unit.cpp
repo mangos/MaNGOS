@@ -660,7 +660,7 @@ bool Unit::UpdateMeleeAttackingState()
         setAttackTimer(OFF_ATTACK, 100);
         swingError = 1;
     }
-    //120 degrees of radiant range
+    // 120 degrees of radiant range
     else if (!HasInArc(2 * M_PI_F / 3, victim))
     {
         setAttackTimer(BASE_ATTACK, 100);
@@ -4984,13 +4984,13 @@ void Unit::RemoveNotOwnTrackedTargetAuras(uint32 newPhase)
             {
                 if (!newPhase)
                 {
-                    scTargets.erase(itr);                       // remove for caster in any case
+                    scTargets.erase(itr);                   // remove for caster in any case
 
                     // remove from target if target found
                     if (Unit* itr_target = GetMap()->GetUnit(itr_targetGuid))
                         itr_target->RemoveAurasByCasterSpell(itr_spellEntry->Id, GetObjectGuid());
 
-                    itr = scTargets.begin();                    // list can be changed at remove aura
+                    itr = scTargets.begin();                // list can be changed at remove aura
                     continue;
                 }
                 else
@@ -4998,13 +4998,13 @@ void Unit::RemoveNotOwnTrackedTargetAuras(uint32 newPhase)
                     Unit* itr_target = GetMap()->GetUnit(itr_targetGuid);
                     if (!itr_target || !itr_target->InSamePhase(newPhase))
                     {
-                        scTargets.erase(itr);                   // remove for caster in any case
+                        scTargets.erase(itr);               // remove for caster in any case
 
                         // remove from target if target found
                         if (itr_target)
                             itr_target->RemoveAurasByCasterSpell(itr_spellEntry->Id, GetObjectGuid());
 
-                        itr = scTargets.begin();                // list can be changed at remove aura
+                        itr = scTargets.begin();            // list can be changed at remove aura
                         continue;
                     }
                 }

@@ -6163,14 +6163,14 @@ void ObjectMgr::LoadGameobjectInfo()
 
         switch (goInfo->type)
         {
-            case GAMEOBJECT_TYPE_DOOR:                      //0
+            case GAMEOBJECT_TYPE_DOOR:                      // 0
             {
                 if (goInfo->door.lockId)
                     CheckGOLockId(goInfo, goInfo->door.lockId, 1);
                 CheckGONoDamageImmuneId(goInfo, goInfo->door.noDamageImmune, 3);
                 break;
             }
-            case GAMEOBJECT_TYPE_BUTTON:                    //1
+            case GAMEOBJECT_TYPE_BUTTON:                    // 1
             {
                 if (goInfo->button.lockId)
                     CheckGOLockId(goInfo, goInfo->button.lockId, 1);
@@ -6179,14 +6179,14 @@ void ObjectMgr::LoadGameobjectInfo()
                 CheckGONoDamageImmuneId(goInfo, goInfo->button.noDamageImmune, 4);
                 break;
             }
-            case GAMEOBJECT_TYPE_QUESTGIVER:                //2
+            case GAMEOBJECT_TYPE_QUESTGIVER:                // 2
             {
                 if (goInfo->questgiver.lockId)
                     CheckGOLockId(goInfo, goInfo->questgiver.lockId, 0);
                 CheckGONoDamageImmuneId(goInfo, goInfo->questgiver.noDamageImmune, 5);
                 break;
             }
-            case GAMEOBJECT_TYPE_CHEST:                     //3
+            case GAMEOBJECT_TYPE_CHEST:                     // 3
             {
                 if (goInfo->chest.lockId)
                     CheckGOLockId(goInfo, goInfo->chest.lockId, 0);
@@ -6197,7 +6197,7 @@ void ObjectMgr::LoadGameobjectInfo()
                     CheckGOLinkedTrapId(goInfo, goInfo->chest.linkedTrapId, 7);
                 break;
             }
-            case GAMEOBJECT_TYPE_TRAP:                      //6
+            case GAMEOBJECT_TYPE_TRAP:                      // 6
             {
                 if (goInfo->trap.lockId)
                     CheckGOLockId(goInfo, goInfo->trap.lockId, 0);
@@ -6207,10 +6207,10 @@ void ObjectMgr::LoadGameobjectInfo()
                 */
                 break;
             }
-            case GAMEOBJECT_TYPE_CHAIR:                     //7
+            case GAMEOBJECT_TYPE_CHAIR:                     // 7
                 CheckAndFixGOChairHeightId(goInfo, goInfo->chair.height, 1);
                 break;
-            case GAMEOBJECT_TYPE_SPELL_FOCUS:               //8
+            case GAMEOBJECT_TYPE_SPELL_FOCUS:               // 8
             {
                 if (goInfo->spellFocus.focusId)
                 {
@@ -6223,7 +6223,7 @@ void ObjectMgr::LoadGameobjectInfo()
                     CheckGOLinkedTrapId(goInfo, goInfo->spellFocus.linkedTrapId, 2);
                 break;
             }
-            case GAMEOBJECT_TYPE_GOOBER:                    //10
+            case GAMEOBJECT_TYPE_GOOBER:                    // 10
             {
                 if (goInfo->goober.lockId)
                     CheckGOLockId(goInfo, goInfo->goober.lockId, 0);
@@ -6245,19 +6245,19 @@ void ObjectMgr::LoadGameobjectInfo()
                     CheckGOLinkedTrapId(goInfo, goInfo->goober.linkedTrapId, 12);
                 break;
             }
-            case GAMEOBJECT_TYPE_AREADAMAGE:                //12
+            case GAMEOBJECT_TYPE_AREADAMAGE:                // 12
             {
                 if (goInfo->areadamage.lockId)
                     CheckGOLockId(goInfo, goInfo->areadamage.lockId, 0);
                 break;
             }
-            case GAMEOBJECT_TYPE_CAMERA:                    //13
+            case GAMEOBJECT_TYPE_CAMERA:                    // 13
             {
                 if (goInfo->camera.lockId)
                     CheckGOLockId(goInfo, goInfo->camera.lockId, 0);
                 break;
             }
-            case GAMEOBJECT_TYPE_MO_TRANSPORT:              //15
+            case GAMEOBJECT_TYPE_MO_TRANSPORT:              // 15
             {
                 if (goInfo->moTransport.taxiPathId)
                 {
@@ -6267,7 +6267,7 @@ void ObjectMgr::LoadGameobjectInfo()
                 }
                 break;
             }
-            case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          //18
+            case GAMEOBJECT_TYPE_SUMMONING_RITUAL:          // 18
             {
                 /* disable check for while, too many nonexistent spells
                 // always must have spell
@@ -6275,38 +6275,38 @@ void ObjectMgr::LoadGameobjectInfo()
                 */
                 break;
             }
-            case GAMEOBJECT_TYPE_SPELLCASTER:               //22
+            case GAMEOBJECT_TYPE_SPELLCASTER:               // 22
             {
                 // always must have spell
                 CheckGOSpellId(goInfo, goInfo->spellcaster.spellId, 0);
                 break;
             }
-            case GAMEOBJECT_TYPE_FLAGSTAND:                 //24
+            case GAMEOBJECT_TYPE_FLAGSTAND:                 // 24
             {
                 if (goInfo->flagstand.lockId)
                     CheckGOLockId(goInfo, goInfo->flagstand.lockId, 0);
                 CheckGONoDamageImmuneId(goInfo, goInfo->flagstand.noDamageImmune, 5);
                 break;
             }
-            case GAMEOBJECT_TYPE_FISHINGHOLE:               //25
+            case GAMEOBJECT_TYPE_FISHINGHOLE:               // 25
             {
                 if (goInfo->fishinghole.lockId)
                     CheckGOLockId(goInfo, goInfo->fishinghole.lockId, 4);
                 break;
             }
-            case GAMEOBJECT_TYPE_FLAGDROP:                  //26
+            case GAMEOBJECT_TYPE_FLAGDROP:                  // 26
             {
                 if (goInfo->flagdrop.lockId)
                     CheckGOLockId(goInfo, goInfo->flagdrop.lockId, 0);
                 CheckGONoDamageImmuneId(goInfo, goInfo->flagdrop.noDamageImmune, 3);
                 break;
             }
-            case GAMEOBJECT_TYPE_CAPTURE_POINT:             //29
+            case GAMEOBJECT_TYPE_CAPTURE_POINT:             // 29
             {
                 CheckAndFixGOCaptureMinTime(goInfo, goInfo->capturePoint.minTime, 16);
                 break;
             }
-            case GAMEOBJECT_TYPE_BARBER_CHAIR:              //32
+            case GAMEOBJECT_TYPE_BARBER_CHAIR:              // 32
                 CheckAndFixGOChairHeightId(goInfo, goInfo->barberChair.chairheight, 0);
                 break;
         }

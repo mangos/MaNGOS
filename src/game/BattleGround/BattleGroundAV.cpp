@@ -116,7 +116,7 @@ void BattleGroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case BG_AV_QUEST_H_SCRAPS2:
             m_Team_QuestStatus[teamIdx][0] += 20;
             reputation = 1;
-            if (m_Team_QuestStatus[teamIdx][0] == 500 || m_Team_QuestStatus[teamIdx][0] == 1000 || m_Team_QuestStatus[teamIdx][0] == 1500)  //25,50,75 turn ins
+            if (m_Team_QuestStatus[teamIdx][0] == 500 || m_Team_QuestStatus[teamIdx][0] == 1000 || m_Team_QuestStatus[teamIdx][0] == 1500)  // 25,50,75 turn ins
             {
                 DEBUG_LOG("BattleGroundAV: Quest %i completed starting with unit upgrading..", questid);
                 for (BG_AV_Nodes i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)

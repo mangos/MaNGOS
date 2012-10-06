@@ -79,7 +79,7 @@ class VehicleInfo : public TransportBase
 
     private:
         // Internal use to calculate the boarding position
-        void CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo) const;
+        void CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float& lx, float& ly, float& lz, float& lo) const;
 
         // Seat information
         VehicleSeatEntry const* GetSeatEntry(uint8 seat) const;

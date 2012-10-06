@@ -26,7 +26,7 @@
 enum
 {
     MAX_NA_GUARDS                           = 15,
-    MAX_NA_ROOSTS                           = 4,                // roosts for each type and team
+    MAX_NA_ROOSTS                           = 4,            // roosts for each type and team
     MAX_FIRE_BOMBS                          = 10,
 
     // spells

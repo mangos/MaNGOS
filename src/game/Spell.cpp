@@ -2220,9 +2220,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // Do not target current victim
                 switch (m_spellInfo->Id)
                 {
-                    case 30843:                                             // Enfeeble
-                    case 37676:                                             // Insidious Whisper
-                    case 38028:                                             // Watery Grave
+                    case 30843:                             // Enfeeble
+                    case 37676:                             // Insidious Whisper
+                    case 38028:                             // Watery Grave
                         if (Unit* pVictim = m_caster->getVictim())
                             targetUnitMap.remove(pVictim);
                         break;

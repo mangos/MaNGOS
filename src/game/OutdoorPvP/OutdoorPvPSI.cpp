@@ -154,8 +154,8 @@ struct SilithusSpawnLocation
 // Area trigger location - workaround to check the flag drop handling
 static SilithusSpawnLocation silithusFlagDropLocations[2] =
 {
-    {-7142.04f, 1397.92f, 4.327f},      // alliance
-    {-7588.48f, 756.806f, -16.425f}     // horde
+    { -7142.04f, 1397.92f, 4.327f},     // alliance
+    { -7588.48f, 756.806f, -16.425f}    // horde
 };
 
 bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)

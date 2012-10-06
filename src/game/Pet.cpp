@@ -945,7 +945,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                     }
                     case CLASS_MAGE:
                     {
-                        //40% damage bonus of mage's frost damage
+                        // 40% damage bonus of mage's frost damage
                         float val = owner->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_FROST) * 0.4f;
                         if (val < 0)
                             val = 0;

@@ -4840,7 +4840,7 @@ bool ChatHandler::HandleChangeWeatherCommand(char* args)
     if (!ExtractUInt32(&args, type))
         return false;
 
-    //0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
+    // 0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
     if (type > 3)
         return false;
 
@@ -4848,7 +4848,7 @@ bool ChatHandler::HandleChangeWeatherCommand(char* args)
     if (!ExtractFloat(&args, grade))
         return false;
 
-    //0 to 1, sending -1 is instand good weather
+    // 0 to 1, sending -1 is instand good weather
     if (grade < 0.0f || grade > 1.0f)
         return false;
 

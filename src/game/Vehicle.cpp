@@ -363,7 +363,7 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
 }
 
 // Helper function to undo the turning of the vehicle to calculate a relative position of the passenger when boarding
-void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float &lx, float &ly, float &lz, float &lo) const
+void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float& lx, float& ly, float& lz, float& lo) const
 {
     NormalizeRotatedPosition(gx - m_owner->GetPositionX(), gy - m_owner->GetPositionY(), lx, ly);
 
@@ -430,7 +430,7 @@ bool VehicleInfo::IsSeatAvailableFor(Unit* passenger, uint8 seat) const
     MANGOS_ASSERT(passenger);
 
     return seat < MAX_VEHICLE_SEAT &&
-            (GetEmptySeatsMask() & (passenger->GetTypeId() == TYPEID_PLAYER ? m_playerSeats : m_creatureSeats) & (1 << seat));
+           (GetEmptySeatsMask() & (passenger->GetTypeId() == TYPEID_PLAYER ? m_playerSeats : m_creatureSeats) & (1 << seat));
 }
 
 /// Wrapper to collect all taken seats

@@ -359,7 +359,7 @@ void OutdoorPvPNA::ProcessCaptureEvent(GameObject* go, Team team)
     SendUpdateWorldState(WORLD_STATE_NA_GUARDS_LEFT, m_guardsLeft);
 
     BuffTeam(m_zoneOwner, SPELL_STRENGTH_HALAANI);
-    sWorld.SendDefenseMessage(ZONE_ID_NAGRAND, m_zoneOwner == ALLIANCE ? LANG_OPVP_NA_CAPTURE_A: LANG_OPVP_NA_CAPTURE_H);
+    sWorld.SendDefenseMessage(ZONE_ID_NAGRAND, m_zoneOwner == ALLIANCE ? LANG_OPVP_NA_CAPTURE_A : LANG_OPVP_NA_CAPTURE_H);
 }
 
 // Handle the gameobjects spawn/despawn depending on the controller faction

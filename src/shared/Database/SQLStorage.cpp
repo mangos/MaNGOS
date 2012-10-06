@@ -33,7 +33,7 @@ SQLStorageBase::SQLStorageBase() :
     m_data(NULL)
 {}
 
-void SQLStorageBase::Initialize( const char* tableName, const char* entry_field, const char* src_format, const char* dst_format)
+void SQLStorageBase::Initialize(const char* tableName, const char* entry_field, const char* src_format, const char* dst_format)
 {
     m_tableName = tableName;
     m_entry_field = entry_field;
@@ -82,7 +82,7 @@ void SQLStorageBase::Free()
             case FT_STRING:
             {
                 for (uint32 recordItr = 0; recordItr < m_recordCount; ++recordItr)
-                        delete[] *(char**)((char*)(m_data + (recordItr * m_recordSize)) + offset);
+                    delete[] *(char**)((char*)(m_data + (recordItr * m_recordSize)) + offset);
 
                 offset += sizeof(char*);
                 break;
@@ -190,12 +190,12 @@ void SQLHashStorage::EraseEntry(uint32 id)
         find->second = NULL;
 }
 
-SQLHashStorage::SQLHashStorage(const char* fmt, const char * _entry_field, const char * sqlname)
+SQLHashStorage::SQLHashStorage(const char* fmt, const char* _entry_field, const char* sqlname)
 {
     Initialize(sqlname, _entry_field, fmt, fmt);
 }
 
-SQLHashStorage::SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname)
+SQLHashStorage::SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
 }
@@ -226,12 +226,12 @@ void SQLMultiStorage::EraseEntry(uint32 id)
     m_indexMultiMap.erase(id);
 }
 
-SQLMultiStorage::SQLMultiStorage(const char* fmt, const char * _entry_field, const char * sqlname)
+SQLMultiStorage::SQLMultiStorage(const char* fmt, const char* _entry_field, const char* sqlname)
 {
     Initialize(sqlname, _entry_field, fmt, fmt);
 }
 
-SQLMultiStorage::SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname)
+SQLMultiStorage::SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
 }

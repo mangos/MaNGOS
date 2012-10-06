@@ -140,8 +140,8 @@ class SQLHashStorage : public SQLStorageBase
     template<class DerivedLoader, class StorageClass> friend class SQLStorageLoaderBase;
 
     public:
-        SQLHashStorage(const char* fmt, const char * _entry_field, const char * sqlname);
-        SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname);
+        SQLHashStorage(const char* fmt, const char* _entry_field, const char* sqlname);
+        SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname);
 
         ~SQLHashStorage() { Free(); }
 
@@ -182,8 +182,8 @@ class SQLMultiStorage : public SQLStorageBase
         typedef std::multimap<uint32/*recordId*/, char* /*record*/> RecordMultiMap;
 
     public:
-        SQLMultiStorage(const char* fmt, const char * _entry_field, const char * sqlname);
-        SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char * _entry_field, const char * sqlname);
+        SQLMultiStorage(const char* fmt, const char* _entry_field, const char* sqlname);
+        SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname);
 
         ~SQLMultiStorage() { Free(); }
 

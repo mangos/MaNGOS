@@ -90,14 +90,17 @@ struct AreaTrigger
     float  target_Orientation;
 
     // Operators
-    bool IsMinimal() const { return requiredLevel == 0 && requiredItem == 0 && requiredItem2 == 0 && heroicKey == 0 &&
-                                    heroicKey2 == 0 && requiredQuest == 0 && requiredQuestHeroic == 0; }
+    bool IsMinimal() const
+    {
+        return requiredLevel == 0 && requiredItem == 0 && requiredItem2 == 0 && heroicKey == 0 &&
+               heroicKey2 == 0 && requiredQuest == 0 && requiredQuestHeroic == 0;
+    }
 
     bool IsLessOrEqualThan(AreaTrigger const* l) const      // Expected to have same map
     {
         MANGOS_ASSERT(target_mapId == l->target_mapId);
         return requiredLevel <= l->requiredLevel && requiredItem <= l->requiredItem && requiredItem2 <= l->requiredItem2
-                && heroicKey <= l->heroicKey&& heroicKey2 <= l->heroicKey2 && requiredQuest <= l->requiredQuest && requiredQuestHeroic <= l->requiredQuestHeroic;
+               && heroicKey <= l->heroicKey && heroicKey2 <= l->heroicKey2 && requiredQuest <= l->requiredQuest && requiredQuestHeroic <= l->requiredQuestHeroic;
     }
 };
 
