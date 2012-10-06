@@ -1021,21 +1021,29 @@ Player* ScriptAction::GetPlayerTargetOrSourceAndLog(WorldObject* pSource, WorldO
 /// Handle one Script Step
 void ScriptAction::HandleScriptStep()
 {
-    Object* source = NULL;
-    Object* target = NULL;
-    if (!GetScriptCommandObject(m_sourceGuid, true, source))
-        return;
-    if (!GetScriptCommandObject(m_targetGuid, false, target))
-        return;
+    WorldObject* pSource;
+    WorldObject* pTarget;
+    Object* pSourceOrItem;                                  // Stores a provided pSource (if exists as WorldObject) or source-item
 
-    // Give some debug log output for easier use
-    DEBUG_LOG("DB-SCRIPTS: Process table `%s` id %u, command %u for source %s (%sin world), target %s (%sin world)", m_table, m_script->id, m_script->command, m_sourceGuid.GetString().c_str(), source ? "" : "not ", m_targetGuid.GetString().c_str(), target ? "" : "not ");
+    {                                                       // Add scope for source & target variables so that they are not used below
+        Object* source = NULL;
+        Object* target = NULL;
+        if (!GetScriptCommandObject(m_sourceGuid, true, source))
+            return;
+        if (!GetScriptCommandObject(m_targetGuid, false, target))
+            return;
 
-    // Get expected source and target (if defined with buddy)
-    WorldObject* pSource = source && source->isType(TYPEMASK_WORLDOBJECT) ? (WorldObject*)source : NULL;
-    WorldObject* pTarget = target && target->isType(TYPEMASK_WORLDOBJECT) ? (WorldObject*)target : NULL;
-    if (!GetScriptProcessTargets(pSource, pTarget, pSource, pTarget))
-        return;
+        // Give some debug log output for easier use
+        DEBUG_LOG("DB-SCRIPTS: Process table `%s` id %u, command %u for source %s (%sin world), target %s (%sin world)", m_table, m_script->id, m_script->command, m_sourceGuid.GetString().c_str(), source ? "" : "not ", m_targetGuid.GetString().c_str(), target ? "" : "not ");
+
+        // Get expected source and target (if defined with buddy)
+        pSource = source && source->isType(TYPEMASK_WORLDOBJECT) ? (WorldObject*)source : NULL;
+        pTarget = target && target->isType(TYPEMASK_WORLDOBJECT) ? (WorldObject*)target : NULL;
+        if (!GetScriptProcessTargets(pSource, pTarget, pSource, pTarget))
+            return;
+
+        pSourceOrItem = pSource ? pSource : (source && source->isType(TYPEMASK_ITEM) ? source : NULL);
+    }
 
     switch (m_script->command)
     {
@@ -1111,20 +1119,18 @@ void ScriptAction::HandleScriptStep()
             break;
         }
         case SCRIPT_COMMAND_FIELD_SET:                      // 2
-            // TODO
-            if (!source)
+            if (!pSourceOrItem)
             {
                 sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u call for NULL object.", m_table, m_script->id, m_script->command);
                 break;
             }
-
-            if (m_script->setField.fieldId <= OBJECT_FIELD_ENTRY || m_script->setField.fieldId >= source->GetValuesCount())
+            if (m_script->setField.fieldId <= OBJECT_FIELD_ENTRY || m_script->setField.fieldId >= pSourceOrItem->GetValuesCount())
             {
-                sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u call for wrong field %u (max count: %u) in object (TypeId: %u).", m_table, m_script->id, m_script->command, m_script->setField.fieldId, source->GetValuesCount(), source->GetTypeId());
+                sLog.outError(" DB-SCRIPTS: Process table `%s` id %u, command %u call for wrong field %u (max count: %u) in %s.",
+                              m_table, m_script->id, m_script->command, m_script->setField.fieldId, pSourceOrItem->GetValuesCount(), pSourceOrItem->GetGuidStr().c_str());
                 break;
             }
-
-            source->SetUInt32Value(m_script->setField.fieldId, m_script->setField.fieldValue);
+            pSourceOrItem->SetUInt32Value(m_script->setField.fieldId, m_script->setField.fieldValue);
             break;
         case SCRIPT_COMMAND_MOVE_TO:                        // 3
         {
@@ -1158,36 +1164,32 @@ void ScriptAction::HandleScriptStep()
             break;
         }
         case SCRIPT_COMMAND_FLAG_SET:                       // 4
-            // TODO
-            if (!source)
+            if (!pSourceOrItem)
             {
                 sLog.outError("SCRIPT_COMMAND_FLAG_SET (script id %u) call for NULL object.", m_script->id);
                 break;
             }
-            if (m_script->setFlag.fieldId <= OBJECT_FIELD_ENTRY || m_script->setFlag.fieldId >= source->GetValuesCount())
+            if (m_script->setFlag.fieldId <= OBJECT_FIELD_ENTRY || m_script->setFlag.fieldId >= pSourceOrItem->GetValuesCount())
             {
-                sLog.outError("SCRIPT_COMMAND_FLAG_SET (script id %u) call for wrong field %u (max count: %u) in object (TypeId: %u).",
-                              m_script->id, m_script->setFlag.fieldId, source->GetValuesCount(), source->GetTypeId());
+                sLog.outError("SCRIPT_COMMAND_FLAG_SET (script id %u) call for wrong field %u (max count: %u) in %s.",
+                              m_script->id, m_script->setFlag.fieldId, pSourceOrItem->GetValuesCount(), pSourceOrItem->GetGuidStr().c_str());
                 break;
             }
-
-            source->SetFlag(m_script->setFlag.fieldId, m_script->setFlag.fieldValue);
+            pSourceOrItem->SetFlag(m_script->setFlag.fieldId, m_script->setFlag.fieldValue);
             break;
         case SCRIPT_COMMAND_FLAG_REMOVE:                    // 5
-            // TODO
-            if (!source)
+            if (!pSourceOrItem)
             {
                 sLog.outError("SCRIPT_COMMAND_FLAG_REMOVE (script id %u) call for NULL object.", m_script->id);
                 break;
             }
-            if (m_script->removeFlag.fieldId <= OBJECT_FIELD_ENTRY || m_script->removeFlag.fieldId >= source->GetValuesCount())
+            if (m_script->removeFlag.fieldId <= OBJECT_FIELD_ENTRY || m_script->removeFlag.fieldId >= pSourceOrItem->GetValuesCount())
             {
-                sLog.outError("SCRIPT_COMMAND_FLAG_REMOVE (script id %u) call for wrong field %u (max count: %u) in object (TypeId: %u).",
-                              m_script->id, m_script->removeFlag.fieldId, source->GetValuesCount(), source->GetTypeId());
+                sLog.outError("SCRIPT_COMMAND_FLAG_REMOVE (script id %u) call for wrong field %u (max count: %u) in %s.",
+                              m_script->id, m_script->removeFlag.fieldId, pSourceOrItem->GetValuesCount(), pSourceOrItem->GetGuidStr().c_str());
                 break;
             }
-
-            source->RemoveFlag(m_script->removeFlag.fieldId, m_script->removeFlag.fieldValue);
+            pSourceOrItem->RemoveFlag(m_script->removeFlag.fieldId, m_script->removeFlag.fieldValue);
             break;
         case SCRIPT_COMMAND_TELEPORT_TO:                    // 6
         {
