@@ -322,6 +322,19 @@ void VehicleInfo::UnBoard(Unit* passenger, bool changeVehicle)
 
     // Remove passenger modifications
     RemoveSeatMods(passenger, seatEntry->m_flags);
+
+    // Some creature vehicles get despawned after passenger unboarding
+    if (m_owner->GetTypeId() == TYPEID_UNIT)
+    {
+        // TODO: Guesswork, but seems to be fairly near correct
+        // Only if the passenger was on control seat? Also depending on some flags
+        if ((seatEntry->m_flags & SEAT_FLAG_CAN_CONTROL) &&
+            !(m_vehicleEntry->m_flags & (VEHICLE_FLAG_UNK4 | VEHICLE_FLAG_UNK20)))
+        {
+            if (((Creature*)m_owner)->IsTemporarySummon())
+                ((Creature*)m_owner)->ForcedDespawn(1000);
+        }
+    }
 }
 
 /**

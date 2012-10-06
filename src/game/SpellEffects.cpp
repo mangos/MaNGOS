@@ -4888,6 +4888,10 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
     // Expected Amount: TODO - there are quite some exceptions (like totems, engineering dragonlings..)
     uint32 amount = damage > 0 ? damage : 1;
 
+    // basepoints of SUMMON_PROP_GROUP_VEHICLE is often a spellId, set amount to 1
+    if (summon_prop->Group == SUMMON_PROP_GROUP_VEHICLE)
+        amount = 1;
+
     // Expected Level                                       (Totem, Pet and Critter may not use this)
     uint32 level = m_caster->getLevel();
     // level of creature summoned using engineering item based at engineering skill level
@@ -5005,14 +5009,11 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
                         summonResult = DoSummonCritter(summonPositions, summon_prop, effect, level);
                     break;
                 case UNITNAME_SUMMON_TITLE_OPPONENT:
+                case UNITNAME_SUMMON_TITLE_VEHICLE:
+                case UNITNAME_SUMMON_TITLE_MOUNT:
                 case UNITNAME_SUMMON_TITLE_LIGHTWELL:
                 case UNITNAME_SUMMON_TITLE_BUTLER:
                     summonResult = DoSummonWild(summonPositions, summon_prop, effect, level);
-                    break;
-                case UNITNAME_SUMMON_TITLE_VEHICLE:
-                case UNITNAME_SUMMON_TITLE_MOUNT:
-                    // TODO
-                    // EffectSummonVehicle(i);
                     break;
                 default:
                     sLog.outError("EffectSummonType: Unhandled summon title %u", summon_prop->Title);
@@ -5038,9 +5039,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
         }
         case SUMMON_PROP_GROUP_VEHICLE:
         {
-            // TODO
-            // EffectSummonVehicle(i);
-            sLog.outDebug("EffectSummonType: Unhandled summon group type SUMMON_PROP_GROUP_VEHICLE(%u)", summon_prop->Group);
+            summonResult = DoSummonVehicle(summonPositions, summon_prop, eff_idx, level);
             break;
         }
         default:
@@ -5478,6 +5477,48 @@ bool Spell::DoSummonPet(SpellEffectEntry const* effect)
         ((Creature*)m_originalCaster)->AI()->JustSummoned((Creature*)spawnCreature);
 
     return false;
+}
+
+bool Spell::DoSummonVehicle(CreatureSummonPositions& list, SummonPropertiesEntry const* prop, SpellEffectIndex effIdx, uint32 /*level*/)
+{
+    MANGOS_ASSERT(!list.empty() && prop);
+
+    uint32 creatureEntry = m_spellInfo->EffectMiscValue[effIdx];
+    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creatureEntry);
+    if (!cInfo)
+    {
+        sLog.outErrorDb("Spell::DoSummonVehicle: creature entry %u not found for spell %u.", creatureEntry, m_spellInfo->Id);
+        return false;
+    }
+
+    Creature* spawnCreature = m_caster->SummonCreature(creatureEntry, list[0].x, list[0].y, list[0].z, m_caster->GetOrientation(),
+            (m_duration == 0) ? TEMPSUMMON_CORPSE_DESPAWN : TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, m_duration);
+
+    if (!spawnCreature)
+    {
+        sLog.outError("Spell::DoSummonVehicle: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
+        return false;
+    }
+
+    list[0].creature = spawnCreature;
+
+    // Changes to be sent
+    spawnCreature->SetCreatorGuid(m_caster->GetObjectGuid());
+    spawnCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
+    //spawnCreature->SetLevel(level); // Do we need to set level for vehicles?
+
+    // Board the caster right after summoning
+    SpellEntry const* controlSpellEntry = sSpellStore.LookupEntry(m_spellInfo->CalculateSimpleValue(effIdx));
+    if (controlSpellEntry && IsSpellHaveAura(controlSpellEntry, SPELL_AURA_CONTROL_VEHICLE))
+        m_caster->CastSpell(spawnCreature, controlSpellEntry, true);
+    else
+        m_caster->CastSpell(spawnCreature, SPELL_RIDE_VEHICLE_HARDCODED, true);
+
+    // Notify Summoner
+    if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_originalCaster)->AI())
+        ((Creature*)m_originalCaster)->AI()->JustSummoned(spawnCreature);
+
+    return true;
 }
 
 void Spell::EffectLearnSpell(SpellEffectEntry const* effect)
