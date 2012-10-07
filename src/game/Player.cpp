@@ -2157,7 +2157,7 @@ void Player::Regenerate(Powers power, uint32 diff)
             else
                 return;
             break;
-        case POWER_ENERGY:                                  // Regenerate energy (rogue)
+        case POWER_ENERGY:                                  // Regenerate energy
         {
             float EnergyRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_ENERGY);
             addvalue = 20 * EnergyRate;
