@@ -800,6 +800,8 @@ void World::LoadConfigSettings(bool reload)
 
     setConfigMin(CONFIG_UINT32_GUILD_EVENT_LOG_COUNT, "Guild.EventLogRecordsCount", GUILD_EVENTLOG_MAX_RECORDS, GUILD_EVENTLOG_MAX_RECORDS);
     setConfigMin(CONFIG_UINT32_GUILD_BANK_EVENT_LOG_COUNT, "Guild.BankEventLogRecordsCount", GUILD_BANK_MAX_LOGS, GUILD_BANK_MAX_LOGS);
+    setConfig(CONGIG_UINT32_GUILD_UNDELETABLE_LEVEL, "Guild.UndeletableLevel", 4);
+    setConfig(CONFIG_BOOL_GUILD_LEVELING_ENABLED, "Guild.LevelingEnabled", true);
 
     setConfig(CONFIG_UINT32_TIMERBAR_FATIGUE_GMLEVEL, "TimerBar.Fatigue.GMLevel", SEC_CONSOLE);
     setConfig(CONFIG_UINT32_TIMERBAR_FATIGUE_MAX,     "TimerBar.Fatigue.Max", 60);

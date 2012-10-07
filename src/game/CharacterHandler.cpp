@@ -665,7 +665,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     //QueryResult *result = CharacterDatabase.PQuery("SELECT guildid,rank FROM guild_member WHERE guid = '%u'",pCurrChar->GetGUIDLow());
     QueryResult *resultGuild = holder->GetResult(PLAYER_LOGIN_QUERY_LOADGUILD);
 
-    if(resultGuild)
+    if (resultGuild)
     {
         Field *fields = resultGuild->Fetch();
         pCurrChar->SetInGuild(fields[0].GetUInt32());
@@ -675,6 +675,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     else if(pCurrChar->GetGuildId())                        // clear guild related fields in case wrong data about nonexistent membership
     {
         pCurrChar->SetInGuild(0);
+        pCurrChar->SetGuildLevel(0);
         pCurrChar->SetRank(0);
     }
 
@@ -683,6 +684,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId());
         if(guild)
         {
+            pCurrChar->SetGuildLevel(guild->GetLevel());
+
             data.Initialize(SMSG_GUILD_EVENT, (1+1+guild->GetMOTD().size()+1));
             data << uint8(GE_MOTD);
             data << uint8(1);
@@ -699,6 +702,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             // remove wrong guild data
             sLog.outError("Player %s (GUID: %u) marked as member of nonexistent guild (id: %u), removing guild membership for player.",pCurrChar->GetName(),pCurrChar->GetGUIDLow(),pCurrChar->GetGuildId());
             pCurrChar->SetInGuild(0);
+            pCurrChar->SetGuildLevel(0);
         }
     }
 

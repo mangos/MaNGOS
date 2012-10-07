@@ -628,6 +628,14 @@ LogColors = ""
 #        Useful when you don't want old log events to be overwritten by new, but increasing can slow down performance
 #        Default: 25
 #
+#    Guild.UndeletableLevel
+#        A level above which guild can't be deleted.
+#        Default: 4
+#
+#    Guild.LevelingEnabled
+#        Allow guild leveling.
+#        Default: 1
+#
 #    TimerBar.Fatigue.GMLevel
 #        Disable/enable fatigue for security level (0..4) or high
 #        Default: 4 (None)
@@ -783,6 +791,8 @@ Quests.Weekly.ResetHour = 6
 Quests.IgnoreRaid = 0
 Guild.EventLogRecordsCount = 100
 Guild.BankEventLogRecordsCount = 25
+Guild.UndeletableLevel = 4
+Guild.LevelingEnabled = 1
 TimerBar.Fatigue.GMLevel = 4
 TimerBar.Fatigue.Max = 60
 TimerBar.Breath.GMLevel = 4

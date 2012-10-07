@@ -439,7 +439,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), m_camera(this), m_
     memset(m_items, 0, sizeof(Item*)*PLAYER_SLOTS_COUNT);
 
     m_social = NULL;
-    m_guildId = 0;
 
     // group is initialized in the reference constructor
     SetGroupInvite(NULL);
@@ -699,16 +698,17 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     SetUInt16Value(PLAYER_BYTES_3, 0, gender);              // only GENDER_MALE/GENDER_FEMALE (1 bit) allowed, drunk state = 0
     SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
 
-    SetInGuild( 0 );
-    SetUInt32Value( PLAYER_GUILDRANK, 0 );
-    SetUInt32Value( PLAYER_GUILD_TIMESTAMP, 0 );
+    SetInGuild(0);
+    SetGuildLevel(0);
+    SetUInt32Value(PLAYER_GUILDRANK, 0);
+    SetUInt32Value(PLAYER_GUILD_TIMESTAMP, 0);
 
     for (int i = 0; i < KNOWN_TITLES_SIZE; ++i)
         SetUInt64Value(PLAYER__FIELD_KNOWN_TITLES + i, 0);  // 0=disabled
     SetUInt32Value(PLAYER_CHOSEN_TITLE, 0);
 
-    SetUInt32Value( PLAYER_FIELD_KILLS, 0 );
-    SetUInt32Value( PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0 );
+    SetUInt32Value(PLAYER_FIELD_KILLS, 0);
+    SetUInt32Value(PLAYER_FIELD_LIFETIME_HONORBALE_KILLS, 0);
 
     // set starting level
     uint32 start_level = getClass() != CLASS_DEATH_KNIGHT
@@ -1482,9 +1482,7 @@ bool Player::BuildEnumData(QueryResult* result, ByteBuffer* data, ByteBuffer* bu
         return false;
     }
 
-    // FIXME
-    //ObjectGuid guildGuid = ObjectGuid(HIGHGUID_GUILD, fields[13].GetUInt32());
-    ObjectGuid guildGuid = ObjectGuid(uint64(fields[13].GetUInt32()));
+    ObjectGuid guildGuid = ObjectGuid(HIGHGUID_GUILD, fields[13].GetUInt32());
     std::string name = fields[1].GetCppString();
     uint8 gender = fields[4].GetUInt8();
     uint32 playerBytes = fields[5].GetUInt32();
@@ -4021,7 +4019,8 @@ void Player::InitVisibleBits()
 {
     updateVisualBits.SetCount(PLAYER_END);
 
-    updateVisualBits.SetBit(OBJECT_FIELD_GUID);
+    updateVisualBits.SetBit(OBJECT_FIELD_GUID + 0);
+    updateVisualBits.SetBit(OBJECT_FIELD_GUID + 1);
     updateVisualBits.SetBit(OBJECT_FIELD_TYPE);
     updateVisualBits.SetBit(OBJECT_FIELD_ENTRY);
     updateVisualBits.SetBit(OBJECT_FIELD_DATA + 0);
@@ -6664,6 +6663,25 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, float honor)
     return true;
 }
 
+void Player::SetInGuild(uint32 GuildId)
+{
+    if (GuildId)
+        SetGuidValue(OBJECT_FIELD_DATA, ObjectGuid(HIGHGUID_GUILD, 0, GuildId));
+    else
+        SetGuidValue(OBJECT_FIELD_DATA, ObjectGuid());
+
+    ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_GUILD_LEVELING_ENABLED, GuildId != 0 && sWorld.getConfig(CONFIG_BOOL_GUILD_LEVELING_ENABLED));
+    SetUInt16Value(OBJECT_FIELD_TYPE, 1, GuildId != 0);
+}
+
+std::string Player::GetGuildName() const
+{
+    if (Guild* guild = sGuildMgr.GetGuildById(GetGuildId()))
+        return guild->GetName();
+
+    return "";
+}
+
 uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
 {
     uint32 lowguid = guid.GetCounter();
@@ -6675,6 +6693,14 @@ uint32 Player::GetGuildIdFromDB(ObjectGuid guid)
     uint32 id = result->Fetch()[0].GetUInt32();
     delete result;
     return id;
+}
+
+ObjectGuid Player::GetGuildGuidFromDB(ObjectGuid guid)
+{
+    if (uint32 guildId = GetGuildIdFromDB(guid))
+        return ObjectGuid(HIGHGUID_GUILD, GetGuildIdFromDB(guid));
+    else
+        return ObjectGuid();
 }
 
 uint32 Player::GetRankFromDB(ObjectGuid guid)
@@ -6689,6 +6715,15 @@ uint32 Player::GetRankFromDB(ObjectGuid guid)
     else
         return 0;
 }
+
+void Player::SendGuildDeclined(std::string name, bool autodecline)
+{
+    WorldPacket data(SMSG_GUILD_DECLINE, 10);
+    data << name;
+    data << uint8(autodecline);
+    GetSession()->SendPacket(&data);
+}
+
 
 uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, ArenaType type)
 {

@@ -474,6 +474,12 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK24                  = 0x00800000,       // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all abilitys on tab except autoattack
     PLAYER_FLAGS_UNK25                  = 0x01000000,       // EVENT_SPELL_UPDATE_USABLE and EVENT_UPDATE_SHAPESHIFT_USABLE, disabled all melee ability on tab include autoattack
     PLAYER_FLAGS_XP_USER_DISABLED       = 0x02000000,
+    PLAYER_FLAGS_UNK27                  = 0x04000000,
+    PLAYER_FLAGS_AUTO_DECLINE_GUILDS    = 0x08000000,       // Automatically declines guild invites
+    PLAYER_FLAGS_GUILD_LEVELING_ENABLED = 0x10000000,       // Lua_GetGuildLevelEnabled() - enables guild leveling related UI
+    PLAYER_FLAGS_VOID_STORAGE_UNLOCKED  = 0x20000000,       // unlocks void storage
+    PLAYER_FLAGS_UNK30                  = 0x40000000,
+    PLAYER_FLAGS_UNK31                  = 0x80000000,
 };
 
 // used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
@@ -1762,14 +1768,20 @@ class MANGOS_DLL_SPEC Player : public Unit
         void SetAllowLowLevelRaid(bool allow) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_ENABLE_LOW_LEVEL_RAID, allow); }
         bool GetAllowLowLevelRaid() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_ENABLE_LOW_LEVEL_RAID); }
 
-        void SetInGuild(uint32 GuildId) { m_guildId = GuildId; }
+        void SetInGuild(uint32 GuildId);
+        void SetGuildLevel(uint32 level) { SetUInt32Value(PLAYER_GUILDLEVEL, level); }
         void SetRank(uint32 rankId){ SetUInt32Value(PLAYER_GUILDRANK, rankId); }
-        void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
-        uint32 GetGuildId() { return m_guildId; }
+        void SetGuildInvited(uint32 GuildId, ObjectGuid inviter = ObjectGuid()) { m_GuildIdInvited = GuildId; m_GuildInviterGuid = inviter; }
+        uint32 GetGuildId() const { return GetGuildGuid().GetCounter(); }
+        ObjectGuid GetGuildGuid() const { return GetGuidValue(OBJECT_FIELD_DATA); }
+        std::string GetGuildName() const;
         static uint32 GetGuildIdFromDB(ObjectGuid guid);
+        static ObjectGuid GetGuildGuidFromDB(ObjectGuid guid);
+        void SendGuildDeclined(std::string name, bool autodecline);
         uint32 GetRank() { return GetUInt32Value(PLAYER_GUILDRANK); }
         static uint32 GetRankFromDB(ObjectGuid guid);
-        int GetGuildIdInvited() { return m_GuildIdInvited; }
+        int GetGuildIdInvited() const { return m_GuildIdInvited; }
+        ObjectGuid GetGuildInviterGuid() const { return m_GuildInviterGuid; }
         static void RemovePetitionsAndSigns(ObjectGuid guid);
         void SendPetitionSignResult(ObjectGuid petitionGuid, Player* player, uint32 result);
         void SendPetitionTurnInResult(uint32 result);
@@ -2521,6 +2533,7 @@ class MANGOS_DLL_SPEC Player : public Unit
         SkillStatusMap mSkillStatus;
 
         uint32 m_GuildIdInvited;
+        ObjectGuid m_GuildInviterGuid;
         uint32 m_ArenaTeamIdInvited;
 
         PlayerMails m_mail;
@@ -2609,7 +2622,6 @@ class MANGOS_DLL_SPEC Player : public Unit
 
         // Social
         PlayerSocial *m_social;
-        uint32 m_guildId;
 
         // Groups
         GroupReference m_group;
