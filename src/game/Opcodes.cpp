@@ -513,10 +513,9 @@ void InitializeOpcodes()
     OPCODE(SMSG_TRAINER_BUY_FAILED,                      STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(CMSG_BINDER_ACTIVATE,                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBinderActivateOpcode      );
     //OPCODE(SMSG_PLAYERBINDERROR,                         STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_BANKER_ACTIVATE,                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBankerActivateOpcode      );
-    //OPCODE(SMSG_SHOW_BANK,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
-    //OPCODE(CMSG_BUY_BANK_SLOT,                           STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBuyBankSlotOpcode         );
-    //OPCODE(SMSG_BUY_BANK_SLOT_RESULT,                    STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_BANKER_ACTIVATE,                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBankerActivateOpcode      );
+    OPCODE(SMSG_SHOW_BANK,                               STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
+    OPCODE(CMSG_BUY_BANK_SLOT,                           STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBuyBankSlotOpcode         );
     OPCODE(CMSG_PETITION_SHOWLIST,                       STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePetitionShowListOpcode    );
     OPCODE(SMSG_PETITION_SHOWLIST,                       STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               );
     OPCODE(CMSG_PETITION_BUY,                            STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandlePetitionBuyOpcode         );

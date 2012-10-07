@@ -498,10 +498,9 @@ enum Opcodes
     SMSG_TRAINER_BUY_FAILED                               = 0x0004, // 4.3.4 15595
     CMSG_BINDER_ACTIVATE                                  = 0x4006, // 4.3.4 15595
     SMSG_PLAYERBINDERROR                                  = 0x11B7,
-    CMSG_BANKER_ACTIVATE                                  = 0x11B8,
-    SMSG_SHOW_BANK                                        = 0x11B9,
-    CMSG_BUY_BANK_SLOT                                    = 0x11BA,
-    SMSG_BUY_BANK_SLOT_RESULT                             = 0x11BB,
+    CMSG_BANKER_ACTIVATE                                  = 0x0005, // 4.3.4 15595
+    SMSG_SHOW_BANK                                        = 0x2627, // 4.3.4 15595
+    CMSG_BUY_BANK_SLOT                                    = 0x0425, // 4.3.4 15595
     CMSG_PETITION_SHOWLIST                                = 0x4617, // 4.3.4 15595
     SMSG_PETITION_SHOWLIST                                = 0x6405, // 4.3.4 15595
     CMSG_PETITION_BUY                                     = 0x4E05, // 4.3.4 15595
