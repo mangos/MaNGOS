@@ -185,7 +185,6 @@ void VehicleInfo::Board(Unit* passenger, uint8 seat)
     BoardPassenger(passenger, lx, ly, lz, lo, seat);        // Use TransportBase to store the passenger
 
     // Set data for createobject packets
-    passenger->m_movementInfo.GetTransportGuid();
     passenger->m_movementInfo.SetTransportData(m_owner->GetObjectGuid(), lx, ly, lz, lo, 0, seat);
 
     if (passenger->GetTypeId() == TYPEID_PLAYER)
@@ -291,7 +290,6 @@ void VehicleInfo::UnBoard(Unit* passenger, bool changeVehicle)
     if (!changeVehicle)                                     // Send expected unboarding packages
     {
         // Update movementInfo
-        passenger->m_movementInfo.GetTransportGuid();
         passenger->m_movementInfo.ClearTransportData();
 
         if (passenger->GetTypeId() == TYPEID_PLAYER)
