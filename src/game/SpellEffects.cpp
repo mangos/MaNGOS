@@ -5039,7 +5039,7 @@ void Spell::EffectSummonType(SpellEffectEntry const* effect)
         }
         case SUMMON_PROP_GROUP_VEHICLE:
         {
-            summonResult = DoSummonVehicle(summonPositions, summon_prop, eff_idx, level);
+            summonResult = DoSummonVehicle(summonPositions, summon_prop, effect, level);
             break;
         }
         default:
@@ -5479,11 +5479,11 @@ bool Spell::DoSummonPet(SpellEffectEntry const* effect)
     return false;
 }
 
-bool Spell::DoSummonVehicle(CreatureSummonPositions& list, SummonPropertiesEntry const* prop, SpellEffectIndex effIdx, uint32 /*level*/)
+bool Spell::DoSummonVehicle(CreatureSummonPositions& list, SummonPropertiesEntry const* prop, SpellEffectEntry const * effect, uint32 /*level*/)
 {
     MANGOS_ASSERT(!list.empty() && prop);
 
-    uint32 creatureEntry = m_spellInfo->EffectMiscValue[effIdx];
+    uint32 creatureEntry = effect->EffectMiscValue;
     CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(creatureEntry);
     if (!cInfo)
     {
@@ -5508,7 +5508,7 @@ bool Spell::DoSummonVehicle(CreatureSummonPositions& list, SummonPropertiesEntry
     //spawnCreature->SetLevel(level); // Do we need to set level for vehicles?
 
     // Board the caster right after summoning
-    SpellEntry const* controlSpellEntry = sSpellStore.LookupEntry(m_spellInfo->CalculateSimpleValue(effIdx));
+    SpellEntry const* controlSpellEntry = sSpellStore.LookupEntry(effect->CalculateSimpleValue());
     if (controlSpellEntry && IsSpellHaveAura(controlSpellEntry, SPELL_AURA_CONTROL_VEHICLE))
         m_caster->CastSpell(spawnCreature, controlSpellEntry, true);
     else
