@@ -9553,7 +9553,7 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         {
             if (itr->spells[i] && !sSpellStore.LookupEntry(itr->spells[i]))
             {
-                sLog.outErrorDb("LoadCreatureTemplateSpells: Spells found for creature entry %u, assigned spell %s does not exist, set to 0", itr->entry, itr->spells[i]);
+                sLog.outErrorDb("LoadCreatureTemplateSpells: Spells found for creature entry %u, assigned spell %u does not exist, set to 0", itr->entry, itr->spells[i]);
                 const_cast<CreatureTemplateSpells*>(*itr)->spells[i] = 0;
             }
         }
