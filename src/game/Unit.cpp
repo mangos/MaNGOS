@@ -1106,7 +1106,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 playerVictim->duel->opponent->CombatStopWithPets(true);
                 playerVictim->CombatStopWithPets(true);
 
-                playerVictim->DuelComplete(DUEL_INTERUPTED);
+                playerVictim->DuelComplete(DUEL_INTERRUPTED);
             }
 
             if (player_tap)                                 // PvP kill
