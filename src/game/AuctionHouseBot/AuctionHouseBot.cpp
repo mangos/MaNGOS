@@ -28,8 +28,8 @@ struct BuyerItemInfo
     uint32  ItemCount;
     double  BuyPrice;
     double  BidPrice;
-    uint32  MinBuyPrice;
-    uint32  MinBidPrice;
+    uint64  MinBuyPrice;
+    uint64  MinBidPrice;
 };
 
 typedef std::map<uint32, BuyerItemInfo > BuyerItemInfoMap;
@@ -167,9 +167,9 @@ class AuctionBotBuyer : public AuctionBotAgent
         AHB_Buyer_Config    m_HouseConfig[MAX_AUCTION_HOUSE_TYPE];
 
         void        LoadBuyerValues(AHB_Buyer_Config& config);
-        bool        IsBuyableEntry(uint32 buyoutPrice, double InGame_BuyPrice, double MaxBuyablePrice, uint32 MinBuyPrice, uint32 MaxChance, uint32 ChanceRatio);
-        bool        IsBidableEntry(uint32 bidPrice, double InGame_BuyPrice, double MaxBidablePrice, uint32 MinBidPrice, uint32 MaxChance, uint32 ChanceRatio);
-        void        PlaceBidToEntry(AuctionEntry* auction, uint32 bidPrice);
+        bool        IsBuyableEntry(uint64 buyoutPrice, double InGame_BuyPrice, double MaxBuyablePrice, uint64 MinBuyPrice, uint32 MaxChance, uint32 ChanceRatio);
+        bool        IsBidableEntry(uint64 bidPrice, double InGame_BuyPrice, double MaxBidablePrice, uint64 MinBidPrice, uint32 MaxChance, uint32 ChanceRatio);
+        void        PlaceBidToEntry(AuctionEntry* auction, uint64 bidPrice);
         void        BuyEntry(AuctionEntry* auction);
         void        PrepareListOfEntry(AHB_Buyer_Config& config);
         uint32      GetBuyableEntry(AHB_Buyer_Config& config);
@@ -203,7 +203,7 @@ class AuctionBotSeller : public AuctionBotAgent
         void        LoadSellerValues(AHB_Seller_Config& config);
         uint32      SetStat(AHB_Seller_Config& config);
         bool        getRandomArray(AHB_Seller_Config& config, RandomArray& ra, const std::vector<std::vector<uint32> >& addedItem);
-        void        SetPricesOfItem(ItemPrototype const* itemProto, AHB_Seller_Config& config, uint32& buyp, uint32& bidp, uint32 stackcnt, ItemQualities itemQuality);
+        void        SetPricesOfItem(ItemPrototype const* itemProto, AHB_Seller_Config& config, uint64& buyp, uint64& bidp, uint32 stackcnt, ItemQualities itemQuality);
         void        LoadItemsQuantity(AHB_Seller_Config& config);
 };
 
@@ -597,7 +597,7 @@ void AuctionBotBuyer::PrepareListOfEntry(AHB_Buyer_Config& config)
     DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: CheckedEntry size = " SIZEFMTD, config.CheckedEntry.size());
 }
 
-bool AuctionBotBuyer::IsBuyableEntry(uint32 buyoutPrice, double InGame_BuyPrice, double MaxBuyablePrice, uint32 MinBuyPrice, uint32 MaxChance, uint32 ChanceRatio)
+bool AuctionBotBuyer::IsBuyableEntry(uint64 buyoutPrice, double InGame_BuyPrice, double MaxBuyablePrice, uint64 MinBuyPrice, uint32 MaxChance, uint32 ChanceRatio)
 {
     double ratio = 0;
     uint32 Chance = 0;
@@ -660,7 +660,7 @@ bool AuctionBotBuyer::IsBuyableEntry(uint32 buyoutPrice, double InGame_BuyPrice,
     }
 }
 
-bool AuctionBotBuyer::IsBidableEntry(uint32 bidPrice, double InGame_BuyPrice, double MaxBidablePrice, uint32 MinBidPrice, uint32 MaxChance, uint32 ChanceRatio)
+bool AuctionBotBuyer::IsBidableEntry(uint64 bidPrice, double InGame_BuyPrice, double MaxBidablePrice, uint64 MinBidPrice, uint32 MaxChance, uint32 ChanceRatio)
 {
     double ratio = 0;
     uint32 Chance = 0;
@@ -707,7 +707,7 @@ bool AuctionBotBuyer::IsBidableEntry(uint32 bidPrice, double InGame_BuyPrice, do
     }
 }
 
-void AuctionBotBuyer::PlaceBidToEntry(AuctionEntry* auction, uint32 bidPrice)
+void AuctionBotBuyer::PlaceBidToEntry(AuctionEntry* auction, uint64 bidPrice)
 {
     DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Bid placed to entry %u, %.2fg", auction->Id, float(bidPrice) / 10000.0f);
     auction->UpdateBid(bidPrice);
@@ -715,7 +715,7 @@ void AuctionBotBuyer::PlaceBidToEntry(AuctionEntry* auction, uint32 bidPrice)
 
 void AuctionBotBuyer::BuyEntry(AuctionEntry* auction)
 {
-    DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Entry %u buyed at %.2fg", auction->Id, float(auction->buyout) / 10000.0f);
+    DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Entry %u bought at %.2fg", auction->Id, float(auction->buyout) / 10000.0f);
     auction->UpdateBid(auction->buyout);
 }
 
@@ -768,15 +768,15 @@ void AuctionBotBuyer::addNewAuctionBuyerBotBid(AHB_Buyer_Config& config)
 
         ItemPrototype const* prototype = item->GetProto();
 
-        uint32 BasePrice = sAuctionBotConfig.getConfig(CONFIG_BOOL_AHBOT_BUYPRICE_BUYER) ? prototype->BuyPrice : prototype->SellPrice;
+        uint64 BasePrice = sAuctionBotConfig.getConfig(CONFIG_BOOL_AHBOT_BUYPRICE_BUYER) ? prototype->BuyPrice : prototype->SellPrice;
         BasePrice *= item->GetCount();
 
         double MaxBuyablePrice = (BasePrice * config.BuyerPriceRatio) / 100;
         BuyerItemInfoMap::iterator sameitem_itr = config.SameItemInfo.find(item->GetEntry());
-        uint32 buyoutPrice = auction->buyout / item->GetCount();
+        uint64 buyoutPrice = auction->buyout / item->GetCount();
 
-        uint32 bidPrice;
-        uint32 bidPriceByItem;
+        uint64 bidPrice;
+        uint64 bidPriceByItem;
         if (auction->bid >= auction->startbid)
         {
             bidPrice = auction->GetAuctionOutBid();
@@ -807,9 +807,9 @@ void AuctionBotBuyer::addNewAuctionBuyerBotBid(AHB_Buyer_Config& config)
         DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Auction added with data:");
         DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: MaxPrice of Entry %u is %.1fg.", itr->second.AuctionId, MaxBuyablePrice / 10000);
         DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: GamePrice buy=%.1fg, bid=%.1fg.", InGame_BuyPrice / 10000, InGame_BidPrice / 10000);
-        DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Minimal price see in AH Buy=%ug, Bid=%ug.",
+        DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Minimal price see in AH Buy=" UI64FMTD "g, Bid=" UI64FMTD "g.",
                          sameitem_itr->second.MinBuyPrice / 10000, sameitem_itr->second.MinBidPrice / 10000);
-        DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Actual Entry price,  Buy=%ug, Bid=%ug.", buyoutPrice / 10000, bidPrice / 10000);
+        DEBUG_FILTER_LOG(LOG_FILTER_AHBOT_BUYER, "AHBot: Actual Entry price,  Buy=" UI64FMTD "g, Bid=" UI64FMTD "g.", buyoutPrice / 10000, bidPrice / 10000);
 
         if (!auction->owner)                // Original auction owner
         {
@@ -1479,7 +1479,7 @@ bool AuctionBotSeller::getRandomArray(AHB_Seller_Config& config, RandomArray& ra
 }
 
 // Set items price. All important value are passed by address.
-void AuctionBotSeller::SetPricesOfItem(ItemPrototype const* itemProto, AHB_Seller_Config& config, uint32& buyp, uint32& bidp, uint32 stackcnt, ItemQualities itemQuality)
+void AuctionBotSeller::SetPricesOfItem(ItemPrototype const* itemProto, AHB_Seller_Config& config, uint64& buyp, uint64& bidp, uint32 stackcnt, ItemQualities itemQuality)
 {
     double temp_buyp = buyp * stackcnt *
                        (itemQuality < MAX_AUCTION_QUALITY ? config.GetPriceRatioPerQuality(AuctionQuality(itemQuality)) : 1) ;
@@ -1611,8 +1611,8 @@ void AuctionBotSeller::addNewAuctions(AHB_Seller_Config& config)
             return;
         }
 
-        uint32 buyoutPrice;
-        uint32 bidPrice = 0;
+        uint64 buyoutPrice;
+        uint64 bidPrice = 0;
         // Not sure if i will keep the next test
         if (sAuctionBotConfig.getConfig(CONFIG_BOOL_AHBOT_BUYPRICE_SELLER))
             buyoutPrice  = prototype->BuyPrice * item->GetCount();

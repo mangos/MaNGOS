@@ -62,9 +62,9 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMap(AuctionHouseEntry const* hou
     }
 }
 
-uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem)
+uint64 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem)
 {
-    float deposit = float(pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME));
+    double deposit = float(pItem->GetProto()->SellPrice * pItem->GetCount() * (time / MIN_AUCTION_TIME));
 
     deposit = deposit * entry->depositPercent * 3.0f / 100.0f;
 
@@ -73,7 +73,7 @@ uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32
     if (deposit < min_deposit)
         deposit = min_deposit;
 
-    return uint32(deposit * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT));
+    return uint64(deposit * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_DEPOSIT));
 }
 
 // does not clear ram
@@ -124,7 +124,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction)
 
             uint32 owner_accid = sObjectMgr.GetPlayerAccountIdByGUID(ownerGuid);
 
-            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction (Entry: %u Count: %u) and pay money: %u. Original owner %s (Account: %u)",
+            sLog.outCommand(bidder_accId, "GM %s (Account: %u) won item in auction (Entry: %u Count: %u) and pay money: " UI64FMTD ". Original owner %s (Account: %u)",
                             bidder_name.c_str(), bidder_accId, auction->itemTemplate, auction->itemCount, auction->bid, owner_name.c_str(), owner_accid);
         }
     }
@@ -192,7 +192,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
         msgAuctionSuccessfulSubject << auction->itemTemplate << ":" << auction->itemRandomPropertyId << ":" << AUCTION_SUCCESSFUL;
 
         std::ostringstream auctionSuccessfulBody;
-        uint32 auctionCut = auction->GetAuctionCut();
+        uint64 auctionCut = auction->GetAuctionCut();
 
         auctionSuccessfulBody.width(16);
         auctionSuccessfulBody << std::right << std::hex << auction->bidder;
@@ -201,7 +201,7 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction)
 
         DEBUG_LOG("AuctionSuccessful body string : %s", auctionSuccessfulBody.str().c_str());
 
-        uint32 profit = auction->bid + auction->deposit - auctionCut;
+        uint64 profit = auction->bid + auction->deposit - auctionCut;
 
         if (owner)
         {
@@ -385,13 +385,13 @@ void AuctionHouseMgr::LoadAuctions()
             auction->ownerName = plWName;
         }
 
-        auction->buyout = fields[7].GetUInt32();
+        auction->buyout = fields[7].GetUInt64();
         auction->expireTime = time_t(fields[8].GetUInt64());
         auction->moneyDeliveryTime = time_t(fields[9].GetUInt64());
         auction->bidder = fields[10].GetUInt32();
-        auction->bid = fields[11].GetUInt32();
-        auction->startbid = fields[12].GetUInt32();
-        auction->deposit = fields[13].GetUInt32();
+        auction->bid = fields[11].GetUInt64();
+        auction->startbid = fields[12].GetUInt64();
+        auction->deposit = fields[13].GetUInt64();
         auction->auctionHouseEntry = NULL;                  // init later
 
         if (auction->moneyDeliveryTime)
@@ -719,8 +719,8 @@ int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry* auc, Pl
         }
         case 6:                                             // minbidbuyout = 6
         {
-            uint32 bid1 = bid ? bid : startbid;
-            uint32 bid2 = auc->bid ? auc->bid : auc->startbid;
+            uint64 bid1 = bid ? bid : startbid;
+            uint64 bid2 = auc->bid ? auc->bid : auc->startbid;
 
             if (bid1 != bid2)
             {
@@ -743,8 +743,8 @@ int AuctionEntry::CompareAuctionEntry(uint32 column, const AuctionEntry* auc, Pl
             return ownerName.compare(auc->ownerName);
         case 8:                                             // bid = 8
         {
-            uint32 bid1 = bid ? bid : startbid;
-            uint32 bid2 = auc->bid ? auc->bid : auc->startbid;
+            uint64 bid1 = bid ? bid : startbid;
+            uint64 bid2 = auc->bid ? auc->bid : auc->startbid;
 
             if (bid1 < bid2)
                 return -1;
@@ -872,7 +872,7 @@ void AuctionHouseObject::BuildListPendingSales(WorldPacket& data, Player* player
 
             data << str1.str();                             // string "%d:%d:%d:%d:%d" -> itemId, ItemRandomPropertyId, 2, auctionId, unk1 (stack size?, unused)
             data << str2.str();                             // string "%16I64X:%d:%d:%d:%d" -> bidderGuid, bid, buyout, deposit, auctionCut
-            data << uint32(97250);                          // unk1
+            data << uint64(97250);                          // unk1
             data << uint32(68);                             // unk2
             float timeLeft = float(Aentry->moneyDeliveryTime - time(NULL)) / float(DAY);
             data << float(timeLeft);                        // time left
@@ -881,7 +881,7 @@ void AuctionHouseObject::BuildListPendingSales(WorldPacket& data, Player* player
     }
 }
 
-AuctionEntry* AuctionHouseObject::AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint32 bid, uint32 buyout, uint32 deposit, Player* pl /*= NULL*/)
+AuctionEntry* AuctionHouseObject::AddAuction(AuctionHouseEntry const* auctionHouseEntry, Item* newItem, uint32 etime, uint64 bid, uint64 buyout, uint64 deposit, Player* pl /*= NULL*/)
 {
     uint32 auction_time = uint32(etime * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_TIME));
 
@@ -947,24 +947,24 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     data << uint32(pItem->GetSpellCharges());               // item->charge FFFFFFF
     data << uint32(0);                                      // item flags (dynamic?) (0x04 no lockId?)
     data << ObjectGuid(HIGHGUID_PLAYER, owner);             // Auction->owner
-    data << uint32(startbid);                               // Auction->startbid (not sure if useful)
-    data << uint32(bid ? GetAuctionOutBid() : 0);           // minimal outbid
-    data << uint32(buyout);                                 // auction->buyout
+    data << uint64(startbid);                               // Auction->startbid (not sure if useful)
+    data << uint64(bid ? GetAuctionOutBid() : 0);           // minimal outbid
+    data << uint64(buyout);                                 // auction->buyout
     data << uint32((expireTime - time(NULL))*IN_MILLISECONDS); // time left
     data << ObjectGuid(HIGHGUID_PLAYER, bidder);            // auction->bidder current
-    data << uint32(bid);                                    // current bid
+    data << uint64(bid);                                    // current bid
     return true;
 }
 
-uint32 AuctionEntry::GetAuctionCut() const
+uint64 AuctionEntry::GetAuctionCut() const
 {
-    return uint32(auctionHouseEntry->cutPercent * bid * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_CUT) / 100.0f);
+    return uint64(auctionHouseEntry->cutPercent * bid * sWorld.getConfig(CONFIG_FLOAT_RATE_AUCTION_CUT) / 100.0f);
 }
 
 /// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
-uint32 AuctionEntry::GetAuctionOutBid() const
+uint64 AuctionEntry::GetAuctionOutBid() const
 {
-    uint32 outbid = (bid / 100) * 5;
+    uint64 outbid = (bid / 100) * 5;
     if (!outbid)
         outbid = 1;
     return outbid;
@@ -980,7 +980,7 @@ void AuctionEntry::SaveToDB() const
 {
     // No SQL injection (no strings)
     CharacterDatabase.PExecute("INSERT INTO auction (id,houseid,itemguid,item_template,item_count,item_randompropertyid,itemowner,buyoutprice,time,moneyTime,buyguid,lastbid,startbid,deposit) "
-                               "VALUES ('%u', '%u', '%u', '%u', '%u', '%i', '%u', '%u', '" UI64FMTD "', '" UI64FMTD "', '%u', '%u', '%u', '%u')",
+                               "VALUES ('%u', '%u', '%u', '%u', '%u', '%i', '%u', '" UI64FMTD "', '" UI64FMTD "', '" UI64FMTD "', '%u', '" UI64FMTD "', '" UI64FMTD "', '" UI64FMTD "')",
                                Id, auctionHouseEntry->houseId, itemGuidLow, itemTemplate, itemCount, itemRandomPropertyId, owner, buyout, (uint64)expireTime, (uint64)moneyDeliveryTime, bidder, bid, startbid, deposit);
 }
 
@@ -989,7 +989,7 @@ void AuctionEntry::AuctionBidWinning(Player* newbidder)
     moneyDeliveryTime = time(NULL) + HOUR;
 
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("UPDATE auction SET itemguid = 0, moneyTime = '" UI64FMTD "', buyguid = '%u', lastbid = '%u' WHERE id = '%u'", (uint64)moneyDeliveryTime, bidder, bid, Id);
+    CharacterDatabase.PExecute("UPDATE auction SET itemguid = 0, moneyTime = '" UI64FMTD "', buyguid = '%u', lastbid = '" UI64FMTD "' WHERE id = '%u'", (uint64)moneyDeliveryTime, bidder, bid, Id);
     if (newbidder)
         newbidder->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
@@ -997,7 +997,7 @@ void AuctionEntry::AuctionBidWinning(Player* newbidder)
     sAuctionMgr.SendAuctionWonMail(this);
 }
 
-bool AuctionEntry::UpdateBid(uint32 newbid, Player* newbidder /*=NULL*/)
+bool AuctionEntry::UpdateBid(uint64 newbid, Player* newbidder /*=NULL*/)
 {
     Player* auction_owner = owner ? sObjectMgr.GetPlayer(ObjectGuid(HIGHGUID_PLAYER, owner)) : NULL;
 
@@ -1028,7 +1028,7 @@ bool AuctionEntry::UpdateBid(uint32 newbid, Player* newbidder /*=NULL*/)
 
         // after this update we should save player's money ...
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("UPDATE auction SET buyguid = '%u', lastbid = '%u' WHERE id = '%u'", bidder, bid, Id);
+        CharacterDatabase.PExecute("UPDATE auction SET buyguid = '%u', lastbid = '" UI64FMTD "' WHERE id = '%u'", bidder, bid, Id);
         if (newbidder)
             newbidder->SaveInventoryAndGoldToDB();
         CharacterDatabase.CommitTransaction();
