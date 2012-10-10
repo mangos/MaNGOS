@@ -400,7 +400,7 @@ DROP TABLE IF EXISTS `character_db_version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_db_version` (
-  `required_12297_01_characters_auction` bit(1) DEFAULT NULL
+  `required_12300_02_characters_mail` bit(1) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Last applied sql update to DB';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -410,7 +410,7 @@ CREATE TABLE `character_db_version` (
 
 LOCK TABLES `character_db_version` WRITE;
 /*!40000 ALTER TABLE `character_db_version` DISABLE KEYS */;
-INSERT INTO `character_db_version` (`required_12297_01_characters_auction`) VALUES
+INSERT INTO `character_db_version` (`required_12300_02_characters_mail`) VALUES
 (NULL);
 /*!40000 ALTER TABLE `character_db_version` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -1101,7 +1101,7 @@ CREATE TABLE `characters` (
   `gender` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `xp` int(10) unsigned NOT NULL DEFAULT '0',
-  `money` int(10) unsigned NOT NULL DEFAULT '0',
+  `money` bigint(40) unsigned NOT NULL DEFAULT '0',
   `playerBytes` int(10) unsigned NOT NULL DEFAULT '0',
   `playerBytes2` int(10) unsigned NOT NULL DEFAULT '0',
   `playerFlags` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1744,8 +1744,8 @@ CREATE TABLE `mail` (
   `has_items` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `expire_time` bigint(40) unsigned NOT NULL DEFAULT '0',
   `deliver_time` bigint(40) unsigned NOT NULL DEFAULT '0',
-  `money` int(11) unsigned NOT NULL DEFAULT '0',
-  `cod` int(11) unsigned NOT NULL DEFAULT '0',
+  `money` bigint(40) unsigned NOT NULL DEFAULT '0',
+  `cod` bigint(40) unsigned NOT NULL DEFAULT '0',
   `checked` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_receiver` (`receiver`)

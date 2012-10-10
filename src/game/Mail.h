@@ -217,9 +217,9 @@ class MailDraft
         /// Returns the subject of this MailDraft.
         std::string const& GetBody() const { return m_body; }
         /// Returns the amount of money in this MailDraft.
-        uint32 GetMoney() const { return m_money; }
+        uint64 GetMoney() const { return m_money; }
         /// Returns the Cost of delivery of this MailDraft.
-        uint32 GetCOD() const { return m_COD; }
+        uint64 GetCOD() const { return m_COD; }
     public:                                                 // modifiers
 
         // this two modifiers expected to be applied in normal case to blank draft and exclusively, it will work and with mixed cases but this will be not normal way use.
@@ -232,13 +232,13 @@ class MailDraft
          *
          * @param money The amount of money included in this MailDraft.
          */
-        MailDraft& SetMoney(uint32 money) { m_money = money; return *this; }
+        MailDraft& SetMoney(uint64 money) { m_money = money; return *this; }
         /**
          * Modifies the cost of delivery of the MailDraft.
          *
          * @param COD the amount to which the cod should be set.
          */
-        MailDraft& SetCOD(uint32 COD) { m_COD = COD; return *this; }
+        MailDraft& SetCOD(uint64 COD) { m_COD = COD; return *this; }
 
         void CloneFrom(MailDraft const& draft);
     public:                                                 // finishers
@@ -263,9 +263,9 @@ class MailDraft
         MailItemMap m_items;                                ///< Keep the items in a map to avoid duplicate guids (which can happen), store only low part of guid
 
         /// The amount of money in this MailDraft.
-        uint32 m_money;
+        uint64 m_money;
         /// The cod amount of this MailDraft.
-        uint32 m_COD;
+        uint64 m_COD;
 };
 /**
  * Structure holding information about an item in the mail.
@@ -309,9 +309,9 @@ struct Mail
     /// The time at which this mail (was/will be) delivered
     time_t deliver_time;
     /// The amount of money contained in this mail.
-    uint32 money;
+    uint64 money;
     /// The amount of money the receiver has to pay to get this mail.
-    uint32 COD;
+    uint64 COD;
     /// The time at which this mail was read.
     uint32 checked;
     /// The state of this mail.

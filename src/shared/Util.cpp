@@ -260,6 +260,21 @@ std::string TimeToTimestampStr(time_t t)
     return std::string(buf);
 }
 
+std::string MoneyToString(uint64 money)
+{
+    uint32 gold = money / 10000;
+    uint32 silv = (money % 10000) / 100;
+    uint32 copp = (money % 10000) % 100;
+    std::stringstream ss;
+    if (gold)
+        ss << gold << "g";
+    if (silv || gold)
+        ss << silv << "s";
+    ss << copp << "c";
+
+    return ss.str();
+}
+
 /// Check if the string is a valid ip address representation
 bool IsIPAddress(char const* ipaddress)
 {

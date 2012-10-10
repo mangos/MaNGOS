@@ -2822,7 +2822,7 @@ enum PetDiet
 
 // Max values for Guild & Guild Bank
 #define GUILD_BANK_MAX_TABS         8                       // send by client for money log also
-#define GUILD_BANK_MAX_BOUGHT_TABS  6
+#define GUILD_BANK_MAX_BOUGHT_TABS  6                       // number of tabs that can be bought through bank interface
 #define GUILD_BANK_MAX_SLOTS        98
 #define GUILD_BANK_MAX_LOGS         25
 #define GUILD_BANK_MONEY_LOGS_TAB   100                     // used for money log in DB
@@ -3108,12 +3108,14 @@ enum MailResponseResult
     MAIL_ERR_RECIPIENT_NOT_FOUND       = 4,
     MAIL_ERR_NOT_YOUR_TEAM             = 5,
     MAIL_ERR_INTERNAL_ERROR            = 6,
+    MAIL_ERR_DELETE_ITEM_ERROR         = 10,    // ERR_MAIL_DATABASE_ERROR
     MAIL_ERR_DISABLED_FOR_TRIAL_ACC    = 14,
     MAIL_ERR_RECIPIENT_CAP_REACHED     = 15,
     MAIL_ERR_CANT_SEND_WRAPPED_COD     = 16,
     MAIL_ERR_MAIL_AND_CHAT_SUSPENDED   = 17,
     MAIL_ERR_TOO_MANY_ATTACHMENTS      = 18,
     MAIL_ERR_MAIL_ATTACHMENT_INVALID   = 19,
+    MAIL_ERR_MAIL_FAILED_NO_REPORT     = 20,
     MAIL_ERR_ITEM_HAS_EXPIRED          = 21,
 };
 

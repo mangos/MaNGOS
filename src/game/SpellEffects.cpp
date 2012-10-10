@@ -7557,7 +7557,7 @@ void Spell::EffectScriptEffect(SpellEffectEntry const* effect)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    ((Player*)unitTarget)->ModifyMoney(50000000);
+                    ((Player*)unitTarget)->ModifyMoney(5000 * GOLD);
                     break;
                 }
                 case 47097:                                 // Surge Needle Teleporter

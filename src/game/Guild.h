@@ -19,7 +19,7 @@
 #ifndef MANGOSSERVER_GUILD_H
 #define MANGOSSERVER_GUILD_H
 
-#define WITHDRAW_MONEY_UNLIMITED    0xFFFFFFFF
+#define WITHDRAW_MONEY_UNLIMITED    UI64LIT(0xFFFFFFFFFFFFFFFF)
 #define WITHDRAW_SLOT_UNLIMITED     0xFFFFFFFF
 
 #include "Common.h"
@@ -215,7 +215,7 @@ enum GuildMemberFlags
     GUILDMEMBER_STATUS_MOBILE    = 0x0008,
 };
 
-inline uint32 GetGuildBankTabPrice(uint8 Index)
+inline uint64 GetGuildBankTabPrice(uint8 Index)
 {
     switch (Index)
     {
@@ -469,13 +469,13 @@ class Guild
         void   LoadGuildBankFromDB();
         // Money deposit/withdraw
         void   SendMoneyInfo(WorldSession* session, uint32 LowGuid);
-        bool   MemberMoneyWithdraw(uint32 amount, uint32 LowGuid);
+        bool   MemberMoneyWithdraw(uint64 amount, uint32 LowGuid);
         uint64 GetGuildBankMoney() { return m_GuildBankMoney; }
         void   SetBankMoney(int64 money);
         // per days
         bool   MemberItemWithdraw(uint8 TabId, uint32 LowGuid);
         uint32 GetMemberSlotWithdrawRem(uint32 LowGuid, uint8 TabId);
-        uint32 GetMemberMoneyWithdrawRem(uint32 LowGuid);
+        uint64 GetMemberMoneyWithdrawRem(uint32 LowGuid);
         void   SetBankMoneyPerDay(uint32 rankId, uint32 money);
         void   SetBankRightsAndSlots(uint32 rankId, uint8 TabId, uint32 right, uint32 SlotPerDay, bool db);
         uint32 GetBankMoneyPerDay(uint32 rankId);

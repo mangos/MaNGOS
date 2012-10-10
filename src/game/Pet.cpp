@@ -1747,7 +1747,7 @@ bool Pet::resetTalents(bool no_cost)
 
     if (!no_cost)
     {
-        player->ModifyMoney(-(int32)cost);
+        player->ModifyMoney(-(int64)cost);
 
         m_resetTalentsCost = cost;
         m_resetTalentsTime = time(NULL);

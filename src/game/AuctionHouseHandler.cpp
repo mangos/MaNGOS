@@ -358,7 +358,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 
         pl->DestroyItemCount(it, stackSize, true);
 
-        pl->ModifyMoney(-int32(deposit));
+        pl->ModifyMoney(-int64(deposit));
 
         AuctionEntry* AH = auctionHouse->AddAuction(auctionHouseEntry, newItem, etime, bid, buyout, deposit, pl);
 
@@ -502,7 +502,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
         if (auction->bidder)                                // if auction have real existed bidder send mail
             SendAuctionCancelledToBidderMail(auction);
 
-        pl->ModifyMoney(-int32(auctionCut));
+        pl->ModifyMoney(-int64(auctionCut));
     }
     // Return the item by mail
     std::ostringstream msgAuctionCanceledOwner;

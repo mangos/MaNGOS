@@ -1398,9 +1398,9 @@ void Guild::SendMoneyInfo(WorldSession* session, uint32 LowGuid)
     DEBUG_LOG("WORLD: Sent SMSG_GUILD_BANK_MONEY_WITHDRAWN");
 }
 
-bool Guild::MemberMoneyWithdraw(uint32 amount, uint32 LowGuid)
+bool Guild::MemberMoneyWithdraw(uint64 amount, uint32 LowGuid)
 {
-    uint32 MoneyWithDrawRight = GetMemberMoneyWithdrawRem(LowGuid);
+    uint64 MoneyWithDrawRight = GetMemberMoneyWithdrawRem(LowGuid);
 
     if (MoneyWithDrawRight < amount || GetGuildBankMoney() < amount)
         return false;
@@ -1485,7 +1485,7 @@ uint32 Guild::GetMemberSlotWithdrawRem(uint32 LowGuid, uint8 TabId)
     return itr->second.BankRemSlotsTab[TabId];
 }
 
-uint32 Guild::GetMemberMoneyWithdrawRem(uint32 LowGuid)
+uint64 Guild::GetMemberMoneyWithdrawRem(uint32 LowGuid)
 {
     MemberList::iterator itr = members.find(LowGuid);
     if (itr == members.end())

@@ -302,7 +302,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recv_data)
     }
     else
     {
-        _player->ModifyMoney(-int32(nSpellCost));
+        _player->ModifyMoney(-int64(nSpellCost));
 
         // visual effect on trainer
         WorldPacket data;

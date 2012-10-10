@@ -125,7 +125,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recv_data)
         return;
     }
 
-    _player->ModifyMoney(-(int32)GUILD_CHARTER_COST);
+    _player->ModifyMoney(-(int64)GUILD_CHARTER_COST);
     Item* charter = _player->StoreNewItem(dest, GUILD_CHARTER, true);
     if (!charter)
         return;

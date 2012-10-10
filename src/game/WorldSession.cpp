@@ -141,6 +141,10 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 
     const_cast<WorldPacket*>(packet)->FlushBits();
 
+    sLog.outError("SESSION: SENT opcode %s (0x%.4X) to %s (%u)",
+        LookupOpcodeName(packet->GetOpcode()),
+        packet->GetOpcode(), GetPlayerName(), GetAccountId());
+
 #ifdef MANGOS_DEBUG
 
     // Code for network use statistic
@@ -218,6 +222,10 @@ bool WorldSession::Update(PacketFilter& updater)
                         LookupOpcodeName(packet->GetOpcode()),
                         packet->GetOpcode());
         #endif*/
+
+        sLog.outError("SESSION: RECEIVED opcode %s (0x%.4X) from %s (%u)",
+                                  LookupOpcodeName(packet->GetOpcode()),
+                                  packet->GetOpcode(), GetPlayerName(), GetAccountId());
 
         OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
         try

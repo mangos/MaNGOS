@@ -1010,8 +1010,8 @@ void WorldSession::HandleGuildPermissions(WorldPacket& /* recv_data */)
             data << uint32(pGuild->GetPurchasedTabs());     // tabs count
             data << uint32(pGuild->GetRankRights(rankId));  // rank rights
             // money per day left
+            // WTF uint32?
             data << uint32(pGuild->GetMemberMoneyWithdrawRem(GetPlayer()->GetGUIDLow()));
-            // why sending all info when not all tabs are purchased???
             data.WriteBits(GUILD_BANK_MAX_TABS, 23);
             for (int i = 0; i < GUILD_BANK_MAX_TABS; ++i)
             {
@@ -1102,7 +1102,7 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recv_data)
     CharacterDatabase.BeginTransaction();
 
     pGuild->SetBankMoney(pGuild->GetGuildBankMoney() + money);
-    GetPlayer()->ModifyMoney(-int32(money));
+    GetPlayer()->ModifyMoney(-int64(money));
     GetPlayer()->SaveGoldToDB();
 
     CharacterDatabase.CommitTransaction();
@@ -1304,7 +1304,7 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recv_data)
     if (TabId != pGuild->GetPurchasedTabs() || TabId >= GUILD_BANK_MAX_BOUGHT_TABS)
         return;
 
-    uint32 TabCost = GetGuildBankTabPrice(TabId) * GOLD;
+    uint64 TabCost = GetGuildBankTabPrice(TabId) * GOLD;
     if (!TabCost)
         return;
 
@@ -1313,7 +1313,7 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recv_data)
 
     // Go on with creating tab
     pGuild->CreateNewBankTab();
-    GetPlayer()->ModifyMoney(-int(TabCost));
+    GetPlayer()->ModifyMoney(-int64(TabCost));
     pGuild->SetBankRightsAndSlots(GetPlayer()->GetRank(), TabId, GUILD_BANK_RIGHT_FULL, WITHDRAW_SLOT_UNLIMITED, true);
     pGuild->Roster();                                       // broadcast for tab rights update
     pGuild->DisplayGuildBankTabsInfo(this);

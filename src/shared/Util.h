@@ -38,6 +38,8 @@ std::string secsToTimeString(time_t timeInSecs, bool shortText = false, bool hou
 uint32 TimeStringToSecs(const std::string& timestring);
 std::string TimeToTimestampStr(time_t t);
 
+std::string MoneyToString(uint64 money);
+
 inline uint32 secsToTimeBitFields(time_t secs)
 {
     tm* lt = localtime(&secs);

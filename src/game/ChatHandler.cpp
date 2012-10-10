@@ -648,6 +648,7 @@ void WorldSession::HandleEmoteOpcode(WorldPacket& recv_data)
 
     uint32 emote;
     recv_data >> emote;
+    DEBUG_LOG("CMSG_EMOTE %u", emote);
     GetPlayer()->HandleEmoteCommand(emote);
 }
 
@@ -673,6 +674,9 @@ namespace MaNGOS
                     data.append(nam, namlen);
                 else
                     data << uint8(0x00);
+
+                DEBUG_LOG("SMSG_TEXT_EMOTE i_text_emote %u i_emote_num %u",
+                    i_text_emote, i_emote_num);
             }
 
         private:

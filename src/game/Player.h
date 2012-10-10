@@ -891,7 +891,7 @@ enum ReputationSource
 
 // Player summoning auto-decline time (in secs)
 #define MAX_PLAYER_SUMMON_DELAY (2*MINUTE)
-#define MAX_MONEY_AMOUNT        (0x7FFFFFFF-1)
+#define MAX_MONEY_AMOUNT        (9999999999)    // from wowpedia
 
 struct InstancePlayerBind
 {
@@ -1529,20 +1529,20 @@ class MANGOS_DLL_SPEC Player : public Unit
         void setWeaponChangeTimer(uint32 time) {m_weaponChangeTimer = time;}
 
         uint64 GetMoney() const { return GetUInt64Value(PLAYER_FIELD_COINAGE); }
-        void ModifyMoney(int32 d)
+        void ModifyMoney(int64 d)
         {
             if (d < 0)
-                SetMoney(GetMoney() > uint32(-d) ? GetMoney() + d : 0);
+                SetMoney(GetMoney() > uint64(-d) ? GetMoney() + d : 0);
             else
-                SetMoney(GetMoney() < uint32(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
+                SetMoney(GetMoney() < uint64(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
 
             // "At Gold Limit"
             if (GetMoney() >= MAX_MONEY_AMOUNT)
                 SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, NULL);
         }
-        void SetMoney(uint32 value)
+        void SetMoney(uint64 value)
         {
-            SetUInt32Value(PLAYER_FIELD_COINAGE, value);
+            SetUInt64Value(PLAYER_FIELD_COINAGE, value);
             MoneyChanged(value);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_GOLD_VALUE_OWNED);
         }

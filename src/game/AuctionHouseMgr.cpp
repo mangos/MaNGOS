@@ -1007,12 +1007,12 @@ bool AuctionEntry::UpdateBid(uint64 newbid, Player* newbidder /*=NULL*/)
 
     if (newbidder && newbidder->GetGUIDLow() == bidder)
     {
-        newbidder->ModifyMoney(-int32(newbid - bid));
+        newbidder->ModifyMoney(-int64(newbid - bid));
     }
     else
     {
         if (newbidder)
-            newbidder->ModifyMoney(-int32(newbid));
+            newbidder->ModifyMoney(-int64(newbid));
 
         if (bidder)                                     // return money to old bidder if present
             WorldSession::SendAuctionOutbiddedMail(this);

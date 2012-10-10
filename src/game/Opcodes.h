@@ -125,8 +125,8 @@ enum Opcodes
     SMSG_PET_NAME_QUERY_RESPONSE                          = 0x1054,
     CMSG_GUILD_QUERY                                      = 0x4426, // 4.3.4 15595
     SMSG_GUILD_QUERY_RESPONSE                             = 0x0E06, // 4.3.4 15595
-    CMSG_PAGE_TEXT_QUERY                                  = 0x105B,
-    SMSG_PAGE_TEXT_QUERY_RESPONSE                         = 0x105C,
+    CMSG_PAGE_TEXT_QUERY                                  = 0x6614, // 4.3.4 15595
+    SMSG_PAGE_TEXT_QUERY_RESPONSE                         = 0x2B14, // 4.3.4 15595
     CMSG_QUEST_QUERY                                      = 0x0D06, // 4.3.4 15595
     SMSG_QUEST_QUERY_RESPONSE                             = 0x6936, // 4.3.4 15595
     CMSG_GAMEOBJECT_QUERY                                 = 0x4017, // 4.3.4 15595
@@ -537,7 +537,7 @@ enum Opcodes
     CMSG_PING                                             = 0x444D, // 4.3.4 15595
     SMSG_PONG                                             = 0x4D42, // 4.3.4 15595
     SMSG_CLEAR_COOLDOWNS                                  = 0x59B4, // 4.3.4 15595
-    SMSG_GAMEOBJECT_PAGETEXT                              = 0x11E0,
+    SMSG_GAMEOBJECT_PAGETEXT                              = 0x2925, // 4.3.4 15595
     CMSG_SETSHEATHED                                      = 0x11E1,
     SMSG_COOLDOWN_CHEAT                                   = 0x11E2,
     SMSG_SPELL_DELAYED                                    = 0x0715, // 4.3.4 15595
@@ -624,7 +624,7 @@ enum Opcodes
     CMSG_SEND_MAIL                                        = 0x0523, // 4.3.4 15595
     SMSG_SEND_MAIL_RESULT                                 = 0x4927, // 4.3.4 15595
     CMSG_GET_MAIL_LIST                                    = 0x4D37, // 4.3.4 15595
-    SMSG_MAIL_LIST_RESULT                                 = 0x123C,
+    SMSG_MAIL_LIST_RESULT                                 = 0x4217, // 4.3.4 15595
     CMSG_BATTLEFIELD_LIST                                 = 0x3814, // 4.3.4 15595
     SMSG_BATTLEFIELD_LIST                                 = 0x71B5, // 4.3.4 15595
     CMSG_BATTLEFIELD_JOIN                                 = 0x123F,
@@ -634,12 +634,12 @@ enum Opcodes
     CMSG_TAXIENABLENODE                                   = 0x1243,
     CMSG_ITEM_TEXT_QUERY                                  = 0x2406, // 4.3.4 15595
     SMSG_ITEM_TEXT_QUERY_RESPONSE                         = 0x2725, // 4.3.4 15595
-    CMSG_MAIL_TAKE_MONEY                                  = 0x1246,
-    CMSG_MAIL_TAKE_ITEM                                   = 0x1247,
-    CMSG_MAIL_MARK_AS_READ                                = 0x1248,
-    CMSG_MAIL_RETURN_TO_SENDER                            = 0x1249,
-    CMSG_MAIL_DELETE                                      = 0x124A,
-    CMSG_MAIL_CREATE_TEXT_ITEM                            = 0x124B,
+    CMSG_MAIL_TAKE_MONEY                                  = 0x4034, // 4.3.4 15595
+    CMSG_MAIL_TAKE_ITEM                                   = 0x2B06, // 4.3.4 15595
+    CMSG_MAIL_MARK_AS_READ                                = 0x0C07, // 4.3.4 15595
+    CMSG_MAIL_RETURN_TO_SENDER                            = 0x0816, // 4.3.4 15595
+    CMSG_MAIL_DELETE                                      = 0x6104, // 4.3.4 15595
+    CMSG_MAIL_CREATE_TEXT_ITEM                            = 0x0B14, // 4.3.4 15595
     SMSG_SPELLLOGMISS                                     = 0x0625, // 4.3.4 15595
     SMSG_SPELLLOGEXECUTE                                  = 0x0626, // 4.3.4 15595
     SMSG_DEBUGAURAPROC                                    = 0x124E,
@@ -698,7 +698,7 @@ enum Opcodes
     CMSG_AUTOSTORE_BANK_ITEM                              = 0x0607, // 4.3.4 15595
     CMSG_AUTOBANK_ITEM                                    = 0x2537, // 4.3.4 15595
     MSG_QUERY_NEXT_MAIL_TIME                              = 0x0F04, // 4.3.4 15595
-    SMSG_RECEIVED_MAIL                                    = 0x1286,
+    SMSG_RECEIVED_MAIL                                    = 0x2924, // 4.3.4 15595
     SMSG_RAID_GROUP_ONLY                                  = 0x0837, // 4.3.4 15595
     CMSG_SET_DURABILITY_CHEAT                             = 0x1288,
     CMSG_SET_PVP_RANK_CHEAT                               = 0x1289,
