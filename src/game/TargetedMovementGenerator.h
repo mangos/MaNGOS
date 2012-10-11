@@ -42,7 +42,7 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
             TargetedMovementGeneratorBase(target),
             i_recheckDistance(0),
             i_offset(offset), i_angle(angle),
-            i_recalculateTravel(false), i_targetReached(false),
+            m_speedChanged(false), i_targetReached(false),
             i_path(NULL)
         {
         }
@@ -58,16 +58,15 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        void unitSpeedChanged() { i_recalculateTravel = true; }
-        void UpdateFinalDistance(float fDistance) override;
+        void unitSpeedChanged() { m_speedChanged = true; }
 
     protected:
-        void _setTargetLocation(T&);
+        void _setTargetLocation(T&, bool updateDestination);
 
         ShortTimeTracker i_recheckDistance;
         float i_offset;
         float i_angle;
-        bool i_recalculateTravel : 1;
+        bool m_speedChanged : 1;
         bool i_targetReached : 1;
 
         PathFinder* i_path;
