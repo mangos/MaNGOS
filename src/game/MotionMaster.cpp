@@ -473,12 +473,6 @@ bool MotionMaster::GetDestination(float& x, float& y, float& z)
     return true;
 }
 
-void MotionMaster::UpdateFinalDistanceToTarget(float fDistance)
-{
-    if (!empty())
-        top()->UpdateFinalDistance(fDistance);
-}
-
 void MotionMaster::MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id)
 {
     Movement::MoveSplineInit init(*m_owner);
