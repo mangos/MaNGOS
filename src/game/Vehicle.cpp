@@ -499,8 +499,7 @@ void VehicleInfo::ApplySeatMods(Unit* passenger, uint32 seatFlags)
         if (seatFlags & (SEAT_FLAG_USABLE | SEAT_FLAG_CAN_CAST))
         {
             CharmInfo* charmInfo = pVehicle->InitCharmInfo(pVehicle);
-            // ToDo: Send vehicle actionbar spells
-            charmInfo->InitEmptyActionBar();
+            charmInfo->InitVehicleCreateSpells();
 
             pPlayer->PossessSpellInitialize();
         }
