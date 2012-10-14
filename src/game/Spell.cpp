@@ -1702,20 +1702,22 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             switch (m_spellInfo->Id)
             {
-                case 802:                                   // Mutate Bug
-                case 804:                                   // Explode Bug
-                case 23138:                                 // Gate of Shazzrah
-                case 28560:                                 // Summon Blizzard
+                case 802:                                   // Mutate Bug (AQ40, Emperor Vek'nilash)
+                case 804:                                   // Explode Bug (AQ40, Emperor Vek'lor)
+                case 23138:                                 // Gate of Shazzrah (MC, Shazzrah)
+                case 28560:                                 // Summon Blizzard (Naxx, Sapphiron)
                 case 30541:                                 // Blaze (Magtheridon)
                 case 30572:                                 // Quake (Magtheridon)
-                case 30769:                                 // Pick Red Riding Hood
-                case 30835:                                 // Infernal Relay
-                case 31347:                                 // Doom TODO: exclude top threat target from target selection
-                case 33711:                                 // Murmur's Touch
-                case 38794:                                 // Murmur's Touch (h)
-                case 44869:                                 // Spectral Blast
-                case 45976:                                 // Open Portal
-                case 47669:                                 // Awaken Subboss
+                case 30769:                                 // Pick Red Riding Hood (Karazhan, Big Bad Wolf)
+                case 30835:                                 // Infernal Relay (Karazhan, Prince Malchezaar)
+                case 31347:                                 // Doom (Hyjal Summit, Azgalor)
+                case 33711:                                 // Murmur's Touch (Shadow Labyrinth, Murmur)
+                case 38794:                                 // Murmur's Touch (h) (Shadow Labyrinth, Murmur)
+                case 41537:                                 // Summon Enslaved Soul (BT, Reliquary of Souls)
+                case 44869:                                 // Spectral Blast (SWP, Kalecgos)
+                case 45892:                                 // Sinister Reflection (SWP, Kil'jaeden)
+                case 45976:                                 // Open Portal (SWP, M'uru)
+                case 47669:                                 // Awaken Subboss (Utgarde Pinnacle)
                 case 48278:                                 // Paralyze (Utgarde Pinnacle)
                 case 50988:                                 // Glare of the Tribunal (Halls of Stone)
                 case 51146:                                 // Searching Gaze (Halls Of Stone)
@@ -1730,16 +1732,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 62042:                                 // Stormhammer (Ulduar, Thorim)
                 case 62301:                                 // Cosmic Smash (Ulduar, Algalon)
                 case 62488:                                 // Activate Construct (Ulduar, Ignis)
-                case 63018:                                 // Searing Light
+                case 63018:                                 // Searing Light (Ulduar, XT-002)
                 case 63024:                                 // Gravity Bomb (Ulduar, XT-002)
                 case 63387:                                 // Rapid Burst
                 case 63795:                                 // Psychosis (Ulduar, Yogg-Saron)
-                case 64218:                                 // Overcharge
+                case 64218:                                 // Overcharge (VoA, Emalon)
                 case 64234:                                 // Gravity Bomb (h) (Ulduar, XT-002)
                 case 64531:                                 // Rapid Burst (h)
-                case 65121:                                 // Searing Light (h)
+                case 65121:                                 // Searing Light (h) (Ulduar, XT-002)
                 case 65301:                                 // Psychosis (Ulduar, Yogg-Saron)
-                case 65872:                                 // Pursuing Spikes
+                case 65872:                                 // Pursuing Spikes (ToCrusader, Anub'arak)
                 case 65950:                                 // Touch of Light (ToCrusader, Val'kyr Twins)
                 case 66001:                                 // Touch of Darkness (ToCrusader, Val'kyr Twins)
                 case 66152:                                 // Bullet Controller Summon Periodic Trigger Light (ToCrusader)
@@ -1773,8 +1775,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 73023:                                 // Mutated Infection (Mode 3)
                     unMaxTargets = 1;
                     break;
-                case 28542:                                 // Life Drain
-                case 66013:                                 // Penetrating Cold (10 man)
+                case 28542:                                 // Life Drain (Naxx, Sapphiron)
+                case 66013:                                 // Penetrating Cold (10 man) (ToCrusader, Anub'arak)
                 case 67755:                                 // Nerubian Burrower (Mode 1) (ToCrusader, Anub'arak)
                 case 67756:                                 // Nerubian Burrower (Mode 2) (ToCrusader, Anub'arak)
                 case 68509:                                 // Penetrating Cold (10 man heroic)
@@ -1785,11 +1787,13 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 71390:                                 // Pact of the Darkfallen
                     unMaxTargets = 2;
                     break;
-                case 28796:                                 // Poison Bolt Volley
-                case 29213:                                 // Curse of the Plaguebringer
-                case 30004:                                 // Flame Wreath
-                case 31298:                                 // Sleep
+                case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
+                case 29213:                                 // Curse of the Plaguebringer (Naxx, Noth the Plaguebringer)
+                case 30004:                                 // Flame Wreath (Karazhan, Shade of Aran)
+                case 31298:                                 // Sleep (Hyjal Summit, Anetheron)
                 case 39992:                                 // Needle Spine Targeting (BT, Warlord Najentus)
+                case 41303:                                 // Soul Drain (BT, Reliquary of Souls)
+                case 41376:                                 // Spite (BT, Reliquary of Souls)
                 case 51904:                                 // Limiting the count of Summoned Ghouls
                 case 54522:
                 case 60936:                                 // Surge of Power (h) (Malygos)
@@ -1799,16 +1803,17 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 72095:                                 // Frozen Orb (h) (Vault of Archavon, Toravon)
                     unMaxTargets = 3;
                     break;
-                case 37676:                                 // Insidious Whisper
-                case 38028:                                 // Watery Grave
+                case 37676:                                 // Insidious Whisper (SSC, Leotheras the Blind)
+                case 38028:                                 // Watery Grave (SSC, Morogrim Tidewalker)
                 case 67757:                                 // Nerubian Burrower (Mode 3) (ToCrusader, Anub'arak)
                 case 71221:                                 // Gas spore (Mode 1) (ICC, Festergut)
                     unMaxTargets = 4;
                     break;
-                case 30843:                                 // Enfeeble
-                case 42005:                                 // Bloodboil
+                case 30843:                                 // Enfeeble (Karazhan, Prince Malchezaar)
+                case 40243:                                 // Crushing Shadows (BT, Teron Gorefiend)
+                case 42005:                                 // Bloodboil (BT, Gurtogg Bloodboil)
                 case 45641:                                 // Fire Bloom (SWP, Kil'jaeden)
-                case 55665:                                 // Life Drain (h)
+                case 55665:                                 // Life Drain (h) (Naxx, Sapphiron)
                 case 58917:                                 // Consume Minions
                 case 64604:                                 // Nature Bomb (Ulduar, Freya)
                 case 67076:                                 // Mistress' Kiss (Mode 1) (ToCrusader, Jaraxxus)
@@ -1820,11 +1825,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 61694:                                 // Arcane Storm (h) (Malygos)
                     unMaxTargets = 7;
                     break;
-                case 54098:                                 // Poison Bolt Volley (h)
-                case 54835:                                 // Curse of the Plaguebringer (h)
+                case 54098:                                 // Poison Bolt Volley (h) (Naxx, Faerlina)
+                case 54835:                                 // Curse of the Plaguebringer (h) (Naxx, Noth the Plaguebringer)
                     unMaxTargets = 10;
                     break;
-                case 25991:                                 // Poison Bolt Volley (Pincess Huhuran)
+                case 25991:                                 // Poison Bolt Volley (AQ40, Pincess Huhuran)
                     unMaxTargets = 15;
                     break;
                 case 61916:                                 // Lightning Whirl (Ulduar, Stormcaller Brundir)
@@ -2236,8 +2241,11 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 switch (m_spellInfo->Id)
                 {
                     case 30843:                             // Enfeeble
+                    case 31347:                             // Doom
                     case 37676:                             // Insidious Whisper
                     case 38028:                             // Watery Grave
+                    case 40618:                             // Insignificance
+                    case 41376:                             // Spite
                         if (Unit* pVictim = m_caster->getVictim())
                             targetUnitMap.remove(pVictim);
                         break;
