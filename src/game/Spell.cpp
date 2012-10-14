@@ -6255,8 +6255,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // Check if trying to board a vehicle that is boarded on current transport
                     bool boardedOnEachOther = m_caster->GetTransportInfo()->HasOnBoard(pTarget);
                     // Check if trying to board a vehicle that has the current transport on board
-                    if (!boardedOnEachOther && pTarget->IsBoarded())
-                        boardedOnEachOther = pTarget->GetTransportInfo()->HasOnBoard(m_caster);
+                    if (!boardedOnEachOther)
+                        boardedOnEachOther = pTarget->GetVehicleInfo()->HasOnBoard(m_caster);
 
                     if (!boardedOnEachOther)
                         return SPELL_FAILED_NOT_ON_TRANSPORT;
