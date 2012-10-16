@@ -5199,6 +5199,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_MOVING;
         }
 
+        if (!m_caster->isInCombat())
+        {
+            // Hunter Disengage allow use only in combat
+            if (m_spellInfo->IsFitToFamily(SPELLFAMILY_HUNTER, UI64LIT(0x0000400000000000)))
+                return SPELL_FAILED_CASTER_AURASTATE;
+        }
+
         if (!m_IsTriggeredSpell && NeedsComboPoints(m_spellInfo) && !m_caster->IsIgnoreUnitState(m_spellInfo, IGNORE_UNIT_TARGET_STATE) &&
                 (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_caster)->GetComboTargetGuid()) &&
                 !m_spellInfo->HasAttribute(SPELL_ATTR_EX8_IGNORE_TARGET_FOR_COMBO_POINTS))
