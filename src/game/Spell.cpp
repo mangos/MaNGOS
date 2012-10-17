@@ -5739,6 +5739,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
+            case SPELL_EFFECT_DISTRACT:                     // All nearby enemies must not be in combat
+            {
+                if (m_targets.m_targetMask & (TARGET_FLAG_DEST_LOCATION | TARGET_FLAG_SOURCE_LOCATION))
+                {
+                    UnitList targetsCombat;
+                    float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[i]));
+
+                    FillAreaTargets(targetsCombat, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
+
+                    if (targetsCombat.empty())
+                        break;
+
+                    for (UnitList::iterator itr = targetsCombat.begin(); itr != targetsCombat.end(); ++itr)
+                        if ((*itr)->isInCombat())
+                            return SPELL_FAILED_TARGET_IN_COMBAT;
+                }
+                break;
+            }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 // Hammer of Wrath
