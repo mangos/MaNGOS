@@ -5514,6 +5514,13 @@ bool Spell::DoSummonVehicle(CreatureSummonPositions& list, SummonPropertiesEntry
     else
         m_caster->CastSpell(spawnCreature, SPELL_RIDE_VEHICLE_HARDCODED, true);
 
+    // If the boarding failed...
+    if (!spawnCreature->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+    {
+        spawnCreature->ForcedDespawn();
+        return false;
+    }
+
     // Notify Summoner
     if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_originalCaster)->AI())
         ((Creature*)m_originalCaster)->AI()->JustSummoned(spawnCreature);
