@@ -1450,7 +1450,7 @@ enum Targets
     TARGET_NONCOMBAT_PET               = 90,
     TARGET_91                          = 91,
     TARGET_92                          = 92,
-    TARGET_94                          = 94,
+    TARGET_CONTROLLED_VEHICLE          = 94,
     TARGET_95                          = 95,
     TARGET_96                          = 96,
     TARGET_97                          = 97,
