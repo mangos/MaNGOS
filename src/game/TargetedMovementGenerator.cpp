@@ -37,7 +37,9 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T& owner, bool up
 
     float x, y, z;
 
-    if (updateDestination)
+    // i_path can be NULL in case this is the first call for this MMGen (via Update)
+    // Can happen for example if no path was created on MMGen-Initialize because of the owner being stunned
+    if (updateDestination || !i_path)
     {
         // prevent redundant micro-movement for pets, other followers.
         if (i_offset && i_target->IsWithinDistInMap(&owner, 2 * i_offset))
@@ -60,8 +62,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T& owner, bool up
     }
     else
     {
-        MANGOS_ASSERT(i_path);
-
         // the destination has not changed, we just need to refresh the path (usually speed change)
         G3D::Vector3 end = i_path->getEndPosition();
         x = end.x;
