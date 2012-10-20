@@ -5356,7 +5356,7 @@ bool Spell::DoSummonPossessed(CreatureSummonPositions& list, SummonPropertiesEnt
 
     spawnCreature->SetLevel(level);
 
-    spawnCreature->SetWalk(m_caster->IsWalking());
+    spawnCreature->SetWalk(m_caster->IsWalking(), true);
     // TODO: Set Fly (ie glyph dependend)
 
     // Internal changes

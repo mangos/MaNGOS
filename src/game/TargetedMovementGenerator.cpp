@@ -170,7 +170,7 @@ void ChaseMovementGenerator<Player>::Initialize(Player& owner)
 template<>
 void ChaseMovementGenerator<Creature>::Initialize(Creature& owner)
 {
-    owner.SetWalk(false);
+    owner.SetWalk(false, false);                            // Chase movement is running
     owner.addUnitState(UNIT_STAT_CHASE | UNIT_STAT_CHASE_MOVE);
     _setTargetLocation(owner, true);
 }

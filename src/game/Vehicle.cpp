@@ -487,11 +487,11 @@ void VehicleInfo::ApplySeatMods(Unit* passenger, uint32 seatFlags)
             {
                 if (!pPlayer->IsWalking() && pVehicle->IsWalking())
                 {
-                    ((Creature*)pVehicle)->SetWalk(false);
+                    ((Creature*)pVehicle)->SetWalk(false, true);
                 }
                 else if (pPlayer->IsWalking() && !pVehicle->IsWalking())
                 {
-                    ((Creature*)pVehicle)->SetWalk(true);
+                    ((Creature*)pVehicle)->SetWalk(true, true);
                 }
             }
         }
