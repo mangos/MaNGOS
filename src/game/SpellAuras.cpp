@@ -349,7 +349,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleAuraAddMechanicAbilities,                  //293 SPELL_AURA_ADD_MECHANIC_ABILITIES  replaces target's action bars with a predefined spellset
     &Aura::HandleAuraStopNaturalManaRegen,                  //294 SPELL_AURA_STOP_NATURAL_MANA_REGEN implemented in Player:Regenerate
     &Aura::HandleUnused,                                    //295 unused (4.3.4)
-    &Aura::HandleNULL,                                      //296 62 spells in 4.3.4
+    &Aura::HandleAuraSetVehicleId,                          //296 6 spells
     &Aura::HandleNULL,                                      //297 14 spells in 4.3.4
     &Aura::HandleUnused,                                    //298 6 spells in 4.3.4
     &Aura::HandleUnused,                                    //299 unused (3.2.2a-4.3.4)
@@ -8804,6 +8804,14 @@ void Aura::HandleAuraModBlockCritChance(bool apply, bool Real)
 {
     if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
         ((Player*)GetTarget())->ApplyModUInt32Value(PLAYER_SHIELD_BLOCK_CRIT_PERCENTAGE, m_modifier.m_amount, apply);
+}
+
+void Aura::HandleAuraSetVehicleId(bool apply, bool Real)
+{
+    if (!Real)
+        return;
+
+    GetTarget()->SetVehicleId(apply ? GetMiscValue() : 0, 0);
 }
 
 bool Aura::IsLastAuraOnHolder()
