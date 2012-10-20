@@ -2474,6 +2474,18 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             if (m_caster->IsBoarded() && m_caster->GetTransportInfo()->IsOnVehicle())
                 targetUnitMap.push_back((Unit*)m_caster->GetTransportInfo()->GetTransport());
             break;
+        case TARGET_VEHICLE_PASSENGER_0:
+        case TARGET_VEHICLE_PASSENGER_1:
+        case TARGET_VEHICLE_PASSENGER_2:
+        case TARGET_VEHICLE_PASSENGER_3:
+        case TARGET_VEHICLE_PASSENGER_4:
+        case TARGET_VEHICLE_PASSENGER_5:
+        case TARGET_VEHICLE_PASSENGER_6:
+        case TARGET_VEHICLE_PASSENGER_7:
+            if (m_caster->IsVehicle())
+                if (Unit* passenger = m_caster->GetVehicleInfo()->GetPassenger(targetMode - TARGET_VEHICLE_PASSENGER_0))
+                    targetUnitMap.push_back(passenger);
+            break;
         case TARGET_CASTER_COORDINATES:
         {
             // Check original caster is GO - set its coordinates as src cast

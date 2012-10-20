@@ -74,6 +74,7 @@ class VehicleInfo : public TransportBase
         void UnBoard(Unit* passenger, bool changeVehicle);  // Used to Unboard a passenger from a vehicle
 
         bool CanBoard(Unit* passenger) const;               // Used to check if a Unit can board a vehicle
+        Unit* GetPassenger(uint8 seat) const;
 
         void RemoveAccessoriesFromMap();                    ///< Unsummones accessory in case of far-teleport or death
 
