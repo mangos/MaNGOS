@@ -373,6 +373,15 @@ bool VehicleInfo::CanBoard(Unit* passenger) const
     return GetEmptySeatsMask() & m_creatureSeats;
 }
 
+Unit* VehicleInfo::GetPassenger(uint8 seat) const
+{
+    for (PassengerMap::const_iterator itr = m_passengers.begin(); itr != m_passengers.end(); ++itr)
+        if (itr->second->GetTransportSeat() == seat)
+            return (Unit*)itr->first;
+
+    return NULL;
+}
+
 // Helper function to undo the turning of the vehicle to calculate a relative position of the passenger when boarding
 void VehicleInfo::CalculateBoardingPositionOf(float gx, float gy, float gz, float go, float& lx, float& ly, float& lz, float& lo) const
 {
