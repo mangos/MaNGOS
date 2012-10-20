@@ -35,7 +35,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T& owner)
         return;
 
     // ignore in case other no reaction state
-    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
+    if (owner.hasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_NOT_MOVE) & ~UNIT_STAT_FLEEING))
         return;
 
     float x, y, z;
@@ -155,7 +155,7 @@ bool FleeingMovementGenerator<T>::Update(T& owner, const uint32& time_diff)
         return false;
 
     // ignore in case other no reaction state
-    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
+    if (owner.hasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_NOT_MOVE) & ~UNIT_STAT_FLEEING))
     {
         owner.clearUnitState(UNIT_STAT_FLEEING_MOVE);
         return true;
@@ -200,7 +200,7 @@ bool TimedFleeingMovementGenerator::Update(Unit& owner, const uint32& time_diff)
         return false;
 
     // ignore in case other no reaction state
-    if (owner.hasUnitState(UNIT_STAT_CAN_NOT_REACT & ~UNIT_STAT_FLEEING))
+    if (owner.hasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_NOT_MOVE) & ~UNIT_STAT_FLEEING))
     {
         owner.clearUnitState(UNIT_STAT_FLEEING_MOVE);
         return true;
