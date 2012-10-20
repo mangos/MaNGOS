@@ -374,6 +374,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraStopNaturalManaRegen(bool apply, bool Real);
         void HandleAuraMastery(bool apply, bool Real);
         void HandleAuraModBlockCritChance(bool apply, bool Real);
+        void HandleAuraSetVehicleId(bool apply, bool Real);
 
         virtual ~Aura();
 
