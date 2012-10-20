@@ -4322,10 +4322,12 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder* holder)
         }
     }
 
-    // passive auras not stackable with other ranks
-    if (IsPassiveSpell(aurSpellInfo) && !IsPassiveSpellStackableWithRanks(aurSpellInfo))
+    // normal spell or passive auras not stackable with other ranks
+    if (!IsPassiveSpell(aurSpellInfo) || !IsPassiveSpellStackableWithRanks(aurSpellInfo))
     {
-        if (!RemoveNoStackAurasDueToAuraHolder(holder))
+        // Hack exceptions for Vehicle/Linked auras
+        if (!IsSpellHaveAura(aurSpellInfo, SPELL_AURA_CONTROL_VEHICLE) && !IsSpellHaveAura(aurSpellInfo, SPELL_AURA_284) &&
+            !RemoveNoStackAurasDueToAuraHolder(holder))
         {
             delete holder;
             return false;                                   // couldn't remove conflicting aura with higher rank
