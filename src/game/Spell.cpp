@@ -5124,6 +5124,15 @@ void Spell::CastPreCastSpells(Unit* target)
         m_caster->CastSpell(target, (*si), true, m_CastItem);
 }
 
+Unit* Spell::GetPrefilledUnitTargetOrUnitTarget(SpellEffectIndex effIndex) const
+{
+    for (TargetList::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
+        if (itr->effectMask & (1 << effIndex))
+            return m_caster->GetMap()->GetUnit(itr->targetGUID);
+
+    return m_targets.getUnitTarget();
+}
+
 SpellCastResult Spell::CheckCast(bool strict)
 {
     // check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
@@ -6131,6 +6140,13 @@ SpellCastResult Spell::CheckCast(bool strict)
         if(!spellEffect)
             continue;
 
+        // Do not check in case of junk in DBC
+        if (!IsAuraApplyEffect(m_spellInfo, SpellEffectIndex(i)))
+            continue;
+
+        // Possible Unit-target for the spell
+        Unit* expectedTarget = GetPrefilledUnitTargetOrUnitTarget(SpellEffectIndex(i));
+
         switch(spellEffect->EffectApplyAuraName)
         {
             case SPELL_AURA_DUMMY:
@@ -6156,7 +6172,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     return SPELL_FAILED_UNKNOWN;
 
-                if (m_targets.getUnitTarget() == m_caster)
+                if (expectedTarget == m_caster)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 if (m_caster->GetPetGuid())
@@ -6168,20 +6184,20 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->GetCharmerGuid())
                     return SPELL_FAILED_CHARMED;
 
-                if (!m_targets.getUnitTarget())
+                if (!expectedTarget)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                if (m_targets.getUnitTarget()->GetCharmerGuid())
+                if (expectedTarget->GetCharmerGuid())
                     return SPELL_FAILED_CHARMED;
 
-                if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
+                if (int32(expectedTarget->getLevel()) > CalculateDamage(SpellEffectIndex(i), expectedTarget))
                     return SPELL_FAILED_HIGHLEVEL;
 
                 break;
             }
             case SPELL_AURA_MOD_CHARM:
             {
-                if (m_targets.getUnitTarget() == m_caster)
+                if (expectedTarget == m_caster)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 if (m_caster->GetPetGuid())
@@ -6193,13 +6209,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->GetCharmerGuid())
                     return SPELL_FAILED_CHARMED;
 
-                if (!m_targets.getUnitTarget())
+                if (!expectedTarget)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                if (m_targets.getUnitTarget()->GetCharmerGuid())
+                if (expectedTarget->GetCharmerGuid())
                     return SPELL_FAILED_CHARMED;
 
-                if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
+                if (int32(expectedTarget->getLevel()) > CalculateDamage(SpellEffectIndex(i), expectedTarget))
                     return SPELL_FAILED_HIGHLEVEL;
 
                 break;
@@ -6243,11 +6259,11 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS:
             {
-                if (!m_targets.getUnitTarget())
+                if (!expectedTarget)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 // can be casted at non-friendly unit or own pet/charm
-                if (m_caster->IsFriendlyTo(m_targets.getUnitTarget()))
+                if (m_caster->IsFriendlyTo(expectedTarget))
                     return SPELL_FAILED_TARGET_FRIENDLY;
 
                 break;
@@ -6266,13 +6282,13 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             case SPELL_AURA_PERIODIC_MANA_LEECH:
             {
-                if (!m_targets.getUnitTarget())
+                if (!expectedTarget)
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_caster->GetTypeId() != TYPEID_PLAYER || m_CastItem)
                     break;
 
-                if (m_targets.getUnitTarget()->getPowerType() != POWER_MANA)
+                if (expectedTarget->getPowerType() != POWER_MANA)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
@@ -6282,48 +6298,41 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->HasAuraType(SPELL_AURA_MOUNTED))
                     return SPELL_FAILED_NOT_MOUNTED;
 
-                Unit* pTarget = m_targets.getUnitTarget();
-
-                if (!pTarget->IsVehicle())
+                if (!expectedTarget || !expectedTarget->IsVehicle())
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // It is possible to change between vehicles that are boarded on each other
                 if (m_caster->IsBoarded() && m_caster->GetTransportInfo()->IsOnVehicle())
                 {
                     // Check if trying to board a vehicle that is boarded on current transport
-                    bool boardedOnEachOther = m_caster->GetTransportInfo()->HasOnBoard(pTarget);
+                    bool boardedOnEachOther = m_caster->GetTransportInfo()->HasOnBoard(expectedTarget);
                     // Check if trying to board a vehicle that has the current transport on board
                     if (!boardedOnEachOther)
-                        boardedOnEachOther = pTarget->GetVehicleInfo()->HasOnBoard(m_caster);
+                        boardedOnEachOther = expectedTarget->GetVehicleInfo()->HasOnBoard(m_caster);
 
                     if (!boardedOnEachOther)
                         return SPELL_FAILED_NOT_ON_TRANSPORT;
                 }
 
-                if (!pTarget->GetVehicleInfo()->CanBoard(m_caster))
+                if (!expectedTarget->GetVehicleInfo()->CanBoard(m_caster))
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
             }
             case SPELL_AURA_MIRROR_IMAGE:
             {
-                Unit* pTarget = m_targets.getUnitTarget();
-
-                // In case of TARGET_SCRIPT, we have already added a target. Use it here (and find a better solution)
-                if (m_UniqueTargetInfo.size() == 1)
-                    pTarget = m_caster->GetMap()->GetAnyTypeCreature(m_UniqueTargetInfo.front().targetGUID);
-
-                if (!pTarget)
+                if (!expectedTarget)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (pTarget->GetTypeId() != TYPEID_UNIT)    // Target must be creature. TODO: Check if target can also be player
+                // Target must be creature. TODO: Check if target can also be player
+                if (expectedTarget->GetTypeId() != TYPEID_UNIT)
                     return SPELL_FAILED_BAD_TARGETS;
 
-                if (pTarget == m_caster)                    // Clone self can't be accepted
+                if (expectedTarget == m_caster)             // Clone self can't be accepted
                     return SPELL_FAILED_BAD_TARGETS;
 
                 // It is assumed that target can not be cloned if already cloned by same or other clone auras
-                if (pTarget->HasAuraType(SPELL_AURA_MIRROR_IMAGE))
+                if (expectedTarget->HasAuraType(SPELL_AURA_MIRROR_IMAGE))
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
