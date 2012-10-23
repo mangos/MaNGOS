@@ -905,7 +905,7 @@ uint32 GetTalentSpellCost(uint32 spellId)
 int32 GetAreaFlagByAreaID(uint32 area_id)
 {
     AreaFlagByAreaID::iterator i = sAreaFlagByAreaID.find(area_id);
-    if(i == sAreaFlagByAreaID.end())
+    if (i == sAreaFlagByAreaID.end())
         return -1;
 
     return i->second;
@@ -913,17 +913,16 @@ int32 GetAreaFlagByAreaID(uint32 area_id)
 
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid)
 {
-        WMOAreaInfoByTripple::iterator i = sWMOAreaInfoByTripple.find(WMOAreaTableTripple(rootid, adtid, groupid));
-            if(i == sWMOAreaInfoByTripple.end())
-                        return NULL;
-                return i->second;
-
+    WMOAreaInfoByTripple::iterator i = sWMOAreaInfoByTripple.find(WMOAreaTableTripple(rootid, adtid, groupid));
+    if (i == sWMOAreaInfoByTripple.end())
+        return NULL;
+    return i->second;
 }
 
 AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
 {
     int32 areaflag = GetAreaFlagByAreaID(area_id);
-    if(areaflag < 0)
+    if (areaflag < 0)
         return NULL;
 
     return sAreaStore.LookupEntry(areaflag );
@@ -931,10 +930,10 @@ AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
 
 AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag,uint32 map_id)
 {
-    if(area_flag)
+    if (area_flag)
         return sAreaStore.LookupEntry(area_flag);
 
-    if(MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
+    if (MapEntry const* mapEntry = sMapStore.LookupEntry(map_id))
         return GetAreaEntryByAreaID(mapEntry->linked_zone);
 
     return NULL;
@@ -943,7 +942,7 @@ AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag,uint32 map_i
 uint32 GetAreaFlagByMapId(uint32 mapid)
 {
     AreaFlagByMapID::iterator i = sAreaFlagByMapID.find(mapid);
-    if(i == sAreaFlagByMapID.end())
+    if (i == sAreaFlagByMapID.end())
         return 0;
     else
         return i->second;
@@ -951,7 +950,7 @@ uint32 GetAreaFlagByMapId(uint32 mapid)
 
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId)
 {
-    if (mapid != 530 && mapid != 571 && mapid != 732)            // speed for most cases
+    if (mapid != 530 && mapid != 571 && mapid != 732)           // speed for most cases
         return mapid;
 
     if (WorldMapAreaEntry const* wma = sWorldMapAreaStore.LookupEntry(zoneId))
@@ -978,10 +977,10 @@ ContentLevels GetContentLevelsForMap(uint32 mapid)
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id)
 {
     // not sorted, numbering index from 0
-    for(uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
     {
         ChatChannelsEntry const* ch = sChatChannelsStore.LookupEntry(i);
-        if(ch && ch->ChannelID == channel_id)
+        if (ch && ch->ChannelID == channel_id)
             return ch;
     }
     return NULL;
@@ -989,25 +988,25 @@ ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id)
 
 bool IsTotemCategoryCompatiableWith(uint32 itemTotemCategoryId, uint32 requiredTotemCategoryId)
 {
-    if(requiredTotemCategoryId==0)
+    if (requiredTotemCategoryId==0)
         return true;
-    if(itemTotemCategoryId==0)
+    if (itemTotemCategoryId==0)
         return false;
 
     TotemCategoryEntry const* itemEntry = sTotemCategoryStore.LookupEntry(itemTotemCategoryId);
-    if(!itemEntry)
+    if (!itemEntry)
         return false;
     TotemCategoryEntry const* reqEntry = sTotemCategoryStore.LookupEntry(requiredTotemCategoryId);
-    if(!reqEntry)
+    if (!reqEntry)
         return false;
 
-    if(itemEntry->categoryType!=reqEntry->categoryType)
+    if (itemEntry->categoryType!=reqEntry->categoryType)
         return false;
 
     return (itemEntry->categoryMask & reqEntry->categoryMask)==reqEntry->categoryMask;
 }
 
-bool Zone2MapCoordinates(float& x,float& y,uint32 zone)
+bool Zone2MapCoordinates(float& x, float& y, uint32 zone)
 {
     WorldMapAreaEntry const* maEntry = sWorldMapAreaStore.LookupEntry(zone);
 
@@ -1015,9 +1014,9 @@ bool Zone2MapCoordinates(float& x,float& y,uint32 zone)
     if (!maEntry || maEntry->x2 == maEntry->x1 || maEntry->y2 == maEntry->y1)
         return false;
 
-    std::swap(x,y);                                         // at client map coords swapped
-    x = x*((maEntry->x2-maEntry->x1)/100)+maEntry->x1;
-    y = y*((maEntry->y2-maEntry->y1)/100)+maEntry->y1;      // client y coord from top to down
+    std::swap(x, y);                                        // at client map coords swapped
+    x = x * ((maEntry->x2-maEntry->x1) / 100) + maEntry->x1;
+    y = y * ((maEntry->y2-maEntry->y1) / 100) + maEntry->y1;    // client y coord from top to down
 
     return true;
 }
@@ -1039,14 +1038,14 @@ bool Map2ZoneCoordinates(float& x,float& y,uint32 zone)
 
 MapDifficultyEntry const* GetMapDifficultyData(uint32 mapId, Difficulty difficulty)
 {
-    MapDifficultyMap::const_iterator itr = sMapDifficultyMap.find(MAKE_PAIR32(mapId,difficulty));
+    MapDifficultyMap::const_iterator itr = sMapDifficultyMap.find(MAKE_PAIR32(mapId, difficulty));
     return itr != sMapDifficultyMap.end() ? itr->second : NULL;
 }
 
-PvPDifficultyEntry const* GetBattlegroundBracketByLevel( uint32 mapid, uint32 level )
+PvPDifficultyEntry const* GetBattlegroundBracketByLevel(uint32 mapid, uint32 level)
 {
     PvPDifficultyEntry const* maxEntry = NULL;              // used for level > max listed level case
-    for(uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sPvPDifficultyStore.GetNumRows(); ++i)
     {
         if (PvPDifficultyEntry const* entry = sPvPDifficultyStore.LookupEntry(i))
         {

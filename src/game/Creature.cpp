@@ -1603,21 +1603,23 @@ bool Creature::IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf)
 bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
     SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(index);
+    if (!spellEffect)
+        return false;
 
-    if (!castOnSelf && spellEffect && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellEffect->EffectMechanic - 1)))
+    if (!castOnSelf && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellEffect->EffectMechanic - 1)))
         return true;
 
     // Taunt immunity special flag check
     if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NOT_TAUNTABLE)
     {
         // Taunt aura apply check
-        if (spellEffect && spellEffect->Effect == SPELL_EFFECT_APPLY_AURA)
+        if (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA)
         {
-            if (spellEffect && spellEffect->EffectApplyAuraName == SPELL_AURA_MOD_TAUNT)
+            if (spellEffect->EffectApplyAuraName == SPELL_AURA_MOD_TAUNT)
                 return true;
         }
         // Spell effect taunt check
-        else if (spellEffect && spellEffect->Effect == SPELL_EFFECT_ATTACK_ME)
+        else if (spellEffect->Effect == SPELL_EFFECT_ATTACK_ME)
             return true;
     }
 
@@ -1705,12 +1707,13 @@ SpellEntry const* Creature::ReachWithSpellCure(Unit* pVictim)
         for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
             SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffectIndex(j));
-            if( spellEffect && (spellEffect->Effect == SPELL_EFFECT_HEAL) )
+            if (spellEffect && spellEffect->Effect == SPELL_EFFECT_HEAL)
             {
                 bcontinue = false;
                 break;
             }
         }
+
         if (bcontinue)
             continue;
 

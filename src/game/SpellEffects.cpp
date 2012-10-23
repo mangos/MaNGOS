@@ -8914,7 +8914,7 @@ void Spell::EffectApplyGlyph(SpellEffectEntry const* effect)
 
     Player* player = (Player*)m_caster;
 
-        // glyph sockets level requirement
+    // glyph sockets level requirement
     uint8 minLevel = 0;
     switch (m_glyphIndex)
     {
