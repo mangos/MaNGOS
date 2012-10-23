@@ -88,7 +88,7 @@ namespace Movement
         if (args.velocity == 0.f)
             args.velocity = unit.GetSpeed(SelectSpeedType(moveFlags));
 
-        if (!args.Validate())
+        if (!args.Validate(&unit))
             return 0;
 
         unit.m_movementInfo.SetMovementFlags((MovementFlags)moveFlags);

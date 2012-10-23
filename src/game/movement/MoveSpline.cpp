@@ -19,6 +19,7 @@
 #include "MoveSpline.h"
 #include <sstream>
 #include "Log.h"
+#include "Unit.h"
 
 namespace Movement
 {
@@ -196,12 +197,12 @@ namespace Movement
 
 /// ============================================================================================
 
-    bool MoveSplineInitArgs::Validate() const
+    bool MoveSplineInitArgs::Validate(Unit* unit) const
     {
 #define CHECK(exp) \
     if (!(exp))\
     {\
-        sLog.outError("MoveSplineInitArgs::Validate: expression '%s' failed", #exp);\
+        sLog.outError("MoveSplineInitArgs::Validate: expression '%s' failed for $s", #exp, unit->GetGuidStr().c_str());\
         return false;\
     }
         CHECK(path.size() > 1);
