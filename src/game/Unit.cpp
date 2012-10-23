@@ -9296,7 +9296,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
 
     SpellScalingEntry const* scalingEntry = spellProto->GetSpellScaling();
     GtSpellScalingEntry const* gtScalingEntry = NULL;
-    if (scalingEntry)
+    if (scalingEntry && scalingEntry->IsScalableEffect(effect_index))
     {
         if (target && IsAuraApplyEffect(spellProto, effect_index) && IsPositiveEffect(spellProto, effect_index))
             level = target->getLevel();

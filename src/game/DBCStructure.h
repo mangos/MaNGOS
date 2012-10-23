@@ -1803,6 +1803,8 @@ struct SpellScalingEntry
     float     coeff3[3];                                    // 11-13
     float     coefBase;                                     // 14       some coefficient, mostly 1.0f
     uint32    coefLevelBase;                                // 15       some level
+
+    bool IsScalableEffect(SpellEffectIndex i) const { return coeff1[i] != 0.0f; };
 };
 
 // SpellShapeshift.dbc
