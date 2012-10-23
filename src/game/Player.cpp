@@ -268,25 +268,6 @@ std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
     return ss;
 }
 
-SpellModifier::SpellModifier( SpellModOp _op, SpellModType _type, int32 _value, SpellEntry const* spellEntry, SpellEffectIndex eff, int16 _charges /*= 0*/ ) : op(_op), type(_type), charges(_charges), value(_value), spellId(spellEntry->Id), lastAffected(NULL)
-{
-    mask = spellEntry->GetEffectSpellClassMask(eff);
-}
-
-SpellModifier::SpellModifier( SpellModOp _op, SpellModType _type, int32 _value, Aura const* aura, int16 _charges /*= 0*/ ) : op(_op), type(_type), charges(_charges), value(_value), spellId(aura->GetId()), lastAffected(NULL)
-{
-    mask = aura->GetAuraSpellClassMask();
-}
-
-bool SpellModifier::isAffectedOnSpell( SpellEntry const *spell ) const
-{
-    SpellEntry const *affect_spell = sSpellStore.LookupEntry(spellId);
-    // False if affect_spell == NULL or spellFamily not equal
-    if (!affect_spell || affect_spell->GetSpellFamilyName() != spell->GetSpellFamilyName())
-        return false;
-    return spell->IsFitToFamilyMask(mask);
-}
-
 //== TradeData =================================================
 
 TradeData* TradeData::GetTraderData() const
