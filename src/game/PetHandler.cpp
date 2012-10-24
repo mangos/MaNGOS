@@ -33,9 +33,11 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
     ObjectGuid petGuid;
     uint32 data;
     ObjectGuid targetGuid;
+    float x, y, z;
     recv_data >> petGuid;
     recv_data >> data;
     recv_data >> targetGuid;
+    recv_data >> x >> y >> z;
 
     uint32 spellid = UNIT_ACTION_BUTTON_ACTION(data);
     uint8 flag = UNIT_ACTION_BUTTON_TYPE(data);             // delete = 0x07 CastSpell = C1

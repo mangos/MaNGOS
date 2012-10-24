@@ -954,8 +954,9 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recv_data)
 
     ObjectGuid guid;
 
-    recv_data >> guid.ReadAsPacked();
     recv_data >> Unused<uint32>();
+    recv_data.ReadGuidMask<5, 1, 3, 7, 6, 0, 4, 2>(guid);
+    recv_data.ReadGuidBytes<7, 1, 2, 4, 3, 6, 0, 5>(guid);
 
     /*
         ObjectGuid guid;
@@ -1066,10 +1067,10 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     plr->BuildEnchantmentsInfoData(&data);
     if (Guild* guild = sGuildMgr.GetGuildById(plr->GetGuildId()))
     {
-        data << uint64(0/*guild->GetGUID()*/);
-        data << uint32(0/*guild->GetLevel()*/);
+        data << guild->GetObjectGuid();
+        data << uint32(guild->GetLevel());
         data << uint64(0/*guild->GetXP()*/);
-        data << uint32(0/*guild->GetMembersCount()*/); // number of members
+        data << uint32(guild->GetMemberSize());             // number of members
     }
 
     SendPacket(&data);

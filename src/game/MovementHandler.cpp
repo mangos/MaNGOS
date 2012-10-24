@@ -382,19 +382,15 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recv_data)
     DEBUG_LOG("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    ObjectGuid old_mover_guid;
     MovementInfo mi;
-
-    recv_data >> old_mover_guid.ReadAsPacked();
     recv_data >> mi;
 
-    if (_player->GetMover()->GetObjectGuid() == old_mover_guid)
+    if (_player->GetMover()->GetObjectGuid() == mi.GetGuid())
     {
         sLog.outError("HandleMoveNotActiveMover: incorrect mover guid: mover is %s and should be %s instead of %s",
                       _player->GetMover()->GetGuidStr().c_str(),
                       _player->GetGuidStr().c_str(),
-                      old_mover_guid.GetString().c_str());
-        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
+                      mi.GetGuid().GetString().c_str());
         return;
     }
 
@@ -425,40 +421,36 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recv_data)
         return;
     }
 
-    ObjectGuid guid;
     MovementInfo movementInfo;
-
-    recv_data >> guid.ReadAsPacked();
-    recv_data >> Unused<uint32>();                          // knockback packets counter
     recv_data >> movementInfo;
 
-    if (!VerifyMovementInfo(movementInfo, guid))
+    if (!VerifyMovementInfo(movementInfo, movementInfo.GetGuid()))
         return;
 
     HandleMoverRelocation(movementInfo);
 
-    WorldPacket data(MSG_MOVE_KNOCK_BACK, recv_data.size() + 15);
-    data << mover->GetPackGUID();
+    WorldPacket data(SMSG_MOVE_UPDATE_KNOCK_BACK, recv_data.size() + 15);
     data << movementInfo;
-    data << movementInfo.GetJumpInfo().sinAngle;
-    data << movementInfo.GetJumpInfo().cosAngle;
-    data << movementInfo.GetJumpInfo().xyspeed;
-    data << movementInfo.GetJumpInfo().velocity;
     mover->SendMessageToSetExcept(&data, _player);
 }
 
 void WorldSession::SendKnockBack(float angle, float horizontalSpeed, float verticalSpeed)
 {
+    ObjectGuid guid = GetPlayer()->GetObjectGuid();
     float vsin = sin(angle);
     float vcos = cos(angle);
 
-    WorldPacket data(SMSG_MOVE_KNOCK_BACK, 9 + 4 + 4 + 4 + 4 + 4);
-    data << GetPlayer()->GetPackGUID();
-    data << uint32(0);                                  // Sequence
-    data << float(vcos);                                // x direction
+    WorldPacket data(SMSG_MOVE_KNOCK_BACK, 9 + 4 + 4 + 4 + 4 + 4 + 1 + 8);
+    data.WriteGuidMask<0, 3, 6, 7, 2, 5, 1, 4>(guid);
+    data.WriteGuidBytes<1>(guid);
     data << float(vsin);                                // y direction
+    data << uint32(0);                                  // Sequence
+    data.WriteGuidBytes<6, 7>(guid);
     data << float(horizontalSpeed);                     // Horizontal speed
+    data.WriteGuidBytes<4, 5, 3>(guid);
     data << float(-verticalSpeed);                      // Z Movement speed (vertical)
+    data << float(vcos);                                // x direction
+    data.WriteGuidBytes<2, 0>(guid);
     SendPacket(&data);
 }
 

@@ -35,6 +35,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_CHANNEL_VOICE_ON");
     // Enable Voice button in channel context menu
+    std::string channelName = recv_data.ReadString(recv_data.ReadBits(8));
     recv_data.hexlike();
 }
 

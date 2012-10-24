@@ -1954,6 +1954,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void BuildMoveWaterWalkPacket(WorldPacket* data, bool apply, uint32 value);
         void BuildSendPlayVisualPacket(WorldPacket* data, uint32 value, bool impact);
         void BuildMoveSetCanFlyPacket(WorldPacket* data, bool apply, uint32 value);
+        void BuildMoveFeatherFallPacket(WorldPacket* data, bool apply, uint32 value);
 
     protected:
         explicit Unit();

@@ -3135,7 +3135,8 @@ enum PetTameFailureReason
     PETTAME_DEAD                    = 10,                   // not used in taming
     PETTAME_NOTDEAD                 = 11,                   // not used in taming
     PETTAME_CANTCONTROLEXOTIC       = 12,                   // 3.x
-    PETTAME_UNKNOWNERROR            = 13
+    PETTAME_INVALIDSLOT             = 13,
+    PETTAME_UNKNOWNERROR            = 14,
 };
 
 // Stored in SummonProperties.dbc with slot+1 values

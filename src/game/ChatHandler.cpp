@@ -750,8 +750,9 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
     uint8 unk;
     // DEBUG_LOG("WORLD: Received CMSG_CHAT_IGNORED");
 
-    recv_data >> iguid;
     recv_data >> unk;                                       // probably related to spam reporting
+    recv_data.ReadGuidMask<2, 5, 6, 4, 7, 0, 1, 3>(iguid);
+    recv_data.ReadGuidBytes<0, 6, 5, 1, 4, 3, 7, 2>(iguid);
 
     Player* player = sObjectMgr.GetPlayer(iguid);
     if (!player || !player->GetSession())
