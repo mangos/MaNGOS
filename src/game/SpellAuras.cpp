@@ -1661,10 +1661,23 @@ void Aura::TriggerSpell()
 //                    case 40113: break;
 //                    // Spirit Lance
 //                    case 40157: break;
-//                    // Demon Transform 2
-//                    case 40398: break;
-//                    // Demon Transform 1
-//                    case 40511: break;
+                    case 40398:                             // Demon Transform 2
+                        switch (GetAuraTicks())
+                        {
+                            case 1:
+                                if (target->HasAura(40506))
+                                    target->RemoveAurasDueToSpell(40506);
+                                else
+                                    trigger_spell_id = 40506;
+                                break;
+                            case 2:
+                                trigger_spell_id = 40510;
+                                break;
+                        }
+                        break;
+                    case 40511:                             // Demon Transform 1
+                        trigger_spell_id = 40398;
+                        break;
 //                    // Ancient Flames
 //                    case 40657: break;
 //                    // Ethereal Ring Cannon: Cannon Aura
