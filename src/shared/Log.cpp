@@ -18,7 +18,7 @@
 
 #include "Common.h"
 #include "Log.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Config/Config.h"
 #include "Util.h"
 #include "ByteBuffer.h"

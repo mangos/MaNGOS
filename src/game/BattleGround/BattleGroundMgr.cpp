@@ -43,7 +43,7 @@
 #include "WorldPacket.h"
 #include "GameEventMgr.h"
 
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 
 INSTANTIATE_SINGLETON_1(BattleGroundMgr);
 

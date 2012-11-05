@@ -20,7 +20,7 @@
 #include "Creature.h"
 #include "CreatureAIImpl.h"
 #include "NullCreatureAI.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "MovementGenerator.h"
 #include "ScriptMgr.h"
 #include "Pet.h"
