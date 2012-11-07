@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "ObjectGuid.h"
 #include "Database/DatabaseEnv.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "ProgressBar.h"
 #include "World.h"
 

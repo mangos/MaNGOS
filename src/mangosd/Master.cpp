@@ -32,7 +32,7 @@
 #include "World.h"
 #include "Log.h"
 #include "Timer.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "SystemConfig.h"
 #include "Config/Config.h"
 #include "Database/DatabaseEnv.h"

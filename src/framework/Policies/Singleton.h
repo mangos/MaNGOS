@@ -62,6 +62,56 @@ namespace MaNGOS
             static T* si_instance;
             static bool si_destroyed;
     };
+
+    template<typename T, class ThreadingModel, class CreatePolicy, class LifeTimePolicy>
+    T* Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::si_instance = NULL;
+
+    template<typename T, class ThreadingModel, class CreatePolicy, class LifeTimePolicy>
+    bool Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::si_destroyed = false;
+
+    template<typename T, class ThreadingModel, class CreatePolicy, class LifeTimePolicy>
+    T& MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::Instance()
+    {
+        if (!si_instance)
+        {
+            // double-checked Locking pattern
+            Guard();
+
+            if (!si_instance)
+            {
+                if (si_destroyed)
+                {
+                    si_destroyed = false;
+                    LifeTimePolicy::OnDeadReference();
+                }
+
+                si_instance = CreatePolicy::Create();
+                LifeTimePolicy::ScheduleCall(&DestroySingleton);
+            }
+        }
+
+        return *si_instance;
+    }
+
+    template<typename T, class ThreadingModel, class CreatePolicy, class LifeTimePolicy>
+    void MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::DestroySingleton()
+    {
+        CreatePolicy::Destroy(si_instance);
+        si_instance = NULL;
+        si_destroyed = true;
+    }
 }
+
+#define INSTANTIATE_SINGLETON_1(TYPE) \
+    template class MANGOS_DLL_DECL MaNGOS::Singleton<TYPE, MaNGOS::SingleThreaded<TYPE>, MaNGOS::OperatorNew<TYPE>, MaNGOS::ObjectLifeTime<TYPE> >;
+
+#define INSTANTIATE_SINGLETON_2(TYPE, THREADINGMODEL) \
+    template class MANGOS_DLL_DECL MaNGOS::Singleton<TYPE, THREADINGMODEL, MaNGOS::OperatorNew<TYPE>, MaNGOS::ObjectLifeTime<TYPE> >;
+
+#define INSTANTIATE_SINGLETON_3(TYPE, THREADINGMODEL, CREATIONPOLICY ) \
+    template class MANGOS_DLL_DECL MaNGOS::Singleton<TYPE, THREADINGMODEL, CREATIONPOLICY, MaNGOS::ObjectLifeTime<TYPE> >;
+
+#define INSTANTIATE_SINGLETON_4(TYPE, THREADINGMODEL, CREATIONPOLICY, OBJECTLIFETIME) \
+    template class MANGOS_DLL_DECL MaNGOS::Singleton<TYPE, THREADINGMODEL, CREATIONPOLICY, OBJECTLIFETIME >;
 
 #endif

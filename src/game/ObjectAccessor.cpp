@@ -18,7 +18,7 @@
 
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "Item.h"

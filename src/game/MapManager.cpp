@@ -18,7 +18,7 @@
 
 #include "MapManager.h"
 #include "MapPersistentStateMgr.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Transports.h"

@@ -10,7 +10,7 @@
 // for that day.
 #define AUCTIONHOUSEBOT_CONF_VERSION    2010102201
 
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 
 struct BuyerAuctionEval
 {

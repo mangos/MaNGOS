@@ -21,7 +21,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "Player.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Util.h"
 #include "Auth/Sha1.h"
 

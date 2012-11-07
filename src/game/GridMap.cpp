@@ -27,7 +27,7 @@
 #include "VMapFactory.h"
 #include "MoveMap.h"
 #include "World.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Util.h"
 
 char const* MAP_MAGIC         = "MAPS";

@@ -26,7 +26,7 @@
  */
 
 #include "MassMailMgr.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Database/DatabaseEnv.h"
 #include "Database/DatabaseImpl.h"
 #include "SharedDefines.h"

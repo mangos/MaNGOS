@@ -23,7 +23,7 @@
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "ProgressBar.h"
-#include "Policies/SingletonImp.h"
+#include "Policies/Singleton.h"
 #include "Player.h"
 
 INSTANTIATE_SINGLETON_1(GMTicketMgr);
