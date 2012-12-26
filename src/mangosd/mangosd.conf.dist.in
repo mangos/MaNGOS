@@ -427,7 +427,9 @@ LogColors = ""
 #
 #    Expansion
 #        Allow server use content from expansion
-#        Default: 3 - check expansion 3 maps existence, and if client support expansion 3 and account have
+#        Default: 4 - check expansion 4 maps existence, and if client support expansion 4 and account have
+#                     expansion 4 setting then allow visit expansion 4 maps, allow create new race and class character)
+#                 3 - check expansion 3 maps existence, and if client support expansion 3 and account have
 #                     expansion 3 setting then allow visit expansion 3 maps, allow create new race and class character)
 #                 2 - check expansion 2 maps existence, and if client support expansion 2 and account have
 #                     expansion 2 setting then allow visit expansion 2 maps, allow create new class character)
@@ -524,7 +526,7 @@ LogColors = ""
 #    MaxPlayerLevel
 #        Max level that can be reached by a player for experience (in range from 1 to 100).
 #        Change not recommended
-#        Default: 85
+#        Default: 90
 #
 #    StartPlayerLevel
 #        Staring level that have character at creating (in range 1 to MaxPlayerLevel)
@@ -753,7 +755,7 @@ LogColors = ""
 
 GameType = 1
 RealmZone = 1
-Expansion = 3
+Expansion = 4
 DBC.Locale = 255
 DeclinedNames = 0
 StrictPlayerNames = 0
@@ -768,7 +770,7 @@ CharactersPerRealm = 10
 HeroicCharactersPerRealm = 1
 MinLevelForHeroicCharacterCreating = 55
 SkipCinematics = 0
-MaxPlayerLevel = 85
+MaxPlayerLevel = 90
 StartPlayerLevel = 1
 StartHeroicPlayerLevel = 55
 StartPlayerMoney = 0
