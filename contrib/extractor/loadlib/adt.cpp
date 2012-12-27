@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include "adt.h"
@@ -10,8 +28,8 @@ bool isHole(int holes, int i, int j)
 {
     int testi = i / 2;
     int testj = j / 4;
-    if(testi > 3) testi = 3;
-    if(testj > 3) testj = 3;
+    if (testi > 3) testi = 3;
+    if (testj > 3) testj = 3;
     return (holes & holetab_h[testi] & holetab_v[testj]) != 0;
 }
 
@@ -44,7 +62,7 @@ bool ADT_file::prepareLoadedData()
         return false;
 
     // Check and prepare MHDR
-    a_grid = (adt_MHDR *)(GetData()+8+version->size);
+    a_grid = (adt_MHDR *)(GetData() + 8 + version->size);
     if (!a_grid->prepareLoadedData())
         return false;
 
@@ -77,7 +95,7 @@ bool adt_MHDR::prepareLoadedData()
     if (fcc != 'MHDR')
         return false;
 
-    if (size!=sizeof(adt_MHDR)-8)
+    if (size != sizeof(adt_MHDR) - 8)
         return false;
 
     // Check and prepare MCIN
@@ -97,9 +115,9 @@ bool adt_MCIN::prepareLoadedData()
         return false;
 
     // Check cells data
-    for (int i=0; i<ADT_CELLS_PER_GRID;i++)
-        for (int j=0; j<ADT_CELLS_PER_GRID;j++)
-            if (cells[i][j].offsMCNK && !getMCNK(i,j)->prepareLoadedData())
+    for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
+        for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
+            if (cells[i][j].offsMCNK && !getMCNK(i, j)->prepareLoadedData())
                 return false;
 
     return true;
@@ -137,7 +155,7 @@ bool adt_MCVT::prepareLoadedData()
     if (fcc != 'MCVT')
         return false;
 
-    if (size != sizeof(adt_MCVT)-8)
+    if (size != sizeof(adt_MCVT) - 8)
         return false;
 
     return true;

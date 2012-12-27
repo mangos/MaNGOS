@@ -1,5 +1,24 @@
+/*
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #ifndef DBCFILE_H
 #define DBCFILE_H
+
 #include <cassert>
 #include <string>
 
@@ -45,17 +64,17 @@ public:
         float getFloat(size_t field) const
         {
             assert(field < file.fieldCount);
-            return *reinterpret_cast<float*>(offset+field*4);
+            return *reinterpret_cast<float*>(offset + field * 4);
         }
         unsigned int getUInt(size_t field) const
         {
             assert(field < file.fieldCount);
-            return *reinterpret_cast<unsigned int*>(offset+field*4);
+            return *reinterpret_cast<unsigned int*>(offset + field * 4);
         }
         int getInt(size_t field) const
         {
             assert(field < file.fieldCount);
-            return *reinterpret_cast<int*>(offset+field*4);
+            return *reinterpret_cast<int*>(offset + field * 4);
         }
         const char *getString(size_t field) const
         {
@@ -72,21 +91,22 @@ public:
         friend class DBCFile;
         friend class DBCFile::Iterator;
     };
-    /** Iterator that iterates over records
-    */
+    /* Iterator that iterates over records */
     class Iterator
     {
     public:
         Iterator(DBCFile &file, unsigned char *offset):
             record(file, offset) {}
         /// Advance (prefix only)
-        Iterator & operator++() {
+        Iterator & operator++()
+        {
             record.offset += record.file.recordSize;
             return *this;
         }
         /// Return address of current instance
         Record const & operator*() const { return record; }
-        const Record* operator->() const {
+        const Record* operator->() const
+        {
             return &record;
         }
         /// Comparison

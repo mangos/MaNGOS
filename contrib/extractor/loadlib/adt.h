@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #ifndef ADT_H
 #define ADT_H
 
@@ -28,13 +46,14 @@ enum LiquidType
 class ADT_file;
 class adt_MCVT
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
     uint32 size;
 public:
-    float height_map[(ADT_CELL_SIZE+1)*(ADT_CELL_SIZE+1)+ADT_CELL_SIZE*ADT_CELL_SIZE];
+    float height_map[(ADT_CELL_SIZE + 1) * (ADT_CELL_SIZE + 1) + ADT_CELL_SIZE*ADT_CELL_SIZE];
 
     bool  prepareLoadedData();
 };
@@ -44,7 +63,8 @@ public:
 //
 class adt_MCLQ
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -52,10 +72,11 @@ class adt_MCLQ
 public:
     float height1;
     float height2;
-    struct liquid_data{
+    struct liquid_data
+    {
         uint32 light;
         float  height;
-    } liquid[ADT_CELL_SIZE+1][ADT_CELL_SIZE+1];
+    } liquid[ADT_CELL_SIZE + 1][ADT_CELL_SIZE + 1];
 
     // 1<<0 - ochen
     // 1<<1 - lava/slime
@@ -73,7 +94,8 @@ public:
 //
 class adt_MCNK
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -133,13 +155,15 @@ public:
 //
 class adt_MCIN
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
     uint32 size;
 public:
-    struct adt_CELLS{
+    struct adt_CELLS
+    {
         uint32 offsMCNK;
         uint32 size;
         uint32 flags;
@@ -159,7 +183,8 @@ public:
 #define ADT_LIQUID_HEADER_FULL_LIGHT   0x01
 #define ADT_LIQUID_HEADER_NO_HIGHT     0x02
 
-struct adt_liquid_header{
+struct adt_liquid_header
+{
     uint16 liquidType;             // Index from LiquidType.dbc
     uint16 formatFlags;
     float  heightLevel1;
@@ -178,13 +203,15 @@ struct adt_liquid_header{
 class adt_MH2O
 {
 public:
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
     uint32 size;
 
-    struct adt_LIQUID{
+    struct adt_LIQUID
+    {
         uint32 offsData1;
         uint32 used;
         uint32 offsData2;
@@ -210,26 +237,26 @@ public:
 
     uint8 *getLiquidLightMap(adt_liquid_header *h)
     {
-        if (h->formatFlags&ADT_LIQUID_HEADER_FULL_LIGHT)
+        if (h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT)
             return 0;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
                 return (uint8 *)((uint8*)this + 8 + h->offsData2b);
-            return (uint8 *)((uint8*)this + 8 + h->offsData2b + (h->width+1)*(h->height+1)*4);
+            return (uint8 *)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
         return 0;
     }
 
     uint32 *getLiquidFullLightMap(adt_liquid_header *h)
     {
-        if (!(h->formatFlags&ADT_LIQUID_HEADER_FULL_LIGHT))
+        if (!(h->formatFlags & ADT_LIQUID_HEADER_FULL_LIGHT))
             return 0;
         if (h->offsData2b)
         {
             if (h->formatFlags & ADT_LIQUID_HEADER_NO_HIGHT)
                 return (uint32 *)((uint8*)this + 8 + h->offsData2b);
-            return (uint32 *)((uint8*)this + 8 + h->offsData2b + (h->width+1)*(h->height+1)*4);
+            return (uint32 *)((uint8*)this + 8 + h->offsData2b + (h->width + 1) * (h->height + 1) * 4);
         }
         return 0;
     }
@@ -249,7 +276,8 @@ public:
 //
 class adt_MHDR
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -280,7 +308,8 @@ public:
 
 };
 
-class ADT_file : public FileLoader{
+class ADT_file : public FileLoader
+{
 public:
     bool prepareLoadedData();
     ADT_file();
