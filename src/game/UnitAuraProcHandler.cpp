@@ -833,6 +833,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                             break;
                         }
                         case CLASS_ROGUE:                   // 39511,40997,40998,41002,41005,41011
+                        case CLASS_MONK:                   // 39511,40997,40998,41002,41005,41011
                         case CLASS_WARRIOR:                 // 39511,40997,40998,41002,41005,41011
                         {
                             uint32 RandomSpell[] = {39511, 40997, 40998, 41002, 41005, 41011};
@@ -1982,6 +1983,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                         case CLASS_ROGUE:
                             triggered_spell_id = 28791;     // Increases the friendly target's attack power by $s1 for $d.
                             break;
+                        case CLASS_MONK:
+                            triggered_spell_id = 28791;     // Increases the friendly target's attack power by $s1 for $d.
+                            break;
                         case CLASS_WARRIOR:
                             triggered_spell_id = 28790;     // Increases the friendly target's armor
                             break;
@@ -2257,6 +2261,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                             break;
                         case CLASS_HUNTER:
                         case CLASS_ROGUE:
+                            triggered_spell_id = 28826;     // Increases the friendly target's attack power by $s1 for $d.
+                            break;
+                        case CLASS_MONK:
                             triggered_spell_id = 28826;     // Increases the friendly target's attack power by $s1 for $d.
                             break;
                         case CLASS_WARRIOR:
@@ -3833,6 +3840,7 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit* pVictim, uint3
                 case POWER_MANA:        triggered_spell_id = 48542; break;
                 case POWER_RAGE:        triggered_spell_id = 48541; break;
                 case POWER_ENERGY:      triggered_spell_id = 48540; break;
+                case POWER_CHI:         triggered_spell_id = 48540; break;
                 case POWER_RUNIC_POWER: triggered_spell_id = 48543; break;
                 default: return SPELL_AURA_PROC_FAILED;
             }
