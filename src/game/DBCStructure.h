@@ -1327,6 +1327,26 @@ struct MapDifficultyEntry
     DBCString   difficultyString;                           // 6        m_difficultystring
 };
 
+struct MountCapabilityEntry
+{
+    uint32 Id;
+    uint32 Flags;
+    uint32 RequiredRidingSkill;
+    uint32 RequiredArea;
+    uint32 RequiredAura;
+    uint32 RequiredSpell;
+    uint32 SpeedModSpell;
+    int32  RequiredMap;
+};
+
+#define MAX_MOUNT_CAPABILITIES 24
+
+struct MountTypeEntry
+{
+    uint32 Id;
+    uint32 MountCapability[MAX_MOUNT_CAPABILITIES];
+};
+
 struct MovieEntry
 {
     uint32      Id;                                         // 0        m_ID

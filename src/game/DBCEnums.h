@@ -421,6 +421,12 @@ enum ItemLimitCategoryMode
     ITEM_LIMIT_CATEGORY_MODE_EQUIP = 1,                      // limit applied to amount equipped items (including used gems)
 };
 
+enum MountFlags
+{
+    MOUNT_FLAG_CAN_PITCH                = 0x4,
+    MOUNT_FLAG_CAN_SWIM                 = 0x8,
+};
+
 // some used in code cases
 enum ItemLimitCategory
 {
