@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D4624B20-AC1E-4EE9-8C9C-0FB65EEE3393}</ProjectGuid>
-    <RootNamespace>vmapExtractor4</RootNamespace>
+    <RootNamespace>vmapExtractor</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vmapExtractor4", "VC100\vmapExtractor4.vcxproj", "{D4624B20-AC1E-4EE9-8C9C-0FB65EEE3393}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vmapExtractor", "VC100\vmapExtractor.vcxproj", "{D4624B20-AC1E-4EE9-8C9C-0FB65EEE3393}"
 	ProjectSection(ProjectDependencies) = postProject
 		{78424708-1F6E-4D4B-920C-FB6D26847055} = {78424708-1F6E-4D4B-920C-FB6D26847055}
 		{B96F612A-C91D-43B3-A4C3-D4294817EC6C} = {B96F612A-C91D-43B3-A4C3-D4294817EC6C}

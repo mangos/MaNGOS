@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="vmapExtractor3"
+	Name="vmapExtractor"
 	ProjectGUID="{D4624B20-AC1E-4EE9-8C9C-0FB65EEE3393}"
-	RootNamespace="vmapExtractor3"
+	RootNamespace="vmapExtractor"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>

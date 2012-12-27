@@ -9,7 +9,7 @@ Linux:
 	$ ./configure
 	$ make
 
-	After that, cd to contrib/vmap_extractor_v4/ and execute:
+	After that, cd to contrib/vmap_extractor/ and execute:
 
 	$ cmake .
 	$ make
@@ -30,8 +30,8 @@ Windows:
 
 1. Building
 
-	Just build the solution in contrib\vmap_extractor_v2\win
-	Resulting binaries will be in contrib\vmap_extractor_v2\bin\$(PlatformName)_$(ConfigurationName)
+	Just build the solution in contrib\vmap_extractor\win
+	Resulting binaries will be in contrib\vmap_extractor\bin\$(PlatformName)_$(ConfigurationName)
 
 2. Extracting
 

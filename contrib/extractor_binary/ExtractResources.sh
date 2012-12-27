@@ -144,11 +144,11 @@ fi
 if [ "$USE_VMAPS" = "1" ]
 then
   echo "`date`: Start extraction of vmaps..." | tee -a $LOG_FILE
-  vmapExtractor4 | tee -a $DETAIL_LOG_FILE
+  vmapExtractor | tee -a $DETAIL_LOG_FILE
   echo "`date`: Extracting of vmaps finished" | tee -a $LOG_FILE
   mkdir vmaps
   echo "`date`: Start assembling of vmaps..." | tee -a $LOG_FILE
-  vmap_assembler.exe buildings vmaps | tee -a $DETAIL_LOG_FILE
+  vmap_assembler buildings vmaps | tee -a $DETAIL_LOG_FILE
   echo "`date`: Assembling of vmaps finished" | tee -a $LOG_FILE
 
   echo | tee -a $LOG_FILE
@@ -158,5 +158,5 @@ fi
 ## Extract mmaps
 if [ "$USE_MMAPS" = "1" ]
 then
-  MoveMapGen.sh $NUM_CPU $LOG_FILE $DETAIL_LOG_FILE
+  sh MoveMapGen.sh $NUM_CPU $LOG_FILE $DETAIL_LOG_FILE
 fi

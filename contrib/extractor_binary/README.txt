@@ -31,6 +31,6 @@ MaNGOSExtractor_detailed.log which includes all the information about the extrac
 
 If you want to toggle some parts in the extraction process, there are a few internal variables in the extraction scripts, that can be modified.
 
-Consider the Readme's in the directories extractor, vmap_assembler, vmap_extractor_v3 and mmap for further information about detail.
+Consider the Readme's in the directories extractor, vmap_assembler, vmap_extractor and mmap for further information about detail.
 
 Also especially related to mmaps updating you might be interested in using the MoveMapGen.sh script.
