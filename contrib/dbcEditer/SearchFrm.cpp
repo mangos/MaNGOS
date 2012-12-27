@@ -7,20 +7,20 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TFrmSearch *FrmSearch;
+TFrmSearch* FrmSearch;
 //---------------------------------------------------------------------------
 __fastcall TFrmSearch::TFrmSearch(TComponent* Owner)
-        : TForm(Owner)
+    : TForm(Owner)
 {
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmSearch::btOkClick(TObject *Sender)
+void __fastcall TFrmSearch::btOkClick(TObject* Sender)
 {
-     ModalResult = mrOk;
+    ModalResult = mrOk;
 }
 //---------------------------------------------------------------------------
-void __fastcall TFrmSearch::btCancelClick(TObject *Sender)
+void __fastcall TFrmSearch::btCancelClick(TObject* Sender)
 {
-     ModalResult = mrCancel;
+    ModalResult = mrCancel;
 }
 //---------------------------------------------------------------------------

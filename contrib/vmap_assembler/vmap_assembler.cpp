@@ -24,7 +24,7 @@
 //=======================================================
 int main(int argc, char* argv[])
 {
-    if(argc != 3)
+    if (argc != 3)
     {
         std::cout << "usage: " << argv[0] << " <raw data dir> <vmap dest dir>" << std::endl;
         return 1;
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
     VMAP::TileAssembler* ta = new VMAP::TileAssembler(src, dest);
 
-    if(!ta->convertWorld2())
+    if (!ta->convertWorld2())
     {
         std::cout << "exit with errors" << std::endl;
         delete ta;

@@ -22,32 +22,32 @@ int main(int argc, char* argv[])
 {
     char sPGhost[26], sPGport[26], sPGdb[26], sPGuser[26], sPGpass[26];
     printf("Postgres connection settings\n Host>");
-    scanf("%s",sPGhost);
+    scanf("%s", sPGhost);
     printf(" Port>");
-    scanf("%s",sPGport);
+    scanf("%s", sPGport);
     printf(" Base>");
-    scanf("%s",sPGdb);
+    scanf("%s", sPGdb);
     printf(" User>");
-    scanf("%s",sPGuser);
+    scanf("%s", sPGuser);
     printf(" Pass>");
-    scanf("%s",sPGpass);
+    scanf("%s", sPGpass);
 
     ///////////////////////////////
     ///////PGSQL Connect///////////
     ///////////////////////////////
-    PGconn *mPGconn=NULL;
-    mPGconn = PQsetdbLogin(sPGhost,sPGport, NULL, NULL, sPGdb, sPGuser, sPGpass);
+    PGconn* mPGconn = NULL;
+    mPGconn = PQsetdbLogin(sPGhost, sPGport, NULL, NULL, sPGdb, sPGuser, sPGpass);
 
     if (PQstatus(mPGconn) != CONNECTION_OK)
     {
-        printf("Could not connect to Postgre database at [%s]: \n %s\n",sPGhost, PQerrorMessage(mPGconn));
+        printf("Could not connect to Postgre database at [%s]: \n %s\n", sPGhost, PQerrorMessage(mPGconn));
         PQfinish(mPGconn);
         return 1;
     }
     else
     {
         printf("Connected to Postgre database at [%s]\n", sPGhost);
-        printf(" PostgreSQL server ver: [%d]\n\n",PQserverVersion(mPGconn));
+        printf(" PostgreSQL server ver: [%d]\n\n", PQserverVersion(mPGconn));
     }
 
     /// Set dummy notice processor
@@ -56,53 +56,53 @@ int main(int argc, char* argv[])
     ///////////////////////////////
     ///////MySQL Connect///////////
     ///////////////////////////////
-    MYSQL *mysqlInit;
+    MYSQL* mysqlInit;
     mysqlInit = mysql_init(NULL);
     if (!mysqlInit)
     {
-        printf( "Could not initialize Mysql connection\n" );
+        printf("Could not initialize Mysql connection\n");
         return 1;
     }
 
     char sMYhost[26], sMYdb[26], sMYuser[26], sMYpass[26];
     int    iMYport;
     printf("Mysql connection settings \n Host>");
-    scanf("%s",sMYhost);
+    scanf("%s", sMYhost);
     printf(" Port>");
-    scanf("%d",&iMYport);
+    scanf("%d", &iMYport);
     printf(" Base>");
-    scanf("%s",sMYdb);
+    scanf("%s", sMYdb);
     printf(" User>");
-    scanf("%s",sMYuser);
+    scanf("%s", sMYuser);
     printf(" Pass>");
-    scanf("%s",sMYpass);
+    scanf("%s", sMYpass);
 
-    mysql_options(mysqlInit,MYSQL_SET_CHARSET_NAME,"utf8");
+    mysql_options(mysqlInit, MYSQL_SET_CHARSET_NAME, "utf8");
 
-    MYSQL *mMysql;
+    MYSQL* mMysql;
     mMysql = mysql_real_connect(mysqlInit, sMYhost, sMYuser,  sMYpass, sMYdb, iMYport, NULL, 0);
 
     if (mMysql)
     {
-        printf( "Connected to MySQL database at [%s] \n", sMYhost);
-        printf( " MySQL client library: [%s] \n", mysql_get_client_info());
-        printf( " MySQL server ver: [%s] \n\n", mysql_get_server_info( mMysql));
+        printf("Connected to MySQL database at [%s] \n", sMYhost);
+        printf(" MySQL client library: [%s] \n", mysql_get_client_info());
+        printf(" MySQL server ver: [%s] \n\n", mysql_get_server_info(mMysql));
     }
     else
     {
-        printf("Could not connect to MySQL database at [%s]:\n %s\n", sMYhost ,mysql_error(mysqlInit));
+        printf("Could not connect to MySQL database at [%s]:\n %s\n", sMYhost , mysql_error(mysqlInit));
         mysql_close(mysqlInit);
         return 1;
     }
 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-    MYSQL_RES *result = NULL;
+    MYSQL_RES* result = NULL;
     MYSQL_ROW row;
-    MYSQL_FIELD *fields = NULL;
+    MYSQL_FIELD* fields = NULL;
     uint64 rowCount = 0;
-    uint32 fieldCount =0;
-    result = mysql_list_tables( mMysql , NULL );
+    uint32 fieldCount = 0;
+    result = mysql_list_tables(mMysql , NULL);
     rowCount   = mysql_num_rows(result);
 
     /***********************/
@@ -110,9 +110,9 @@ int main(int argc, char* argv[])
     /***********************/
     T_TableList mTableList;
     mTableList.reserve((size_t)rowCount);
-    while( (row = mysql_fetch_row(result)) !=NULL )
+    while ((row = mysql_fetch_row(result)) != NULL)
     {
-        for (uint32 i = 0;i<mysql_num_fields(result);i++)
+        for (uint32 i = 0; i < mysql_num_fields(result); i++)
         {
             mTableList.push_back(row[i]);
         }
@@ -125,13 +125,13 @@ int main(int argc, char* argv[])
     T_Table m_Table;
     TDataBase m_DataBase_Map;
     m_DataBase_Map.clear();
-    for (uint32 j=0; j<mTableList.size();++j)
+    for (uint32 j = 0; j < mTableList.size(); ++j)
     {
         result     = mysql_list_fields(mMysql, mTableList[j].c_str(), NULL);
         fieldCount = mysql_num_fields(result);
         fields     = mysql_fetch_fields(result);
 
-        for (uint32 i=0; i<fieldCount;++i)
+        for (uint32 i = 0; i < fieldCount; ++i)
         {
             sField mfield;
             mfield.name   = fields[i].name;
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
             {
                 mfield.def = "NULL";
             }
-            else if (!strcmp(fields[i].def,"0000-00-00 00:00:00"))
+            else if (!strcmp(fields[i].def, "0000-00-00 00:00:00"))
             {
                 /// Convert MySQL Default timestamp to PGSQL Default timestamp
                 mfield.def.append("'1970-01-01 00:00:00'");
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
                 mfield.def.append(fields[i].def);;
                 mfield.def.append("'");
             }
-            mfield.type = ConvertNativeType(fields[i].type,fields[i].length);
+            mfield.type = ConvertNativeType(fields[i].type, fields[i].length);
             mfield.flags  = fields[i].flags;
             m_Table.push_back(mfield);
         }
@@ -169,31 +169,31 @@ int main(int argc, char* argv[])
     for (citr = m_DataBase_Map.begin(); citr != m_DataBase_Map.end(); ++citr)
     {
         ostringstream sql_str;
-        sql_str<<"DROP TABLE IF EXISTS "<<(*citr).first.c_str()<<";\n";
-        sql_str<<"CREATE TABLE "<<(*citr).first.c_str()<<"(\n";
+        sql_str << "DROP TABLE IF EXISTS " << (*citr).first.c_str() << ";\n";
+        sql_str << "CREATE TABLE " << (*citr).first.c_str() << "(\n";
 
         T_Table::const_iterator v_iter;
         ostringstream prim_key_str;
         ostringstream index_str;
         for (v_iter = (*citr).second.begin();
-            v_iter != (*citr).second.end();
-            ++v_iter)
+                v_iter != (*citr).second.end();
+                ++v_iter)
         {
-            sql_str<<" "<<(*v_iter).name;
-            if (((*v_iter).flags & AUTO_INCREMENT_FLAG)!=0)
+            sql_str << " " << (*v_iter).name;
+            if (((*v_iter).flags & AUTO_INCREMENT_FLAG) != 0)
             {
                 /// AUTO_INCREMENT fields not have "default" data
-                sql_str<<" bigserial";
+                sql_str << " bigserial";
             }
             else
             {
-                sql_str<<" "<<(*v_iter).type;
-                sql_str<<" default "<<(*v_iter).def;
+                sql_str << " " << (*v_iter).type;
+                sql_str << " default " << (*v_iter).def;
             }
             /// IF column have PRIMARY KEY flag then use column in PRIMARY KEY
-            if (IS_PRI_KEY( (*v_iter).flags )!=0)
+            if (IS_PRI_KEY((*v_iter).flags) != 0)
             {
-                if( prim_key_str.str().size())
+                if (prim_key_str.str().size())
                     prim_key_str << ", ";
                 else
                 {
@@ -205,9 +205,9 @@ int main(int argc, char* argv[])
                     prim_key_str << (*v_iter).name;
                     prim_key_str << " PRIMARY KEY (";
                 }
-                prim_key_str<<(*v_iter).name;
+                prim_key_str << (*v_iter).name;
             }
-            else if (((*v_iter).flags & MULTIPLE_KEY_FLAG)!=0)
+            else if (((*v_iter).flags & MULTIPLE_KEY_FLAG) != 0)
             {
                 /// IF column have INDEX flag then create INDEX
                 index_str << "CREATE INDEX  idx_";
@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
                 index_str << (*v_iter).name;
                 index_str << ");\n";
             }
-            else if (((*v_iter).flags & UNIQUE_KEY_FLAG)!=0)
+            else if (((*v_iter).flags & UNIQUE_KEY_FLAG) != 0)
             {
                 /// IF column have UNIQUE INDEX flag then create INDEX
                 index_str << "CREATE UNIQUE INDEX  uidx_";
@@ -234,29 +234,29 @@ int main(int argc, char* argv[])
                 index_str << ");\n";
             }
             /// don't output "," for last column
-            if(v_iter + 1 != (*citr).second.end())
-                sql_str<< ",\n";
+            if (v_iter + 1 != (*citr).second.end())
+                sql_str << ",\n";
             else
-                sql_str<< "\n";
+                sql_str << "\n";
         }
-        sql_str<< ")\n";
+        sql_str << ")\n";
 
         /// Out Table structure
-        PG_Exec_str(sql_str.str(),mPGconn);
+        PG_Exec_str(sql_str.str(), mPGconn);
 
         /// out PRIMARY KEY
-        if(prim_key_str.str().size())
+        if (prim_key_str.str().size())
         {
-            prim_key_str<<")";
-            PG_Exec_str(prim_key_str.str(),mPGconn);
+            prim_key_str << ")";
+            PG_Exec_str(prim_key_str.str(), mPGconn);
         }
 
         /// out INDEX's
         if (index_str.str().size())
-            PG_Exec_str(index_str.str(),mPGconn);
+            PG_Exec_str(index_str.str(), mPGconn);
 
         ++count;
-        printf("Convert [%d] tables...\r",count);
+        printf("Convert [%d] tables...\r", count);
     }
     printf("Completed the conversion of [%d] tables!\n", count);
 
@@ -265,18 +265,18 @@ int main(int argc, char* argv[])
     /****************/
 
     count = 0;
-    for (uint32 j=0; j<mTableList.size();++j)
+    for (uint32 j = 0; j < mTableList.size(); ++j)
     {
         ostringstream sql_str;
         sql_str << "SELECT * FROM ";
         sql_str << mTableList[j].c_str();
 
-        if (mysql_query(mysqlInit,sql_str.str().c_str()) )
+        if (mysql_query(mysqlInit, sql_str.str().c_str()))
             continue;
         if (!(result = mysql_store_result(mysqlInit)))
             continue;
 
-        while ((row = mysql_fetch_row(result))!=NULL)
+        while ((row = mysql_fetch_row(result)) != NULL)
         {
             ostringstream insert_str;
             insert_str << "INSERT INTO ";
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
                         insert_str << field_str.c_str();
                         insert_str << "'";
                     }
-                    else if (!strcmp(row[i],"0000-00-00 00:00:00"))
+                    else if (!strcmp(row[i], "0000-00-00 00:00:00"))
                     {
                         /// Convert MySQL  timestamp to PGSQL timestamp
                         insert_str << "'1970-01-01 00:00:00'";
@@ -313,18 +313,18 @@ int main(int argc, char* argv[])
                 }
 
                 /// don't output "," for last column
-                if(i + 1 != fieldCount )
-                    insert_str<< ",";
+                if (i + 1 != fieldCount)
+                    insert_str << ",";
                 else
-                    insert_str<< ")\n";
+                    insert_str << ")\n";
             }
             PG_Exec_str(insert_str.str(), mPGconn);
         }
         mysql_free_result(result);
         ++count;
-        printf("Copied data from [%d] tables...\r",count);
+        printf("Copied data from [%d] tables...\r", count);
     }
-    printf("Finished copying the data from [%d] tables!\n",count);
+    printf("Finished copying the data from [%d] tables!\n", count);
     mTableList.clear();
     m_DataBase_Map.clear();
 

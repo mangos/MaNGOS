@@ -34,7 +34,7 @@ typedef struct
     float x;
     float y;
     float z;
-}svec;
+} svec;
 
 struct vec
 {
@@ -50,9 +50,9 @@ struct triangle
 
 typedef struct
 {
-    float v9[16*8+1][16*8+1];
-    float v8[16*8][16*8];
-}Cell;
+    float v9[16 * 8 + 1][16 * 8 + 1];
+    float v8[16 * 8][16 * 8];
+} Cell;
 
 typedef struct
 {
@@ -62,12 +62,12 @@ typedef struct
     //Liquid *lq;
     float waterlevel[9][9];
     uint8 flag;
-}chunk;
+} chunk;
 
 typedef struct
 {
     chunk ch[16][16];
-}mcell;
+} mcell;
 
 struct MapChunkHeader
 {
@@ -109,35 +109,35 @@ struct MapChunkHeader
 
 class ADTFile
 {
-public:
-    ADTFile(char* filename);
-    ~ADTFile();
-    int nWMO;
-    int nMDX;
-    string* WmoInstansName;
-    string* ModelInstansName;
-    bool init(uint32 map_num, uint32 tileX, uint32 tileY);
-    //void LoadMapChunks();
+    public:
+        ADTFile(char* filename);
+        ~ADTFile();
+        int nWMO;
+        int nMDX;
+        string* WmoInstansName;
+        string* ModelInstansName;
+        bool init(uint32 map_num, uint32 tileX, uint32 tileY);
+        //void LoadMapChunks();
 
-    //uint32 wmo_count;
-/*
-    const mcell& Getmcell() const
-    {
-        return Mcell;
-    }
-*/
-private:
-    //size_t mcnk_offsets[256], mcnk_sizes[256];
-    MPQFile ADT;
-    //mcell Mcell;
-    string Adtfilename;
+        //uint32 wmo_count;
+        /*
+            const mcell& Getmcell() const
+            {
+                return Mcell;
+            }
+        */
+    private:
+        //size_t mcnk_offsets[256], mcnk_sizes[256];
+        MPQFile ADT;
+        //mcell Mcell;
+        string Adtfilename;
 };
 
-const char * GetPlainName(const char * FileName);
-char * GetPlainName(char * FileName);
-char * GetExtension(char * FileName);
-void fixnamen(char *name, size_t len);
-void fixname2(char *name, size_t len);
+const char* GetPlainName(const char* FileName);
+char* GetPlainName(char* FileName);
+char* GetExtension(char* FileName);
+void fixnamen(char* name, size_t len);
+void fixname2(char* name, size_t len);
 //void fixMapNamen(char *name, size_t len);
 
 #endif

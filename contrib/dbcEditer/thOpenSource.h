@@ -7,17 +7,17 @@
 //---------------------------------------------------------------------------
 class thOpenFile : public TThread
 {
-private:
-protected:
+    private:
+    protected:
         void __fastcall Execute();
         void __fastcall RunOpen();
-public:
-         bool       thEnd;
-         int   ColType[10000];
+    public:
+        bool       thEnd;
+        int   ColType[10000];
 
         __fastcall thOpenFile(bool CreateSuspended);
-        void LoadAndModify(const char * pszFileName);
-        void ReadAndModifyFromBuff(char *pBuff, DWORD dwSize, const char* pszFileName);
+        void LoadAndModify(const char* pszFileName);
+        void ReadAndModifyFromBuff(char* pBuff, DWORD dwSize, const char* pszFileName);
 
 };
 //---------------------------------------------------------------------------

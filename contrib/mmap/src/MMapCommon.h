@@ -30,8 +30,8 @@
 #include "Platform/Define.h"
 
 #ifndef WIN32
-    #include <stddef.h>
-    #include <dirent.h>
+#include <stddef.h>
+#include <dirent.h>
 #endif
 
 using namespace std;
@@ -40,27 +40,27 @@ namespace MMAP
 {
     inline bool matchWildcardFilter(const char* filter, const char* str)
     {
-        if(!filter || !str)
+        if (!filter || !str)
             return false;
 
         // end on null character
-        while(*filter && *str)
+        while (*filter && *str)
         {
-            if(*filter == '*')
+            if (*filter == '*')
             {
-                if(*++filter == '\0')   // wildcard at end of filter means all remaing chars match
+                if (*++filter == '\0')  // wildcard at end of filter means all remaing chars match
                     return true;
 
-                while(true)
+                while (true)
                 {
-                    if(*filter == *str)
+                    if (*filter == *str)
                         break;
-                    if(*str == '\0')
+                    if (*str == '\0')
                         return false;   // reached end of string without matching next filter character
                     str++;
                 }
             }
-            else if(*filter != *str)
+            else if (*filter != *str)
                 return false;           // mismatch
 
             filter++;
@@ -76,9 +76,9 @@ namespace MMAP
         LISTFILE_OK = 1
     };
 
-    inline ListFilesResult getDirContents(vector<string> &fileList, string dirpath = ".", string filter = "*", bool includeSubDirs = false)
+    inline ListFilesResult getDirContents(vector<string>& fileList, string dirpath = ".", string filter = "*", bool includeSubDirs = false)
     {
-    #ifdef WIN32
+#ifdef WIN32
         HANDLE hFind;
         WIN32_FIND_DATA findFileInfo;
         string directory;
@@ -87,40 +87,40 @@ namespace MMAP
 
         hFind = FindFirstFile(directory.c_str(), &findFileInfo);
 
-        if(hFind == INVALID_HANDLE_VALUE)
+        if (hFind == INVALID_HANDLE_VALUE)
             return LISTFILE_DIRECTORY_NOT_FOUND;
 
         do
         {
-            if(includeSubDirs || (findFileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+            if (includeSubDirs || (findFileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
                 fileList.push_back(string(findFileInfo.cFileName));
         }
         while (FindNextFile(hFind, &findFileInfo));
 
         FindClose(hFind);
 
-    #else
-        const char *p = dirpath.c_str();
-        DIR * dirp = opendir(p);
-        struct dirent * dp;
+#else
+        const char* p = dirpath.c_str();
+        DIR* dirp = opendir(p);
+        struct dirent* dp;
 
         while (dirp)
         {
             errno = 0;
             if ((dp = readdir(dirp)) != NULL)
             {
-                if(matchWildcardFilter(filter.c_str(), dp->d_name))
+                if (matchWildcardFilter(filter.c_str(), dp->d_name))
                     fileList.push_back(string(dp->d_name));
             }
             else
                 break;
         }
 
-        if(dirp)
+        if (dirp)
             closedir(dirp);
         else
             return LISTFILE_DIRECTORY_NOT_FOUND;
-    #endif
+#endif
 
         return LISTFILE_OK;
     }

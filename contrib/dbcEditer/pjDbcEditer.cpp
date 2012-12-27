@@ -9,29 +9,29 @@ USEFORM("SearchFrm.cpp", FrmSearch);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
+    try
+    {
+        Application->Initialize();
+        Application->CreateForm(__classid(TFrmMain), &FrmMain);
+        Application->CreateForm(__classid(TFrmTitle), &FrmTitle);
+        Application->CreateForm(__classid(TFrmSearch), &FrmSearch);
+        Application->Run();
+    }
+    catch (Exception& exception)
+    {
+        Application->ShowException(&exception);
+    }
+    catch (...)
+    {
         try
         {
-                 Application->Initialize();
-                 Application->CreateForm(__classid(TFrmMain), &FrmMain);
-                 Application->CreateForm(__classid(TFrmTitle), &FrmTitle);
-                 Application->CreateForm(__classid(TFrmSearch), &FrmSearch);
-                 Application->Run();
+            throw Exception("");
         }
-        catch (Exception &exception)
+        catch (Exception& exception)
         {
-                 Application->ShowException(&exception);
+            Application->ShowException(&exception);
         }
-        catch (...)
-        {
-                 try
-                 {
-                         throw Exception("");
-                 }
-                 catch (Exception &exception)
-                 {
-                         Application->ShowException(&exception);
-                 }
-        }
-        return 0;
+    }
+    return 0;
 }
 //---------------------------------------------------------------------------

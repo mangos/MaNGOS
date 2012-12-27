@@ -53,12 +53,12 @@ typedef uint8_t            uint8;
 #endif
 
 typedef std::deque<HANDLE> ArchiveSet;
-typedef std::pair<ArchiveSet::const_iterator,ArchiveSet::const_iterator> ArchiveSetBounds;
+typedef std::pair<ArchiveSet::const_iterator, ArchiveSet::const_iterator> ArchiveSetBounds;
 
 bool OpenArchive(char const* mpqFileName, HANDLE* mpqHandlePtr = NULL);
 bool OpenNewestFile(char const* filename, HANDLE* fileHandlerPtr);
 ArchiveSetBounds GetArchivesBounds();
-bool ExtractFile( char const* mpq_name, std::string const& filename );
+bool ExtractFile(char const* mpq_name, std::string const& filename);
 void CloseArchives();
 
 #define FILE_FORMAT_VERSION    18
@@ -79,17 +79,17 @@ struct file_MVER
 
 class FileLoader
 {
-    uint8  *data;
-    uint32  data_size;
-public:
-    virtual bool prepareLoadedData();
-    uint8 *GetData()     {return data;}
-    uint32 GetDataSize() {return data_size;}
+        uint8*  data;
+        uint32  data_size;
+    public:
+        virtual bool prepareLoadedData();
+        uint8* GetData()     {return data;}
+        uint32 GetDataSize() {return data_size;}
 
-    file_MVER *version;
-    FileLoader();
-    ~FileLoader();
-    bool loadFile(char *filename, bool log = true);
-    virtual void free();
+        file_MVER* version;
+        FileLoader();
+        ~FileLoader();
+        bool loadFile(char* filename, bool log = true);
+        virtual void free();
 };
 #endif

@@ -39,19 +39,19 @@
 #include <fcntl.h>
 
 #if defined( __GNUC__ )
-    #define _open   open
-    #define _close close
-    #ifndef O_BINARY
-        #define O_BINARY 0
-    #endif
+#define _open   open
+#define _close close
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 #else
-    #include <io.h>
+#include <io.h>
 #endif
 
 #ifdef O_LARGEFILE
-    #define OPEN_FLAGS  (O_RDONLY | O_BINARY | O_LARGEFILE)
+#define OPEN_FLAGS  (O_RDONLY | O_BINARY | O_LARGEFILE)
 #else
-    #define OPEN_FLAGS (O_RDONLY | O_BINARY)
+#define OPEN_FLAGS (O_RDONLY | O_BINARY)
 #endif
 
 typedef struct
@@ -60,9 +60,9 @@ typedef struct
     uint32 id;
 } map_id;
 
-map_id *map_ids;
-uint16 *areas;
-uint16 *LiqType;
+map_id* map_ids;
+uint16* areas;
+uint16* LiqType;
 char output_path[128] = ".";
 char input_path[128] = ".";
 uint32 maxAreaId = 0;
@@ -134,7 +134,7 @@ void Usage(char* prg)
     exit(1);
 }
 
-void HandleArgs(int argc, char * arg[])
+void HandleArgs(int argc, char* arg[])
 {
     for (int c = 1; c < argc; ++c)
     {
@@ -177,7 +177,7 @@ void HandleArgs(int argc, char * arg[])
                     Usage(arg[0]);
                 break;
             case 'b':
-                if(c + 1 < argc)                            // all ok
+                if (c + 1 < argc)                           // all ok
                 {
                     CONF_max_build = atoi(arg[(c++) + 1]);
                     if (CONF_max_build < MIN_SUPPORTED_BUILD)
@@ -228,7 +228,7 @@ void AppendDB2FileListTo(HANDLE mpqHandle, std::set<std::string>& filelist)
 uint32 ReadBuild(int locale)
 {
     // include build info file also
-    std::string filename  = std::string("component.wow-")+langs[locale]+".txt";
+    std::string filename  = std::string("component.wow-") + langs[locale] + ".txt";
     //printf("Read %s file... ", filename.c_str());
 
     HANDLE fileHandle;
@@ -254,14 +254,14 @@ uint32 ReadBuild(int locale)
 
     size_t pos = text.find("version=\"");
     size_t pos1 = pos + strlen("version=\"");
-    size_t pos2 = text.find("\"",pos1);
+    size_t pos2 = text.find("\"", pos1);
     if (pos == text.npos || pos2 == text.npos || pos1 >= pos2)
     {
         printf("Fatal error: Invalid  %s file format!\n", filename.c_str());
         exit(1);
     }
 
-    std::string build_str = text.substr(pos1,pos2-pos1);
+    std::string build_str = text.substr(pos1, pos2 - pos1);
 
     int build = atoi(build_str.c_str());
     if (build <= 0)
@@ -482,7 +482,7 @@ uint8 liquid_type[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 bool  liquid_show[ADT_GRID_SIZE][ADT_GRID_SIZE];
 float liquid_height[ADT_GRID_SIZE + 1][ADT_GRID_SIZE + 1];
 
-bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 build)
+bool ConvertADT(char* filename, char* filename2, int cell_y, int cell_x, uint32 build)
 {
     ADT_file adt;
 
@@ -503,7 +503,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
     {
         for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
         {
-            adt_MCNK * cell = adt.cells[i][j];
+            adt_MCNK* cell = adt.cells[i][j];
             uint32 areaid = cell->areaid;
             if (areaid && areaid <= maxAreaId)
             {
@@ -558,7 +558,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
     {
         for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
         {
-            adt_MCNK * cell = adt.cells[i][j];
+            adt_MCNK* cell = adt.cells[i][j];
             if (!cell)
                 continue;
             // Height values for triangles stored in order:
@@ -597,7 +597,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
                 }
             }
             // Get custom height
-            adt_MCVT *v = cell->getMCVT();
+            adt_MCVT* v = cell->getMCVT();
             if (!v)
                 continue;
             // get V9 height map
@@ -725,14 +725,14 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
     }
 
     // Get liquid map for grid (in WOTLK used MH2O chunk)
-    adt_MH2O * h2o = adt.a_grid->getMH2O();
+    adt_MH2O* h2o = adt.a_grid->getMH2O();
     if (h2o)
     {
         for (int i = 0; i < ADT_CELLS_PER_GRID; i++)
         {
             for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
             {
-                adt_liquid_header *h = h2o->getLiquidData(i, j);
+                adt_liquid_header* h = h2o->getLiquidData(i, j);
                 if (!h)
                     continue;
 
@@ -767,7 +767,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
                 // Dark water detect
                 if (type == LIQUID_TYPE_OCEAN)
                 {
-                    uint8 *lm = h2o->getLiquidLightMap(h);
+                    uint8* lm = h2o->getLiquidLightMap(h);
                     if (!lm)
                         liquid_type[i][j] |= MAP_LIQUID_TYPE_DARK_WATER;
                 }
@@ -775,7 +775,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
                 if (!count && liquid_type[i][j])
                     printf("Wrong liquid detect in MH2O chunk");
 
-                float *height = h2o->getLiquidHeightMap(h);
+                float* height = h2o->getLiquidHeightMap(h);
                 int pos = 0;
                 for (int y = 0; y <= h->height; y++)
                 {
@@ -800,11 +800,11 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
         {
             for (int j = 0; j < ADT_CELLS_PER_GRID; j++)
             {
-                adt_MCNK *cell = adt.cells[i][j];
+                adt_MCNK* cell = adt.cells[i][j];
                 if (!cell)
                     continue;
 
-                adt_MCLQ *liquid = cell->getMCLQ();
+                adt_MCLQ* liquid = cell->getMCLQ();
                 int count = 0;
                 if (!liquid || cell->sizeMCLQ <= 8)
                     continue;
@@ -945,7 +945,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
     {
         for (int j = 0; j < ADT_CELLS_PER_GRID; ++j)
         {
-            adt_MCNK * cell = adt.cells[i][j];
+            adt_MCNK* cell = adt.cells[i][j];
             if (!cell)
                 continue;
             holes[i][j] = cell->holes;
@@ -953,7 +953,7 @@ bool ConvertADT(char *filename, char *filename2, int cell_y, int cell_x, uint32 
     }
 
     // Ok all data prepared - store it
-    FILE *output = fopen(filename2, "wb");
+    FILE* output = fopen(filename2, "wb");
     if (!output)
     {
         printf("Can't create the output file '%s'\n", filename2);
@@ -1013,7 +1013,7 @@ void ExtractMapsFromMpq(uint32 build, const int locale)
     char output_filename[1024];
     char mpq_map_name[1024];
 
-    printf("\nExtracting maps for build %u...\n",build);
+    printf("\nExtracting maps for build %u...\n", build);
 
     uint32 map_count = ReadMapDBC(locale);
 
@@ -1063,7 +1063,7 @@ void ExtractDBCFiles(int locale, bool basicLocale)
 
     // get DBC file list
     ArchiveSetBounds archives = GetArchivesBounds();
-    for(ArchiveSet::const_iterator i = archives.first; i != archives.second;++i)
+    for (ArchiveSet::const_iterator i = archives.first; i != archives.second; ++i)
     {
         AppendDBCFileListTo(*i, dbcfiles);
         AppendDB2FileListTo(*i, dbcfiles);
@@ -1100,30 +1100,30 @@ void ExtractDBCFiles(int locale, bool basicLocale)
     printf("Extracted %u DBC/DB2 files\n\n", count);
 }
 
-typedef std::pair<std::string /*full_filename*/, char const* /*locale_prefix*/> UpdatesPair;
-typedef std::map<int /*build*/, UpdatesPair> Updates;
+typedef std::pair < std::string /*full_filename*/, char const* /*locale_prefix*/ > UpdatesPair;
+typedef std::map < int /*build*/, UpdatesPair > Updates;
 
 void AppendPatchMPQFilesToList(char const* subdir, char const* suffix, char const* section, Updates& updates)
 {
     char dirname[512];
     if (subdir)
-        sprintf(dirname,"%s/Data/%s", input_path, subdir);
+        sprintf(dirname, "%s/Data/%s", input_path, subdir);
     else
-        sprintf(dirname,"%s/Data", input_path);
+        sprintf(dirname, "%s/Data", input_path);
 
     char scanname[512];
     if (suffix)
-        sprintf(scanname,"wow-update-%s-%%u.MPQ", suffix);
+        sprintf(scanname, "wow-update-%s-%%u.MPQ", suffix);
     else
-        sprintf(scanname,"wow-update-%%u.MPQ");
+        sprintf(scanname, "wow-update-%%u.MPQ");
 
 #ifdef WIN32
 
     char maskname[512];
     if (suffix)
-        sprintf(maskname,"%s/wow-update-%s-*.MPQ", dirname, suffix);
+        sprintf(maskname, "%s/wow-update-%s-*.MPQ", dirname, suffix);
     else
-        sprintf(maskname,"%s/wow-update-*.MPQ", dirname);
+        sprintf(maskname, "%s/wow-update-*.MPQ", dirname);
 
     WIN32_FIND_DATA ffd;
     HANDLE hFind = FindFirstFile(maskname, &ffd);
@@ -1146,10 +1146,10 @@ void AppendPatchMPQFilesToList(char const* subdir, char const* suffix, char cons
 
 #else
 
-    if (DIR *dp  = opendir(dirname))
+    if (DIR* dp  = opendir(dirname))
     {
         int ubuild = 0;
-        dirent *dirp;
+        dirent* dirp;
         while ((dirp = readdir(dp)) != NULL)
             if (sscanf(dirp->d_name, scanname, &ubuild) == 1 && (!CONF_max_build || ubuild <= CONF_max_build))
                 updates[ubuild] = UpdatesPair(dirp->d_name, section);
@@ -1185,9 +1185,9 @@ void LoadLocaleMPQFiles(int const locale)
     for (Updates::const_iterator itr = updates.begin(); itr != updates.end(); ++itr)
     {
         if (!itr->second.second)
-            sprintf(filename,"%s/Data/%s/%s", input_path, langs[locale], itr->second.first.c_str());
+            sprintf(filename, "%s/Data/%s/%s", input_path, langs[locale], itr->second.first.c_str());
         else
-            sprintf(filename,"%s/Data/%s", input_path, itr->second.first.c_str());
+            sprintf(filename, "%s/Data/%s", input_path, itr->second.first.c_str());
 
         //if (!OpenArchive(filename))
         if (!SFileOpenPatchArchive(localeMpqHandle, filename, itr->second.second ? itr->second.second : "", 0))
@@ -1234,7 +1234,7 @@ void LoadBaseMPQFiles()
 
     for (Updates::const_iterator itr = updates.begin(); itr != updates.end(); ++itr)
     {
-        sprintf(filename,"%s/Data/%s", input_path, itr->second.first.c_str());
+        sprintf(filename, "%s/Data/%s", input_path, itr->second.first.c_str());
 
         printf("%s\n", filename);
 
@@ -1246,7 +1246,7 @@ void LoadBaseMPQFiles()
     }
 }
 
-int main(int argc, char * arg[])
+int main(int argc, char* arg[])
 {
     printf("\nMap & DBC Extractor\n");
     printf("===================\n\n");

@@ -69,7 +69,7 @@ bool DBCFile::open()
         return false;
 
     _data = new unsigned char[_recordSize * _recordCount + _stringSize];
-    _stringTable = _data + _recordSize*_recordCount;
+    _stringTable = _data + _recordSize * _recordCount;
 
     size_t data_size = _recordSize * _recordCount + _stringSize;
     readBytes = 0;
@@ -90,7 +90,7 @@ DBCFile::~DBCFile()
 DBCFile::Record DBCFile::getRecord(size_t id)
 {
     assert(_data);
-    return Record(*this, _data + id*_recordSize);
+    return Record(*this, _data + id * _recordSize);
 }
 
 size_t DBCFile::getMaxId()
@@ -98,7 +98,7 @@ size_t DBCFile::getMaxId()
     assert(_data);
 
     size_t maxId = 0;
-    for(size_t i = 0; i < getRecordCount(); ++i)
+    for (size_t i = 0; i < getRecordCount(); ++i)
         if (maxId < getRecord(i).getUInt(0))
             maxId = getRecord(i).getUInt(0);
 

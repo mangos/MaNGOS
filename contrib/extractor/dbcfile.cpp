@@ -21,7 +21,7 @@
 #include "dbcfile.h"
 #include "loadlib/loadlib.h"
 
-DBCFile::DBCFile(const std::string &filename):
+DBCFile::DBCFile(const std::string& filename):
     filename(filename),
     data(0)
 {
