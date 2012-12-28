@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2005-2012 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2005-2013 MaNGOS <http://getmangos.com/>
 #
 
 This small Python script is intended to help with the convertion
