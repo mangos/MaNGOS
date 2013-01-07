@@ -12,7 +12,10 @@
 #include "G3D/AtomicInt32.h"
 #include "G3D/debugAssert.h"
 #include <string>
-/* #include <unistd.h> */
+
+#ifndef _MSC_VER
+ #include <unistd.h>
+#endif
 
 #ifndef G3D_WIN32
 #   include <pthread.h>
