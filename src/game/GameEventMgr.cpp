@@ -153,6 +153,7 @@ void GameEventMgr::LoadFromDB()
 
             if (pGameEvent.occurence < pGameEvent.length)   // occurence < length is useless. This also asserts that occurence > 0!
             {
+                pGameEvent.length = 0;                      // disable event (GameEventData::isValid() returns false when it gets updated)
                 sLog.outErrorDb("`game_event` game event id (%i) has occurence %u  < length %u and can't be used.", event_id, pGameEvent.occurence, pGameEvent.length);
                 continue;
             }
@@ -623,6 +624,9 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
     uint32 calcDelay;
     for (uint16 itr = 1; itr < mGameEvent.size(); ++itr)
     {
+        if (!mGameEvent[itr].isValid())
+            continue;
+
         // sLog.outErrorDb("Checking event %u",itr);
         if (CheckOneGameEvent(itr, currenttime))
         {
