@@ -9,7 +9,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cmake_minimum_required (VERSION 2.6)
-project (EXTRACT)
+project (MANGOS_VMAP_EXTRACT_IO)
 
 # All .cpp files are part of the executable...
 file(GLOB src_files *.cpp)
