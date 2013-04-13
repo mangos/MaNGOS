@@ -9,8 +9,17 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 cmake_minimum_required (VERSION 2.6)
-project (MANGOS_IOMAP_EXTRACTOR)
+project (MANGOS_VMAP_EXTRACT_IO)
 
-LINK_DIRECTORIES( ${LINK_DIRECTORIES} ../../../dep/libmpq/libmpq/.libs/ )
-add_executable(vmapextractor adtfile.cpp  dbcfile.cpp  model.cpp  mpq_libmpq.cpp  vmapexport.cpp  wdtfile.cpp  wmo.cpp)
-target_link_libraries(vmapextractor libmpq.a bz2 z)
+# All .cpp files are part of the executable...
+file(GLOB src_files *.cpp)
+add_executable(vmapextractor ${src_files})
+
+# Needed for the StormLIb headers
+include_directories (${CMAKE_CURRENT_SOURCE_DIR}/../../../dep/StormLib/src)
+
+# Make sure the linker can find StormLib.
+link_directories (${EXTRACT_SOURCE_DIR}/StormLib)
+
+target_link_libraries(vmapextractor storm)
+
