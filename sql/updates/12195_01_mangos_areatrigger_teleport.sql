@@ -1,3 +1,0 @@
-ALTER TABLE db_version CHANGE COLUMN required_12186_01_mangos_item_template required_12195_01_mangos_areatrigger_teleport bit;
-
-ALTER TABLE areatrigger_teleport DROP COLUMN required_failed_text;

@@ -1,3 +1,0 @@
-ALTER TABLE db_version CHANGE COLUMN required_2008_11_18_02_mangos_mangos_string required_2008_11_27_01_mangos_playercreateinfo_item bit;
-
-TRUNCATE  TABLE playercreateinfo_item;

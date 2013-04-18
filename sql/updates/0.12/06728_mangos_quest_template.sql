@@ -1,1 +1,0 @@
-ALTER TABLE `quest_template` ADD COLUMN `Method` tinyint(3) unsigned NOT NULL default '2' AFTER `entry`;
