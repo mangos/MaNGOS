@@ -5,7 +5,6 @@
 ----
 
 * [**Official MaNGOS Site**](http://getmangos.co.uk/)  
-* [**Official MaNGOS Community Forum (Safe Haven)**](http://www.mangosbackupforum.com/)  
 
 ----
 
