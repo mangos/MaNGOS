@@ -1,8 +1,10 @@
 ----
-#MaNGOS is Back
+#Welcome to MaNGOS
 ----
 **Official Websites**
 ----
+
+This is the central Repository for those lost souls who have ended up here but there is plenty to see and do at our main areas.
 
 * [**Official MaNGOS Site**](http://getmangos.co.uk/)  
 
