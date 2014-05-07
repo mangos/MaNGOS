@@ -33,3 +33,9 @@ We are also supporting a continuation of the Spurious project in the form of Man
 ----
 
 * [**Table of Contents**](http://github.com/mangoswiki/Wiki/wiki/Home)  
+
+
+---
+Proudly brought to you by:
+<br>
+[![getMaNGOS](https://www.getmangos.eu/!assets_mangos/logo.png)](http://getmangos.eu)
