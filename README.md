@@ -8,7 +8,7 @@ This is the central Repository for those lost souls who have ended up here but t
 
 We welcome contributions from anyone who is interested in helping out !
 
-* [**Official MaNGOS Site**](https://getmangos.co.uk/)  
+* [**Official MaNGOS Site**](https://getmangos.eu/)  
 
 ----
 
