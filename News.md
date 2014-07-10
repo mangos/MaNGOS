@@ -3,11 +3,29 @@ MaNGOS - History of visible changes
 
 Please visit the following websites for additional information:
 
-[MaNGOS Website](http://getmangos.co.uk/ "website") - Project Website for documentation and more<br>
-[MaNGOS Community Forum](http://community.getmangos.co.uk/ "Community Forum") - Discussion and Support Forums<br>
-[MaNGOS Wiki](https://github.com/mangoswiki/wiki/ "Wiki") - Our Wiki for Guides and FAQ's
+[MaNGOS Website](http://getmangos.eu "website") - Project Website for documentation and more<br>
+[MaNGOS Community Forum](http://getmangos.eu "Community Forum") - Discussion and Support Forums<br>
+[MaNGOS Wiki](https://github.com/mangoswiki/wiki/wiki/ "Wiki") - Our Wiki for Guides and FAQ's
 
 
+Version 0.19
+-
+### (2014-07-09) [MangosZero - Classic Wow] - Ludas Legacy
+
+ * MySQL client libs updated to 5.5
+ * OpenSSL lib upgrade to OpenSSL 1.0.1e
+ * Build Version replaced with a enhanced version of Version 0.17's
+ * Eluna LUA Scripting support added.
+ * Support for Visual Studio 2013 Added
+ 
+Version 0.18
+-
+### (2013-08-22) [MangosZero - Classic Wow]
+
+ * Visual Studio 2005 (VC8) support dropped
+ * New build system deployed
+ * Scripts Library merged into the main project
+ 
 Version 0.17
 -
  * ACE Framework updated to ACE 5.8.3.
