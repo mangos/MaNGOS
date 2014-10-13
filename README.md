@@ -32,7 +32,7 @@ We are also supporting a continuation of the Spurious project in the form of Man
 **Main Wiki**
 ----
 
-* [**Table of Contents**](http://github.com/mangoswiki/Wiki/wiki/Home)  
+* [**Table of Contents**](http://getmangos.eu/wiki)  
 
 
 ---
