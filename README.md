@@ -27,13 +27,16 @@ We are also supporting a continuation of the Spurious project in the form of Man
 * [**MangosVB2**](https://github.com/mangosvb/serverTwo/) - For World of Warcraft: The Wrath of the Lich King
 
 
-
-
 **Main Wiki**
 ----
 
 * [**Table of Contents**](http://getmangos.eu/wiki)  
 
+
+**Bug / Issue Tracker**
+----
+
+* [**Tracker**](http://getmangos.eu/project.php)  
 
 ---
 Proudly brought to you by:
