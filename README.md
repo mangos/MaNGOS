@@ -36,7 +36,7 @@ We are also supporting a continuation of the Spurious project in the form of Man
 **Bug / Issue Tracker**
 ----
 
-* [**Tracker**](http://getmangos.eu/project.php)  
+* [**Tracker**](https://www.getmangos.eu/bug-tracker/)  
 
 ---
 Proudly brought to you by:
