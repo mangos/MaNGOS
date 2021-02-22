@@ -14,7 +14,7 @@ Over the years we have had a selection of Icons:
 [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo_variant.png" width="32" valign="middle"/>](http://getmangos.eu)
 [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo2.png" width="32" valign="middle"/>](http://getmangos.eu) The last one being a copyright violation of a chinese Tv channel !
 <br>But have settled on the 
-[<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu) family of icons designed by UnkleNuke which vary slightly by core/expansion.
+[<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu) family of icons designed by UnkleNuke which vary slightly by core/expansion (see the full set [HERE](mangosFamily.md)).
 
 The original ideals and insistence that MaNGOS remained an open-source educational project continues today.
 - To that end we are very beginner friendly, with many of the team available to help walk users through the initial setup/installation process.
