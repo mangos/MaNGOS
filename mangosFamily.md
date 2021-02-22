@@ -4,7 +4,7 @@
 
 The following family of icons were designed by UnkleNuke of MaNGOS, each vary slightly by core/expansion.
 <br><br>The new logos [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu) are based on the original mangos logo [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu).
-The two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons. The Realm logo is designed to lock like a padlock.
+The two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons. The Realm logo is designed to look like a padlock.
 
 [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu)C++ Mangos:<br>
 ----
@@ -15,23 +15,27 @@ The two circles are interlocked to symbolise the ying / yang relationship betwee
 [<img src="images/Mangos3.png" width="32" valign="middle"/>](http://getmangos.eu) MangosThree<br>
 [<img src="images/Mangos4.png" width="32" valign="middle"/>](http://getmangos.eu) MangosFour<br>
 [<img src="images/Mangos5.png" width="32" valign="middle"/>](http://getmangos.eu) Mangosfive<br>
-<br>
-[<img src="images/MangosVBMain.png" width="32" valign="middle"/>](http://getmangos.eu) VB.Net Mangos:<br>
+
+<br>[<img src="images/MangosVBMain.png" width="32" valign="middle"/>](http://getmangos.eu) VB.Net Mangos:<br>
 ----
+
 [<img src="images/MangosVB0.png" width="32" valign="middle"/>](http://getmangos.eu) MangosVBZero<br>
 [<img src="images/MangosVB1.png" width="32" valign="middle"/>](http://getmangos.eu) MangosVBOne<br>
 [<img src="images/MangosVB2.png" width="32" valign="middle"/>](http://getmangos.eu) MangosVBTwo<br>
-<br>
-C# Mangos:<br>
+
+<br>C# Mangos:<br>
 ----
+
 [<img src="images/MangosSharp0.png" width="32" valign="middle"/>](http://getmangos.eu) MangosSharp<br>
-<br>
-Realm:<br>
+
+<br>Realm:<br>
 ----
+
 [<img src="images/Realm.png" width="32" valign="middle"/>](http://getmangos.eu) Realm<br>
-<br>
-Utilities and Tools:<br>
+
+<br>Utilities and Tools:<br>
 ----
+
 [<img src="images/MangosEasyBuild.png" width="32" valign="middle"/>](http://getmangos.eu) EasyBuild<br>
 [<img src="images/MangosTools.png" width="32" valign="middle"/>](http://getmangos.eu) Tools<br>
 [<img src="images/Mangosdocs.png" width="32" valign="middle"/>](http://getmangos.eu) Docs<br>
