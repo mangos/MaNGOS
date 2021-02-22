@@ -43,6 +43,8 @@ In addition we now also have a prototype C# project MangosSharp (aka Mangos#) wh
 * [**Tracker**](https://www.getmangos.eu/bug-tracker/)  
 
 **Installation Guides**
+----
+
 * [**Installation Guides**](https://www.getmangos.eu/wiki/documentation/installation-guides/) 
 
 ---
