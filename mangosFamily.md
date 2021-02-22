@@ -2,9 +2,11 @@
 [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="96" valign="middle"/>](http://getmangos.eu)Introducing the MaNGOS icon family
 ----
 
-The following family of icons by designed by UnkleNuke which vary slightly by core/expansion.
+The following family of icons were designed by UnkleNuke of MaNGOS, each vary slightly by core/expansion.
+- These are based on the original mangos logo: [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu)
+ the two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons
 
-C++ Mangos:<br>
+[<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu)C++ Mangos:<br>
 ----
 
 [<img src="images/Mangos0.png" width="32" valign="middle"/>](http://getmangos.eu) MangosZero<br>
@@ -14,7 +16,7 @@ C++ Mangos:<br>
 [<img src="images/Mangos4.png" width="32" valign="middle"/>](http://getmangos.eu) MangosFour<br>
 [<img src="images/Mangos5.png" width="32" valign="middle"/>](http://getmangos.eu) Mangosfive<br>
 <br>
-VB.Net Mangos:<br>
+[<img src="images/MangosVBMain.png" width="32" valign="middle"/>](http://getmangos.eu) VB.Net Mangos:<br>
 ----
 [<img src="images/MangosVB0.png" width="32" valign="middle"/>](http://getmangos.eu) MangosVBZero<br>
 [<img src="images/MangosVB1.png" width="32" valign="middle"/>](http://getmangos.eu) MangosVBOne<br>
