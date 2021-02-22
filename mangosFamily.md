@@ -3,8 +3,10 @@
 ----
 
 The following family of icons were designed by UnkleNuke of MaNGOS, each vary slightly by core/expansion.
-<br><br>The new logos [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu) are based on the original mangos logo [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu).
-The two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons. The Realm logo is designed to look like a padlock.
+<br><br>The new logos [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu) are based on the original mangos logo [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu) but with some additional symbolism.<br>
+- The two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons.<br>
+- The Realm logo is designed to look like a padlock.<br>
+- Lastly each core tries hard to use the primary colour of each expansion as the background colour.
 
 [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu)C++ Mangos:<br>
 ----
