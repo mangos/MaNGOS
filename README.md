@@ -1,10 +1,10 @@
 ----
-#Welcome to MaNGOS
+#Welcome to the original MaNGOS (sometimes called getMangos by external sites)
 ----
 **Official Websites**
 ----
 
-This is the central Repository for those lost souls who have ended up here but there is plenty to see and do at our main areas.
+This is the central Repository for links to the many original MaNGOS repositories for those lost souls who have ended up here.
 
 We welcome contributions from anyone who is interested in helping out !
 
@@ -26,6 +26,10 @@ We are also supporting a continuation of the Spurious project in the form of Man
 * [**MangosVB1**](https://github.com/mangosvb/serverOne/) - For World of Warcraft: The Burning Crusade
 * [**MangosVB2**](https://github.com/mangosvb/serverTwo/) - For World of Warcraft: The Wrath of the Lich King
 
+In addition we now also have a prototype C# project MangosSharp (aka Mangos#) which is based on the work on mangosVB
+
+* [**MangosSharp**](https://github.com/MangosServer/MangosSharp/) - For Vanilla World of Warcraft
+
 
 **Main Wiki**
 ----
@@ -37,6 +41,9 @@ We are also supporting a continuation of the Spurious project in the form of Man
 ----
 
 * [**Tracker**](https://www.getmangos.eu/bug-tracker/)  
+
+**Installation Guides**
+* [**Installation Guides**](https://www.getmangos.eu/wiki/documentation/installation-guides/) 
 
 ---
 Proudly brought to you by:
