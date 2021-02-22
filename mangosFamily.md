@@ -3,7 +3,7 @@
 ----
 
 The following family of icons were designed by UnkleNuke of MaNGOS, each vary slightly by core/expansion.
-- These are based on the original mangos logo: [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu)
+<br><br>They are based on the original mangos logo [<img src="https://www.getmangos.eu/!assets_mangos/oldlogo1.png" width="32" valign="middle"/>](http://getmangos.eu)
  the two circles are interlocked to symbolise the ying / yang relationship between the MangosD and RealmD Daemons
 
 [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu)C++ Mangos:<br>
