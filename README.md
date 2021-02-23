@@ -55,7 +55,7 @@ The overall plan is that all three sub-projects Mangos, MangosVB and Mangos# wil
 
 **Discord Server**
 ----
- [<img class="ipsImage" src="https://discordapp.com/api/guilds/286167585270005763/widget.png?style=banner3" alt='brilliantdiscord_widget'>](https://www.getmangos.eu/discord/invite/general/)
+[![Widget for the Discord API guild](https://discord.com/api/guilds/286167585270005763/widget.png?style=banner2)](https://discord.gg/CzXcBXq) 
 
 **Main Wiki**
 ----
