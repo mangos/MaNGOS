@@ -39,7 +39,6 @@ We supports 5 WoW versions: Vanilla, TBC, WOTLK, CATA and MOP (although the CATA
 * [**Mangos Two**](https://github.com/mangostwo/) - For World of Warcraft: The Wrath of the Lich King
 * [**Mangos Three**](https://github.com/mangosthree/) - For World of Warcraft: The Cataclysm
 * [**Mangos Four**](https://github.com/mangosfour/) - For World of Warcraft: Mists of Pandaria
-* [**Mangos Tools**](https://github.com/mangostools/) - For General MaNGOS Tools and Utilities
 
 We also have a vb.Net based Emulator called MangosVB for Vanilla, TBC and WOTLK (originally called Spurious before merging under the MaNGOS banner).
 
@@ -57,6 +56,7 @@ We also have a couple of Utility repositories as well
 
 * [**MangosCMS**](https://github.com/mangoscms/) - A CMS for Mangos
 * [**MangosExtras**](https://github.com/MangosExtras/) - For Localised Mangos content
+* [**Mangos Tools**](https://github.com/mangostools/) - For General MaNGOS Tools and Utilities
 
 
 **Discord Server**
