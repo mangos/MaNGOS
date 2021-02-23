@@ -53,6 +53,12 @@ In addition we now also have a prototype C# project MangosSharp (aka Mangos#) us
 
 The overall plan is that all three sub-projects Mangos, MangosVB and Mangos# will use the same database across the cores.
 
+We also have a couple of Utility repositories as well
+
+* [**MangosCMS**](https://github.com/mangoscms/) - A CMS for Mangos
+* [**MangosExtras**](https://github.com/MangosExtras/) - For Localised Mangos content
+
+
 **Discord Server**
 ----
 [![Widget for the Discord API guild](https://discord.com/api/guilds/286167585270005763/widget.png?style=banner2)](https://discord.gg/CzXcBXq) 
