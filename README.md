@@ -52,6 +52,8 @@ In addition we now also have a prototype C# project MangosSharp (aka Mangos#) us
 
 The overall plan is that all three sub-projects Mangos, MangosVB and Mangos# will use the same database across the cores.
 
+* [**Core State**](coreState.md) - The state of all the 9 Cores in one place
+
 We also have a couple of Utility repositories as well
 
 * [**MangosCMS**](https://github.com/mangoscms/) - A CMS for Mangos
