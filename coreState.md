@@ -2,7 +2,7 @@
 [<img src='https://www.getmangos.eu/!assets_mangos/logo.png' border=0>](https://www.getmangos.eu)
 [<img src='https://img.shields.io/discord/286167585270005763.svg' border=0 valign="middle"/>](https://discord.gg/fPxMjHS8xs "Our community hub on Discord")
 
-Below is a breakdown of the code status across the 9 Mangos Cores
+Below is a breakdown of the code status across the 10 Mangos Cores
 ---
 
 | Core Name | Language | Expansion | State |Linux / MAC Build | Windows Build | Codacy Status | CodeFactor Status
