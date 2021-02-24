@@ -17,3 +17,12 @@ Below is a breakdown of the code status across the 10 Mangos Cores
 | [MangosVB1](https://github.com/mangosvb/serverone/) | VB.Net | TBC | Alpha | N/A | [<img src='https://ci.appveyor.com/api/projects/status/github/mangosvb/serverOne?branch=master&svg=true' border=0 valign="middle">](https://ci.appveyor.com/project/MaNGOS/server-9fytl/history) | [<img src='https://api.codacy.com/project/badge/Grade/b26a884fd15f4418bc9bf1230b45c456' border=0 valign="middle"/>](https://app.codacy.com/gh/mangosvb/serverOne/dashboard) | [<img src='https://www.codefactor.io/repository/github/mangosvb/serverOne/badge' border=0 valign="middle"/>](https://www.codefactor.io/repository/github/mangosvb/serverOne) |
 | [MangosVB2](https://github.com/mangosvb/servertwo/) | VB.Net | WOTLK | Alpha | N/A | [<img src='https://ci.appveyor.com/api/projects/status/github/mangosvb/serverTwo?branch=master&svg=true' border=0 valign="middle">](https://ci.appveyor.com/project/MaNGOS/server-9fytl/history) | [<img src='https://api.codacy.com/project/badge/Grade/e503039ada4a48c89fe15fced8835008' border=0 valign="middle"/>](https://app.codacy.com/gh/mangosvb/serverTwo/dashboard) | [<img src='https://www.codefactor.io/repository/github/mangosvb/serverTwo/badge' border=0 valign="middle"/>](https://www.codefactor.io/repository/github/mangosvb/serverTwo) |
 | [MangosSharp0](https://github.com/mangosserver/MangosSharp/) | C# | Vanilla | ProtoType | N/A | [<img src='https://ci.appveyor.com/api/projects/status/github/mangosserver/MangosSharp?branch=main&svg=true' border=0 valign="middle">](https://ci.appveyor.com/project/MaNGOS/server-9fytl/history) | [<img src='https://api.codacy.com/project/badge/Grade/f77c3dbb9e124188b0cf4ec6da878721' border=0 valign="middle"/>](https://app.codacy.com/gh/MangosServer/MangosSharp/dashboard) | [<img src='https://www.codefactor.io/repository/github/mangosserver/mangossharp/badge' border=0 valign="middle"/>](https://www.codefactor.io/repository/github/mangosserver/mangossharp) |
+
+What do the states actually mean ?
+
+| Status Name | Meaning
+| :---: | :--- |
+| Playable | The game should play fine with perhaps the odd non working feature |
+|Alpha | Means that is works but a bit 'raw' in places, some key parts may not be implemented |
+|Prototype | Means it will break and crash lots. Do Not expect a smooth gaming experience |
+|Skeleton | Means that it's the bare bones of a build system and the code needs to be actually written |
