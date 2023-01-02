@@ -11,24 +11,34 @@ The following family of icons were designed by UnkleNuke of MaNGOS, each vary sl
 [<img src="https://www.getmangos.eu/!assets_mangos/currentlogo.gif" width="32" valign="middle"/>](http://getmangos.eu)C++ Mangos:<br>
 ----
 
-[<img src="images/Mangos0.png" width="32" valign="middle"/>](http://github.com/mangoszero) MangosZero - For Vanilla Wow<br>
-[<img src="images/Mangos1.png" width="32" valign="middle"/>](http://github.com/mangosone) MangosOne - For TBC<br>
-[<img src="images/Mangos2.png" width="32" valign="middle"/>](http://github.com/mangostwo) MangosTwo - For WOTLK<br>
-[<img src="images/Mangos3.png" width="32" valign="middle"/>](http://github.com/mangosthree) MangosThree - For CATA<br>
-[<img src="images/Mangos4.png" width="32" valign="middle"/>](http://github.com/mangosfour) MangosFour - For MOP<br>
-[<img src="images/Mangos5.png" width="32" valign="middle"/>](http://github.com/mangosfive) MangosFive - For WOD<br>
+[<img src="images/Mangos0.png" width="32" valign="middle"/>](http://github.com/mangoszero) MangosZero - For Vanilla Wow: 
+[http://github.com/mangoszero](http://github.com/mangoszero)<br>
+[<img src="images/Mangos1.png" width="32" valign="middle"/>](http://github.com/mangosone) MangosOne - For TBC:
+[http://github.com/mangosone](http://github.com/mangosone)<br>
+[<img src="images/Mangos2.png" width="32" valign="middle"/>](http://github.com/mangostwo) MangosTwo - For WOTLK:
+[http://github.com/mangostwo](http://github.com/mangostwo)<br>
+[<img src="images/Mangos3.png" width="32" valign="middle"/>](http://github.com/mangosthree) MangosThree - For CATA:
+[http://github.com/mangosthree](http://github.com/mangosthree)<br>
+[<img src="images/Mangos4.png" width="32" valign="middle"/>](http://github.com/mangosfour) MangosFour - For MOP:
+[http://github.com/mangosfour](http://github.com/mangosfour)<br>
+[<img src="images/Mangos5.png" width="32" valign="middle"/>](http://github.com/mangosfive) MangosFive - For WOD:
+[http://github.com/mangosfive](http://github.com/mangosfive)<br>
 
 <br>[<img src="images/MangosVBMain.png" width="32" valign="middle"/>](http://getmangos.eu) VB.Net Mangos:<br>
 ----
 
-[<img src="images/MangosVB0.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverZero) MangosVBZero - For Vanilla Wow<br>
-[<img src="images/MangosVB1.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverOne) MangosVBOne - For TBC<br>
-[<img src="images/MangosVB2.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverTwo) MangosVBTwo - For WOTLK<br>
+[<img src="images/MangosVB0.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverZero) MangosVBZero - For Vanilla Wow:
+[https://github.com/mangosvb/serverZero](https://github.com/mangosvb/serverZero)<br>
+[<img src="images/MangosVB1.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverOne) MangosVBOne - For TBC:
+[https://github.com/mangosvb/serverOne](https://github.com/mangosvb/serverOne)<br>
+[<img src="images/MangosVB2.png" width="32" valign="middle"/>](https://github.com/mangosvb/serverTwo) MangosVBTwo - For WOTLK:
+[https://github.com/mangosvb/serverTwo](https://github.com/mangosvb/serverTwo)<br>
 
 <br>C# Mangos:<br>
 ----
 
-[<img src="images/MangosSharp0.png" width="32" valign="middle"/>](https://github.com/MangosServer/MangosSharp) MangosSharp - For Vanilla Wow<br>
+[<img src="images/MangosSharp0.png" width="32" valign="middle"/>](https://github.com/MangosServer/MangosSharp) MangosSharp - For Vanilla Wow:
+[https://github.com/MangosServer/MangosSharp](https://github.com/MangosServer/MangosSharp)<br>
 
 <br>Realm:<br>
 ----
