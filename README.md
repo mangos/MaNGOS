@@ -46,7 +46,7 @@ We also have a vb.Net based Emulator called MangosVB for Vanilla, TBC and WOTLK 
 * [**MangosVB1**](https://github.com/mangosvb/serverOne/) - For World of Warcraft: The Burning Crusade
 * [**MangosVB2**](https://github.com/mangosvb/serverTwo/) - For World of Warcraft: The Wrath of the Lich King
 
-In addition we now also have a prototype C# project MangosSharp (aka Mangos#) using .Net 5, which is based on the work on mangosVB.
+In addition we now also have a prototype C# project MangosSharp (aka Mangos#) using .Net 9, which is based on the work on mangosVB.
 
 * [**MangosSharp**](https://github.com/MangosServer/MangosSharp/) - For Vanilla World of Warcraft
 
